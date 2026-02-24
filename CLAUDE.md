@@ -48,7 +48,8 @@ When operating in Ralph Loop mode (invoked via `ralph.sh`), follow these rules:
 8. **Run tests/build** after each change to verify nothing is broken (integration tests MUST pass)
 9. **Commit your changes** with a descriptive message referencing the task
 10. Do NOT skip ahead or do multiple tasks at once
-11. If a task is blocked, note it in PROGRESS.md and move to the next unblocked task
+11. **NEVER modify completed (`- [x]`) or in-progress tasks in TASKS.md.** Only unchecked/unstarted tasks (`- [ ]`) may be edited, reordered, or removed. Completed and in-progress tasks are immutable records.
+12. If a task is blocked, note it in PROGRESS.md and move to the next unblocked task
 
 ## Task Ordering: UI-First
 When generating or ordering tasks in TASKS.md, **prioritize getting a visible, working UI as early as possible** so that progress is verifiable by human eyes. Follow this order:
@@ -62,19 +63,61 @@ When generating or ordering tasks in TASKS.md, **prioritize getting a visible, w
 
 The goal: a human reviewing PROGRESS.md should be able to see screenshots proving real UI progress within the first few tasks, not just backend plumbing.
 
-## Forbidden Commands: Docker
-**NEVER run `docker`, `docker-compose`, or `docker compose` commands directly.** This includes `docker build`, `docker run`, `docker-compose up`, `docker compose up`, and any other Docker CLI invocations.
+## External Dependencies & Forbidden Commands
+Ralph MUST NOT directly run certain commands. These require the user to execute them manually outside of Claude.
 
-If a task requires Docker (e.g. starting a database, running a service):
-1. **Write the docker-compose.yml** or Dockerfile as needed
-2. **Print the exact command** the user needs to run, e.g.:
-   ```
-   ACTION REQUIRED: Please run the following command manually:
-     docker compose up -d
-   Then re-run Ralph to continue.
-   ```
-3. **Mark the task as blocked** in PROGRESS.md with the manual step required
-4. **Stop the current iteration** — do NOT proceed assuming Docker is running
+### Forbidden commands
+- `docker`, `docker-compose`, `docker compose` (and all subcommands)
+- Any other commands listed in `## External Dependencies` below
+
+### External Dependencies
+<!-- Define services/dependencies that must be running before Ralph can proceed.
+     Each entry has:
+       - name: human-readable label
+       - check: command Ralph CAN run to verify the dependency is available
+       - start: command the USER must run manually (Ralph prints this)
+
+     Example entries (uncomment/edit for your project):
+-->
+<!--
+- name: PostgreSQL (via Docker)
+  check: pg_isready -h localhost -p 5432
+  start: docker compose up -d db
+
+- name: Redis (via Docker)
+  check: redis-cli -h localhost ping
+  start: docker compose up -d redis
+
+- name: API server
+  check: curl -sf http://localhost:3000/health
+  start: cd api && npm start
+-->
+
+### How Ralph handles missing dependencies
+Before starting implementation on any task, Ralph MUST:
+
+1. **Check each external dependency** by running its `check` command
+2. If ALL checks pass, proceed with the task normally
+3. If ANY check fails, **do NOT attempt the task**. Instead:
+   a. Print a clear `ACTION REQUIRED` block listing every failing dependency and the exact command to start it:
+      ```
+      ══════════════════════════════════════════════════
+      ACTION REQUIRED — External dependencies not running
+      ══════════════════════════════════════════════════
+
+      The following dependencies are needed for this task but are not available:
+
+      ✗ PostgreSQL (via Docker)
+        → Run: docker compose up -d db
+
+      ✗ Redis (via Docker)
+        → Run: docker compose up -d redis
+
+      After starting them, re-run Ralph to continue.
+      ══════════════════════════════════════════════════
+      ```
+   b. Log the blocker in PROGRESS.md under the current task
+   c. **Stop the current iteration immediately** — do NOT proceed, do NOT skip to another task
 
 ## Important Notes
 - {{NOTE_1}}

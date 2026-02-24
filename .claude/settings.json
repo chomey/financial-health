@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ],
+    "deny": [
+      "Bash(docker *)",
+      "Bash(docker)",
+      "Bash(docker-compose *)",
+      "Bash(docker-compose)",
+      "Bash(docker compose *)"
+    ]
+  }
+}
