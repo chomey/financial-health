@@ -31,23 +31,31 @@ Complete exactly ONE task from TASKS.md, then stop.
 
 2. **Read PROGRESS.md** — Understand what has already been done. Check for any notes about blockers or context from previous iterations.
 
-3. **Plan** — Think through what needs to happen to complete this task. Consider:
+3. **Check External Dependencies** — Read the `## External Dependencies` section in CLAUDE.md. For each dependency listed, run its `check` command to verify it's available. If ANY dependency check fails:
+   - Print an `ACTION REQUIRED` block listing every failing dependency and the exact `start` command the user must run (see CLAUDE.md for the format)
+   - Log the blocker in PROGRESS.md
+   - **STOP immediately** — do NOT continue with implementation, do NOT skip to another task
+   - The user will start the dependencies manually and re-run Ralph
+
+   If all checks pass (or no external dependencies are defined), proceed.
+
+4. **Plan** — Think through what needs to happen to complete this task. Consider:
    - What files need to be created or modified?
    - Are there dependencies on other tasks or existing code?
    - What's the simplest correct approach?
    - **UI-first**: If this task involves both backend and frontend work, implement the visible UI first (even with mock/hardcoded data) so progress is verifiable by human eyes. Wire in real data as a follow-up.
 
-4. **Implement** — Write the code. Follow project conventions from CLAUDE.md.
+5. **Implement** — Write the code. Follow project conventions from CLAUDE.md.
 
-5. **Write Integration Tests** — Every task MUST include automated integration tests that verify the feature works end-to-end. Tests should cover the happy path and key edge cases. Do NOT skip this step.
+6. **Write Integration Tests** — Every task MUST include automated integration tests that verify the feature works end-to-end. Tests should cover the happy path and key edge cases. Do NOT skip this step.
 
-6. **Capture Screenshots** (visual products only) — If this project has a visual UI, automate screenshots using the project's screenshot tooling (e.g. Playwright, Puppeteer, or equivalent). Save screenshots to `screenshots/` with descriptive filenames like `task-[NUMBER]-[description].png`. If the project is not visual (CLI, library, API-only), skip this step.
+7. **Capture Screenshots** (visual products only) — If this project has a visual UI, automate screenshots using the project's screenshot tooling (e.g. Playwright, Puppeteer, or equivalent). Save screenshots to `screenshots/` with descriptive filenames like `task-[NUMBER]-[description].png`. If the project is not visual (CLI, library, API-only), skip this step.
 
-7. **Verify** — Run ALL tests including your new integration tests, plus build/lint. All tests MUST pass before proceeding.
+8. **Verify** — Run ALL tests including your new integration tests, plus build/lint. All tests MUST pass before proceeding.
 
-8. **Update TASKS.md** — Mark your task as complete: change `- [ ]` to `- [x]`.
+9. **Update TASKS.md** — Mark your task as complete: change `- [ ]` to `- [x]`.
 
-9. **Update PROGRESS.md** — Add an entry at the bottom with:
+10. **Update PROGRESS.md** — Add an entry at the bottom with:
    ```
    ## Task [NUMBER]: [TASK_TITLE]
    - **Status**: Complete
@@ -62,7 +70,7 @@ Complete exactly ONE task from TASKS.md, then stop.
    - **Notes**: [Any context for future iterations]
    ```
 
-10. **Commit** — Stage and commit all changes with a message like:
+11. **Commit** — Stage and commit all changes with a message like:
    `ralph: complete task [NUMBER] - [SHORT_DESCRIPTION]`
 
 ## Rules
@@ -72,6 +80,7 @@ Complete exactly ONE task from TASKS.md, then stop.
 - If a task is blocked or unclear, mark it as blocked in PROGRESS.md with an explanation and move to the next unblocked task.
 - Always verify your changes compile/build/pass ALL tests (including integration) before marking complete.
 - **UI-first ordering**: Tasks should be ordered so a visible, working UI appears as early as possible. When generating tasks from a PRD, put project scaffolding, UI shell, and core screens before backend logic. Use mock/hardcoded data in early UI tasks — wire real data later. A human should see screenshots of real UI in PROGRESS.md within the first few tasks.
-- **NEVER run Docker commands** (`docker`, `docker-compose`, `docker compose`). If a task needs Docker, write the config files, print the exact command the user must run manually with an `ACTION REQUIRED` message, mark the task as blocked in PROGRESS.md, and stop the iteration.
+- **NEVER run forbidden commands** (see `## External Dependencies & Forbidden Commands` in CLAUDE.md). This includes `docker`, `docker-compose`, `docker compose`, and any other commands listed there. If a dependency is missing, print the `ACTION REQUIRED` block with the exact commands the user must run, log the blocker in PROGRESS.md, and stop the iteration immediately.
+- **NEVER modify completed or in-progress tasks in TASKS.md.** Tasks marked `- [x]` are immutable records. The only change allowed to the current task is marking it `- [x]` when done. You may only edit, reorder, or remove tasks that are still unchecked (`- [ ]`) and not yet started.
 - Keep changes minimal and focused on the task at hand.
 - Do not refactor or "improve" code outside the scope of your current task.
