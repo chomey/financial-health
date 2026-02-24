@@ -14,10 +14,13 @@
   - Include file paths or function names when relevant
 -->
 
-<!-- EXAMPLE TASKS (replace with your own):
-- [ ] Task 1: Initialize project — Run the project scaffolding command and verify it builds
-- [ ] Task 2: Set up data models — Create the core data models per the PRD
-- [ ] Task 3: Implement feature X — Build the handler for [specific feature]
-- [ ] Task 4: Add tests for feature X — Write unit tests covering the happy path and edge cases
-- [ ] Task 5: Implement feature Y — Build [specific feature] with [specific requirements]
+<!-- EXAMPLE TASKS (replace with your own — note UI-first ordering):
+- [ ] Task 1: Initialize project & dev server — Scaffold the project so it runs and displays a page in the browser
+- [ ] Task 2: Set up screenshot & test infrastructure — Install Playwright (or equivalent), create a helper that takes automated screenshots, verify it captures the running app
+- [ ] Task 3: Build app shell & navigation — Create the main layout, nav bar, and page routing with placeholder pages
+- [ ] Task 4: Build core screen with mock data — Implement the primary UI screen using hardcoded/mock data so it's visually verifiable
+- [ ] Task 5: Set up data models — Create the core data models per the PRD
+- [ ] Task 6: Wire real data into UI — Replace mock data with real data layer, keeping the UI intact
+- [ ] Task 7: Implement feature X — Build [specific feature] end-to-end (UI + logic)
+- [ ] Task 8: Implement feature Y — Build [specific feature] with [specific requirements]
 -->
