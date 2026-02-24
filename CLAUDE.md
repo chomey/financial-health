@@ -20,7 +20,7 @@ See `PRD.md` for full product requirements.
 ├── PROMPT.md              # Ralph Loop iteration prompt (implementation)
 ├── TASKS.md               # Discrete tasks to complete
 ├── PROGRESS.md            # Per-task progress log
-├── ralph.sh               # Ralph Loop driver script
+├── ralph.zsh               # Ralph Loop driver script
 └── src/                   # Source code (adjust to your project)
 ```
 
@@ -41,7 +41,7 @@ Invoke them in a Claude session:
 ```
 
 ### Phase 2: Implementation (Ralph Loop only)
-Once tasks exist in TASKS.md, **only the Ralph Loop executes them** — via `ralph.sh` or an interactive Claude session with `"Read PROMPT.md and follow its instructions"`. No agent should implement features inline during a planning conversation.
+Once tasks exist in TASKS.md, **only the Ralph Loop executes them** — via `ralph.zsh` or an interactive Claude session with `"Read PROMPT.md and follow its instructions"`. No agent should implement features inline during a planning conversation.
 
 ### The Rule
 **Prefer tasks for all meaningful work.** New features, multi-file changes, and anything that needs integration tests should be a task in TASKS.md and implemented by Ralph. Small bug fixes, config tweaks, and quick adjustments can be done inline when the user drives an interactive session.
@@ -60,7 +60,7 @@ Once tasks exist in TASKS.md, **only the Ralph Loop executes them** — via `ral
 - {{CONVENTION_3}}
 
 ## Ralph Loop Instructions
-When operating in Ralph Loop mode (invoked via `ralph.sh`), follow these rules:
+When operating in Ralph Loop mode (invoked via `ralph.zsh`), follow these rules:
 
 1. **Read TASKS.md** to find the next unchecked task (`- [ ]`)
 2. **Read PROGRESS.md** to understand what has been done so far
