@@ -13,14 +13,38 @@ See `PRD.md` for full product requirements.
 
 ## Project Structure
 ```
-├── CLAUDE.md          # This file - project instructions for Claude
-├── PRD.md             # Product requirements document
-├── PROMPT.md          # Ralph Loop iteration prompt
-├── TASKS.md           # Discrete tasks to complete
-├── PROGRESS.md        # Per-task progress log
-├── ralph.sh           # Ralph Loop driver script
-└── src/               # Source code (adjust to your project)
+├── CLAUDE.md              # This file - project instructions for Claude
+├── PRD.md                 # Product requirements document
+├── PRODUCT-DESIGNER.md    # Product Designer agent prompt (planning only)
+├── SOFTWARE-ARCHITECT.md  # Software Architect agent prompt (planning only)
+├── PROMPT.md              # Ralph Loop iteration prompt (implementation)
+├── TASKS.md               # Discrete tasks to complete
+├── PROGRESS.md            # Per-task progress log
+├── ralph.sh               # Ralph Loop driver script
+└── src/                   # Source code (adjust to your project)
 ```
+
+## Workflow: Plan Then Build
+This project enforces a strict separation between **planning** and **implementation**.
+
+### Phase 1: Planning (no code written)
+Two planning agents generate tasks. They NEVER write code:
+
+- **Product Designer** (`PRODUCT-DESIGNER.md`) — Owns product vision, UX, and feature design. Writes PRD.md and generates user-facing tasks. Makes design decisions autonomously, asks the user only for genuinely ambiguous tradeoffs. Tags infrastructure tasks with `[ARCH]` for the Software Architect.
+
+- **Software Architect** (`SOFTWARE-ARCHITECT.md`) — Owns infrastructure, security, and technical architecture. Configures CLAUDE.md (tech stack, commands, dependencies). Generates `[ARCH]` technical tasks and reviews `[ARCH]`-tagged tasks from the Product Designer.
+
+Invoke them in a Claude session:
+```
+"Read PRODUCT-DESIGNER.md and follow its instructions"
+"Read SOFTWARE-ARCHITECT.md and follow its instructions"
+```
+
+### Phase 2: Implementation (Ralph Loop only)
+Once tasks exist in TASKS.md, **only the Ralph Loop executes them** — via `ralph.sh` or an interactive Claude session with `"Read PROMPT.md and follow its instructions"`. No agent should implement features inline during a planning conversation.
+
+### The Rule
+**Prefer tasks for all meaningful work.** New features, multi-file changes, and anything that needs integration tests should be a task in TASKS.md and implemented by Ralph. Small bug fixes, config tweaks, and quick adjustments can be done inline when the user drives an interactive session.
 
 ## Key Commands
 <!-- Fill in your project's commands -->
