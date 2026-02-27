@@ -29,7 +29,7 @@ export default function RegionToggle({ region, onChange }: RegionToggleProps) {
             role="radio"
             aria-checked={isSelected}
             onClick={() => onChange(option.value)}
-            className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 ${
+            className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 active:scale-95 ${
               isSelected
                 ? "bg-white text-stone-900 shadow-sm"
                 : "text-stone-500 hover:text-stone-700 hover:bg-white/50"

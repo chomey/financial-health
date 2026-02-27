@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 12
-- **Remaining**: 3
+- **Completed**: 13
+- **Remaining**: 2
 - **Last Updated**: 2026-02-27
 
 ---
@@ -397,3 +397,30 @@
   ![Region persists after reload](screenshots/task-12-region-persists-reload.png)
   ![Region flag icons](screenshots/task-12-region-flags.png)
 - **Notes**: Region state required special handling for React 19 hydration. During SSR, region defaults to "both" (matching static HTML). After hydration, a useEffect syncs the region from URL state. This avoids React 19's "attributes won't be patched up" behavior for `aria-checked` during hydration mismatch. The compact URL encoding only stores `r` when non-default ("both"), saving bytes in the common case. Debt category suggestions are universal (not region-specific) so DebtEntry was not modified.
+
+## Task 13: Add micro-interactions and polish
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/app/globals.css`: Added CSS keyframe animations — `slide-in` (for add form appearance), `slide-in-up` (for new list items), `glow-pulse` (celebratory glow for runway >12 months), `fade-in` (tooltip transitions). Defined utility classes `.animate-in`, `.animate-slide-in`, `.animate-glow-pulse`, `.animate-fade-in`.
+  - `src/components/SnapshotDashboard.tsx`: Added celebratory glow effect on Financial Runway metric card when value >12 months — green border, ring, animated glow pulse, and "Excellent safety net!" text. Added `animate-fade-in` class to tooltips for smooth entrance. Added `data-runway-celebration` attribute for testability.
+  - `src/components/RegionToggle.tsx`: Added `active:scale-95` to toggle buttons for tactile press feedback.
+  - `src/components/AssetEntry.tsx`: Added `active:scale-95` to confirm Add button. Changed `transition-colors` to `transition-all` on confirm button. Enhanced empty state with centered layout, rounded icon container with SVG dollar sign illustration, and `data-testid`.
+  - `src/components/DebtEntry.tsx`: Same active state and empty state polish — receipt SVG icon in rose-colored circle.
+  - `src/components/IncomeEntry.tsx`: Same active state and empty state polish — banknote SVG icon in green-colored circle.
+  - `src/components/ExpenseEntry.tsx`: Same active state and empty state polish — shopping cart SVG icon in amber-colored circle.
+  - `src/components/GoalEntry.tsx`: Same active state and empty state polish — flag SVG icon in blue-colored circle.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/micro-interactions.test.tsx`: 13 T1 tests — runway celebratory glow (>12mo, =12mo, <12mo, celebration text), tooltip fade animation, empty state icons and messages (assets, debts, income, expenses, goals), active states on confirm buttons (13 passed, 0 failed)
+  - `tests/e2e/micro-interactions.spec.ts`: 7 T2 tests — active states on confirm buttons, runway celebratory glow, tooltip fade-in animation, empty states with icons, card hover lift effect, animate-in on add form, region toggle active state (7 passed, 0 failed)
+  - All pre-existing tests: 171 T1 passed, 73 T2 passed, 0 failed
+  - Total: 264 passed, 0 failed
+- **Screenshots**:
+  ![Active state on button](screenshots/task-13-active-state-button.png)
+  ![Runway celebratory glow](screenshots/task-13-runway-glow.png)
+  ![Tooltip fade animation](screenshots/task-13-tooltip-fade.png)
+  ![Empty states](screenshots/task-13-empty-states.png)
+  ![Card hover effect](screenshots/task-13-card-hover.png)
+  ![Animate-in on add form](screenshots/task-13-animate-in-form.png)
+- **Notes**: Fixed pre-existing lint errors (react-hooks/set-state-in-effect) in all 5 entry components by adding eslint-disable-next-line comments on the setState lines inside useEffect — these are intentional external-system syncs for the controlled/uncontrolled component pattern. The `animate-in` class was referenced in previous tasks but never defined in CSS — now properly defined with a slide-in-down animation. The runway celebration uses a 3-second infinite glow-pulse animation that subtly draws attention without being distracting.

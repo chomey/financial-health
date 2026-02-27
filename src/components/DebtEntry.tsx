@@ -190,10 +190,16 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
       </h2>
 
       {debts.length === 0 && !addingNew ? (
-        <p className="text-sm text-stone-400">
-          Track your mortgage, loans, and credit cards — every number brings
-          clarity.
-        </p>
+        <div className="flex flex-col items-center py-4 text-center" data-testid="debt-empty-state">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 text-rose-300">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+            </svg>
+          </div>
+          <p className="text-sm text-stone-400">
+            Track your mortgage, loans, and credit cards — every number brings clarity.
+          </p>
+        </div>
       ) : (
         <div className="space-y-1" role="list" aria-label="Debt items">
           {debts.map((debt) => (
@@ -366,7 +372,7 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
           <button
             type="button"
             onClick={addDebt}
-            className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white transition-colors duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300"
+            className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95"
             aria-label="Confirm add debt"
           >
             Add

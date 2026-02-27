@@ -199,9 +199,16 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
       </h2>
 
       {items.length === 0 && !addingNew ? (
-        <p className="text-sm text-stone-400">
-          Enter your income sources to understand your monthly cash flow.
-        </p>
+        <div className="flex flex-col items-center py-4 text-center" data-testid="income-empty-state">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-400">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+            </svg>
+          </div>
+          <p className="text-sm text-stone-400">
+            Enter your income sources to understand your monthly cash flow.
+          </p>
+        </div>
       ) : (
         <div className="space-y-1" role="list" aria-label="Income items">
           {items.map((item) => (
@@ -374,7 +381,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
           <button
             type="button"
             onClick={addItem}
-            className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white transition-colors duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300"
+            className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95"
             aria-label="Confirm add income"
           >
             Add
