@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 26
-- **Completed**: 25
-- **Remaining**: 1
+- **Completed**: 26
+- **Remaining**: 0
 - **Last Updated**: 2026-02-27
 
 ---
@@ -712,3 +712,23 @@
   ![1-year timeline](screenshots/task-25-timeline-1-year.png)
   ![20-year milestones](screenshots/task-25-milestones-20yr.png)
 - **Notes**: Chart is placed full-width below the two-column layout for better horizontal space. Recharts' ResponsiveContainer emits a harmless SSR warning about dimensions during static build — this is expected behavior since there's no real DOM during server rendering. The projection engine accumulates monthly surplus into the first asset balance and distributes surplus equally across unmet goals for goal tracking.
+
+---
+
+## Task 26: [MILESTONE] Full E2E test for new features
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `tests/e2e/milestone-2-e2e.spec.ts`: New comprehensive E2E test with 3 test cases covering asset ROI/contribution editing, property interest rate/payment/amortization editing, debt interest rate editing, projection chart rendering with scenarios/timeline slider/goal milestones, region toggle visibility improvements (toast, dimming, grouped suggestions), and URL state persistence across reload and copy-link
+  - `tests/unit/milestone-2-infra.test.ts`: T1 infrastructure verification test — confirms all feature-specific test files from tasks 22-25 exist, verifies projections library exports, and validates financial state structure
+  - `tests/e2e/expense-entry.spec.ts`: Fixed pre-existing strict mode violation by scoping getByText selectors to expense section
+  - `tests/e2e/goal-entry.spec.ts`: Fixed pre-existing strict mode violation by scoping getByText selectors to goals list
+  - `tests/e2e/income-entry.spec.ts`: Fixed pre-existing strict mode violation by scoping getByText selectors to income section
+  - `tests/e2e/setstate-fix.spec.ts`: Fixed pre-existing strict mode violation by scoping getByText selectors to goals list
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/milestone-2-infra.test.ts`: Verifies E2E and unit test file presence for tasks 22-25, projections library exports, financial state structure (5 passed, 0 failed)
+  - `tests/e2e/milestone-2-e2e.spec.ts`: Full journey covering all new features with data persistence verification (3 passed, 0 failed)
+  - All unit tests: 373 passed, 0 failed
+  - All E2E tests: 152 passed, 0 failed
+- **Notes**: Fixed 4 pre-existing test failures caused by task 25's projection chart adding text elements (e.g., "$600k", "House Down Payment reached") that created strict mode violations in older tests using unscoped `getByText()` selectors. All tests now pass. This completes all 26 tasks in the project.
