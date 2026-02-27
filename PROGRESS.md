@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 26
-- **Completed**: 23
-- **Remaining**: 3
+- **Completed**: 24
+- **Remaining**: 2
 - **Last Updated**: 2026-02-27
 
 ---
@@ -666,3 +666,26 @@
   ![Payment too low warning](screenshots/task-23-mortgage-payment-warning.png)
   ![Mortgage details persisted via URL](screenshots/task-23-mortgage-details-persisted.png)
 - **Notes**: Follows the same UI pattern as Task 22's asset ROI/contribution fields — greyed-out suggested values that become active when user sets them. Smart defaults: 5% interest rate suggested, monthly payment calculated from mortgage amount at 25-year amortization. Computed info shows current interest/principal split, total remaining interest, and estimated payoff date. Warning appears when payment doesn't cover monthly interest. All new fields are backward-compatible in URL encoding — old URLs without property details still work. The interest rate data will feed into the projection graph (Task 25).
+
+---
+
+## Task 24: Add interest rate to debts
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/DebtEntry.tsx`: Added `interestRate` and `monthlyPayment` optional fields to Debt interface. Added `DEFAULT_DEBT_INTEREST` smart defaults (Credit Card: 19.9%, Car Loan: 6%, Student Loan: 5%, Personal Loan: 8%, Line of Credit: 7%, HELOC: 6.5%). Added `getDefaultDebtInterest()` helper. Added secondary detail fields UI below each debt row with interest rate and monthly payment badges — same pattern as AssetEntry ROI/contribution fields. Updated `editingField` and `commitEdit` to handle new field types.
+  - `src/lib/url-state.ts`: Added `ir` (interestRate) and `mp` (monthlyPayment) to `CompactDebt` interface. Updated `toCompact` and `fromCompact` to serialize/deserialize debt interest and payment fields. Backward compatible — old URLs without these fields still work.
+  - `src/lib/insights.ts`: Added `DebtDetail` interface and `debts` field to `FinancialData`. Added `debt-interest` insight type. Added high-interest debt insight (fires at 15%+ APR) and debt priority/avalanche method insight (fires when 2+ debts have interest rates). Both identify the highest-interest debt to prioritize.
+  - `src/lib/financial-state.ts`: Updated `toFinancialData()` to pass debt details (category, amount, interestRate, monthlyPayment) to the insights engine.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/debt-interest.test.tsx`: 24 tests covering default interest rates, UI badge display (suggested vs set vs placeholder), editing via click, onChange callbacks, URL state roundtripping (encode/decode, compact format, backward compat), and insights generation (high-interest, priority, no-interest). All 24 passed, 0 failed.
+  - `tests/e2e/debt-interest.spec.ts`: 7 browser integration tests covering suggested badge display, placeholder text, editing interest rate and payment via click, URL persistence after reload, and detail field visibility. All 7 passed, 0 failed.
+  - Full test suite: 353 unit tests passed, 143 E2E tests passed, 0 failed.
+- **Screenshots**:
+  ![Suggested interest rate badge](screenshots/task-24-interest-suggested-badge.png)
+  ![Interest rate edited](screenshots/task-24-interest-edited.png)
+  ![Payment edited](screenshots/task-24-payment-edited.png)
+  ![URL persistence](screenshots/task-24-url-persistence.png)
+  ![Detail fields visible](screenshots/task-24-detail-fields.png)
+- **Notes**: Follows the same UI pattern as Task 22 (asset ROI) and Task 23 (property interest). Smart defaults show as greyed-out "(suggested)" badges that become active blue/green when user sets their own value. The interest rate data feeds into the insights engine — high-interest debts (15%+ like credit cards) get a prominent "pay this down first" insight, and multiple debts with rates get an "avalanche method" insight. These values will also feed into the projection graph (Task 25).

@@ -7,6 +7,8 @@ export interface Debt {
   id: string;
   category: string;
   amount: number;
+  interestRate?: number; // annual interest rate %
+  monthlyPayment?: number; // minimum monthly payment $
 }
 
 const DEBT_CATEGORY_SUGGESTIONS = {
@@ -71,6 +73,24 @@ export function getDebtCategoryFlag(category: string): string {
   if (CA_DEBT_CATEGORIES.has(category)) return "🇨🇦";
   if (US_DEBT_CATEGORIES.has(category)) return "🇺🇸";
   return "";
+}
+
+/** Smart interest rate defaults by debt type (annual %) */
+export const DEFAULT_DEBT_INTEREST: Record<string, number> = {
+  "Credit Card": 19.9,
+  "Car Loan": 6,
+  "Student Loan": 5,
+  "Canada Student Loan": 5,
+  "Federal Student Loan": 5,
+  "Personal Loan": 8,
+  "Line of Credit": 7,
+  "HELOC": 6.5,
+  "Medical Debt": 0,
+};
+
+/** Get the suggested interest rate for a debt category, or undefined if none */
+export function getDefaultDebtInterest(category: string): number | undefined {
+  return DEFAULT_DEBT_INTEREST[category];
 }
 
 const MOCK_DEBTS: Debt[] = [
@@ -141,7 +161,7 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
   }, [debts]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
-    "category" | "amount" | null
+    "category" | "amount" | "interestRate" | "monthlyPayment" | null
   >(null);
   const [editValue, setEditValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -169,7 +189,7 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
 
   const startEdit = (
     id: string,
-    field: "category" | "amount",
+    field: "category" | "amount" | "interestRate" | "monthlyPayment",
     currentValue: string
   ) => {
     setEditingId(id);
@@ -187,6 +207,14 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
           if (d.id !== editingId) return d;
           if (editingField === "category") {
             return { ...d, category: editValue || d.category };
+          }
+          if (editingField === "interestRate") {
+            const val = parseFloat(editValue);
+            return { ...d, interestRate: isNaN(val) ? undefined : val };
+          }
+          if (editingField === "monthlyPayment") {
+            const val = parseCurrencyInput(editValue);
+            return { ...d, monthlyPayment: val || undefined };
           }
           return { ...d, amount: parseCurrencyInput(editValue) };
         })
@@ -285,12 +313,15 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
         <div className="space-y-1" role="list" aria-label="Debt items">
           {debts.map((debt) => {
             const outOfRegion = isDebtOutOfRegion(debt.category, region);
+            const defaultInterest = getDefaultDebtInterest(debt.category);
+            const displayInterest = debt.interestRate ?? defaultInterest;
+            const hasInterest = debt.interestRate !== undefined;
+            const hasPayment = debt.monthlyPayment !== undefined && debt.monthlyPayment > 0;
             return (
-            <div
-              key={debt.id}
-              role="listitem"
-              className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50 ${outOfRegion ? "opacity-50" : ""}`}
-            >
+            <div key={debt.id} role="listitem" className={outOfRegion ? "opacity-50" : ""}>
+              <div
+                className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50"
+              >
               <div className="flex flex-1 items-center gap-3 min-w-0">
                 {/* Category */}
                 {editingId === debt.id && editingField === "category" ? (
@@ -411,6 +442,74 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
                   />
                 </svg>
               </button>
+              </div>
+
+              {/* Secondary detail fields: interest rate and monthly payment */}
+              <div className="flex flex-wrap items-center gap-2 px-5 pb-1" data-testid={`debt-details-${debt.id}`}>
+                {/* Interest rate badge/editor */}
+                {editingId === debt.id && editingField === "interestRate" ? (
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={commitEdit}
+                    onKeyDown={handleEditKeyDown}
+                    className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                    aria-label={`Edit interest rate for ${debt.category}`}
+                    placeholder="e.g. 19.9"
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => startEdit(debt.id, "interestRate", String(debt.interestRate ?? ""))}
+                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                      hasInterest
+                        ? "bg-rose-50 text-rose-600 hover:bg-rose-100"
+                        : displayInterest !== undefined
+                          ? "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
+                          : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                    }`}
+                    aria-label={`Edit interest rate for ${debt.category}${displayInterest !== undefined ? `, currently ${displayInterest}%` : ""}`}
+                    data-testid={`interest-badge-${debt.id}`}
+                  >
+                    {displayInterest !== undefined
+                      ? `${displayInterest}% APR${!hasInterest ? " (suggested)" : ""}`
+                      : "Interest rate %"}
+                  </button>
+                )}
+
+                {/* Monthly payment badge/editor */}
+                {editingId === debt.id && editingField === "monthlyPayment" ? (
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={commitEdit}
+                    onKeyDown={handleEditKeyDown}
+                    className="w-24 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                    aria-label={`Edit monthly payment for ${debt.category}`}
+                    placeholder="e.g. 150"
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => startEdit(debt.id, "monthlyPayment", String(debt.monthlyPayment ?? ""))}
+                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                      hasPayment
+                        ? "bg-green-50 text-green-600 hover:bg-green-100"
+                        : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                    }`}
+                    aria-label={`Edit monthly payment for ${debt.category}${hasPayment ? `, currently ${formatCurrency(debt.monthlyPayment!)}` : ""}`}
+                    data-testid={`debt-payment-badge-${debt.id}`}
+                  >
+                    {hasPayment
+                      ? `${formatCurrency(debt.monthlyPayment!)}/mo`
+                      : "Monthly payment"}
+                  </button>
+                )}
+              </div>
             </div>
           );})}
         </div>

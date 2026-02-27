@@ -127,5 +127,11 @@ export function toFinancialData(state: FinancialState): FinancialData {
       target: g.targetAmount,
       current: g.currentAmount,
     })),
+    debts: state.debts.map((d) => ({
+      category: d.category,
+      amount: d.amount,
+      interestRate: d.interestRate,
+      monthlyPayment: d.monthlyPayment,
+    })),
   };
 }
