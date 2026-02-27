@@ -100,6 +100,8 @@ interface CompactAsset {
 interface CompactDebt {
   c: string;
   a: number;
+  ir?: number; // interestRate (annual %)
+  mp?: number; // monthlyPayment ($)
 }
 interface CompactIncome {
   c: string;
@@ -140,7 +142,12 @@ function toCompact(state: FinancialState): CompactState {
       if (x.monthlyContribution !== undefined && x.monthlyContribution > 0) ca.m = x.monthlyContribution;
       return ca;
     }),
-    d: state.debts.map((x) => ({ c: x.category, a: x.amount })),
+    d: state.debts.map((x) => {
+      const cd: CompactDebt = { c: x.category, a: x.amount };
+      if (x.interestRate !== undefined) cd.ir = x.interestRate;
+      if (x.monthlyPayment !== undefined && x.monthlyPayment > 0) cd.mp = x.monthlyPayment;
+      return cd;
+    }),
     i: state.income.map((x) => ({ c: x.category, a: x.amount })),
     e: state.expenses.map((x) => ({ c: x.category, a: x.amount })),
     g: state.goals.map((x) => ({ n: x.name, t: x.targetAmount, s: x.currentAmount })),
@@ -170,7 +177,12 @@ function fromCompact(compact: CompactState): FinancialState {
       if (x.m !== undefined) asset.monthlyContribution = x.m;
       return asset;
     }),
-    debts: compact.d.map((x, i) => ({ id: `d${i + 1}`, category: x.c, amount: x.a })),
+    debts: compact.d.map((x, i) => {
+      const debt: { id: string; category: string; amount: number; interestRate?: number; monthlyPayment?: number } = { id: `d${i + 1}`, category: x.c, amount: x.a };
+      if (x.ir !== undefined) debt.interestRate = x.ir;
+      if (x.mp !== undefined) debt.monthlyPayment = x.mp;
+      return debt;
+    }),
     income: compact.i.map((x, i) => ({ id: `i${i + 1}`, category: x.c, amount: x.a })),
     expenses: compact.e.map((x, i) => ({ id: `e${i + 1}`, category: x.c, amount: x.a })),
     goals: compact.g.map((x, i) => ({

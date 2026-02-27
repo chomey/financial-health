@@ -1,3 +1,10 @@
+export interface DebtDetail {
+  category: string;
+  amount: number;
+  interestRate?: number;
+  monthlyPayment?: number;
+}
+
 export interface FinancialData {
   totalAssets: number;
   totalDebts: number;
@@ -6,9 +13,11 @@ export interface FinancialData {
   monthlyIncome: number;
   monthlyExpenses: number;
   goals: { name: string; target: number; current: number }[];
+  /** Individual debt details for interest-based insights */
+  debts?: DebtDetail[];
 }
 
-export type InsightType = "runway" | "surplus" | "goal" | "net-worth" | "savings-rate";
+export type InsightType = "runway" | "surplus" | "goal" | "net-worth" | "savings-rate" | "debt-interest";
 
 export interface Insight {
   id: string;
@@ -121,6 +130,30 @@ export function generateInsights(data: FinancialData): Insight[] {
         message: `You've started saving toward "${top.name}" — every contribution gets you closer to your ${formatCurrency(top.target)} target.`,
         icon: "🎯",
       });
+    }
+  }
+
+  // High-interest debt insight — prioritize paying off highest-rate debt first
+  if (data.debts && data.debts.length > 0) {
+    const debtsWithInterest = data.debts.filter((d) => d.interestRate !== undefined && d.interestRate > 0 && d.amount > 0);
+    if (debtsWithInterest.length > 0) {
+      const sorted = [...debtsWithInterest].sort((a, b) => (b.interestRate ?? 0) - (a.interestRate ?? 0));
+      const highest = sorted[0];
+      if (highest.interestRate! >= 15) {
+        insights.push({
+          id: "debt-high-interest",
+          type: "debt-interest",
+          message: `Your ${highest.category} has a ${highest.interestRate}% interest rate — paying this down first could save you the most in interest costs.`,
+          icon: "🔥",
+        });
+      } else if (debtsWithInterest.length >= 2) {
+        insights.push({
+          id: "debt-priority",
+          type: "debt-interest",
+          message: `Focus extra payments on your ${highest.category} (${highest.interestRate}% APR) first — the avalanche method saves the most on interest.`,
+          icon: "🔥",
+        });
+      }
     }
   }
 
