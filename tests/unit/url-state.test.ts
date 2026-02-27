@@ -146,6 +146,46 @@ describe("encodeState / decodeState", () => {
     // ASCII85 characters are in the printable range; URL encoding handles the rest
     expect(encoded).toBeTruthy();
   });
+
+  it("roundtrips property with interest rate, monthly payment, and amortization", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [],
+      expenses: [],
+      goals: [],
+      properties: [
+        { id: "p1", name: "Home", value: 450000, mortgage: 280000, interestRate: 4.5, monthlyPayment: 1550, amortizationYears: 20 },
+      ],
+      region: "both",
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.properties[0].interestRate).toBe(4.5);
+    expect(decoded!.properties[0].monthlyPayment).toBe(1550);
+    expect(decoded!.properties[0].amortizationYears).toBe(20);
+  });
+
+  it("roundtrips property without optional fields (backward compat)", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [],
+      expenses: [],
+      goals: [],
+      properties: [
+        { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
+      ],
+      region: "both",
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.properties[0].interestRate).toBeUndefined();
+    expect(decoded!.properties[0].monthlyPayment).toBeUndefined();
+    expect(decoded!.properties[0].amortizationYears).toBeUndefined();
+  });
 });
 
 describe("getStateFromURL", () => {

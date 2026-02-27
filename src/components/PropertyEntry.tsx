@@ -7,6 +7,64 @@ export interface Property {
   name: string;
   value: number;
   mortgage: number;
+  interestRate?: number; // annual %
+  monthlyPayment?: number; // $ per month
+  amortizationYears?: number; // years remaining
+}
+
+/** Default interest rate suggestion for mortgages (annual %) */
+export const DEFAULT_INTEREST_RATE = 5;
+
+/** Compute monthly interest and principal portions of a mortgage payment */
+export function computeMortgageBreakdown(
+  mortgage: number,
+  annualRate: number,
+  monthlyPayment: number
+): { interestPortion: number; principalPortion: number } {
+  const monthlyRate = annualRate / 100 / 12;
+  const interestPortion = mortgage * monthlyRate;
+  const principalPortion = Math.max(0, monthlyPayment - interestPortion);
+  return { interestPortion, principalPortion };
+}
+
+/** Compute total interest over remaining term and estimated payoff date */
+export function computeAmortizationInfo(
+  mortgage: number,
+  annualRate: number,
+  monthlyPayment: number
+): { totalInterest: number; payoffMonths: number } {
+  if (mortgage <= 0 || monthlyPayment <= 0) {
+    return { totalInterest: 0, payoffMonths: 0 };
+  }
+  const monthlyRate = annualRate / 100 / 12;
+  let balance = mortgage;
+  let totalInterest = 0;
+  let months = 0;
+  const maxMonths = 360 * 2; // safety cap: 60 years
+
+  while (balance > 0.01 && months < maxMonths) {
+    const interest = balance * monthlyRate;
+    totalInterest += interest;
+    const principal = Math.min(monthlyPayment - interest, balance);
+    if (principal <= 0) {
+      // Payment doesn't cover interest — will never pay off
+      return { totalInterest: -1, payoffMonths: -1 };
+    }
+    balance -= principal;
+    months++;
+  }
+
+  return { totalInterest, payoffMonths: months };
+}
+
+/** Suggest a reasonable monthly payment from mortgage amount and rate */
+export function suggestMonthlyPayment(mortgage: number, annualRate: number, years: number = 25): number {
+  if (mortgage <= 0) return 0;
+  const monthlyRate = annualRate / 100 / 12;
+  if (monthlyRate === 0) return Math.round(mortgage / (years * 12));
+  const n = years * 12;
+  const payment = mortgage * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
+  return Math.round(payment);
 }
 
 const MOCK_PROPERTIES: Property[] = [
@@ -75,12 +133,15 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
   }, [properties]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingField, setEditingField] = useState<"name" | "value" | "mortgage" | null>(null);
+  const [editingField, setEditingField] = useState<"name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | null>(null);
   const [editValue, setEditValue] = useState("");
   const [addingNew, setAddingNew] = useState(false);
   const [newName, setNewName] = useState("");
   const [newValue, setNewValue] = useState("");
   const [newMortgage, setNewMortgage] = useState("");
+  const [newInterestRate, setNewInterestRate] = useState("");
+  const [newMonthlyPayment, setNewMonthlyPayment] = useState("");
+  const [newAmortization, setNewAmortization] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const newNameRef = useRef<HTMLInputElement>(null);
   const newValueRef = useRef<HTMLInputElement>(null);
@@ -99,7 +160,7 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
     }
   }, [editingId, editingField]);
 
-  const startEdit = (id: string, field: "name" | "value" | "mortgage", currentValue: string) => {
+  const startEdit = (id: string, field: "name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears", currentValue: string) => {
     setEditingId(id);
     setEditingField(field);
     setEditValue(currentValue);
@@ -116,7 +177,22 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
           if (editingField === "value") {
             return { ...p, value: parseCurrencyInput(editValue) };
           }
-          return { ...p, mortgage: parseCurrencyInput(editValue) };
+          if (editingField === "mortgage") {
+            return { ...p, mortgage: parseCurrencyInput(editValue) };
+          }
+          if (editingField === "interestRate") {
+            const val = parseFloat(editValue);
+            return { ...p, interestRate: isNaN(val) ? undefined : val };
+          }
+          if (editingField === "monthlyPayment") {
+            const val = parseCurrencyInput(editValue);
+            return { ...p, monthlyPayment: val || undefined };
+          }
+          if (editingField === "amortizationYears") {
+            const val = parseFloat(editValue);
+            return { ...p, amortizationYears: isNaN(val) ? undefined : val };
+          }
+          return p;
         })
       );
     }
@@ -142,17 +218,24 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
     if (!newName.trim()) return;
     const value = parseCurrencyInput(newValue);
     const mortgage = parseCurrencyInput(newMortgage);
-    setProperties((prev) => [
-      ...prev,
-      { id: generateId(), name: newName.trim(), value, mortgage },
-    ]);
+    const newProp: Property = { id: generateId(), name: newName.trim(), value, mortgage };
+    const rate = parseFloat(newInterestRate);
+    if (!isNaN(rate)) newProp.interestRate = rate;
+    const payment = parseCurrencyInput(newMonthlyPayment);
+    if (payment > 0) newProp.monthlyPayment = payment;
+    const amort = parseFloat(newAmortization);
+    if (!isNaN(amort) && amort > 0) newProp.amortizationYears = amort;
+    setProperties((prev) => [...prev, newProp]);
     setNewName("");
     setNewValue("");
     setNewMortgage("");
+    setNewInterestRate("");
+    setNewMonthlyPayment("");
+    setNewAmortization("");
     setAddingNew(false);
   };
 
-  const handleNewKeyDown = (e: React.KeyboardEvent, field: "name" | "value" | "mortgage") => {
+  const handleNewKeyDown = (e: React.KeyboardEvent, field: string) => {
     if (e.key === "Enter") {
       if (field === "name" && newValueRef.current) {
         newValueRef.current.focus();
@@ -166,6 +249,9 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
       setNewName("");
       setNewValue("");
       setNewMortgage("");
+      setNewInterestRate("");
+      setNewMonthlyPayment("");
+      setNewAmortization("");
     }
   };
 
@@ -298,6 +384,159 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                     </p>
                   </div>
                 </div>
+
+                {/* Secondary detail fields: interest rate, monthly payment, amortization */}
+                {(() => {
+                  const rate = property.interestRate;
+                  const hasRate = rate !== undefined;
+                  const displayRate = rate ?? DEFAULT_INTEREST_RATE;
+                  const payment = property.monthlyPayment;
+                  const hasPayment = payment !== undefined && payment > 0;
+                  const suggestedPayment = property.mortgage > 0 ? suggestMonthlyPayment(property.mortgage, displayRate, property.amortizationYears ?? 25) : 0;
+                  const displayPayment = payment ?? suggestedPayment;
+                  const amortYears = property.amortizationYears;
+                  const hasAmort = amortYears !== undefined;
+
+                  // Computed info
+                  const showComputed = property.mortgage > 0 && displayPayment > 0;
+                  const breakdown = showComputed ? computeMortgageBreakdown(property.mortgage, displayRate, displayPayment) : null;
+                  const amortInfo = showComputed ? computeAmortizationInfo(property.mortgage, displayRate, displayPayment) : null;
+
+                  return (
+                    <div className="mt-1.5 space-y-1.5" data-testid={`property-details-${property.id}`}>
+                      {/* Editable detail badges */}
+                      <div className="flex flex-wrap items-center gap-2 px-1">
+                        {/* Interest rate */}
+                        {editingId === property.id && editingField === "interestRate" ? (
+                          <input
+                            ref={inputRef}
+                            type="text"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={commitEdit}
+                            onKeyDown={handleEditKeyDown}
+                            className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                            aria-label={`Edit interest rate for ${property.name}`}
+                            placeholder="e.g. 5"
+                          />
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => startEdit(property.id, "interestRate", String(property.interestRate ?? ""))}
+                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                              hasRate
+                                ? "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                                : "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
+                            }`}
+                            aria-label={`Edit interest rate for ${property.name}${hasRate ? `, currently ${rate}%` : ""}`}
+                            data-testid={`rate-badge-${property.id}`}
+                          >
+                            {hasRate ? `${rate}% APR` : `${DEFAULT_INTEREST_RATE}% APR (suggested)`}
+                          </button>
+                        )}
+
+                        {/* Monthly payment */}
+                        {editingId === property.id && editingField === "monthlyPayment" ? (
+                          <input
+                            ref={inputRef}
+                            type="text"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={commitEdit}
+                            onKeyDown={handleEditKeyDown}
+                            className="w-24 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                            aria-label={`Edit monthly payment for ${property.name}`}
+                            placeholder="e.g. 1500"
+                          />
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => startEdit(property.id, "monthlyPayment", String(property.monthlyPayment ?? ""))}
+                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                              hasPayment
+                                ? "bg-green-50 text-green-600 hover:bg-green-100"
+                                : suggestedPayment > 0
+                                  ? "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
+                                  : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                            }`}
+                            aria-label={`Edit monthly payment for ${property.name}${hasPayment ? `, currently ${formatCurrency(payment!)}` : ""}`}
+                            data-testid={`payment-badge-${property.id}`}
+                          >
+                            {hasPayment
+                              ? `${formatCurrency(payment!)}/mo`
+                              : suggestedPayment > 0
+                                ? `${formatCurrency(suggestedPayment)}/mo (suggested)`
+                                : "Monthly payment"}
+                          </button>
+                        )}
+
+                        {/* Amortization years */}
+                        {editingId === property.id && editingField === "amortizationYears" ? (
+                          <input
+                            ref={inputRef}
+                            type="text"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={commitEdit}
+                            onKeyDown={handleEditKeyDown}
+                            className="w-16 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                            aria-label={`Edit amortization years for ${property.name}`}
+                            placeholder="e.g. 25"
+                          />
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => startEdit(property.id, "amortizationYears", String(property.amortizationYears ?? ""))}
+                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                              hasAmort
+                                ? "bg-purple-50 text-purple-600 hover:bg-purple-100"
+                                : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                            }`}
+                            aria-label={`Edit amortization for ${property.name}${hasAmort ? `, currently ${amortYears} years` : ""}`}
+                            data-testid={`amort-badge-${property.id}`}
+                          >
+                            {hasAmort ? `${amortYears}yr term` : "Term years"}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Computed mortgage info */}
+                      {showComputed && breakdown && amortInfo && amortInfo.payoffMonths > 0 && (
+                        <div className="mx-1 rounded-md bg-stone-50 px-2 py-1.5 text-[11px] text-stone-500 space-y-0.5" data-testid={`mortgage-info-${property.id}`}>
+                          <div className="flex justify-between">
+                            <span>Monthly interest</span>
+                            <span className="font-medium text-rose-500">{formatCurrency(Math.round(breakdown.interestPortion))}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Monthly principal</span>
+                            <span className="font-medium text-green-600">{formatCurrency(Math.round(breakdown.principalPortion))}</span>
+                          </div>
+                          {amortInfo.totalInterest > 0 && (
+                            <div className="flex justify-between border-t border-stone-200 pt-0.5 mt-0.5">
+                              <span>Total interest remaining</span>
+                              <span className="font-medium text-stone-600">{formatCurrency(Math.round(amortInfo.totalInterest))}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between">
+                            <span>Estimated payoff</span>
+                            <span className="font-medium text-stone-600">
+                              {(() => {
+                                const payoffDate = new Date();
+                                payoffDate.setMonth(payoffDate.getMonth() + amortInfo.payoffMonths);
+                                return `${payoffDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })} (${Math.ceil(amortInfo.payoffMonths / 12)}yr)`;
+                              })()}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {showComputed && amortInfo && amortInfo.payoffMonths === -1 && (
+                        <div className="mx-1 rounded-md bg-amber-50 px-2 py-1.5 text-[11px] text-amber-600" data-testid={`mortgage-warning-${property.id}`}>
+                          Payment doesn&apos;t cover monthly interest — consider increasing your payment.
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             );
           })}
@@ -356,6 +595,9 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                   setNewName("");
                   setNewValue("");
                   setNewMortgage("");
+                  setNewInterestRate("");
+                  setNewMonthlyPayment("");
+                  setNewAmortization("");
                 }}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"
                 aria-label="Cancel adding property"
