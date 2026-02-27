@@ -104,11 +104,10 @@ describe("getAllCategorySuggestions", () => {
     expect(suggestions).toContain("Roth IRA");
     expect(suggestions).toContain("Savings");
     expect(suggestions).toContain("Brokerage");
-    expect(suggestions).toContain("Home Equity");
   });
 
-  it("returns 16 total suggestions", () => {
+  it("returns 15 total suggestions", () => {
     const suggestions = getAllCategorySuggestions();
-    expect(suggestions.length).toBe(16);
+    expect(suggestions.length).toBe(15);
   });
 });

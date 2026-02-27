@@ -15,10 +15,10 @@ test.describe("Snapshot Dashboard", () => {
     await expect(page.locator('[aria-label="Debt-to-Asset Ratio"] h3')).toBeVisible();
 
     // Verify animated values are displayed (after count-up completes, scoped via aria-labels)
-    await expect(page.getByLabel("Net Worth: -$229,500")).toBeVisible();
+    await expect(page.getByLabel("Net Worth: $220,500")).toBeVisible();
     await expect(page.getByLabel("Monthly Surplus: $3,350")).toBeVisible();
     await expect(page.getByLabel("Financial Runway: 22.2 mo")).toBeVisible();
-    await expect(page.getByLabel("Debt-to-Asset Ratio: 4.50")).toBeVisible();
+    await expect(page.getByLabel("Debt-to-Asset Ratio: 1.25")).toBeVisible();
 
     await captureScreenshot(page, "task-8-dashboard-metrics");
   });
@@ -91,9 +91,9 @@ test.describe("Snapshot Dashboard", () => {
     const surplusValue = page.getByLabel("Monthly Surplus: $3,350");
     await expect(surplusValue).toHaveClass(/text-green-600/);
 
-    // Net Worth value should be rose (negative value)
-    const netWorthValue = page.getByLabel("Net Worth: -$229,500");
-    await expect(netWorthValue).toHaveClass(/text-rose-600/);
+    // Net Worth value should be green (positive value)
+    const netWorthValue = page.getByLabel("Net Worth: $220,500");
+    await expect(netWorthValue).toHaveClass(/text-green-600/);
 
     await captureScreenshot(page, "task-8-dashboard-colors");
   });

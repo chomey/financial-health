@@ -79,7 +79,7 @@ describe("getAllCategorySuggestions", () => {
   });
 
   it("always includes universal categories regardless of region", () => {
-    const universal = ["Savings", "Checking", "Brokerage", "Home Equity", "Vehicle", "Other"];
+    const universal = ["Savings", "Checking", "Brokerage", "Vehicle", "Other"];
     for (const region of ["CA", "US", "both"] as const) {
       const suggestions = getAllCategorySuggestions(region);
       for (const cat of universal) {

@@ -29,11 +29,10 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
     await expect(assetsList).toContainText("Brokerage");
 
     const debtsList = page.getByRole("list", { name: "Debt items" });
-    await expect(debtsList).toContainText("Mortgage");
     await expect(debtsList).toContainText("Car Loan");
 
     // Verify initial dashboard metrics
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$229,500");
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$220,500");
     await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText(
       "$3,350"
     );
@@ -69,8 +68,8 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
     await page.getByLabel("Confirm add asset").click();
     await expect(assetsList).toContainText("HSA");
 
-    // Verify net worth updated: (65500 + 10000 + 25000 + 5000) - 295000 = -189500
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$189,500");
+    // Verify net worth updated: (65500 + 10000 + 25000 + 5000) + 170000 - 15000 = 260500
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$260,500");
 
     await captureScreenshot(page, "task-15-after-adding-assets");
 
@@ -103,14 +102,14 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
 
     // Note: Due to pre-existing onChange timing with URL state sync,
     // the last add may not propagate to parent state immediately.
-    // Net worth: 105500 - (280000+15000+30000+5000) should be -224500
-    // but may show -219500 if last onChange is swallowed.
-    // Verify the debt list visually shows all 4 items:
-    expect(await debtsList.getByRole("listitem").count()).toBe(4);
+    // Net worth: (105500 + 170000) - (15000+30000+5000) should be 225500
+    // but may show 230500 if last onChange is swallowed.
+    // Verify the debt list visually shows all 3 items:
+    expect(await debtsList.getByRole("listitem").count()).toBe(3);
 
     // Accept either value to handle the pre-existing timing issue
     const netWorthLabel = await dashboard.getByLabel(/Net Worth:/).getAttribute("aria-label");
-    expect(netWorthLabel).toMatch(/Net Worth: -\$(219,500|224,500)/);
+    expect(netWorthLabel).toMatch(/Net Worth: \$(225,500|230,500)/);
 
     await captureScreenshot(page, "task-15-after-adding-debts");
 
@@ -245,15 +244,14 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
     await expect(assetsListAfterReload).toContainText("Roth IRA");
     await expect(assetsListAfterReload).toContainText("HSA");
 
-    // Verify debts (2 original + at least 1 added; second may not persist due to onChange timing)
+    // Verify debts (1 original + at least 1 added; second may not persist due to onChange timing)
     const debtsListAfterReload = page.getByRole("list", {
       name: "Debt items",
     });
-    await expect(debtsListAfterReload).toContainText("Mortgage");
     await expect(debtsListAfterReload).toContainText("Car Loan");
     await expect(debtsListAfterReload).toContainText("Student Loan");
     const debtCountAfterReload = await debtsListAfterReload.getByRole("listitem").count();
-    expect(debtCountAfterReload).toBeGreaterThanOrEqual(3);
+    expect(debtCountAfterReload).toBeGreaterThanOrEqual(2);
 
     // Verify income (2 original + 1 added)
     const incomeListAfterReload = page.getByRole("list", {
@@ -288,7 +286,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
     );
     // Accept either value due to pre-existing onChange timing issue
     const netWorthAfterReload = await dashboardAfterReload.getByLabel(/Net Worth:/).getAttribute("aria-label");
-    expect(netWorthAfterReload).toMatch(/Net Worth: -\$(219,500|224,500)/);
+    expect(netWorthAfterReload).toMatch(/Net Worth: \$(225,500|230,500)/);
     const surplusAfterReload = await dashboardAfterReload.getByLabel(/Monthly Surplus:/).getAttribute("aria-label");
     expect(surplusAfterReload).toMatch(/Monthly Surplus: \$[3-5],\d{3}/);
 

@@ -10,7 +10,7 @@ test.describe("T3: Full end-to-end user journey", () => {
 
     // --- Step 1: Verify initial state loaded correctly ---
     await expect(page.getByText("Financial Health Snapshot")).toBeVisible();
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$229,500");
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$220,500");
     await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$3,350");
     await captureScreenshot(page, "task-10-e2e-initial-state");
 
@@ -26,8 +26,8 @@ test.describe("T3: Full end-to-end user journey", () => {
     await expect(assetsList).toContainText("Emergency Fund");
     await expect(assetsList).toContainText("$25,000");
 
-    // Net worth should now be: (65500 + 25000) - 295000 = -204500
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$204,500");
+    // Net worth should now be: (65500 + 25000) + 170000 - 15000 = 245500
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$245,500");
 
     // --- Step 3: Delete a debt and verify dashboard updates ---
     const debtsList = page.getByRole("list", { name: "Debt items" });
@@ -35,8 +35,8 @@ test.describe("T3: Full end-to-end user journey", () => {
     await carLoanRow.hover();
     await carLoanRow.getByLabel("Delete Car Loan").click();
 
-    // Net worth: (90500) - (280000) = -189500
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$189,500");
+    // Net worth: (90500) + 170000 - 0 = 260500 (Car Loan deleted, no debts remain)
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$260,500");
 
     // --- Step 4: Add income and verify surplus updates ---
     const incomeSection = page.locator("section", { has: page.getByText("Monthly Income") }).first();

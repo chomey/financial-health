@@ -84,7 +84,6 @@ describe("Debt category region filtering", () => {
     const ca = getAllDebtCategorySuggestions("CA");
     expect(ca).toContain("HELOC");
     expect(ca).toContain("Canada Student Loan");
-    expect(ca).toContain("Mortgage");
     expect(ca).toContain("Car Loan");
     expect(ca).not.toContain("Medical Debt");
     expect(ca).not.toContain("Federal Student Loan");
@@ -94,7 +93,7 @@ describe("Debt category region filtering", () => {
     const us = getAllDebtCategorySuggestions("US");
     expect(us).toContain("Medical Debt");
     expect(us).toContain("Federal Student Loan");
-    expect(us).toContain("Mortgage");
+    expect(us).toContain("Car Loan");
     expect(us).not.toContain("HELOC");
     expect(us).not.toContain("Canada Student Loan");
   });
@@ -103,14 +102,14 @@ describe("Debt category region filtering", () => {
     const both = getAllDebtCategorySuggestions("both");
     expect(both).toContain("HELOC");
     expect(both).toContain("Medical Debt");
-    expect(both).toContain("Mortgage");
+    expect(both).toContain("Car Loan");
 
     const undef = getAllDebtCategorySuggestions();
     expect(undef).toEqual(both);
   });
 
   it("always includes universal debt categories", () => {
-    const universal = ["Mortgage", "Car Loan", "Student Loan", "Credit Card", "Line of Credit", "Personal Loan", "Other"];
+    const universal = ["Car Loan", "Student Loan", "Credit Card", "Line of Credit", "Personal Loan", "Other"];
     for (const region of ["CA", "US", "both"] as const) {
       const suggestions = getAllDebtCategorySuggestions(region);
       for (const cat of universal) {

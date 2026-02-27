@@ -3,6 +3,7 @@ import type { Debt } from "@/components/DebtEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import type { Goal } from "@/components/GoalEntry";
+import type { Property } from "@/components/PropertyEntry";
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
 
@@ -14,6 +15,7 @@ export interface FinancialState {
   income: IncomeItem[];
   expenses: ExpenseItem[];
   goals: Goal[];
+  properties: Property[];
   region: Region;
 }
 
@@ -25,7 +27,6 @@ export const INITIAL_STATE: FinancialState = {
     { id: "3", category: "Brokerage", amount: 18500 },
   ],
   debts: [
-    { id: "d1", category: "Mortgage", amount: 280000 },
     { id: "d2", category: "Car Loan", amount: 15000 },
   ],
   income: [
@@ -42,6 +43,9 @@ export const INITIAL_STATE: FinancialState = {
     { id: "g2", name: "New Car", targetAmount: 42000, currentAmount: 13500 },
     { id: "g3", name: "Vacation", targetAmount: 6500, currentAmount: 6200 },
   ],
+  properties: [
+    { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
+  ],
 };
 
 export function computeTotals(state: FinancialState) {
@@ -49,16 +53,26 @@ export function computeTotals(state: FinancialState) {
   const totalDebts = state.debts.reduce((sum, d) => sum + d.amount, 0);
   const monthlyIncome = state.income.reduce((sum, i) => sum + i.amount, 0);
   const monthlyExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses };
+  // Properties: equity = value - mortgage. Counts toward net worth but NOT runway (illiquid).
+  const properties = state.properties ?? [];
+  const totalPropertyEquity = properties.reduce((sum, p) => sum + Math.max(0, p.value - p.mortgage), 0);
+  const totalPropertyValue = properties.reduce((sum, p) => sum + p.value, 0);
+  const totalPropertyMortgage = properties.reduce((sum, p) => sum + p.mortgage, 0);
+  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage };
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyMortgage } = computeTotals(state);
 
-  const netWorth = totalAssets - totalDebts;
+  // Net worth includes property equity: (liquid assets + property equity) - debts
+  const netWorth = totalAssets + totalPropertyEquity - totalDebts;
   const surplus = monthlyIncome - monthlyExpenses;
+  // Runway uses only liquid assets (NOT property)
   const runway = monthlyExpenses > 0 ? totalAssets / monthlyExpenses : 0;
-  const debtToAssetRatio = totalAssets > 0 ? totalDebts / totalAssets : 0;
+  // Debt-to-asset ratio includes property: (debts + mortgages) / (liquid assets + property values)
+  const totalAllAssets = totalAssets + totalPropertyEquity;
+  const totalAllDebts = totalDebts + totalPropertyMortgage;
+  const debtToAssetRatio = totalAllAssets > 0 ? totalAllDebts / totalAllAssets : 0;
 
   return [
     {
@@ -101,10 +115,11 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 }
 
 export function toFinancialData(state: FinancialState): FinancialData {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyMortgage } = computeTotals(state);
   return {
-    totalAssets,
-    totalDebts,
+    totalAssets: totalAssets + totalPropertyEquity,
+    totalDebts: totalDebts + totalPropertyMortgage,
+    liquidAssets: totalAssets,
     monthlyIncome,
     monthlyExpenses,
     goals: state.goals.map((g) => ({

@@ -16,7 +16,6 @@ const CATEGORY_SUGGESTIONS = {
     "Savings",
     "Checking",
     "Brokerage",
-    "Home Equity",
     "Vehicle",
     "Other",
   ],

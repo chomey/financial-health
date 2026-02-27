@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
+import PropertyEntry from "@/components/PropertyEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import GoalEntry from "@/components/GoalEntry";
@@ -17,6 +18,7 @@ import type { Region } from "@/lib/financial-state";
 import { getStateFromURL, updateURL } from "@/lib/url-state";
 import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
+import type { Property } from "@/components/PropertyEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import type { Goal } from "@/components/GoalEntry";
@@ -95,6 +97,7 @@ export default function Home() {
   const [initialState] = useState(getInitialState);
   const [assets, setAssets] = useState<Asset[]>(() => initialState.assets);
   const [debts, setDebts] = useState<Debt[]>(() => initialState.debts);
+  const [properties, setProperties] = useState<Property[]>(() => initialState.properties);
   const [income, setIncome] = useState<IncomeItem[]>(() => initialState.income);
   const [expenses, setExpenses] = useState<ExpenseItem[]>(() => initialState.expenses);
   const [goals, setGoals] = useState<Goal[]>(() => initialState.goals);
@@ -123,10 +126,10 @@ export default function Home() {
       // Still write the URL on first render so the s= param is always present
       isFirstRender.current = false;
     }
-    updateURL({ assets, debts, income, expenses, goals, region });
-  }, [assets, debts, income, expenses, goals, region]);
+    updateURL({ assets, debts, properties, income, expenses, goals, region });
+  }, [assets, debts, properties, income, expenses, goals, region]);
 
-  const state = { assets, debts, income, expenses, goals, region };
+  const state = { assets, debts, properties, income, expenses, goals, region };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
 
@@ -164,6 +167,8 @@ export default function Home() {
               <div key={`debt-pulse-${regionPulse}`} className={regionPulse > 0 ? "animate-region-pulse rounded-xl" : ""} data-testid="debt-pulse-wrapper">
                 <DebtEntry items={debts} onChange={setDebts} region={region} />
               </div>
+
+              <PropertyEntry items={properties} onChange={setProperties} />
 
               <IncomeEntry items={income} onChange={setIncome} />
 
