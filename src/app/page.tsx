@@ -4,6 +4,7 @@ import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
+import GoalEntry from "@/components/GoalEntry";
 
 export default function Home() {
   return (
@@ -34,6 +35,8 @@ export default function Home() {
               <IncomeEntry />
 
               <ExpenseEntry />
+
+              <GoalEntry />
             </div>
           </section>
 

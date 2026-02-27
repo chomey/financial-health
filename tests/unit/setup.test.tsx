@@ -35,12 +35,13 @@ describe("App shell layout", () => {
     expect(dashboardPanel).toBeInTheDocument();
   });
 
-  it("renders all four entry sections", () => {
+  it("renders all five entry sections", () => {
     render(<Home />);
     expect(screen.getByText("Assets")).toBeInTheDocument();
     expect(screen.getByText("Debts")).toBeInTheDocument();
     expect(screen.getByText("Monthly Income")).toBeInTheDocument();
     expect(screen.getByText("Monthly Expenses")).toBeInTheDocument();
+    expect(screen.getByText("Goals")).toBeInTheDocument();
   });
 
   it("renders all four dashboard metric cards", () => {
