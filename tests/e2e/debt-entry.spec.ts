@@ -130,7 +130,7 @@ test.describe("Debt entry section", () => {
 
     // Should show suggestions dropdown with known debt categories
     await expect(
-      page.getByRole("button", { name: "Student Loan" })
+      page.getByRole("button", { name: "Student Loan", exact: true })
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Credit Card" })

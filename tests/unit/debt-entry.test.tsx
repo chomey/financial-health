@@ -106,8 +106,8 @@ describe("getAllDebtCategorySuggestions", () => {
     expect(suggestions).toContain("Other");
   });
 
-  it("returns 7 total suggestions", () => {
+  it("returns 11 total suggestions (7 universal + 2 CA + 2 US)", () => {
     const suggestions = getAllDebtCategorySuggestions();
-    expect(suggestions.length).toBe(7);
+    expect(suggestions.length).toBe(11);
   });
 });

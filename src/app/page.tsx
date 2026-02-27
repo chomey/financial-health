@@ -101,11 +101,21 @@ export default function Home() {
   // Region defaults to "both" during SSR, then syncs from URL after hydration
   // to avoid React 19 hydration mismatch for aria-checked attributes
   const [region, setRegion] = useState<Region>("both");
+  const [regionPulse, setRegionPulse] = useState(0);
+  const regionInitialized = useRef(false);
   const isFirstRender = useRef(true);
 
   // Sync region from URL state after mount — this is an intentional external-system sync
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setRegion(initialState.region); }, [initialState.region]);
+  useEffect(() => { setRegion(initialState.region); regionInitialized.current = true; }, [initialState.region]);
+
+  // Handle user region change: update state and trigger pulse
+  const handleRegionChange = useCallback((newRegion: Region) => {
+    setRegion(newRegion);
+    if (regionInitialized.current) {
+      setRegionPulse((p) => p + 1);
+    }
+  }, []);
 
   // Update URL whenever state changes (skip the initial render to avoid unnecessary write)
   useEffect(() => {
@@ -133,7 +143,7 @@ export default function Home() {
             </p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <RegionToggle region={region} onChange={setRegion} />
+            <RegionToggle region={region} onChange={handleRegionChange} />
             <CopyLinkButton />
           </div>
         </div>
@@ -147,9 +157,13 @@ export default function Home() {
             aria-label="Financial data entry"
           >
             <div className="space-y-6">
-              <AssetEntry items={assets} onChange={setAssets} region={region} />
+              <div key={`asset-pulse-${regionPulse}`} className={regionPulse > 0 ? "animate-region-pulse rounded-xl" : ""} data-testid="asset-pulse-wrapper">
+                <AssetEntry items={assets} onChange={setAssets} region={region} />
+              </div>
 
-              <DebtEntry items={debts} onChange={setDebts} />
+              <div key={`debt-pulse-${regionPulse}`} className={regionPulse > 0 ? "animate-region-pulse rounded-xl" : ""} data-testid="debt-pulse-wrapper">
+                <DebtEntry items={debts} onChange={setDebts} region={region} />
+              </div>
 
               <IncomeEntry items={income} onChange={setIncome} />
 
