@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 7
-- **Remaining**: 8
+- **Completed**: 8
+- **Remaining**: 7
 - **Last Updated**: 2026-02-27
 
 ---
@@ -216,3 +216,38 @@
   ![Saved amount edited](screenshots/task-7-saved-amount-edited.png)
   ![Goal tooltip on hover](screenshots/task-7-goal-tooltip.png)
 - **Notes**: GoalEntry follows the same component pattern as AssetEntry/DebtEntry but adds progress bars with dynamic color coding based on completion percentage (amber<25%, blue<50%, teal<75%, emerald<100%, green=100%). Goals at 100% get a celebratory glow effect (amber ring + shadow) and pulse animation. Mock data values were chosen to avoid text collisions with existing components on the page (e.g., avoiding "$12,000" which appears in AssetEntry and "Emergency Fund" which is used in asset E2E tests). Component manages its own state — Task 10 will wire to shared state.
+
+## Task 8: Build snapshot dashboard with mock calculations
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/SnapshotDashboard.tsx`: Created new component replacing inline DashboardCard elements. Displays four metric cards (Net Worth, Monthly Surplus, Financial Runway, Debt-to-Asset Ratio) with hardcoded mock values calculated from entry component mock data. Features: count-up animation on load using requestAnimationFrame with ease-out cubic easing, emoji icons per metric (💰 📈 🛡️ ⚖️), hover tooltips explaining each metric, encouraging color coding (green for positive metrics, rose for negative values, neutral stone for non-negative ratios), hover lift effects with shadow transitions. Exports `formatMetricValue` utility and `MOCK_METRICS` data for testing.
+  - `src/app/page.tsx`: Replaced four inline DashboardCard components with SnapshotDashboard component. Removed unused DashboardCard function. Added SnapshotDashboard import.
+  - `tests/unit/snapshot-dashboard.test.tsx`: 17 T1 unit tests covering metric card rendering, icon rendering, accessible labels with final values, tooltip show/hide on hover, green color for positive metrics, rose color for negative values, test id, group roles, formatMetricValue for currency/months/ratio formats, and MOCK_METRICS data structure.
+  - `tests/unit/setup.test.tsx`: Updated "shows placeholder values" test to "shows metric values" using group role queries instead of dash placeholders.
+  - `tests/e2e/snapshot-dashboard.spec.ts`: 7 T2 browser tests — metric cards with animated values, icons scoped to dashboard, tooltip on hover for Net Worth, tooltip for Monthly Surplus, tooltip hide on mouse leave, hover lift effect, encouraging color coding verification.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/snapshot-dashboard.test.tsx`: 17 passed, 0 failed
+  - `tests/unit/setup.test.tsx`: 8 passed, 0 failed
+  - `tests/unit/asset-entry.test.tsx`: 13 passed, 0 failed (pre-existing)
+  - `tests/unit/debt-entry.test.tsx`: 14 passed, 0 failed (pre-existing)
+  - `tests/unit/income-entry.test.tsx`: 15 passed, 0 failed (pre-existing)
+  - `tests/unit/expense-entry.test.tsx`: 15 passed, 0 failed (pre-existing)
+  - `tests/unit/goal-entry.test.tsx`: 14 passed, 0 failed (pre-existing)
+  - `tests/unit/screenshot-helpers.test.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/snapshot-dashboard.spec.ts`: 7 passed, 0 failed
+  - `tests/e2e/app-shell.spec.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/asset-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/debt-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/income-entry.spec.ts`: 6 passed, 0 failed (pre-existing)
+  - `tests/e2e/expense-entry.spec.ts`: 6 passed, 0 failed (pre-existing)
+  - `tests/e2e/goal-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/smoke.spec.ts`: 1 passed, 0 failed (pre-existing)
+  - Total: 143 passed, 0 failed
+- **Screenshots**:
+  ![Dashboard metrics](screenshots/task-8-dashboard-metrics.png)
+  ![Dashboard tooltip](screenshots/task-8-dashboard-tooltip.png)
+  ![Dashboard card hover](screenshots/task-8-dashboard-card-hover.png)
+  ![Dashboard colors](screenshots/task-8-dashboard-colors.png)
+- **Notes**: SnapshotDashboard uses hardcoded mock values calculated from existing entry component mock data (Assets $65,500, Debts $295,000, Income $6,300, Expenses $2,950). Net Worth is negative (-$229,500) due to mortgage — this is realistic and the tooltip reassures users. The count-up animation uses requestAnimationFrame with ease-out cubic easing for a smooth feel. aria-labels on value elements contain the final formatted value (not the animated intermediate) for accessibility. Task 10 will wire real state to replace mock values.
