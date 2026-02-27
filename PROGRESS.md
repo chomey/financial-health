@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 13
-- **Remaining**: 2
+- **Completed**: 14
+- **Remaining**: 1
 - **Last Updated**: 2026-02-27
 
 ---
@@ -424,3 +424,32 @@
   ![Card hover effect](screenshots/task-13-card-hover.png)
   ![Animate-in on add form](screenshots/task-13-animate-in-form.png)
 - **Notes**: Fixed pre-existing lint errors (react-hooks/set-state-in-effect) in all 5 entry components by adding eslint-disable-next-line comments on the setState lines inside useEffect — these are intentional external-system syncs for the controlled/uncontrolled component pattern. The `animate-in` class was referenced in previous tasks but never defined in CSS — now properly defined with a slide-in-down animation. The runway celebration uses a 3-second infinite glow-pulse animation that subtly draws attention without being distracting.
+
+## Task 14: Mobile responsiveness pass
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/app/page.tsx`: Header wraps on mobile with `flex-wrap`, responsive padding (`px-4 sm:px-6`), smaller title on mobile (`text-xl sm:text-2xl`). Main content uses `px-4 sm:px-6` padding. CopyLinkButton gets `min-h-[44px]` touch target.
+  - `src/components/AssetEntry.tsx`: Delete buttons visible on mobile (`sm:opacity-0` instead of bare `opacity-0`), larger touch targets (`min-h-[44px] min-w-[44px]`), icon size responsive (`h-5 w-5 sm:h-4 sm:w-4`). Category/amount buttons get `min-h-[44px] sm:min-h-0`. Add form stacks on mobile (`flex-col sm:flex-row`). Inputs use `text-base` on mobile for iOS zoom prevention. Card padding responsive (`p-4 sm:p-6`).
+  - `src/components/DebtEntry.tsx`: Same responsive patterns — delete button visibility, touch targets, form stacking, responsive padding.
+  - `src/components/IncomeEntry.tsx`: Same responsive patterns applied.
+  - `src/components/ExpenseEntry.tsx`: Same responsive patterns applied.
+  - `src/components/GoalEntry.tsx`: Same patterns plus: goal amount buttons enlarged (`text-sm sm:text-xs`, `min-h-[44px]`), tooltip supports tap via `onClick` toggle, add form inputs use `text-base` on mobile.
+  - `src/components/SnapshotDashboard.tsx`: MetricCard tooltip supports tap via `onClick` toggle for mobile accessibility.
+  - `src/components/RegionToggle.tsx`: Buttons get `min-h-[44px] sm:min-h-0` touch targets.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/mobile-responsive.test.tsx`: 17 T1 tests — delete button visibility (sm:opacity-0 not bare opacity-0), touch target sizes (min-h-[44px]) for delete/category/amount/goal buttons, RegionToggle touch targets, responsive card padding (p-4 sm:p-6), tooltip tap support, add form stacking layout (17 passed, 0 failed)
+  - `tests/e2e/mobile-responsive.spec.ts`: 8 T2 tests at 375px/768px/1024px — header wrapping, entry cards stacked, delete buttons visible without hover, add form stacking, tooltip on hover at mobile viewport, inline editing on mobile, tablet layout, desktop two-column layout (8 passed, 0 failed)
+  - All pre-existing tests: 184 T1 passed, 80 T2 passed, 0 failed
+  - Total: 289 passed, 0 failed
+- **Screenshots**:
+  ![Mobile header at 375px](screenshots/task-14-mobile-375-header.png)
+  ![Mobile entry cards stacked](screenshots/task-14-mobile-375-cards.png)
+  ![Delete buttons visible on mobile](screenshots/task-14-mobile-delete-visible.png)
+  ![Add form stacked on mobile](screenshots/task-14-mobile-add-form-stacked.png)
+  ![Tooltip at mobile viewport](screenshots/task-14-mobile-tooltip.png)
+  ![Inline editing on mobile](screenshots/task-14-mobile-inline-edit.png)
+  ![Tablet layout at 768px](screenshots/task-14-tablet-768.png)
+  ![Desktop two-column at 1024px](screenshots/task-14-desktop-1024.png)
+- **Notes**: Mobile responsiveness was achieved using Tailwind's responsive prefixes (sm: for >=640px, lg: for >=1024px). Key patterns: (1) Delete buttons use `sm:opacity-0 sm:group-hover:opacity-100` so they're always visible on mobile but hover-reveal on desktop. (2) Add-new forms use `flex-col sm:flex-row` to stack inputs vertically on mobile. (3) All interactive elements have `min-h-[44px]` on mobile for WCAG touch target compliance, reverting to compact sizes via `sm:min-h-0`. (4) Form inputs use `text-base` on mobile to prevent iOS Safari auto-zoom. (5) Card padding is `p-4 sm:p-6` to give more content room on small screens. (6) Tooltips support both hover (desktop) and click/tap (mobile) via onClick handler. The MetricCard's `onMouseLeave` still clears the tooltip, which works for desktop but means on Chromium mobile emulation, the tooltip persists only until a mouseleave event — on real mobile devices (touch), there is no mouseleave, so the click toggle works correctly.

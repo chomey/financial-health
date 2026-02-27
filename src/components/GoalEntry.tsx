@@ -177,7 +177,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
   };
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+    <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-6">
       <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-stone-800">
         <span aria-hidden="true">🎯</span>
         Goals
@@ -206,6 +206,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
                 key={goal.id}
                 role="listitem"
                 className="group relative rounded-lg px-3 py-3 transition-colors duration-150 hover:bg-stone-50"
+                onClick={() => setHoveredGoalId((prev) => prev === goal.id ? null : goal.id)}
                 onMouseEnter={() => setHoveredGoalId(goal.id)}
                 onMouseLeave={() => setHoveredGoalId(null)}
               >
@@ -227,7 +228,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
                       <button
                         type="button"
                         onClick={() => startEdit(goal.id, "name", goal.name)}
-                        className="truncate text-left text-sm font-medium text-stone-700 rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        className="truncate text-left text-sm font-medium text-stone-700 rounded px-2 py-2 sm:py-1 min-h-[44px] sm:min-h-0 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
                         aria-label={`Edit name for ${goal.name}`}
                       >
                         {goal.name}
@@ -238,12 +239,12 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
                   <button
                     type="button"
                     onClick={() => deleteGoal(goal.id)}
-                    className="ml-2 rounded-md p-1 text-stone-300 opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 group-hover:opacity-100"
+                    className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-stone-300 sm:opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 sm:group-hover:opacity-100"
                     aria-label={`Delete ${goal.name}`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
+                      className="h-5 w-5 sm:h-4 sm:w-4"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -257,7 +258,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
                 </div>
 
                 {/* Amounts row */}
-                <div className="flex items-center gap-2 text-xs text-stone-500 mb-2 px-2">
+                <div className="flex items-center gap-2 text-sm sm:text-xs text-stone-500 mb-2 px-2">
                   {editingId === goal.id && editingField === "currentAmount" ? (
                     <input
                       ref={inputRef}
@@ -275,7 +276,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
                       onClick={() =>
                         startEdit(goal.id, "currentAmount", String(goal.currentAmount))
                       }
-                      className="rounded px-1 py-0.5 text-xs font-medium text-green-700 transition-colors duration-150 hover:bg-green-50 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      className="rounded px-2 py-1 text-sm sm:text-xs sm:px-1 sm:py-0.5 font-medium text-green-700 min-h-[44px] sm:min-h-0 transition-colors duration-150 hover:bg-green-50 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-200"
                       aria-label={`Edit saved amount for ${goal.name}, currently ${formatCurrency(goal.currentAmount)}`}
                     >
                       {formatCurrency(goal.currentAmount)}
@@ -299,7 +300,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
                       onClick={() =>
                         startEdit(goal.id, "targetAmount", String(goal.targetAmount))
                       }
-                      className="rounded px-1 py-0.5 text-xs font-medium text-stone-600 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      className="rounded px-2 py-1 text-sm sm:text-xs sm:px-1 sm:py-0.5 font-medium text-stone-600 min-h-[44px] sm:min-h-0 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
                       aria-label={`Edit target amount for ${goal.name}, currently ${formatCurrency(goal.targetAmount)}`}
                     >
                       {formatCurrency(goal.targetAmount)}
@@ -359,7 +360,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => handleNewKeyDown(e, "name")}
-              className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+              className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
               aria-label="New goal name"
             />
             <div className="flex items-center gap-2">
@@ -372,7 +373,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
                   value={newTarget}
                   onChange={(e) => setNewTarget(e.target.value)}
                   onKeyDown={(e) => handleNewKeyDown(e, "target")}
-                  className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                  className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                   aria-label="New goal target amount"
                 />
               </div>
@@ -385,7 +386,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
                   value={newCurrent}
                   onChange={(e) => setNewCurrent(e.target.value)}
                   onKeyDown={(e) => handleNewKeyDown(e, "current")}
-                  className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                  className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                   aria-label="New goal current amount"
                 />
               </div>
@@ -399,7 +400,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
                   setNewTarget("");
                   setNewCurrent("");
                 }}
-                className="rounded-md px-3 py-1 text-sm text-stone-500 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-200"
+                className="min-h-[44px] rounded-md px-4 py-2 text-sm text-stone-500 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-200 sm:min-h-0 sm:px-3 sm:py-1"
                 aria-label="Cancel adding goal"
               >
                 Cancel
@@ -407,7 +408,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
               <button
                 type="button"
                 onClick={addGoal}
-                className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95"
+                className="min-h-[44px] rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
                 aria-label="Confirm add goal"
               >
                 Add
