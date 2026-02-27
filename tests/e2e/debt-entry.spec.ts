@@ -11,7 +11,7 @@ test.describe("Debt entry section", () => {
     ).toBeVisible();
 
     // Check mock data rows
-    await expect(page.getByText("Mortgage")).toBeVisible();
+    await expect(page.getByText("Mortgage", { exact: true })).toBeVisible();
     await expect(page.getByText("Car Loan")).toBeVisible();
 
     // Check formatted amounts

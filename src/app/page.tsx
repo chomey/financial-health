@@ -2,6 +2,8 @@
 
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
+import IncomeEntry from "@/components/IncomeEntry";
+import ExpenseEntry from "@/components/ExpenseEntry";
 
 export default function Home() {
   return (
@@ -29,18 +31,9 @@ export default function Home() {
 
               <DebtEntry />
 
-              <EntryCard title="Monthly Income" icon="💰">
-                <p className="text-stone-400">
-                  Enter your income sources to understand your monthly cash flow.
-                </p>
-              </EntryCard>
+              <IncomeEntry />
 
-              <EntryCard title="Monthly Expenses" icon="🧾">
-                <p className="text-stone-400">
-                  Add your regular expenses — be as detailed or broad as you
-                  like.
-                </p>
-              </EntryCard>
+              <ExpenseEntry />
             </div>
           </section>
 

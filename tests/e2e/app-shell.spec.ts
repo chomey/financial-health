@@ -40,7 +40,13 @@ test.describe("App shell layout", () => {
     await expect(page.getByText("Savings Account")).toBeVisible();
 
     // Debts section shows mock data instead of empty state
-    await expect(page.getByText("Mortgage")).toBeVisible();
+    await expect(page.getByText("Mortgage", { exact: true })).toBeVisible();
+
+    // Income section shows mock data
+    await expect(page.getByText("Salary")).toBeVisible();
+
+    // Expenses section shows mock data
+    await expect(page.getByText("Groceries")).toBeVisible();
 
     await captureScreenshot(page, "task-3-app-shell-desktop");
   });
