@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 19
-- **Completed**: 18
-- **Remaining**: 1
+- **Completed**: 19
+- **Remaining**: 0
 - **Last Updated**: 2026-02-27
 
 ---
@@ -549,3 +549,23 @@
   ![Dashboard after property delete](screenshots/task-18-dashboard-after-property-delete.png)
   ![Property persists after reload](screenshots/task-18-property-persists-reload.png)
 - **Notes**: Property equity is derived (value - mortgage, capped at 0) and not directly editable. Properties count toward net worth and debt-to-asset ratio but NOT financial runway (illiquid). The URL encoding is backward compatible — URLs without the `p` field decode to empty properties array. Mock data shifted significantly: Mortgage moved from Debts to Property, net worth went from -$229,500 to +$220,500, debt total from $295,000 to $15,000. All existing tests were updated to match.
+
+## Task 19: Fix z-index and mouseover issues in dashboard column
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/SnapshotDashboard.tsx`: Added dynamic z-index to MetricCard — `z-0` by default, `z-20` when hovered/tooltip visible, so the tooltip floats above sibling cards. Tooltip itself uses `z-30`. Added `data-tooltip-visible` attribute for test hooks.
+  - `src/app/page.tsx`: Added `overflow-visible` to the `lg:sticky` dashboard wrapper to prevent tooltip clipping.
+  - `tests/unit/snapshot-dashboard.test.tsx`: Added 4 new unit tests for z-index elevation on hover, z-index reset on leave, data-tooltip-visible attribute, and tooltip z-30 class.
+  - `tests/e2e/snapshot-dashboard.spec.ts`: Added 3 new browser tests verifying tooltip is not clipped by sibling cards, tooltip remains visible when hovering between cards, and all four cards show correct tooltips sequentially.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/snapshot-dashboard.test.tsx`: 21 passed, 0 failed (4 new)
+  - `tests/e2e/snapshot-dashboard.spec.ts`: 10 passed, 0 failed (3 new)
+  - All T1 unit tests: 256 passed, 0 failed
+  - All T2 E2E tests: 111 passed, 0 failed
+- **Screenshots**:
+  ![Tooltip not clipped by sibling cards](screenshots/task-19-tooltip-not-clipped.png)
+  ![Monthly Surplus tooltip visible](screenshots/task-19-surplus-tooltip.png)
+  ![Debt-to-Asset Ratio tooltip](screenshots/task-19-ratio-tooltip.png)
+- **Notes**: The root cause was that tooltips positioned `absolute top-full` on a `relative` card were being covered by subsequent sibling cards in the DOM stacking order. Fix: dynamically elevate the hovered card's z-index to `z-20` and use `z-30` on the tooltip itself. The `overflow-visible` on the sticky wrapper ensures nothing clips the tooltip.

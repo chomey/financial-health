@@ -88,6 +88,45 @@ describe("SnapshotDashboard", () => {
     const groups = screen.getAllByRole("group");
     expect(groups.length).toBe(4);
   });
+
+  it("elevates z-index on hovered card to prevent tooltip clipping", () => {
+    render(<SnapshotDashboard />);
+    const card = screen.getByRole("group", { name: "Net Worth" });
+    // Before hover, card should have z-0
+    expect(card.className).toContain("z-0");
+    fireEvent.mouseEnter(card);
+    // After hover, card should elevate to z-20
+    expect(card.className).toContain("z-20");
+    expect(card.className).not.toContain("z-0");
+  });
+
+  it("resets z-index when mouse leaves card", () => {
+    render(<SnapshotDashboard />);
+    const card = screen.getByRole("group", { name: "Net Worth" });
+    fireEvent.mouseEnter(card);
+    expect(card.className).toContain("z-20");
+    fireEvent.mouseLeave(card);
+    expect(card.className).toContain("z-0");
+    expect(card.className).not.toContain("z-20");
+  });
+
+  it("sets data-tooltip-visible attribute when tooltip is shown", () => {
+    render(<SnapshotDashboard />);
+    const card = screen.getByRole("group", { name: "Net Worth" });
+    expect(card).not.toHaveAttribute("data-tooltip-visible");
+    fireEvent.mouseEnter(card);
+    expect(card).toHaveAttribute("data-tooltip-visible", "true");
+    fireEvent.mouseLeave(card);
+    expect(card).not.toHaveAttribute("data-tooltip-visible");
+  });
+
+  it("tooltip has z-30 class for proper stacking", () => {
+    render(<SnapshotDashboard />);
+    const card = screen.getByRole("group", { name: "Net Worth" });
+    fireEvent.mouseEnter(card);
+    const tooltip = screen.getByRole("tooltip");
+    expect(tooltip.className).toContain("z-30");
+  });
 });
 
 describe("formatMetricValue", () => {
