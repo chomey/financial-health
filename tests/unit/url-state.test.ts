@@ -61,7 +61,9 @@ describe("toCompact / fromCompact", () => {
     const compact = toCompact(INITIAL_STATE);
     expect(compact.a).toHaveLength(3);
     expect(compact.a[0]).toEqual({ c: "Savings Account", a: 12000 });
-    expect(compact.d[0]).toEqual({ c: "Mortgage", a: 280000 });
+    expect(compact.d[0]).toEqual({ c: "Car Loan", a: 15000 });
+    expect(compact.p).toHaveLength(1);
+    expect(compact.p![0]).toEqual({ n: "Home", v: 450000, m: 280000 });
     expect(compact.i[0]).toEqual({ c: "Salary", a: 5500 });
     expect(compact.e[0]).toEqual({ c: "Rent/Mortgage Payment", a: 2200 });
     expect(compact.g[0]).toEqual({ n: "Rainy Day Fund", t: 20000, s: 14500 });
@@ -77,6 +79,10 @@ describe("toCompact / fromCompact", () => {
     expect(restored.goals[0].name).toBe("Rainy Day Fund");
     expect(restored.goals[0].targetAmount).toBe(20000);
     expect(restored.goals[0].currentAmount).toBe(14500);
+    expect(restored.properties).toHaveLength(1);
+    expect(restored.properties[0].name).toBe("Home");
+    expect(restored.properties[0].value).toBe(450000);
+    expect(restored.properties[0].mortgage).toBe(280000);
   });
 });
 
@@ -104,6 +110,7 @@ describe("encodeState / decodeState", () => {
       income: [],
       expenses: [],
       goals: [],
+      properties: [],
     };
     const encoded = encodeState(emptyState);
     const decoded = decodeState(encoded);
@@ -119,6 +126,7 @@ describe("encodeState / decodeState", () => {
       income: [],
       expenses: [],
       goals: [],
+      properties: [],
     };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);

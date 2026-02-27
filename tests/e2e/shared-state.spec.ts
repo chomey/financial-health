@@ -11,8 +11,8 @@ test.describe("Shared state — live dashboard updates", () => {
   test("dashboard shows computed metrics from initial mock data", async ({ page }) => {
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
 
-    // Net Worth: 65500 - 295000 = -229500
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$229,500");
+    // Net Worth: 65500 + 170000 - 15000 = 220500
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$220,500");
 
     // Monthly Surplus: 6300 - 2950 = 3350
     await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$3,350");
@@ -24,7 +24,7 @@ test.describe("Shared state — live dashboard updates", () => {
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
 
     // Get initial net worth
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$229,500");
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$220,500");
 
     // Add a new asset worth $100,000
     const assetSection = page.locator("text=Assets").locator("..");
@@ -33,8 +33,8 @@ test.describe("Shared state — live dashboard updates", () => {
     await page.getByLabel("New asset amount").fill("100000");
     await page.getByLabel("Confirm add asset").click();
 
-    // Net worth should update: -229500 + 100000 = -129500
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$129,500");
+    // Net worth should update: 220500 + 100000 = 320500
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$320,500");
 
     await captureScreenshot(page, "task-10-asset-updates-dashboard");
   });
@@ -48,8 +48,8 @@ test.describe("Shared state — live dashboard updates", () => {
     await carLoanRow.hover();
     await carLoanRow.getByLabel("Delete Car Loan").click();
 
-    // Net worth should update: -229500 + 15000 = -214500
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$214,500");
+    // Net worth should update: 220500 + 15000 = 235500
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$235,500");
 
     await captureScreenshot(page, "task-10-debt-delete-updates-dashboard");
   });
@@ -125,8 +125,8 @@ test.describe("Shared state — live dashboard updates", () => {
     await page.getByLabel("New income amount").fill("1000");
     await page.getByLabel("Confirm add income").click();
 
-    // Net worth: -229500 + 10000 = -219500
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("-$219,500");
+    // Net worth: 220500 + 10000 = 230500
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$230,500");
 
     // Surplus: (6300 + 1000) - 2950 = 4350
     await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$4,350");

@@ -1,6 +1,8 @@
 export interface FinancialData {
   totalAssets: number;
   totalDebts: number;
+  /** Liquid assets only (excludes property equity). Used for runway calculation. */
+  liquidAssets?: number;
   monthlyIncome: number;
   monthlyExpenses: number;
   goals: { name: string; target: number; current: number }[];
@@ -21,7 +23,9 @@ export function generateInsights(data: FinancialData): Insight[] {
 
   const netWorth = totalAssets - totalDebts;
   const surplus = monthlyIncome - monthlyExpenses;
-  const runway = monthlyExpenses > 0 ? totalAssets / monthlyExpenses : 0;
+  // Use liquid assets for runway if available, otherwise fall back to totalAssets
+  const runwayAssets = data.liquidAssets ?? totalAssets;
+  const runway = monthlyExpenses > 0 ? runwayAssets / monthlyExpenses : 0;
   const savingsRate = monthlyIncome > 0 ? (surplus / monthlyIncome) * 100 : 0;
 
   // Runway insight

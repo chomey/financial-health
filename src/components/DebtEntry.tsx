@@ -13,7 +13,6 @@ const DEBT_CATEGORY_SUGGESTIONS = {
   CA: ["HELOC", "Canada Student Loan"],
   US: ["Medical Debt", "Federal Student Loan"],
   universal: [
-    "Mortgage",
     "Car Loan",
     "Student Loan",
     "Credit Card",
@@ -50,7 +49,6 @@ export function getDebtCategoryFlag(category: string): string {
 }
 
 const MOCK_DEBTS: Debt[] = [
-  { id: "d1", category: "Mortgage", amount: 280000 },
   { id: "d2", category: "Car Loan", amount: 15000 },
 ];
 

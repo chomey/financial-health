@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 19
-- **Completed**: 17
-- **Remaining**: 2
+- **Completed**: 18
+- **Remaining**: 1
 - **Last Updated**: 2026-02-27
 
 ---
@@ -520,3 +520,32 @@
   ![Region pulse animation](screenshots/task-17-region-pulse.png)
   ![Debt Both suggestions](screenshots/task-17-debt-both-suggestions.png)
 - **Notes**: DebtEntry now supports region-aware category suggestions matching the same pattern as AssetEntry. CA-specific debt categories (HELOC, Canada Student Loan) and US-specific (Medical Debt, Federal Student Loan) are shown/hidden based on region toggle. Flag emoji badges (🇨🇦/🇺🇸) appear next to region-specific categories in both saved item labels and suggestion dropdowns for both assets and debts. The region pulse animation uses a CSS keyframe that flashes a blue border and expanding ring on asset/debt cards when the region toggle changes. Pre-existing E2E test flakiness was discovered and mitigated: rapid-fire add operations occasionally lose an onChange propagation due to the useEffect-based onChange pattern interacting with URL state sync. This is a known limitation of the Task 16 fix that should be addressed in a future task.
+
+## Task 18: Replace mortgage mock data with linked Property card
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/PropertyEntry.tsx`: Created new Property card component with `Property` interface (`{ id, name, value, mortgage }` with derived equity). Supports inline editing for name, value, and mortgage fields. Shows computed equity per property. Same interaction patterns as other entry cards (hover highlight, click-to-edit, delete, add new, smooth transitions). Empty state encourages adding properties.
+  - `src/lib/financial-state.ts`: Added `Property` import, added `properties: Property[]` to `FinancialState`. Updated `INITIAL_STATE` to remove Mortgage from debts and add default property ("Home" $450k/$280k). Updated `computeTotals()` to return `totalPropertyEquity`, `totalPropertyValue`, `totalPropertyMortgage`. Updated `computeMetrics()` so net worth includes property equity, debt-to-asset includes mortgage, but runway uses only liquid assets. Updated `toFinancialData()` to include `liquidAssets` field.
+  - `src/lib/url-state.ts`: Added `CompactProperty` interface and `p` field to `CompactState`. Updated `toCompact()` and `fromCompact()` for property serialization. Backward compatible — missing `p` field defaults to empty array.
+  - `src/lib/insights.ts`: Added optional `liquidAssets` field to `FinancialData`. Runway insight uses `liquidAssets` when available, falling back to `totalAssets`.
+  - `src/components/AssetEntry.tsx`: Removed "Home Equity" from universal category suggestions (properties are now tracked separately).
+  - `src/components/DebtEntry.tsx`: Removed "Mortgage" from universal category suggestions and from MOCK_DEBTS (mortgages are now tracked in Property).
+  - `src/app/page.tsx`: Added PropertyEntry import, `properties` state, and wired it into the entry panel between debts and income/expenses. URL state sync includes properties.
+  - Updated 6 existing test files to match new mock data values (debt totals, net worth, debt-to-asset ratio, category suggestions).
+  - Updated 6 existing E2E test files to match new mock data values.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/property-entry.test.tsx`: 14 T1 tests — renders heading, mock data, formatted values, total equity, add form, delete, empty state, inline edit name/value/mortgage, list roles, underwater equity capped at 0, onChange callback (14 passed, 0 failed)
+  - `tests/e2e/property-entry.spec.ts`: 6 T2 tests — displays mock data, add new property, delete property, inline edit value with equity update, dashboard metric updates on property change, URL state persistence across reload (6 passed, 0 failed)
+  - All pre-existing T1 tests: 238 passed, 0 failed (updated for new mock data)
+  - All pre-existing T2/T3 tests: 102 passed, 0 failed (updated for new mock data)
+  - Total: 252 T1 passed, 108 T2/T3 passed, 0 failed (360 total)
+- **Screenshots**:
+  ![Property card with mock data](screenshots/task-18-property-card.png)
+  ![Property added](screenshots/task-18-property-added.png)
+  ![Property deleted](screenshots/task-18-property-deleted.png)
+  ![Property value edited](screenshots/task-18-property-value-edited.png)
+  ![Dashboard after property delete](screenshots/task-18-dashboard-after-property-delete.png)
+  ![Property persists after reload](screenshots/task-18-property-persists-reload.png)
+- **Notes**: Property equity is derived (value - mortgage, capped at 0) and not directly editable. Properties count toward net worth and debt-to-asset ratio but NOT financial runway (illiquid). The URL encoding is backward compatible — URLs without the `p` field decode to empty properties array. Mock data shifted significantly: Mortgage moved from Debts to Property, net worth went from -$229,500 to +$220,500, debt total from $295,000 to $15,000. All existing tests were updated to match.

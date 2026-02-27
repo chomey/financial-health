@@ -11,15 +11,14 @@ test.describe("Debt entry section", () => {
     ).toBeVisible();
 
     // Check mock data rows
-    await expect(page.getByText("Mortgage", { exact: true })).toBeVisible();
     await expect(page.getByText("Car Loan")).toBeVisible();
 
-    // Check formatted amounts
-    await expect(page.getByText("$280,000")).toBeVisible();
-    await expect(page.getByText("$15,000")).toBeVisible();
+    // Check formatted amounts (scoped to list item to avoid matching total)
+    const debtsList = page.getByRole("list", { name: "Debt items" });
+    await expect(debtsList.getByRole("listitem").filter({ hasText: "Car Loan" })).toContainText("$15,000");
 
     // Check total
-    await expect(page.getByText("Total: $295,000")).toBeVisible();
+    await expect(page.getByText("Total: $15,000")).toBeVisible();
 
     await captureScreenshot(page, "task-5-debts-with-mock-data");
   });
@@ -55,7 +54,7 @@ test.describe("Debt entry section", () => {
     await expect(page.getByText("$25,000")).toBeVisible();
 
     // Total should update
-    await expect(page.getByText("Total: $320,000")).toBeVisible();
+    await expect(page.getByText("Total: $40,000")).toBeVisible();
 
     await captureScreenshot(page, "task-5-debt-added");
   });
@@ -75,8 +74,8 @@ test.describe("Debt entry section", () => {
     // Should be gone
     await expect(page.getByText("Car Loan")).not.toBeVisible();
 
-    // Total should update
-    await expect(page.getByText("Total: $280,000")).toBeVisible();
+    // Total should update (no debts remain)
+    await expect(page.getByText("Total: $0")).toBeVisible();
 
     await captureScreenshot(page, "task-5-debt-deleted");
   });
@@ -86,7 +85,7 @@ test.describe("Debt entry section", () => {
   }) => {
     await page.goto("/");
 
-    await page.getByLabel("Edit category for Mortgage").click();
+    await page.getByLabel("Edit category for Car Loan").click();
 
     // Should show an edit input
     const editInput = page.getByLabel("Edit category name");
@@ -112,8 +111,8 @@ test.describe("Debt entry section", () => {
       page.getByLabel(/Edit amount for Car Loan, currently \$12,000/)
     ).toBeVisible();
 
-    // Total should update (280000 + 12000 = 292000)
-    await expect(page.getByText("Total: $292,000")).toBeVisible();
+    // Total should update (only Car Loan edited to 12000)
+    await expect(page.getByText("Total: $12,000")).toBeVisible();
 
     await captureScreenshot(page, "task-5-debt-amount-edited");
   });

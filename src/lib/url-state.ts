@@ -112,12 +112,18 @@ interface CompactGoal {
   t: number; // target
   s: number; // saved
 }
+interface CompactProperty {
+  n: string; // name
+  v: number; // value
+  m: number; // mortgage
+}
 interface CompactState {
   a: CompactAsset[];
   d: CompactDebt[];
   i: CompactIncome[];
   e: CompactExpense[];
   g: CompactGoal[];
+  p?: CompactProperty[]; // properties (optional for backward compat)
   r?: string; // region: "CA" | "US" | "both"
 }
 
@@ -129,6 +135,10 @@ function toCompact(state: FinancialState): CompactState {
     e: state.expenses.map((x) => ({ c: x.category, a: x.amount })),
     g: state.goals.map((x) => ({ n: x.name, t: x.targetAmount, s: x.currentAmount })),
   };
+  const properties = state.properties ?? [];
+  if (properties.length > 0) {
+    compact.p = properties.map((x) => ({ n: x.name, v: x.value, m: x.mortgage }));
+  }
   if (state.region && state.region !== "both") {
     compact.r = state.region;
   }
@@ -149,6 +159,12 @@ function fromCompact(compact: CompactState): FinancialState {
       name: x.n,
       targetAmount: x.t,
       currentAmount: x.s,
+    })),
+    properties: (compact.p ?? []).map((x) => ({
+      id: nextId(),
+      name: x.n,
+      value: x.v,
+      mortgage: x.m,
     })),
   };
 }

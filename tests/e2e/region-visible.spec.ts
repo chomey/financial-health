@@ -144,7 +144,7 @@ test.describe("Region toggle visible effects", () => {
     // Should see both CA and US specific categories plus universal
     await expect(page.getByRole("button", { name: /HELOC/ })).toBeVisible();
     await expect(page.getByRole("button", { name: /Medical Debt/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Mortgage", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Car Loan", exact: true })).toBeVisible();
 
     await captureScreenshot(page, "task-17-debt-both-suggestions");
   });

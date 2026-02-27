@@ -26,7 +26,7 @@ describe("financial-state", () => {
 
     it("sums debts correctly from initial state", () => {
       const { totalDebts } = computeTotals(INITIAL_STATE);
-      expect(totalDebts).toBe(280000 + 15000);
+      expect(totalDebts).toBe(15000);
     });
 
     it("sums income correctly from initial state", () => {
@@ -39,6 +39,13 @@ describe("financial-state", () => {
       expect(monthlyExpenses).toBe(2200 + 600 + 150);
     });
 
+    it("computes property equity from initial state", () => {
+      const { totalPropertyEquity, totalPropertyValue, totalPropertyMortgage } = computeTotals(INITIAL_STATE);
+      expect(totalPropertyValue).toBe(450000);
+      expect(totalPropertyMortgage).toBe(280000);
+      expect(totalPropertyEquity).toBe(170000);
+    });
+
     it("handles empty arrays", () => {
       const empty: FinancialState = {
         assets: [],
@@ -46,6 +53,7 @@ describe("financial-state", () => {
         income: [],
         expenses: [],
         goals: [],
+        properties: [],
       };
       const totals = computeTotals(empty);
       expect(totals.totalAssets).toBe(0);
@@ -61,11 +69,12 @@ describe("financial-state", () => {
       expect(metrics).toHaveLength(4);
     });
 
-    it("computes net worth as assets minus debts", () => {
+    it("computes net worth as liquid assets + property equity minus debts", () => {
       const metrics = computeMetrics(INITIAL_STATE);
       const netWorth = metrics.find((m) => m.title === "Net Worth");
       expect(netWorth).toBeDefined();
-      expect(netWorth!.value).toBe(65500 - 295000);
+      // liquid assets (65500) + property equity (170000) - debts (15000)
+      expect(netWorth!.value).toBe(65500 + 170000 - 15000);
       expect(netWorth!.format).toBe("currency");
     });
 
@@ -85,11 +94,12 @@ describe("financial-state", () => {
       expect(runway!.format).toBe("months");
     });
 
-    it("computes debt-to-asset ratio", () => {
+    it("computes debt-to-asset ratio including property", () => {
       const metrics = computeMetrics(INITIAL_STATE);
       const ratio = metrics.find((m) => m.title === "Debt-to-Asset Ratio");
       expect(ratio).toBeDefined();
-      expect(ratio!.value).toBeCloseTo(295000 / 65500, 2);
+      // (debts 15000 + mortgage 280000) / (liquid 65500 + equity 170000)
+      expect(ratio!.value).toBeCloseTo((15000 + 280000) / (65500 + 170000), 2);
       expect(ratio!.format).toBe("ratio");
     });
 
@@ -146,8 +156,12 @@ describe("financial-state", () => {
   describe("toFinancialData", () => {
     it("converts state to FinancialData for insights", () => {
       const data = toFinancialData(INITIAL_STATE);
-      expect(data.totalAssets).toBe(65500);
-      expect(data.totalDebts).toBe(295000);
+      // totalAssets includes property equity: 65500 + 170000
+      expect(data.totalAssets).toBe(65500 + 170000);
+      // totalDebts includes mortgage: 15000 + 280000
+      expect(data.totalDebts).toBe(15000 + 280000);
+      // liquidAssets excludes property
+      expect(data.liquidAssets).toBe(65500);
       expect(data.monthlyIncome).toBe(6300);
       expect(data.monthlyExpenses).toBe(2950);
     });
