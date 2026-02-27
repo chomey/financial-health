@@ -1,26 +1,31 @@
 # Tasks
 
-<!--
-  Populate this file with discrete, well-defined tasks.
-  Each task should be completable in a single Ralph Loop iteration.
+- [x] Task 1: [ARCH] Initialize Next.js project with Tailwind CSS and Vitest — Scaffold a Next.js 15 app with TypeScript (strict mode), Tailwind CSS v4, and Vitest. Run `npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --no-import-alias` (use src/ directory). Add Vitest with `npm install -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/jest-dom`. Create `vitest.config.ts` with jsdom environment and React plugin. Configure a custom Tailwind color palette in the CSS theme: warm greens (emerald/teal for positive metrics), warm neutrals (stone/slate for backgrounds), soft blues (for info/links), and a celebratory gold/amber for achievements. Add a `"test": "vitest run"` script to package.json. Verification: `npm run dev` serves a styled page at localhost:3000, `npm test` runs with 0 tests found (no error). [@devops]
 
-  Format:
-  - [ ] Task N: Short title — Longer description of what needs to be done
+- [ ] Task 2: Set up Playwright screenshot & test infrastructure — Install Playwright with `npm init playwright@latest` (use tests/e2e/ directory, install browsers). Configure `playwright.config.ts` with baseURL `http://localhost:3000`, webServer that runs `npm run dev`, and a screenshot helper utility at `tests/e2e/helpers.ts` that captures and saves screenshots to `screenshots/` with descriptive filenames. Create `.gitattributes` to track `*.png *.jpg *.jpeg *.gif *.webp *.svg` via Git LFS. Write one smoke test (`tests/e2e/smoke.spec.ts`) that loads `/`, verifies the page renders with the app title, and saves a screenshot. Verification: `npx playwright test` passes, screenshot appears in `screenshots/`. [@qa]
 
-  Tips for good tasks:
-  - Keep them small and atomic (one thing per task)
-  - Order them so dependencies come first
-  - Be specific about what "done" looks like
-  - Include file paths or function names when relevant
--->
+- [ ] Task 3: Build app shell & responsive layout — Create the main page layout: a left-hand entry panel and a right-hand dashboard panel, side by side on desktop, stacked on mobile. Add an app header with the name "Financial Health Snapshot" and a warm tagline (e.g., "Your finances at a glance — no judgment, just clarity"). All panels should have subtle hover lift effects, smooth transitions, and a polished empty state. [@frontend]
 
-<!-- EXAMPLE TASKS (replace with your own — note UI-first ordering):
-- [ ] Task 1: Initialize project & dev server — Scaffold the project so it runs and displays a page in the browser
-- [ ] Task 2: Set up screenshot & test infrastructure — Install Playwright (or equivalent), create a helper that takes automated screenshots, verify it captures the running app
-- [ ] Task 3: Build app shell & navigation — Create the main layout, nav bar, and page routing with placeholder pages
-- [ ] Task 4: Build core screen with mock data — Implement the primary UI screen using hardcoded/mock data so it's visually verifiable
-- [ ] Task 5: Set up data models — Create the core data models per the PRD
-- [ ] Task 6: Wire real data into UI — Replace mock data with real data layer, keeping the UI intact
-- [ ] Task 7: Implement feature X — Build [specific feature] end-to-end (UI + logic)
-- [ ] Task 8: Implement feature Y — Build [specific feature] with [specific requirements]
--->
+- [ ] Task 4: Build asset entry section with mock data — Create the Assets card in the entry panel. Pre-populate with 2-3 example assets (e.g., "Savings Account: $12,000", "TFSA: $35,000"). Each row shows a category label and dollar amount. Rows highlight on hover, show a delete button on hover. An "Add Asset" button at the bottom smoothly expands a new row with inline editing (click to type category name and amount). Support category suggestions for CA (TFSA, RRSP, RESP, FHSA, LIRA) and US (401k, IRA, Roth IRA, 529, HSA) plus universal ones (Savings, Checking, Brokerage, Home Equity, Vehicle, Other). All values click-to-edit with smooth focus transitions. [@frontend]
+
+- [ ] Task 5: Build debt entry section — Create the Debts card, same interaction pattern as assets. Pre-populate with 1-2 example debts (e.g., "Mortgage: $280,000", "Car Loan: $15,000"). Category suggestions: Mortgage, Car Loan, Student Loan, Credit Card, Line of Credit, Personal Loan, Other. Rows have hover highlight, hover-reveal delete, click-to-edit values, smooth add/remove animations. [@frontend]
+
+- [ ] Task 6: Build income & expense entry sections — Create two cards: Monthly Income and Monthly Expenses. Income has category suggestions (Salary, Freelance, Investment Income, Side Hustle, Other). Expenses has flexible categories (Rent/Mortgage Payment, Childcare, Groceries, Subscriptions, Transportation, Insurance, Utilities, "Monthly Expenses" as a catch-all, Other). Users can be as granular or broad as they want. Same interaction pattern: hover highlights, click-to-edit, smooth add/remove. Show a monthly total at the bottom of each card that animates when values change. [@frontend]
+
+- [ ] Task 7: Build financial goals section — Create a Goals card. Each goal has a name (e.g., "New Car", "Emergency Fund", "Vacation"), a target amount, and a current amount saved. Show an animated progress bar for each goal. Add button expands a new inline goal. Progress bars should have smooth fill animations, color transitions (warm to green as they approach 100%), and a celebratory glow effect when a goal is reached. Hover on a goal shows a tooltip with percentage and remaining amount. [@frontend]
+
+- [ ] Task 8: Build snapshot dashboard with mock calculations — Create the right-hand dashboard panel. Display four key metric cards: Net Worth (assets minus debts), Monthly Surplus/Deficit (income minus expenses), Financial Runway (months of expenses covered by liquid assets), and Debt-to-Asset Ratio. Use hardcoded mock values initially. Each metric card should have a large number that counts up on load, a label, a subtle icon, and a hover tooltip explaining what the metric means. Cards lift on hover. Use encouraging color coding (greens for positive metrics). [@frontend]
+
+- [ ] Task 9: Build positive insights engine — Below the metric cards, add an Insights section that generates 3-5 human-readable, encouraging messages based on the financial data. Use the actual values from the entry panel (wire the state). Examples: "You could comfortably cover about 18 months of expenses — that's a strong safety net", "Your savings are growing nicely — you're 60% of the way to your New Car goal", "You're spending less than you earn each month — that surplus is building your future". Insights should have a warm card style, subtle entrance animations, and an icon per insight type (shield for runway, trending-up for surplus, target for goals). [@fullstack]
+
+- [ ] Task 10: Wire all entry sections to shared state — Connect assets, debts, income, expenses, and goals to a shared React state (useReducer or useState). Dashboard metrics should recalculate live as the user edits any value. Numbers in the dashboard should animate smoothly when they change. Ensure add/edit/delete in any section immediately updates the dashboard. [@fullstack]
+
+- [ ] Task 11: Implement URL state persistence — Encode the full app state (all assets, debts, income, expenses, goals) as base85-encoded JSON in a `s=` query param. Update the URL on every state change (using `replaceState`, not `pushState`, to avoid polluting browser history). On page load, read the `s=` param and restore state. Add a "Copy Link" button in the header that copies the current URL to clipboard with a brief "Copied!" animation. Verify that reloading the page preserves all entered data exactly. [@fullstack]
+
+- [ ] Task 12: Add region toggle for CA/US financial vehicles — Add a toggle in the header or settings area that lets users choose their region (Canada, United States, or Both). The toggle should use flag icons or short labels (CA/US). When a region is selected, asset and debt category suggestions should filter to show only relevant vehicles (e.g., CA shows TFSA/RRSP but not 401k). "Both" shows all. The selection should persist in the URL state. Smooth transition when toggling. [@frontend]
+
+- [ ] Task 13: Add micro-interactions and polish — Audit the entire UI for interactivity polish. Ensure: all buttons have hover, focus, and active states; all cards lift on hover with shadow transitions; number inputs have smooth focus rings; add/remove items have slide-in/slide-out animations; the "runway" metric has a special celebratory glow when it exceeds 12 months; tooltips appear on hover for financial terms (e.g., "Net Worth", "Runway"); empty states have friendly illustrations or messages encouraging the user to add their first item. [@frontend]
+
+- [ ] Task 14: Mobile responsiveness pass — Ensure the entire app works beautifully on mobile. Entry panel stacks above dashboard. Cards are full-width. Touch targets are large enough (min 44px). Inline editing works well on mobile keyboards. The "Copy Link" button is easily accessible. Test at 375px, 768px, and 1024px widths. [@frontend]
+
+- [ ] Task 15: [MILESTONE] Full E2E test — Write a comprehensive end-to-end test that: loads the app, adds 3 assets, 2 debts, income and expenses, and a goal; verifies dashboard metrics update correctly; copies the URL; reloads the page; verifies all data is preserved; toggles region and verifies category suggestions change. Capture screenshots at each step. [@qa]
