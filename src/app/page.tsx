@@ -5,6 +5,7 @@ import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import GoalEntry from "@/components/GoalEntry";
+import SnapshotDashboard from "@/components/SnapshotDashboard";
 
 export default function Home() {
   return (
@@ -45,30 +46,8 @@ export default function Home() {
             className="lg:col-span-5"
             aria-label="Financial dashboard"
           >
-            <div className="space-y-6 lg:sticky lg:top-8">
-              <DashboardCard title="Net Worth" value="—">
-                <p className="text-xs text-stone-400">
-                  Assets minus debts
-                </p>
-              </DashboardCard>
-
-              <DashboardCard title="Monthly Surplus" value="—">
-                <p className="text-xs text-stone-400">
-                  Income minus expenses
-                </p>
-              </DashboardCard>
-
-              <DashboardCard title="Financial Runway" value="—">
-                <p className="text-xs text-stone-400">
-                  Months of expenses covered by liquid assets
-                </p>
-              </DashboardCard>
-
-              <DashboardCard title="Debt-to-Asset Ratio" value="—">
-                <p className="text-xs text-stone-400">
-                  How your debts compare to your assets
-                </p>
-              </DashboardCard>
+            <div className="lg:sticky lg:top-8">
+              <SnapshotDashboard />
             </div>
           </section>
         </div>
@@ -97,20 +76,3 @@ function EntryCard({
   );
 }
 
-function DashboardCard({
-  title,
-  value,
-  children,
-}: {
-  title: string;
-  value: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-      <h3 className="text-sm font-medium text-stone-500">{title}</h3>
-      <p className="mt-1 text-3xl font-bold text-stone-800">{value}</p>
-      <div className="mt-2">{children}</div>
-    </div>
-  );
-}

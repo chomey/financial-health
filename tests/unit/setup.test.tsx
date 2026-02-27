@@ -52,10 +52,13 @@ describe("App shell layout", () => {
     expect(screen.getByText("Debt-to-Asset Ratio")).toBeInTheDocument();
   });
 
-  it("shows placeholder values in dashboard cards", () => {
+  it("shows metric values in dashboard cards", () => {
     render(<Home />);
-    const dashes = screen.getAllByText("—");
-    expect(dashes.length).toBe(4);
+    // Each metric card has a group role with the metric title as label
+    expect(screen.getByRole("group", { name: "Net Worth" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Monthly Surplus" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Financial Runway" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Debt-to-Asset Ratio" })).toBeInTheDocument();
   });
 
   it("shows mock data in income and expense sections", () => {
