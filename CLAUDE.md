@@ -112,7 +112,7 @@ When operating in Ralph Loop mode (invoked via `ralph.zsh`), follow these rules:
 2. **Read PROGRESS.md** to understand what has been done so far
 3. **Complete exactly ONE task** per iteration
 4. **Write tests (tiered by domain)** — Every task MUST include automated tests at the tiers required by its agent tag. **T1 (Unit + API)** is always required. **T2 (Browser integration)** is required for `[@frontend]`, `[@fullstack]`, and `[@qa]` tasks. **T3 (Full E2E)** runs on `[@qa]` tasks, tasks tagged `[E2E]` or `[MILESTONE]`, and automatically every 5 completed tasks. Do not mark a task complete without passing all required-tier tests.
-5. **Capture screenshots** — If the project has a visual UI, automate screenshots (e.g. using Playwright, Puppeteer, or equivalent) after each task. Save screenshots to `screenshots/` and embed them in PROGRESS.md using `![description](screenshots/filename.png)`.
+5. **Capture screenshots** — If the project has a visual UI, run Playwright with `CAPTURE_SCREENSHOTS=1 npx playwright test` to capture screenshots. Without this env var, `captureScreenshot()` is a no-op — this prevents test re-runs from overwriting committed task screenshots. Save screenshots to `screenshots/` and embed them in PROGRESS.md using `![description](screenshots/filename.png)`.
 6. **Mark the task as done** in TASKS.md (`- [x]`)
 7. **Log your work** in PROGRESS.md with a timestamped entry, including integration test results and any screenshots
 8. **Run tests/build** after each change to verify nothing is broken. Run all T1 tests plus any new tests you wrote. Run T2 tests only if the agent tag requires it (`[@frontend]`, `[@fullstack]`, `[@qa]`). Run T3 tests only when triggered (every 5 completed tasks, `[E2E]`/`[MILESTONE]` tags, or `[@qa]` tasks). All required-tier tests MUST pass. **If tests you did NOT write are now failing**, `git stash` your changes, fix the pre-existing failure, commit the fix with `ralph: fix pre-existing test failure during task [N]`, then `git stash pop` and continue.
@@ -171,6 +171,7 @@ Before starting implementation on a task, Ralph MUST:
 ## Screenshots & Git LFS
 - **Git LFS is required for all image files.** Ensure `.gitattributes` tracks `*.png`, `*.jpg`, `*.jpeg`, `*.gif`, `*.webp`, and `*.svg` via Git LFS. If `.gitattributes` doesn't exist or doesn't track images, create/update it before committing any screenshots.
 - **Screenshots MUST be committed with each task** — include them in the task's commit so progress is visible in the git history.
+- **Screenshot capture is opt-in** — `captureScreenshot()` only writes files when `CAPTURE_SCREENSHOTS=1` is set. Use `CAPTURE_SCREENSHOTS=1 npx playwright test` when you need screenshots for a task commit. Normal test runs (`npx playwright test`) skip capture to avoid overwriting previously committed screenshots.
 - **T3/regression QA tasks do NOT commit screenshots.** When running full T3 regression tests or QA summary tasks, just report "all tests pass" — do not duplicate screenshots that were already captured in the original task commits.
 
 ## Important Notes
