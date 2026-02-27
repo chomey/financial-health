@@ -1,13 +1,34 @@
 "use client";
 
+import { useState } from "react";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import GoalEntry from "@/components/GoalEntry";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
+import {
+  INITIAL_STATE,
+  computeMetrics,
+  toFinancialData,
+} from "@/lib/financial-state";
+import type { Asset } from "@/components/AssetEntry";
+import type { Debt } from "@/components/DebtEntry";
+import type { IncomeItem } from "@/components/IncomeEntry";
+import type { ExpenseItem } from "@/components/ExpenseEntry";
+import type { Goal } from "@/components/GoalEntry";
 
 export default function Home() {
+  const [assets, setAssets] = useState<Asset[]>(INITIAL_STATE.assets);
+  const [debts, setDebts] = useState<Debt[]>(INITIAL_STATE.debts);
+  const [income, setIncome] = useState<IncomeItem[]>(INITIAL_STATE.income);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
+  const [goals, setGoals] = useState<Goal[]>(INITIAL_STATE.goals);
+
+  const state = { assets, debts, income, expenses, goals };
+  const metrics = computeMetrics(state);
+  const financialData = toFinancialData(state);
+
   return (
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white px-6 py-4 shadow-sm">
@@ -29,15 +50,15 @@ export default function Home() {
             aria-label="Financial data entry"
           >
             <div className="space-y-6">
-              <AssetEntry />
+              <AssetEntry items={assets} onChange={setAssets} />
 
-              <DebtEntry />
+              <DebtEntry items={debts} onChange={setDebts} />
 
-              <IncomeEntry />
+              <IncomeEntry items={income} onChange={setIncome} />
 
-              <ExpenseEntry />
+              <ExpenseEntry items={expenses} onChange={setExpenses} />
 
-              <GoalEntry />
+              <GoalEntry items={goals} onChange={setGoals} />
             </div>
           </section>
 
@@ -47,7 +68,7 @@ export default function Home() {
             aria-label="Financial dashboard"
           >
             <div className="lg:sticky lg:top-8">
-              <SnapshotDashboard />
+              <SnapshotDashboard metrics={metrics} financialData={financialData} />
             </div>
           </section>
         </div>
@@ -55,24 +76,3 @@ export default function Home() {
     </div>
   );
 }
-
-function EntryCard({
-  title,
-  icon,
-  children,
-}: {
-  title: string;
-  icon: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-      <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-stone-800">
-        <span aria-hidden="true">{icon}</span>
-        {title}
-      </h2>
-      <div className="text-sm">{children}</div>
-    </div>
-  );
-}
-

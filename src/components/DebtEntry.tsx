@@ -47,8 +47,27 @@ function parseCurrencyInput(value: string): number {
   return isNaN(parsed) ? 0 : parsed;
 }
 
-export default function DebtEntry() {
-  const [debts, setDebts] = useState<Debt[]>(MOCK_DEBTS);
+interface DebtEntryProps {
+  items?: Debt[];
+  onChange?: (items: Debt[]) => void;
+}
+
+export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
+  const [debts, setDebtsInternal] = useState<Debt[]>(items ?? MOCK_DEBTS);
+
+  useEffect(() => {
+    if (items !== undefined) {
+      setDebtsInternal(items);
+    }
+  }, [items]);
+
+  const setDebts = (updater: Debt[] | ((prev: Debt[]) => Debt[])) => {
+    setDebtsInternal((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      onChange?.(next);
+      return next;
+    });
+  };
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "category" | "amount" | null

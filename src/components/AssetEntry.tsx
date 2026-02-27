@@ -55,8 +55,28 @@ function parseCurrencyInput(value: string): number {
   return isNaN(parsed) ? 0 : parsed;
 }
 
-export default function AssetEntry() {
-  const [assets, setAssets] = useState<Asset[]>(MOCK_ASSETS);
+interface AssetEntryProps {
+  items?: Asset[];
+  onChange?: (items: Asset[]) => void;
+}
+
+export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
+  const [assets, setAssetsInternal] = useState<Asset[]>(items ?? MOCK_ASSETS);
+
+  // Sync with parent if controlled
+  useEffect(() => {
+    if (items !== undefined) {
+      setAssetsInternal(items);
+    }
+  }, [items]);
+
+  const setAssets = (updater: Asset[] | ((prev: Asset[]) => Asset[])) => {
+    setAssetsInternal((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      onChange?.(next);
+      return next;
+    });
+  };
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "category" | "amount" | null

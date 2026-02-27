@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import InsightsPanel from "@/components/InsightsPanel";
+import type { FinancialData } from "@/lib/insights";
 
 interface MetricData {
   title: string;
@@ -157,14 +158,21 @@ function MetricCard({ metric }: { metric: MetricData }) {
   );
 }
 
-export default function SnapshotDashboard() {
+interface SnapshotDashboardProps {
+  metrics?: MetricData[];
+  financialData?: FinancialData;
+}
+
+export default function SnapshotDashboard({ metrics, financialData }: SnapshotDashboardProps = {}) {
+  const displayMetrics = metrics ?? MOCK_METRICS;
+
   return (
     <div className="space-y-6" data-testid="snapshot-dashboard">
-      {MOCK_METRICS.map((metric) => (
+      {displayMetrics.map((metric) => (
         <MetricCard key={metric.title} metric={metric} />
       ))}
 
-      <InsightsPanel />
+      <InsightsPanel data={financialData} />
     </div>
   );
 }
