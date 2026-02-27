@@ -17,11 +17,13 @@ test.describe("Smoke test", () => {
     );
     await expect(tagline).toBeVisible();
 
-    // Verify the welcome message is present
-    const welcome = page.getByText(
-      "Welcome! Your financial snapshot is on its way."
-    );
-    await expect(welcome).toBeVisible();
+    // Verify both panels are present
+    await expect(
+      page.getByRole("region", { name: "Financial data entry" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Financial dashboard" })
+    ).toBeVisible();
 
     // Capture screenshot
     await captureScreenshot(page, "task-2-home-loaded");
