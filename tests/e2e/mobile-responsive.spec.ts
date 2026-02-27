@@ -12,7 +12,7 @@ test.describe("Mobile responsiveness — 375px viewport", () => {
     await expect(page.locator("h1")).toContainText("Financial Health Snapshot");
 
     // Region toggle and Copy Link button should be accessible
-    const regionToggle = page.getByRole("radiogroup", { name: "Select financial region" });
+    const regionToggle = page.getByRole("radiogroup", { name: "Filter account types by region" });
     await expect(regionToggle).toBeVisible();
 
     const copyButton = page.getByRole("button", { name: "Copy link to clipboard" });

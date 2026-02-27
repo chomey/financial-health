@@ -40,6 +40,31 @@ export function getAllCategorySuggestions(region?: Region): string[] {
   ];
 }
 
+export interface SuggestionGroup {
+  label: string;
+  items: string[];
+}
+
+export function getGroupedCategorySuggestions(region?: Region): SuggestionGroup[] {
+  const groups: SuggestionGroup[] = [];
+  if (region !== "US") {
+    groups.push({ label: "🇨🇦 Canadian", items: CATEGORY_SUGGESTIONS.CA });
+  }
+  if (region !== "CA") {
+    groups.push({ label: "🇺🇸 US", items: CATEGORY_SUGGESTIONS.US });
+  }
+  groups.push({ label: "General", items: CATEGORY_SUGGESTIONS.universal });
+  return groups;
+}
+
+/** Check if a category belongs to the "other" region (not selected) */
+export function isOutOfRegion(category: string, region?: Region): boolean {
+  if (!region || region === "both") return false;
+  if (region === "CA" && US_ASSET_CATEGORIES.has(category)) return true;
+  if (region === "US" && CA_ASSET_CATEGORIES.has(category)) return true;
+  return false;
+}
+
 /** Returns a flag emoji if the category is region-specific, or empty string */
 export function getAssetCategoryFlag(category: string): string {
   if (CA_ASSET_CATEGORIES.has(category)) return "🇨🇦";
@@ -225,6 +250,18 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
     return all.filter((s) => s.toLowerCase().includes(query.toLowerCase()));
   };
 
+  const filteredGroupedSuggestions = (query: string): SuggestionGroup[] => {
+    const groups = getGroupedCategorySuggestions(region);
+    return groups
+      .map((group) => ({
+        ...group,
+        items: query
+          ? group.items.filter((s) => s.toLowerCase().includes(query.toLowerCase()))
+          : group.items,
+      }))
+      .filter((group) => group.items.length > 0);
+  };
+
   const total = assets.reduce((sum, a) => sum + a.amount, 0);
 
   return (
@@ -247,11 +284,13 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
         </div>
       ) : (
         <div className="space-y-1" role="list" aria-label="Asset items">
-          {assets.map((asset) => (
+          {assets.map((asset) => {
+            const outOfRegion = isOutOfRegion(asset.category, region);
+            return (
             <div
               key={asset.id}
               role="listitem"
-              className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-stone-50"
+              className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50 ${outOfRegion ? "opacity-50" : ""}`}
             >
               <div className="flex flex-1 items-center gap-3 min-w-0">
                 {/* Category */}
@@ -276,28 +315,33 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
                       aria-label="Edit category name"
                     />
                     {showSuggestions &&
-                      filteredSuggestions(editValue).length > 0 && (
+                      filteredGroupedSuggestions(editValue).length > 0 && (
                         <div
                           ref={suggestionsRef}
-                          className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
+                          className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
                         >
-                          {filteredSuggestions(editValue).map((suggestion) => (
-                            <button
-                              key={suggestion}
-                              type="button"
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                setEditValue(suggestion);
-                                setShowSuggestions(false);
-                                commitEdit();
-                              }}
-                              className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
-                            >
-                              {getAssetCategoryFlag(suggestion) && (
-                                <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
-                              )}
-                              {suggestion}
-                            </button>
+                          {filteredGroupedSuggestions(editValue).map((group) => (
+                            <div key={group.label}>
+                              <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
+                              {group.items.map((suggestion) => (
+                                <button
+                                  key={suggestion}
+                                  type="button"
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    setEditValue(suggestion);
+                                    setShowSuggestions(false);
+                                    commitEdit();
+                                  }}
+                                  className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                                >
+                                  {getAssetCategoryFlag(suggestion) && (
+                                    <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
+                                  )}
+                                  {suggestion}
+                                </button>
+                              ))}
+                            </div>
                           ))}
                         </div>
                       )}
@@ -315,6 +359,11 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
                       <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(asset.category)}</span>
                     )}
                     {asset.category}
+                    {outOfRegion && (
+                      <span className="ml-1.5 inline-flex items-center rounded px-1 py-0.5 text-[10px] font-medium leading-none bg-stone-100 text-stone-400" data-testid={`region-badge-${asset.id}`}>
+                        {CA_ASSET_CATEGORIES.has(asset.category) ? "CA" : "US"}
+                      </span>
+                    )}
                   </button>
                 )}
 
@@ -365,7 +414,7 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
                 </svg>
               </button>
             </div>
-          ))}
+          );})}
         </div>
       )}
 
@@ -392,25 +441,30 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
                 aria-label="New asset category"
               />
               {showNewSuggestions &&
-                filteredSuggestions(newCategory).length > 0 && (
-                  <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
-                    {filteredSuggestions(newCategory).map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        type="button"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          setNewCategory(suggestion);
-                          setShowNewSuggestions(false);
-                          newAmountRef.current?.focus();
-                        }}
-                        className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
-                      >
-                        {getAssetCategoryFlag(suggestion) && (
-                          <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
-                        )}
-                        {suggestion}
-                      </button>
+                filteredGroupedSuggestions(newCategory).length > 0 && (
+                  <div className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                    {filteredGroupedSuggestions(newCategory).map((group) => (
+                      <div key={group.label}>
+                        <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
+                        {group.items.map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              setNewCategory(suggestion);
+                              setShowNewSuggestions(false);
+                              newAmountRef.current?.focus();
+                            }}
+                            className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
+                          >
+                            {getAssetCategoryFlag(suggestion) && (
+                              <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
+                            )}
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
                     ))}
                   </div>
                 )}

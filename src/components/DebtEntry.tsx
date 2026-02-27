@@ -41,6 +41,31 @@ export function getAllDebtCategorySuggestions(region?: Region): string[] {
   ];
 }
 
+export interface DebtSuggestionGroup {
+  label: string;
+  items: string[];
+}
+
+export function getGroupedDebtCategorySuggestions(region?: Region): DebtSuggestionGroup[] {
+  const groups: DebtSuggestionGroup[] = [];
+  if (region !== "US") {
+    groups.push({ label: "🇨🇦 Canadian", items: DEBT_CATEGORY_SUGGESTIONS.CA });
+  }
+  if (region !== "CA") {
+    groups.push({ label: "🇺🇸 US", items: DEBT_CATEGORY_SUGGESTIONS.US });
+  }
+  groups.push({ label: "General", items: DEBT_CATEGORY_SUGGESTIONS.universal });
+  return groups;
+}
+
+/** Check if a debt category belongs to the "other" region (not selected) */
+export function isDebtOutOfRegion(category: string, region?: Region): boolean {
+  if (!region || region === "both") return false;
+  if (region === "CA" && US_DEBT_CATEGORIES.has(category)) return true;
+  if (region === "US" && CA_DEBT_CATEGORIES.has(category)) return true;
+  return false;
+}
+
 /** Returns a flag emoji if the category is region-specific, or empty string */
 export function getDebtCategoryFlag(category: string): string {
   if (CA_DEBT_CATEGORIES.has(category)) return "🇨🇦";
@@ -224,6 +249,18 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
     return all.filter((s) => s.toLowerCase().includes(query.toLowerCase()));
   };
 
+  const filteredGroupedSuggestions = (query: string): DebtSuggestionGroup[] => {
+    const groups = getGroupedDebtCategorySuggestions(region);
+    return groups
+      .map((group) => ({
+        ...group,
+        items: query
+          ? group.items.filter((s) => s.toLowerCase().includes(query.toLowerCase()))
+          : group.items,
+      }))
+      .filter((group) => group.items.length > 0);
+  };
+
   const total = debts.reduce((sum, d) => sum + d.amount, 0);
 
   return (
@@ -246,11 +283,13 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
         </div>
       ) : (
         <div className="space-y-1" role="list" aria-label="Debt items">
-          {debts.map((debt) => (
+          {debts.map((debt) => {
+            const outOfRegion = isDebtOutOfRegion(debt.category, region);
+            return (
             <div
               key={debt.id}
               role="listitem"
-              className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-stone-50"
+              className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50 ${outOfRegion ? "opacity-50" : ""}`}
             >
               <div className="flex flex-1 items-center gap-3 min-w-0">
                 {/* Category */}
@@ -274,28 +313,33 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
                       aria-label="Edit category name"
                     />
                     {showSuggestions &&
-                      filteredSuggestions(editValue).length > 0 && (
+                      filteredGroupedSuggestions(editValue).length > 0 && (
                         <div
                           ref={suggestionsRef}
-                          className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
+                          className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
                         >
-                          {filteredSuggestions(editValue).map((suggestion) => (
-                            <button
-                              key={suggestion}
-                              type="button"
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                setEditValue(suggestion);
-                                setShowSuggestions(false);
-                                commitEdit();
-                              }}
-                              className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
-                            >
-                              {getDebtCategoryFlag(suggestion) && (
-                                <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(suggestion)}</span>
-                              )}
-                              {suggestion}
-                            </button>
+                          {filteredGroupedSuggestions(editValue).map((group) => (
+                            <div key={group.label}>
+                              <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
+                              {group.items.map((suggestion) => (
+                                <button
+                                  key={suggestion}
+                                  type="button"
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    setEditValue(suggestion);
+                                    setShowSuggestions(false);
+                                    commitEdit();
+                                  }}
+                                  className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                                >
+                                  {getDebtCategoryFlag(suggestion) && (
+                                    <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(suggestion)}</span>
+                                  )}
+                                  {suggestion}
+                                </button>
+                              ))}
+                            </div>
                           ))}
                         </div>
                       )}
@@ -313,6 +357,11 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
                       <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(debt.category)}</span>
                     )}
                     {debt.category}
+                    {outOfRegion && (
+                      <span className="ml-1.5 inline-flex items-center rounded px-1 py-0.5 text-[10px] font-medium leading-none bg-stone-100 text-stone-400" data-testid={`region-badge-${debt.id}`}>
+                        {CA_DEBT_CATEGORIES.has(debt.category) ? "CA" : "US"}
+                      </span>
+                    )}
                   </button>
                 )}
 
@@ -363,7 +412,7 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
                 </svg>
               </button>
             </div>
-          ))}
+          );})}
         </div>
       )}
 
@@ -390,25 +439,30 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
                 aria-label="New debt category"
               />
               {showNewSuggestions &&
-                filteredSuggestions(newCategory).length > 0 && (
-                  <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
-                    {filteredSuggestions(newCategory).map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        type="button"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          setNewCategory(suggestion);
-                          setShowNewSuggestions(false);
-                          newAmountRef.current?.focus();
-                        }}
-                        className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
-                      >
-                        {getDebtCategoryFlag(suggestion) && (
-                          <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(suggestion)}</span>
-                        )}
-                        {suggestion}
-                      </button>
+                filteredGroupedSuggestions(newCategory).length > 0 && (
+                  <div className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                    {filteredGroupedSuggestions(newCategory).map((group) => (
+                      <div key={group.label}>
+                        <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
+                        {group.items.map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              setNewCategory(suggestion);
+                              setShowNewSuggestions(false);
+                              newAmountRef.current?.focus();
+                            }}
+                            className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
+                          >
+                            {getDebtCategoryFlag(suggestion) && (
+                              <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(suggestion)}</span>
+                            )}
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
                     ))}
                   </div>
                 )}

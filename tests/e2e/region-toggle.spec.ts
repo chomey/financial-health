@@ -4,7 +4,7 @@ import { captureScreenshot } from "./helpers";
 test.describe("Region Toggle", () => {
   test("renders region toggle in header with Both selected by default", async ({ page }) => {
     await page.goto("/");
-    const toggle = page.getByRole("radiogroup", { name: /Select financial region/i });
+    const toggle = page.getByRole("radiogroup", { name: /Filter account types by region/i });
     await expect(toggle).toBeVisible();
     const bothButton = toggle.getByRole("radio", { name: /Both/i });
     await expect(bothButton).toHaveAttribute("aria-checked", "true");
@@ -14,7 +14,7 @@ test.describe("Region Toggle", () => {
   test("switching to CA filters asset category suggestions", async ({ page }) => {
     await page.goto("/");
     // Click CA
-    const toggle = page.getByRole("radiogroup", { name: /Select financial region/i });
+    const toggle = page.getByRole("radiogroup", { name: /Filter account types by region/i });
     await toggle.getByRole("radio", { name: /CA/i }).click();
     // Verify CA is now selected
     await expect(toggle.getByRole("radio", { name: /CA/i })).toHaveAttribute("aria-checked", "true");
@@ -33,7 +33,7 @@ test.describe("Region Toggle", () => {
   test("switching to US filters asset category suggestions", async ({ page }) => {
     await page.goto("/");
     // Click US
-    const toggle = page.getByRole("radiogroup", { name: /Select financial region/i });
+    const toggle = page.getByRole("radiogroup", { name: /Filter account types by region/i });
     await toggle.getByRole("radio", { name: /US/i }).click();
     // Open add asset form
     await page.getByText("+ Add Asset").click();
@@ -52,7 +52,7 @@ test.describe("Region Toggle", () => {
 
   test("switching to Both shows all category suggestions", async ({ page }) => {
     await page.goto("/");
-    const toggle = page.getByRole("radiogroup", { name: /Select financial region/i });
+    const toggle = page.getByRole("radiogroup", { name: /Filter account types by region/i });
     // Switch to CA first, then back to Both
     await toggle.getByRole("radio", { name: /CA/i }).click();
     await toggle.getByRole("radio", { name: /Both/i }).click();
@@ -72,7 +72,7 @@ test.describe("Region Toggle", () => {
 
   test("region selection persists in URL and survives reload", async ({ page }) => {
     await page.goto("/");
-    const toggle = page.getByRole("radiogroup", { name: /Select financial region/i });
+    const toggle = page.getByRole("radiogroup", { name: /Filter account types by region/i });
     // Get the initial URL s= param
     const initialS = await page.evaluate(() => new URL(window.location.href).searchParams.get("s"));
     // Select CA
@@ -87,14 +87,14 @@ test.describe("Region Toggle", () => {
     const currentUrl = page.url();
     await page.goto(currentUrl);
     // Verify CA is still selected after reload
-    const toggleAfterReload = page.getByRole("radiogroup", { name: /Select financial region/i });
+    const toggleAfterReload = page.getByRole("radiogroup", { name: /Filter account types by region/i });
     await expect(toggleAfterReload.getByRole("radio", { name: /CA/i })).toHaveAttribute("aria-checked", "true");
     await captureScreenshot(page, "task-12-region-persists-reload");
   });
 
   test("region toggle has smooth visual transition", async ({ page }) => {
     await page.goto("/");
-    const toggle = page.getByRole("radiogroup", { name: /Select financial region/i });
+    const toggle = page.getByRole("radiogroup", { name: /Filter account types by region/i });
     // Verify transition class is present on buttons
     const caButton = toggle.getByRole("radio", { name: /CA/i });
     await expect(caButton).toHaveClass(/transition-all/);
@@ -103,7 +103,7 @@ test.describe("Region Toggle", () => {
 
   test("toggle shows flag icons for each region", async ({ page }) => {
     await page.goto("/");
-    const toggle = page.getByRole("radiogroup", { name: /Select financial region/i });
+    const toggle = page.getByRole("radiogroup", { name: /Filter account types by region/i });
     await expect(toggle.getByText("🇨🇦")).toBeVisible();
     await expect(toggle.getByText("🇺🇸")).toBeVisible();
     await expect(toggle.getByText("🌐")).toBeVisible();
