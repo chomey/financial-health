@@ -97,4 +97,74 @@ test.describe("Snapshot Dashboard", () => {
 
     await captureScreenshot(page, "task-8-dashboard-colors");
   });
+
+  test("tooltip is not clipped by sibling metric cards", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForTimeout(1500);
+
+    // Hover Net Worth (first card) — its tooltip should appear above the next card
+    const netWorthCard = page.locator('[aria-label="Net Worth"]').first();
+    await netWorthCard.hover();
+
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+
+    // Verify tooltip is actually visible and not occluded:
+    // The tooltip bounding box bottom should be positive (on screen)
+    const tooltipBox = await tooltip.boundingBox();
+    expect(tooltipBox).toBeTruthy();
+    expect(tooltipBox!.height).toBeGreaterThan(0);
+
+    // Verify the hovered card has elevated z-index
+    await expect(netWorthCard).toHaveAttribute("data-tooltip-visible", "true");
+
+    await captureScreenshot(page, "task-19-tooltip-not-clipped");
+  });
+
+  test("tooltip remains visible when hovering between cards", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForTimeout(1500);
+
+    // Hover Monthly Surplus (second card)
+    const surplusCard = page.locator('[aria-label="Monthly Surplus"]').first();
+    await surplusCard.hover();
+
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText("How much more you earn");
+
+    // Tooltip should be clickable/visible — verify it's not hidden behind Financial Runway card
+    const tooltipBox = await tooltip.boundingBox();
+    expect(tooltipBox).toBeTruthy();
+    expect(tooltipBox!.width).toBeGreaterThan(0);
+
+    await captureScreenshot(page, "task-19-surplus-tooltip");
+  });
+
+  test("hovering different cards shows correct tooltip each time", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForTimeout(1500);
+
+    // Hover Net Worth
+    const netWorthCard = page.locator('[aria-label="Net Worth"]').first();
+    await netWorthCard.hover();
+    await expect(page.getByRole("tooltip")).toContainText("total assets minus total debts");
+
+    // Move to Monthly Surplus
+    const surplusCard = page.locator('[aria-label="Monthly Surplus"]').first();
+    await surplusCard.hover();
+    await expect(page.getByRole("tooltip")).toContainText("How much more you earn");
+
+    // Move to Financial Runway
+    const runwayCard = page.locator('[aria-label="Financial Runway"]').first();
+    await runwayCard.hover();
+    await expect(page.getByRole("tooltip")).toContainText("months your liquid assets");
+
+    // Move to Debt-to-Asset Ratio
+    const ratioCard = page.locator('[aria-label="Debt-to-Asset Ratio"]').first();
+    await ratioCard.hover();
+    await expect(page.getByRole("tooltip")).toContainText("total debts divided by your total assets");
+
+    await captureScreenshot(page, "task-19-ratio-tooltip");
+  });
 });

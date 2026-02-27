@@ -183,7 +183,7 @@ export default function Home() {
             className="lg:col-span-5"
             aria-label="Financial dashboard"
           >
-            <div className="lg:sticky lg:top-8">
+            <div className="lg:sticky lg:top-8 overflow-visible">
               <SnapshotDashboard metrics={metrics} financialData={financialData} />
             </div>
           </section>
