@@ -109,4 +109,90 @@ describe("PropertyEntry component", () => {
     await user.click(screen.getByLabelText("Delete Home"));
     expect(onChange).toHaveBeenCalledWith([]);
   });
+
+  it("shows suggested interest rate badge for default property", () => {
+    render(<PropertyEntry />);
+    const rateBadge = screen.getByTestId("rate-badge-p1");
+    expect(rateBadge).toHaveTextContent("5% APR (suggested)");
+  });
+
+  it("shows suggested monthly payment badge for default property", () => {
+    render(<PropertyEntry />);
+    const paymentBadge = screen.getByTestId("payment-badge-p1");
+    expect(paymentBadge).toHaveTextContent("/mo (suggested)");
+  });
+
+  it("shows term years placeholder for default property", () => {
+    render(<PropertyEntry />);
+    const amortBadge = screen.getByTestId("amort-badge-p1");
+    expect(amortBadge).toHaveTextContent("Term years");
+  });
+
+  it("displays user-set interest rate as active badge", () => {
+    const items: Property[] = [
+      { id: "p1", name: "Home", value: 450000, mortgage: 280000, interestRate: 4.5 },
+    ];
+    render(<PropertyEntry items={items} />);
+    const rateBadge = screen.getByTestId("rate-badge-p1");
+    expect(rateBadge).toHaveTextContent("4.5% APR");
+    expect(rateBadge).not.toHaveTextContent("suggested");
+  });
+
+  it("displays user-set monthly payment as active badge", () => {
+    const items: Property[] = [
+      { id: "p1", name: "Home", value: 450000, mortgage: 280000, monthlyPayment: 1800 },
+    ];
+    render(<PropertyEntry items={items} />);
+    const paymentBadge = screen.getByTestId("payment-badge-p1");
+    expect(paymentBadge).toHaveTextContent("$1,800/mo");
+    expect(paymentBadge).not.toHaveTextContent("suggested");
+  });
+
+  it("displays user-set amortization years as active badge", () => {
+    const items: Property[] = [
+      { id: "p1", name: "Home", value: 450000, mortgage: 280000, amortizationYears: 20 },
+    ];
+    render(<PropertyEntry items={items} />);
+    const amortBadge = screen.getByTestId("amort-badge-p1");
+    expect(amortBadge).toHaveTextContent("20yr term");
+  });
+
+  it("shows computed mortgage info when payment is set", () => {
+    const items: Property[] = [
+      { id: "p1", name: "Home", value: 450000, mortgage: 280000, interestRate: 5, monthlyPayment: 1636 },
+    ];
+    render(<PropertyEntry items={items} />);
+    const info = screen.getByTestId("mortgage-info-p1");
+    expect(info).toBeInTheDocument();
+    expect(info).toHaveTextContent("Monthly interest");
+    expect(info).toHaveTextContent("Monthly principal");
+    expect(info).toHaveTextContent("Total interest remaining");
+    expect(info).toHaveTextContent("Estimated payoff");
+  });
+
+  it("shows warning when payment doesn't cover interest", () => {
+    const items: Property[] = [
+      { id: "p1", name: "Home", value: 450000, mortgage: 280000, interestRate: 10, monthlyPayment: 500 },
+    ];
+    render(<PropertyEntry items={items} />);
+    const warning = screen.getByTestId("mortgage-warning-p1");
+    expect(warning).toHaveTextContent("Payment doesn't cover monthly interest");
+  });
+
+  it("allows editing interest rate inline", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    const items: Property[] = [
+      { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
+    ];
+    render(<PropertyEntry items={items} onChange={onChange} />);
+    await user.click(screen.getByTestId("rate-badge-p1"));
+    const input = screen.getByLabelText("Edit interest rate for Home");
+    await user.clear(input);
+    await user.type(input, "4.5");
+    await user.keyboard("{Enter}");
+    expect(onChange).toHaveBeenCalledWith([
+      expect.objectContaining({ interestRate: 4.5 }),
+    ]);
+  });
 });

@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 26
-- **Completed**: 22
-- **Remaining**: 4
+- **Completed**: 23
+- **Remaining**: 3
 - **Last Updated**: 2026-02-27
 
 ---
@@ -640,3 +640,29 @@
   ![All detail fields visible](screenshots/task-22-all-detail-fields.png)
   ![URL persistence after reload](screenshots/task-22-url-persistence.png)
 - **Notes**: Smart ROI defaults are shown as greyed-out suggestions that users can accept or override. When a user explicitly sets an ROI, the "(suggested)" label is removed and the badge turns blue. The fields are designed as secondary detail rows below each asset, keeping the main row clean. URL encoding only includes ROI and contribution when set, maintaining backward compatibility with older URLs. The ROI and contribution values will feed into the projection graph (Task 25).
+
+---
+
+## Task 23: Add interest rate and monthly payment to properties
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/PropertyEntry.tsx`: Added `interestRate`, `monthlyPayment`, `amortizationYears` optional fields to Property interface. Added helper functions (`computeMortgageBreakdown`, `computeAmortizationInfo`, `suggestMonthlyPayment`). Added secondary detail badges below each property row (interest rate, monthly payment, amortization years) with click-to-edit. Added computed mortgage info panel showing monthly interest vs principal, total interest remaining, and estimated payoff date. Added warning when payment doesn't cover interest.
+  - `src/lib/url-state.ts`: Added `ir`, `mp`, `ay` fields to CompactProperty for URL encoding. Updated `toCompact` and `fromCompact` to handle new fields with backward compatibility.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/property-mortgage.test.ts`: 14 tests for computeMortgageBreakdown, computeAmortizationInfo, suggestMonthlyPayment, DEFAULT_INTEREST_RATE
+  - `tests/unit/property-entry.test.tsx`: 12 new tests for interest rate/payment/amortization badges, computed info, warning, inline editing
+  - `tests/unit/url-state.test.ts`: 2 new tests for property roundtrip with/without new fields
+  - `tests/e2e/property-mortgage.spec.ts`: 7 tests for browser integration of all mortgage detail features
+  - All T1 unit tests: 329 passed, 0 failed
+  - All T2 E2E tests: 136 passed, 0 failed
+- **Screenshots**:
+  ![Property with suggested badges](screenshots/task-23-property-suggested-badges.png)
+  ![Interest rate edited](screenshots/task-23-interest-rate-edited.png)
+  ![Monthly payment edited](screenshots/task-23-monthly-payment-edited.png)
+  ![Amortization years edited](screenshots/task-23-amortization-edited.png)
+  ![Mortgage breakdown computed](screenshots/task-23-mortgage-breakdown.png)
+  ![Payment too low warning](screenshots/task-23-mortgage-payment-warning.png)
+  ![Mortgage details persisted via URL](screenshots/task-23-mortgage-details-persisted.png)
+- **Notes**: Follows the same UI pattern as Task 22's asset ROI/contribution fields — greyed-out suggested values that become active when user sets them. Smart defaults: 5% interest rate suggested, monthly payment calculated from mortgage amount at 25-year amortization. Computed info shows current interest/principal split, total remaining interest, and estimated payoff date. Warning appears when payment doesn't cover monthly interest. All new fields are backward-compatible in URL encoding — old URLs without property details still work. The interest rate data will feed into the projection graph (Task 25).
