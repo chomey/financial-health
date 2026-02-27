@@ -57,13 +57,9 @@ describe("App shell layout", () => {
     expect(dashes.length).toBe(4);
   });
 
-  it("shows encouraging empty state messages for non-interactive cards", () => {
+  it("shows mock data in income and expense sections", () => {
     render(<Home />);
-    expect(
-      screen.getByText(/Enter your income sources/)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Add your regular expenses/)
-    ).toBeInTheDocument();
+    expect(screen.getByText("Salary")).toBeInTheDocument();
+    expect(screen.getByText("Rent/Mortgage Payment")).toBeInTheDocument();
   });
 });

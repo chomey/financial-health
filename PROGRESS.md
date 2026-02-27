@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 5
-- **Remaining**: 10
+- **Completed**: 6
+- **Remaining**: 9
 - **Last Updated**: 2026-02-27
 
 ---
@@ -136,3 +136,47 @@
   ![Debt amount edited](screenshots/task-5-debt-amount-edited.png)
   ![Debt category suggestions](screenshots/task-5-debt-category-suggestions.png)
 - **Notes**: DebtEntry follows the same pattern as AssetEntry but uses rose/red color for amounts to visually distinguish debts from assets. It manages its own state with useState — Task 10 will wire it to shared state. Category suggestions are debt-specific (7 categories vs 16 for assets).
+
+## Task 6: Build income & expense entry sections
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/IncomeEntry.tsx`: Created new component with full income entry functionality — mock data (Salary $5,500, Freelance $800), click-to-edit category names and amounts, delete on hover, "Add Income" button with inline form, category suggestions (Salary, Freelance, Investment Income, Side Hustle, Other). Income amounts displayed in green. Monthly total at bottom with animation on change.
+  - `src/components/ExpenseEntry.tsx`: Created new component with full expense entry functionality — mock data (Rent/Mortgage Payment $2,200, Groceries $600, Subscriptions $150), click-to-edit category names and amounts, delete on hover, "Add Expense" button with inline form, category suggestions (Rent/Mortgage Payment, Childcare, Groceries, Subscriptions, Transportation, Insurance, Utilities, Monthly Expenses, Other). Expense amounts displayed in amber. Monthly total at bottom with animation on change.
+  - `src/app/page.tsx`: Replaced static Monthly Income and Monthly Expenses EntryCards with the new IncomeEntry and ExpenseEntry components.
+  - `tests/unit/income-entry.test.tsx`: 15 T1 unit tests covering rendering, mock data display, formatted amounts, monthly total, add/delete interactions, click-to-edit, empty state, green amount color, category suggestions.
+  - `tests/unit/expense-entry.test.tsx`: 15 T1 unit tests covering rendering, mock data display, formatted amounts, monthly total, add/delete interactions, click-to-edit, empty state, amber amount color, category suggestions.
+  - `tests/unit/setup.test.tsx`: Updated to verify income/expense sections show mock data instead of empty-state text.
+  - `tests/e2e/income-entry.spec.ts`: 6 T2 browser tests — mock data rendering, add form, adding income, deleting income, click-to-edit amount, category suggestions.
+  - `tests/e2e/expense-entry.spec.ts`: 6 T2 browser tests — mock data rendering, add form, adding expense, deleting expense, click-to-edit amount, category suggestions.
+  - `tests/e2e/app-shell.spec.ts`: Updated to verify income/expense sections show mock data; fixed "Mortgage" text matching to use exact match to avoid conflict with "Rent/Mortgage Payment".
+  - `tests/e2e/debt-entry.spec.ts`: Fixed "Mortgage" text matching to use exact match.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/income-entry.test.tsx`: 15 passed, 0 failed
+  - `tests/unit/expense-entry.test.tsx`: 15 passed, 0 failed
+  - `tests/unit/setup.test.tsx`: 8 passed, 0 failed
+  - `tests/unit/asset-entry.test.tsx`: 13 passed, 0 failed (pre-existing)
+  - `tests/unit/debt-entry.test.tsx`: 14 passed, 0 failed (pre-existing)
+  - `tests/unit/screenshot-helpers.test.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/income-entry.spec.ts`: 6 passed, 0 failed
+  - `tests/e2e/expense-entry.spec.ts`: 6 passed, 0 failed
+  - `tests/e2e/app-shell.spec.ts`: 3 passed, 0 failed
+  - `tests/e2e/debt-entry.spec.ts`: 7 passed, 0 failed
+  - `tests/e2e/asset-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/smoke.spec.ts`: 1 passed, 0 failed (pre-existing)
+  - Total: 98 passed, 0 failed
+- **Screenshots**:
+  ![Income with mock data](screenshots/task-6-income-with-mock-data.png)
+  ![Add income form](screenshots/task-6-add-income-form.png)
+  ![Income added](screenshots/task-6-income-added.png)
+  ![Income deleted](screenshots/task-6-income-deleted.png)
+  ![Income amount edited](screenshots/task-6-income-amount-edited.png)
+  ![Income category suggestions](screenshots/task-6-income-category-suggestions.png)
+  ![Expenses with mock data](screenshots/task-6-expenses-with-mock-data.png)
+  ![Add expense form](screenshots/task-6-add-expense-form.png)
+  ![Expense added](screenshots/task-6-expense-added.png)
+  ![Expense deleted](screenshots/task-6-expense-deleted.png)
+  ![Expense amount edited](screenshots/task-6-expense-amount-edited.png)
+  ![Expense category suggestions](screenshots/task-6-expense-category-suggestions.png)
+- **Notes**: IncomeEntry uses green for amounts (matching assets' positive feel), ExpenseEntry uses amber/orange to distinguish spending. Both have animated monthly totals triggered from event handlers (not useEffect) to satisfy React 19's strict lint rules. Components manage their own state — Task 10 will wire to shared state. The "Rent/Mortgage Payment" expense category created an ambiguity with the "Mortgage" debt category in E2E tests, fixed with exact text matching.
