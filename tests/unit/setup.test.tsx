@@ -57,11 +57,8 @@ describe("App shell layout", () => {
     expect(dashes.length).toBe(4);
   });
 
-  it("shows encouraging empty state messages for non-asset cards", () => {
+  it("shows encouraging empty state messages for non-interactive cards", () => {
     render(<Home />);
-    expect(
-      screen.getByText(/Track your mortgage, loans, and credit cards/)
-    ).toBeInTheDocument();
     expect(
       screen.getByText(/Enter your income sources/)
     ).toBeInTheDocument();
