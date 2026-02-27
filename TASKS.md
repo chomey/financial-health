@@ -28,4 +28,4 @@
 
 - [x] Task 14: Mobile responsiveness pass — Ensure the entire app works beautifully on mobile. Entry panel stacks above dashboard. Cards are full-width. Touch targets are large enough (min 44px). Inline editing works well on mobile keyboards. The "Copy Link" button is easily accessible. Test at 375px, 768px, and 1024px widths. [@frontend]
 
-- [ ] Task 15: [MILESTONE] Full E2E test — Write a comprehensive end-to-end test that: loads the app, adds 3 assets, 2 debts, income and expenses, and a goal; verifies dashboard metrics update correctly; copies the URL; reloads the page; verifies all data is preserved; toggles region and verifies category suggestions change. Capture screenshots at each step. [@qa]
+- [x] Task 15: [MILESTONE] Full E2E test — Write a comprehensive end-to-end test that: loads the app, adds 3 assets, 2 debts, income and expenses, and a goal; verifies dashboard metrics update correctly; copies the URL; reloads the page; verifies all data is preserved; toggles region and verifies category suggestions change. Capture screenshots at each step. [@qa]
