@@ -37,8 +37,9 @@ describe("App shell layout", () => {
 
   it("renders all five entry sections", () => {
     render(<Home />);
-    expect(screen.getByText("Assets")).toBeInTheDocument();
-    expect(screen.getByText("Debts")).toBeInTheDocument();
+    // Use getAllByText for terms that appear in both entry sections and chart legend
+    expect(screen.getAllByText("Assets").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Debts").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Monthly Income")).toBeInTheDocument();
     expect(screen.getByText("Monthly Expenses")).toBeInTheDocument();
     expect(screen.getByText("Goals")).toBeInTheDocument();
@@ -46,10 +47,11 @@ describe("App shell layout", () => {
 
   it("renders all four dashboard metric cards", () => {
     render(<Home />);
-    expect(screen.getByText("Net Worth")).toBeInTheDocument();
-    expect(screen.getByText("Monthly Surplus")).toBeInTheDocument();
-    expect(screen.getByText("Financial Runway")).toBeInTheDocument();
-    expect(screen.getByText("Debt-to-Asset Ratio")).toBeInTheDocument();
+    // Use role-based queries to scope to the metric cards (avoid ambiguity with chart legend)
+    expect(screen.getByRole("group", { name: "Net Worth" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Monthly Surplus" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Financial Runway" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Debt-to-Asset Ratio" })).toBeInTheDocument();
   });
 
   it("shows metric values in dashboard cards", () => {

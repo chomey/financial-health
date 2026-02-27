@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 26
-- **Completed**: 24
-- **Remaining**: 2
+- **Completed**: 25
+- **Remaining**: 1
 - **Last Updated**: 2026-02-27
 
 ---
@@ -689,3 +689,26 @@
   ![URL persistence](screenshots/task-24-url-persistence.png)
   ![Detail fields visible](screenshots/task-24-detail-fields.png)
 - **Notes**: Follows the same UI pattern as Task 22 (asset ROI) and Task 23 (property interest). Smart defaults show as greyed-out "(suggested)" badges that become active blue/green when user sets their own value. The interest rate data feeds into the insights engine — high-interest debts (15%+ like credit cards) get a prominent "pay this down first" insight, and multiple debts with rates get an "avalanche method" insight. These values will also feed into the projection graph (Task 25).
+
+---
+
+## Task 25: Build financial projection timeline graph
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `package.json`: Added recharts dependency
+  - `src/lib/projections.ts`: New projection calculation engine — projects net worth month-by-month using asset ROI/contributions, debt interest/payments, property mortgage amortization, and monthly surplus. Supports conservative/moderate/optimistic scenarios via multipliers. Tracks goal completion dates, debt-free month, and net worth milestones ($100k, $250k, $500k, $1M).
+  - `src/components/ProjectionChart.tsx`: New interactive chart component using recharts. Features: line chart with Net Worth, Assets (dashed), and Debts (dashed negative) lines; timeline slider (1-30 years); scenario toggle buttons (conservative/moderate/optimistic); debt-free reference line; goal completion markers (amber dots); net worth milestone reference lines; interactive hover tooltip with formatted values; legend bar; milestone/goal summary text below chart.
+  - `src/app/page.tsx`: Added ProjectionChart as full-width section below the two-column entry/dashboard layout, passing full financial state.
+  - `tests/unit/setup.test.tsx`: Updated to use role-based queries and getAllByText for text that now appears in both dashboard metrics and chart legend.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/projections.test.ts`: 15 tests — point count, static net worth, ROI growth, monthly contributions, debt reduction, debt-free detection, goal milestones, net worth milestones, scenario multipliers (conservative/optimistic), property mortgage payments, persistent debt handling, empty state, downsample logic (15 passed, 0 failed)
+  - `tests/e2e/projection-chart.spec.ts`: 6 tests — chart rendering, scenario toggle, timeline slider, milestone/goal labels, chart legend, aria labels (6 passed, 0 failed)
+  - All existing tests: 368 passed, 0 failed
+- **Screenshots**:
+  ![Projection chart loaded](screenshots/task-25-projection-chart-loaded.png)
+  ![Optimistic scenario](screenshots/task-25-scenario-optimistic.png)
+  ![1-year timeline](screenshots/task-25-timeline-1-year.png)
+  ![20-year milestones](screenshots/task-25-milestones-20yr.png)
+- **Notes**: Chart is placed full-width below the two-column layout for better horizontal space. Recharts' ResponsiveContainer emits a harmless SSR warning about dimensions during static build — this is expected behavior since there's no real DOM during server rendering. The projection engine accumulates monthly surplus into the first asset balance and distributes surplus equally across unmet goals for goal tracking.
