@@ -1,6 +1,7 @@
 "use client";
 
 import AssetEntry from "@/components/AssetEntry";
+import DebtEntry from "@/components/DebtEntry";
 
 export default function Home() {
   return (
@@ -26,12 +27,7 @@ export default function Home() {
             <div className="space-y-6">
               <AssetEntry />
 
-              <EntryCard title="Debts" icon="📋">
-                <p className="text-stone-400">
-                  Track your mortgage, loans, and credit cards — every number
-                  brings clarity.
-                </p>
-              </EntryCard>
+              <DebtEntry />
 
               <EntryCard title="Monthly Income" icon="💰">
                 <p className="text-stone-400">

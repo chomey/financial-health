@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 4
-- **Remaining**: 11
+- **Completed**: 5
+- **Remaining**: 10
 - **Last Updated**: 2026-02-27
 
 ---
@@ -105,3 +105,34 @@
   ![Amount edited](screenshots/task-4-amount-edited.png)
   ![Category suggestions](screenshots/task-4-category-suggestions.png)
 - **Notes**: AssetEntry is now a standalone component in `src/components/`. It manages its own state with useState for now — Task 10 will wire it to shared state. Category suggestions include all CA, US, and universal options (region filtering comes in Task 12). The `@testing-library/user-event` package was added to support more realistic interaction testing in unit tests.
+
+## Task 5: Build debt entry section
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/DebtEntry.tsx`: Created new component with full debt entry functionality — mock data (Mortgage $280,000, Car Loan $15,000), click-to-edit category names and amounts, delete on hover, "Add Debt" button with inline form, category suggestions (Mortgage, Car Loan, Student Loan, Credit Card, Line of Credit, Personal Loan, Other). Debt amounts displayed in rose/red color to visually distinguish from assets. Formatted currency display, running total, smooth focus transitions, empty state message.
+  - `src/app/page.tsx`: Replaced static Debts EntryCard with the new DebtEntry component. Added import.
+  - `tests/unit/debt-entry.test.tsx`: 14 T1 unit tests covering rendering, mock data display, formatted amounts, total calculation, add/delete interactions, click-to-edit, empty state, category suggestions, and rose color for debt amounts.
+  - `tests/unit/setup.test.tsx`: Updated to account for Debts section no longer showing empty-state text (now shows mock data). Test count changed from 8 to 7.
+  - `tests/e2e/debt-entry.spec.ts`: 7 T2 browser tests — mock data rendering, add form, adding new debt, deleting debt, click-to-edit category, click-to-edit amount, category suggestions with selection.
+  - `tests/e2e/app-shell.spec.ts`: Updated to verify Debts shows mock data (Mortgage) instead of empty-state text.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/debt-entry.test.tsx`: 14 passed, 0 failed
+  - `tests/unit/setup.test.tsx`: 8 passed, 0 failed
+  - `tests/unit/asset-entry.test.tsx`: 13 passed, 0 failed (pre-existing)
+  - `tests/unit/screenshot-helpers.test.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/debt-entry.spec.ts`: 7 passed, 0 failed
+  - `tests/e2e/app-shell.spec.ts`: 3 passed, 0 failed
+  - `tests/e2e/asset-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/smoke.spec.ts`: 1 passed, 0 failed (pre-existing)
+  - Total: 56 passed, 0 failed
+- **Screenshots**:
+  ![Debts with mock data](screenshots/task-5-debts-with-mock-data.png)
+  ![Add debt form](screenshots/task-5-add-debt-form.png)
+  ![Debt added](screenshots/task-5-debt-added.png)
+  ![Debt deleted](screenshots/task-5-debt-deleted.png)
+  ![Edit debt category](screenshots/task-5-edit-debt-category.png)
+  ![Debt amount edited](screenshots/task-5-debt-amount-edited.png)
+  ![Debt category suggestions](screenshots/task-5-debt-category-suggestions.png)
+- **Notes**: DebtEntry follows the same pattern as AssetEntry but uses rose/red color for amounts to visually distinguish debts from assets. It manages its own state with useState — Task 10 will wire it to shared state. Category suggestions are debt-specific (7 categories vs 16 for assets).

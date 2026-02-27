@@ -39,10 +39,8 @@ test.describe("App shell layout", () => {
     // Assets section shows mock data instead of empty state
     await expect(page.getByText("Savings Account")).toBeVisible();
 
-    // Other cards still show empty state messages
-    await expect(
-      page.getByText(/Track your mortgage, loans, and credit cards/)
-    ).toBeVisible();
+    // Debts section shows mock data instead of empty state
+    await expect(page.getByText("Mortgage")).toBeVisible();
 
     await captureScreenshot(page, "task-3-app-shell-desktop");
   });
