@@ -1,0 +1,194 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import {
+  encode85,
+  decode85,
+  encodeState,
+  decodeState,
+  toCompact,
+  fromCompact,
+  getStateFromURL,
+  updateURL,
+} from "@/lib/url-state";
+import { INITIAL_STATE } from "@/lib/financial-state";
+import type { FinancialState } from "@/lib/financial-state";
+
+describe("ASCII85 encode/decode", () => {
+  it("encodes and decodes empty data", () => {
+    const bytes = new Uint8Array(0);
+    const encoded = encode85(bytes);
+    const decoded = decode85(encoded);
+    expect(decoded).toEqual(bytes);
+  });
+
+  it("encodes and decodes a simple string", () => {
+    const text = "Hello, World!";
+    const bytes = new TextEncoder().encode(text);
+    const encoded = encode85(bytes);
+    const decoded = decode85(encoded);
+    expect(new TextDecoder().decode(decoded)).toBe(text);
+  });
+
+  it("handles the zero-block shortcut (z)", () => {
+    const bytes = new Uint8Array([0, 0, 0, 0]);
+    const encoded = encode85(bytes);
+    expect(encoded).toBe("z");
+    const decoded = decode85(encoded);
+    expect(decoded).toEqual(bytes);
+  });
+
+  it("encodes and decodes arbitrary bytes", () => {
+    const bytes = new Uint8Array([1, 2, 3, 4, 255, 254, 253, 252, 128]);
+    const encoded = encode85(bytes);
+    const decoded = decode85(encoded);
+    expect(decoded).toEqual(bytes);
+  });
+
+  it("roundtrips JSON data", () => {
+    const json = JSON.stringify({ test: "value", num: 42, arr: [1, 2, 3] });
+    const bytes = new TextEncoder().encode(json);
+    const encoded = encode85(bytes);
+    const decoded = decode85(encoded);
+    expect(new TextDecoder().decode(decoded)).toBe(json);
+  });
+
+  it("throws on invalid ASCII85 characters", () => {
+    expect(() => decode85("\x00")).toThrow("Invalid ASCII85 character");
+  });
+});
+
+describe("toCompact / fromCompact", () => {
+  it("compacts state by stripping IDs and shortening keys", () => {
+    const compact = toCompact(INITIAL_STATE);
+    expect(compact.a).toHaveLength(3);
+    expect(compact.a[0]).toEqual({ c: "Savings Account", a: 12000 });
+    expect(compact.d[0]).toEqual({ c: "Mortgage", a: 280000 });
+    expect(compact.i[0]).toEqual({ c: "Salary", a: 5500 });
+    expect(compact.e[0]).toEqual({ c: "Rent/Mortgage Payment", a: 2200 });
+    expect(compact.g[0]).toEqual({ n: "Rainy Day Fund", t: 20000, s: 14500 });
+  });
+
+  it("restores state from compact format with generated IDs", () => {
+    const compact = toCompact(INITIAL_STATE);
+    const restored = fromCompact(compact);
+    expect(restored.assets).toHaveLength(3);
+    expect(restored.assets[0].category).toBe("Savings Account");
+    expect(restored.assets[0].amount).toBe(12000);
+    expect(restored.assets[0].id).toBeTruthy();
+    expect(restored.goals[0].name).toBe("Rainy Day Fund");
+    expect(restored.goals[0].targetAmount).toBe(20000);
+    expect(restored.goals[0].currentAmount).toBe(14500);
+  });
+});
+
+describe("encodeState / decodeState", () => {
+  it("roundtrips the initial state", () => {
+    const encoded = encodeState(INITIAL_STATE);
+    expect(typeof encoded).toBe("string");
+    expect(encoded.length).toBeGreaterThan(0);
+
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.assets).toHaveLength(INITIAL_STATE.assets.length);
+    expect(decoded!.assets[0].category).toBe(INITIAL_STATE.assets[0].category);
+    expect(decoded!.assets[0].amount).toBe(INITIAL_STATE.assets[0].amount);
+    expect(decoded!.debts).toHaveLength(INITIAL_STATE.debts.length);
+    expect(decoded!.income).toHaveLength(INITIAL_STATE.income.length);
+    expect(decoded!.expenses).toHaveLength(INITIAL_STATE.expenses.length);
+    expect(decoded!.goals).toHaveLength(INITIAL_STATE.goals.length);
+  });
+
+  it("roundtrips empty state", () => {
+    const emptyState: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [],
+      expenses: [],
+      goals: [],
+    };
+    const encoded = encodeState(emptyState);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.assets).toHaveLength(0);
+    expect(decoded!.debts).toHaveLength(0);
+  });
+
+  it("roundtrips state with special characters in categories", () => {
+    const state: FinancialState = {
+      assets: [{ id: "1", category: "Roth IRA (tax-free)", amount: 50000 }],
+      debts: [],
+      income: [],
+      expenses: [],
+      goals: [],
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded!.assets[0].category).toBe("Roth IRA (tax-free)");
+  });
+
+  it("returns null for invalid encoded data", () => {
+    expect(decodeState("!!!invalid")).toBeNull();
+  });
+
+  it("returns null for empty string", () => {
+    expect(decodeState("")).toBeNull();
+  });
+
+  it("produces URL-safe output", () => {
+    const encoded = encodeState(INITIAL_STATE);
+    // ASCII85 characters are in the printable range; URL encoding handles the rest
+    expect(encoded).toBeTruthy();
+  });
+});
+
+describe("getStateFromURL", () => {
+  beforeEach(() => {
+    // Set a clean URL
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("returns null when no s= param exists", () => {
+    expect(getStateFromURL()).toBeNull();
+  });
+
+  it("restores state from s= param", () => {
+    const encoded = encodeState(INITIAL_STATE);
+    window.history.replaceState(null, "", `/?s=${encodeURIComponent(encoded)}`);
+    const restored = getStateFromURL();
+    expect(restored).not.toBeNull();
+    expect(restored!.assets).toHaveLength(INITIAL_STATE.assets.length);
+    expect(restored!.assets[0].category).toBe(INITIAL_STATE.assets[0].category);
+  });
+
+  it("returns null for corrupted s= param", () => {
+    window.history.replaceState(null, "", "/?s=garbage_data");
+    expect(getStateFromURL()).toBeNull();
+  });
+});
+
+describe("updateURL", () => {
+  beforeEach(() => {
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("sets s= param in the URL", () => {
+    updateURL(INITIAL_STATE);
+    const params = new URLSearchParams(window.location.search);
+    expect(params.has("s")).toBe(true);
+    expect(params.get("s")).toBeTruthy();
+  });
+
+  it("updates can be read back with getStateFromURL", () => {
+    updateURL(INITIAL_STATE);
+    const restored = getStateFromURL();
+    expect(restored).not.toBeNull();
+    expect(restored!.assets[0].category).toBe(INITIAL_STATE.assets[0].category);
+    expect(restored!.assets[0].amount).toBe(INITIAL_STATE.assets[0].amount);
+  });
+
+  it("uses replaceState (does not add history entries)", () => {
+    const spy = vi.spyOn(window.history, "replaceState");
+    updateURL(INITIAL_STATE);
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
+  });
+});

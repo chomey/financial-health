@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 10
-- **Remaining**: 5
+- **Completed**: 11
+- **Remaining**: 4
 - **Last Updated**: 2026-02-27
 
 ---
@@ -324,3 +324,47 @@
   ![E2E after all edits](screenshots/task-10-e2e-after-edits.png)
   ![E2E tooltip verification](screenshots/task-10-e2e-tooltip.png)
 - **Notes**: State is now lifted to page.tsx and flows down via props. Each entry component supports both controlled (props provided) and uncontrolled (standalone with mock data) modes, so existing unit tests continue to work unchanged. The `computeMetrics` function in `financial-state.ts` replaces the hardcoded `MOCK_METRICS` — dashboard values now recalculate live as the user edits any entry. InsightsPanel also receives live data. This was the 10th completed task, triggering T3 full E2E testing. All 200 tests pass across all tiers.
+
+## Task 11: Implement URL state persistence
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/url-state.ts`: Created URL state encoding/decoding module with ASCII85 (base85) encoding for compact URLs. Exports `encodeState`, `decodeState`, `getStateFromURL`, `updateURL`. State is compacted before encoding (IDs stripped, keys shortened) to minimize URL length. Includes full ASCII85 encoder/decoder implementation with zero-block shortcut and partial-block handling.
+  - `src/app/page.tsx`: Added URL state persistence — state initializes from `s=` URL param (lazy useState initializer), URL updates via `replaceState` on every state change. Added `CopyLinkButton` component in header with clipboard API support, "Copied!" feedback animation (2s), and fallback for browsers without clipboard API. Header layout updated to flex with button on the right.
+  - `tests/unit/url-state.test.ts`: 20 T1 unit tests covering ASCII85 encode/decode (empty data, strings, zero-block, arbitrary bytes, JSON roundtrip, invalid characters), compact state conversion, encodeState/decodeState roundtrips (initial state, empty state, special characters, invalid data), getStateFromURL (no param, valid param, corrupted param), updateURL (sets param, reads back, uses replaceState).
+  - `tests/e2e/url-state.spec.ts`: 7 T2 browser tests covering Copy Link button visibility, Copied! feedback with revert, URL updates on state change, state persistence across reload, shared URL restoration, dashboard metrics preserved after reload, empty state default behavior.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/url-state.test.ts`: 20 passed, 0 failed
+  - `tests/unit/financial-state.test.ts`: 17 passed, 0 failed (pre-existing)
+  - `tests/unit/insights.test.ts`: 18 passed, 0 failed (pre-existing)
+  - `tests/unit/insights-panel.test.tsx`: 7 passed, 0 failed (pre-existing)
+  - `tests/unit/snapshot-dashboard.test.tsx`: 17 passed, 0 failed (pre-existing)
+  - `tests/unit/setup.test.tsx`: 8 passed, 0 failed (pre-existing)
+  - `tests/unit/asset-entry.test.tsx`: 13 passed, 0 failed (pre-existing)
+  - `tests/unit/debt-entry.test.tsx`: 14 passed, 0 failed (pre-existing)
+  - `tests/unit/income-entry.test.tsx`: 15 passed, 0 failed (pre-existing)
+  - `tests/unit/expense-entry.test.tsx`: 15 passed, 0 failed (pre-existing)
+  - `tests/unit/goal-entry.test.tsx`: 14 passed, 0 failed (pre-existing)
+  - `tests/unit/screenshot-helpers.test.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/url-state.spec.ts`: 7 passed, 0 failed
+  - `tests/e2e/app-shell.spec.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/asset-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/debt-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/income-entry.spec.ts`: 6 passed, 0 failed (pre-existing)
+  - `tests/e2e/expense-entry.spec.ts`: 6 passed, 0 failed (pre-existing)
+  - `tests/e2e/goal-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/snapshot-dashboard.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/insights-panel.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/shared-state.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/full-e2e.spec.ts`: 1 passed, 0 failed (pre-existing)
+  - `tests/e2e/smoke.spec.ts`: 1 passed, 0 failed (pre-existing)
+  - Total: 227 passed, 0 failed
+- **Screenshots**:
+  ![Copy Link button](screenshots/task-11-copy-link-button.png)
+  ![Copied feedback](screenshots/task-11-copied-feedback.png)
+  ![URL updated after edit](screenshots/task-11-url-updated-after-edit.png)
+  ![State preserved after reload](screenshots/task-11-state-after-reload.png)
+  ![State restored from shared URL](screenshots/task-11-state-from-shared-url.png)
+  ![Metrics preserved after reload](screenshots/task-11-metrics-after-reload.png)
+- **Notes**: ASCII85 encoding produces ~20% smaller URLs than base64. State is compacted before encoding by stripping IDs and shortening property names (e.g., `category`→`c`, `amount`→`a`). IDs are regenerated on decode. The lazy useState initializer pattern avoids React's `set-state-in-effect` lint warning by reading the URL during component initialization rather than in a useEffect. The URL is updated using `replaceState` to avoid polluting browser history. Copy Link uses the Clipboard API with a fallback for older browsers.
