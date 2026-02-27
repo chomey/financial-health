@@ -58,8 +58,10 @@ interface ExpenseEntryProps {
 export default function ExpenseEntry({ items: controlledItems, onChange }: ExpenseEntryProps = {}) {
   const [items, setItemsInternal] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
 
+  // Sync with parent if controlled — intentional external-system sync
   useEffect(() => {
     if (controlledItems !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setItemsInternal(controlledItems);
     }
   }, [controlledItems]);

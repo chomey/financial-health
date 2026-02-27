@@ -55,8 +55,10 @@ interface DebtEntryProps {
 export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
   const [debts, setDebtsInternal] = useState<Debt[]>(items ?? MOCK_DEBTS);
 
+  // Sync with parent if controlled — intentional external-system sync
   useEffect(() => {
     if (items !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDebtsInternal(items);
     }
   }, [items]);

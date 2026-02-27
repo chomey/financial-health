@@ -71,9 +71,10 @@ interface AssetEntryProps {
 export default function AssetEntry({ items, onChange, region }: AssetEntryProps = {}) {
   const [assets, setAssetsInternal] = useState<Asset[]>(items ?? MOCK_ASSETS);
 
-  // Sync with parent if controlled
+  // Sync with parent if controlled — intentional external-system sync
   useEffect(() => {
     if (items !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAssetsInternal(items);
     }
   }, [items]);

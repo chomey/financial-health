@@ -53,8 +53,10 @@ interface IncomeEntryProps {
 export default function IncomeEntry({ items: controlledItems, onChange }: IncomeEntryProps = {}) {
   const [items, setItemsInternal] = useState<IncomeItem[]>(controlledItems ?? MOCK_INCOME);
 
+  // Sync with parent if controlled — intentional external-system sync
   useEffect(() => {
     if (controlledItems !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setItemsInternal(controlledItems);
     }
   }, [controlledItems]);
