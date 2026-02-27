@@ -184,9 +184,16 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
       </h2>
 
       {goals.length === 0 && !addingNew ? (
-        <p className="text-sm text-stone-400">
-          Set financial goals to track your progress toward what matters most.
-        </p>
+        <div className="flex flex-col items-center py-4 text-center" data-testid="goal-empty-state">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5" />
+            </svg>
+          </div>
+          <p className="text-sm text-stone-400">
+            Set financial goals to track your progress toward what matters most.
+          </p>
+        </div>
       ) : (
         <div className="space-y-3" role="list" aria-label="Goal items">
           {goals.map((goal) => {
@@ -400,7 +407,7 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
               <button
                 type="button"
                 onClick={addGoal}
-                className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white transition-colors duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300"
+                className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95"
                 aria-label="Confirm add goal"
               >
                 Add

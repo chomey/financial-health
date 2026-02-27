@@ -125,13 +125,24 @@ function MetricCard({ metric }: { metric: MetricData }) {
       ? "text-rose-600"
       : "text-stone-700";
 
+  // Celebratory glow for Financial Runway > 12 months
+  const isRunwayCelebration =
+    metric.title === "Financial Runway" &&
+    metric.format === "months" &&
+    metric.value > 12;
+
   return (
     <div
-      className="relative rounded-xl border border-stone-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default"
+      className={`relative rounded-xl border bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default ${
+        isRunwayCelebration
+          ? "border-green-300 ring-1 ring-green-200 animate-glow-pulse"
+          : "border-stone-200"
+      }`}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
       role="group"
       aria-label={metric.title}
+      data-runway-celebration={isRunwayCelebration || undefined}
     >
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-stone-500">{metric.title}</h3>
@@ -145,10 +156,15 @@ function MetricCard({ metric }: { metric: MetricData }) {
       >
         {formatMetricValue(animatedValue, metric.format)}
       </p>
+      {isRunwayCelebration && (
+        <p className="mt-1 text-xs font-medium text-green-600" data-testid="runway-celebration-text">
+          Excellent safety net!
+        </p>
+      )}
 
       {showTooltip && (
         <div
-          className="absolute left-0 right-0 top-full z-10 mt-2 rounded-lg border border-stone-200 bg-white p-3 text-xs text-stone-600 shadow-lg"
+          className="absolute left-0 right-0 top-full z-10 mt-2 rounded-lg border border-stone-200 bg-white p-3 text-xs text-stone-600 shadow-lg animate-fade-in"
           role="tooltip"
         >
           {metric.tooltip}
