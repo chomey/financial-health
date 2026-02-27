@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 14
-- **Remaining**: 1
+- **Completed**: 15
+- **Remaining**: 0
 - **Last Updated**: 2026-02-27
 
 ---
@@ -453,3 +453,19 @@
   ![Tablet layout at 768px](screenshots/task-14-tablet-768.png)
   ![Desktop two-column at 1024px](screenshots/task-14-desktop-1024.png)
 - **Notes**: Mobile responsiveness was achieved using Tailwind's responsive prefixes (sm: for >=640px, lg: for >=1024px). Key patterns: (1) Delete buttons use `sm:opacity-0 sm:group-hover:opacity-100` so they're always visible on mobile but hover-reveal on desktop. (2) Add-new forms use `flex-col sm:flex-row` to stack inputs vertically on mobile. (3) All interactive elements have `min-h-[44px]` on mobile for WCAG touch target compliance, reverting to compact sizes via `sm:min-h-0`. (4) Form inputs use `text-base` on mobile to prevent iOS Safari auto-zoom. (5) Card padding is `p-4 sm:p-6` to give more content room on small screens. (6) Tooltips support both hover (desktop) and click/tap (mobile) via onClick handler. The MetricCard's `onMouseLeave` still clears the tooltip, which works for desktop but means on Chromium mobile emulation, the tooltip persists only until a mouseleave event — on real mobile devices (touch), there is no mouseleave, so the click toggle works correctly.
+
+## Task 15: [MILESTONE] Full E2E test
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `tests/e2e/milestone-e2e.spec.ts`: Created comprehensive T3 E2E test suite with 4 tests covering the full user journey — adds 3 assets, 2 debts, income, expenses, and a goal; verifies dashboard metrics update correctly at each step; copies URL via clipboard; reloads page and verifies all data preserved; toggles region and verifies CA/US category suggestion filtering. Also includes 3 supplementary tests: region persistence across reload, inline edit persistence, and delete persistence.
+  - `tests/unit/milestone-e2e-infra.test.ts`: Created 7 T1 tests verifying E2E test infrastructure — e2e directory exists, screenshots directory exists, helpers.ts exists, milestone spec exists, playwright config exists, all 16 expected spec files present, .gitattributes tracks images via LFS.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/milestone-e2e-infra.test.ts`: 7 passed, 0 failed
+  - All pre-existing unit tests: 201 passed, 0 failed
+  - `tests/e2e/milestone-e2e.spec.ts`: 4 passed, 0 failed
+  - All pre-existing E2E tests: 88 passed, 0 failed
+  - Total: 208 T1 passed, 92 T2/T3 passed, 0 failed (300 total)
+- **Screenshots**: T3/regression QA task — no new screenshots committed. All tests pass.
+- **Notes**: This is the final task in the project. The comprehensive E2E test validates the complete user workflow: data entry across all 5 sections (assets, debts, income, expenses, goals), live dashboard metric updates, URL state persistence via base85 encoding, clipboard copy functionality, page reload data preservation, and region toggle filtering of category suggestions. All 15 tasks are now complete with 300 total tests passing across all tiers.
