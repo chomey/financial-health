@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 26
-- **Completed**: 21
-- **Remaining**: 5
+- **Completed**: 22
+- **Remaining**: 4
 - **Last Updated**: 2026-02-27
 
 ---
@@ -620,3 +620,23 @@
   ![Grouped asset suggestions](screenshots/task-21-grouped-asset-suggestions.png)
   ![CA-only grouped suggestions](screenshots/task-21-ca-grouped-suggestions.png)
 - **Notes**: Four improvements: (1) tooltip/aria-label explaining toggle purpose, (2) toast message on toggle, (3) opacity-50 dimming + CA/US text badges for out-of-region items, (4) grouped suggestions with section headers (Canadian/US/General) in dropdowns. Updated all existing tests referencing the old aria-label.
+
+## Task 22: Add ROI and monthly contributions to assets
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/AssetEntry.tsx`: Added optional `roi` (annual %) and `monthlyContribution` ($) fields to `Asset` interface. Added `DEFAULT_ROI` mapping with smart defaults (401k/IRA/Roth IRA → 7%, TFSA/RRSP/RESP/FHSA/LIRA → 5%, Savings → 2%, Brokerage → 7%, etc.). Added `getDefaultRoi()` helper. Updated `commitEdit` to handle `roi` and `monthlyContribution` editing fields. Added secondary detail row below each asset with click-to-edit ROI badge (shows suggested defaults in greyed-out style, user-set values in blue) and monthly contribution badge (shows "+$500/mo" in green when set). Moved `opacity-50` for out-of-region assets to outer listitem wrapper for consistent test targeting.
+  - `src/lib/url-state.ts`: Added `r` (roi) and `m` (monthlyContribution) optional fields to `CompactAsset`. Updated `toCompact` to include these fields only when set (saves URL space). Updated `fromCompact` to restore them. Backward compatible — old URLs without these fields still decode correctly.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/asset-roi.test.tsx`: 20 tests — getDefaultRoi for various account types, ROI badge rendering (suggested/set/placeholder), contribution badge rendering, click-to-edit ROI and contribution, onChange propagation, URL roundtrip encoding for ROI/contribution, compact format inclusion/exclusion, backward compatibility
+  - `tests/e2e/asset-roi.spec.ts`: 7 tests — suggested ROI badges display, monthly contribution placeholder, ROI editing via click, contribution editing via click, ROI URL persistence, contribution URL persistence, detail fields visibility for all assets
+  - All T1 unit tests: 304 passed, 0 failed
+  - All T2 E2E tests: 129 passed, 0 failed
+- **Screenshots**:
+  ![ROI suggested badges for known account types](screenshots/task-22-roi-suggested-badges.png)
+  ![ROI edited to custom value](screenshots/task-22-roi-edited.png)
+  ![Monthly contribution edited](screenshots/task-22-contribution-edited.png)
+  ![All detail fields visible](screenshots/task-22-all-detail-fields.png)
+  ![URL persistence after reload](screenshots/task-22-url-persistence.png)
+- **Notes**: Smart ROI defaults are shown as greyed-out suggestions that users can accept or override. When a user explicitly sets an ROI, the "(suggested)" label is removed and the badge turns blue. The fields are designed as secondary detail rows below each asset, keeping the main row clean. URL encoding only includes ROI and contribution when set, maintaining backward compatibility with older URLs. The ROI and contribution values will feed into the projection graph (Task 25).

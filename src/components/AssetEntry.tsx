@@ -7,6 +7,8 @@ export interface Asset {
   id: string;
   category: string;
   amount: number;
+  roi?: number; // annual ROI percentage
+  monthlyContribution?: number; // monthly contribution in $
 }
 
 const CATEGORY_SUGGESTIONS = {
@@ -55,6 +57,29 @@ export function getGroupedCategorySuggestions(region?: Region): SuggestionGroup[
   }
   groups.push({ label: "General", items: CATEGORY_SUGGESTIONS.universal });
   return groups;
+}
+
+/** Smart ROI defaults by account type (annual %) */
+export const DEFAULT_ROI: Record<string, number> = {
+  "401k": 7,
+  "IRA": 7,
+  "Roth IRA": 7,
+  "TFSA": 5,
+  "RRSP": 5,
+  "RESP": 5,
+  "FHSA": 5,
+  "LIRA": 5,
+  "Savings": 2,
+  "Savings Account": 2,
+  "Checking": 0.5,
+  "Brokerage": 7,
+  "529": 6,
+  "HSA": 6,
+};
+
+/** Get the suggested ROI for a category, or undefined if none */
+export function getDefaultRoi(category: string): number | undefined {
+  return DEFAULT_ROI[category];
 }
 
 /** Check if a category belongs to the "other" region (not selected) */
@@ -142,7 +167,7 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
   }, [assets]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
-    "category" | "amount" | null
+    "category" | "amount" | "roi" | "monthlyContribution" | null
   >(null);
   const [editValue, setEditValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -170,7 +195,7 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
 
   const startEdit = (
     id: string,
-    field: "category" | "amount",
+    field: "category" | "amount" | "roi" | "monthlyContribution",
     currentValue: string
   ) => {
     setEditingId(id);
@@ -188,6 +213,14 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
           if (a.id !== editingId) return a;
           if (editingField === "category") {
             return { ...a, category: editValue || a.category };
+          }
+          if (editingField === "roi") {
+            const val = parseFloat(editValue);
+            return { ...a, roi: isNaN(val) ? undefined : val };
+          }
+          if (editingField === "monthlyContribution") {
+            const val = parseCurrencyInput(editValue);
+            return { ...a, monthlyContribution: val || undefined };
           }
           return { ...a, amount: parseCurrencyInput(editValue) };
         })
@@ -286,89 +319,142 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
         <div className="space-y-1" role="list" aria-label="Asset items">
           {assets.map((asset) => {
             const outOfRegion = isOutOfRegion(asset.category, region);
+            const defaultRoi = getDefaultRoi(asset.category);
+            const displayRoi = asset.roi ?? defaultRoi;
+            const hasRoi = asset.roi !== undefined;
+            const hasContribution = asset.monthlyContribution !== undefined && asset.monthlyContribution > 0;
             return (
-            <div
-              key={asset.id}
-              role="listitem"
-              className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50 ${outOfRegion ? "opacity-50" : ""}`}
-            >
-              <div className="flex flex-1 items-center gap-3 min-w-0">
-                {/* Category */}
-                {editingId === asset.id && editingField === "category" ? (
-                  <div className="relative flex-1 min-w-0">
+            <div key={asset.id} role="listitem" className={outOfRegion ? "opacity-50" : ""}>
+              <div
+                className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50"
+              >
+                <div className="flex flex-1 items-center gap-3 min-w-0">
+                  {/* Category */}
+                  {editingId === asset.id && editingField === "category" ? (
+                    <div className="relative flex-1 min-w-0">
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => {
+                          setEditValue(e.target.value);
+                          setShowSuggestions(true);
+                        }}
+                        onBlur={() => {
+                          // Delay to allow suggestion click
+                          setTimeout(() => {
+                            commitEdit();
+                          }, 150);
+                        }}
+                        onKeyDown={handleEditKeyDown}
+                        className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                        aria-label="Edit category name"
+                      />
+                      {showSuggestions &&
+                        filteredGroupedSuggestions(editValue).length > 0 && (
+                          <div
+                            ref={suggestionsRef}
+                            className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
+                          >
+                            {filteredGroupedSuggestions(editValue).map((group) => (
+                              <div key={group.label}>
+                                <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
+                                {group.items.map((suggestion) => (
+                                  <button
+                                    key={suggestion}
+                                    type="button"
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      setEditValue(suggestion);
+                                      setShowSuggestions(false);
+                                      commitEdit();
+                                    }}
+                                    className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                                  >
+                                    {getAssetCategoryFlag(suggestion) && (
+                                      <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
+                                    )}
+                                    {suggestion}
+                                  </button>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startEdit(asset.id, "category", asset.category)
+                      }
+                      className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-stone-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      aria-label={`Edit category for ${asset.category}`}
+                    >
+                      {getAssetCategoryFlag(asset.category) && (
+                        <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(asset.category)}</span>
+                      )}
+                      {asset.category}
+                      {outOfRegion && (
+                        <span className="ml-1.5 inline-flex items-center rounded px-1 py-0.5 text-[10px] font-medium leading-none bg-stone-100 text-stone-400" data-testid={`region-badge-${asset.id}`}>
+                          {CA_ASSET_CATEGORIES.has(asset.category) ? "CA" : "US"}
+                        </span>
+                      )}
+                    </button>
+                  )}
+
+                  {/* Amount */}
+                  {editingId === asset.id && editingField === "amount" ? (
                     <input
                       ref={inputRef}
                       type="text"
                       value={editValue}
-                      onChange={(e) => {
-                        setEditValue(e.target.value);
-                        setShowSuggestions(true);
-                      }}
-                      onBlur={() => {
-                        // Delay to allow suggestion click
-                        setTimeout(() => {
-                          commitEdit();
-                        }, 150);
-                      }}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={commitEdit}
                       onKeyDown={handleEditKeyDown}
-                      className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
-                      aria-label="Edit category name"
+                      className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                      aria-label={`Edit amount for ${asset.category}`}
                     />
-                    {showSuggestions &&
-                      filteredGroupedSuggestions(editValue).length > 0 && (
-                        <div
-                          ref={suggestionsRef}
-                          className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
-                        >
-                          {filteredGroupedSuggestions(editValue).map((group) => (
-                            <div key={group.label}>
-                              <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
-                              {group.items.map((suggestion) => (
-                                <button
-                                  key={suggestion}
-                                  type="button"
-                                  onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    setEditValue(suggestion);
-                                    setShowSuggestions(false);
-                                    commitEdit();
-                                  }}
-                                  className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
-                                >
-                                  {getAssetCategoryFlag(suggestion) && (
-                                    <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
-                                  )}
-                                  {suggestion}
-                                </button>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      startEdit(asset.id, "category", asset.category)
-                    }
-                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-stone-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    aria-label={`Edit category for ${asset.category}`}
-                  >
-                    {getAssetCategoryFlag(asset.category) && (
-                      <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(asset.category)}</span>
-                    )}
-                    {asset.category}
-                    {outOfRegion && (
-                      <span className="ml-1.5 inline-flex items-center rounded px-1 py-0.5 text-[10px] font-medium leading-none bg-stone-100 text-stone-400" data-testid={`region-badge-${asset.id}`}>
-                        {CA_ASSET_CATEGORIES.has(asset.category) ? "CA" : "US"}
-                      </span>
-                    )}
-                  </button>
-                )}
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startEdit(asset.id, "amount", String(asset.amount))
+                      }
+                      className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-green-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-green-50 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      aria-label={`Edit amount for ${asset.category}, currently ${formatCurrency(asset.amount)}`}
+                    >
+                      {formatCurrency(asset.amount)}
+                    </button>
+                  )}
+                </div>
 
-                {/* Amount */}
-                {editingId === asset.id && editingField === "amount" ? (
+                {/* Delete button */}
+                <button
+                  type="button"
+                  onClick={() => deleteAsset(asset.id)}
+                  className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-stone-300 sm:opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 sm:group-hover:opacity-100"
+                  aria-label={`Delete ${asset.category}`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 sm:h-4 sm:w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Secondary detail fields: ROI and Monthly Contribution */}
+              <div className="flex flex-wrap items-center gap-2 px-5 pb-1" data-testid={`asset-details-${asset.id}`}>
+                {/* ROI badge/editor */}
+                {editingId === asset.id && editingField === "roi" ? (
                   <input
                     ref={inputRef}
                     type="text"
@@ -376,43 +462,61 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={commitEdit}
                     onKeyDown={handleEditKeyDown}
-                    className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
-                    aria-label={`Edit amount for ${asset.category}`}
+                    className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                    aria-label={`Edit ROI for ${asset.category}`}
+                    placeholder="e.g. 7"
                   />
                 ) : (
                   <button
                     type="button"
-                    onClick={() =>
-                      startEdit(asset.id, "amount", String(asset.amount))
-                    }
-                    className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-green-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-green-50 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-200"
-                    aria-label={`Edit amount for ${asset.category}, currently ${formatCurrency(asset.amount)}`}
+                    onClick={() => startEdit(asset.id, "roi", String(asset.roi ?? ""))}
+                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                      hasRoi
+                        ? "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                        : displayRoi !== undefined
+                          ? "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
+                          : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                    }`}
+                    aria-label={`Edit ROI for ${asset.category}${displayRoi !== undefined ? `, currently ${displayRoi}%` : ""}`}
+                    data-testid={`roi-badge-${asset.id}`}
                   >
-                    {formatCurrency(asset.amount)}
+                    {displayRoi !== undefined
+                      ? `${displayRoi}% ROI${!hasRoi ? " (suggested)" : ""}`
+                      : "Annual return %"}
+                  </button>
+                )}
+
+                {/* Monthly contribution badge/editor */}
+                {editingId === asset.id && editingField === "monthlyContribution" ? (
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={commitEdit}
+                    onKeyDown={handleEditKeyDown}
+                    className="w-24 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                    aria-label={`Edit monthly contribution for ${asset.category}`}
+                    placeholder="e.g. 500"
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => startEdit(asset.id, "monthlyContribution", String(asset.monthlyContribution ?? ""))}
+                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                      hasContribution
+                        ? "bg-green-50 text-green-600 hover:bg-green-100"
+                        : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                    }`}
+                    aria-label={`Edit monthly contribution for ${asset.category}${hasContribution ? `, currently ${formatCurrency(asset.monthlyContribution!)}` : ""}`}
+                    data-testid={`contribution-badge-${asset.id}`}
+                  >
+                    {hasContribution
+                      ? `+${formatCurrency(asset.monthlyContribution!)}/mo`
+                      : "Monthly contribution"}
                   </button>
                 )}
               </div>
-
-              {/* Delete button */}
-              <button
-                type="button"
-                onClick={() => deleteAsset(asset.id)}
-                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-stone-300 sm:opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 sm:group-hover:opacity-100"
-                aria-label={`Delete ${asset.category}`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 sm:h-4 sm:w-4"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
             </div>
           );})}
         </div>

@@ -94,6 +94,8 @@ function decode85(encoded: string): Uint8Array {
 interface CompactAsset {
   c: string; // category
   a: number; // amount
+  r?: number; // roi (annual %)
+  m?: number; // monthlyContribution ($)
 }
 interface CompactDebt {
   c: string;
@@ -129,7 +131,12 @@ interface CompactState {
 
 function toCompact(state: FinancialState): CompactState {
   const compact: CompactState = {
-    a: state.assets.map((x) => ({ c: x.category, a: x.amount })),
+    a: state.assets.map((x) => {
+      const ca: CompactAsset = { c: x.category, a: x.amount };
+      if (x.roi !== undefined) ca.r = x.roi;
+      if (x.monthlyContribution !== undefined && x.monthlyContribution > 0) ca.m = x.monthlyContribution;
+      return ca;
+    }),
     d: state.debts.map((x) => ({ c: x.category, a: x.amount })),
     i: state.income.map((x) => ({ c: x.category, a: x.amount })),
     e: state.expenses.map((x) => ({ c: x.category, a: x.amount })),
@@ -148,7 +155,12 @@ function toCompact(state: FinancialState): CompactState {
 function fromCompact(compact: CompactState): FinancialState {
   return {
     region: (compact.r as FinancialState["region"]) || "both",
-    assets: compact.a.map((x, i) => ({ id: `a${i + 1}`, category: x.c, amount: x.a })),
+    assets: compact.a.map((x, i) => {
+      const asset: { id: string; category: string; amount: number; roi?: number; monthlyContribution?: number } = { id: `a${i + 1}`, category: x.c, amount: x.a };
+      if (x.r !== undefined) asset.roi = x.r;
+      if (x.m !== undefined) asset.monthlyContribution = x.m;
+      return asset;
+    }),
     debts: compact.d.map((x, i) => ({ id: `d${i + 1}`, category: x.c, amount: x.a })),
     income: compact.i.map((x, i) => ({ id: `i${i + 1}`, category: x.c, amount: x.a })),
     expenses: compact.e.map((x, i) => ({ id: `e${i + 1}`, category: x.c, amount: x.a })),
