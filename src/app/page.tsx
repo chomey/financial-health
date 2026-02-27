@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
@@ -12,18 +12,100 @@ import {
   computeMetrics,
   toFinancialData,
 } from "@/lib/financial-state";
+import { getStateFromURL, updateURL } from "@/lib/url-state";
 import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import type { Goal } from "@/components/GoalEntry";
 
+function CopyLinkButton() {
+  const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for browsers without clipboard API
+      const input = document.createElement("input");
+      input.value = window.location.href;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      document.body.removeChild(input);
+      setCopied(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    }
+  }, []);
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm font-medium text-stone-600 shadow-sm transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 active:scale-95"
+      aria-label="Copy link to clipboard"
+    >
+      {copied ? (
+        <>
+          <svg
+            className="h-4 w-4 text-emerald-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-emerald-600">Copied!</span>
+        </>
+      ) : (
+        <>
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+            />
+          </svg>
+          Copy Link
+        </>
+      )}
+    </button>
+  );
+}
+
+function getInitialState() {
+  if (typeof window === "undefined") return INITIAL_STATE;
+  return getStateFromURL() ?? INITIAL_STATE;
+}
+
 export default function Home() {
-  const [assets, setAssets] = useState<Asset[]>(INITIAL_STATE.assets);
-  const [debts, setDebts] = useState<Debt[]>(INITIAL_STATE.debts);
-  const [income, setIncome] = useState<IncomeItem[]>(INITIAL_STATE.income);
-  const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
-  const [goals, setGoals] = useState<Goal[]>(INITIAL_STATE.goals);
+  const [initialState] = useState(getInitialState);
+  const [assets, setAssets] = useState<Asset[]>(() => initialState.assets);
+  const [debts, setDebts] = useState<Debt[]>(() => initialState.debts);
+  const [income, setIncome] = useState<IncomeItem[]>(() => initialState.income);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>(() => initialState.expenses);
+  const [goals, setGoals] = useState<Goal[]>(() => initialState.goals);
+  const isFirstRender = useRef(true);
+
+  // Update URL whenever state changes (skip the initial render to avoid unnecessary write)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      // Still write the URL on first render so the s= param is always present
+      isFirstRender.current = false;
+    }
+    updateURL({ assets, debts, income, expenses, goals });
+  }, [assets, debts, income, expenses, goals]);
 
   const state = { assets, debts, income, expenses, goals };
   const metrics = computeMetrics(state);
@@ -32,13 +114,16 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white px-6 py-4 shadow-sm">
-        <div className="mx-auto max-w-7xl">
-          <h1 className="text-2xl font-bold text-stone-900">
-            Financial Health Snapshot
-          </h1>
-          <p className="text-sm text-stone-500">
-            Your finances at a glance — no judgment, just clarity
-          </p>
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-stone-900">
+              Financial Health Snapshot
+            </h1>
+            <p className="text-sm text-stone-500">
+              Your finances at a glance — no judgment, just clarity
+            </p>
+          </div>
+          <CopyLinkButton />
         </div>
       </header>
 
