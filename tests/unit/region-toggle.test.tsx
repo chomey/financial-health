@@ -29,7 +29,7 @@ describe("RegionToggle", () => {
 
   it("has radiogroup role with accessible label", () => {
     render(<RegionToggle region="US" onChange={() => {}} />);
-    expect(screen.getByRole("radiogroup", { name: /Select financial region/i })).toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: /Filter account types by region/i })).toBeInTheDocument();
   });
 
   it("shows flag icons", () => {

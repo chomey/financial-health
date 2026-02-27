@@ -296,7 +296,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
     // Step 9: Toggle region and verify category suggestions change
     // ========================================
     const toggle = page.getByRole("radiogroup", {
-      name: /Select financial region/i,
+      name: /Filter account types by region/i,
     });
 
     // Switch to CA
@@ -359,7 +359,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
 
     // Switch to US region
     const toggle = page.getByRole("radiogroup", {
-      name: /Select financial region/i,
+      name: /Filter account types by region/i,
     });
     await toggle.getByRole("radio", { name: /US/i }).click();
 
@@ -372,7 +372,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
 
     // Verify US is still selected
     const toggleAfterReload = page.getByRole("radiogroup", {
-      name: /Select financial region/i,
+      name: /Filter account types by region/i,
     });
     await expect(
       toggleAfterReload.getByRole("radio", { name: /US/i })

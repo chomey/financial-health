@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 26
-- **Completed**: 20
-- **Remaining**: 6
+- **Completed**: 21
+- **Remaining**: 5
 - **Last Updated**: 2026-02-27
 
 ---
@@ -595,3 +595,28 @@
   ![No hydration errors on load](screenshots/task-20-no-hydration-errors.png)
   ![Stable property IDs after reload](screenshots/task-20-stable-property-ids.png)
 - **Notes**: The root cause was twofold: (1) `fromCompact()` in url-state.ts used a single sequential counter for all entity types, so the property got ID `"13"` instead of `"p1"` after URL decode; (2) `page.tsx` used `getInitialState()` which read URL state during client hydration, producing different IDs than the server's `INITIAL_STATE`. Fix: type-prefixed IDs in `fromCompact`, matching IDs in `INITIAL_STATE` and all component mock data, and deferred URL state loading via `useEffect`.
+
+## Task 21: Make region toggle obviously useful
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/RegionToggle.tsx`: Added tooltip (title attr + descriptive aria-label "Filter account types by region"), toast feedback message on region change ("Showing US/Canadian/all account types") with 2s auto-dismiss
+  - `src/components/AssetEntry.tsx`: Added `isOutOfRegion()` helper, `getGroupedCategorySuggestions()` for section-header dropdowns, opacity-50 dimming on out-of-region items, "CA"/"US" text badge on dimmed items
+  - `src/components/DebtEntry.tsx`: Same changes as AssetEntry — `isDebtOutOfRegion()`, `getGroupedDebtCategorySuggestions()`, dimming, badges
+  - `tests/unit/region-toggle.test.tsx`: Updated aria-label reference
+  - `tests/e2e/region-toggle.spec.ts`: Updated aria-label references
+  - `tests/e2e/milestone-e2e.spec.ts`: Updated aria-label references
+  - `tests/e2e/mobile-responsive.spec.ts`: Updated aria-label references
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/region-toggle-ux.test.tsx`: 24 tests — RegionToggle tooltip, toast feedback, isOutOfRegion/isDebtOutOfRegion logic, grouped suggestions, asset/debt dimming and badges
+  - `tests/e2e/region-toggle-ux.spec.ts`: 7 tests — tooltip visibility, toast on toggle, out-of-region dimming, grouped suggestion headers
+  - All T1 unit tests: 284 passed, 0 failed
+  - All T2 E2E region tests: 21 passed, 0 failed
+- **Screenshots**:
+  ![Region toast showing US](screenshots/task-21-region-toast-us.png)
+  ![Region toast showing CA](screenshots/task-21-region-toast-ca.png)
+  ![Dimmed out-of-region assets](screenshots/task-21-dimmed-assets-us.png)
+  ![Grouped asset suggestions](screenshots/task-21-grouped-asset-suggestions.png)
+  ![CA-only grouped suggestions](screenshots/task-21-ca-grouped-suggestions.png)
+- **Notes**: Four improvements: (1) tooltip/aria-label explaining toggle purpose, (2) toast message on toggle, (3) opacity-50 dimming + CA/US text badges for out-of-region items, (4) grouped suggestions with section headers (Canadian/US/General) in dropdowns. Updated all existing tests referencing the old aria-label.
