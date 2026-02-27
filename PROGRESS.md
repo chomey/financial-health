@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 6
-- **Remaining**: 9
+- **Completed**: 7
+- **Remaining**: 8
 - **Last Updated**: 2026-02-27
 
 ---
@@ -180,3 +180,39 @@
   ![Expense amount edited](screenshots/task-6-expense-amount-edited.png)
   ![Expense category suggestions](screenshots/task-6-expense-category-suggestions.png)
 - **Notes**: IncomeEntry uses green for amounts (matching assets' positive feel), ExpenseEntry uses amber/orange to distinguish spending. Both have animated monthly totals triggered from event handlers (not useEffect) to satisfy React 19's strict lint rules. Components manage their own state — Task 10 will wire to shared state. The "Rent/Mortgage Payment" expense category created an ambiguity with the "Mortgage" debt category in E2E tests, fixed with exact text matching.
+
+## Task 7: Build financial goals section
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/GoalEntry.tsx`: Created new component with full goal entry functionality — mock data (Rainy Day Fund $14,500/$20,000, New Car $13,500/$42,000, Vacation $6,200/$6,500), animated progress bars with color transitions (amber→blue→teal→emerald→green as progress increases), celebratory glow effect + pulse animation when a goal is reached (100%), click-to-edit goal name/saved amount/target amount, delete on hover, "Add Goal" button with inline form (name, target, saved so far), hover tooltip showing percentage complete and remaining amount, empty state message.
+  - `src/app/page.tsx`: Added GoalEntry component import and placed it in the entry panel after ExpenseEntry.
+  - `tests/unit/goal-entry.test.tsx`: 14 T1 unit tests covering rendering, mock data display, formatted amounts, progress bars with correct percentages, add/delete interactions, click-to-edit for all three fields, empty state, and adding new goals.
+  - `tests/e2e/goal-entry.spec.ts`: 7 T2 browser tests — mock data with progress bars, add form, adding new goal, deleting goal, click-to-edit name, click-to-edit saved amount with progress bar update, hover tooltip.
+  - `tests/unit/setup.test.tsx`: Updated to verify all five entry sections including Goals.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/goal-entry.test.tsx`: 14 passed, 0 failed
+  - `tests/unit/setup.test.tsx`: 8 passed, 0 failed
+  - `tests/unit/asset-entry.test.tsx`: 13 passed, 0 failed (pre-existing)
+  - `tests/unit/debt-entry.test.tsx`: 14 passed, 0 failed (pre-existing)
+  - `tests/unit/income-entry.test.tsx`: 15 passed, 0 failed (pre-existing)
+  - `tests/unit/expense-entry.test.tsx`: 15 passed, 0 failed (pre-existing)
+  - `tests/unit/screenshot-helpers.test.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/goal-entry.spec.ts`: 7 passed, 0 failed
+  - `tests/e2e/app-shell.spec.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/asset-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/debt-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/income-entry.spec.ts`: 6 passed, 0 failed (pre-existing)
+  - `tests/e2e/expense-entry.spec.ts`: 6 passed, 0 failed (pre-existing)
+  - `tests/e2e/smoke.spec.ts`: 1 passed, 0 failed (pre-existing)
+  - Total: 119 passed, 0 failed
+- **Screenshots**:
+  ![Goals with mock data](screenshots/task-7-goals-with-mock-data.png)
+  ![Add goal form](screenshots/task-7-add-goal-form.png)
+  ![Goal added](screenshots/task-7-goal-added.png)
+  ![Goal deleted](screenshots/task-7-goal-deleted.png)
+  ![Edit goal name](screenshots/task-7-edit-goal-name.png)
+  ![Saved amount edited](screenshots/task-7-saved-amount-edited.png)
+  ![Goal tooltip on hover](screenshots/task-7-goal-tooltip.png)
+- **Notes**: GoalEntry follows the same component pattern as AssetEntry/DebtEntry but adds progress bars with dynamic color coding based on completion percentage (amber<25%, blue<50%, teal<75%, emerald<100%, green=100%). Goals at 100% get a celebratory glow effect (amber ring + shadow) and pulse animation. Mock data values were chosen to avoid text collisions with existing components on the page (e.g., avoiding "$12,000" which appears in AssetEntry and "Emergency Fund" which is used in asset E2E tests). Component manages its own state — Task 10 will wire to shared state.
