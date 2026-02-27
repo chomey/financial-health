@@ -8,6 +8,7 @@ import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import GoalEntry from "@/components/GoalEntry";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
+import ProjectionChart from "@/components/ProjectionChart";
 import RegionToggle from "@/components/RegionToggle";
 import {
   INITIAL_STATE,
@@ -195,6 +196,11 @@ export default function Home() {
             </div>
           </section>
         </div>
+
+        {/* Projection Chart — full width below the two-column layout */}
+        <section className="mt-8" aria-label="Financial projection">
+          <ProjectionChart state={state} />
+        </section>
       </main>
     </div>
   );
