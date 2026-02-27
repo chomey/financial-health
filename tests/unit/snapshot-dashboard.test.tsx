@@ -14,9 +14,10 @@ describe("SnapshotDashboard", () => {
 
   it("renders icons for each metric", () => {
     render(<SnapshotDashboard />);
-    expect(screen.getByText("💰")).toBeInTheDocument();
-    expect(screen.getByText("📈")).toBeInTheDocument();
-    expect(screen.getByText("🛡️")).toBeInTheDocument();
+    // Icons may appear in both metric cards and insights panel, so use getAllByText
+    expect(screen.getAllByText("💰").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("📈").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("🛡️").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("⚖️")).toBeInTheDocument();
   });
 

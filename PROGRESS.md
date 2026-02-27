@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 8
-- **Remaining**: 7
+- **Completed**: 9
+- **Remaining**: 6
 - **Last Updated**: 2026-02-27
 
 ---
@@ -251,3 +251,45 @@
   ![Dashboard card hover](screenshots/task-8-dashboard-card-hover.png)
   ![Dashboard colors](screenshots/task-8-dashboard-colors.png)
 - **Notes**: SnapshotDashboard uses hardcoded mock values calculated from existing entry component mock data (Assets $65,500, Debts $295,000, Income $6,300, Expenses $2,950). Net Worth is negative (-$229,500) due to mortgage — this is realistic and the tooltip reassures users. The count-up animation uses requestAnimationFrame with ease-out cubic easing for a smooth feel. aria-labels on value elements contain the final formatted value (not the animated intermediate) for accessibility. Task 10 will wire real state to replace mock values.
+
+## Task 9: Build positive insights engine
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/insights.ts`: Created pure insights generation engine. Takes structured financial data (assets, debts, income, expenses, goals) and produces 3-5 encouraging, human-readable insights. Insight types: runway (shield icon), surplus (chart icon), savings-rate (star icon), goal progress (target icon), net-worth (money icon). Logic adapts messages based on thresholds (e.g., strong vs solid vs building runway).
+  - `src/components/InsightsPanel.tsx`: Created InsightsPanel component rendering insight cards with warm gradient styling, staggered entrance animations (opacity + translate-y with 150ms delays), hover lift effects, icons per insight type, and article roles for accessibility. Accepts optional `data` prop for custom financial data (defaults to mock data matching entry components).
+  - `src/components/SnapshotDashboard.tsx`: Added InsightsPanel below the four metric cards. Imported InsightsPanel component.
+  - `tests/unit/insights.test.ts`: 18 T1 unit tests for the insights engine — covers all insight types, threshold variations, edge cases (empty data, zero values), unique IDs, and message content.
+  - `tests/unit/insights-panel.test.tsx`: 7 T1 unit tests for the InsightsPanel component — rendering, icons, article roles, test ID, null when empty, custom data prop.
+  - `tests/unit/snapshot-dashboard.test.tsx`: Updated "renders icons" test to use `getAllByText` since icons now appear in both metric cards and insights panel.
+  - `tests/e2e/insights-panel.spec.ts`: 7 T2 browser tests — insights section visibility, card count, runway/surplus/goal content, entrance animations, hover effects.
+  - `tests/e2e/snapshot-dashboard.spec.ts`: Updated selectors to use aria-labels and scoped locators to avoid ambiguity with insights text.
+  - `tests/e2e/app-shell.spec.ts`: Updated metric card assertions to use scoped locators.
+  - `tests/e2e/goal-entry.spec.ts`: Scoped goal text assertions to goals list to avoid matching insight text; fixed "Safety Net" assertion to use button role.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/insights.test.ts`: 18 passed, 0 failed
+  - `tests/unit/insights-panel.test.tsx`: 7 passed, 0 failed
+  - `tests/unit/snapshot-dashboard.test.tsx`: 17 passed, 0 failed
+  - `tests/unit/setup.test.tsx`: 8 passed, 0 failed (pre-existing)
+  - `tests/unit/asset-entry.test.tsx`: 13 passed, 0 failed (pre-existing)
+  - `tests/unit/debt-entry.test.tsx`: 14 passed, 0 failed (pre-existing)
+  - `tests/unit/income-entry.test.tsx`: 15 passed, 0 failed (pre-existing)
+  - `tests/unit/expense-entry.test.tsx`: 15 passed, 0 failed (pre-existing)
+  - `tests/unit/goal-entry.test.tsx`: 14 passed, 0 failed (pre-existing)
+  - `tests/unit/screenshot-helpers.test.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/insights-panel.spec.ts`: 7 passed, 0 failed
+  - `tests/e2e/snapshot-dashboard.spec.ts`: 7 passed, 0 failed
+  - `tests/e2e/app-shell.spec.ts`: 3 passed, 0 failed
+  - `tests/e2e/goal-entry.spec.ts`: 7 passed, 0 failed
+  - `tests/e2e/asset-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/debt-entry.spec.ts`: 7 passed, 0 failed (pre-existing)
+  - `tests/e2e/income-entry.spec.ts`: 6 passed, 0 failed (pre-existing)
+  - `tests/e2e/expense-entry.spec.ts`: 6 passed, 0 failed (pre-existing)
+  - `tests/e2e/smoke.spec.ts`: 1 passed, 0 failed (pre-existing)
+  - Total: 175 passed, 0 failed
+- **Screenshots**:
+  ![Insights panel](screenshots/task-9-insights-panel.png)
+  ![Insights animated](screenshots/task-9-insights-animated.png)
+  ![Insight card hover](screenshots/task-9-insight-hover.png)
+- **Notes**: The insights engine is a pure function in `src/lib/insights.ts` that accepts structured `FinancialData` and returns insight objects. Currently uses mock data matching entry components. Task 10 will wire shared state so insights update live as users edit values. The InsightsPanel component accepts an optional `data` prop, making it ready for real state integration. Several pre-existing E2E tests needed selector updates because insight messages contain phrases like "Net Worth", "$3,350", "Vacation", and "safety net" that caused ambiguous text matches — fixed by scoping to specific elements (aria-labels, roles, lists).

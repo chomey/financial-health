@@ -10,10 +10,11 @@ test.describe("Goal entry section", () => {
       page.getByRole("heading", { name: "Goals" })
     ).toBeVisible();
 
-    // Check mock data
-    await expect(page.getByText("Rainy Day Fund")).toBeVisible();
-    await expect(page.getByText("New Car")).toBeVisible();
-    await expect(page.getByText("Vacation")).toBeVisible();
+    // Check mock data (scoped to goals list to avoid matching insight text)
+    const goalsList = page.getByRole("list").filter({ hasText: "Rainy Day Fund" });
+    await expect(goalsList.getByText("Rainy Day Fund")).toBeVisible();
+    await expect(goalsList.getByText("New Car")).toBeVisible();
+    await expect(goalsList.getByText("Vacation")).toBeVisible();
 
     // Check progress bars exist
     const progressBars = page.getByRole("progressbar");
@@ -91,7 +92,7 @@ test.describe("Goal entry section", () => {
     await editInput.fill("Safety Net");
     await editInput.press("Enter");
 
-    await expect(page.getByText("Safety Net")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit name for Safety Net" })).toBeVisible();
 
     await captureScreenshot(page, "task-7-edit-goal-name");
   });

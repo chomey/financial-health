@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import InsightsPanel from "@/components/InsightsPanel";
 
 interface MetricData {
   title: string;
@@ -162,6 +163,8 @@ export default function SnapshotDashboard() {
       {MOCK_METRICS.map((metric) => (
         <MetricCard key={metric.title} metric={metric} />
       ))}
+
+      <InsightsPanel />
     </div>
   );
 }
