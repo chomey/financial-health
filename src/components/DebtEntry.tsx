@@ -49,12 +49,12 @@ export function getDebtCategoryFlag(category: string): string {
 }
 
 const MOCK_DEBTS: Debt[] = [
-  { id: "d2", category: "Car Loan", amount: 15000 },
+  { id: "d1", category: "Car Loan", amount: 15000 },
 ];
 
 let nextId = 200;
 function generateId(): string {
-  return String(++nextId);
+  return `d${++nextId}`;
 }
 
 function formatCurrency(amount: number): string {

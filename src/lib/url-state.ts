@@ -146,22 +146,20 @@ function toCompact(state: FinancialState): CompactState {
 }
 
 function fromCompact(compact: CompactState): FinancialState {
-  let idCounter = 1;
-  const nextId = () => String(idCounter++);
   return {
     region: (compact.r as FinancialState["region"]) || "both",
-    assets: compact.a.map((x) => ({ id: nextId(), category: x.c, amount: x.a })),
-    debts: compact.d.map((x) => ({ id: nextId(), category: x.c, amount: x.a })),
-    income: compact.i.map((x) => ({ id: nextId(), category: x.c, amount: x.a })),
-    expenses: compact.e.map((x) => ({ id: nextId(), category: x.c, amount: x.a })),
-    goals: compact.g.map((x) => ({
-      id: nextId(),
+    assets: compact.a.map((x, i) => ({ id: `a${i + 1}`, category: x.c, amount: x.a })),
+    debts: compact.d.map((x, i) => ({ id: `d${i + 1}`, category: x.c, amount: x.a })),
+    income: compact.i.map((x, i) => ({ id: `i${i + 1}`, category: x.c, amount: x.a })),
+    expenses: compact.e.map((x, i) => ({ id: `e${i + 1}`, category: x.c, amount: x.a })),
+    goals: compact.g.map((x, i) => ({
+      id: `g${i + 1}`,
       name: x.n,
       targetAmount: x.t,
       currentAmount: x.s,
     })),
-    properties: (compact.p ?? []).map((x) => ({
-      id: nextId(),
+    properties: (compact.p ?? []).map((x, i) => ({
+      id: `p${i + 1}`,
       name: x.n,
       value: x.v,
       mortgage: x.m,

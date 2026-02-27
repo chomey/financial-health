@@ -32,7 +32,7 @@ const MOCK_EXPENSES: ExpenseItem[] = [
 
 let nextId = 400;
 function generateId(): string {
-  return String(++nextId);
+  return `e${++nextId}`;
 }
 
 function formatCurrency(amount: number): string {

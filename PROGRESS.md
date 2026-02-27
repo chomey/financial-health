@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 19
-- **Completed**: 19
-- **Remaining**: 0
+- **Total Tasks**: 26
+- **Completed**: 20
+- **Remaining**: 6
 - **Last Updated**: 2026-02-27
 
 ---
@@ -569,3 +569,29 @@
   ![Monthly Surplus tooltip visible](screenshots/task-19-surplus-tooltip.png)
   ![Debt-to-Asset Ratio tooltip](screenshots/task-19-ratio-tooltip.png)
 - **Notes**: The root cause was that tooltips positioned `absolute top-full` on a `relative` card were being covered by subsequent sibling cards in the DOM stacking order. Fix: dynamically elevate the hovered card's z-index to `z-20` and use `z-30` on the tooltip itself. The `overflow-visible` on the sticky wrapper ensures nothing clips the tooltip.
+
+---
+
+## Task 20: Fix hydration mismatch in PropertyEntry
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/app/page.tsx`: Removed `getInitialState()` function that read URL on client during hydration. All state now initializes with `INITIAL_STATE` consistently on both server and client. URL state is restored in a `useEffect` after hydration to prevent mismatch. Removed unused `useMemo` import.
+  - `src/lib/url-state.ts`: Changed `fromCompact()` to generate type-prefixed deterministic IDs (`a1`, `d1`, `i1`, `e1`, `g1`, `p1`) instead of a sequential counter (`1`, `2`, ... `13`). This ensures encode→decode roundtrips produce IDs matching `INITIAL_STATE`.
+  - `src/lib/financial-state.ts`: Updated `INITIAL_STATE` asset IDs from `"1"`, `"2"`, `"3"` to `"a1"`, `"a2"`, `"a3"` and debt ID from `"d2"` to `"d1"` to match the `fromCompact` naming convention.
+  - `src/components/AssetEntry.tsx`: Updated mock data IDs to `"a1"`, `"a2"`, `"a3"` and `generateId()` to produce `a`-prefixed IDs.
+  - `src/components/DebtEntry.tsx`: Updated mock data ID to `"d1"` and `generateId()` to produce `d`-prefixed IDs.
+  - `src/components/IncomeEntry.tsx`: Updated `generateId()` to produce `i`-prefixed IDs.
+  - `src/components/ExpenseEntry.tsx`: Updated `generateId()` to produce `e`-prefixed IDs.
+  - `src/components/GoalEntry.tsx`: Updated mock data IDs to `"g1"`, `"g2"`, `"g3"` and `generateId()` to produce `g`-prefixed IDs.
+  - `src/components/PropertyEntry.tsx`: Updated `generateId()` to produce `p`-prefixed IDs.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/hydration-ids.test.ts`: 4 tests — verifies fromCompact generates type-prefixed IDs, INITIAL_STATE IDs match roundtrip output, encode→decode preserves IDs, deterministic across calls
+  - `tests/e2e/hydration-fix.spec.ts`: 4 tests — no hydration errors on initial load, no hydration errors after reload with URL state, stable property equity test IDs, data persists correctly
+  - All T1 unit tests: 260 passed, 0 failed
+  - All T2 E2E hydration tests: 4 passed, 0 failed
+- **Screenshots**:
+  ![No hydration errors on load](screenshots/task-20-no-hydration-errors.png)
+  ![Stable property IDs after reload](screenshots/task-20-stable-property-ids.png)
+- **Notes**: The root cause was twofold: (1) `fromCompact()` in url-state.ts used a single sequential counter for all entity types, so the property got ID `"13"` instead of `"p1"` after URL decode; (2) `page.tsx` used `getInitialState()` which read URL state during client hydration, producing different IDs than the server's `INITIAL_STATE`. Fix: type-prefixed IDs in `fromCompact`, matching IDs in `INITIAL_STATE` and all component mock data, and deferred URL state loading via `useEffect`.
