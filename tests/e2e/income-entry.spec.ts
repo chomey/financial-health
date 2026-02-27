@@ -45,9 +45,11 @@ test.describe("Income entry section", () => {
     await amountInput.fill("500");
     await page.getByLabel("Confirm add income").click();
 
-    await expect(page.getByText("Side Hustle")).toBeVisible();
-    await expect(page.getByText("$500")).toBeVisible();
-    await expect(page.getByText("Monthly Total: $6,800")).toBeVisible();
+    // Scope to income section to avoid matching projection chart text
+    const incomeSection = page.locator("section", { has: page.getByRole("heading", { name: "Monthly Income" }) }).first();
+    await expect(incomeSection.getByText("Side Hustle")).toBeVisible();
+    await expect(incomeSection.getByText("$500")).toBeVisible();
+    await expect(incomeSection.getByText("Monthly Total: $6,800")).toBeVisible();
 
     await captureScreenshot(page, "task-6-income-added");
   });
