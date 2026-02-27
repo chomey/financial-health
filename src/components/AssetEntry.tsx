@@ -48,14 +48,14 @@ export function getAssetCategoryFlag(category: string): string {
 }
 
 const MOCK_ASSETS: Asset[] = [
-  { id: "1", category: "Savings Account", amount: 12000 },
-  { id: "2", category: "TFSA", amount: 35000 },
-  { id: "3", category: "Brokerage", amount: 18500 },
+  { id: "a1", category: "Savings Account", amount: 12000 },
+  { id: "a2", category: "TFSA", amount: 35000 },
+  { id: "a3", category: "Brokerage", amount: 18500 },
 ];
 
 let nextId = 100;
 function generateId(): string {
-  return String(++nextId);
+  return `a${++nextId}`;
 }
 
 function formatCurrency(amount: number): string {

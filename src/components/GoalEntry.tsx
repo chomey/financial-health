@@ -10,14 +10,14 @@ export interface Goal {
 }
 
 const MOCK_GOALS: Goal[] = [
-  { id: "1", name: "Rainy Day Fund", targetAmount: 20000, currentAmount: 14500 },
-  { id: "2", name: "New Car", targetAmount: 42000, currentAmount: 13500 },
-  { id: "3", name: "Vacation", targetAmount: 6500, currentAmount: 6200 },
+  { id: "g1", name: "Rainy Day Fund", targetAmount: 20000, currentAmount: 14500 },
+  { id: "g2", name: "New Car", targetAmount: 42000, currentAmount: 13500 },
+  { id: "g3", name: "Vacation", targetAmount: 6500, currentAmount: 6200 },
 ];
 
 let nextId = 100;
 function generateId(): string {
-  return String(++nextId);
+  return `g${++nextId}`;
 }
 
 function formatCurrency(amount: number): string {

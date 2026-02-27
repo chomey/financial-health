@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import PropertyEntry from "@/components/PropertyEntry";
@@ -88,29 +88,36 @@ function CopyLinkButton() {
   );
 }
 
-function getInitialState() {
-  if (typeof window === "undefined") return INITIAL_STATE;
-  return getStateFromURL() ?? INITIAL_STATE;
-}
-
 export default function Home() {
-  const [initialState] = useState(getInitialState);
-  const [assets, setAssets] = useState<Asset[]>(() => initialState.assets);
-  const [debts, setDebts] = useState<Debt[]>(() => initialState.debts);
-  const [properties, setProperties] = useState<Property[]>(() => initialState.properties);
-  const [income, setIncome] = useState<IncomeItem[]>(() => initialState.income);
-  const [expenses, setExpenses] = useState<ExpenseItem[]>(() => initialState.expenses);
-  const [goals, setGoals] = useState<Goal[]>(() => initialState.goals);
-  // Region defaults to "both" during SSR, then syncs from URL after hydration
-  // to avoid React 19 hydration mismatch for aria-checked attributes
+  // Always initialize with INITIAL_STATE for both server and client to avoid hydration mismatch.
+  // URL state is loaded after mount via useEffect.
+  const [assets, setAssets] = useState<Asset[]>(INITIAL_STATE.assets);
+  const [debts, setDebts] = useState<Debt[]>(INITIAL_STATE.debts);
+  const [properties, setProperties] = useState<Property[]>(INITIAL_STATE.properties);
+  const [income, setIncome] = useState<IncomeItem[]>(INITIAL_STATE.income);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
+  const [goals, setGoals] = useState<Goal[]>(INITIAL_STATE.goals);
   const [region, setRegion] = useState<Region>("both");
   const [regionPulse, setRegionPulse] = useState(0);
   const regionInitialized = useRef(false);
   const isFirstRender = useRef(true);
 
-  // Sync region from URL state after mount — this is an intentional external-system sync
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setRegion(initialState.region); regionInitialized.current = true; }, [initialState.region]);
+  // Restore state from URL after hydration — prevents server/client mismatch
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    const urlState = getStateFromURL();
+    if (urlState) {
+      setAssets(urlState.assets);
+      setDebts(urlState.debts);
+      setProperties(urlState.properties);
+      setIncome(urlState.income);
+      setExpenses(urlState.expenses);
+      setGoals(urlState.goals);
+      setRegion(urlState.region);
+    }
+    regionInitialized.current = true;
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Handle user region change: update state and trigger pulse
   const handleRegionChange = useCallback((newRegion: Region) => {

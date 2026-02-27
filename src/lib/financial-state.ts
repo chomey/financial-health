@@ -22,12 +22,12 @@ export interface FinancialState {
 export const INITIAL_STATE: FinancialState = {
   region: "both" as Region,
   assets: [
-    { id: "1", category: "Savings Account", amount: 12000 },
-    { id: "2", category: "TFSA", amount: 35000 },
-    { id: "3", category: "Brokerage", amount: 18500 },
+    { id: "a1", category: "Savings Account", amount: 12000 },
+    { id: "a2", category: "TFSA", amount: 35000 },
+    { id: "a3", category: "Brokerage", amount: 18500 },
   ],
   debts: [
-    { id: "d2", category: "Car Loan", amount: 15000 },
+    { id: "d1", category: "Car Loan", amount: 15000 },
   ],
   income: [
     { id: "i1", category: "Salary", amount: 5500 },

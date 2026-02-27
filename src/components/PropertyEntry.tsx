@@ -15,7 +15,7 @@ const MOCK_PROPERTIES: Property[] = [
 
 let nextId = 500;
 function generateId(): string {
-  return String(++nextId);
+  return `p${++nextId}`;
 }
 
 function formatCurrency(amount: number): string {

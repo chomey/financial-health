@@ -27,7 +27,7 @@ const MOCK_INCOME: IncomeItem[] = [
 
 let nextId = 300;
 function generateId(): string {
-  return String(++nextId);
+  return `i${++nextId}`;
 }
 
 function formatCurrency(amount: number): string {
