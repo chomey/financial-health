@@ -118,22 +118,28 @@ interface CompactState {
   i: CompactIncome[];
   e: CompactExpense[];
   g: CompactGoal[];
+  r?: string; // region: "CA" | "US" | "both"
 }
 
 function toCompact(state: FinancialState): CompactState {
-  return {
+  const compact: CompactState = {
     a: state.assets.map((x) => ({ c: x.category, a: x.amount })),
     d: state.debts.map((x) => ({ c: x.category, a: x.amount })),
     i: state.income.map((x) => ({ c: x.category, a: x.amount })),
     e: state.expenses.map((x) => ({ c: x.category, a: x.amount })),
     g: state.goals.map((x) => ({ n: x.name, t: x.targetAmount, s: x.currentAmount })),
   };
+  if (state.region && state.region !== "both") {
+    compact.r = state.region;
+  }
+  return compact;
 }
 
 function fromCompact(compact: CompactState): FinancialState {
   let idCounter = 1;
   const nextId = () => String(idCounter++);
   return {
+    region: (compact.r as FinancialState["region"]) || "both",
     assets: compact.a.map((x) => ({ id: nextId(), category: x.c, amount: x.a })),
     debts: compact.d.map((x) => ({ id: nextId(), category: x.c, amount: x.a })),
     income: compact.i.map((x) => ({ id: nextId(), category: x.c, amount: x.a })),

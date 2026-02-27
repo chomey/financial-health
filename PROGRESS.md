@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 11
-- **Remaining**: 4
+- **Completed**: 12
+- **Remaining**: 3
 - **Last Updated**: 2026-02-27
 
 ---
@@ -368,3 +368,32 @@
   ![State restored from shared URL](screenshots/task-11-state-from-shared-url.png)
   ![Metrics preserved after reload](screenshots/task-11-metrics-after-reload.png)
 - **Notes**: ASCII85 encoding produces ~20% smaller URLs than base64. State is compacted before encoding by stripping IDs and shortening property names (e.g., `category`→`c`, `amount`→`a`). IDs are regenerated on decode. The lazy useState initializer pattern avoids React's `set-state-in-effect` lint warning by reading the URL during component initialization rather than in a useEffect. The URL is updated using `replaceState` to avoid polluting browser history. Copy Link uses the Clipboard API with a fallback for older browsers.
+
+## Task 12: Add region toggle for CA/US financial vehicles
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/financial-state.ts`: Added `Region` type (`"CA" | "US" | "both"`) and `region` field to `FinancialState` interface. INITIAL_STATE defaults to `region: "both"`.
+  - `src/lib/url-state.ts`: Added optional `r` field to `CompactState` for region encoding. `toCompact` only writes `r` when region is not "both" (saves space). `fromCompact` reads `r` or defaults to "both".
+  - `src/components/RegionToggle.tsx`: New component — three-option radio group (CA/US/Both) with flag icons, accessible `radiogroup` role, smooth transitions, selected state styling.
+  - `src/components/AssetEntry.tsx`: Updated `getAllCategorySuggestions()` to accept optional `Region` param. CA shows only CA+universal suggestions, US shows only US+universal, both shows all. Added `region` prop to component.
+  - `src/app/page.tsx`: Added `RegionToggle` to header between title and Copy Link button. Added `region` state (defaults to "both" during SSR, syncs from URL after hydration via useEffect). Passes `region` to `AssetEntry`. Region persists in URL state.
+  - `tests/unit/region-toggle.test.tsx`: 10 T1 unit tests — RegionToggle rendering, selection, onChange, accessibility, flag icons, styling; getAllCategorySuggestions filtering for CA/US/both/undefined.
+  - `tests/e2e/region-toggle.spec.ts`: 7 T2 browser tests — default Both selection, CA filters suggestions (no 401k), US filters suggestions (no TFSA), Both shows all, region persists across reload, smooth transitions, flag icons.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/region-toggle.test.tsx`: 10 passed, 0 failed
+  - `tests/unit/url-state.test.ts`: 20 passed, 0 failed (pre-existing)
+  - `tests/unit/financial-state.test.ts`: 17 passed, 0 failed (pre-existing)
+  - All other unit tests: 124 passed, 0 failed (pre-existing)
+  - `tests/e2e/region-toggle.spec.ts`: 7 passed, 0 failed
+  - All other E2E tests: 66 passed, 0 failed (pre-existing)
+  - Total: 244 passed, 0 failed
+- **Screenshots**:
+  ![Region toggle default (Both)](screenshots/task-12-region-toggle-default.png)
+  ![CA suggestions filtered](screenshots/task-12-ca-suggestions.png)
+  ![US suggestions filtered](screenshots/task-12-us-suggestions.png)
+  ![Both shows all suggestions](screenshots/task-12-both-suggestions.png)
+  ![Region persists after reload](screenshots/task-12-region-persists-reload.png)
+  ![Region flag icons](screenshots/task-12-region-flags.png)
+- **Notes**: Region state required special handling for React 19 hydration. During SSR, region defaults to "both" (matching static HTML). After hydration, a useEffect syncs the region from URL state. This avoids React 19's "attributes won't be patched up" behavior for `aria-checked` during hydration mismatch. The compact URL encoding only stores `r` when non-default ("both"), saving bytes in the common case. Debt category suggestions are universal (not region-specific) so DebtEntry was not modified.
