@@ -56,8 +56,10 @@ interface GoalEntryProps {
 export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
   const [goals, setGoalsInternal] = useState<Goal[]>(items ?? MOCK_GOALS);
 
+  // Sync with parent if controlled — intentional external-system sync
   useEffect(() => {
     if (items !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setGoalsInternal(items);
     }
   }, [items]);
