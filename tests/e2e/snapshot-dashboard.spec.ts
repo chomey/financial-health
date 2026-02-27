@@ -8,17 +8,17 @@ test.describe("Snapshot Dashboard", () => {
     // Wait for count-up animation to complete
     await page.waitForTimeout(1500);
 
-    // Verify all four metric cards are visible
-    await expect(page.getByText("Net Worth")).toBeVisible();
-    await expect(page.getByText("Monthly Surplus")).toBeVisible();
-    await expect(page.getByText("Financial Runway")).toBeVisible();
-    await expect(page.getByText("Debt-to-Asset Ratio")).toBeVisible();
+    // Verify all four metric card titles are visible (scoped to group elements)
+    await expect(page.locator('[aria-label="Net Worth"] h3')).toBeVisible();
+    await expect(page.locator('[aria-label="Monthly Surplus"] h3')).toBeVisible();
+    await expect(page.locator('[aria-label="Financial Runway"] h3')).toBeVisible();
+    await expect(page.locator('[aria-label="Debt-to-Asset Ratio"] h3')).toBeVisible();
 
-    // Verify animated values are displayed (after count-up completes)
-    await expect(page.getByText("-$229,500")).toBeVisible();
-    await expect(page.getByText("$3,350")).toBeVisible();
-    await expect(page.getByText("22.2 mo")).toBeVisible();
-    await expect(page.getByText("4.50")).toBeVisible();
+    // Verify animated values are displayed (after count-up completes, scoped via aria-labels)
+    await expect(page.getByLabel("Net Worth: -$229,500")).toBeVisible();
+    await expect(page.getByLabel("Monthly Surplus: $3,350")).toBeVisible();
+    await expect(page.getByLabel("Financial Runway: 22.2 mo")).toBeVisible();
+    await expect(page.getByLabel("Debt-to-Asset Ratio: 4.50")).toBeVisible();
 
     await captureScreenshot(page, "task-8-dashboard-metrics");
   });
@@ -26,11 +26,12 @@ test.describe("Snapshot Dashboard", () => {
   test("renders icons for each metric", async ({ page }) => {
     await page.goto("/");
 
-    const dashboard = page.getByTestId("snapshot-dashboard");
-    await expect(dashboard.getByText("💰")).toBeVisible();
-    await expect(dashboard.getByText("📈")).toBeVisible();
-    await expect(dashboard.getByText("🛡️")).toBeVisible();
-    await expect(dashboard.getByText("⚖️")).toBeVisible();
+    // Scope to metric card groups to avoid matching insight panel icons
+    const metricCards = page.locator('[role="group"]');
+    await expect(metricCards.filter({ hasText: "💰" }).first()).toBeVisible();
+    await expect(metricCards.filter({ hasText: "📈" }).first()).toBeVisible();
+    await expect(metricCards.filter({ hasText: "🛡️" }).first()).toBeVisible();
+    await expect(metricCards.filter({ hasText: "⚖️" }).first()).toBeVisible();
   });
 
   test("shows tooltip on hover explaining metric", async ({ page }) => {

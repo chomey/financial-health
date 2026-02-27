@@ -30,11 +30,11 @@ test.describe("App shell layout", () => {
       page.getByRole("heading", { name: "Monthly Expenses" })
     ).toBeVisible();
 
-    // Dashboard metric cards
-    await expect(page.getByText("Net Worth")).toBeVisible();
-    await expect(page.getByText("Monthly Surplus")).toBeVisible();
-    await expect(page.getByText("Financial Runway")).toBeVisible();
-    await expect(page.getByText("Debt-to-Asset Ratio")).toBeVisible();
+    // Dashboard metric cards (scoped to metric group elements)
+    await expect(page.locator('[aria-label="Net Worth"] h3')).toBeVisible();
+    await expect(page.locator('[aria-label="Monthly Surplus"] h3')).toBeVisible();
+    await expect(page.locator('[aria-label="Financial Runway"] h3')).toBeVisible();
+    await expect(page.locator('[aria-label="Debt-to-Asset Ratio"] h3')).toBeVisible();
 
     // Assets section shows mock data instead of empty state
     await expect(page.getByText("Savings Account")).toBeVisible();
@@ -74,7 +74,7 @@ test.describe("App shell layout", () => {
     await expect(
       page.getByRole("heading", { name: "Assets" })
     ).toBeVisible();
-    await expect(page.getByText("Net Worth")).toBeVisible();
+    await expect(page.locator('[aria-label="Net Worth"] h3')).toBeVisible();
 
     await captureScreenshot(page, "task-3-mobile-layout");
   });
