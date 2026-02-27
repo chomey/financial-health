@@ -36,10 +36,10 @@ test.describe("App shell layout", () => {
     await expect(page.getByText("Financial Runway")).toBeVisible();
     await expect(page.getByText("Debt-to-Asset Ratio")).toBeVisible();
 
-    // Empty state messages
-    await expect(
-      page.getByText(/Add your savings, investments, and property/)
-    ).toBeVisible();
+    // Assets section shows mock data instead of empty state
+    await expect(page.getByText("Savings Account")).toBeVisible();
+
+    // Other cards still show empty state messages
     await expect(
       page.getByText(/Track your mortgage, loans, and credit cards/)
     ).toBeVisible();

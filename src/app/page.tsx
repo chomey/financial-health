@@ -1,5 +1,7 @@
 "use client";
 
+import AssetEntry from "@/components/AssetEntry";
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-stone-50">
@@ -22,12 +24,7 @@ export default function Home() {
             aria-label="Financial data entry"
           >
             <div className="space-y-6">
-              <EntryCard title="Assets" icon="📊">
-                <p className="text-stone-400">
-                  Add your savings, investments, and property to see your full
-                  picture.
-                </p>
-              </EntryCard>
+              <AssetEntry />
 
               <EntryCard title="Debts" icon="📋">
                 <p className="text-stone-400">

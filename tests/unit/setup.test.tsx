@@ -35,7 +35,7 @@ describe("App shell layout", () => {
     expect(dashboardPanel).toBeInTheDocument();
   });
 
-  it("renders all four entry cards with empty states", () => {
+  it("renders all four entry sections", () => {
     render(<Home />);
     expect(screen.getByText("Assets")).toBeInTheDocument();
     expect(screen.getByText("Debts")).toBeInTheDocument();
@@ -57,11 +57,8 @@ describe("App shell layout", () => {
     expect(dashes.length).toBe(4);
   });
 
-  it("shows encouraging empty state messages", () => {
+  it("shows encouraging empty state messages for non-asset cards", () => {
     render(<Home />);
-    expect(
-      screen.getByText(/Add your savings, investments, and property/)
-    ).toBeInTheDocument();
     expect(
       screen.getByText(/Track your mortgage, loans, and credit cards/)
     ).toBeInTheDocument();

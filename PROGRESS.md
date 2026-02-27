@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 3
-- **Remaining**: 12
+- **Completed**: 4
+- **Remaining**: 11
 - **Last Updated**: 2026-02-27
 
 ---
@@ -75,3 +75,33 @@
   ![Card hover effect](screenshots/task-3-card-hover.png)
   ![Mobile layout at 375px](screenshots/task-3-mobile-layout.png)
 - **Notes**: Used `"use client"` since future tasks will add interactivity (state, click-to-edit). Entry and Dashboard cards are defined as local components in page.tsx for now — they'll be extracted to separate files when they gain complexity in later tasks. The dashboard panel uses `lg:sticky lg:top-8` so it stays visible while scrolling the entry panel on desktop.
+
+## Task 4: Build asset entry section with mock data
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/AssetEntry.tsx`: Created new component with full asset entry functionality — mock data (Savings Account $12,000, TFSA $35,000, Brokerage $18,500), click-to-edit category names and amounts, delete on hover, "Add Asset" button with inline form, category suggestions for CA (TFSA, RRSP, RESP, FHSA, LIRA), US (401k, IRA, Roth IRA, 529, HSA), and universal (Savings, Checking, Brokerage, Home Equity, Vehicle, Other). Formatted currency display, running total, smooth focus transitions, empty state message.
+  - `src/app/page.tsx`: Replaced static Assets EntryCard with the new AssetEntry component. Added import.
+  - `tests/unit/asset-entry.test.tsx`: 13 T1 unit tests covering rendering, mock data display, formatted amounts, total calculation, add/delete interactions, click-to-edit, empty state, category suggestions.
+  - `tests/unit/setup.test.tsx`: Updated to account for Assets section no longer showing empty-state text (now shows mock data).
+  - `tests/e2e/asset-entry.spec.ts`: 7 T2 browser tests — mock data rendering, add form, adding new asset, deleting asset, click-to-edit category, click-to-edit amount, category suggestions with selection.
+  - `tests/e2e/app-shell.spec.ts`: Updated to verify Assets shows mock data instead of empty-state text.
+  - `package.json`: Added @testing-library/user-event dev dependency.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/asset-entry.test.tsx`: 13 passed, 0 failed
+  - `tests/unit/setup.test.tsx`: 8 passed, 0 failed
+  - `tests/unit/screenshot-helpers.test.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/asset-entry.spec.ts`: 7 passed, 0 failed
+  - `tests/e2e/app-shell.spec.ts`: 3 passed, 0 failed
+  - `tests/e2e/smoke.spec.ts`: 1 passed, 0 failed
+  - Total: 35 passed, 0 failed
+- **Screenshots**:
+  ![Assets with mock data](screenshots/task-4-assets-with-mock-data.png)
+  ![Add asset form](screenshots/task-4-add-asset-form.png)
+  ![Asset added](screenshots/task-4-asset-added.png)
+  ![Asset deleted](screenshots/task-4-asset-deleted.png)
+  ![Edit category](screenshots/task-4-edit-category.png)
+  ![Amount edited](screenshots/task-4-amount-edited.png)
+  ![Category suggestions](screenshots/task-4-category-suggestions.png)
+- **Notes**: AssetEntry is now a standalone component in `src/components/`. It manages its own state with useState for now — Task 10 will wire it to shared state. Category suggestions include all CA, US, and universal options (region filtering comes in Task 12). The `@testing-library/user-event` package was added to support more realistic interaction testing in unit tests.
