@@ -45,8 +45,8 @@ test.describe("Region Toggle", () => {
     const addRow = page.locator(".animate-in");
     const suggestionButtons = addRow.getByRole("button");
     const allTexts = await suggestionButtons.allTextContents();
-    expect(allTexts).toContain("401k");
-    expect(allTexts).not.toContain("TFSA");
+    expect(allTexts.some(t => t.includes("401k"))).toBe(true);
+    expect(allTexts.some(t => t.includes("TFSA"))).toBe(false);
     await captureScreenshot(page, "task-12-us-suggestions");
   });
 
@@ -64,8 +64,8 @@ test.describe("Region Toggle", () => {
     const addRow = page.locator(".animate-in");
     const suggestionButtons = addRow.getByRole("button");
     const allTexts = await suggestionButtons.allTextContents();
-    expect(allTexts).toContain("TFSA");
-    expect(allTexts).toContain("401k");
+    expect(allTexts.some(t => t.includes("TFSA"))).toBe(true);
+    expect(allTexts.some(t => t.includes("401k"))).toBe(true);
     expect(allTexts).toContain("Savings");
     await captureScreenshot(page, "task-12-both-suggestions");
   });
@@ -103,9 +103,10 @@ test.describe("Region Toggle", () => {
 
   test("toggle shows flag icons for each region", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("🇨🇦")).toBeVisible();
-    await expect(page.getByText("🇺🇸")).toBeVisible();
-    await expect(page.getByText("🌐")).toBeVisible();
+    const toggle = page.getByRole("radiogroup", { name: /Select financial region/i });
+    await expect(toggle.getByText("🇨🇦")).toBeVisible();
+    await expect(toggle.getByText("🇺🇸")).toBeVisible();
+    await expect(toggle.getByText("🌐")).toBeVisible();
     await captureScreenshot(page, "task-12-region-flags");
   });
 });

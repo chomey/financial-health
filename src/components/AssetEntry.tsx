@@ -22,6 +22,11 @@ const CATEGORY_SUGGESTIONS = {
   ],
 };
 
+/** Set of CA-specific asset category names */
+export const CA_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.CA);
+/** Set of US-specific asset category names */
+export const US_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.US);
+
 export function getAllCategorySuggestions(region?: Region): string[] {
   if (region === "CA") {
     return [...CATEGORY_SUGGESTIONS.CA, ...CATEGORY_SUGGESTIONS.universal];
@@ -34,6 +39,13 @@ export function getAllCategorySuggestions(region?: Region): string[] {
     ...CATEGORY_SUGGESTIONS.US,
     ...CATEGORY_SUGGESTIONS.universal,
   ];
+}
+
+/** Returns a flag emoji if the category is region-specific, or empty string */
+export function getAssetCategoryFlag(category: string): string {
+  if (CA_ASSET_CATEGORIES.has(category)) return "🇨🇦";
+  if (US_ASSET_CATEGORIES.has(category)) return "🇺🇸";
+  return "";
 }
 
 const MOCK_ASSETS: Asset[] = [
@@ -282,6 +294,9 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
                               }}
                               className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
                             >
+                              {getAssetCategoryFlag(suggestion) && (
+                                <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
+                              )}
                               {suggestion}
                             </button>
                           ))}
@@ -297,6 +312,9 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
                     className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-stone-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     aria-label={`Edit category for ${asset.category}`}
                   >
+                    {getAssetCategoryFlag(asset.category) && (
+                      <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(asset.category)}</span>
+                    )}
                     {asset.category}
                   </button>
                 )}
@@ -389,6 +407,9 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
                         }}
                         className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
                       >
+                        {getAssetCategoryFlag(suggestion) && (
+                          <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
+                        )}
                         {suggestion}
                       </button>
                     ))}

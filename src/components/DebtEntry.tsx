@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import type { Region } from "@/lib/financial-state";
 
 export interface Debt {
   id: string;
@@ -8,18 +9,44 @@ export interface Debt {
   amount: number;
 }
 
-const CATEGORY_SUGGESTIONS = [
-  "Mortgage",
-  "Car Loan",
-  "Student Loan",
-  "Credit Card",
-  "Line of Credit",
-  "Personal Loan",
-  "Other",
-];
+const DEBT_CATEGORY_SUGGESTIONS = {
+  CA: ["HELOC", "Canada Student Loan"],
+  US: ["Medical Debt", "Federal Student Loan"],
+  universal: [
+    "Mortgage",
+    "Car Loan",
+    "Student Loan",
+    "Credit Card",
+    "Line of Credit",
+    "Personal Loan",
+    "Other",
+  ],
+};
 
-export function getAllDebtCategorySuggestions(): string[] {
-  return [...CATEGORY_SUGGESTIONS];
+/** Set of CA-specific debt category names */
+export const CA_DEBT_CATEGORIES = new Set(DEBT_CATEGORY_SUGGESTIONS.CA);
+/** Set of US-specific debt category names */
+export const US_DEBT_CATEGORIES = new Set(DEBT_CATEGORY_SUGGESTIONS.US);
+
+export function getAllDebtCategorySuggestions(region?: Region): string[] {
+  if (region === "CA") {
+    return [...DEBT_CATEGORY_SUGGESTIONS.CA, ...DEBT_CATEGORY_SUGGESTIONS.universal];
+  }
+  if (region === "US") {
+    return [...DEBT_CATEGORY_SUGGESTIONS.US, ...DEBT_CATEGORY_SUGGESTIONS.universal];
+  }
+  return [
+    ...DEBT_CATEGORY_SUGGESTIONS.CA,
+    ...DEBT_CATEGORY_SUGGESTIONS.US,
+    ...DEBT_CATEGORY_SUGGESTIONS.universal,
+  ];
+}
+
+/** Returns a flag emoji if the category is region-specific, or empty string */
+export function getDebtCategoryFlag(category: string): string {
+  if (CA_DEBT_CATEGORIES.has(category)) return "🇨🇦";
+  if (US_DEBT_CATEGORIES.has(category)) return "🇺🇸";
+  return "";
 }
 
 const MOCK_DEBTS: Debt[] = [
@@ -50,9 +77,10 @@ function parseCurrencyInput(value: string): number {
 interface DebtEntryProps {
   items?: Debt[];
   onChange?: (items: Debt[]) => void;
+  region?: Region;
 }
 
-export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
+export default function DebtEntry({ items, onChange, region }: DebtEntryProps = {}) {
   const [debts, setDebts] = useState<Debt[]>(items ?? MOCK_DEBTS);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -193,7 +221,7 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
   };
 
   const filteredSuggestions = (query: string) => {
-    const all = getAllDebtCategorySuggestions();
+    const all = getAllDebtCategorySuggestions(region);
     if (!query) return all;
     return all.filter((s) => s.toLowerCase().includes(query.toLowerCase()));
   };
@@ -265,6 +293,9 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
                               }}
                               className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
                             >
+                              {getDebtCategoryFlag(suggestion) && (
+                                <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(suggestion)}</span>
+                              )}
                               {suggestion}
                             </button>
                           ))}
@@ -280,6 +311,9 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
                     className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-stone-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     aria-label={`Edit category for ${debt.category}`}
                   >
+                    {getDebtCategoryFlag(debt.category) && (
+                      <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(debt.category)}</span>
+                    )}
                     {debt.category}
                   </button>
                 )}
@@ -372,6 +406,9 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
                         }}
                         className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
                       >
+                        {getDebtCategoryFlag(suggestion) && (
+                          <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(suggestion)}</span>
+                        )}
                         {suggestion}
                       </button>
                     ))}
