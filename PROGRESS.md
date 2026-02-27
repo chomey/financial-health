@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 9
-- **Remaining**: 6
+- **Completed**: 10
+- **Remaining**: 5
 - **Last Updated**: 2026-02-27
 
 ---
@@ -293,3 +293,34 @@
   ![Insights animated](screenshots/task-9-insights-animated.png)
   ![Insight card hover](screenshots/task-9-insight-hover.png)
 - **Notes**: The insights engine is a pure function in `src/lib/insights.ts` that accepts structured `FinancialData` and returns insight objects. Currently uses mock data matching entry components. Task 10 will wire shared state so insights update live as users edit values. The InsightsPanel component accepts an optional `data` prop, making it ready for real state integration. Several pre-existing E2E tests needed selector updates because insight messages contain phrases like "Net Worth", "$3,350", "Vacation", and "safety net" that caused ambiguous text matches — fixed by scoping to specific elements (aria-labels, roles, lists).
+
+## Task 10: Wire all entry sections to shared state
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/financial-state.ts`: Created shared state module with `FinancialState` type, `INITIAL_STATE` mock data, `computeTotals()`, `computeMetrics()`, and `toFinancialData()` functions. Centralizes all financial calculations so dashboard metrics recompute live from entry data.
+  - `src/components/AssetEntry.tsx`: Added `items` and `onChange` props. Component uses controlled state when props are provided, falls back to internal mock data when standalone. Parent state changes propagate via `onChange` callback.
+  - `src/components/DebtEntry.tsx`: Same pattern — added `items`/`onChange` props with controlled/uncontrolled support.
+  - `src/components/IncomeEntry.tsx`: Same pattern — added `items`/`onChange` props with controlled/uncontrolled support.
+  - `src/components/ExpenseEntry.tsx`: Same pattern — added `items`/`onChange` props with controlled/uncontrolled support.
+  - `src/components/GoalEntry.tsx`: Same pattern — added `items`/`onChange` props with controlled/uncontrolled support.
+  - `src/components/SnapshotDashboard.tsx`: Added `metrics` and `financialData` props. Uses provided metrics instead of hardcoded `MOCK_METRICS` when available. Passes `financialData` to `InsightsPanel`.
+  - `src/app/page.tsx`: Lifted all state to the page component using `useState` for each section (assets, debts, income, expenses, goals). Computes metrics and financial data from state on every render. Passes items + onChange to entry components, metrics + financialData to dashboard.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/financial-state.test.ts`: 17 T1 tests — INITIAL_STATE structure, computeTotals for all sections, computeMetrics (net worth, surplus, runway, ratio, positive/negative cases, edge cases), toFinancialData conversion, recalculation on state change (17 passed, 0 failed)
+  - `tests/e2e/shared-state.spec.ts`: 7 T2 tests — dashboard initial values, adding asset updates net worth, deleting debt updates net worth, editing income updates surplus, adding expense updates surplus, insights update when data changes, multiple edits across sections reflect consistently (7 passed, 0 failed)
+  - `tests/e2e/full-e2e.spec.ts`: 1 T3 test — complete user journey: verify initial state, add asset, delete debt, add income, add expense, edit existing amount, verify goals, verify insights, verify all dashboard metrics, verify tooltips (1 passed, 0 failed)
+  - All pre-existing tests: 141 T1 passed, 51 T2 passed, 0 failed
+  - Total: 200 passed, 0 failed
+- **Screenshots**:
+  ![Dashboard initial state](screenshots/task-10-dashboard-initial.png)
+  ![Asset updates dashboard](screenshots/task-10-asset-updates-dashboard.png)
+  ![Debt delete updates dashboard](screenshots/task-10-debt-delete-updates-dashboard.png)
+  ![Income edit updates surplus](screenshots/task-10-income-edit-updates-surplus.png)
+  ![Expense updates dashboard](screenshots/task-10-expense-updates-dashboard.png)
+  ![Insights update on data change](screenshots/task-10-insights-update.png)
+  ![Multiple edits reflected in dashboard](screenshots/task-10-multi-edit-dashboard.png)
+  ![E2E after all edits](screenshots/task-10-e2e-after-edits.png)
+  ![E2E tooltip verification](screenshots/task-10-e2e-tooltip.png)
+- **Notes**: State is now lifted to page.tsx and flows down via props. Each entry component supports both controlled (props provided) and uncontrolled (standalone with mock data) modes, so existing unit tests continue to work unchanged. The `computeMetrics` function in `financial-state.ts` replaces the hardcoded `MOCK_METRICS` — dashboard values now recalculate live as the user edits any entry. InsightsPanel also receives live data. This was the 10th completed task, triggering T3 full E2E testing. All 200 tests pass across all tiers.

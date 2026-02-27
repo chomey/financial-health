@@ -48,8 +48,27 @@ function getProgressColor(percent: number): string {
   return "bg-amber-500";
 }
 
-export default function GoalEntry() {
-  const [goals, setGoals] = useState<Goal[]>(MOCK_GOALS);
+interface GoalEntryProps {
+  items?: Goal[];
+  onChange?: (items: Goal[]) => void;
+}
+
+export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
+  const [goals, setGoalsInternal] = useState<Goal[]>(items ?? MOCK_GOALS);
+
+  useEffect(() => {
+    if (items !== undefined) {
+      setGoalsInternal(items);
+    }
+  }, [items]);
+
+  const setGoals = (updater: Goal[] | ((prev: Goal[]) => Goal[])) => {
+    setGoalsInternal((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      onChange?.(next);
+      return next;
+    });
+  };
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "name" | "targetAmount" | "currentAmount" | null

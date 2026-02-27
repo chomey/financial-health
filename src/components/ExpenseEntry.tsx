@@ -50,8 +50,27 @@ function parseCurrencyInput(value: string): number {
   return isNaN(parsed) ? 0 : parsed;
 }
 
-export default function ExpenseEntry() {
-  const [items, setItems] = useState<ExpenseItem[]>(MOCK_EXPENSES);
+interface ExpenseEntryProps {
+  items?: ExpenseItem[];
+  onChange?: (items: ExpenseItem[]) => void;
+}
+
+export default function ExpenseEntry({ items: controlledItems, onChange }: ExpenseEntryProps = {}) {
+  const [items, setItemsInternal] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
+
+  useEffect(() => {
+    if (controlledItems !== undefined) {
+      setItemsInternal(controlledItems);
+    }
+  }, [controlledItems]);
+
+  const setItems = (updater: ExpenseItem[] | ((prev: ExpenseItem[]) => ExpenseItem[])) => {
+    setItemsInternal((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      onChange?.(next);
+      return next;
+    });
+  };
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "category" | "amount" | null
