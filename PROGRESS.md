@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 15
-- **Completed**: 2
-- **Remaining**: 13
+- **Completed**: 3
+- **Remaining**: 12
 - **Last Updated**: 2026-02-27
 
 ---
@@ -54,3 +54,24 @@
 - **Screenshots**:
   ![Homepage loaded](screenshots/task-2-home-loaded.png)
 - **Notes**: Installed only chromium browser to keep setup lightweight. Playwright webServer config auto-starts `npm run dev` for E2E tests. Screenshot helper is simple and reusable for future tasks.
+
+## Task 3: Build app shell & responsive layout
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/app/page.tsx`: Replaced single-card layout with two-panel design — left entry panel (7 cols) with 4 entry cards (Assets, Debts, Monthly Income, Monthly Expenses) and right dashboard panel (5 cols) with 4 metric cards (Net Worth, Monthly Surplus, Financial Runway, Debt-to-Asset Ratio). Added "use client" directive. Entry cards have icons, titles, and encouraging empty-state messages. Dashboard cards show placeholder "—" values with descriptions. All cards have hover lift effects (shadow + translate) with smooth transitions. Responsive: side-by-side on lg+, stacked on mobile. Dashboard panel is sticky on desktop.
+  - `tests/unit/setup.test.tsx`: Updated from 3 to 8 unit tests — verifies app title, tagline, entry panel aria region, dashboard panel aria region, all 4 entry card titles, all 4 dashboard metric titles, placeholder dash values, and encouraging empty state messages.
+  - `tests/e2e/smoke.spec.ts`: Updated to check for two panels instead of old welcome message.
+  - `tests/e2e/app-shell.spec.ts`: New E2E test file — 3 tests: full layout verification (header, entry cards, dashboard cards, empty states), hover lift effect on entry cards, and mobile viewport responsiveness at 375px.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/setup.test.tsx`: 8 passed, 0 failed
+  - `tests/unit/screenshot-helpers.test.ts`: 3 passed, 0 failed (pre-existing)
+  - `tests/e2e/smoke.spec.ts`: 1 passed, 0 failed
+  - `tests/e2e/app-shell.spec.ts`: 3 passed, 0 failed
+  - Total: 15 passed, 0 failed
+- **Screenshots**:
+  ![App shell desktop layout](screenshots/task-3-app-shell-desktop.png)
+  ![Card hover effect](screenshots/task-3-card-hover.png)
+  ![Mobile layout at 375px](screenshots/task-3-mobile-layout.png)
+- **Notes**: Used `"use client"` since future tasks will add interactivity (state, click-to-edit). Entry and Dashboard cards are defined as local components in page.tsx for now — they'll be extracted to separate files when they gain complexity in later tasks. The dashboard panel uses `lg:sticky lg:top-8` so it stays visible while scrolling the entry panel on desktop.
