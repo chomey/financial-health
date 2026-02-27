@@ -13,9 +13,11 @@ test.describe("Expense entry section", () => {
     await expect(page.getByText("Groceries")).toBeVisible();
     await expect(page.getByText("Subscriptions")).toBeVisible();
 
-    await expect(page.getByText("$2,200")).toBeVisible();
-    await expect(page.getByText("$600")).toBeVisible();
-    await expect(page.getByText("$150")).toBeVisible();
+    // Scope to expense section to avoid matching projection chart text
+    const expenseSection = page.locator("section", { has: page.getByRole("heading", { name: "Monthly Expenses" }) }).first();
+    await expect(expenseSection.getByText("$2,200")).toBeVisible();
+    await expect(expenseSection.getByText("$600")).toBeVisible();
+    await expect(expenseSection.getByText("$150")).toBeVisible();
 
     await expect(page.getByText("Monthly Total: $2,950")).toBeVisible();
 

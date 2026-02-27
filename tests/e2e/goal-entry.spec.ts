@@ -53,8 +53,9 @@ test.describe("Goal entry section", () => {
     await page.getByLabel("New goal current amount").fill("25000");
     await page.getByLabel("Confirm add goal").click();
 
-    // New goal should appear
-    await expect(page.getByText("House Down Payment")).toBeVisible();
+    // New goal should appear (scope to goals list to avoid matching projection chart)
+    const goalsList = page.getByRole("list", { name: "Goal items" });
+    await expect(goalsList.getByText("House Down Payment")).toBeVisible();
 
     // Should now have 4 goals
     await expect(page.getByRole("progressbar")).toHaveCount(4);

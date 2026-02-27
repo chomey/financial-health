@@ -81,17 +81,17 @@ test.describe("setState-during-render fix — onChange fires via useEffect", () 
       }
     });
 
-    // Verify initial goal exists
-    await expect(page.getByText("Rainy Day Fund")).toBeVisible();
+    // Verify initial goal exists (scope to goals list to avoid matching projection chart)
+    const goalsList = page.getByRole("list", { name: "Goal items" });
+    await expect(goalsList.getByText("Rainy Day Fund")).toBeVisible();
 
     // Delete it
-    const goalsList = page.getByRole("list", { name: "Goal items" });
     const rainyDayRow = goalsList.getByRole("listitem").filter({ hasText: "Rainy Day Fund" });
     await rainyDayRow.hover();
     await rainyDayRow.getByLabel("Delete Rainy Day Fund").click();
 
     // Goal should be gone
-    await expect(page.getByText("Rainy Day Fund")).not.toBeVisible();
+    await expect(goalsList.getByText("Rainy Day Fund")).not.toBeVisible();
 
     // No setState-during-render warnings
     const setStateWarnings = consoleWarnings.filter(
