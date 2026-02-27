@@ -138,6 +138,7 @@ function MetricCard({ metric }: { metric: MetricData }) {
           ? "border-green-300 ring-1 ring-green-200 animate-glow-pulse"
           : "border-stone-200"
       }`}
+      onClick={() => setShowTooltip((prev) => !prev)}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
       role="group"

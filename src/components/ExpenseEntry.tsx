@@ -197,7 +197,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange }: Expen
   };
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+    <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-6">
       <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-stone-800">
         <span aria-hidden="true">🧾</span>
         Monthly Expenses
@@ -273,7 +273,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange }: Expen
                     onClick={() =>
                       startEdit(item.id, "category", item.category)
                     }
-                    className="flex-1 min-w-0 truncate text-left text-sm text-stone-700 rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-stone-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     aria-label={`Edit category for ${item.category}`}
                   >
                     {item.category}
@@ -298,7 +298,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange }: Expen
                     onClick={() =>
                       startEdit(item.id, "amount", String(item.amount))
                     }
-                    className="w-28 text-right text-sm font-medium text-amber-700 rounded px-2 py-1 transition-colors duration-150 hover:bg-amber-50 hover:text-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                    className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-amber-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-amber-50 hover:text-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-200"
                     aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
                   >
                     {formatCurrency(item.amount)}
@@ -310,12 +310,12 @@ export default function ExpenseEntry({ items: controlledItems, onChange }: Expen
               <button
                 type="button"
                 onClick={() => deleteItem(item.id)}
-                className="ml-2 rounded-md p-1 text-stone-300 opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 group-hover:opacity-100"
+                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-stone-300 sm:opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 sm:group-hover:opacity-100"
                 aria-label={`Delete ${item.category}`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
+                  className="h-5 w-5 sm:h-4 sm:w-4"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -333,88 +333,92 @@ export default function ExpenseEntry({ items: controlledItems, onChange }: Expen
 
       {/* Add new expense row */}
       {addingNew && (
-        <div className="mt-2 flex items-center gap-2 rounded-lg border border-dashed border-blue-200 bg-blue-50/50 px-3 py-2 animate-in">
-          <div className="relative flex-1 min-w-0">
-            <input
-              ref={newCategoryRef}
-              type="text"
-              placeholder="Expense type..."
-              value={newCategory}
-              onChange={(e) => {
-                setNewCategory(e.target.value);
-                setShowNewSuggestions(true);
-              }}
-              onFocus={() => setShowNewSuggestions(true)}
-              onBlur={() => {
-                setTimeout(() => setShowNewSuggestions(false), 150);
-              }}
-              onKeyDown={(e) => handleNewKeyDown(e, "category")}
-              className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
-              aria-label="New expense category"
-            />
-            {showNewSuggestions &&
-              filteredSuggestions(newCategory).length > 0 && (
-                <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
-                  {filteredSuggestions(newCategory).map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        setNewCategory(suggestion);
-                        setShowNewSuggestions(false);
-                        newAmountRef.current?.focus();
-                      }}
-                      className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              )}
-          </div>
-          <input
-            ref={newAmountRef}
-            type="text"
-            placeholder="$0"
-            value={newAmount}
-            onChange={(e) => setNewAmount(e.target.value)}
-            onKeyDown={(e) => handleNewKeyDown(e, "amount")}
-            className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
-            aria-label="New expense amount"
-          />
-          <button
-            type="button"
-            onClick={addItem}
-            className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95"
-            aria-label="Confirm add expense"
-          >
-            Add
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAddingNew(false);
-              setNewCategory("");
-              setNewAmount("");
-              setShowNewSuggestions(false);
-            }}
-            className="rounded-md p-1 text-stone-400 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"
-            aria-label="Cancel adding expense"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
+        <div className="mt-2 rounded-lg border border-dashed border-blue-200 bg-blue-50/50 px-3 py-2 animate-in">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="relative flex-1 min-w-0">
+              <input
+                ref={newCategoryRef}
+                type="text"
+                placeholder="Expense type..."
+                value={newCategory}
+                onChange={(e) => {
+                  setNewCategory(e.target.value);
+                  setShowNewSuggestions(true);
+                }}
+                onFocus={() => setShowNewSuggestions(true)}
+                onBlur={() => {
+                  setTimeout(() => setShowNewSuggestions(false), 150);
+                }}
+                onKeyDown={(e) => handleNewKeyDown(e, "category")}
+                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                aria-label="New expense category"
               />
-            </svg>
-          </button>
+              {showNewSuggestions &&
+                filteredSuggestions(newCategory).length > 0 && (
+                  <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                    {filteredSuggestions(newCategory).map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setNewCategory(suggestion);
+                          setShowNewSuggestions(false);
+                          newAmountRef.current?.focus();
+                        }}
+                        className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                ref={newAmountRef}
+                type="text"
+                placeholder="$0"
+                value={newAmount}
+                onChange={(e) => setNewAmount(e.target.value)}
+                onKeyDown={(e) => handleNewKeyDown(e, "amount")}
+                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-right text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                aria-label="New expense amount"
+              />
+              <button
+                type="button"
+                onClick={addItem}
+                className="min-h-[44px] rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                aria-label="Confirm add expense"
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAddingNew(false);
+                  setNewCategory("");
+                  setNewAmount("");
+                  setShowNewSuggestions(false);
+                }}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"
+                aria-label="Cancel adding expense"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 sm:h-4 sm:w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
