@@ -7,11 +7,13 @@ import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import GoalEntry from "@/components/GoalEntry";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
+import RegionToggle from "@/components/RegionToggle";
 import {
   INITIAL_STATE,
   computeMetrics,
   toFinancialData,
 } from "@/lib/financial-state";
+import type { Region } from "@/lib/financial-state";
 import { getStateFromURL, updateURL } from "@/lib/url-state";
 import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
@@ -96,7 +98,14 @@ export default function Home() {
   const [income, setIncome] = useState<IncomeItem[]>(() => initialState.income);
   const [expenses, setExpenses] = useState<ExpenseItem[]>(() => initialState.expenses);
   const [goals, setGoals] = useState<Goal[]>(() => initialState.goals);
+  // Region defaults to "both" during SSR, then syncs from URL after hydration
+  // to avoid React 19 hydration mismatch for aria-checked attributes
+  const [region, setRegion] = useState<Region>("both");
   const isFirstRender = useRef(true);
+
+  // Sync region from URL state after mount — this is an intentional external-system sync
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setRegion(initialState.region); }, [initialState.region]);
 
   // Update URL whenever state changes (skip the initial render to avoid unnecessary write)
   useEffect(() => {
@@ -104,10 +113,10 @@ export default function Home() {
       // Still write the URL on first render so the s= param is always present
       isFirstRender.current = false;
     }
-    updateURL({ assets, debts, income, expenses, goals });
-  }, [assets, debts, income, expenses, goals]);
+    updateURL({ assets, debts, income, expenses, goals, region });
+  }, [assets, debts, income, expenses, goals, region]);
 
-  const state = { assets, debts, income, expenses, goals };
+  const state = { assets, debts, income, expenses, goals, region };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
 
@@ -123,7 +132,10 @@ export default function Home() {
               Your finances at a glance — no judgment, just clarity
             </p>
           </div>
-          <CopyLinkButton />
+          <div className="flex items-center gap-3">
+            <RegionToggle region={region} onChange={setRegion} />
+            <CopyLinkButton />
+          </div>
         </div>
       </header>
 
@@ -135,7 +147,7 @@ export default function Home() {
             aria-label="Financial data entry"
           >
             <div className="space-y-6">
-              <AssetEntry items={assets} onChange={setAssets} />
+              <AssetEntry items={assets} onChange={setAssets} region={region} />
 
               <DebtEntry items={debts} onChange={setDebts} />
 

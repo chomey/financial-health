@@ -6,15 +6,19 @@ import type { Goal } from "@/components/GoalEntry";
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
 
+export type Region = "CA" | "US" | "both";
+
 export interface FinancialState {
   assets: Asset[];
   debts: Debt[];
   income: IncomeItem[];
   expenses: ExpenseItem[];
   goals: Goal[];
+  region: Region;
 }
 
 export const INITIAL_STATE: FinancialState = {
+  region: "both" as Region,
   assets: [
     { id: "1", category: "Savings Account", amount: 12000 },
     { id: "2", category: "TFSA", amount: 35000 },

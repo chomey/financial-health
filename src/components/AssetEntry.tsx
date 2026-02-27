@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import type { Region } from "@/lib/financial-state";
 
 export interface Asset {
   id: string;
@@ -21,7 +22,13 @@ const CATEGORY_SUGGESTIONS = {
   ],
 };
 
-export function getAllCategorySuggestions(): string[] {
+export function getAllCategorySuggestions(region?: Region): string[] {
+  if (region === "CA") {
+    return [...CATEGORY_SUGGESTIONS.CA, ...CATEGORY_SUGGESTIONS.universal];
+  }
+  if (region === "US") {
+    return [...CATEGORY_SUGGESTIONS.US, ...CATEGORY_SUGGESTIONS.universal];
+  }
   return [
     ...CATEGORY_SUGGESTIONS.CA,
     ...CATEGORY_SUGGESTIONS.US,
@@ -58,9 +65,10 @@ function parseCurrencyInput(value: string): number {
 interface AssetEntryProps {
   items?: Asset[];
   onChange?: (items: Asset[]) => void;
+  region?: Region;
 }
 
-export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
+export default function AssetEntry({ items, onChange, region }: AssetEntryProps = {}) {
   const [assets, setAssetsInternal] = useState<Asset[]>(items ?? MOCK_ASSETS);
 
   // Sync with parent if controlled
@@ -182,7 +190,7 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
   };
 
   const filteredSuggestions = (query: string) => {
-    const all = getAllCategorySuggestions();
+    const all = getAllCategorySuggestions(region);
     if (!query) return all;
     return all.filter((s) => s.toLowerCase().includes(query.toLowerCase()));
   };
