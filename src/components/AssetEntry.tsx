@@ -69,23 +69,41 @@ interface AssetEntryProps {
 }
 
 export default function AssetEntry({ items, onChange, region }: AssetEntryProps = {}) {
-  const [assets, setAssetsInternal] = useState<Asset[]>(items ?? MOCK_ASSETS);
+  const [assets, setAssets] = useState<Asset[]>(items ?? MOCK_ASSETS);
+  const isExternalSync = useRef(false);
+  const didMount = useRef(false);
+  const syncDidMount = useRef(false);
 
   // Sync with parent if controlled — intentional external-system sync
+  // Skip initial mount since useState already handles the initial value
   useEffect(() => {
+    if (!syncDidMount.current) {
+      syncDidMount.current = true;
+      return;
+    }
     if (items !== undefined) {
+      isExternalSync.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAssetsInternal(items);
+      setAssets(items);
     }
   }, [items]);
 
-  const setAssets = (updater: Asset[] | ((prev: Asset[]) => Asset[])) => {
-    setAssetsInternal((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
-      onChange?.(next);
-      return next;
-    });
-  };
+  // Notify parent of internal changes via useEffect (not during render)
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
+    if (isExternalSync.current) {
+      isExternalSync.current = false;
+      return;
+    }
+    onChangeRef.current?.(assets);
+  }, [assets]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "category" | "amount" | null

@@ -51,23 +51,41 @@ interface IncomeEntryProps {
 }
 
 export default function IncomeEntry({ items: controlledItems, onChange }: IncomeEntryProps = {}) {
-  const [items, setItemsInternal] = useState<IncomeItem[]>(controlledItems ?? MOCK_INCOME);
+  const [items, setItems] = useState<IncomeItem[]>(controlledItems ?? MOCK_INCOME);
+  const isExternalSync = useRef(false);
+  const didMount = useRef(false);
+  const syncDidMount = useRef(false);
 
   // Sync with parent if controlled — intentional external-system sync
+  // Skip initial mount since useState already handles the initial value
   useEffect(() => {
+    if (!syncDidMount.current) {
+      syncDidMount.current = true;
+      return;
+    }
     if (controlledItems !== undefined) {
+      isExternalSync.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setItemsInternal(controlledItems);
+      setItems(controlledItems);
     }
   }, [controlledItems]);
 
-  const setItems = (updater: IncomeItem[] | ((prev: IncomeItem[]) => IncomeItem[])) => {
-    setItemsInternal((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
-      onChange?.(next);
-      return next;
-    });
-  };
+  // Notify parent of internal changes via useEffect (not during render)
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
+    if (isExternalSync.current) {
+      isExternalSync.current = false;
+      return;
+    }
+    onChangeRef.current?.(items);
+  }, [items]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "category" | "amount" | null

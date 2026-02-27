@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 15
-- **Completed**: 15
-- **Remaining**: 0
+- **Total Tasks**: 19
+- **Completed**: 16
+- **Remaining**: 3
 - **Last Updated**: 2026-02-27
 
 ---
@@ -469,3 +469,24 @@
   - Total: 208 T1 passed, 92 T2/T3 passed, 0 failed (300 total)
 - **Screenshots**: T3/regression QA task — no new screenshots committed. All tests pass.
 - **Notes**: This is the final task in the project. The comprehensive E2E test validates the complete user workflow: data entry across all 5 sections (assets, debts, income, expenses, goals), live dashboard metric updates, URL state persistence via base85 encoding, clipboard copy functionality, page reload data preservation, and region toggle filtering of category suggestions. All 15 tasks are now complete with 300 total tests passing across all tiers.
+
+## Task 16: Fix setState-during-render bug in all entry components
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/AssetEntry.tsx`: Replaced inline `onChange` call inside setState updater with a `useEffect` that fires after state changes. Added refs (`isExternalSync`, `didMount`, `syncDidMount`, `onChangeRef`) to track whether state changes are from parent sync vs internal edits, preventing spurious onChange calls. Renamed `setAssetsInternal` to `setAssets` (now uses React's setter directly).
+  - `src/components/DebtEntry.tsx`: Same pattern — moved `onChange` from setState updater to useEffect with ref-based tracking.
+  - `src/components/IncomeEntry.tsx`: Same pattern — moved `onChange` from setState updater to useEffect with ref-based tracking.
+  - `src/components/ExpenseEntry.tsx`: Same pattern — moved `onChange` from setState updater to useEffect with ref-based tracking.
+  - `src/components/GoalEntry.tsx`: Same pattern — moved `onChange` from setState updater to useEffect with ref-based tracking.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/setstate-during-render.test.tsx`: 12 new tests — verifies onChange fires after add/delete (5 components), does not fire on initial mount (5 components), does not fire on external prop sync (1 test), external prop change test (1 test). All 12 passed.
+  - `tests/e2e/setstate-fix.spec.ts`: 3 new browser tests — asset add updates dashboard without console warnings, expense edit updates surplus without warnings, goal delete works without warnings. All 3 passed.
+  - All pre-existing T1 tests: 208 passed, 0 failed
+  - All new + pre-existing total: 220 T1 passed, 3 T2 passed, 0 failed
+- **Screenshots**:
+  ![Asset add updates dashboard](screenshots/task-16-asset-updates-dashboard.png)
+  ![Expense edit updates surplus](screenshots/task-16-expense-edit-updates-surplus.png)
+  ![Goal delete no warnings](screenshots/task-16-goal-delete-no-warnings.png)
+- **Notes**: The core bug was that all 5 entry components called `onChange?.(next)` inside a `setState` updater function, triggering parent state updates during rendering. The fix moves `onChange` notification to a `useEffect` that tracks internal state changes. Three refs coordinate the logic: `syncDidMount` skips the initial mount in the parent sync effect (since `useState` already handles the initial value), `isExternalSync` prevents onChange from firing when state is set by the parent, and `didMount` prevents onChange from firing on component mount. The `onChangeRef` is updated via a separate useEffect to satisfy the `react-hooks/refs` lint rule.

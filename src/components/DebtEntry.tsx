@@ -53,23 +53,41 @@ interface DebtEntryProps {
 }
 
 export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
-  const [debts, setDebtsInternal] = useState<Debt[]>(items ?? MOCK_DEBTS);
+  const [debts, setDebts] = useState<Debt[]>(items ?? MOCK_DEBTS);
+  const isExternalSync = useRef(false);
+  const didMount = useRef(false);
+  const syncDidMount = useRef(false);
 
   // Sync with parent if controlled — intentional external-system sync
+  // Skip initial mount since useState already handles the initial value
   useEffect(() => {
+    if (!syncDidMount.current) {
+      syncDidMount.current = true;
+      return;
+    }
     if (items !== undefined) {
+      isExternalSync.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDebtsInternal(items);
+      setDebts(items);
     }
   }, [items]);
 
-  const setDebts = (updater: Debt[] | ((prev: Debt[]) => Debt[])) => {
-    setDebtsInternal((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
-      onChange?.(next);
-      return next;
-    });
-  };
+  // Notify parent of internal changes via useEffect (not during render)
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
+    if (isExternalSync.current) {
+      isExternalSync.current = false;
+      return;
+    }
+    onChangeRef.current?.(debts);
+  }, [debts]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "category" | "amount" | null
