@@ -945,3 +945,33 @@
   ![Surplus with contributions](screenshots/task-35-surplus-with-contributions.png)
   ![Expense total with contributions](screenshots/task-35-expense-total-with-contributions.png)
 - **Notes**: The core fix ensures surplus = income − expenses − contributions (not income − expenses). The projection engine now only uses per-asset contributions for asset growth and treats surplus as truly unallocated money. The auto-generated expense row is read-only (no delete button) with a distinct italic style and "auto" badge to indicate it's derived from asset contributions.
+
+## Task 36: [MILESTONE] Full E2E test for tasks 27-35
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `tests/e2e/milestone-3-e2e.spec.ts`: New comprehensive T3 E2E test with 4 test cases covering all features from tasks 27-35: projection chart full-width position, scenario legend visibility/content, debt payoff timeline with amortization math, income frequency selector and normalized totals, grouped category dropdowns without region toggle, stock entry with ticker/price/gain-loss, amortization schedule expand/collapse, investment contributions auto-row, and URL state persistence for all features.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/*`: 427 unit tests — 427 passed, 0 failed (T1)
+  - `tests/e2e/milestone-3-e2e.spec.ts`: 4 tests — full journey, frequency dashboard impact, stock+contributions net worth, copy-link persistence (4 passed, 0 failed) (T3)
+  - Full E2E suite: 166 passed, 9 pre-existing failures (all in chart-position, debt-entry, full-e2e, micro-interactions, milestone-e2e, milestone-2-e2e — confirmed pre-existing by running without changes)
+- **Screenshots**:
+  ![Chart full-width position](screenshots/task-36-chart-fullwidth-position.png)
+  ![Scenario legend expanded](screenshots/task-36-scenario-legend-expanded.png)
+  ![Debt payoff timeline](screenshots/task-36-debt-payoff-timeline.png)
+  ![Debt payoff warning](screenshots/task-36-debt-payoff-warning.png)
+  ![Amortization schedule](screenshots/task-36-amortization-schedule.png)
+  ![Income frequency weekly](screenshots/task-36-income-frequency-weekly.png)
+  ![Income annual deficit](screenshots/task-36-income-annual-deficit.png)
+  ![Income quarterly added](screenshots/task-36-income-quarterly-added.png)
+  ![Grouped asset dropdown](screenshots/task-36-grouped-asset-dropdown.png)
+  ![Grouped debt dropdown](screenshots/task-36-grouped-debt-dropdown.png)
+  ![Stock added](screenshots/task-36-stock-added.png)
+  ![Stock gain/loss](screenshots/task-36-stock-gain-loss.png)
+  ![Investment contributions](screenshots/task-36-investment-contributions.png)
+  ![After reload persistence](screenshots/task-36-after-reload-persistence.png)
+  ![Frequency affects dashboard](screenshots/task-36-frequency-affects-dashboard.png)
+  ![Stock affects net worth](screenshots/task-36-stock-affects-networth.png)
+  ![Copy link all features](screenshots/task-36-copy-link-all-features.png)
+- **Notes**: This milestone E2E test validates all features from tasks 27-35 in an integrated journey. The 9 pre-existing test failures (chart-position, debt-entry, full-e2e, micro-interactions, milestone-e2e, milestone-2-e2e) were confirmed by stashing changes and running without modifications — they fail identically without the new test file. These should be addressed in a future cleanup task.
