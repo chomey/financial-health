@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 55
-- **Completed**: 54
-- **Remaining**: 1
+- **Completed**: 55
+- **Remaining**: 0
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1287,3 +1287,30 @@
   ![Portfolio performance card](screenshots/task-54-portfolio-performance-card.png)
   ![Purchase date persisted](screenshots/task-54-purchase-date-persisted.png)
 - **Notes**: Annualized return uses CAGR formula: (endPrice/startPrice)^(1/years) - 1. Portfolio summary only appears when at least one stock has a cost basis set. The Portfolio Performance dashboard card shows aggregate gain/loss and per-stock annualized returns (for stocks with purchase dates). Purchase dates persist in URL state via the `pd` field in CompactStock.
+
+## Task 55: [MILESTONE] Full E2E test for Kubera-inspired visualization features
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `tests/e2e/milestone-5-e2e.spec.ts`: Created comprehensive E2E test with 7 tests covering all Kubera-inspired visualization features (tasks 48-54): asset allocation chart with toggle, expense breakdown with income comparison, net worth waterfall chart, Fast Forward scenario panel with debt toggles and windfall, benchmark comparisons with age input and URL persistence, Sankey diagram with flow paths and legend, stock ROI performance metrics
+  - `tests/unit/milestone-5-e2e-infra.test.ts`: Created 8 T1 unit tests verifying the E2E test infrastructure — file existence, Playwright imports, screenshot helper import, coverage of all 7 visualization features, screenshot capture points, test count, timeout configuration, screenshots directory
+  - `tests/unit/insights-panel.test.tsx`: Fixed pre-existing test failure — InsightsPanel no longer renders "Insights" heading text; updated to check for container test ID
+  - `tests/unit/setup.test.tsx`: Fixed pre-existing test failure — "Salary" appears in both IncomeEntry and Sankey diagram; updated to use getAllByText
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/milestone-5-e2e-infra.test.ts`: 8 passed, 0 failed
+  - `tests/e2e/milestone-5-e2e.spec.ts`: 7 passed, 0 failed (full journey + 6 focused tests)
+  - All T1 unit tests: 683 passed, 0 failed
+  - All T2/T3 E2E tests: 139 passed, 0 failed
+- **Screenshots**:
+  ![Allocation chart by type](screenshots/task-55-allocation-chart-by-type.png)
+  ![Allocation liquidity view](screenshots/task-55-allocation-liquidity-view.png)
+  ![Expense breakdown](screenshots/task-55-expense-breakdown.png)
+  ![Waterfall chart](screenshots/task-55-waterfall-chart.png)
+  ![Fast forward scenario](screenshots/task-55-fast-forward-scenario.png)
+  ![Fast forward with windfall](screenshots/task-55-fast-forward-with-windfall.png)
+  ![Benchmark comparisons age 35](screenshots/task-55-benchmark-comparisons-age-35.png)
+  ![Sankey diagram](screenshots/task-55-sankey-diagram.png)
+  ![Stock ROI performance](screenshots/task-55-stock-roi-performance.png)
+  ![Full page top](screenshots/task-55-full-page-top.png)
+- **Notes**: Fixed 2 pre-existing test failures (committed separately) before proceeding with the milestone task. The Sankey component starts expanded by default (collapsed: false), and the FastForwardPanel replaces its toggle button with a close button when open — both required careful test ID handling. All 55 tasks are now complete.
