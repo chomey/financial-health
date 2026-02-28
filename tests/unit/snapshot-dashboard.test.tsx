@@ -31,7 +31,7 @@ describe("SnapshotDashboard", () => {
       screen.getByLabelText("Monthly Surplus: $3,350")
     ).toBeInTheDocument();
     expect(
-      screen.getByLabelText("Financial Runway: 22.2 mo")
+      screen.getByLabelText("Financial Runway: 1.8 yr")
     ).toBeInTheDocument();
     expect(
       screen.getByLabelText("Debt-to-Asset Ratio: 4.50")
@@ -98,7 +98,7 @@ describe("formatMetricValue", () => {
   });
 
   it("formats months with one decimal", () => {
-    expect(formatMetricValue(22.2, "months")).toBe("22.2 mo");
+    expect(formatMetricValue(22.2, "months")).toBe("1.8 yr");
   });
 
   it("formats ratio with two decimals", () => {
