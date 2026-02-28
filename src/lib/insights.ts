@@ -222,7 +222,7 @@ export function generateInsights(data: FinancialData): Insight[] {
     insights.push({
       id: "networth-positive",
       type: "net-worth",
-      message: `Your net worth is positive at ${formatCurrency(netWorth)} — your assets outweigh your debts.`,
+      message: `Your net worth is positive — your assets outweigh your debts.`,
       icon: "💰",
     });
   } else if (netWorth < 0 && totalAssets > 0) {
