@@ -1,9 +1,16 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import AssetEntry, { getDefaultRoi, DEFAULT_ROI } from "@/components/AssetEntry";
+import type { Asset } from "@/components/AssetEntry";
 import { encodeState, decodeState, toCompact, fromCompact } from "@/lib/url-state";
 import type { FinancialState } from "@/lib/financial-state";
+
+function ControlledAssetEntry({ items: initial }: { items?: Asset[] }) {
+  const [items, setItems] = useState(initial);
+  return <AssetEntry items={items} onChange={setItems} />;
+}
 
 describe("getDefaultRoi", () => {
   it("returns 7 for 401k", () => {
@@ -74,7 +81,7 @@ describe("Asset ROI and contribution UI", () => {
   it("allows editing ROI via click", async () => {
     const user = userEvent.setup();
     const items = [{ id: "a1", category: "TFSA", amount: 35000 }];
-    render(<AssetEntry items={items} />);
+    render(<ControlledAssetEntry items={items} />);
 
     await user.click(screen.getByTestId("roi-badge-a1"));
     const input = screen.getByLabelText("Edit ROI for TFSA");
@@ -93,7 +100,7 @@ describe("Asset ROI and contribution UI", () => {
   it("allows editing monthly contribution via click", async () => {
     const user = userEvent.setup();
     const items = [{ id: "a1", category: "TFSA", amount: 35000 }];
-    render(<AssetEntry items={items} />);
+    render(<ControlledAssetEntry items={items} />);
 
     await user.click(screen.getByTestId("contribution-badge-a1"));
     const input = screen.getByLabelText("Edit monthly contribution for TFSA");

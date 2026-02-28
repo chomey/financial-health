@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 export interface Asset {
   id: string;
@@ -128,41 +128,12 @@ interface AssetEntryProps {
 }
 
 export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: AssetEntryProps = {}) {
-  const [assets, setAssets] = useState<Asset[]>(items ?? MOCK_ASSETS);
-  const isExternalSync = useRef(false);
-  const didMount = useRef(false);
-  const syncDidMount = useRef(false);
+  const assets = items ?? MOCK_ASSETS;
 
-  // Sync with parent if controlled — intentional external-system sync
-  // Skip initial mount since useState already handles the initial value
-  useEffect(() => {
-    if (!syncDidMount.current) {
-      syncDidMount.current = true;
-      return;
-    }
-    if (items !== undefined) {
-      isExternalSync.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAssets(items);
-    }
-  }, [items]);
-
-  // Notify parent of internal changes via useEffect (not during render)
-  const onChangeRef = useRef(onChange);
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
-  useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
-    }
-    if (isExternalSync.current) {
-      isExternalSync.current = false;
-      return;
-    }
-    onChangeRef.current?.(assets);
-  }, [assets]);
+  const updateAssets = useCallback((updater: Asset[] | ((prev: Asset[]) => Asset[])) => {
+    const next = typeof updater === "function" ? updater(assets) : updater;
+    onChange?.(next);
+  }, [assets, onChange]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "category" | "amount" | "roi" | "monthlyContribution" | null
@@ -207,7 +178,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
   const commitEdit = (overrideValue?: string) => {
     const value = overrideValue ?? editValue;
     if (editingId && editingField) {
-      setAssets((prev) =>
+      updateAssets((prev) =>
         prev.map((a) => {
           if (a.id !== editingId) return a;
           if (editingField === "category") {
@@ -242,7 +213,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
   };
 
   const deleteAsset = (id: string) => {
-    setAssets((prev) => {
+    updateAssets((prev) => {
       const next = prev.filter((a) => a.id !== id);
       // If we deleted the surplus target, reassign to first remaining
       if (next.length > 0 && !next.some((a) => a.surplusTarget)) {
@@ -255,7 +226,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
   const addAsset = () => {
     if (!newCategory.trim()) return;
     const amount = parseCurrencyInput(newAmount);
-    setAssets((prev) => {
+    updateAssets((prev) => {
       const isFirst = prev.length === 0;
       return [
         ...prev,
@@ -533,7 +504,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
                     checked={asset.surplusTarget ?? false}
                     onChange={() => {
                       if (asset.surplusTarget) return;
-                      setAssets((prev) =>
+                      updateAssets((prev) =>
                         prev.map((a) => ({
                           ...a,
                           surplusTarget: a.id === asset.id,
