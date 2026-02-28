@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 46
-- **Completed**: 37
-- **Remaining**: 9
+- **Completed**: 38
+- **Remaining**: 8
 - **Last Updated**: 2026-02-27
 
 ---
@@ -988,3 +988,16 @@
   - `tests/unit/url-state.test.ts`: Added 8 new tests — roundtrip CA/ON, roundtrip US/CA, backward compat defaults, INITIAL_STATE with country/jurisdiction, multiple US jurisdictions, toCompact with co/ju, toCompact omits when undefined, fromCompact defaults when missing. Total: 30 passed, 0 failed.
   - All 431 unit tests passed, 0 failed.
 - **Notes**: Backend-only task ([@backend]), no screenshots required. Country/jurisdiction fields are optional on FinancialState for backward compatibility — existing URLs without these fields will default to CA/ON when decoded.
+
+## Task 38: Add incomeType field to IncomeItem and URL encoding
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/IncomeEntry.tsx`: Added `IncomeType` type (`"employment" | "capital-gains" | "other"`) and `incomeType?: IncomeType` to `IncomeItem` interface. Added "Capital Gains" and "Dividends" to `CATEGORY_SUGGESTIONS`.
+  - `src/lib/url-state.ts`: Added `it?: string` to `CompactIncome` interface. Updated `toCompact` to serialize incomeType (omitted when undefined or "employment" to save URL space). Updated `fromCompact` to deserialize incomeType.
+- **Test tiers run**: T1
+- **Tests**:
+  - `tests/unit/url-state.test.ts`: Added 8 new tests — omits incomeType when employment, omits when undefined, encodes capital-gains, encodes other, roundtrips capital-gains with frequency, roundtrips other, backward compat without incomeType, mixed income items with different types. Total: 38 passed, 0 failed.
+  - `tests/unit/income-entry.test.tsx`: Updated existing tests to reflect new category suggestions (Capital Gains, Dividends). Total: 15 passed, 0 failed.
+  - All 439 unit tests passed, 0 failed.
+- **Notes**: Backend-only task ([@backend]), no screenshots required. incomeType is omitted from compact encoding when undefined or "employment" (the default) to minimize URL size. Backward compatible — existing URLs without `it` field decode without incomeType set.

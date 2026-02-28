@@ -4,11 +4,14 @@ import { useState, useRef, useEffect } from "react";
 
 export type IncomeFrequency = "monthly" | "weekly" | "biweekly" | "quarterly" | "semi-annually" | "annually";
 
+export type IncomeType = "employment" | "capital-gains" | "other";
+
 export interface IncomeItem {
   id: string;
   category: string;
   amount: number;
   frequency?: IncomeFrequency;
+  incomeType?: IncomeType;
 }
 
 const FREQUENCY_LABELS: Record<IncomeFrequency, string> = {
@@ -45,6 +48,8 @@ const CATEGORY_SUGGESTIONS = [
   "Salary",
   "Freelance",
   "Investment Income",
+  "Capital Gains",
+  "Dividends",
   "Side Hustle",
   "Other",
 ];

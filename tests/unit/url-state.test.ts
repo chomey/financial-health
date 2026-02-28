@@ -303,6 +303,139 @@ describe("encodeState / decodeState", () => {
   });
 });
 
+describe("incomeType encoding", () => {
+  it("omits incomeType when employment (default)", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [{ id: "i1", category: "Salary", amount: 5000, incomeType: "employment" }],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+    };
+    const compact = toCompact(state);
+    expect(compact.i[0].it).toBeUndefined();
+  });
+
+  it("omits incomeType when undefined", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+    };
+    const compact = toCompact(state);
+    expect(compact.i[0].it).toBeUndefined();
+  });
+
+  it("encodes capital-gains incomeType", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [{ id: "i1", category: "Stock Sale", amount: 10000, incomeType: "capital-gains" }],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+    };
+    const compact = toCompact(state);
+    expect(compact.i[0].it).toBe("capital-gains");
+  });
+
+  it("encodes other incomeType", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [{ id: "i1", category: "Gift", amount: 500, incomeType: "other" }],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+    };
+    const compact = toCompact(state);
+    expect(compact.i[0].it).toBe("other");
+  });
+
+  it("roundtrips income with capital-gains incomeType", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [{ id: "i1", category: "Stock Sale", amount: 10000, incomeType: "capital-gains", frequency: "annually" }],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.income[0].incomeType).toBe("capital-gains");
+    expect(decoded!.income[0].frequency).toBe("annually");
+    expect(decoded!.income[0].category).toBe("Stock Sale");
+    expect(decoded!.income[0].amount).toBe(10000);
+  });
+
+  it("roundtrips income with other incomeType", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [{ id: "i1", category: "Gift", amount: 500, incomeType: "other" }],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.income[0].incomeType).toBe("other");
+  });
+
+  it("roundtrips income without incomeType (backward compat)", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.income[0].incomeType).toBeUndefined();
+  });
+
+  it("roundtrips mixed income items with different types", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [
+        { id: "i1", category: "Salary", amount: 5000 },
+        { id: "i2", category: "Stock Sale", amount: 10000, incomeType: "capital-gains" },
+        { id: "i3", category: "Side Job", amount: 800, incomeType: "other", frequency: "weekly" },
+      ],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.income).toHaveLength(3);
+    expect(decoded!.income[0].incomeType).toBeUndefined();
+    expect(decoded!.income[1].incomeType).toBe("capital-gains");
+    expect(decoded!.income[2].incomeType).toBe("other");
+    expect(decoded!.income[2].frequency).toBe("weekly");
+  });
+});
+
 describe("getStateFromURL", () => {
   beforeEach(() => {
     // Set a clean URL

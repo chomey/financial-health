@@ -108,6 +108,7 @@ interface CompactIncome {
   c: string;
   a: number;
   f?: string; // frequency (omitted when "monthly" / default)
+  it?: string; // incomeType (omitted when "employment" / default)
 }
 interface CompactExpense {
   c: string;
@@ -162,6 +163,7 @@ function toCompact(state: FinancialState): CompactState {
     i: state.income.map((x) => {
       const ci: CompactIncome = { c: x.category, a: x.amount };
       if (x.frequency && x.frequency !== "monthly") ci.f = x.frequency;
+      if (x.incomeType && x.incomeType !== "employment") ci.it = x.incomeType;
       return ci;
     }),
     e: state.expenses.map((x) => ({ c: x.category, a: x.amount })),
@@ -214,8 +216,9 @@ function fromCompact(compact: CompactState): FinancialState {
       return debt;
     }),
     income: compact.i.map((x, i) => {
-      const item: { id: string; category: string; amount: number; frequency?: import("@/components/IncomeEntry").IncomeFrequency } = { id: `i${i + 1}`, category: x.c, amount: x.a };
+      const item: { id: string; category: string; amount: number; frequency?: import("@/components/IncomeEntry").IncomeFrequency; incomeType?: import("@/components/IncomeEntry").IncomeType } = { id: `i${i + 1}`, category: x.c, amount: x.a };
       if (x.f) item.frequency = x.f as import("@/components/IncomeEntry").IncomeFrequency;
+      if (x.it) item.incomeType = x.it as import("@/components/IncomeEntry").IncomeType;
       return item;
     }),
     expenses: compact.e.map((x, i) => ({ id: `e${i + 1}`, category: x.c, amount: x.a })),
