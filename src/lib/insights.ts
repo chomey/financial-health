@@ -16,9 +16,15 @@ export interface FinancialData {
   rawMonthlyExpenses?: number;
   /** Individual debt details for interest-based insights */
   debts?: DebtDetail[];
+  /** Effective tax rate (0-1) for tax insights */
+  effectiveTaxRate?: number;
+  /** Estimated annual tax amount */
+  annualTax?: number;
+  /** Whether any income is capital gains type */
+  hasCapitalGains?: boolean;
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax";
 
 export interface Insight {
   id: string;
@@ -125,6 +131,33 @@ export function generateInsights(data: FinancialData): Insight[] {
           icon: "🔥",
         });
       }
+    }
+  }
+
+  // Tax insights
+  if (data.effectiveTaxRate !== undefined && data.effectiveTaxRate > 0) {
+    const ratePercent = (data.effectiveTaxRate * 100).toFixed(1);
+    if (data.hasCapitalGains) {
+      insights.push({
+        id: "tax-capital-gains",
+        type: "tax",
+        message: `Your effective tax rate is ${ratePercent}% — capital gains income is taxed at a lower rate than employment income.`,
+        icon: "🏛️",
+      });
+    } else if (data.effectiveTaxRate > 0.3) {
+      insights.push({
+        id: "tax-rate-high",
+        type: "tax",
+        message: `Your effective tax rate is ${ratePercent}% — tax-advantaged accounts (TFSA, RRSP, 401k) can help reduce your tax burden.`,
+        icon: "🏛️",
+      });
+    } else if (data.annualTax && data.annualTax > 0) {
+      insights.push({
+        id: "tax-rate-info",
+        type: "tax",
+        message: `Your effective tax rate is ${ratePercent}% — that's ${formatCurrency(data.annualTax)} annually in estimated taxes.`,
+        icon: "🏛️",
+      });
     }
   }
 

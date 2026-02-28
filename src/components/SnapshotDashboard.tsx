@@ -79,6 +79,7 @@ export type { MetricData };
 const METRIC_TO_INSIGHT_TYPES: Record<string, InsightType[]> = {
   "Net Worth": ["net-worth"],
   "Monthly Surplus": ["surplus", "savings-rate"],
+  "Estimated Tax": ["tax"],
   "Financial Runway": ["runway"],
   "Debt-to-Asset Ratio": ["debt-interest"],
 };

@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 46
-- **Completed**: 43
-- **Remaining**: 3
+- **Completed**: 44
+- **Remaining**: 2
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1092,3 +1092,23 @@
   ![Five metric cards with tax](screenshots/task-44-five-metric-cards.png)
   ![After-tax surplus breakdown](screenshots/task-44-surplus-after-tax-breakdown.png)
 - **Notes**: The tax computation runs per-income-item, annualizing each item and computing tax based on its `incomeType` and the global `country`/`jurisdiction`. This means mixed income types (employment + capital gains) each get taxed at their appropriate rates. The surplus, projections, and insights all now use after-tax values. The Estimated Tax card shows annual tax estimate and effective rate.
+
+## Task 45: Show tax summary in dashboard and update projections
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/lib/insights.ts`: Added `effectiveTaxRate`, `annualTax`, and `hasCapitalGains` fields to `FinancialData` interface. Added `"tax"` to `InsightType` union. Added tax insight generation: capital gains insight when capital gains income is present, high tax rate insight (>30%) suggesting tax-advantaged accounts, and general tax rate info insight.
+  - `src/lib/financial-state.ts`: Updated `toFinancialData` to pass `effectiveTaxRate`, `annualTax`, and `hasCapitalGains` from `computeTotals` to the insights engine.
+  - `src/components/SnapshotDashboard.tsx`: Added `"Estimated Tax": ["tax"]` to `METRIC_TO_INSIGHT_TYPES` mapping so tax insights appear under the Estimated Tax metric card.
+  - `tests/unit/tax-summary.test.ts`: 14 new unit tests covering tax metric card presence, effective rate display, zero income handling, after-tax surplus comparison, projection after-tax integration, tax insights generation, capital gains insights, and CA vs US tax differences.
+  - `tests/e2e/tax-summary.spec.ts`: 5 new browser integration tests verifying tax insight visibility, projection chart rendering, tax metric values, effective rate sub-line, and all five metric cards.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/tax-summary.test.ts`: 14 tests. All 14 passed, 0 failed.
+  - `tests/e2e/tax-summary.spec.ts`: 5 tests. All 5 passed, 0 failed.
+  - All 550 unit tests passed, 0 failed. Build succeeded.
+- **Screenshots**:
+  ![Tax insight under Estimated Tax card](screenshots/task-45-tax-insight.png)
+  ![Projection chart](screenshots/task-45-projection-chart.png)
+  ![All metrics with tax](screenshots/task-45-all-metrics-with-tax.png)
+- **Notes**: The tax summary and projection after-tax integration were largely done in Task 44. This task completed the feature by adding tax-related insights to the insights engine (effective rate info, capital gains lower rate messaging, high tax rate suggestions), wiring them to the Estimated Tax dashboard card, and writing comprehensive T1+T2 tests to verify projections correctly use after-tax values.
