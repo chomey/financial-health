@@ -129,6 +129,7 @@ interface CompactStock {
   t: string; // ticker
   s: number; // shares
   cb?: number; // costBasis
+  pd?: string; // purchaseDate (ISO date string)
 }
 interface CompactState {
   a: CompactAsset[];
@@ -182,6 +183,7 @@ function toCompact(state: FinancialState): CompactState {
     compact.st = stocks.map((x) => {
       const cs: CompactStock = { t: x.ticker, s: x.shares };
       if (x.costBasis !== undefined) cs.cb = x.costBasis;
+      if (x.purchaseDate) cs.pd = x.purchaseDate;
       return cs;
     });
   }
@@ -235,12 +237,13 @@ function fromCompact(compact: CompactState): FinancialState {
       return prop;
     }),
     stocks: (compact.st ?? []).map((x, i) => {
-      const stock: { id: string; ticker: string; shares: number; costBasis?: number } = {
+      const stock: { id: string; ticker: string; shares: number; costBasis?: number; purchaseDate?: string } = {
         id: `s${i + 1}`,
         ticker: x.t,
         shares: x.s,
       };
       if (x.cb !== undefined) stock.costBasis = x.cb;
+      if (x.pd) stock.purchaseDate = x.pd;
       return stock;
     }),
     country: (compact.co as "CA" | "US") ?? "CA",
