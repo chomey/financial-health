@@ -158,7 +158,7 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
   // Per-asset projections always at 10/20/30 years (includes surplus allocation)
   const assetProjections = useMemo(() => {
     const totals = computeTotals(state);
-    const surplus = totals.monthlyIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
+    const surplus = totals.monthlyAfterTaxIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
     return projectAssets(state.assets, scenario, milestoneYears, surplus);
   }, [state, scenario, milestoneYears]);
 
