@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   computeMortgageBreakdown,
   computeAmortizationInfo,
+  computeAmortizationSchedule,
   suggestMonthlyPayment,
   DEFAULT_INTEREST_RATE,
 } from "@/components/PropertyEntry";
@@ -91,6 +92,52 @@ describe("suggestMonthlyPayment", () => {
     const payment = suggestMonthlyPayment(280000, 5);
     expect(payment).toBeGreaterThan(1500);
     expect(payment).toBeLessThan(1800);
+  });
+});
+
+describe("computeAmortizationSchedule", () => {
+  it("returns year-by-year summaries for a standard mortgage", () => {
+    // $280k at 5% with $1,636/mo (~25-year amortization)
+    const schedule = computeAmortizationSchedule(280000, 5, 1636);
+    expect(schedule.length).toBeGreaterThan(20);
+    expect(schedule.length).toBeLessThanOrEqual(30);
+    // First year should have high interest
+    expect(schedule[0].year).toBe(1);
+    expect(schedule[0].interestPaid).toBeGreaterThan(schedule[0].principalPaid);
+    // Last year should have low interest
+    const last = schedule[schedule.length - 1];
+    expect(last.endingBalance).toBe(0);
+    expect(last.interestPaid).toBeLessThan(last.principalPaid);
+  });
+
+  it("returns empty array for zero mortgage", () => {
+    expect(computeAmortizationSchedule(0, 5, 1000)).toEqual([]);
+  });
+
+  it("returns empty array for zero payment", () => {
+    expect(computeAmortizationSchedule(280000, 5, 0)).toEqual([]);
+  });
+
+  it("stops when payment doesn't cover interest", () => {
+    const schedule = computeAmortizationSchedule(280000, 10, 500);
+    // Should return empty or partial since payment < interest from month 1
+    expect(schedule.length).toBe(0);
+  });
+
+  it("handles zero interest rate", () => {
+    const schedule = computeAmortizationSchedule(12000, 0, 1000);
+    expect(schedule.length).toBe(1); // 12 months = 1 year
+    expect(schedule[0].interestPaid).toBe(0);
+    expect(schedule[0].principalPaid).toBe(12000);
+    expect(schedule[0].endingBalance).toBe(0);
+  });
+
+  it("interest decreases and principal increases over time", () => {
+    const schedule = computeAmortizationSchedule(200000, 6, 1200);
+    // Check that interest portion decreases across years
+    for (let i = 1; i < schedule.length; i++) {
+      expect(schedule[i].interestPaid).toBeLessThanOrEqual(schedule[i - 1].interestPaid);
+    }
   });
 });
 

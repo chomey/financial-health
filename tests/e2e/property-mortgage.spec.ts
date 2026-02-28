@@ -81,12 +81,53 @@ test.describe("Property mortgage details", () => {
     // Computed info should appear
     const mortgageInfo = page.getByTestId("mortgage-info-p1");
     await expect(mortgageInfo).toBeVisible();
-    await expect(mortgageInfo).toContainText("Monthly interest");
-    await expect(mortgageInfo).toContainText("Monthly principal");
+    await expect(mortgageInfo).toContainText("Current month: interest");
+    await expect(mortgageInfo).toContainText("Current month: principal");
     await expect(mortgageInfo).toContainText("Total interest remaining");
     await expect(mortgageInfo).toContainText("Estimated payoff");
+    await expect(mortgageInfo).toContainText("First year avg interest");
+    await expect(mortgageInfo).toContainText("Last year avg interest");
 
-    await captureScreenshot(page, "task-23-mortgage-breakdown");
+    // View schedule button should be visible
+    const viewScheduleBtn = page.getByTestId("view-schedule-p1");
+    await expect(viewScheduleBtn).toBeVisible();
+    await expect(viewScheduleBtn).toContainText("View schedule");
+
+    await captureScreenshot(page, "task-34-mortgage-breakdown-relabeled");
+  });
+
+  test("can expand and collapse amortization schedule", async ({ page }) => {
+    // Set interest rate and payment
+    await page.getByTestId("rate-badge-p1").click();
+    await page.getByLabel("Edit interest rate for Home").fill("5");
+    await page.getByLabel("Edit interest rate for Home").press("Enter");
+
+    await page.getByTestId("payment-badge-p1").click();
+    await page.getByLabel("Edit monthly payment for Home").fill("1636");
+    await page.getByLabel("Edit monthly payment for Home").press("Enter");
+
+    // Click "View schedule"
+    const viewScheduleBtn = page.getByTestId("view-schedule-p1");
+    await viewScheduleBtn.click();
+
+    // Table should appear
+    const scheduleTable = page.getByTestId("schedule-table-p1");
+    await expect(scheduleTable).toBeVisible();
+    // Should have year-by-year rows with Interest/Principal/Balance headers
+    await expect(scheduleTable).toContainText("Year");
+    await expect(scheduleTable).toContainText("Interest");
+    await expect(scheduleTable).toContainText("Principal");
+    await expect(scheduleTable).toContainText("Balance");
+
+    // Button text should change to "Hide schedule"
+    await expect(viewScheduleBtn).toContainText("Hide schedule");
+
+    await captureScreenshot(page, "task-34-amortization-schedule-expanded");
+
+    // Click again to collapse
+    await viewScheduleBtn.click();
+    await expect(scheduleTable).not.toBeVisible();
+    await expect(viewScheduleBtn).toContainText("View schedule");
   });
 
   test("shows warning when payment is too low", async ({ page }) => {

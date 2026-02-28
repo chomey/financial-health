@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 34
-- **Completed**: 33
-- **Remaining**: 1
+- **Total Tasks**: 36
+- **Completed**: 34
+- **Remaining**: 2
 - **Last Updated**: 2026-02-27
 
 ---
@@ -904,3 +904,22 @@
   ![Chart full-width desktop](screenshots/task-33-chart-fullwidth-desktop.png)
   ![Chart full-width mobile](screenshots/task-33-chart-fullwidth-mobile.png)
 - **Notes**: The projection chart now spans the full page width above the entry and dashboard columns, making it the most prominent visual element. The wrapper section uses `aria-label="Financial projections"` (plural) while the chart component itself retains `aria-label="Financial projection"` (singular) — the existing E2E test was updated with `exact: true` to disambiguate.
+
+## Task 34: Fix mortgage breakdown to show changing interest/principal over time
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/PropertyEntry.tsx`: Added `computeAmortizationSchedule()` utility that returns year-by-year summaries (interest paid, principal paid, ending balance). Relabeled "Monthly interest"/"Monthly principal" to "Current month: interest"/"Current month: principal". Added first/last year average interest comparison rows. Added expandable "View schedule" / "Hide schedule" button with a year-by-year amortization table showing interest, principal, and balance columns.
+  - `tests/unit/property-mortgage.test.ts`: Added 6 new unit tests for `computeAmortizationSchedule` covering standard mortgage, zero mortgage, zero payment, insufficient payment, zero interest rate, and decreasing interest over time.
+  - `tests/unit/property-entry.test.tsx`: Updated label assertions from "Monthly interest"/"Monthly principal" to "Current month: interest"/"Current month: principal".
+  - `tests/e2e/property-mortgage.spec.ts`: Updated existing test assertions for relabeled fields. Added new test for expand/collapse of amortization schedule table, verifying headers, toggle behavior, and screenshot capture.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/property-mortgage.test.ts`: 20 tests (6 new for amortization schedule) — 20 passed, 0 failed
+  - `tests/unit/property-entry.test.tsx`: Updated label assertions — all passed
+  - `tests/e2e/property-mortgage.spec.ts`: 8 tests (1 new for schedule expand/collapse) — 8 passed, 0 failed
+  - All unit tests: 418 passed, 0 failed
+- **Screenshots**:
+  ![Mortgage breakdown relabeled](screenshots/task-34-mortgage-breakdown-relabeled.png)
+  ![Amortization schedule expanded](screenshots/task-34-amortization-schedule-expanded.png)
+- **Notes**: The `computeMortgageBreakdown` function was kept as-is per the task description — it correctly computes the current month's split. The new `computeAmortizationSchedule` function generates year-by-year summaries that power both the first/last year comparison and the expandable schedule table. Interest decreases and principal increases over time as expected with standard amortization math.
