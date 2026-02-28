@@ -23,25 +23,22 @@ export interface FinancialState {
 
 export const INITIAL_STATE: FinancialState = {
   assets: [
-    { id: "a1", category: "Savings Account", amount: 12000, surplusTarget: true },
-    { id: "a2", category: "TFSA", amount: 35000 },
-    { id: "a3", category: "Brokerage", amount: 18500 },
+    { id: "a1", category: "Savings Account", amount: 5000, surplusTarget: true },
+    { id: "a2", category: "TFSA", amount: 22000 },
+    { id: "a3", category: "RRSP", amount: 28000 },
   ],
   debts: [
-    { id: "d1", category: "Car Loan", amount: 15000 },
+    { id: "d1", category: "Car Loan", amount: 5000 },
   ],
   income: [
-    { id: "i1", category: "Salary", amount: 5500 },
-    { id: "i2", category: "Freelance", amount: 800 },
+    { id: "i1", category: "Salary", amount: 4500 },
   ],
   expenses: [
-    { id: "e1", category: "Rent/Mortgage Payment", amount: 2200 },
-    { id: "e2", category: "Groceries", amount: 600 },
-    { id: "e3", category: "Subscriptions", amount: 150 },
+    { id: "e1", category: "Rent/Mortgage Payment", amount: 1800 },
+    { id: "e2", category: "Groceries", amount: 500 },
+    { id: "e3", category: "Subscriptions", amount: 50 },
   ],
-  properties: [
-    { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
-  ],
+  properties: [],
   stocks: [],
   country: "CA",
   jurisdiction: "ON",

@@ -60,12 +60,11 @@ describe("toCompact / fromCompact", () => {
   it("compacts state by stripping IDs and shortening keys", () => {
     const compact = toCompact(INITIAL_STATE);
     expect(compact.a).toHaveLength(3);
-    expect(compact.a[0]).toEqual({ c: "Savings Account", a: 12000, st: 1 });
-    expect(compact.d[0]).toEqual({ c: "Car Loan", a: 15000 });
-    expect(compact.p).toHaveLength(1);
-    expect(compact.p![0]).toEqual({ n: "Home", v: 450000, m: 280000 });
-    expect(compact.i[0]).toEqual({ c: "Salary", a: 5500 });
-    expect(compact.e[0]).toEqual({ c: "Rent/Mortgage Payment", a: 2200 });
+    expect(compact.a[0]).toEqual({ c: "Savings Account", a: 5000, st: 1 });
+    expect(compact.d[0]).toEqual({ c: "Car Loan", a: 5000 });
+    expect(compact.p).toBeUndefined();
+    expect(compact.i[0]).toEqual({ c: "Salary", a: 4500 });
+    expect(compact.e[0]).toEqual({ c: "Rent/Mortgage Payment", a: 1800 });
   });
 
   it("restores state from compact format with generated IDs", () => {
@@ -73,12 +72,9 @@ describe("toCompact / fromCompact", () => {
     const restored = fromCompact(compact);
     expect(restored.assets).toHaveLength(3);
     expect(restored.assets[0].category).toBe("Savings Account");
-    expect(restored.assets[0].amount).toBe(12000);
+    expect(restored.assets[0].amount).toBe(5000);
     expect(restored.assets[0].id).toBeTruthy();
-    expect(restored.properties).toHaveLength(1);
-    expect(restored.properties[0].name).toBe("Home");
-    expect(restored.properties[0].value).toBe(450000);
-    expect(restored.properties[0].mortgage).toBe(280000);
+    expect(restored.properties).toHaveLength(0);
   });
 
   it("compacts country and jurisdiction into co/ju fields", () => {
