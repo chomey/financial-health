@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 36
-- **Completed**: 34
-- **Remaining**: 2
+- **Completed**: 35
+- **Remaining**: 1
 - **Last Updated**: 2026-02-27
 
 ---
@@ -923,3 +923,25 @@
   ![Mortgage breakdown relabeled](screenshots/task-34-mortgage-breakdown-relabeled.png)
   ![Amortization schedule expanded](screenshots/task-34-amortization-schedule-expanded.png)
 - **Notes**: The `computeMortgageBreakdown` function was kept as-is per the task description — it correctly computes the current month's split. The new `computeAmortizationSchedule` function generates year-by-year summaries that power both the first/last year comparison and the expandable schedule table. Interest decreases and principal increases over time as expected with standard amortization math.
+
+## Task 35: Prevent double-counting of investment contributions in surplus
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/financial-state.ts`: Added `totalMonthlyContributions` to `computeTotals` return value; subtracted contributions from surplus in `computeMetrics`; included contributions in `monthlyExpenses` in `toFinancialData` for insights
+  - `src/lib/projections.ts`: Updated `baseSurplus` to exclude `totalMonthlyContributions` — prevents double-counting since per-asset contributions are already handled individually
+  - `src/components/ExpenseEntry.tsx`: Added `investmentContributions` prop; renders auto-generated read-only "Investment Contributions" row with "auto" badge when contributions > 0; expense total includes contributions
+  - `src/app/page.tsx`: Computes `totalInvestmentContributions` from assets and passes to ExpenseEntry
+  - `tests/unit/investment-contributions.test.ts`: New T1 tests for computeTotals, computeMetrics, toFinancialData, and projection engine
+  - `tests/e2e/investment-contributions.spec.ts`: New T2 browser tests for contributions row visibility, surplus impact, read-only behavior, and expense total
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/investment-contributions.test.ts`: 9 tests — surplus calculation, contributions sum, projection double-counting prevention (9 passed, 0 failed)
+  - `tests/e2e/investment-contributions.spec.ts`: 4 tests — contributions row display, surplus decrease, auto badge, expense total (4 passed, 0 failed)
+  - All unit tests: 427 passed, 0 failed
+  - Key E2E regression: shared-state, snapshot-dashboard, expense-entry — 23 passed, 0 failed
+- **Screenshots**:
+  ![Investment contributions row](screenshots/task-35-investment-contributions-row.png)
+  ![Surplus with contributions](screenshots/task-35-surplus-with-contributions.png)
+  ![Expense total with contributions](screenshots/task-35-expense-total-with-contributions.png)
+- **Notes**: The core fix ensures surplus = income − expenses − contributions (not income − expenses). The projection engine now only uses per-asset contributions for asset growth and treats surplus as truly unallocated money. The auto-generated expense row is read-only (no delete button) with a distinct italic style and "auto" badge to indicate it's derived from asset contributions.

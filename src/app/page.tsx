@@ -129,6 +129,7 @@ export default function Home() {
   const state = { assets, debts, properties, stocks, income, expenses, goals };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
+  const totalInvestmentContributions = assets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -171,7 +172,7 @@ export default function Home() {
 
               <IncomeEntry items={income} onChange={setIncome} />
 
-              <ExpenseEntry items={expenses} onChange={setExpenses} />
+              <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} />
 
               <GoalEntry items={goals} onChange={setGoals} />
             </div>

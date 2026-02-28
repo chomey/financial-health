@@ -53,9 +53,10 @@ function parseCurrencyInput(value: string): number {
 interface ExpenseEntryProps {
   items?: ExpenseItem[];
   onChange?: (items: ExpenseItem[]) => void;
+  investmentContributions?: number;
 }
 
-export default function ExpenseEntry({ items: controlledItems, onChange }: ExpenseEntryProps = {}) {
+export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0 }: ExpenseEntryProps = {}) {
   const [items, setItems] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -108,7 +109,8 @@ export default function ExpenseEntry({ items: controlledItems, onChange }: Expen
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const total = items.reduce((sum, item) => sum + item.amount, 0);
+  const itemsTotal = items.reduce((sum, item) => sum + item.amount, 0);
+  const total = itemsTotal + investmentContributions;
 
   const triggerTotalAnimation = () => {
     if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
@@ -346,6 +348,26 @@ export default function ExpenseEntry({ items: controlledItems, onChange }: Expen
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Auto-generated investment contributions row */}
+      {investmentContributions > 0 && (
+        <div
+          className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200 mt-1"
+          data-testid="investment-contributions-row"
+        >
+          <div className="flex flex-1 items-center gap-2 min-w-0">
+            <span className="text-sm italic text-stone-500">
+              Investment Contributions
+            </span>
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600" title="Auto-calculated from your asset monthly contributions">
+              auto
+            </span>
+          </div>
+          <span className="text-sm font-medium italic text-amber-600">
+            {formatCurrency(investmentContributions)}
+          </span>
         </div>
       )}
 
