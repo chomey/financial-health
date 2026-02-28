@@ -115,9 +115,10 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
   }
 
   return (
-    <div
+    <section
       className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-6"
       data-testid="projection-chart"
+      aria-label="Financial projection"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-lg font-semibold text-stone-800">
@@ -312,6 +313,6 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

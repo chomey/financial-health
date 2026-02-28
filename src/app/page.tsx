@@ -191,16 +191,12 @@ export default function Home() {
             className="lg:col-span-5"
             aria-label="Financial dashboard"
           >
-            <div className="lg:sticky lg:top-8 overflow-visible">
+            <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
+              <ProjectionChart state={state} />
               <SnapshotDashboard metrics={metrics} financialData={financialData} />
             </div>
           </section>
         </div>
-
-        {/* Projection Chart — full width below the two-column layout */}
-        <section className="mt-8" aria-label="Financial projection">
-          <ProjectionChart state={state} />
-        </section>
       </main>
     </div>
   );
