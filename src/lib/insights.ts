@@ -55,7 +55,7 @@ export function generateInsights(data: FinancialData): Insight[] {
       insights.push({
         id: "runway-strong",
         type: "runway",
-        message: `That's about ${months} months of expenses covered — a strong safety net.`,
+        message: `That's about ${(months / 12).toFixed(1)} years of expenses covered — a strong safety net.`,
         icon: "🛡️",
       });
     } else if (months >= 3) {

@@ -66,6 +66,9 @@ function formatMetricValue(value: number, format: MetricData["format"]): string 
       return value < 0 ? `-${formatted}` : formatted;
     }
     case "months":
+      if (value >= 12) {
+        return `${(value / 12).toFixed(1)} yr`;
+      }
       return `${value.toFixed(1)} mo`;
     case "ratio":
       return `${value.toFixed(2)}`;
