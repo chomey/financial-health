@@ -9,6 +9,7 @@ import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
 import ProjectionChart from "@/components/ProjectionChart";
+import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -226,6 +227,12 @@ export default function Home() {
             </p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
+            <CountryJurisdictionSelector
+              country={country}
+              jurisdiction={jurisdiction}
+              onCountryChange={setCountry}
+              onJurisdictionChange={setJurisdiction}
+            />
             <CopyLinkButton />
           </div>
         </div>
