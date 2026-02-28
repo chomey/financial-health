@@ -12,6 +12,8 @@ export interface FinancialData {
   liquidAssets?: number;
   monthlyIncome: number;
   monthlyExpenses: number;
+  /** Raw monthly expenses without investment contributions. Used for runway to match metric card. */
+  rawMonthlyExpenses?: number;
   goals: { name: string; target: number; current: number }[];
   /** Individual debt details for interest-based insights */
   debts?: DebtDetail[];
@@ -33,32 +35,34 @@ export function generateInsights(data: FinancialData): Insight[] {
   const netWorth = totalAssets - totalDebts;
   const surplus = monthlyIncome - monthlyExpenses;
   // Use liquid assets for runway if available, otherwise fall back to totalAssets
+  // Use raw expenses (not including investment contributions) to match the metric card
   const runwayAssets = data.liquidAssets ?? totalAssets;
-  const runway = monthlyExpenses > 0 ? runwayAssets / monthlyExpenses : 0;
+  const rawExpenses = data.rawMonthlyExpenses ?? monthlyExpenses;
+  const runway = rawExpenses > 0 ? runwayAssets / rawExpenses : 0;
   const savingsRate = monthlyIncome > 0 ? (surplus / monthlyIncome) * 100 : 0;
 
-  // Runway insight
+  // Runway insight — use the same value shown on the metric card
   if (runway > 0) {
     const months = Math.floor(runway);
     if (months >= 12) {
       insights.push({
         id: "runway-strong",
         type: "runway",
-        message: `You could comfortably cover about ${months} months of expenses — that's a strong safety net.`,
+        message: `That's about ${months} months of expenses covered — a strong safety net.`,
         icon: "🛡️",
       });
     } else if (months >= 3) {
       insights.push({
         id: "runway-solid",
         type: "runway",
-        message: `Your assets could cover about ${months} months of expenses — you're building a solid buffer.`,
+        message: `About ${months} months of expenses covered — you're building a solid buffer.`,
         icon: "🛡️",
       });
     } else if (months >= 1) {
       insights.push({
         id: "runway-building",
         type: "runway",
-        message: `You have about ${months} month${months > 1 ? "s" : ""} of expenses covered — every bit of savings strengthens your safety net.`,
+        message: `About ${months} month${months > 1 ? "s" : ""} of expenses covered — every bit of savings strengthens your safety net.`,
         icon: "🛡️",
       });
     }

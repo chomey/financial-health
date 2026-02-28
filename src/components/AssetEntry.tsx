@@ -8,6 +8,7 @@ export interface Asset {
   amount: number;
   roi?: number; // annual ROI percentage
   monthlyContribution?: number; // monthly contribution in $
+  surplusTarget?: boolean; // monthly surplus is deposited here
 }
 
 const CATEGORY_SUGGESTIONS = {
@@ -86,6 +87,23 @@ const MOCK_ASSETS: Asset[] = [
 
 function generateId(): string {
   return `a${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+/** Project an asset's value at year milestones using compound growth + contributions */
+function projectAssetValue(amount: number, annualRoi: number, monthlyContribution: number, years: number): number {
+  const monthlyRate = annualRoi / 100 / 12;
+  let balance = amount;
+  for (let m = 0; m < years * 12; m++) {
+    balance = balance * (1 + monthlyRate) + monthlyContribution;
+  }
+  return Math.round(balance);
+}
+
+function formatCompact(amount: number): string {
+  const abs = Math.abs(amount);
+  if (abs >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `$${(amount / 1_000).toFixed(0)}k`;
+  return `$${amount.toFixed(0)}`;
 }
 
 function formatCurrency(amount: number): string {
@@ -278,8 +296,8 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
   const total = assets.reduce((sum, a) => sum + a.amount, 0);
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-6">
-      <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-stone-800">
+    <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
+      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-stone-800">
         <span aria-hidden="true">📊</span>
         Assets
       </h2>
@@ -488,7 +506,42 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
                       : "Monthly contribution"}
                   </button>
                 )}
+
+                {/* Surplus target checkbox */}
+                <label
+                  className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-xs cursor-pointer transition-colors duration-150 ${
+                    asset.surplusTarget
+                      ? "bg-amber-50 text-amber-700"
+                      : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                  }`}
+                  data-testid={`surplus-target-${asset.id}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={asset.surplusTarget ?? false}
+                    onChange={() => {
+                      setAssets((prev) =>
+                        prev.map((a) => ({
+                          ...a,
+                          surplusTarget: a.id === asset.id ? !a.surplusTarget : false,
+                        }))
+                      );
+                    }}
+                    className="h-3 w-3 rounded border-stone-300 text-amber-600 accent-amber-500"
+                  />
+                  Surplus goes here
+                </label>
               </div>
+
+              {/* Per-asset 10/20/30 year projections */}
+              {(displayRoi !== undefined && displayRoi > 0) || hasContribution ? (
+                <div className="flex items-center gap-3 px-5 pb-1.5 text-[10px] text-stone-400" data-testid={`asset-projection-${asset.id}`}>
+                  <span className="font-medium">Projected:</span>
+                  <span>10yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, asset.monthlyContribution ?? 0, 10))}</span></span>
+                  <span>20yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, asset.monthlyContribution ?? 0, 20))}</span></span>
+                  <span>30yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, asset.monthlyContribution ?? 0, 30))}</span></span>
+                </div>
+              ) : null}
             </div>
           );})}
         </div>

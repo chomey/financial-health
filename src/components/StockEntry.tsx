@@ -194,16 +194,18 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
     );
   }, [stocks]);
 
-  // Auto-fetch prices on mount for stocks that have tickers but no price
-  const hasFetchedRef = useRef(false);
+  // Auto-fetch prices for stocks that have tickers but no price
+  // Track which tickers we've already fetched to avoid duplicate requests
+  const fetchedTickersRef = useRef(new Set<string>());
   useEffect(() => {
-    if (hasFetchedRef.current) return;
     const needFetch = stocks.filter(
-      (s) => s.ticker.trim() && !s.manualPrice && !s.lastFetchedPrice
+      (s) => s.ticker.trim() && !s.manualPrice && !s.lastFetchedPrice && !fetchedTickersRef.current.has(s.ticker)
     );
     if (needFetch.length > 0) {
-      hasFetchedRef.current = true;
-      needFetch.forEach((s) => fetchPrice(s.id, s.ticker));
+      needFetch.forEach((s) => {
+        fetchedTickersRef.current.add(s.ticker);
+        fetchPrice(s.id, s.ticker);
+      });
     }
   }, [stocks, fetchPrice]);
 
@@ -309,9 +311,9 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   const total = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-6">
+    <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="flex items-center gap-2 text-lg font-semibold text-stone-800">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-stone-800">
           <span aria-hidden="true">📈</span>
           Stocks &amp; Equity
         </h2>

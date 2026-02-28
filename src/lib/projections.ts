@@ -7,6 +7,8 @@ export interface ProjectionPoint {
   netWorth: number;
   totalAssets: number;
   totalDebts: number;
+  consumerDebts: number;
+  mortgageDebts: number;
   totalPropertyEquity: number;
 }
 
@@ -34,6 +36,8 @@ export interface ProjectionResult {
   points: ProjectionPoint[];
   goalMilestones: GoalMilestone[];
   debtFreeMonth: number | null;
+  consumerDebtFreeMonth: number | null; // debts only (excludes mortgages)
+  mortgageFreeMonth: number | null; // mortgages only
   milestones: Milestone[];
 }
 
@@ -90,6 +94,8 @@ export function projectFinances(
   const milestoneThresholds = [100_000, 250_000, 500_000, 1_000_000, 2_500_000, 5_000_000];
   const passedMilestones = new Set<number>();
   let debtFreeMonth: number | null = null;
+  let consumerDebtFreeMonth: number | null = null;
+  let mortgageFreeMonth: number | null = null;
 
   for (let m = 0; m <= totalMonths; m++) {
     // Calculate current totals
@@ -108,6 +114,8 @@ export function projectFinances(
       netWorth: Math.round(netWorth),
       totalAssets: Math.round(totalAssetValue + stocksTotal),
       totalDebts: Math.round(totalDebtValue + totalMortgage),
+      consumerDebts: Math.round(totalDebtValue),
+      mortgageDebts: Math.round(totalMortgage),
       totalPropertyEquity: Math.round(totalPropertyEquity),
     });
 
@@ -123,7 +131,13 @@ export function projectFinances(
       }
     }
 
-    // Check debt-free
+    // Check debt-free (consumer debts vs mortgages separately)
+    if (consumerDebtFreeMonth === null && totalDebtValue <= 0) {
+      consumerDebtFreeMonth = m;
+    }
+    if (mortgageFreeMonth === null && totalMortgage <= 0) {
+      mortgageFreeMonth = m;
+    }
     if (debtFreeMonth === null && totalDebtValue <= 0 && totalMortgage <= 0) {
       debtFreeMonth = m;
     }
@@ -158,10 +172,11 @@ export function projectFinances(
         }
       }
 
-      // Monthly surplus goes to liquid assets (split evenly among assets, or first asset)
-      // Surplus already excludes debt payments from expenses, so add surplus to savings
+      // Monthly surplus goes to the designated surplus target account, or first asset as fallback
       if (baseSurplus > 0 && assetBalances.length > 0) {
-        assetBalances[0].balance += baseSurplus * multiplier;
+        const targetIdx = state.assets.findIndex((a) => a.surplusTarget);
+        const idx = targetIdx >= 0 ? targetIdx : 0;
+        assetBalances[idx].balance += baseSurplus * multiplier;
       }
 
       // Goal progress: assume surplus contributes proportionally to goals
@@ -181,7 +196,7 @@ export function projectFinances(
     targetAmount: g.target,
   }));
 
-  return { points, goalMilestones, debtFreeMonth, milestones };
+  return { points, goalMilestones, debtFreeMonth, consumerDebtFreeMonth, mortgageFreeMonth, milestones };
 }
 
 function formatMilestoneLabel(value: number): string {
@@ -189,6 +204,41 @@ function formatMilestoneLabel(value: number): string {
     return `$${(value / 1_000_000).toFixed(value % 1_000_000 === 0 ? 0 : 1)}M`;
   }
   return `$${(value / 1_000).toFixed(0)}k`;
+}
+
+/** Project a single asset's value at specific year milestones */
+export interface AssetProjection {
+  category: string;
+  currentValue: number;
+  milestoneValues: number[]; // values at each milestone year
+}
+
+export function projectAssets(
+  assets: FinancialState["assets"],
+  scenario: Scenario = "moderate",
+  milestoneYears: number[] = [10, 20, 30]
+): AssetProjection[] {
+  const multiplier = SCENARIO_MULTIPLIERS[scenario];
+  const maxMonth = Math.max(...milestoneYears) * 12;
+  const milestoneMonths = new Set(milestoneYears.map((y) => y * 12));
+
+  return assets.map((a) => {
+    const monthlyROI = ((a.roi ?? 0) * multiplier) / 100 / 12;
+    const monthlyContribution = (a.monthlyContribution ?? 0) * multiplier;
+    let balance = a.amount;
+    const snapshots: Map<number, number> = new Map();
+    for (let m = 1; m <= maxMonth; m++) {
+      balance = balance * (1 + monthlyROI) + monthlyContribution;
+      if (milestoneMonths.has(m)) {
+        snapshots.set(m, Math.round(balance));
+      }
+    }
+    return {
+      category: a.category,
+      currentValue: a.amount,
+      milestoneValues: milestoneYears.map((y) => snapshots.get(y * 12) ?? Math.round(balance)),
+    };
+  });
 }
 
 /** Downsample projection points for chart rendering — keep start, end, and evenly-spaced points */

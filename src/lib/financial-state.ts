@@ -67,6 +67,13 @@ export function computeTotals(state: FinancialState) {
   return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalStocks };
 }
 
+function fmtShort(n: number): string {
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `$${(n / 1_000).toFixed(0)}k`;
+  return `$${n.toFixed(0)}`;
+}
+
 export function computeMetrics(state: FinancialState): MetricData[] {
   const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyMortgage, totalStocks } = computeTotals(state);
 
@@ -82,6 +89,25 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const totalAllDebts = totalDebts + totalPropertyMortgage;
   const debtToAssetRatio = totalAllAssets > 0 ? totalAllDebts / totalAllAssets : 0;
 
+  // Build breakdown strings
+  const nwParts: string[] = [];
+  if (totalAssets > 0) nwParts.push(`${fmtShort(totalAssets)} savings`);
+  if (totalStocks > 0) nwParts.push(`${fmtShort(totalStocks)} stocks`);
+  if (totalPropertyEquity > 0) nwParts.push(`${fmtShort(totalPropertyEquity)} equity`);
+  if (totalDebts > 0) nwParts.push(`- ${fmtShort(totalDebts)} debts`);
+  const netWorthBreakdown = nwParts.length > 0 ? nwParts.join(" + ").replace("+ -", "- ") : undefined;
+
+  const totalExp = monthlyExpenses + totalMonthlyContributions;
+  const surplusBreakdown = `${fmtShort(monthlyIncome)} income - ${fmtShort(totalExp)} expenses`;
+
+  const runwayBreakdown = monthlyExpenses > 0
+    ? `${fmtShort(liquidTotal)} liquid / ${fmtShort(monthlyExpenses)}/mo expenses`
+    : undefined;
+
+  const ratioBreakdown = totalAllAssets > 0
+    ? `${fmtShort(totalAllDebts)} debts / ${fmtShort(totalAllAssets)} assets`
+    : undefined;
+
   return [
     {
       title: "Net Worth",
@@ -91,6 +117,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       tooltip:
         "Your total assets minus total debts. This is a snapshot — it changes as you pay down debts and grow savings.",
       positive: netWorth >= 0,
+      breakdown: netWorthBreakdown,
     },
     {
       title: "Monthly Surplus",
@@ -100,6 +127,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       tooltip:
         "How much more you earn than you spend each month. A positive surplus means you're building wealth.",
       positive: surplus > 0,
+      breakdown: surplusBreakdown,
     },
     {
       title: "Financial Runway",
@@ -109,6 +137,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       tooltip:
         "How many months your liquid assets could cover your expenses. 3–6 months is a solid emergency fund.",
       positive: runway >= 3,
+      breakdown: runwayBreakdown,
     },
     {
       title: "Debt-to-Asset Ratio",
@@ -118,18 +147,21 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       tooltip:
         "Your total debts divided by your total assets. A lower ratio means stronger financial footing. Mortgages often push this higher — that's normal.",
       positive: debtToAssetRatio <= 1,
+      breakdown: ratioBreakdown,
     },
   ];
 }
 
 export function toFinancialData(state: FinancialState): FinancialData {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyMortgage, totalStocks } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalStocks } = computeTotals(state);
+  // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
   return {
-    totalAssets: totalAssets + totalStocks + totalPropertyEquity,
+    totalAssets: totalAssets + totalStocks + totalPropertyValue,
     totalDebts: totalDebts + totalPropertyMortgage,
     liquidAssets: totalAssets + totalStocks,
     monthlyIncome,
     monthlyExpenses: monthlyExpenses + totalMonthlyContributions,
+    rawMonthlyExpenses: monthlyExpenses,
     goals: state.goals.map((g) => ({
       name: g.name,
       target: g.targetAmount,
