@@ -14,6 +14,7 @@ import AssetAllocationChart from "@/components/AssetAllocationChart";
 import ExpenseBreakdownChart from "@/components/ExpenseBreakdownChart";
 import NetWorthWaterfallChart from "@/components/NetWorthWaterfallChart";
 import FastForwardPanel from "@/components/FastForwardPanel";
+import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -175,6 +176,7 @@ export default function Home() {
   const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
   const [country, setCountry] = useState<"CA" | "US">(INITIAL_STATE.country ?? "CA");
   const [jurisdiction, setJurisdiction] = useState<string>(INITIAL_STATE.jurisdiction ?? "ON");
+  const [age, setAge] = useState<number | undefined>(INITIAL_STATE.age);
   const isFirstRender = useRef(true);
 
   // Restore state from URL after hydration
@@ -190,6 +192,7 @@ export default function Home() {
       setExpenses(urlState.expenses);
       if (urlState.country) setCountry(urlState.country);
       if (urlState.jurisdiction) setJurisdiction(urlState.jurisdiction);
+      if (urlState.age !== undefined) setAge(urlState.age);
     }
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -200,10 +203,10 @@ export default function Home() {
       isFirstRender.current = false;
       return;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction });
-  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age });
+  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age]);
 
-  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction };
+  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
   const totals = computeTotals(state);
@@ -219,6 +222,13 @@ export default function Home() {
   const expenseTotal = expenses.reduce((sum, e) => sum + e.amount, 0) + totalInvestmentContributions + totalMortgagePayments;
   const propertyCount = properties.length;
   const stockCount = stocks.length;
+
+  // Benchmark comparison values
+  const benchmarkNetWorth = totals.totalAssets + totals.totalStocks + totals.totalPropertyEquity - totals.totalDebts;
+  const benchmarkSavingsRate = totals.monthlyAfterTaxIncome > 0 ? monthlySurplus / totals.monthlyAfterTaxIncome : 0;
+  const benchmarkEmergencyMonths = totals.monthlyExpenses > 0 ? (totals.totalAssets + totals.totalStocks) / totals.monthlyExpenses : 0;
+  const annualIncome = totals.monthlyIncome * 12;
+  const benchmarkDebtToIncome = annualIncome > 0 ? (debtTotal + totals.totalPropertyMortgage) / annualIncome : 0;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -309,6 +319,15 @@ export default function Home() {
                 debts={debts}
                 properties={properties}
                 stocks={stocks}
+              />
+              <BenchmarkComparisons
+                age={age}
+                country={country}
+                netWorth={benchmarkNetWorth}
+                savingsRate={benchmarkSavingsRate}
+                emergencyMonths={benchmarkEmergencyMonths}
+                debtToIncomeRatio={benchmarkDebtToIncome}
+                onAgeChange={setAge}
               />
             </div>
           </section>

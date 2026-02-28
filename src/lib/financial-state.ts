@@ -20,6 +20,7 @@ export interface FinancialState {
   stocks: StockHolding[];
   country?: "CA" | "US";
   jurisdiction?: string;
+  age?: number;
 }
 
 export const INITIAL_STATE: FinancialState = {
