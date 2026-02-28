@@ -95,6 +95,40 @@ describe("AssetEntry component", () => {
   });
 });
 
+describe("surplus target radio buttons", () => {
+  it("selecting a surplus target radio deselects all others", async () => {
+    const user = userEvent.setup();
+    render(<AssetEntry />);
+
+    // Get all surplus target radios — mock has 3 assets
+    const radios = screen.getAllByRole("radio");
+    expect(radios).toHaveLength(3);
+
+    // First asset should be the default surplus target (or none set initially)
+    // Click the second radio to select it
+    await user.click(radios[1]);
+
+    // Second radio should now be checked, others unchecked
+    expect(radios[0]).not.toBeChecked();
+    expect(radios[1]).toBeChecked();
+    expect(radios[2]).not.toBeChecked();
+
+    // Click the third radio
+    await user.click(radios[2]);
+
+    // Third radio should be checked, others unchecked
+    expect(radios[0]).not.toBeChecked();
+    expect(radios[1]).not.toBeChecked();
+    expect(radios[2]).toBeChecked();
+
+    // Click first radio to go back
+    await user.click(radios[0]);
+    expect(radios[0]).toBeChecked();
+    expect(radios[1]).not.toBeChecked();
+    expect(radios[2]).not.toBeChecked();
+  });
+});
+
 describe("getAllCategorySuggestions", () => {
   it("includes CA, US, and universal categories", () => {
     const suggestions = getAllCategorySuggestions();

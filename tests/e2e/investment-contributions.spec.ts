@@ -65,6 +65,85 @@ test.describe("Investment contributions in expenses", () => {
     await expect(deleteButton).toHaveCount(0);
   });
 
+  test("switching surplus target radio updates projection chart and asset projections", async ({ page }) => {
+    await page.goto("/");
+
+    // Default surplus target is the first asset (Savings Account, id=a1)
+    // Surplus = $6,300 - $2,950 = $3,350/mo
+    // Savings Account has 2% default ROI, Brokerage has 7%
+
+    // Verify surplus badge is on the first asset initially
+    const surplusBadgeA1 = page.getByTestId("surplus-amount-a1");
+    await expect(surplusBadgeA1).toBeVisible();
+    await expect(surplusBadgeA1).toContainText("$3,350");
+
+    // Brokerage should NOT have a surplus badge
+    const surplusBadgeA3 = page.getByTestId("surplus-amount-a3");
+    await expect(surplusBadgeA3).not.toBeVisible();
+
+    // Capture the initial per-asset inline projection for Savings Account (with surplus)
+    const projA1 = page.getByTestId("asset-projection-a1");
+    await expect(projA1).toBeVisible();
+    const initialA1Text = await projA1.textContent();
+
+    // Capture the initial per-asset inline projection for Brokerage (without surplus)
+    const projA3 = page.getByTestId("asset-projection-a3");
+    await expect(projA3).toBeVisible();
+    const initialA3Text = await projA3.textContent();
+
+    // Capture the initial projection summary table net worth at 10yr
+    const summaryTable = page.getByTestId("projection-summary-table");
+    await expect(summaryTable).toBeVisible();
+    const initialSummaryText = await summaryTable.textContent();
+
+    // Capture the initial asset projections table
+    const assetTable = page.getByTestId("asset-projections-table");
+    await expect(assetTable).toBeVisible();
+    const initialAssetTableText = await assetTable.textContent();
+
+    // --- Switch surplus target to Brokerage (a3, 7% ROI) ---
+    const surplusRadioA3 = page.getByTestId("surplus-target-a3").locator("input[type=radio]");
+    await surplusRadioA3.click();
+
+    // Surplus badge should now be on Brokerage, not Savings Account
+    await expect(surplusBadgeA1).not.toBeVisible();
+    await expect(surplusBadgeA3).toBeVisible();
+    await expect(surplusBadgeA3).toContainText("$3,350");
+
+    // Per-asset inline projections should update:
+    // Savings Account projection should decrease (lost surplus)
+    const updatedA1Text = await projA1.textContent();
+    expect(updatedA1Text).not.toBe(initialA1Text);
+
+    // Brokerage projection should increase (gained surplus at higher ROI)
+    const updatedA3Text = await projA3.textContent();
+    expect(updatedA3Text).not.toBe(initialA3Text);
+
+    // The projection summary table should update (higher ROI on surplus = higher net worth)
+    const updatedSummaryText = await summaryTable.textContent();
+    expect(updatedSummaryText).not.toBe(initialSummaryText);
+
+    // The asset projections table should update
+    const updatedAssetTableText = await assetTable.textContent();
+    expect(updatedAssetTableText).not.toBe(initialAssetTableText);
+
+    // --- Switch back to Savings Account (a1) to verify full reset ---
+    const surplusRadioA1 = page.getByTestId("surplus-target-a1").locator("input[type=radio]");
+    await surplusRadioA1.click();
+
+    // Should revert to original state
+    await expect(surplusBadgeA1).toBeVisible();
+    await expect(surplusBadgeA3).not.toBeVisible();
+
+    const revertedA1Text = await projA1.textContent();
+    expect(revertedA1Text).toBe(initialA1Text);
+
+    const revertedA3Text = await projA3.textContent();
+    expect(revertedA3Text).toBe(initialA3Text);
+
+    await captureScreenshot(page, "surplus-target-switch-projections");
+  });
+
   test("expense total includes investment contributions", async ({ page }) => {
     await page.goto("/");
 

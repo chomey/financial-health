@@ -1,5 +1,6 @@
 import type { FinancialState } from "@/lib/financial-state";
 import { computeTotals } from "@/lib/financial-state";
+import { getDefaultRoi } from "@/components/AssetEntry";
 
 export interface ProjectionPoint {
   month: number;
@@ -49,7 +50,7 @@ export function projectFinances(
   // Track each asset individually for ROI/contribution
   const assetBalances = state.assets.map((a) => ({
     balance: a.amount,
-    monthlyROI: ((a.roi ?? 0) * multiplier) / 100 / 12,
+    monthlyROI: ((a.roi ?? getDefaultRoi(a.category) ?? 0) * multiplier) / 100 / 12,
     monthlyContribution: (a.monthlyContribution ?? 0) * multiplier,
   }));
 
@@ -180,15 +181,17 @@ export interface AssetProjection {
 export function projectAssets(
   assets: FinancialState["assets"],
   scenario: Scenario = "moderate",
-  milestoneYears: number[] = [10, 20, 30]
+  milestoneYears: number[] = [10, 20, 30],
+  monthlySurplus: number = 0
 ): AssetProjection[] {
   const multiplier = SCENARIO_MULTIPLIERS[scenario];
   const maxMonth = Math.max(...milestoneYears) * 12;
   const milestoneMonths = new Set(milestoneYears.map((y) => y * 12));
 
   return assets.map((a) => {
-    const monthlyROI = ((a.roi ?? 0) * multiplier) / 100 / 12;
-    const monthlyContribution = (a.monthlyContribution ?? 0) * multiplier;
+    const monthlyROI = ((a.roi ?? getDefaultRoi(a.category) ?? 0) * multiplier) / 100 / 12;
+    const surplusContrib = a.surplusTarget && monthlySurplus > 0 ? monthlySurplus : 0;
+    const monthlyContribution = ((a.monthlyContribution ?? 0) + surplusContrib) * multiplier;
     let balance = a.amount;
     const snapshots: Map<number, number> = new Map();
     for (let m = 1; m <= maxMonth; m++) {
