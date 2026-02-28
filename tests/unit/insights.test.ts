@@ -35,7 +35,7 @@ describe("generateInsights", () => {
     const insights = generateInsights(mockData);
     const runway = insights.find((i) => i.type === "runway");
     expect(runway).toBeDefined();
-    expect(runway!.message).toContain("1.8 years");
+    expect(runway!.message).toContain("22 months");
     expect(runway!.message).toContain("strong safety net");
     expect(runway!.icon).toBe("🛡️");
   });

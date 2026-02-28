@@ -108,9 +108,10 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const netWorthWithEquity = totalAssets + totalStocks + totalPropertyEquity - totalDebts;
   // Surplus uses after-tax income, subtracts expenses, investment contributions, and mortgage payments
   const surplus = monthlyAfterTaxIncome - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments;
-  // Runway uses liquid assets + stocks (NOT property)
+  // Runway uses liquid assets + stocks (NOT property), divided by total monthly obligations
   const liquidTotal = totalAssets + totalStocks;
-  const runway = monthlyExpenses > 0 ? liquidTotal / monthlyExpenses : 0;
+  const monthlyObligations = monthlyExpenses + totalMortgagePayments;
+  const runway = monthlyObligations > 0 ? liquidTotal / monthlyObligations : 0;
   // Debt-to-asset ratio includes property: (debts + mortgages) / (liquid assets + stocks + property values)
   // Use property VALUE (not equity) on asset side — equity already nets out the mortgage,
   // so using equity + mortgage as debt would double-count the mortgage.
@@ -138,8 +139,8 @@ export function computeMetrics(state: FinancialState): MetricData[] {
     ? `${surplusParts.join(" - ")} → ${fmtShort(surplus)}/mo to ${surplusTargetName}`
     : surplusParts.join(" - ");
 
-  const runwayBreakdown = monthlyExpenses > 0
-    ? `${fmtShort(liquidTotal)} liquid / ${fmtShort(monthlyExpenses)}/mo expenses`
+  const runwayBreakdown = monthlyObligations > 0
+    ? `${fmtShort(liquidTotal)} liquid / ${fmtShort(monthlyObligations)}/mo obligations${totalMortgagePayments > 0 ? ` (${fmtShort(monthlyExpenses)} expenses + ${fmtShort(totalMortgagePayments)} mortgage)` : ""}`
     : undefined;
 
   const ratioBreakdown = totalAllAssets > 0
@@ -189,7 +190,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       format: "months",
       icon: "🛡️",
       tooltip:
-        "How many months your liquid assets could cover your expenses. 3–6 months is a solid emergency fund.",
+        "How many months your liquid assets could cover your expenses and mortgage payments. 3–6 months is a solid emergency fund.",
       positive: runway >= 3,
       breakdown: runwayBreakdown,
     },
@@ -218,6 +219,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     monthlyIncome: monthlyAfterTaxIncome,
     monthlyExpenses: monthlyExpenses + totalMonthlyContributions + totalMortgagePayments,
     rawMonthlyExpenses: monthlyExpenses,
+    monthlyMortgagePayments: totalMortgagePayments,
     debts: state.debts.map((d) => ({
       category: d.category,
       amount: d.amount,
