@@ -122,6 +122,7 @@ interface CompactProperty {
   ir?: number; // interestRate (annual %)
   mp?: number; // monthlyPayment ($)
   ay?: number; // amortizationYears
+  yp?: number; // yearPurchased
 }
 interface CompactStock {
   t: string; // ticker
@@ -169,6 +170,7 @@ function toCompact(state: FinancialState): CompactState {
       if (x.interestRate !== undefined) cp.ir = x.interestRate;
       if (x.monthlyPayment !== undefined && x.monthlyPayment > 0) cp.mp = x.monthlyPayment;
       if (x.amortizationYears !== undefined) cp.ay = x.amortizationYears;
+      if (x.yearPurchased !== undefined) cp.yp = x.yearPurchased;
       return cp;
     });
   }
@@ -215,7 +217,7 @@ function fromCompact(compact: CompactState): FinancialState {
     }),
     expenses: compact.e.map((x, i) => ({ id: `e${i + 1}`, category: x.c, amount: x.a })),
     properties: (compact.p ?? []).map((x, i) => {
-      const prop: { id: string; name: string; value: number; mortgage: number; interestRate?: number; monthlyPayment?: number; amortizationYears?: number } = {
+      const prop: { id: string; name: string; value: number; mortgage: number; interestRate?: number; monthlyPayment?: number; amortizationYears?: number; yearPurchased?: number } = {
         id: `p${i + 1}`,
         name: x.n,
         value: x.v,
@@ -224,6 +226,7 @@ function fromCompact(compact: CompactState): FinancialState {
       if (x.ir !== undefined) prop.interestRate = x.ir;
       if (x.mp !== undefined) prop.monthlyPayment = x.mp;
       if (x.ay !== undefined) prop.amortizationYears = x.ay;
+      if (x.yp !== undefined) prop.yearPurchased = x.yp;
       return prop;
     }),
     stocks: (compact.st ?? []).map((x, i) => {

@@ -84,12 +84,13 @@ export function generateInsights(data: FinancialData): Insight[] {
       message: `You're spending less than you earn each month — that ${formatted} surplus is building your future.`,
       icon: "📈",
     });
-    // Annual projection
-    const annualSurplus = surplus * 12;
+    // Annual projection — wealth growth includes surplus + contributions + mortgage equity
+    // (contributions move money into assets, mortgage payments reduce debt = both grow net worth)
+    const annualWealthGrowth = (monthlyIncome - rawExpenses) * 12;
     insights.push({
       id: "surplus-annual",
       type: "surplus",
-      message: `At this pace, you'll add ${formatCurrency(annualSurplus)} to your wealth this year.`,
+      message: `At this pace, you'll add ${formatCurrency(annualWealthGrowth)} to your wealth this year.`,
       icon: "📈",
     });
   } else if (surplus === 0 && monthlyIncome > 0) {

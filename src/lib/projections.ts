@@ -1,6 +1,7 @@
 import type { FinancialState } from "@/lib/financial-state";
 import { computeTotals } from "@/lib/financial-state";
 import { getDefaultRoi } from "@/components/AssetEntry";
+import { getEffectivePayment } from "@/components/PropertyEntry";
 
 export interface ProjectionPoint {
   month: number;
@@ -72,7 +73,7 @@ export function projectFinances(
     value: p.value,
     mortgage: p.mortgage,
     monthlyRate: ((p.interestRate ?? 0) * multiplier) / 100 / 12,
-    monthlyPayment: p.monthlyPayment ?? 0,
+    monthlyPayment: getEffectivePayment(p),
   }));
 
   const points: ProjectionPoint[] = [];
