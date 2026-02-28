@@ -7,6 +7,7 @@ export interface StockHolding {
   ticker: string;
   shares: number;
   costBasis?: number; // optional cost basis per share
+  purchaseDate?: string; // ISO date string (YYYY-MM-DD) for annualized return calc
   lastFetchedPrice?: number; // auto-fetched price (not persisted in URL)
   lastUpdated?: string; // timestamp of last price fetch (not persisted)
 }
@@ -29,6 +30,45 @@ export function getStockGainLoss(stock: StockHolding): { amount: number; percent
   const amount = (currentPrice - stock.costBasis) * stock.shares;
   const percentage = ((currentPrice - stock.costBasis) / stock.costBasis) * 100;
   return { amount, percentage };
+}
+
+/** Compute annualized return (CAGR) for a stock with cost basis and purchase date */
+export function getAnnualizedReturn(stock: StockHolding): number | null {
+  if (stock.costBasis === undefined || stock.costBasis <= 0) return null;
+  if (!stock.purchaseDate) return null;
+  const currentPrice = getStockPrice(stock);
+  if (currentPrice <= 0) return null;
+  const purchaseMs = new Date(stock.purchaseDate).getTime();
+  if (isNaN(purchaseMs)) return null;
+  const now = Date.now();
+  const years = (now - purchaseMs) / (365.25 * 24 * 60 * 60 * 1000);
+  if (years <= 0) return null;
+  // CAGR = (endValue / startValue)^(1/years) - 1
+  const cagr = Math.pow(currentPrice / stock.costBasis, 1 / years) - 1;
+  return cagr * 100; // as percentage
+}
+
+/** Portfolio-level aggregate performance */
+export interface PortfolioSummary {
+  totalValue: number;
+  totalCostBasis: number;
+  totalGainLoss: number;
+  overallReturnPct: number;
+}
+
+export function getPortfolioSummary(stocks: StockHolding[]): PortfolioSummary {
+  let totalValue = 0;
+  let totalCostBasis = 0;
+  for (const s of stocks) {
+    const value = getStockValue(s);
+    totalValue += value;
+    if (s.costBasis !== undefined && s.costBasis > 0 && value > 0) {
+      totalCostBasis += s.costBasis * s.shares;
+    }
+  }
+  const totalGainLoss = totalCostBasis > 0 ? totalValue - totalCostBasis : 0;
+  const overallReturnPct = totalCostBasis > 0 ? (totalGainLoss / totalCostBasis) * 100 : 0;
+  return { totalValue, totalCostBasis, totalGainLoss, overallReturnPct };
 }
 
 function generateId(): string {
@@ -131,7 +171,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
-    "ticker" | "shares" | "costBasis" | null
+    "ticker" | "shares" | "costBasis" | "purchaseDate" | null
   >(null);
   const [editValue, setEditValue] = useState("");
   const [addingNew, setAddingNew] = useState(false);
@@ -220,7 +260,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
 
   const startEdit = (
     id: string,
-    field: "ticker" | "shares" | "costBasis",
+    field: "ticker" | "shares" | "costBasis" | "purchaseDate",
     currentValue: string
   ) => {
     setEditingId(id);
@@ -244,6 +284,9 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
           if (editingField === "costBasis") {
             const val = parseCurrencyInput(editValue);
             return { ...s, costBasis: val || undefined };
+          }
+          if (editingField === "purchaseDate") {
+            return { ...s, purchaseDate: editValue || undefined };
           }
           return s;
         })
@@ -305,6 +348,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   };
 
   const total = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
+  const portfolio = getPortfolioSummary(stocks);
 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
@@ -342,6 +386,24 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
         )}
       </div>
 
+      {/* Portfolio summary */}
+      {stocks.length > 0 && portfolio.totalCostBasis > 0 && (
+        <div className="mb-3 rounded-lg bg-stone-50 px-3 py-2" data-testid="portfolio-summary">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+            <span className="text-stone-500">
+              Portfolio: <span className="font-medium text-stone-700">{formatCurrency(portfolio.totalValue)}</span>
+            </span>
+            <span className={`font-medium ${portfolio.totalGainLoss >= 0 ? "text-green-600" : "text-rose-600"}`}>
+              {portfolio.totalGainLoss >= 0 ? "+" : ""}{formatCurrency(portfolio.totalGainLoss)}
+              {" "}({portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}%)
+            </span>
+            <span className="text-stone-400">
+              Cost: {formatCurrency(portfolio.totalCostBasis)}
+            </span>
+          </div>
+        </div>
+      )}
+
       {stocks.length === 0 && !addingNew ? (
         <div className="flex flex-col items-center py-4 text-center" data-testid="stock-empty-state">
           <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-400">
@@ -359,6 +421,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
             const price = getStockPrice(stock);
             const value = getStockValue(stock);
             const gainLoss = getStockGainLoss(stock);
+            const annualizedReturn = getAnnualizedReturn(stock);
             const isFetching = fetchingPrices.has(stock.id);
             return (
               <div key={stock.id} role="listitem">
@@ -481,6 +544,36 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                     </button>
                   )}
 
+                  {/* Purchase date */}
+                  {editingId === stock.id && editingField === "purchaseDate" ? (
+                    <input
+                      ref={inputRef}
+                      type="date"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={commitEdit}
+                      onKeyDown={handleEditKeyDown}
+                      className="w-36 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                      aria-label={`Edit purchase date for ${stock.ticker}`}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => startEdit(stock.id, "purchaseDate", stock.purchaseDate ?? "")}
+                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                        stock.purchaseDate
+                          ? "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                          : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                      }`}
+                      aria-label={`Set purchase date for ${stock.ticker}${stock.purchaseDate ? `, currently ${stock.purchaseDate}` : ""}`}
+                      data-testid={`purchase-date-${stock.id}`}
+                    >
+                      {stock.purchaseDate
+                        ? `Bought: ${new Date(stock.purchaseDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                        : "Purchase date"}
+                    </button>
+                  )}
+
                   {/* Gain/Loss display */}
                   {gainLoss && (
                     <span
@@ -494,6 +587,21 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                       {gainLoss.amount >= 0 ? "+" : ""}
                       {formatCurrency(gainLoss.amount)} ({gainLoss.percentage >= 0 ? "+" : ""}
                       {gainLoss.percentage.toFixed(1)}%)
+                    </span>
+                  )}
+
+                  {/* Annualized return */}
+                  {annualizedReturn !== null && (
+                    <span
+                      className={`rounded px-1.5 py-0.5 text-xs font-medium ${
+                        annualizedReturn >= 0
+                          ? "bg-emerald-50 text-emerald-600"
+                          : "bg-rose-50 text-rose-600"
+                      }`}
+                      data-testid={`annualized-return-${stock.id}`}
+                    >
+                      {annualizedReturn >= 0 ? "+" : ""}
+                      {annualizedReturn.toFixed(1)}%/yr
                     </span>
                   )}
 

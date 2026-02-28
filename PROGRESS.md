@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 55
-- **Completed**: 53
-- **Remaining**: 2
+- **Completed**: 54
+- **Remaining**: 1
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1267,3 +1267,23 @@
   ![Sankey diagram expanded](screenshots/task-53-sankey-expanded.png)
   ![Sankey tooltip on hover](screenshots/task-53-sankey-tooltip.png)
 - **Notes**: Used d3-sankey with a thin React SVG wrapper instead of @nivo/sankey to keep the bundle lightweight and maintain full control over styling. The diagram shows money flowing from income sources through taxes to expenses, investments, and surplus. Flow paths use gradient colors transitioning from source to target node color. The component is collapsible to avoid cluttering the dashboard. Tax allocation is proportional to income source amounts when multiple income sources exist.
+
+## Task 54: Add ROI performance tracking to stock holdings
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/components/StockEntry.tsx`: Added `purchaseDate` field to `StockHolding` interface. Added `getAnnualizedReturn()` function computing CAGR from cost basis, current price, and purchase date. Added `PortfolioSummary` interface and `getPortfolioSummary()` function for aggregate portfolio metrics. Added purchase date editing UI (date input, "Bought:" display). Added annualized return badge (%/yr) next to gain/loss for stocks with purchase dates. Added portfolio-level summary bar (total value, total gain/loss, overall return %, cost basis) at top of stock list when cost basis data exists. Extended editing field type to include "purchaseDate".
+  - `src/lib/url-state.ts`: Added `pd` (purchaseDate) field to `CompactStock` interface. Updated `toCompact`/`fromCompact` to serialize/deserialize purchase dates. Backward compatible — missing `pd` decodes as undefined.
+  - `src/app/page.tsx`: Added Portfolio Performance card to dashboard column (between SnapshotDashboard and ExpenseBreakdownChart). Shows aggregate gain/loss, overall return percentage, and per-stock annualized returns for stocks with purchase dates. Only renders when stocks exist.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/stock-performance.test.ts`: 16 tests — getAnnualizedReturn (null cases for missing data, positive/negative CAGR), getPortfolioSummary (empty, single, multiple stocks, missing cost basis, mixed), URL state round-trip with purchaseDate (encode/decode, omit when undefined, backward compat). All 16 passed, 0 failed.
+  - `tests/e2e/stock-performance.spec.ts`: 5 tests — purchase date button visibility, setting purchase date, portfolio summary display, portfolio performance dashboard card, URL persistence of purchase date. All 5 passed, 0 failed.
+  - All unit tests: 675 passed, 0 failed. Build succeeded.
+- **Screenshots**:
+  ![Purchase date button](screenshots/task-54-purchase-date-button.png)
+  ![Purchase date set](screenshots/task-54-purchase-date-set.png)
+  ![Portfolio summary](screenshots/task-54-portfolio-summary.png)
+  ![Portfolio performance card](screenshots/task-54-portfolio-performance-card.png)
+  ![Purchase date persisted](screenshots/task-54-purchase-date-persisted.png)
+- **Notes**: Annualized return uses CAGR formula: (endPrice/startPrice)^(1/years) - 1. Portfolio summary only appears when at least one stock has a cost basis set. The Portfolio Performance dashboard card shows aggregate gain/loss and per-stock annualized returns (for stocks with purchase dates). Purchase dates persist in URL state via the `pd` field in CompactStock.

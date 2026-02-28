@@ -27,6 +27,7 @@ import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
 import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
+import { getPortfolioSummary, getAnnualizedReturn } from "@/components/StockEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 
@@ -302,6 +303,43 @@ export default function Home() {
           >
             <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
               <SnapshotDashboard metrics={metrics} financialData={financialData} />
+              {stocks.length > 0 && (() => {
+                const portfolio = getPortfolioSummary(stocks);
+                const stocksWithReturns = stocks
+                  .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
+                  .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
+                return (
+                  <div className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5" data-testid="portfolio-performance">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium text-stone-500">Portfolio Performance</h3>
+                      <span className="text-lg" aria-hidden="true">📊</span>
+                    </div>
+                    <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-green-600" : "text-rose-600"}`}>
+                      {portfolio.totalGainLoss >= 0 ? "+" : ""}{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(portfolio.totalGainLoss)}
+                    </p>
+                    {portfolio.totalCostBasis > 0 && (
+                      <p className="mt-0.5 text-sm text-stone-500" data-testid="portfolio-return-pct">
+                        {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% overall return
+                      </p>
+                    )}
+                    {stocksWithReturns.length > 0 && (
+                      <div className="mt-2 space-y-0.5">
+                        {stocksWithReturns.map((s) => (
+                          <p key={s.ticker} className="text-xs text-stone-400">
+                            <span className="font-mono font-medium text-stone-500">{s.ticker}</span>{" "}
+                            <span className={s.annualized >= 0 ? "text-green-500" : "text-rose-500"}>
+                              {s.annualized >= 0 ? "+" : ""}{s.annualized.toFixed(1)}%/yr
+                            </span>
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                    <p className="mt-1.5 text-xs text-stone-400 leading-relaxed">
+                      Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
+                    </p>
+                  </div>
+                );
+              })()}
               <ExpenseBreakdownChart
                 expenses={expenses}
                 investmentContributions={totalInvestmentContributions}
