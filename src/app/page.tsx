@@ -149,6 +149,11 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+        {/* Projection Chart — full-width above the two-column layout */}
+        <section className="mb-8" aria-label="Financial projections">
+          <ProjectionChart state={state} />
+        </section>
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* Entry Panel — left side on desktop, top on mobile */}
           <section
@@ -178,7 +183,6 @@ export default function Home() {
             aria-label="Financial dashboard"
           >
             <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
-              <ProjectionChart state={state} />
               <SnapshotDashboard metrics={metrics} financialData={financialData} />
             </div>
           </section>

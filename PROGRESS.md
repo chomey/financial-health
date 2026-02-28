@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 34
-- **Completed**: 32
-- **Remaining**: 2
+- **Completed**: 33
+- **Remaining**: 1
 - **Last Updated**: 2026-02-27
 
 ---
@@ -885,3 +885,22 @@
   ![Stock affects net worth](screenshots/task-32-stock-affects-networth.png)
   ![Stock URL persistence](screenshots/task-32-stock-url-persistence.png)
 - **Notes**: Stocks are treated as liquid assets — they count toward net worth AND financial runway (unlike properties which are illiquid). The API route uses Yahoo Finance's chart endpoint with server-side proxying to avoid CORS issues. Fetched prices are NOT persisted in URL state (only ticker, shares, manual price, and cost basis are stored). Prices are re-fetched on page load for stocks without manual price overrides. The API route includes a 5-minute in-memory cache to reduce external API calls.
+
+## Task 33: Make projection chart full-width above the two-column layout
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/app/page.tsx`: Moved ProjectionChart out of the right dashboard column into its own full-width section above the two-column grid. Added `aria-label="Financial projections"` to the wrapper section with `mb-8` spacing.
+  - `tests/unit/chart-position.test.ts`: Updated to verify the new layout — chart is in its own section above both columns, not inside the dashboard section.
+  - `tests/e2e/chart-fullwidth.spec.ts`: New T2 browser tests verifying full-width position, width comparison vs dashboard column on desktop, not inside dashboard, and mobile responsiveness.
+  - `tests/e2e/projection-chart.spec.ts`: Fixed aria-label query to use `exact: true` to avoid ambiguity with the new wrapper section.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/chart-position.test.ts`: 4 tests — chart in own section, not in dashboard, appears before columns, has aria-label (4 passed, 0 failed)
+  - `tests/e2e/chart-fullwidth.spec.ts`: 4 tests — full-width position, wider than dashboard on desktop, not inside dashboard, mobile responsive (4 passed, 0 failed)
+  - All existing tests: 412 unit tests passed, 10 projection chart E2E tests passed
+- **Screenshots**:
+  ![Chart full-width layout](screenshots/task-33-chart-fullwidth.png)
+  ![Chart full-width desktop](screenshots/task-33-chart-fullwidth-desktop.png)
+  ![Chart full-width mobile](screenshots/task-33-chart-fullwidth-mobile.png)
+- **Notes**: The projection chart now spans the full page width above the entry and dashboard columns, making it the most prominent visual element. The wrapper section uses `aria-label="Financial projections"` (plural) while the chart component itself retains `aria-label="Financial projection"` (singular) — the existing E2E test was updated with `exact: true` to disambiguate.
