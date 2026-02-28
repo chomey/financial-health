@@ -6,7 +6,6 @@ export interface StockHolding {
   id: string;
   ticker: string;
   shares: number;
-  manualPrice?: number; // manual override price per share
   costBasis?: number; // optional cost basis per share
   lastFetchedPrice?: number; // auto-fetched price (not persisted in URL)
   lastUpdated?: string; // timestamp of last price fetch (not persisted)
@@ -14,13 +13,12 @@ export interface StockHolding {
 
 /** Compute total value of a stock holding */
 export function getStockValue(stock: StockHolding): number {
-  const price = stock.manualPrice ?? stock.lastFetchedPrice ?? 0;
-  return stock.shares * price;
+  return stock.shares * (stock.lastFetchedPrice ?? 0);
 }
 
 /** Get the display price for a stock */
 export function getStockPrice(stock: StockHolding): number {
-  return stock.manualPrice ?? stock.lastFetchedPrice ?? 0;
+  return stock.lastFetchedPrice ?? 0;
 }
 
 /** Compute gain/loss for a stock if cost basis is set */
@@ -88,7 +86,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   const didMount = useRef(false);
   const syncDidMount = useRef(false);
 
-  // Sync with parent if controlled
+  // Sync with parent if controlled — preserve locally-fetched prices
   useEffect(() => {
     if (!syncDidMount.current) {
       syncDidMount.current = true;
@@ -97,7 +95,20 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
     if (items !== undefined) {
       isExternalSync.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setStocks(items);
+      setStocks((prev) => {
+        // Merge lastFetchedPrice/lastUpdated from local state so concurrent
+        // fetch responses aren't overwritten by stale parent items
+        const localPrices = new Map(
+          prev.map((s) => [s.id, { lastFetchedPrice: s.lastFetchedPrice, lastUpdated: s.lastUpdated }])
+        );
+        return items.map((item) => {
+          const local = localPrices.get(item.id);
+          if (local?.lastFetchedPrice && !item.lastFetchedPrice) {
+            return { ...item, lastFetchedPrice: local.lastFetchedPrice, lastUpdated: local.lastUpdated };
+          }
+          return item;
+        });
+      });
     }
   }, [items]);
 
@@ -120,18 +131,16 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
-    "ticker" | "shares" | "manualPrice" | "costBasis" | null
+    "ticker" | "shares" | "costBasis" | null
   >(null);
   const [editValue, setEditValue] = useState("");
   const [addingNew, setAddingNew] = useState(false);
   const [newTicker, setNewTicker] = useState("");
   const [newShares, setNewShares] = useState("");
-  const [newPrice, setNewPrice] = useState("");
   const [fetchingPrices, setFetchingPrices] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
   const newTickerRef = useRef<HTMLInputElement>(null);
   const newSharesRef = useRef<HTMLInputElement>(null);
-  const newPriceRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (addingNew && newTickerRef.current) {
@@ -199,7 +208,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   const fetchedTickersRef = useRef(new Set<string>());
   useEffect(() => {
     const needFetch = stocks.filter(
-      (s) => s.ticker.trim() && !s.manualPrice && !s.lastFetchedPrice && !fetchedTickersRef.current.has(s.ticker)
+      (s) => s.ticker.trim() && !s.lastFetchedPrice && !fetchedTickersRef.current.has(s.ticker)
     );
     if (needFetch.length > 0) {
       needFetch.forEach((s) => {
@@ -211,7 +220,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
 
   const startEdit = (
     id: string,
-    field: "ticker" | "shares" | "manualPrice" | "costBasis",
+    field: "ticker" | "shares" | "costBasis",
     currentValue: string
   ) => {
     setEditingId(id);
@@ -231,10 +240,6 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
           if (editingField === "shares") {
             const val = parseCurrencyInput(editValue);
             return { ...s, shares: val };
-          }
-          if (editingField === "manualPrice") {
-            const val = parseCurrencyInput(editValue);
-            return { ...s, manualPrice: val || undefined };
           }
           if (editingField === "costBasis") {
             const val = parseCurrencyInput(editValue);
@@ -269,34 +274,26 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   const addStock = () => {
     if (!newTicker.trim()) return;
     const shares = parseCurrencyInput(newShares) || 0;
-    const price = parseCurrencyInput(newPrice);
     const id = generateId();
     const stock: StockHolding = {
       id,
       ticker: newTicker.toUpperCase().trim(),
       shares,
-      manualPrice: price || undefined,
     };
     setStocks((prev) => [...prev, stock]);
-    // Fetch price if no manual price set
-    if (!price && newTicker.trim()) {
-      fetchPrice(id, newTicker.trim());
-    }
+    fetchPrice(id, newTicker.trim());
     setNewTicker("");
     setNewShares("");
-    setNewPrice("");
     setAddingNew(false);
   };
 
   const handleNewKeyDown = (
     e: React.KeyboardEvent,
-    field: "ticker" | "shares" | "price"
+    field: "ticker" | "shares"
   ) => {
     if (e.key === "Enter") {
       if (field === "ticker" && newSharesRef.current) {
         newSharesRef.current.focus();
-      } else if (field === "shares" && newPriceRef.current) {
-        newPriceRef.current.focus();
       } else {
         addStock();
       }
@@ -304,7 +301,6 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
       setAddingNew(false);
       setNewTicker("");
       setNewShares("");
-      setNewPrice("");
     }
   };
 
@@ -452,39 +448,8 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                   </button>
                 </div>
 
-                {/* Secondary details: manual price override, cost basis, gain/loss */}
+                {/* Secondary details: cost basis, gain/loss */}
                 <div className="flex flex-wrap items-center gap-2 px-5 pb-1" data-testid={`stock-details-${stock.id}`}>
-                  {/* Manual price override */}
-                  {editingId === stock.id && editingField === "manualPrice" ? (
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={commitEdit}
-                      onKeyDown={handleEditKeyDown}
-                      className="w-24 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
-                      aria-label={`Edit manual price for ${stock.ticker}`}
-                      placeholder="e.g. 150.00"
-                    />
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => startEdit(stock.id, "manualPrice", String(stock.manualPrice ?? ""))}
-                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
-                        stock.manualPrice !== undefined
-                          ? "bg-amber-50 text-amber-600 hover:bg-amber-100"
-                          : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
-                      }`}
-                      aria-label={`Set manual price for ${stock.ticker}${stock.manualPrice ? `, currently ${formatPrice(stock.manualPrice)}` : ""}`}
-                      data-testid={`manual-price-${stock.id}`}
-                    >
-                      {stock.manualPrice !== undefined
-                        ? `Manual: ${formatPrice(stock.manualPrice)}`
-                        : "Manual price"}
-                    </button>
-                  )}
-
                   {/* Cost basis */}
                   {editingId === stock.id && editingField === "costBasis" ? (
                     <input
@@ -533,7 +498,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                   )}
 
                   {/* Last updated timestamp */}
-                  {stock.lastUpdated && !stock.manualPrice && (
+                  {stock.lastUpdated && (
                     <span className="text-[10px] text-stone-300" data-testid={`last-updated-${stock.id}`}>
                       Updated {new Date(stock.lastUpdated).toLocaleTimeString()}
                     </span>
@@ -569,16 +534,6 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
               className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-right text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:w-20 sm:px-2 sm:py-1 sm:text-sm"
               aria-label="Number of shares"
             />
-            <input
-              ref={newPriceRef}
-              type="text"
-              placeholder="Price (optional)"
-              value={newPrice}
-              onChange={(e) => setNewPrice(e.target.value)}
-              onKeyDown={(e) => handleNewKeyDown(e, "price")}
-              className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-right text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
-              aria-label="Price per share (leave empty to auto-fetch)"
-            />
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -594,7 +549,6 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                   setAddingNew(false);
                   setNewTicker("");
                   setNewShares("");
-                  setNewPrice("");
                 }}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"
                 aria-label="Cancel adding stock"

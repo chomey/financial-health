@@ -124,9 +124,10 @@ function parseCurrencyInput(value: string): number {
 interface AssetEntryProps {
   items?: Asset[];
   onChange?: (items: Asset[]) => void;
+  monthlySurplus?: number;
 }
 
-export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
+export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: AssetEntryProps = {}) {
   const [assets, setAssets] = useState<Asset[]>(items ?? MOCK_ASSETS);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -241,16 +242,26 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
   };
 
   const deleteAsset = (id: string) => {
-    setAssets((prev) => prev.filter((a) => a.id !== id));
+    setAssets((prev) => {
+      const next = prev.filter((a) => a.id !== id);
+      // If we deleted the surplus target, reassign to first remaining
+      if (next.length > 0 && !next.some((a) => a.surplusTarget)) {
+        next[0] = { ...next[0], surplusTarget: true };
+      }
+      return next;
+    });
   };
 
   const addAsset = () => {
     if (!newCategory.trim()) return;
     const amount = parseCurrencyInput(newAmount);
-    setAssets((prev) => [
-      ...prev,
-      { id: generateId(), category: newCategory.trim(), amount },
-    ]);
+    setAssets((prev) => {
+      const isFirst = prev.length === 0;
+      return [
+        ...prev,
+        { id: generateId(), category: newCategory.trim(), amount, surplusTarget: isFirst ? true : undefined },
+      ];
+    });
     setNewCategory("");
     setNewAmount("");
     setAddingNew(false);
@@ -507,41 +518,52 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
                   </button>
                 )}
 
-                {/* Surplus target checkbox */}
+                {/* Surplus target — radio behavior, one must always be selected */}
                 <label
-                  className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-xs cursor-pointer transition-colors duration-150 ${
+                  className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                     asset.surplusTarget
-                      ? "bg-amber-50 text-amber-700"
-                      : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                      ? "bg-amber-50 text-amber-700 cursor-default"
+                      : "text-stone-300 hover:bg-stone-50 hover:text-stone-400 cursor-pointer"
                   }`}
                   data-testid={`surplus-target-${asset.id}`}
                 >
                   <input
-                    type="checkbox"
+                    type="radio"
+                    name="surplus-target"
                     checked={asset.surplusTarget ?? false}
                     onChange={() => {
+                      if (asset.surplusTarget) return;
                       setAssets((prev) =>
                         prev.map((a) => ({
                           ...a,
-                          surplusTarget: a.id === asset.id ? !a.surplusTarget : false,
+                          surplusTarget: a.id === asset.id,
                         }))
                       );
                     }}
-                    className="h-3 w-3 rounded border-stone-300 text-amber-600 accent-amber-500"
+                    className="h-3 w-3 border-stone-300 text-amber-600 accent-amber-500"
                   />
                   Surplus goes here
                 </label>
+                {asset.surplusTarget && monthlySurplus > 0 && (
+                  <span className="rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-600" data-testid={`surplus-amount-${asset.id}`}>
+                    +{formatCurrency(monthlySurplus)}/mo surplus
+                  </span>
+                )}
               </div>
 
               {/* Per-asset 10/20/30 year projections */}
-              {(displayRoi !== undefined && displayRoi > 0) || hasContribution ? (
-                <div className="flex items-center gap-3 px-5 pb-1.5 text-[10px] text-stone-400" data-testid={`asset-projection-${asset.id}`}>
-                  <span className="font-medium">Projected:</span>
-                  <span>10yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, asset.monthlyContribution ?? 0, 10))}</span></span>
-                  <span>20yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, asset.monthlyContribution ?? 0, 20))}</span></span>
-                  <span>30yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, asset.monthlyContribution ?? 0, 30))}</span></span>
-                </div>
-              ) : null}
+              {(() => {
+                const totalContrib = (asset.monthlyContribution ?? 0) + (asset.surplusTarget ? monthlySurplus : 0);
+                const showProjection = (displayRoi !== undefined && displayRoi > 0) || totalContrib > 0;
+                return showProjection ? (
+                  <div className="flex items-center gap-3 px-5 pb-1.5 text-[10px] text-stone-400" data-testid={`asset-projection-${asset.id}`}>
+                    <span className="font-medium">Projected:</span>
+                    <span>10yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 10))}</span></span>
+                    <span>20yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 20))}</span></span>
+                    <span>30yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 30))}</span></span>
+                  </div>
+                ) : null;
+              })()}
             </div>
           );})}
         </div>

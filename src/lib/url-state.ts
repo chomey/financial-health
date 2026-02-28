@@ -130,7 +130,6 @@ interface CompactProperty {
 interface CompactStock {
   t: string; // ticker
   s: number; // shares
-  mp?: number; // manualPrice
   cb?: number; // costBasis
 }
 interface CompactState {
@@ -183,7 +182,6 @@ function toCompact(state: FinancialState): CompactState {
   if (stocks.length > 0) {
     compact.st = stocks.map((x) => {
       const cs: CompactStock = { t: x.ticker, s: x.shares };
-      if (x.manualPrice !== undefined) cs.mp = x.manualPrice;
       if (x.costBasis !== undefined) cs.cb = x.costBasis;
       return cs;
     });
@@ -241,12 +239,11 @@ function fromCompact(compact: CompactState): FinancialState {
       return prop;
     }),
     stocks: (compact.st ?? []).map((x, i) => {
-      const stock: { id: string; ticker: string; shares: number; manualPrice?: number; costBasis?: number } = {
+      const stock: { id: string; ticker: string; shares: number; costBasis?: number } = {
         id: `s${i + 1}`,
         ticker: x.t,
         shares: x.s,
       };
-      if (x.mp !== undefined) stock.manualPrice = x.mp;
       if (x.cb !== undefined) stock.costBasis = x.cb;
       return stock;
     }),
