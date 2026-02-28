@@ -116,9 +116,8 @@ const MOCK_PROPERTIES: Property[] = [
   { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
 ];
 
-let nextId = 500;
 function generateId(): string {
-  return `p${++nextId}`;
+  return `p${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 function formatCurrency(amount: number): string {

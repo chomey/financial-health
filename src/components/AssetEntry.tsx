@@ -84,9 +84,8 @@ const MOCK_ASSETS: Asset[] = [
   { id: "a3", category: "Brokerage", amount: 18500 },
 ];
 
-let nextId = 100;
 function generateId(): string {
-  return `a${++nextId}`;
+  return `a${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 function formatCurrency(amount: number): string {
@@ -186,23 +185,24 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
     }
   };
 
-  const commitEdit = () => {
+  const commitEdit = (overrideValue?: string) => {
+    const value = overrideValue ?? editValue;
     if (editingId && editingField) {
       setAssets((prev) =>
         prev.map((a) => {
           if (a.id !== editingId) return a;
           if (editingField === "category") {
-            return { ...a, category: editValue || a.category };
+            return { ...a, category: value || a.category };
           }
           if (editingField === "roi") {
-            const val = parseFloat(editValue);
+            const val = parseFloat(value);
             return { ...a, roi: isNaN(val) ? undefined : val };
           }
           if (editingField === "monthlyContribution") {
-            const val = parseCurrencyInput(editValue);
+            const val = parseCurrencyInput(value);
             return { ...a, monthlyContribution: val || undefined };
           }
-          return { ...a, amount: parseCurrencyInput(editValue) };
+          return { ...a, amount: parseCurrencyInput(value) };
         })
       );
     }
@@ -344,9 +344,7 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
                                     type="button"
                                     onMouseDown={(e) => {
                                       e.preventDefault();
-                                      setEditValue(suggestion);
-                                      setShowSuggestions(false);
-                                      commitEdit();
+                                      commitEdit(suggestion);
                                     }}
                                     className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
                                   >
@@ -384,7 +382,7 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
                       type="text"
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={commitEdit}
+                      onBlur={() => commitEdit()}
                       onKeyDown={handleEditKeyDown}
                       className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
                       aria-label={`Edit amount for ${asset.category}`}
@@ -434,7 +432,7 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
                     type="text"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={commitEdit}
+                    onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
                     aria-label={`Edit ROI for ${asset.category}`}
@@ -467,7 +465,7 @@ export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
                     type="text"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={commitEdit}
+                    onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-24 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
                     aria-label={`Edit monthly contribution for ${asset.category}`}
