@@ -10,9 +10,9 @@
 
 ## Summary
 - **Total Tasks**: 46
-- **Completed**: 41
-- **Remaining**: 5
-- **Last Updated**: 2026-02-27
+- **Completed**: 42
+- **Remaining**: 4
+- **Last Updated**: 2026-02-28
 
 ---
 
@@ -1037,3 +1037,18 @@
   - `tests/unit/tax-engine.test.ts`: 34 tests covering: edge cases (zero/negative income for both countries), Canadian employment income (ON $50k/$100k, AB $100k, BC $200k, QC $500k, below BPA, other=employment equivalence), Canadian capital gains (50% inclusion, higher inclusion above $250k, lower effective rate than employment, marginal rate adjustment), US employment income (CA $50k, NY $100k, TX/FL no state tax, below standard deduction, $1M high income, other=employment equivalence, standard deduction verification), US capital gains (0% rate, 15% rate, employment comparison, state taxation, no-tax states), cross-country invariants (afterTax = income - totalTax, effectiveRate = totalTax / income, marginal >= effective), error handling (invalid province/state codes). All 34 passed, 0 failed.
   - All 519 unit tests passed, 0 failed.
 - **Notes**: Backend-only task ([@backend]), no screenshots required. The key architectural distinction is how US vs CA handle deductions: US standard deduction ($15k) is subtracted from income before applying brackets, while Canadian BPA is applied as a non-refundable tax credit. The `calculateUSFederalTax` function handles this correctly by computing tax on `max(0, income - standardDeduction)` without using the BPA credit logic in `calculateProgressiveTax`.
+
+## Task 42: Add country and jurisdiction selector UI to page header
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/components/CountryJurisdictionSelector.tsx`: New component with segmented country toggle (CA/US with flag icons) and dependent province/state dropdown. Exports `CA_PROVINCES` (13 entries), `US_STATES` (51 entries), and `DEFAULT_JURISDICTION` mapping. Switching country resets jurisdiction to sensible default (ON for CA, CA for US).
+  - `src/app/page.tsx`: Imported and integrated CountryJurisdictionSelector into the page header, next to the Copy Link button. Wired to existing country/jurisdiction state and URL persistence.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/country-jurisdiction-selector.test.tsx`: 17 tests covering rendering, active state display, province/state list filtering, country switching with jurisdiction reset, no-op on same country click, jurisdiction selection, selected value, data validation (counts, code lengths, sort order, default validity). All 17 passed, 0 failed.
+  - `tests/e2e/country-jurisdiction.spec.ts`: 6 browser tests covering selector visibility, default values (CA/ON), switching to US with jurisdiction reset, switching back to CA, province selection, and URL persistence across reload. All 6 passed, 0 failed.
+  - All 515 unit tests passed, 0 failed. Build succeeded.
+- **Screenshots**:
+  ![Country jurisdiction selector with US/NY selected](screenshots/task-42-country-jurisdiction-selector.png)
+- **Notes**: The selector uses a compact segmented control for country (showing flags on mobile, flags + text on desktop) and a native select dropdown for jurisdiction. Both persist through existing URL state mechanism (co/ju fields in CompactState). Warm styling consistent with the rest of the app.
