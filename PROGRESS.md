@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 46
-- **Completed**: 38
-- **Remaining**: 8
+- **Completed**: 39
+- **Remaining**: 7
 - **Last Updated**: 2026-02-27
 
 ---
@@ -1001,3 +1001,15 @@
   - `tests/unit/income-entry.test.tsx`: Updated existing tests to reflect new category suggestions (Capital Gains, Dividends). Total: 15 passed, 0 failed.
   - All 439 unit tests passed, 0 failed.
 - **Notes**: Backend-only task ([@backend]), no screenshots required. incomeType is omitted from compact encoding when undefined or "employment" (the default) to minimize URL size. Backward compatible — existing URLs without `it` field decode without incomeType set.
+
+## Task 39: Build Canadian federal and provincial tax bracket tables
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/tax-tables.ts`: Created with 2025 Canadian federal tax brackets and all 13 provincial/territorial bracket tables (AB, BC, MB, NB, NL, NT, NS, NU, ON, PE, QC, SK, YT). Includes `BracketTable` and `TaxBracket` interfaces, `CA_CAPITAL_GAINS` constants (50% inclusion on first $250k, 66.67% above), `getCanadianBrackets(province, year?)` lookup function, `calculateProgressiveTax()` utility with basic personal amount credit, and `calculateCanadianCapitalGainsInclusion()` for capital gains. JSDoc comments cite CRA sources.
+  - `tests/unit/tax-tables.test.ts`: Created comprehensive T1 unit test suite
+- **Test tiers run**: T1
+- **Tests**:
+  - `tests/unit/tax-tables.test.ts`: 24 tests covering: getCanadianBrackets lookup (valid codes, case-insensitive, all 13 provinces, unknown code error, unsupported year error), calculateProgressiveTax (zero/negative income, below BPA, $50k/$100k federal, $100k Ontario, combined federal+Ontario, $200k Alberta, high income top bracket, BPA credit floor), calculateCanadianCapitalGainsInclusion (zero/negative, under $250k at 50%, above $250k at 66.67%, exact $250k boundary), bracket table integrity (contiguous brackets, rates between 0 and 1, capital gains constants). All 24 passed, 0 failed.
+  - All 463 unit tests passed, 0 failed.
+- **Notes**: Backend-only task ([@backend]), no screenshots required. Tax tables are data-only with pure utility functions — no UI changes. The `calculateProgressiveTax` function applies basic personal amount as a non-refundable credit at the lowest bracket rate, matching CRA methodology. Only 2025 tax year is supported; the lookup function throws for other years. Task 40 will add US federal and state tax tables to this same file.
