@@ -111,12 +111,14 @@ describe("getAllIncomeCategorySuggestions", () => {
     expect(suggestions).toContain("Salary");
     expect(suggestions).toContain("Freelance");
     expect(suggestions).toContain("Investment Income");
+    expect(suggestions).toContain("Capital Gains");
+    expect(suggestions).toContain("Dividends");
     expect(suggestions).toContain("Side Hustle");
     expect(suggestions).toContain("Other");
   });
 
-  it("returns 5 total suggestions", () => {
+  it("returns 7 total suggestions", () => {
     const suggestions = getAllIncomeCategorySuggestions();
-    expect(suggestions.length).toBe(5);
+    expect(suggestions.length).toBe(7);
   });
 });
