@@ -6,9 +6,9 @@ import ExpenseEntry, {
 } from "@/components/ExpenseEntry";
 
 describe("ExpenseEntry component", () => {
-  it("renders the Monthly Expenses heading", () => {
+  it("renders the Expenses heading", () => {
     render(<ExpenseEntry />);
-    expect(screen.getByText("Monthly Expenses")).toBeInTheDocument();
+    expect(screen.getByText("Expenses")).toBeInTheDocument();
   });
 
   it("renders mock expense items on load", () => {

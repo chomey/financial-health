@@ -155,7 +155,7 @@ test.describe("Investment contributions in expenses", () => {
 
     // The expense section total should include the contribution
     // Default expenses: $2,200 + $600 + $150 = $2,950 + $1,000 contribution = $3,950
-    const expenseSection = page.locator("section").filter({ hasText: "Monthly Expenses" });
+    const expenseSection = page.locator("section").filter({ hasText: "Expenses" });
     await expect(expenseSection.locator("text=Monthly Total: $3,950")).toBeVisible();
 
     await captureScreenshot(page, "task-35-expense-total-with-contributions");

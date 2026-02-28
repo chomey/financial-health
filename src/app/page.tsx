@@ -205,6 +205,7 @@ export default function Home() {
   const totalInvestmentContributions = assets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   const totalMortgagePayments = properties.reduce((sum, p) => sum + (p.monthlyPayment ?? 0), 0);
   const monthlySurplus = totals.monthlyAfterTaxIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
+  const surplusTargetName = assets.find((a) => a.surplusTarget)?.category ?? assets[0]?.category;
 
   // Summaries for collapsed sections
   const assetTotal = assets.reduce((sum, a) => sum + a.amount, 0);
@@ -259,12 +260,12 @@ export default function Home() {
                 <DebtEntry items={debts} onChange={setDebts} />
               </CollapsibleSection>
 
-<CollapsibleSection title="Monthly Income" icon="💵" summary={formatCurrencySummary(incomeTotal)}>
+<CollapsibleSection title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)}>
                 <IncomeEntry items={income} onChange={setIncome} />
               </CollapsibleSection>
 
-              <CollapsibleSection title="Monthly Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)}>
-                <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} />
+              <CollapsibleSection title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)}>
+                <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} surplusTargetName={surplusTargetName} federalTax={totals.totalFederalTax / 12} provincialStateTax={totals.totalProvincialStateTax / 12} country={country} />
               </CollapsibleSection>
 
               <CollapsibleSection title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"}>

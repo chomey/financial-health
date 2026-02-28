@@ -6,9 +6,9 @@ import IncomeEntry, {
 } from "@/components/IncomeEntry";
 
 describe("IncomeEntry component", () => {
-  it("renders the Monthly Income heading", () => {
+  it("renders the Income heading", () => {
     render(<IncomeEntry />);
-    expect(screen.getByText("Monthly Income")).toBeInTheDocument();
+    expect(screen.getByText("Income")).toBeInTheDocument();
   });
 
   it("renders mock income items on load", () => {

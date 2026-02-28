@@ -40,8 +40,8 @@ describe("App shell layout", () => {
     // Use getAllByText for terms that appear in both entry sections and chart legend
     expect(screen.getAllByText("Assets").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Debts").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("Monthly Income")).toBeInTheDocument();
-    expect(screen.getByText("Monthly Expenses")).toBeInTheDocument();
+    expect(screen.getAllByText("Income").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Expenses").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders all four dashboard metric cards", () => {
