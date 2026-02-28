@@ -95,7 +95,7 @@ test.describe("Projection Chart", () => {
 
   test("projection section has correct aria label", async ({ page }) => {
     await page.goto("/");
-    const section = page.getByRole("region", { name: "Financial projection" });
+    const section = page.getByRole("region", { name: "Financial projection", exact: true });
     await expect(section).toBeVisible();
   });
 });
