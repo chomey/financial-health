@@ -169,7 +169,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
     onChangeRef.current?.(stocks);
   }, [stocks]);
 
-  const [sortBy, setSortBy] = useState<"alpha" | "position">("alpha");
+  const [sortBy, setSortBy] = useState<"alpha" | "position" | "returnPct" | "returnAbs">("alpha");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "ticker" | "shares" | "costBasis" | "purchaseDate" | null
@@ -354,7 +354,16 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   // Sort stocks for display (doesn't mutate source array)
   const sortedStocks = [...stocks].sort((a, b) => {
     if (sortBy === "alpha") return a.ticker.localeCompare(b.ticker);
-    return getStockValue(b) - getStockValue(a); // largest position first
+    if (sortBy === "position") return getStockValue(b) - getStockValue(a);
+    if (sortBy === "returnPct") {
+      const aGL = getStockGainLoss(a);
+      const bGL = getStockGainLoss(b);
+      return (bGL?.percentage ?? -Infinity) - (aGL?.percentage ?? -Infinity);
+    }
+    // returnAbs
+    const aGL = getStockGainLoss(a);
+    const bGL = getStockGainLoss(b);
+    return (bGL?.amount ?? -Infinity) - (aGL?.amount ?? -Infinity);
   });
 
   return (
@@ -367,32 +376,29 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
         {stocks.length > 0 && (
           <div className="flex items-center gap-1">
             <div className="flex rounded-md border border-stone-200 text-[10px]">
-              <button
-                type="button"
-                onClick={() => setSortBy("alpha")}
-                className={`px-1.5 py-0.5 rounded-l-md transition-colors duration-150 ${
-                  sortBy === "alpha"
-                    ? "bg-blue-50 text-blue-700 font-medium"
-                    : "text-stone-400 hover:bg-stone-50"
-                }`}
-                aria-label="Sort alphabetically"
-                aria-pressed={sortBy === "alpha"}
-              >
-                A-Z
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortBy("position")}
-                className={`px-1.5 py-0.5 rounded-r-md transition-colors duration-150 ${
-                  sortBy === "position"
-                    ? "bg-blue-50 text-blue-700 font-medium"
-                    : "text-stone-400 hover:bg-stone-50"
-                }`}
-                aria-label="Sort by position size"
-                aria-pressed={sortBy === "position"}
-              >
-                Size
-              </button>
+              {([
+                ["alpha", "A-Z", "Sort alphabetically"],
+                ["position", "Size", "Sort by position size"],
+                ["returnPct", "Return %", "Sort by return percentage"],
+                ["returnAbs", "Return $", "Sort by return amount"],
+              ] as const).map(([key, label, ariaLabel], i, arr) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSortBy(key)}
+                  className={`px-1.5 py-0.5 transition-colors duration-150 ${
+                    i === 0 ? "rounded-l-md" : ""
+                  } ${i === arr.length - 1 ? "rounded-r-md" : ""} ${
+                    sortBy === key
+                      ? "bg-blue-50 text-blue-700 font-medium"
+                      : "text-stone-400 hover:bg-stone-50"
+                  }`}
+                  aria-label={ariaLabel}
+                  aria-pressed={sortBy === key}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           <button
             type="button"
