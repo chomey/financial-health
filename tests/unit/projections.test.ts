@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { projectFinances, downsamplePoints } from "@/lib/projections";
+import { projectFinances, projectAssets, downsamplePoints } from "@/lib/projections";
 import type { FinancialState } from "@/lib/financial-state";
 
 function makeState(overrides: Partial<FinancialState> = {}): FinancialState {
@@ -24,7 +24,7 @@ describe("projectFinances", () => {
 
   it("projects static net worth when no growth/payments", () => {
     const state = makeState({
-      assets: [{ id: "a1", category: "Savings", amount: 50000 }],
+      assets: [{ id: "a1", category: "Savings", amount: 50000, roi: 0 }],
       debts: [],
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
       expenses: [{ id: "e1", category: "Rent", amount: 5000 }],
@@ -50,7 +50,7 @@ describe("projectFinances", () => {
 
   it("grows assets with monthly contributions", () => {
     const state = makeState({
-      assets: [{ id: "a1", category: "Savings", amount: 0, monthlyContribution: 1000 }],
+      assets: [{ id: "a1", category: "Savings", amount: 0, roi: 0, monthlyContribution: 1000 }],
       income: [{ id: "i1", category: "Salary", amount: 1000 }],
       expenses: [{ id: "e1", category: "Rent", amount: 1000 }],
     });
@@ -147,6 +147,108 @@ describe("projectFinances", () => {
     expect(result.points[0].netWorth).toBe(0);
     expect(result.debtFreeMonth).toBe(0); // no debts = debt free from start
     expect(result.milestones).toHaveLength(0);
+  });
+});
+
+describe("surplus target affects projections", () => {
+  // Two accounts: TFSA (5% default ROI) and Brokerage (7% default ROI)
+  // Income $5000, Expenses $2000 → Surplus = $3000/mo
+  // Switching surplus target between accounts should change net worth projections
+  // because surplus compounds at different rates.
+  const baseAssets = [
+    { id: "a1", category: "TFSA", amount: 10000 },      // 5% default ROI
+    { id: "a2", category: "Brokerage", amount: 10000 },  // 7% default ROI
+  ];
+  const income = [{ id: "i1", category: "Salary", amount: 5000 }];
+  const expenses = [{ id: "e1", category: "Rent", amount: 2000 }];
+
+  it("projectFinances: surplus to higher-ROI account yields higher net worth", () => {
+    const stateToTFSA = makeState({
+      assets: [
+        { ...baseAssets[0], surplusTarget: true },
+        { ...baseAssets[1] },
+      ],
+      income,
+      expenses,
+    });
+    const stateToBrokerage = makeState({
+      assets: [
+        { ...baseAssets[0] },
+        { ...baseAssets[1], surplusTarget: true },
+      ],
+      income,
+      expenses,
+    });
+
+    const resultTFSA = projectFinances(stateToTFSA, 10);
+    const resultBrokerage = projectFinances(stateToBrokerage, 10);
+
+    // After 10 years, surplus compounding at 7% (Brokerage) should beat 5% (TFSA)
+    const nwTFSA = resultTFSA.points[120].netWorth;
+    const nwBrokerage = resultBrokerage.points[120].netWorth;
+
+    // Math: $3000/mo for 120 months at different rates creates meaningful difference
+    // TFSA (5%): monthly rate = 0.4167%. Brokerage (7%): monthly rate = 0.5833%.
+    // The difference should be thousands of dollars over 10 years.
+    expect(nwBrokerage).toBeGreaterThan(nwTFSA);
+    expect(nwBrokerage - nwTFSA).toBeGreaterThan(5000); // meaningful difference
+  });
+
+  it("projectAssets: surplus target changes per-asset milestone values", () => {
+    const surplusToA = projectAssets(
+      [
+        { ...baseAssets[0], surplusTarget: true },
+        { ...baseAssets[1] },
+      ],
+      "moderate",
+      [10],
+      3000 // $3000/mo surplus
+    );
+    const surplusToB = projectAssets(
+      [
+        { ...baseAssets[0] },
+        { ...baseAssets[1], surplusTarget: true },
+      ],
+      "moderate",
+      [10],
+      3000
+    );
+
+    // When surplus goes to A, A's 10yr value should be much higher than when it doesn't
+    const aWithSurplus = surplusToA[0].milestoneValues[0];
+    const aWithoutSurplus = surplusToB[0].milestoneValues[0];
+    expect(aWithSurplus).toBeGreaterThan(aWithoutSurplus);
+    expect(aWithSurplus - aWithoutSurplus).toBeGreaterThan(300000); // ~$3k/mo * 120mo
+
+    // And vice versa for B
+    const bWithSurplus = surplusToB[1].milestoneValues[0];
+    const bWithoutSurplus = surplusToA[1].milestoneValues[0];
+    expect(bWithSurplus).toBeGreaterThan(bWithoutSurplus);
+  });
+
+  it("uses default ROI when roi is undefined", () => {
+    // TFSA has default ROI of 5%. With no explicit roi, projections should use 5%.
+    const state = makeState({
+      assets: [{ id: "a1", category: "TFSA", amount: 10000 }], // no roi set
+      income: [{ id: "i1", category: "Salary", amount: 1000 }],
+      expenses: [{ id: "e1", category: "Rent", amount: 1000 }],
+    });
+    const result = projectFinances(state, 1);
+    // 5% annual = ~0.4167%/mo. After 12 months: 10000 * (1.004167)^12 ≈ 10,512
+    const finalAssets = result.points[12].totalAssets;
+    expect(finalAssets).toBeGreaterThan(10400);
+    expect(finalAssets).toBeLessThan(10600);
+  });
+
+  it("explicit roi: 0 overrides default ROI", () => {
+    const state = makeState({
+      assets: [{ id: "a1", category: "TFSA", amount: 10000, roi: 0 }],
+      income: [{ id: "i1", category: "Salary", amount: 1000 }],
+      expenses: [{ id: "e1", category: "Rent", amount: 1000 }],
+    });
+    const result = projectFinances(state, 1);
+    // roi explicitly 0 → no growth
+    expect(result.points[12].totalAssets).toBe(10000);
   });
 });
 

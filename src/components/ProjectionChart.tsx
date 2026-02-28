@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import type { FinancialState } from "@/lib/financial-state";
+import { computeTotals, type FinancialState } from "@/lib/financial-state";
 import {
   projectFinances,
   downsamplePoints,
@@ -155,11 +155,12 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
     };
   }, [fullProjection, milestoneYears]);
 
-  // Per-asset projections always at 10/20/30 years
-  const assetProjections = useMemo(
-    () => projectAssets(state.assets, scenario, milestoneYears),
-    [state.assets, scenario, milestoneYears]
-  );
+  // Per-asset projections always at 10/20/30 years (includes surplus allocation)
+  const assetProjections = useMemo(() => {
+    const totals = computeTotals(state);
+    const surplus = totals.monthlyIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
+    return projectAssets(state.assets, scenario, milestoneYears, surplus);
+  }, [state, scenario, milestoneYears]);
 
   return (
     <section
