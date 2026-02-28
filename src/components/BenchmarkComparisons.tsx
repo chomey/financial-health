@@ -14,6 +14,7 @@ interface BenchmarkComparisonsProps {
   savingsRate: number;
   emergencyMonths: number;
   debtToIncomeRatio: number;
+  annualIncome?: number;
   onAgeChange: (age: number | undefined) => void;
 }
 
@@ -35,18 +36,20 @@ function formatBarValue(value: number, format: BenchmarkComparison["format"]): s
 }
 
 function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
-  const { metric, userValue, benchmarkValue, format, message, aboveBenchmark } = comparison;
+  const { metric, userValue, benchmarkValue, nationalAverage, format, message, aboveBenchmark } = comparison;
 
   // For debt-to-income, lower is better, so we invert the visual logic
   const isDebtMetric = metric === "Debt-to-Income";
 
-  // Calculate bar widths as percentage of max(user, benchmark)
-  const maxVal = Math.max(Math.abs(userValue), Math.abs(benchmarkValue), 0.01);
+  // Calculate bar widths as percentage of max(user, benchmark, nationalAverage)
+  const maxVal = Math.max(Math.abs(userValue), Math.abs(benchmarkValue), Math.abs(nationalAverage), 0.01);
   const userWidth = Math.max((Math.abs(userValue) / maxVal) * 100, 2);
   const benchmarkWidth = Math.max((Math.abs(benchmarkValue) / maxVal) * 100, 2);
+  const nationalWidth = Math.max((Math.abs(nationalAverage) / maxVal) * 100, 2);
 
   const userColor = aboveBenchmark ? "bg-emerald-500" : "bg-blue-400";
   const benchmarkColor = "bg-stone-300";
+  const nationalColor = "bg-amber-300";
 
   return (
     <div className="space-y-2" data-testid={`benchmark-${metric.toLowerCase().replace(/\s+/g, "-")}`}>
@@ -62,7 +65,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
       {/* User bar */}
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-stone-500 w-12 shrink-0">You</span>
+          <span className="text-xs text-stone-500 w-14 shrink-0">You</span>
           <div className="flex-1 h-5 bg-stone-100 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${userColor}`}
@@ -76,7 +79,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
 
         {/* Benchmark bar */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-stone-500 w-12 shrink-0">Median</span>
+          <span className="text-xs text-stone-500 w-14 shrink-0">Median</span>
           <div className="flex-1 h-5 bg-stone-100 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${benchmarkColor}`}
@@ -85,6 +88,20 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
           </div>
           <span className="text-xs font-medium text-stone-500 w-16 text-right shrink-0">
             {formatBarValue(benchmarkValue, format)}
+          </span>
+        </div>
+
+        {/* National average bar */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-stone-500 w-14 shrink-0">Nat&apos;l Avg</span>
+          <div className="flex-1 h-5 bg-stone-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${nationalColor}`}
+              style={{ width: `${nationalWidth}%` }}
+            />
+          </div>
+          <span className="text-xs font-medium text-amber-600 w-16 text-right shrink-0">
+            {formatBarValue(nationalAverage, format)}
           </span>
         </div>
       </div>
@@ -101,6 +118,7 @@ export default function BenchmarkComparisons({
   savingsRate,
   emergencyMonths,
   debtToIncomeRatio,
+  annualIncome,
   onAgeChange,
 }: BenchmarkComparisonsProps) {
   const [showInfo, setShowInfo] = useState(false);
@@ -108,7 +126,7 @@ export default function BenchmarkComparisons({
   const [ageInput, setAgeInput] = useState(age?.toString() ?? "");
 
   const comparisons = age
-    ? computeBenchmarkComparisons(age, country, netWorth, savingsRate, emergencyMonths, debtToIncomeRatio)
+    ? computeBenchmarkComparisons(age, country, netWorth, savingsRate, emergencyMonths, debtToIncomeRatio, annualIncome)
     : [];
 
   const handleAgeSubmit = () => {
