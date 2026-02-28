@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 55
-- **Completed**: 52
-- **Remaining**: 3
+- **Completed**: 53
+- **Remaining**: 2
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1249,3 +1249,21 @@
   ![Age persisted after reload](screenshots/task-52-benchmark-url-persistence.png)
   ![US benchmarks after country switch](screenshots/task-52-benchmark-us-sources.png)
 - **Notes**: Benchmarks are approximate medians from published statistical surveys. All comparison messages use encouraging, non-judgmental framing — gaps are framed as opportunities ("you're building toward it") not failures. The age field is optional and stored in URL state for persistence. The info button shows data source citations. Switching country updates both the benchmark values and the source citation.
+
+## Task 53: Build cash flow Sankey diagram
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `package.json`: Added d3-sankey and @types/d3-sankey dependencies
+  - `src/lib/sankey-data.ts`: **New** — Transforms financial state into Sankey diagram nodes and links. Builds flow from income sources → taxes + after-tax pool → expenses, investments, mortgage, and surplus. Exports `buildSankeyData()`, `SANKEY_COLORS`, and TypeScript interfaces (`SankeyNode`, `SankeyLink`, `SankeyData`, `CashFlowInput`). Handles proportional tax allocation across multiple income sources, weekly/biweekly/quarterly income normalization, and zero-amount filtering.
+  - `src/components/CashFlowSankey.tsx`: **New** — Collapsible "Cash Flow" section with SVG Sankey diagram using d3-sankey layout engine. Features: gradient-colored flow paths between nodes, interactive hover highlighting (hovering a node or link dims unrelated flows), tooltip showing source → target and amount on hover, labeled nodes (income sources on left, expenses/investments/surplus on right), legend with colored dots for each flow category (Income, Taxes, Expenses, Investments, Surplus). Collapsed by default.
+  - `src/app/page.tsx`: Integrated CashFlowSankey into the dashboard column, positioned between NetWorthWaterfallChart and BenchmarkComparisons. Passes income, expenses, investment contributions, mortgage payments, monthly tax amounts, and surplus.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/sankey-data.test.ts`: 16 tests — empty income, zero-amount income, income node creation, tax node presence/absence, after-tax pool value, expense nodes, investment node, mortgage node, surplus calculation, proportional tax links, after-tax destination links, weekly income normalization, zero-expense filtering, SANKEY_COLORS completeness (16 passed, 0 failed)
+  - `tests/e2e/cash-flow-sankey.spec.ts`: 7 tests — collapsed by default, expand/collapse toggle, SVG node labels (Salary, Rent), tooltip on hover, legend categories, dashboard column positioning (7 passed, 0 failed)
+  - All unit tests: 659 passed, 0 failed
+- **Screenshots**:
+  ![Sankey diagram expanded](screenshots/task-53-sankey-expanded.png)
+  ![Sankey tooltip on hover](screenshots/task-53-sankey-tooltip.png)
+- **Notes**: Used d3-sankey with a thin React SVG wrapper instead of @nivo/sankey to keep the bundle lightweight and maintain full control over styling. The diagram shows money flowing from income sources through taxes to expenses, investments, and surplus. Flow paths use gradient colors transitioning from source to target node color. The component is collapsible to avoid cluttering the dashboard. Tax allocation is proportional to income source amounts when multiple income sources exist.
