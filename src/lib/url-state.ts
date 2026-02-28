@@ -1,4 +1,5 @@
 import type { FinancialState } from "@/lib/financial-state";
+import { deflate, inflate } from "pako";
 
 // ASCII85 (base85) encoding/decoding for compact URL state
 // Encodes binary data using printable ASCII characters (33-117), ~20% smaller than base64
@@ -242,16 +243,31 @@ function fromCompact(compact: CompactState): FinancialState {
 export function encodeState(state: FinancialState): string {
   const compact = toCompact(state);
   const json = JSON.stringify(compact);
-  const encoder = new TextEncoder();
-  const bytes = encoder.encode(json);
-  return encode85(bytes);
+  const raw = new TextEncoder().encode(json);
+
+  // Deflate compress, then prepend version byte 0x01
+  const compressed = deflate(raw);
+  const versioned = new Uint8Array(compressed.length + 1);
+  versioned[0] = 0x01;
+  versioned.set(compressed, 1);
+
+  return encode85(versioned);
 }
 
 export function decodeState(encoded: string): FinancialState | null {
   try {
-    const bytes = decode85(encoded);
-    const decoder = new TextDecoder();
-    const json = decoder.decode(bytes);
+    const raw = decode85(encoded);
+    let bytes: Uint8Array;
+
+    if (raw[0] === 0x01) {
+      // Version 1: deflate-compressed
+      bytes = inflate(raw.slice(1));
+    } else {
+      // Legacy: uncompressed (first byte is '{' = 0x7b)
+      bytes = raw;
+    }
+
+    const json = new TextDecoder().decode(bytes);
     const compact = JSON.parse(json) as CompactState;
 
     // Validate structure
