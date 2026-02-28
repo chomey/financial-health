@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 33
-- **Completed**: 30
-- **Remaining**: 3
+- **Completed**: 31
+- **Remaining**: 2
 - **Last Updated**: 2026-02-27
 
 ---
@@ -817,3 +817,45 @@
   ![Frequency persists after reload](screenshots/task-30-frequency-persists-reload.png)
   ![Dashboard updates with frequency](screenshots/task-30-dashboard-updates-with-frequency.png)
 - **Notes**: The `normalizeToMonthly()` function is exported from `IncomeEntry.tsx` and also imported by `financial-state.ts` for `computeTotals()`. All downstream consumers (projections, insights, dashboard metrics) benefit from the normalization since they flow through `computeTotals()`. Frequency defaults to "monthly" when undefined, ensuring backward compatibility with existing saved URLs.
+
+## Task 31: Remove region toggle, add account-type subdivisions to asset/debt dropdowns
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/RegionToggle.tsx`: **Deleted** — removed the CA/US/Both toggle component entirely
+  - `src/lib/financial-state.ts`: Removed `Region` type export and `region` field from `FinancialState` interface and `INITIAL_STATE`
+  - `src/lib/url-state.ts`: Removed region encoding (`compact.r`) and decoding (`region: compact.r || "both"`) from URL state
+  - `src/components/AssetEntry.tsx`: Removed `region` prop, removed `isOutOfRegion()` function, simplified `getAllCategorySuggestions()` and `getGroupedCategorySuggestions()` to always return all three groups (Canada/USA/General) without filtering, removed out-of-region dimming and badges
+  - `src/components/DebtEntry.tsx`: Same changes as AssetEntry — removed `region` prop, `isDebtOutOfRegion()`, simplified suggestion functions, removed dimming and badges
+  - `src/app/page.tsx`: Removed `RegionToggle` import/rendering, removed `region`/`regionPulse`/`regionInitialized` state variables, removed `handleRegionChange` handler, removed region from URL update and state object, removed pulse animation wrappers around AssetEntry/DebtEntry
+  - `src/app/globals.css`: Removed `@keyframes region-pulse` and `.animate-region-pulse` CSS
+  - `tests/unit/region-toggle.test.tsx`: **Deleted**
+  - `tests/unit/region-toggle-ux.test.tsx`: **Deleted**
+  - `tests/unit/region-visible.test.tsx`: **Deleted**
+  - `tests/e2e/region-toggle.spec.ts`: **Deleted**
+  - `tests/e2e/region-toggle-ux.spec.ts`: **Deleted**
+  - `tests/e2e/region-visible.spec.ts`: **Deleted**
+  - `tests/unit/url-state.test.ts`: Removed `region: "both"` from state objects
+  - `tests/unit/projections.test.ts`: Removed `region: "both"` from state objects
+  - `tests/unit/income-frequency.test.tsx`: Removed `region: "both"` from state objects
+  - `tests/unit/debt-interest.test.tsx`: Removed `region: "both"` from state objects
+  - `tests/unit/asset-roi.test.tsx`: Removed `region: "both"` from state objects
+  - `tests/unit/mobile-responsive.test.tsx`: Removed RegionToggle import and touch target test
+  - `tests/unit/milestone-e2e-infra.test.ts`: Removed `region-toggle.spec.ts` from expected file list
+  - `tests/e2e/milestone-e2e.spec.ts`: Removed region toggle test step and region persistence test
+  - `tests/e2e/milestone-2-e2e.spec.ts`: Removed region toggle visibility test step, updated group header expectations to "Canada"/"USA"
+  - `tests/e2e/micro-interactions.spec.ts`: Removed region toggle active:scale-95 test
+  - `tests/e2e/mobile-responsive.spec.ts`: Removed region toggle visibility check
+  - `tests/unit/grouped-dropdowns.test.ts`: **New** — 14 unit tests for grouped asset/debt suggestions
+  - `tests/e2e/grouped-dropdowns.spec.ts`: **New** — 5 E2E tests for grouped dropdowns in browser
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/grouped-dropdowns.test.ts`: 14 tests — verifies grouped suggestion functions return Canada/USA/General groups with correct items, flag emojis, category sets, and URL state without region (14 passed, 0 failed)
+  - `tests/e2e/grouped-dropdowns.spec.ts`: 5 tests — verifies region toggle absent, asset/debt dropdowns show three groups, category selection works, no dimming/badges (5 passed, 0 failed)
+  - All existing tests: 383 unit tests passed, 153 E2E tests passed
+- **Screenshots**:
+  ![Asset grouped dropdown](screenshots/task-31-asset-grouped-dropdown.png)
+  ![Debt grouped dropdown](screenshots/task-31-debt-grouped-dropdown.png)
+  ![Category selected from group](screenshots/task-31-category-selected.png)
+  ![No dimming on items](screenshots/task-31-no-dimming.png)
+- **Notes**: The grouped suggestion dropdown headers changed from "🇨🇦 Canadian" / "🇺🇸 US" to "🇨🇦 Canada" / "🇺🇸 USA" for consistency. Flag emojis (🇨🇦/🇺🇸) still appear next to region-specific categories in the suggestion list and inline display via `getAssetCategoryFlag()` / `getDebtCategoryFlag()`. Old URLs with `r=CA` or `r=US` encoded will still decode correctly since `fromCompact()` simply ignores the unknown `r` field now.

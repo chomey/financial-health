@@ -123,7 +123,6 @@ describe("URL state roundtrip with frequency", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
 
     const encoded = encodeState(state);
@@ -142,7 +141,6 @@ describe("URL state roundtrip with frequency", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
 
     const encoded = encodeState(state);
@@ -164,7 +162,6 @@ describe("computeTotals with frequency", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
 
     const totals = computeTotals(state);
@@ -183,7 +180,6 @@ describe("computeTotals with frequency", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
 
     const totals = computeTotals(state);

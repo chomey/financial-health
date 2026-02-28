@@ -127,7 +127,6 @@ describe("URL state encoding with debt interest and payment", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);
@@ -143,7 +142,6 @@ describe("URL state encoding with debt interest and payment", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);
@@ -159,7 +157,6 @@ describe("URL state encoding with debt interest and payment", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);
@@ -176,7 +173,6 @@ describe("URL state encoding with debt interest and payment", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const compact = toCompact(state);
     expect(compact.d[0]).toEqual({ c: "Car Loan", a: 15000 });
@@ -192,7 +188,6 @@ describe("URL state encoding with debt interest and payment", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const compact = toCompact(state);
     expect(compact.d[0].ir).toBe(19.9);
@@ -286,7 +281,6 @@ describe("Insights with debt interest rates", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const data = toFinancialData(state);
     expect(data.debts).toHaveLength(1);

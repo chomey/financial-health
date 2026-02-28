@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
-  test("full financial snapshot lifecycle: add data, verify metrics, copy URL, reload, region toggle", async ({
+  test("full financial snapshot lifecycle: add data, verify metrics, copy URL, reload", async ({
     page,
     context,
   }) => {
@@ -292,91 +292,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
 
     await captureScreenshot(page, "task-15-after-reload");
 
-    // ========================================
-    // Step 9: Toggle region and verify category suggestions change
-    // ========================================
-    const toggle = page.getByRole("radiogroup", {
-      name: /Filter account types by region/i,
-    });
-
-    // Switch to CA
-    await toggle.getByRole("radio", { name: /CA/i }).click();
-    await expect(
-      toggle.getByRole("radio", { name: /CA/i })
-    ).toHaveAttribute("aria-checked", "true");
-
-    // Open add asset form and verify CA suggestions
-    await page.getByText("+ Add Asset").click();
-    const categoryInput = page.getByLabel("New asset category");
-    await categoryInput.focus();
-
-    // CA should show RRSP but not 401k
-    const addRow = page.locator(".animate-in");
-    const suggestionButtons = addRow.getByRole("button");
-    const caTexts = await suggestionButtons.allTextContents();
-    expect(caTexts.some(t => t.includes("RRSP"))).toBe(true);
-    expect(caTexts.some(t => t.includes("TFSA"))).toBe(true);
-    expect(caTexts.some(t => t.includes("401k"))).toBe(false);
-    expect(caTexts.some(t => t.includes("Roth IRA"))).toBe(false);
-
-    await captureScreenshot(page, "task-15-ca-suggestions");
-
-    // Cancel the add form by pressing Escape
-    await categoryInput.press("Escape");
-
-    // Switch to US
-    await toggle.getByRole("radio", { name: /US/i }).click();
-    await expect(
-      toggle.getByRole("radio", { name: /US/i })
-    ).toHaveAttribute("aria-checked", "true");
-
-    // Open add asset form and verify US suggestions
-    await page.getByText("+ Add Asset").click();
-    const categoryInputUS = page.getByLabel("New asset category");
-    await categoryInputUS.focus();
-
-    const addRowUS = page.locator(".animate-in");
-    const usButtons = addRowUS.getByRole("button");
-    const usTexts = await usButtons.allTextContents();
-    expect(usTexts.some(t => t.includes("401k"))).toBe(true);
-    expect(usTexts.some(t => t.includes("Roth IRA"))).toBe(true);
-    expect(usTexts.some(t => t.includes("RRSP"))).toBe(false);
-    expect(usTexts.some(t => t.includes("TFSA"))).toBe(false);
-
-    await captureScreenshot(page, "task-15-us-suggestions");
-
-    // Switch back to Both
-    await toggle.getByRole("radio", { name: /Both/i }).click();
-
     await captureScreenshot(page, "task-15-final-state");
-  });
-
-  test("region selection persists across reload during full workflow", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await page.waitForSelector('[data-testid="snapshot-dashboard"]');
-
-    // Switch to US region
-    const toggle = page.getByRole("radiogroup", {
-      name: /Filter account types by region/i,
-    });
-    await toggle.getByRole("radio", { name: /US/i }).click();
-
-    // Wait for URL to update with region
-    await page.waitForTimeout(1000);
-
-    // Reload
-    const regionUrl = page.url();
-    await page.goto(regionUrl);
-
-    // Verify US is still selected
-    const toggleAfterReload = page.getByRole("radiogroup", {
-      name: /Filter account types by region/i,
-    });
-    await expect(
-      toggleAfterReload.getByRole("radio", { name: /US/i })
-    ).toHaveAttribute("aria-checked", "true");
   });
 
   test("editing inline values persists across reload", async ({ page }) => {

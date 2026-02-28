@@ -11,10 +11,7 @@ test.describe("Mobile responsiveness — 375px viewport", () => {
     // Title should be visible
     await expect(page.locator("h1")).toContainText("Financial Health Snapshot");
 
-    // Region toggle and Copy Link button should be accessible
-    const regionToggle = page.getByRole("radiogroup", { name: "Filter account types by region" });
-    await expect(regionToggle).toBeVisible();
-
+    // Copy Link button should be accessible
     const copyButton = page.getByRole("button", { name: "Copy link to clipboard" });
     await expect(copyButton).toBeVisible();
 

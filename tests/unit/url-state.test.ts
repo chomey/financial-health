@@ -157,7 +157,6 @@ describe("encodeState / decodeState", () => {
       properties: [
         { id: "p1", name: "Home", value: 450000, mortgage: 280000, interestRate: 4.5, monthlyPayment: 1550, amortizationYears: 20 },
       ],
-      region: "both",
     };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);
@@ -177,7 +176,6 @@ describe("encodeState / decodeState", () => {
       properties: [
         { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
       ],
-      region: "both",
     };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);

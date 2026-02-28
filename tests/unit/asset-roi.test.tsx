@@ -133,7 +133,6 @@ describe("URL state encoding with ROI and contributions", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);
@@ -149,7 +148,6 @@ describe("URL state encoding with ROI and contributions", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);
@@ -165,7 +163,6 @@ describe("URL state encoding with ROI and contributions", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);
@@ -182,7 +179,6 @@ describe("URL state encoding with ROI and contributions", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const compact = toCompact(state);
     expect(compact.a[0]).toEqual({ c: "TFSA", a: 35000 });
@@ -198,7 +194,6 @@ describe("URL state encoding with ROI and contributions", () => {
       expenses: [],
       goals: [],
       properties: [],
-      region: "both",
     };
     const compact = toCompact(state);
     expect(compact.a[0].r).toBe(7);

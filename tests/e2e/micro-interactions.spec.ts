@@ -109,12 +109,4 @@ test.describe("Micro-interactions and polish", () => {
     await captureScreenshot(page, "task-13-animate-in-form");
   });
 
-  test("region toggle has active:scale-95", async ({ page }) => {
-    await page.goto("/");
-
-    const caButton = page.getByRole("radio", { name: /CA/ });
-    await expect(caButton).toBeVisible();
-    const className = await caButton.getAttribute("class");
-    expect(className).toContain("active:scale-95");
-  });
 });

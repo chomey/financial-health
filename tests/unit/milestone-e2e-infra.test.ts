@@ -43,7 +43,7 @@ describe("Milestone E2E infrastructure verification", () => {
       "shared-state.spec.ts",
       "full-e2e.spec.ts",
       "url-state.spec.ts",
-      "region-toggle.spec.ts",
+
       "micro-interactions.spec.ts",
       "mobile-responsive.spec.ts",
       "milestone-e2e.spec.ts",

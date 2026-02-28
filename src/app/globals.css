@@ -143,22 +143,3 @@ body {
   animation: fade-in 0.15s ease-out;
 }
 
-/* Brief border pulse when region changes */
-@keyframes region-pulse {
-  0% {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4);
-  }
-  50% {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.1);
-  }
-  100% {
-    border-color: #e7e5e4;
-    box-shadow: none;
-  }
-}
-
-.animate-region-pulse {
-  animation: region-pulse 0.6s ease-out;
-}

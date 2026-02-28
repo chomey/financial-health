@@ -132,7 +132,6 @@ interface CompactState {
   e: CompactExpense[];
   g: CompactGoal[];
   p?: CompactProperty[]; // properties (optional for backward compat)
-  r?: string; // region: "CA" | "US" | "both"
 }
 
 function toCompact(state: FinancialState): CompactState {
@@ -167,15 +166,11 @@ function toCompact(state: FinancialState): CompactState {
       return cp;
     });
   }
-  if (state.region && state.region !== "both") {
-    compact.r = state.region;
-  }
   return compact;
 }
 
 function fromCompact(compact: CompactState): FinancialState {
   return {
-    region: (compact.r as FinancialState["region"]) || "both",
     assets: compact.a.map((x, i) => {
       const asset: { id: string; category: string; amount: number; roi?: number; monthlyContribution?: number } = { id: `a${i + 1}`, category: x.c, amount: x.a };
       if (x.r !== undefined) asset.roi = x.r;

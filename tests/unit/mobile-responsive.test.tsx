@@ -6,7 +6,7 @@ import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import GoalEntry from "@/components/GoalEntry";
-import RegionToggle from "@/components/RegionToggle";
+
 import SnapshotDashboard from "@/components/SnapshotDashboard";
 
 describe("Mobile responsiveness — touch targets and layout", () => {
@@ -88,16 +88,6 @@ describe("Mobile responsiveness — touch targets and layout", () => {
       const savedButtons = screen.getAllByLabelText(/^Edit saved amount for /);
       const targetButtons = screen.getAllByLabelText(/^Edit target amount for /);
       [...savedButtons, ...targetButtons].forEach((btn) => {
-        expect(btn.className).toContain("min-h-[44px]");
-      });
-    });
-  });
-
-  describe("RegionToggle touch targets", () => {
-    it("region toggle buttons have min-h-[44px]", () => {
-      render(<RegionToggle region="both" onChange={() => {}} />);
-      const buttons = screen.getAllByRole("radio");
-      buttons.forEach((btn) => {
         expect(btn.className).toContain("min-h-[44px]");
       });
     });

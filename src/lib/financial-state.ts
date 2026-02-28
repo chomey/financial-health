@@ -8,8 +8,6 @@ import type { Property } from "@/components/PropertyEntry";
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
 
-export type Region = "CA" | "US" | "both";
-
 export interface FinancialState {
   assets: Asset[];
   debts: Debt[];
@@ -17,11 +15,9 @@ export interface FinancialState {
   expenses: ExpenseItem[];
   goals: Goal[];
   properties: Property[];
-  region: Region;
 }
 
 export const INITIAL_STATE: FinancialState = {
-  region: "both" as Region,
   assets: [
     { id: "a1", category: "Savings Account", amount: 12000 },
     { id: "a2", category: "TFSA", amount: 35000 },
