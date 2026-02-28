@@ -77,7 +77,7 @@ export function projectFinances(
 
   const points: ProjectionPoint[] = [];
   const milestones: Milestone[] = [];
-  const milestoneThresholds = [100_000, 250_000, 500_000, 1_000_000, 2_500_000, 5_000_000];
+  const milestoneThresholds = [100_000, 250_000, 500_000, 1_000_000, 2_500_000, 5_000_000, 10_000_000];
   const passedMilestones = new Set<number>();
   let debtFreeMonth: number | null = null;
   let consumerDebtFreeMonth: number | null = null;
