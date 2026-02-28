@@ -621,9 +621,11 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                   {gainLoss && (
                     <span
                       className={`rounded px-1.5 py-0.5 text-xs font-medium ${
-                        gainLoss.amount >= 0
+                        gainLoss.amount > 0
                           ? "bg-green-50 text-green-600"
-                          : "bg-rose-50 text-rose-600"
+                          : gainLoss.amount < 0
+                            ? "bg-rose-50 text-rose-600"
+                            : "bg-stone-50 text-stone-500"
                       }`}
                       data-testid={`gain-loss-${stock.id}`}
                     >
@@ -637,9 +639,11 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                   {annualizedReturn !== null && (
                     <span
                       className={`rounded px-1.5 py-0.5 text-xs font-medium ${
-                        annualizedReturn >= 0
+                        annualizedReturn > 0
                           ? "bg-emerald-50 text-emerald-600"
-                          : "bg-rose-50 text-rose-600"
+                          : annualizedReturn < 0
+                            ? "bg-rose-50 text-rose-600"
+                            : "bg-stone-50 text-stone-500"
                       }`}
                       data-testid={`annualized-return-${stock.id}`}
                     >
