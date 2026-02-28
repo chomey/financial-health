@@ -14,6 +14,8 @@ export interface FinancialData {
   monthlyExpenses: number;
   /** Raw monthly expenses without investment contributions. Used for runway to match metric card. */
   rawMonthlyExpenses?: number;
+  /** Monthly mortgage payments. Included in runway obligations alongside expenses. */
+  monthlyMortgagePayments?: number;
   /** Individual debt details for interest-based insights */
   debts?: DebtDetail[];
   /** Effective tax rate (0-1) for tax insights */
@@ -43,7 +45,8 @@ export function generateInsights(data: FinancialData): Insight[] {
   // Use raw expenses (not including investment contributions) to match the metric card
   const runwayAssets = data.liquidAssets ?? totalAssets;
   const rawExpenses = data.rawMonthlyExpenses ?? monthlyExpenses;
-  const runway = rawExpenses > 0 ? runwayAssets / rawExpenses : 0;
+  const monthlyObligations = rawExpenses + (data.monthlyMortgagePayments ?? 0);
+  const runway = monthlyObligations > 0 ? runwayAssets / monthlyObligations : 0;
   // Savings rate includes both surplus AND investment contributions (which are a form of saving)
   const totalSavings = monthlyIncome - rawExpenses;
   const savingsRate = monthlyIncome > 0 ? (totalSavings / monthlyIncome) * 100 : 0;
@@ -55,7 +58,7 @@ export function generateInsights(data: FinancialData): Insight[] {
       insights.push({
         id: "runway-strong",
         type: "runway",
-        message: `That's about ${(months / 12).toFixed(1)} years of expenses covered — a strong safety net.`,
+        message: `That's about ${months} months of expenses covered — a strong safety net.`,
         icon: "🛡️",
       });
     } else if (months >= 3) {
@@ -222,7 +225,7 @@ export function generateInsights(data: FinancialData): Insight[] {
     insights.push({
       id: "networth-positive",
       type: "net-worth",
-      message: `Your net worth is positive — your assets outweigh your debts.`,
+      message: `Your net worth is ${formatCurrency(netWorth)} — positive and growing.`,
       icon: "💰",
     });
   } else if (netWorth < 0 && totalAssets > 0) {
