@@ -18,11 +18,13 @@ export interface FinancialState {
   goals: Goal[];
   properties: Property[];
   stocks: StockHolding[];
+  country?: "CA" | "US";
+  jurisdiction?: string;
 }
 
 export const INITIAL_STATE: FinancialState = {
   assets: [
-    { id: "a1", category: "Savings Account", amount: 12000 },
+    { id: "a1", category: "Savings Account", amount: 12000, surplusTarget: true },
     { id: "a2", category: "TFSA", amount: 35000 },
     { id: "a3", category: "Brokerage", amount: 18500 },
   ],
@@ -47,6 +49,8 @@ export const INITIAL_STATE: FinancialState = {
     { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
   ],
   stocks: [],
+  country: "CA",
+  jurisdiction: "ON",
 };
 
 export function computeTotals(state: FinancialState) {
@@ -97,8 +101,12 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   if (totalDebts > 0) nwParts.push(`- ${fmtShort(totalDebts)} debts`);
   const netWorthBreakdown = nwParts.length > 0 ? nwParts.join(" + ").replace("+ -", "- ") : undefined;
 
+  const surplusTargetName = state.assets.find((a) => a.surplusTarget)?.category ?? state.assets[0]?.category;
+
   const totalExp = monthlyExpenses + totalMonthlyContributions;
-  const surplusBreakdown = `${fmtShort(monthlyIncome)} income - ${fmtShort(totalExp)} expenses`;
+  const surplusBreakdown = surplus > 0 && surplusTargetName
+    ? `${fmtShort(monthlyIncome)} income - ${fmtShort(totalExp)} expenses → going to ${surplusTargetName}`
+    : `${fmtShort(monthlyIncome)} income - ${fmtShort(totalExp)} expenses`;
 
   const runwayBreakdown = monthlyExpenses > 0
     ? `${fmtShort(liquidTotal)} liquid / ${fmtShort(monthlyExpenses)}/mo expenses`
