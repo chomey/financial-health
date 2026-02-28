@@ -16,6 +16,7 @@ import NetWorthWaterfallChart from "@/components/NetWorthWaterfallChart";
 import FastForwardPanel from "@/components/FastForwardPanel";
 import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import CashFlowSankey from "@/components/CashFlowSankey";
+import InsightsPanel from "@/components/InsightsPanel";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -227,7 +228,8 @@ export default function Home() {
 
   // Benchmark comparison values
   const benchmarkNetWorth = totals.totalAssets + totals.totalStocks + totals.totalPropertyEquity - totals.totalDebts;
-  const benchmarkSavingsRate = totals.monthlyAfterTaxIncome > 0 ? monthlySurplus / totals.monthlyAfterTaxIncome : 0;
+  // Savings rate includes surplus + investment contributions (which are a form of saving)
+  const benchmarkSavingsRate = totals.monthlyAfterTaxIncome > 0 ? (monthlySurplus + totals.totalMonthlyContributions) / totals.monthlyAfterTaxIncome : 0;
   const benchmarkEmergencyMonths = totals.monthlyExpenses > 0 ? (totals.totalAssets + totals.totalStocks) / totals.monthlyExpenses : 0;
   const annualIncome = totals.monthlyIncome * 12;
   const benchmarkDebtToIncome = annualIncome > 0 ? (debtTotal + totals.totalPropertyMortgage) / annualIncome : 0;
@@ -258,9 +260,9 @@ export default function Home() {
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
         {/* Projection Chart — full-width above the two-column layout */}
-        <section className="mb-8 space-y-4" aria-label="Financial projections">
+        <section className="mb-6 space-y-4" aria-label="Financial projections">
           <ProjectionChart state={state} />
-          <FastForwardPanel state={state} />
+          <InsightsPanel data={financialData} />
         </section>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -380,6 +382,11 @@ export default function Home() {
             </div>
           </section>
         </div>
+
+        {/* What If scenario panel — full-width at the bottom */}
+        <section className="mt-8" aria-label="Scenario modeling">
+          <FastForwardPanel state={state} />
+        </section>
       </main>
     </div>
   );
