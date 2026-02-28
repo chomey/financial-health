@@ -19,10 +19,9 @@ describe("InsightsPanel", () => {
 
   it("renders icons for each insight", () => {
     render(<InsightsPanel />);
-    // Check that shield, chart, star, target, and money icons appear
+    // Check that shield, chart, and money icons appear
     expect(screen.getByText("🛡️")).toBeInTheDocument();
     expect(screen.getByText("📈")).toBeInTheDocument();
-    expect(screen.getByText("🎯")).toBeInTheDocument();
     expect(screen.getByText("💰")).toBeInTheDocument();
   });
 
@@ -43,7 +42,6 @@ describe("InsightsPanel", () => {
       totalDebts: 0,
       monthlyIncome: 0,
       monthlyExpenses: 0,
-      goals: [],
     };
     const { container } = render(<InsightsPanel data={emptyData} />);
     expect(container.firstChild).toBeNull();
@@ -55,10 +53,8 @@ describe("InsightsPanel", () => {
       totalDebts: 100000,
       monthlyIncome: 10000,
       monthlyExpenses: 4000,
-      goals: [{ name: "Dream Home", target: 200000, current: 150000 }],
     };
     render(<InsightsPanel data={customData} />);
-    expect(screen.getByText(/Dream Home/)).toBeInTheDocument();
     expect(screen.getByText(/\$400,000/)).toBeInTheDocument();
   });
 });

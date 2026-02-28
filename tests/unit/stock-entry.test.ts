@@ -81,7 +81,7 @@ function makeState(overrides: Partial<FinancialState> = {}): FinancialState {
     debts: [],
     income: [],
     expenses: [],
-    goals: [],
+
     properties: [],
     stocks: [],
     ...overrides,
@@ -198,7 +198,7 @@ describe("URL state encoding with stocks", () => {
       d: [],
       i: [],
       e: [],
-      g: [],
+
       st: [
         { t: "GOOG", s: 3 },
       ],

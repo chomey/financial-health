@@ -6,11 +6,6 @@ const mockData: FinancialData = {
   totalDebts: 295000,
   monthlyIncome: 6300,
   monthlyExpenses: 2950,
-  goals: [
-    { name: "Rainy Day Fund", target: 20000, current: 14500 },
-    { name: "New Car", target: 42000, current: 13500 },
-    { name: "Vacation", target: 6500, current: 6200 },
-  ],
 };
 
 describe("generateInsights", () => {
@@ -122,39 +117,6 @@ describe("generateInsights", () => {
     expect(rate!.message).toContain("healthy habit");
   });
 
-  it("generates a goal insight for the most complete goal (Vacation 95%)", () => {
-    const insights = generateInsights(mockData);
-    const goal = insights.find((i) => i.type === "goal");
-    expect(goal).toBeDefined();
-    expect(goal!.message).toContain("Vacation");
-    expect(goal!.message).toContain("95%");
-    expect(goal!.icon).toBe("🎯");
-  });
-
-  it("generates a reached goal insight when a goal is 100%", () => {
-    const data: FinancialData = {
-      ...mockData,
-      goals: [{ name: "Emergency Fund", target: 10000, current: 10000 }],
-    };
-    const insights = generateInsights(data);
-    const goal = insights.find((i) => i.type === "goal");
-    expect(goal).toBeDefined();
-    expect(goal!.message).toContain("Congratulations");
-    expect(goal!.message).toContain("Emergency Fund");
-  });
-
-  it("generates a started goal insight when under 50%", () => {
-    const data: FinancialData = {
-      ...mockData,
-      goals: [{ name: "House", target: 100000, current: 5000 }],
-    };
-    const insights = generateInsights(data);
-    const goal = insights.find((i) => i.type === "goal");
-    expect(goal).toBeDefined();
-    expect(goal!.message).toContain("House");
-    expect(goal!.message).toContain("$100,000");
-  });
-
   it("generates a net worth insight when debts exceed assets", () => {
     const insights = generateInsights(mockData);
     const nw = insights.find((i) => i.type === "net-worth");
@@ -182,7 +144,6 @@ describe("generateInsights", () => {
       totalDebts: 0,
       monthlyIncome: 0,
       monthlyExpenses: 0,
-      goals: [],
     };
     const insights = generateInsights(data);
     expect(insights).toEqual([]);

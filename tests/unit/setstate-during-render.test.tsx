@@ -5,8 +5,6 @@ import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
-import GoalEntry from "@/components/GoalEntry";
-
 describe("setState-during-render fix", () => {
   describe("AssetEntry", () => {
     it("calls onChange after adding an asset (via useEffect, not during render)", async () => {
@@ -140,28 +138,4 @@ describe("setState-during-render fix", () => {
     });
   });
 
-  describe("GoalEntry", () => {
-    it("calls onChange after adding a goal", async () => {
-      const onChange = vi.fn();
-      const user = userEvent.setup();
-      render(<GoalEntry items={[]} onChange={onChange} />);
-
-      await user.click(screen.getByText("+ Add Goal"));
-      await user.type(screen.getByLabelText("New goal name"), "Vacation");
-      await user.type(screen.getByLabelText("New goal target amount"), "5000");
-      await user.type(screen.getByLabelText("New goal current amount"), "1000");
-      await user.click(screen.getByLabelText("Confirm add goal"));
-
-      expect(onChange).toHaveBeenCalled();
-      const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0];
-      expect(lastCall).toHaveLength(1);
-      expect(lastCall[0].name).toBe("Vacation");
-    });
-
-    it("does not call onChange on initial mount", () => {
-      const onChange = vi.fn();
-      render(<GoalEntry items={[{ id: "1", name: "Car", targetAmount: 20000, currentAmount: 5000 }]} onChange={onChange} />);
-      expect(onChange).not.toHaveBeenCalled();
-    });
-  });
 });

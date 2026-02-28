@@ -3,7 +3,6 @@ import type { Debt } from "@/components/DebtEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
-import type { Goal } from "@/components/GoalEntry";
 import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
@@ -15,7 +14,6 @@ export interface FinancialState {
   debts: Debt[];
   income: IncomeItem[];
   expenses: ExpenseItem[];
-  goals: Goal[];
   properties: Property[];
   stocks: StockHolding[];
   country?: "CA" | "US";
@@ -39,11 +37,6 @@ export const INITIAL_STATE: FinancialState = {
     { id: "e1", category: "Rent/Mortgage Payment", amount: 2200 },
     { id: "e2", category: "Groceries", amount: 600 },
     { id: "e3", category: "Subscriptions", amount: 150 },
-  ],
-  goals: [
-    { id: "g1", name: "Rainy Day Fund", targetAmount: 20000, currentAmount: 14500 },
-    { id: "g2", name: "New Car", targetAmount: 42000, currentAmount: 13500 },
-    { id: "g3", name: "Vacation", targetAmount: 6500, currentAmount: 6200 },
   ],
   properties: [
     { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
@@ -172,11 +165,6 @@ export function toFinancialData(state: FinancialState): FinancialData {
     monthlyIncome,
     monthlyExpenses: monthlyExpenses + totalMonthlyContributions,
     rawMonthlyExpenses: monthlyExpenses,
-    goals: state.goals.map((g) => ({
-      name: g.name,
-      target: g.targetAmount,
-      current: g.currentAmount,
-    })),
     debts: state.debts.map((d) => ({
       category: d.category,
       amount: d.amount,

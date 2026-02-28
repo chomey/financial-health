@@ -7,7 +7,6 @@ import PropertyEntry from "@/components/PropertyEntry";
 import StockEntry from "@/components/StockEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
-import GoalEntry from "@/components/GoalEntry";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
 import ProjectionChart from "@/components/ProjectionChart";
 import {
@@ -23,7 +22,6 @@ import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
-import type { Goal } from "@/components/GoalEntry";
 
 function CopyLinkButton() {
   const [copied, setCopied] = useState(false);
@@ -170,7 +168,6 @@ export default function Home() {
   const [stocks, setStocks] = useState<StockHolding[]>(INITIAL_STATE.stocks);
   const [income, setIncome] = useState<IncomeItem[]>(INITIAL_STATE.income);
   const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
-  const [goals, setGoals] = useState<Goal[]>(INITIAL_STATE.goals);
   const [country, setCountry] = useState<"CA" | "US">(INITIAL_STATE.country ?? "CA");
   const [jurisdiction, setJurisdiction] = useState<string>(INITIAL_STATE.jurisdiction ?? "ON");
   const isFirstRender = useRef(true);
@@ -186,7 +183,6 @@ export default function Home() {
       setStocks(urlState.stocks);
       setIncome(urlState.income);
       setExpenses(urlState.expenses);
-      setGoals(urlState.goals);
       if (urlState.country) setCountry(urlState.country);
       if (urlState.jurisdiction) setJurisdiction(urlState.jurisdiction);
     }
@@ -198,10 +194,10 @@ export default function Home() {
     if (isFirstRender.current) {
       isFirstRender.current = false;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, goals, country, jurisdiction });
-  }, [assets, debts, properties, stocks, income, expenses, goals, country, jurisdiction]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction });
+  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction]);
 
-  const state = { assets, debts, properties, stocks, income, expenses, goals, country, jurisdiction };
+  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
   const totals = computeTotals(state);
@@ -212,7 +208,6 @@ export default function Home() {
   // Summaries for collapsed sections
   const assetTotal = assets.reduce((sum, a) => sum + a.amount, 0);
   const debtTotal = debts.reduce((sum, d) => sum + d.amount, 0);
-  const goalCount = goals.length;
   const incomeTotal = income.reduce((sum, i) => sum + i.amount, 0);
   const expenseTotal = expenses.reduce((sum, e) => sum + e.amount, 0) + totalInvestmentContributions + totalMortgagePayments;
   const propertyCount = properties.length;
@@ -257,16 +252,12 @@ export default function Home() {
                 <DebtEntry items={debts} onChange={setDebts} />
               </CollapsibleSection>
 
-              <CollapsibleSection title="Goals" icon="🎯" summary={`${goalCount} goal${goalCount !== 1 ? "s" : ""}`}>
-                <GoalEntry items={goals} onChange={setGoals} />
-              </CollapsibleSection>
-
-              <CollapsibleSection title="Monthly Income" icon="💵" summary={formatCurrencySummary(incomeTotal)}>
+<CollapsibleSection title="Monthly Income" icon="💵" summary={formatCurrencySummary(incomeTotal)}>
                 <IncomeEntry items={income} onChange={setIncome} />
               </CollapsibleSection>
 
               <CollapsibleSection title="Monthly Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)}>
-                <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} />
+                <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} />
               </CollapsibleSection>
 
               <CollapsibleSection title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"}>

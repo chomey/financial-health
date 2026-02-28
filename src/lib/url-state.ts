@@ -114,11 +114,6 @@ interface CompactExpense {
   c: string;
   a: number;
 }
-interface CompactGoal {
-  n: string; // name
-  t: number; // target
-  s: number; // saved
-}
 interface CompactProperty {
   n: string; // name
   v: number; // value
@@ -137,7 +132,6 @@ interface CompactState {
   d: CompactDebt[];
   i: CompactIncome[];
   e: CompactExpense[];
-  g: CompactGoal[];
   p?: CompactProperty[]; // properties (optional for backward compat)
   st?: CompactStock[]; // stocks (optional for backward compat)
   co?: string; // country ("CA" | "US", optional for backward compat)
@@ -166,7 +160,6 @@ function toCompact(state: FinancialState): CompactState {
       return ci;
     }),
     e: state.expenses.map((x) => ({ c: x.category, a: x.amount })),
-    g: state.goals.map((x) => ({ n: x.name, t: x.targetAmount, s: x.currentAmount })),
   };
   const properties = state.properties ?? [];
   if (properties.length > 0) {
@@ -220,12 +213,6 @@ function fromCompact(compact: CompactState): FinancialState {
       return item;
     }),
     expenses: compact.e.map((x, i) => ({ id: `e${i + 1}`, category: x.c, amount: x.a })),
-    goals: compact.g.map((x, i) => ({
-      id: `g${i + 1}`,
-      name: x.n,
-      targetAmount: x.t,
-      currentAmount: x.s,
-    })),
     properties: (compact.p ?? []).map((x, i) => {
       const prop: { id: string; name: string; value: number; mortgage: number; interestRate?: number; monthlyPayment?: number; amortizationYears?: number } = {
         id: `p${i + 1}`,
@@ -273,8 +260,7 @@ export function decodeState(encoded: string): FinancialState | null {
       !Array.isArray(compact.a) ||
       !Array.isArray(compact.d) ||
       !Array.isArray(compact.i) ||
-      !Array.isArray(compact.e) ||
-      !Array.isArray(compact.g)
+      !Array.isArray(compact.e)
     ) {
       return null;
     }

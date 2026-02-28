@@ -37,7 +37,6 @@ describe("Milestone E2E infrastructure verification", () => {
       "debt-entry.spec.ts",
       "income-entry.spec.ts",
       "expense-entry.spec.ts",
-      "goal-entry.spec.ts",
       "snapshot-dashboard.spec.ts",
       "insights-panel.spec.ts",
       "shared-state.spec.ts",

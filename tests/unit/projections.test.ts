@@ -8,7 +8,6 @@ function makeState(overrides: Partial<FinancialState> = {}): FinancialState {
     debts: [],
     income: [],
     expenses: [],
-    goals: [],
     properties: [],
     ...overrides,
   };
@@ -81,19 +80,6 @@ describe("projectFinances", () => {
     expect(result.debtFreeMonth).toBe(6);
   });
 
-  it("detects goal milestones", () => {
-    const state = makeState({
-      assets: [{ id: "a1", category: "Savings", amount: 10000 }],
-      goals: [{ id: "g1", name: "Vacation", targetAmount: 5000, currentAmount: 4000 }],
-      income: [{ id: "i1", category: "Salary", amount: 2000 }],
-      expenses: [{ id: "e1", category: "Rent", amount: 1000 }],
-    });
-    const result = projectFinances(state, 1);
-    const vacationGoal = result.goalMilestones.find((g) => g.goalName === "Vacation");
-    expect(vacationGoal).toBeDefined();
-    expect(vacationGoal!.monthReached).toBe(1); // $1000 surplus in month 1 puts goal over $5000
-  });
-
   it("detects net worth milestones", () => {
     const state = makeState({
       assets: [{ id: "a1", category: "Savings", amount: 90000 }],
@@ -160,7 +146,6 @@ describe("projectFinances", () => {
     expect(result.points).toHaveLength(13);
     expect(result.points[0].netWorth).toBe(0);
     expect(result.debtFreeMonth).toBe(0); // no debts = debt free from start
-    expect(result.goalMilestones).toHaveLength(0);
     expect(result.milestones).toHaveLength(0);
   });
 });

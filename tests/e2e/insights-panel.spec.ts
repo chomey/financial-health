@@ -32,13 +32,6 @@ test.describe("Insights Panel", () => {
     await expect(insightsPanel.locator("text=$3,350 surplus")).toBeVisible();
   });
 
-  test("shows goal progress insight for Vacation", async ({ page }) => {
-    await page.goto("/");
-    const insightsPanel = page.locator('[data-testid="insights-panel"]');
-    await expect(insightsPanel.locator("text=Vacation")).toBeVisible();
-    await expect(insightsPanel.locator("text=95%")).toBeVisible();
-  });
-
   test("insight cards have entrance animation classes", async ({ page }) => {
     await page.goto("/");
     // Wait for entrance animations to complete

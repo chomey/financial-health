@@ -8,7 +8,7 @@ import {
 import { INITIAL_STATE } from "@/lib/financial-state";
 
 describe("Deterministic IDs prevent hydration mismatch", () => {
-  it("fromCompact generates type-prefixed IDs (a1, d1, i1, e1, g1, p1)", () => {
+  it("fromCompact generates type-prefixed IDs (a1, d1, i1, e1, p1)", () => {
     const compact = toCompact(INITIAL_STATE);
     const restored = fromCompact(compact);
 
@@ -28,11 +28,6 @@ describe("Deterministic IDs prevent hydration mismatch", () => {
     expect(restored.expenses[0].id).toBe("e1");
     expect(restored.expenses[1].id).toBe("e2");
     expect(restored.expenses[2].id).toBe("e3");
-
-    // Goals should have g-prefixed IDs
-    expect(restored.goals[0].id).toBe("g1");
-    expect(restored.goals[1].id).toBe("g2");
-    expect(restored.goals[2].id).toBe("g3");
 
     // Properties should have p-prefixed IDs
     expect(restored.properties[0].id).toBe("p1");
@@ -54,9 +49,6 @@ describe("Deterministic IDs prevent hydration mismatch", () => {
     });
     INITIAL_STATE.expenses.forEach((exp, i) => {
       expect(restored.expenses[i].id).toBe(exp.id);
-    });
-    INITIAL_STATE.goals.forEach((goal, i) => {
-      expect(restored.goals[i].id).toBe(goal.id);
     });
     INITIAL_STATE.properties.forEach((prop, i) => {
       expect(restored.properties[i].id).toBe(prop.id);

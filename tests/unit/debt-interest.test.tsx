@@ -125,7 +125,7 @@ describe("URL state encoding with debt interest and payment", () => {
       debts: [{ id: "d1", category: "Credit Card", amount: 5000, interestRate: 19.9 }],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const encoded = encodeState(state);
@@ -140,7 +140,7 @@ describe("URL state encoding with debt interest and payment", () => {
       debts: [{ id: "d1", category: "Car Loan", amount: 15000, monthlyPayment: 350 }],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const encoded = encodeState(state);
@@ -155,7 +155,7 @@ describe("URL state encoding with debt interest and payment", () => {
       debts: [{ id: "d1", category: "Credit Card", amount: 5000, interestRate: 19.9, monthlyPayment: 150 }],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const encoded = encodeState(state);
@@ -171,7 +171,7 @@ describe("URL state encoding with debt interest and payment", () => {
       debts: [{ id: "d1", category: "Car Loan", amount: 15000 }],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const compact = toCompact(state);
@@ -186,7 +186,7 @@ describe("URL state encoding with debt interest and payment", () => {
       debts: [{ id: "d1", category: "Credit Card", amount: 5000, interestRate: 19.9, monthlyPayment: 150 }],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const compact = toCompact(state);
@@ -200,7 +200,7 @@ describe("URL state encoding with debt interest and payment", () => {
       d: [{ c: "Credit Card", a: 5000, ir: 19.9, mp: 150 }],
       i: [],
       e: [],
-      g: [],
+
     };
     const state = fromCompact(compact);
     expect(state.debts[0].interestRate).toBe(19.9);
@@ -213,7 +213,7 @@ describe("URL state encoding with debt interest and payment", () => {
       d: [{ c: "Car Loan", a: 15000 }],
       i: [],
       e: [],
-      g: [],
+
     };
     const state = fromCompact(compact);
     expect(state.debts[0].interestRate).toBeUndefined();
@@ -228,7 +228,7 @@ describe("Insights with debt interest rates", () => {
       totalDebts: 10000,
       monthlyIncome: 5000,
       monthlyExpenses: 3000,
-      goals: [],
+
       debts: [
         { category: "Credit Card", amount: 5000, interestRate: 19.9 },
         { category: "Car Loan", amount: 5000, interestRate: 6 },
@@ -246,7 +246,7 @@ describe("Insights with debt interest rates", () => {
       totalDebts: 20000,
       monthlyIncome: 5000,
       monthlyExpenses: 3000,
-      goals: [],
+
       debts: [
         { category: "Car Loan", amount: 10000, interestRate: 6 },
         { category: "Personal Loan", amount: 10000, interestRate: 8 },
@@ -264,7 +264,7 @@ describe("Insights with debt interest rates", () => {
       totalDebts: 10000,
       monthlyIncome: 5000,
       monthlyExpenses: 3000,
-      goals: [],
+
       debts: [
         { category: "Car Loan", amount: 10000 },
       ],
@@ -279,7 +279,7 @@ describe("Insights with debt interest rates", () => {
       debts: [{ id: "d1", category: "Credit Card", amount: 5000, interestRate: 19.9, monthlyPayment: 150 }],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const data = toFinancialData(state);

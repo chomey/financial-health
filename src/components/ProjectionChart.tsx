@@ -10,7 +10,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
-  ReferenceDot,
 } from "recharts";
 import type { FinancialState } from "@/lib/financial-state";
 import {
@@ -18,7 +17,7 @@ import {
   downsamplePoints,
   projectAssets,
 } from "@/lib/projections";
-import type { Scenario, Milestone, GoalMilestone } from "@/lib/projections";
+import type { Scenario, Milestone } from "@/lib/projections";
 
 interface ProjectionChartProps {
   state: FinancialState;
@@ -138,13 +137,6 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
   const hasMortgage = state.properties.some((p) => p.mortgage > 0);
   const hasBothDebtTypes = hasConsumerDebt && hasMortgage;
 
-  const goalMarkers = projection.goalMilestones
-    .filter((g): g is GoalMilestone & { monthReached: number } => g.monthReached !== null)
-    .map((g) => ({
-      name: g.goalName,
-      year: parseFloat((g.monthReached / 12).toFixed(1)),
-    }));
-
   const milestoneMarkers = projection.milestones.filter((m) => m.month > 0);
 
   const milestoneYears = TABLE_MILESTONES;
@@ -168,14 +160,6 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
     () => projectAssets(state.assets, scenario, milestoneYears),
     [state.assets, scenario, milestoneYears]
   );
-
-  // Find the net worth value at a given year for ReferenceDot
-  function netWorthAtYear(targetYear: number): number {
-    const closest = chartData.reduce((prev, curr) =>
-      Math.abs(curr.year - targetYear) < Math.abs(prev.year - targetYear) ? curr : prev
-    );
-    return closest.netWorth;
-  }
 
   return (
     <section
@@ -327,19 +311,6 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
               )
             )}
 
-            {/* Goal markers */}
-            {goalMarkers.map((g) => (
-              <ReferenceDot
-                key={g.name}
-                x={g.year}
-                y={netWorthAtYear(g.year)}
-                r={5}
-                fill="#f59e0b"
-                stroke="#fff"
-                strokeWidth={2}
-              />
-            ))}
-
             {/* Milestone markers */}
             {milestoneMarkers.map((m: Milestone) => (
               <ReferenceLine
@@ -376,12 +347,6 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
           <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-red-500" />
           Debts
         </span>
-        {goalMarkers.length > 0 && (
-          <span className="flex items-center gap-1">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />
-            Goal reached
-          </span>
-        )}
       </div>
 
       {/* Scenario legend */}
@@ -422,8 +387,8 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
         )}
       </div>
 
-      {/* Goal & milestone details */}
-      {(goalMarkers.length > 0 || milestoneMarkers.length > 0 || debtFreeYear !== null) && (
+      {/* Milestone details */}
+      {(milestoneMarkers.length > 0 || debtFreeYear !== null) && (
         <div className="mt-3 space-y-1 border-t border-stone-100 pt-3">
           {hasBothDebtTypes ? (
             <>
@@ -445,11 +410,6 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
               </p>
             )
           )}
-          {goalMarkers.map((g) => (
-            <p key={g.name} className="text-xs text-amber-600" data-testid="goal-reached-label">
-              🎯 &ldquo;{g.name}&rdquo; reached in ~{g.year.toFixed(1)} years
-            </p>
-          ))}
           {milestoneMarkers.map((m: Milestone) => (
             <p key={m.label} className="text-xs text-stone-500" data-testid="milestone-label">
               ⭐ {m.label} net worth in ~{(m.month / 12).toFixed(1)} years

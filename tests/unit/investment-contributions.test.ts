@@ -13,7 +13,7 @@ function makeState(overrides: Partial<FinancialState> = {}): FinancialState {
     debts: [],
     income: [],
     expenses: [],
-    goals: [],
+
     properties: [],
     stocks: [],
     ...overrides,

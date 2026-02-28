@@ -5,8 +5,6 @@ import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
-import GoalEntry from "@/components/GoalEntry";
-
 import SnapshotDashboard from "@/components/SnapshotDashboard";
 
 describe("Mobile responsiveness — touch targets and layout", () => {
@@ -49,13 +47,6 @@ describe("Mobile responsiveness — touch targets and layout", () => {
       });
     });
 
-    it("goal delete buttons have min touch target size", () => {
-      render(<GoalEntry />);
-      const deleteButtons = screen.getAllByLabelText(/^Delete /);
-      deleteButtons.forEach((btn) => {
-        expect(btn.className).toContain("min-h-[44px]");
-      });
-    });
   });
 
   describe("Inline edit buttons touch targets", () => {
@@ -75,22 +66,6 @@ describe("Mobile responsiveness — touch targets and layout", () => {
       });
     });
 
-    it("goal name buttons have min-h-[44px] for mobile", () => {
-      render(<GoalEntry />);
-      const nameButtons = screen.getAllByLabelText(/^Edit name for /);
-      nameButtons.forEach((btn) => {
-        expect(btn.className).toContain("min-h-[44px]");
-      });
-    });
-
-    it("goal amount buttons have min-h-[44px] for mobile", () => {
-      render(<GoalEntry />);
-      const savedButtons = screen.getAllByLabelText(/^Edit saved amount for /);
-      const targetButtons = screen.getAllByLabelText(/^Edit target amount for /);
-      [...savedButtons, ...targetButtons].forEach((btn) => {
-        expect(btn.className).toContain("min-h-[44px]");
-      });
-    });
   });
 
   describe("Card padding responsive", () => {
@@ -122,12 +97,6 @@ describe("Mobile responsiveness — touch targets and layout", () => {
       expect(card?.className).toContain("sm:p-4");
     });
 
-    it("goal card has responsive padding", () => {
-      const { container } = render(<GoalEntry />);
-      const card = container.firstElementChild;
-      expect(card?.className).toContain("p-3");
-      expect(card?.className).toContain("sm:p-4");
-    });
   });
 
   describe("Tooltip tap support", () => {

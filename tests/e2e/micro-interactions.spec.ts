@@ -72,8 +72,7 @@ test.describe("Micro-interactions and polish", () => {
       await page.waitForTimeout(100);
     }
 
-    // We can check the Goal empty state by deleting all goals
-    // For now, let's verify that the empty state structure exists in one component
+    // Verify that the empty state structure exists in one component
     // by checking the page source after deleting all items from a section
 
     await captureScreenshot(page, "task-13-empty-states");

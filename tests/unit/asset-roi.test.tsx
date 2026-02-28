@@ -131,7 +131,7 @@ describe("URL state encoding with ROI and contributions", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const encoded = encodeState(state);
@@ -146,7 +146,7 @@ describe("URL state encoding with ROI and contributions", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const encoded = encodeState(state);
@@ -161,7 +161,7 @@ describe("URL state encoding with ROI and contributions", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const encoded = encodeState(state);
@@ -177,7 +177,7 @@ describe("URL state encoding with ROI and contributions", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const compact = toCompact(state);
@@ -192,7 +192,7 @@ describe("URL state encoding with ROI and contributions", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
     const compact = toCompact(state);
@@ -206,7 +206,7 @@ describe("URL state encoding with ROI and contributions", () => {
       d: [],
       i: [],
       e: [],
-      g: [],
+
     };
     const state = fromCompact(compact);
     expect(state.assets[0].roi).toBe(5);
@@ -219,7 +219,7 @@ describe("URL state encoding with ROI and contributions", () => {
       d: [],
       i: [],
       e: [],
-      g: [],
+
     };
     const state = fromCompact(compact);
     expect(state.assets[0].roi).toBeUndefined();

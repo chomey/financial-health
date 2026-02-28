@@ -64,26 +64,6 @@ test.describe("Projection Chart", () => {
     await captureScreenshot(page, "task-25-timeline-1-year");
   });
 
-  test("displays milestone and goal information", async ({ page }) => {
-    await page.goto("/");
-    const chart = page.getByTestId("projection-chart");
-
-    // Set a long enough timeline to hit some milestones
-    const slider = chart.getByTestId("timeline-slider");
-    await slider.fill("20");
-
-    // Wait for chart to render
-    await page.waitForTimeout(600);
-
-    // Should show goal reached labels (from default mock data with goals)
-    const goalLabels = chart.getByTestId("goal-reached-label");
-    const goalCount = await goalLabels.count();
-    // At least the "Vacation" goal ($6200/$6500) should be reached quickly
-    expect(goalCount).toBeGreaterThanOrEqual(1);
-
-    await captureScreenshot(page, "task-25-milestones-20yr");
-  });
-
   test("chart legend is visible", async ({ page }) => {
     await page.goto("/");
     const chart = page.getByTestId("projection-chart");
