@@ -192,6 +192,77 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
         </div>
       </div>
 
+      {/* Summary table: dynamic milestone year projections */}
+      <div className="mb-4" data-testid="projection-summary-table">
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-stone-200">
+                <th className="pb-1.5 pr-4 text-left font-medium text-stone-500">Metric</th>
+                <th className="pb-1.5 px-2 text-right font-medium text-stone-500">Now</th>
+                {milestoneYears.map((y, i) => (
+                  <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-stone-500`}>
+                    {y}yr
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-100">
+              <tr>
+                <td className="py-1.5 pr-4 font-medium text-stone-700">Net Worth</td>
+                <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.netWorth)}</td>
+                {summaryPoints.milestones.map((p, i) => (
+                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-green-600 font-medium`}>
+                    {formatCurrency(p.netWorth)}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <td className="py-1.5 pr-4 font-medium text-stone-700">Total Assets</td>
+                <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.totalAssets)}</td>
+                {summaryPoints.milestones.map((p, i) => (
+                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-indigo-600`}>
+                    {formatCurrency(p.totalAssets)}
+                  </td>
+                ))}
+              </tr>
+              {hasBothDebtTypes ? (
+                <>
+                  <tr>
+                    <td className="py-1.5 pr-4 font-medium text-stone-700">Consumer Debt</td>
+                    <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.consumerDebts)}</td>
+                    {summaryPoints.milestones.map((p, i) => (
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
+                        {formatCurrency(p.consumerDebts)}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="py-1.5 pr-4 font-medium text-stone-700">Mortgage</td>
+                    <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.mortgageDebts)}</td>
+                    {summaryPoints.milestones.map((p, i) => (
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
+                        {formatCurrency(p.mortgageDebts)}
+                      </td>
+                    ))}
+                  </tr>
+                </>
+              ) : (
+                <tr>
+                  <td className="py-1.5 pr-4 font-medium text-stone-700">Total Debts</td>
+                  <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.totalDebts)}</td>
+                  {summaryPoints.milestones.map((p, i) => (
+                    <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
+                      {formatCurrency(p.totalDebts)}
+                    </td>
+                  ))}
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div className="mb-4 flex items-center gap-2">
         <span className="text-xs text-stone-500">Timeline</span>
         {TIMELINE_OPTIONS.map((y) => (
@@ -418,79 +489,6 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
           ))}
         </div>
       )}
-
-      {/* Summary table: dynamic milestone year projections */}
-      <div className="mt-4 border-t border-stone-100 pt-4" data-testid="projection-summary-table">
-        <h4 className="mb-2 text-sm font-semibold text-stone-700">Projection Summary</h4>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-stone-200">
-                <th className="pb-1.5 pr-4 text-left font-medium text-stone-500">Metric</th>
-                <th className="pb-1.5 px-2 text-right font-medium text-stone-500">Now</th>
-                {milestoneYears.map((y, i) => (
-                  <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-stone-500`}>
-                    {y}yr
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100">
-              <tr>
-                <td className="py-1.5 pr-4 font-medium text-stone-700">Net Worth</td>
-                <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.netWorth)}</td>
-                {summaryPoints.milestones.map((p, i) => (
-                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-green-600 font-medium`}>
-                    {formatCurrency(p.netWorth)}
-                  </td>
-                ))}
-              </tr>
-              <tr>
-                <td className="py-1.5 pr-4 font-medium text-stone-700">Total Assets</td>
-                <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.totalAssets)}</td>
-                {summaryPoints.milestones.map((p, i) => (
-                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-indigo-600`}>
-                    {formatCurrency(p.totalAssets)}
-                  </td>
-                ))}
-              </tr>
-              {/* Split debts: consumer vs mortgage when both exist */}
-              {hasBothDebtTypes ? (
-                <>
-                  <tr>
-                    <td className="py-1.5 pr-4 font-medium text-stone-700">Consumer Debt</td>
-                    <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.consumerDebts)}</td>
-                    {summaryPoints.milestones.map((p, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
-                        {formatCurrency(p.consumerDebts)}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="py-1.5 pr-4 font-medium text-stone-700">Mortgage</td>
-                    <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.mortgageDebts)}</td>
-                    {summaryPoints.milestones.map((p, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
-                        {formatCurrency(p.mortgageDebts)}
-                      </td>
-                    ))}
-                  </tr>
-                </>
-              ) : (
-                <tr>
-                  <td className="py-1.5 pr-4 font-medium text-stone-700">Total Debts</td>
-                  <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.totalDebts)}</td>
-                  {summaryPoints.milestones.map((p, i) => (
-                    <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
-                      {formatCurrency(p.totalDebts)}
-                    </td>
-                  ))}
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
 
       {/* Per-asset projections with dynamic milestones */}
       {assetProjections.length > 0 && (
