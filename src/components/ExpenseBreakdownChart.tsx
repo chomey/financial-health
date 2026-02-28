@@ -173,6 +173,14 @@ export default function ExpenseBreakdownChart({
 
   const totalExpenses = data.reduce((s, d) => s + d.value, 0);
 
+  // Spending power = after-tax income minus locked-in obligations (investments + mortgage)
+  // This is what's actually available for day-to-day expenses
+  const spendingPower = Math.max(0, monthlyAfterTaxIncome - investmentContributions - mortgagePayments);
+  // Manual expenses only (what the user actually spends on day-to-day)
+  const manualExpenses = expenses.reduce((s, e) => s + (e.amount > 0 ? e.amount : 0), 0);
+
+  const INFLATION_RATE = 0.03; // 3% annual inflation
+
   if (data.length === 0) {
     return (
       <div
@@ -238,6 +246,31 @@ export default function ExpenseBreakdownChart({
               {formatCurrency(totalExpenses - incomeForComparison)}/mo over budget
             </p>
           ) : null}
+        </div>
+      )}
+
+      {/* Spending power & inflation */}
+      {spendingPower > 0 && (
+        <div className="mb-4 rounded-lg bg-stone-50 px-3 py-2.5 space-y-1.5" data-testid="spending-power">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-stone-500">Spending Power</span>
+            <span className="text-xs font-medium text-stone-800">{formatCurrency(spendingPower)}/mo</span>
+          </div>
+          {manualExpenses > 0 && manualExpenses < spendingPower && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-stone-400">Discretionary remaining</span>
+              <span className="text-xs font-medium text-emerald-600">{formatCurrency(spendingPower - manualExpenses)}/mo</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between border-t border-stone-200 pt-1.5">
+            <span className="text-xs text-stone-400 flex items-center gap-1">
+              <svg className="h-3 w-3 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+              </svg>
+              After inflation ({(INFLATION_RATE * 100).toFixed(0)}%/yr)
+            </span>
+            <span className="text-xs text-amber-600">{formatCurrency(spendingPower * (1 - INFLATION_RATE))}/mo in 1yr</span>
+          </div>
         </div>
       )}
 
