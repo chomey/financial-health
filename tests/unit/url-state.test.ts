@@ -60,7 +60,7 @@ describe("toCompact / fromCompact", () => {
   it("compacts state by stripping IDs and shortening keys", () => {
     const compact = toCompact(INITIAL_STATE);
     expect(compact.a).toHaveLength(3);
-    expect(compact.a[0]).toEqual({ c: "Savings Account", a: 12000 });
+    expect(compact.a[0]).toEqual({ c: "Savings Account", a: 12000, st: 1 });
     expect(compact.d[0]).toEqual({ c: "Car Loan", a: 15000 });
     expect(compact.p).toHaveLength(1);
     expect(compact.p![0]).toEqual({ n: "Home", v: 450000, m: 280000 });
@@ -83,6 +83,36 @@ describe("toCompact / fromCompact", () => {
     expect(restored.properties[0].name).toBe("Home");
     expect(restored.properties[0].value).toBe(450000);
     expect(restored.properties[0].mortgage).toBe(280000);
+  });
+
+  it("compacts country and jurisdiction into co/ju fields", () => {
+    const state: FinancialState = {
+      ...INITIAL_STATE,
+      country: "US",
+      jurisdiction: "NY",
+    };
+    const compact = toCompact(state);
+    expect(compact.co).toBe("US");
+    expect(compact.ju).toBe("NY");
+  });
+
+  it("omits co/ju when country/jurisdiction are undefined", () => {
+    const state: FinancialState = {
+      ...INITIAL_STATE,
+      country: undefined,
+      jurisdiction: undefined,
+    };
+    const compact = toCompact(state);
+    expect(compact.co).toBeUndefined();
+    expect(compact.ju).toBeUndefined();
+  });
+
+  it("restores country/jurisdiction from compact with defaults when missing", () => {
+    const compact = toCompact({ ...INITIAL_STATE, country: undefined, jurisdiction: undefined });
+    const restored = fromCompact(compact);
+    // Should default to CA/ON when co/ju are missing
+    expect(restored.country).toBe("CA");
+    expect(restored.jurisdiction).toBe("ON");
   });
 });
 
@@ -183,6 +213,93 @@ describe("encodeState / decodeState", () => {
     expect(decoded!.properties[0].interestRate).toBeUndefined();
     expect(decoded!.properties[0].monthlyPayment).toBeUndefined();
     expect(decoded!.properties[0].amortizationYears).toBeUndefined();
+  });
+
+  it("roundtrips country and jurisdiction (CA/ON)", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+      country: "CA",
+      jurisdiction: "ON",
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.country).toBe("CA");
+    expect(decoded!.jurisdiction).toBe("ON");
+  });
+
+  it("roundtrips country and jurisdiction (US/CA)", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+      country: "US",
+      jurisdiction: "CA",
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.country).toBe("US");
+    expect(decoded!.jurisdiction).toBe("CA");
+  });
+
+  it("defaults to CA/ON when country/jurisdiction missing from encoded state (backward compat)", () => {
+    // Encode a state without country/jurisdiction fields
+    const state: FinancialState = {
+      assets: [{ id: "a1", category: "Savings", amount: 1000 }],
+      debts: [],
+      income: [],
+      expenses: [],
+      goals: [],
+      properties: [],
+      stocks: [],
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    // Should default to CA/ON when not present
+    expect(decoded!.country).toBe("CA");
+    expect(decoded!.jurisdiction).toBe("ON");
+  });
+
+  it("roundtrips INITIAL_STATE with country and jurisdiction", () => {
+    const encoded = encodeState(INITIAL_STATE);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.country).toBe("CA");
+    expect(decoded!.jurisdiction).toBe("ON");
+  });
+
+  it("roundtrips US state with different jurisdiction codes", () => {
+    const jurisdictions = ["NY", "TX", "FL", "WA"];
+    for (const jur of jurisdictions) {
+      const state: FinancialState = {
+        assets: [],
+        debts: [],
+        income: [],
+        expenses: [],
+        goals: [],
+        properties: [],
+        stocks: [],
+        country: "US",
+        jurisdiction: jur,
+      };
+      const encoded = encodeState(state);
+      const decoded = decodeState(encoded);
+      expect(decoded).not.toBeNull();
+      expect(decoded!.country).toBe("US");
+      expect(decoded!.jurisdiction).toBe(jur);
+    }
   });
 });
 

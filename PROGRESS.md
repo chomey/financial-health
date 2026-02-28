@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 36
-- **Completed**: 35
-- **Remaining**: 1
+- **Total Tasks**: 46
+- **Completed**: 37
+- **Remaining**: 9
 - **Last Updated**: 2026-02-27
 
 ---
@@ -975,3 +975,16 @@
   ![Stock affects net worth](screenshots/task-36-stock-affects-networth.png)
   ![Copy link all features](screenshots/task-36-copy-link-all-features.png)
 - **Notes**: This milestone E2E test validates all features from tasks 27-35 in an integrated journey. The 9 pre-existing test failures (chart-position, debt-entry, full-e2e, micro-interactions, milestone-e2e, milestone-2-e2e) were confirmed by stashing changes and running without modifications — they fail identically without the new test file. These should be addressed in a future cleanup task.
+
+## Task 37: Add country and jurisdiction fields to FinancialState and URL encoding
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/financial-state.ts`: Added `country?: "CA" | "US"` and `jurisdiction?: string` to `FinancialState` interface. Updated `INITIAL_STATE` with `country: "CA"`, `jurisdiction: "ON"`.
+  - `src/lib/url-state.ts`: Added `co?: string` and `ju?: string` to `CompactState` interface. Updated `toCompact` to serialize country/jurisdiction (omitted when undefined). Updated `fromCompact` to deserialize with defaults (`"CA"`/`"ON"` when missing for backward compatibility).
+  - `src/app/page.tsx`: Added `country` and `jurisdiction` state variables with `useState`. Restore from URL state on load. Include in `updateURL` calls and `state` object passed to components.
+- **Test tiers run**: T1
+- **Tests**:
+  - `tests/unit/url-state.test.ts`: Added 8 new tests — roundtrip CA/ON, roundtrip US/CA, backward compat defaults, INITIAL_STATE with country/jurisdiction, multiple US jurisdictions, toCompact with co/ju, toCompact omits when undefined, fromCompact defaults when missing. Total: 30 passed, 0 failed.
+  - All 431 unit tests passed, 0 failed.
+- **Notes**: Backend-only task ([@backend]), no screenshots required. Country/jurisdiction fields are optional on FinancialState for backward compatibility — existing URLs without these fields will default to CA/ON when decoded.

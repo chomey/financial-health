@@ -170,6 +170,8 @@ export default function Home() {
   const [income, setIncome] = useState<IncomeItem[]>(INITIAL_STATE.income);
   const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
   const [goals, setGoals] = useState<Goal[]>(INITIAL_STATE.goals);
+  const [country, setCountry] = useState<"CA" | "US">(INITIAL_STATE.country ?? "CA");
+  const [jurisdiction, setJurisdiction] = useState<string>(INITIAL_STATE.jurisdiction ?? "ON");
   const isFirstRender = useRef(true);
 
   // Restore state from URL after hydration
@@ -184,6 +186,8 @@ export default function Home() {
       setIncome(urlState.income);
       setExpenses(urlState.expenses);
       setGoals(urlState.goals);
+      if (urlState.country) setCountry(urlState.country);
+      if (urlState.jurisdiction) setJurisdiction(urlState.jurisdiction);
     }
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -193,10 +197,10 @@ export default function Home() {
     if (isFirstRender.current) {
       isFirstRender.current = false;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, goals });
-  }, [assets, debts, properties, stocks, income, expenses, goals]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, goals, country, jurisdiction });
+  }, [assets, debts, properties, stocks, income, expenses, goals, country, jurisdiction]);
 
-  const state = { assets, debts, properties, stocks, income, expenses, goals };
+  const state = { assets, debts, properties, stocks, income, expenses, goals, country, jurisdiction };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
   const totalInvestmentContributions = assets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);

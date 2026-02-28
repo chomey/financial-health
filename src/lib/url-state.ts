@@ -140,6 +140,8 @@ interface CompactState {
   g: CompactGoal[];
   p?: CompactProperty[]; // properties (optional for backward compat)
   st?: CompactStock[]; // stocks (optional for backward compat)
+  co?: string; // country ("CA" | "US", optional for backward compat)
+  ju?: string; // jurisdiction (province/state code, optional for backward compat)
 }
 
 function toCompact(state: FinancialState): CompactState {
@@ -184,18 +186,27 @@ function toCompact(state: FinancialState): CompactState {
       return cs;
     });
   }
+  if (state.country) compact.co = state.country;
+  if (state.jurisdiction) compact.ju = state.jurisdiction;
   return compact;
 }
 
 function fromCompact(compact: CompactState): FinancialState {
   return {
-    assets: compact.a.map((x, i) => {
-      const asset: { id: string; category: string; amount: number; roi?: number; monthlyContribution?: number; surplusTarget?: boolean } = { id: `a${i + 1}`, category: x.c, amount: x.a };
-      if (x.r !== undefined) asset.roi = x.r;
-      if (x.m !== undefined) asset.monthlyContribution = x.m;
-      if (x.st) asset.surplusTarget = true;
-      return asset;
-    }),
+    assets: (() => {
+      const assets = compact.a.map((x, i) => {
+        const asset: { id: string; category: string; amount: number; roi?: number; monthlyContribution?: number; surplusTarget?: boolean } = { id: `a${i + 1}`, category: x.c, amount: x.a };
+        if (x.r !== undefined) asset.roi = x.r;
+        if (x.m !== undefined) asset.monthlyContribution = x.m;
+        if (x.st) asset.surplusTarget = true;
+        return asset;
+      });
+      // Ensure exactly one asset is the surplus target
+      if (assets.length > 0 && !assets.some((a) => a.surplusTarget)) {
+        assets[0].surplusTarget = true;
+      }
+      return assets;
+    })(),
     debts: compact.d.map((x, i) => {
       const debt: { id: string; category: string; amount: number; interestRate?: number; monthlyPayment?: number } = { id: `d${i + 1}`, category: x.c, amount: x.a };
       if (x.ir !== undefined) debt.interestRate = x.ir;
@@ -236,6 +247,8 @@ function fromCompact(compact: CompactState): FinancialState {
       if (x.cb !== undefined) stock.costBasis = x.cb;
       return stock;
     }),
+    country: (compact.co as "CA" | "US") ?? "CA",
+    jurisdiction: compact.ju ?? "ON",
   };
 }
 
