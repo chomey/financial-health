@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 55
-- **Completed**: 48
-- **Remaining**: 7
+- **Completed**: 49
+- **Remaining**: 6
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1179,3 +1179,19 @@
   ![Asset allocation by category](screenshots/task-48-allocation-chart-category.png)
   ![Asset allocation by liquidity](screenshots/task-48-allocation-chart-liquidity.png)
 - **Notes**: Category grouping uses flexible string matching (e.g., "Savings Account" matches "Savings & Checking" group). Recharts Legend renders alongside a custom compact legend with values. The chart is responsive and uses the app's warm color palette.
+
+## Task 49: Build expense breakdown visualization
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/components/ExpenseBreakdownChart.tsx`: New component with recharts horizontal BarChart. Shows expense categories sorted largest-to-smallest with warm, distinguishable colors. Auto-generated categories (Investment Contributions, Mortgage Payments, Taxes) shown with "auto" badges. Income vs expenses comparison bar at top shows surplus/deficit gap visually. Custom tooltip with category name, amount, percentage, and auto indicator. Compact legend with colored dots, values, and percentages below the chart.
+  - `src/app/page.tsx`: Integrated ExpenseBreakdownChart into the dashboard section, positioned between SnapshotDashboard metric cards and AssetAllocationChart. Passes expenses, investment contributions, mortgage payments, tax amounts, and after-tax income.
+  - `tests/unit/setup.test.tsx`: Updated to use `getAllByText` for "Rent/Mortgage Payment" which now appears in both expense entry and breakdown chart.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/expense-breakdown-chart.test.ts`: 8 passed, 0 failed (empty state, manual expenses, zero filtering, auto categories, sorting, percentages, combined categories)
+  - `tests/e2e/expense-breakdown-chart.spec.ts`: 6 passed, 0 failed (chart rendering, legend categories, income vs expenses bar, auto badges, dashboard positioning, screenshot)
+  - All existing tests: 596 unit tests passed, 109 E2E tests passed
+- **Screenshots**:
+  ![Expense breakdown chart](screenshots/task-49-expense-breakdown-chart.png)
+- **Notes**: Uses horizontal bar chart (not doughnut) for better readability of expense categories with labels. The income vs expenses comparison bar shows a green fill when under budget with surplus annotation, or red when over budget. Auto-generated categories are clearly distinguished with "auto" badges in both tooltip and legend.
