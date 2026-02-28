@@ -13,6 +13,7 @@ import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelecto
 import AssetAllocationChart from "@/components/AssetAllocationChart";
 import ExpenseBreakdownChart from "@/components/ExpenseBreakdownChart";
 import NetWorthWaterfallChart from "@/components/NetWorthWaterfallChart";
+import FastForwardPanel from "@/components/FastForwardPanel";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -245,8 +246,9 @@ export default function Home() {
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
         {/* Projection Chart — full-width above the two-column layout */}
-        <section className="mb-8" aria-label="Financial projections">
+        <section className="mb-8 space-y-4" aria-label="Financial projections">
           <ProjectionChart state={state} />
+          <FastForwardPanel state={state} />
         </section>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">

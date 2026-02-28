@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 55
-- **Completed**: 50
-- **Remaining**: 5
+- **Completed**: 51
+- **Remaining**: 4
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1210,3 +1210,21 @@
 - **Screenshots**:
   ![Net worth waterfall chart](screenshots/task-50-waterfall-chart-default.png)
 - **Notes**: Waterfall chart uses stacked bars with an invisible "base" bar to achieve the bridge/waterfall effect. Property equity is shown separately from liquid assets, and property mortgages are shown separately from consumer debts, giving clear visibility into how each component contributes to net worth. Chart dynamically sizes based on number of segments.
+
+## Task 51: Build "Fast Forward" scenario modeling panel
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/lib/scenario.ts`: New utility module — scenario modification types, `applyModification()` to transform financial state with debt exclusions/contribution overrides/income adjustments/windfalls, `compareScenarios()` to run baseline vs modified projections and compute net worth deltas and debt-free timeline differences.
+  - `src/components/FastForwardPanel.tsx`: New component — collapsible "Fast Forward" panel with: debt toggle checkboxes (pay off individual debts), contribution amount overrides, income adjustment buttons (+/-$500), one-time windfall input, and side-by-side scenario comparison display showing net worth deltas at 5/10 year milestones plus debt-free timeline changes.
+  - `src/app/page.tsx`: Added FastForwardPanel below ProjectionChart in the full-width projections section.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/scenario.test.ts`: 16 passed, 0 failed (applyModification: empty mod, exclude debts, multiple debts, contribution overrides, income adjustment, negative income floor, windfall to surplus target, windfall to first asset, immutability; compareScenarios: no-change baseline, debt removal, windfall impact, debt-free delta, income improvement, milestone year filtering)
+  - `tests/e2e/fast-forward.spec.ts`: 7 passed, 0 failed (collapsed toggle visibility, panel expand, debt toggle with comparison, income adjustment, windfall with positive delta, reset button, placeholder text)
+  - All existing tests: 621 unit passed, 0 failed
+- **Screenshots**:
+  ![Fast Forward panel expanded](screenshots/task-51-fast-forward-expanded.png)
+  ![Debt toggled scenario](screenshots/task-51-debt-toggled.png)
+  ![Windfall scenario](screenshots/task-51-windfall-scenario.png)
+- **Notes**: Scenarios are temporary and not persisted to URL. The panel reuses the existing projection engine (`projectFinances`) with a modified copy of the financial state. The comparison shows net worth deltas at 5 and 10 year milestones (extending to 20/30 for longer timelines), plus debt-free timeline differences when applicable.
