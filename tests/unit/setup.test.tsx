@@ -64,7 +64,8 @@ describe("App shell layout", () => {
 
   it("shows mock data in income and expense sections", () => {
     render(<Home />);
-    expect(screen.getByText("Salary")).toBeInTheDocument();
+    // Use getAllByText since "Salary" may appear in both income entry and Sankey diagram
+    expect(screen.getAllByText("Salary").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Rent/Mortgage Payment").length).toBeGreaterThan(0);
   });
 });

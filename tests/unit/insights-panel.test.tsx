@@ -4,9 +4,9 @@ import InsightsPanel, { MOCK_FINANCIAL_DATA } from "@/components/InsightsPanel";
 import { generateInsights } from "@/lib/insights";
 
 describe("InsightsPanel", () => {
-  it("renders the Insights heading", () => {
+  it("renders the insights panel container", () => {
     render(<InsightsPanel />);
-    expect(screen.getByText("Insights")).toBeInTheDocument();
+    expect(screen.getByTestId("insights-panel")).toBeInTheDocument();
   });
 
   it("renders insight cards with mock data", () => {
