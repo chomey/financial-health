@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { Region } from "@/lib/financial-state";
+import { calculateDebtPayoff, formatPayoffCurrency } from "@/lib/debt-payoff";
 
 export interface Debt {
   id: string;
@@ -510,6 +511,35 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
                   </button>
                 )}
               </div>
+
+              {/* Payoff timeline summary */}
+              {(() => {
+                const effectiveRate = debt.interestRate ?? defaultInterest;
+                if (effectiveRate !== undefined && hasPayment) {
+                  const result = calculateDebtPayoff(debt.amount, effectiveRate, debt.monthlyPayment!);
+                  if (!result.coversInterest) {
+                    return (
+                      <div
+                        className="mx-5 mb-1 rounded px-2 py-1 text-xs bg-amber-50 text-amber-700 border border-amber-200"
+                        data-testid={`debt-payoff-warning-${debt.id}`}
+                      >
+                        Payment doesn&rsquo;t cover interest &mdash; balance will grow
+                      </div>
+                    );
+                  }
+                  if (result.months > 0) {
+                    return (
+                      <div
+                        className="mx-5 mb-1 rounded px-2 py-1 text-xs bg-blue-50 text-blue-600"
+                        data-testid={`debt-payoff-${debt.id}`}
+                      >
+                        Paid off in {result.payoffDuration} &middot; {formatPayoffCurrency(result.totalInterest)} total interest
+                      </div>
+                    );
+                  }
+                }
+                return null;
+              })()}
             </div>
           );})}
         </div>

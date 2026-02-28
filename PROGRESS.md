@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 33
-- **Completed**: 28
-- **Remaining**: 5
+- **Completed**: 29
+- **Remaining**: 4
 - **Last Updated**: 2026-02-27
 
 ---
@@ -769,3 +769,23 @@
   ![Scenario legend expanded](screenshots/task-28-scenario-legend-expanded.png)
   ![Scenario legend colors](screenshots/task-28-scenario-legend-colors.png)
 - **Notes**: The legend is collapsible to avoid cluttering the chart area. Each scenario button also has a native title tooltip for quick reference without needing to open the legend. Descriptions match the actual multipliers in projections.ts (0.7×, 1.0×, 1.3×).
+
+---
+
+## Task 29: Show loan payoff timeline on debts
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/debt-payoff.ts`: New utility with `calculateDebtPayoff()` using standard amortization math, `formatDuration()`, and `formatPayoffCurrency()`. Handles edge cases: zero balance, zero interest, zero payment, payment not covering interest.
+  - `src/components/DebtEntry.tsx`: Added import of debt-payoff utilities. Added inline payoff summary below each debt's detail fields — shows "Paid off in X years Y months · $Z total interest" when both interest rate and payment are set. Shows amber warning when payment doesn't cover monthly interest. Uses suggested default rate when no explicit rate is set.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/debt-payoff.test.ts`: 21 tests — calculateDebtPayoff (zero balance, zero interest, car loan, credit card, payment doesn't cover interest, payment equals interest, zero payment, negative balance, multi-year duration), formatDuration (months, years, combinations, edge cases), formatPayoffCurrency (formatting)
+  - `tests/e2e/debt-payoff.spec.ts`: 4 tests — payoff info appears with rate+payment set, warning when payment doesn't cover interest, no payoff when only rate set (no payment), payoff works with suggested default rate
+  - All T1 unit tests: 403 passed, 0 failed (29 test files)
+  - All T2 debt-payoff tests: 4 passed, 0 failed
+- **Screenshots**:
+  ![Payoff timeline](screenshots/task-29-payoff-timeline.png)
+  ![Payoff warning](screenshots/task-29-payoff-warning.png)
+  ![Payoff with suggested rate](screenshots/task-29-payoff-suggested-rate.png)
+- **Notes**: The payoff calculation uses standard amortization: each month apply monthly interest (rate/12) to balance, subtract payment, iterate until balance reaches 0. Caps at 1200 months (100 years) to prevent infinite loops. The display uses the effective rate (explicit or suggested default) so users get immediate feedback when they set a monthly payment even without explicitly confirming the interest rate.
