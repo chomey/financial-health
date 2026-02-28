@@ -44,18 +44,50 @@ export function normalizeToMonthly(amount: number, frequency: IncomeFrequency = 
   }
 }
 
-const CATEGORY_SUGGESTIONS = [
-  "Salary",
-  "Freelance",
-  "Investment Income",
-  "Capital Gains",
-  "Dividends",
-  "Side Hustle",
-  "Other",
-];
+const INCOME_TYPE_LABELS: Record<IncomeType, string> = {
+  employment: "Employment",
+  "capital-gains": "Capital Gains",
+  other: "Other",
+};
 
-export function getAllIncomeCategorySuggestions(): string[] {
-  return [...CATEGORY_SUGGESTIONS];
+const INCOME_TYPE_SHORT_LABELS: Record<IncomeType, string> = {
+  employment: "Emp",
+  "capital-gains": "Cap Gains",
+  other: "Other",
+};
+
+const CATEGORY_SUGGESTIONS: Record<IncomeType, string[]> = {
+  employment: [
+    "Salary",
+    "Freelance",
+    "Investment Income",
+    "Dividends",
+    "Side Hustle",
+    "Other",
+  ],
+  "capital-gains": [
+    "Stock Sale",
+    "Property Sale",
+    "Crypto",
+    "Capital Gains",
+    "Other",
+  ],
+  other: [
+    "Salary",
+    "Freelance",
+    "Investment Income",
+    "Capital Gains",
+    "Dividends",
+    "Side Hustle",
+    "Stock Sale",
+    "Property Sale",
+    "Crypto",
+    "Other",
+  ],
+};
+
+export function getAllIncomeCategorySuggestions(incomeType?: IncomeType): string[] {
+  return [...CATEGORY_SUGGESTIONS[incomeType ?? "employment"]];
 }
 
 const MOCK_INCOME: IncomeItem[] = [
@@ -133,6 +165,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
   const [newCategory, setNewCategory] = useState("");
   const [newAmount, setNewAmount] = useState("");
   const [newFrequency, setNewFrequency] = useState<IncomeFrequency>("monthly");
+  const [newIncomeType, setNewIncomeType] = useState<IncomeType>("employment");
   const [showNewSuggestions, setShowNewSuggestions] = useState(false);
   const [animatingTotal, setAnimatingTotal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -219,6 +252,14 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
     );
   };
 
+  const changeIncomeType = (id: string, incomeType: IncomeType) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, incomeType: incomeType === "employment" ? undefined : incomeType } : item
+      )
+    );
+  };
+
   const addItem = () => {
     if (!newCategory.trim()) return;
     const amount = parseCurrencyInput(newAmount);
@@ -228,11 +269,13 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
       category: newCategory.trim(),
       amount,
       ...(newFrequency !== "monthly" ? { frequency: newFrequency } : {}),
+      ...(newIncomeType !== "employment" ? { incomeType: newIncomeType } : {}),
     };
     setItems((prev) => [...prev, newItem]);
     setNewCategory("");
     setNewAmount("");
     setNewFrequency("monthly");
+    setNewIncomeType("employment");
     setAddingNew(false);
     setShowNewSuggestions(false);
   };
@@ -251,12 +294,13 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
       setAddingNew(false);
       setNewCategory("");
       setNewAmount("");
+      setNewIncomeType("employment");
       setShowNewSuggestions(false);
     }
   };
 
-  const filteredSuggestions = (query: string) => {
-    const all = getAllIncomeCategorySuggestions();
+  const filteredSuggestions = (query: string, incomeType?: IncomeType) => {
+    const all = getAllIncomeCategorySuggestions(incomeType);
     if (!query) return all;
     return all.filter((s) => s.toLowerCase().includes(query.toLowerCase()));
   };
@@ -285,7 +329,11 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
             <div
               key={item.id}
               role="listitem"
-              className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-stone-50"
+              className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 ${
+                item.incomeType === "capital-gains"
+                  ? "bg-amber-50/50 hover:bg-amber-50 border-l-2 border-amber-400"
+                  : "hover:bg-stone-50"
+              }`}
             >
               <div className="flex flex-1 items-center gap-3 min-w-0">
                 {/* Category */}
@@ -309,12 +357,12 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                       aria-label="Edit category name"
                     />
                     {showSuggestions &&
-                      filteredSuggestions(editValue).length > 0 && (
+                      filteredSuggestions(editValue, item.incomeType).length > 0 && (
                         <div
                           ref={suggestionsRef}
                           className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
                         >
-                          {filteredSuggestions(editValue).map((suggestion) => (
+                          {filteredSuggestions(editValue, item.incomeType).map((suggestion) => (
                             <button
                               key={suggestion}
                               type="button"
@@ -382,6 +430,25 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                     </option>
                   ))}
                 </select>
+
+                {/* Income type selector */}
+                <select
+                  value={item.incomeType ?? "employment"}
+                  onChange={(e) => changeIncomeType(item.id, e.target.value as IncomeType)}
+                  className={`w-auto min-h-[44px] sm:min-h-0 rounded-md border px-1.5 py-1 text-xs transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 cursor-pointer ${
+                    item.incomeType === "capital-gains"
+                      ? "border-amber-300 bg-amber-50 text-amber-700 hover:border-amber-400 hover:bg-amber-100"
+                      : "border-stone-200 bg-stone-50 text-stone-500 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
+                  }`}
+                  aria-label={`Change income type for ${item.category}`}
+                  data-testid={`income-type-${item.id}`}
+                >
+                  {(Object.keys(INCOME_TYPE_SHORT_LABELS) as IncomeType[]).map((type) => (
+                    <option key={type} value={type}>
+                      {INCOME_TYPE_SHORT_LABELS[type]}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Delete button */}
@@ -432,9 +499,9 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                 aria-label="New income category"
               />
               {showNewSuggestions &&
-                filteredSuggestions(newCategory).length > 0 && (
+                filteredSuggestions(newCategory, newIncomeType).length > 0 && (
                   <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
-                    {filteredSuggestions(newCategory).map((suggestion) => (
+                    {filteredSuggestions(newCategory, newIncomeType).map((suggestion) => (
                       <button
                         key={suggestion}
                         type="button"
@@ -476,6 +543,19 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                   </option>
                 ))}
               </select>
+              <select
+                value={newIncomeType}
+                onChange={(e) => setNewIncomeType(e.target.value as IncomeType)}
+                className="min-h-[44px] sm:min-h-0 rounded-md border border-blue-300 bg-white px-2 py-2 text-xs text-stone-600 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:py-1 cursor-pointer"
+                aria-label="New income type"
+                data-testid="new-income-type"
+              >
+                {(Object.keys(INCOME_TYPE_LABELS) as IncomeType[]).map((type) => (
+                  <option key={type} value={type}>
+                    {INCOME_TYPE_LABELS[type]}
+                  </option>
+                ))}
+              </select>
               <button
                 type="button"
                 onClick={addItem}
@@ -490,6 +570,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                   setAddingNew(false);
                   setNewCategory("");
                   setNewAmount("");
+                  setNewIncomeType("employment");
                   setShowNewSuggestions(false);
                 }}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"

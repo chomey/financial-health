@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import IncomeEntry, {
@@ -106,19 +106,116 @@ describe("IncomeEntry component", () => {
 });
 
 describe("getAllIncomeCategorySuggestions", () => {
-  it("includes all income categories", () => {
+  it("returns employment suggestions by default", () => {
     const suggestions = getAllIncomeCategorySuggestions();
     expect(suggestions).toContain("Salary");
     expect(suggestions).toContain("Freelance");
     expect(suggestions).toContain("Investment Income");
-    expect(suggestions).toContain("Capital Gains");
     expect(suggestions).toContain("Dividends");
     expect(suggestions).toContain("Side Hustle");
     expect(suggestions).toContain("Other");
+    expect(suggestions).not.toContain("Stock Sale");
   });
 
-  it("returns 7 total suggestions", () => {
-    const suggestions = getAllIncomeCategorySuggestions();
-    expect(suggestions.length).toBe(7);
+  it("returns 6 employment suggestions", () => {
+    const suggestions = getAllIncomeCategorySuggestions("employment");
+    expect(suggestions.length).toBe(6);
+  });
+
+  it("returns capital-gains specific suggestions", () => {
+    const suggestions = getAllIncomeCategorySuggestions("capital-gains");
+    expect(suggestions).toContain("Stock Sale");
+    expect(suggestions).toContain("Property Sale");
+    expect(suggestions).toContain("Crypto");
+    expect(suggestions).toContain("Capital Gains");
+    expect(suggestions).toContain("Other");
+    expect(suggestions).not.toContain("Salary");
+  });
+
+  it("returns 5 capital-gains suggestions", () => {
+    const suggestions = getAllIncomeCategorySuggestions("capital-gains");
+    expect(suggestions.length).toBe(5);
+  });
+
+  it("returns all suggestions for 'other' income type", () => {
+    const suggestions = getAllIncomeCategorySuggestions("other");
+    expect(suggestions).toContain("Salary");
+    expect(suggestions).toContain("Stock Sale");
+    expect(suggestions).toContain("Crypto");
+    expect(suggestions.length).toBe(10);
+  });
+});
+
+describe("IncomeEntry income type selector", () => {
+  it("renders income type selector for each row", () => {
+    render(<IncomeEntry />);
+    expect(screen.getByLabelText("Change income type for Salary")).toBeInTheDocument();
+    expect(screen.getByLabelText("Change income type for Freelance")).toBeInTheDocument();
+  });
+
+  it("defaults to Employment income type", () => {
+    render(<IncomeEntry />);
+    const selector = screen.getByTestId("income-type-i1") as HTMLSelectElement;
+    expect(selector.value).toBe("employment");
+  });
+
+  it("applies capital-gains visual styling to row", () => {
+    const items = [
+      { id: "i1", category: "Stock Sale", amount: 5000, incomeType: "capital-gains" as const },
+    ];
+    render(<IncomeEntry items={items} />);
+    const listItem = screen.getByRole("listitem");
+    expect(listItem.className).toContain("bg-amber-50");
+    expect(listItem.className).toContain("border-amber-400");
+  });
+
+  it("does not apply capital-gains styling to employment rows", () => {
+    render(<IncomeEntry />);
+    const listItems = screen.getAllByRole("listitem");
+    expect(listItems[0].className).not.toContain("bg-amber-50");
+  });
+
+  it("shows income type selector in add new form", async () => {
+    const user = userEvent.setup();
+    render(<IncomeEntry />);
+    await user.click(screen.getByText("+ Add Income"));
+    expect(screen.getByLabelText("New income type")).toBeInTheDocument();
+    expect(screen.getByTestId("new-income-type")).toBeInTheDocument();
+  });
+
+  it("adds new item with selected income type", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<IncomeEntry items={[]} onChange={onChange} />);
+    await user.click(screen.getByText("+ Add Income"));
+    await user.type(screen.getByLabelText("New income category"), "Stock Sale");
+    await user.type(screen.getByLabelText("New income amount"), "10000");
+    await user.selectOptions(screen.getByTestId("new-income-type"), "capital-gains");
+    await user.click(screen.getByLabelText("Confirm add income"));
+    // The onChange should have been called with the new item
+    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
+    const addedItem = lastCall[0][0];
+    expect(addedItem.category).toBe("Stock Sale");
+    expect(addedItem.incomeType).toBe("capital-gains");
+  });
+
+  it("changes income type on existing row via selector", async () => {
+    const onChange = vi.fn();
+    const items = [{ id: "i1", category: "Salary", amount: 5000 }];
+    const user = userEvent.setup();
+    render(<IncomeEntry items={items} onChange={onChange} />);
+    await user.selectOptions(screen.getByTestId("income-type-i1"), "capital-gains");
+    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
+    expect(lastCall[0][0].incomeType).toBe("capital-gains");
+  });
+
+  it("styles capital-gains income type selector with amber colors", () => {
+    const items = [
+      { id: "i1", category: "Stock Sale", amount: 5000, incomeType: "capital-gains" as const },
+    ];
+    render(<IncomeEntry items={items} />);
+    const selector = screen.getByTestId("income-type-i1");
+    expect(selector.className).toContain("border-amber-300");
+    expect(selector.className).toContain("text-amber-700");
   });
 });
