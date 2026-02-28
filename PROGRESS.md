@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 33
-- **Completed**: 29
-- **Remaining**: 4
+- **Completed**: 30
+- **Remaining**: 3
 - **Last Updated**: 2026-02-27
 
 ---
@@ -789,3 +789,31 @@
   ![Payoff warning](screenshots/task-29-payoff-warning.png)
   ![Payoff with suggested rate](screenshots/task-29-payoff-suggested-rate.png)
 - **Notes**: The payoff calculation uses standard amortization: each month apply monthly interest (rate/12) to balance, subtract payment, iterate until balance reaches 0. Caps at 1200 months (100 years) to prevent infinite loops. The display uses the effective rate (explicit or suggested default) so users get immediate feedback when they set a monthly payment even without explicitly confirming the interest rate.
+
+---
+
+## Task 30: Support different income frequencies
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/IncomeEntry.tsx`: Added `IncomeFrequency` type and `normalizeToMonthly()` export. Added `frequency` optional field to `IncomeItem` interface. Each income row now shows a frequency dropdown (/mo, /wk, /2wk, /qtr, /6mo, /yr). The "add new" form includes a frequency selector. Monthly total at the bottom normalizes all items to monthly equivalent.
+  - `src/lib/financial-state.ts`: Updated `computeTotals()` to normalize income by frequency using `normalizeToMonthly()`.
+  - `src/lib/url-state.ts`: Added `f` field to `CompactIncome` for non-monthly frequencies. Encodes/decodes frequency in URL state (omits "monthly" for compact URLs). Backward compatible — old URLs without frequency still work.
+  - `tests/unit/income-entry.test.tsx`: Updated 3 existing tests to use `getByTestId("income-monthly-total")` matcher instead of full text match (due to nested `<span>` for the total).
+  - `tests/unit/income-frequency.test.tsx`: New test file with 14 tests covering normalizeToMonthly math, frequency UI rendering, onChange callbacks, URL state roundtrip, and computeTotals normalization.
+  - `tests/e2e/income-frequency.spec.ts`: New E2E test file with 7 tests covering frequency dropdowns, monthly total updates, add form with frequency, URL persistence, and dashboard metric updates.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/income-frequency.test.tsx`: 14 tests — normalizeToMonthly (all 6 frequencies + zero + default), frequency UI (render, change, add with frequency, onChange callback), URL state roundtrip (with frequency, backward compat), computeTotals (single frequency, mixed frequencies)
+  - `tests/e2e/income-frequency.spec.ts`: 7 tests — frequency dropdowns visible with defaults, monthly total updates on change, weekly normalization, add form frequency selector, add with non-monthly frequency, URL persistence after reload, dashboard metrics update
+  - All T1 unit tests: 421 passed, 0 failed (30 test files)
+  - All T2 income-frequency tests: 7 passed, 0 failed
+- **Screenshots**:
+  ![Frequency defaults](screenshots/task-30-income-frequency-defaults.png)
+  ![Frequency changed to annually](screenshots/task-30-frequency-changed-to-annually.png)
+  ![Frequency weekly](screenshots/task-30-frequency-weekly.png)
+  ![Add form with frequency](screenshots/task-30-add-form-with-frequency.png)
+  ![New quarterly income](screenshots/task-30-new-quarterly-income.png)
+  ![Frequency persists after reload](screenshots/task-30-frequency-persists-reload.png)
+  ![Dashboard updates with frequency](screenshots/task-30-dashboard-updates-with-frequency.png)
+- **Notes**: The `normalizeToMonthly()` function is exported from `IncomeEntry.tsx` and also imported by `financial-state.ts` for `computeTotals()`. All downstream consumers (projections, insights, dashboard metrics) benefit from the normalization since they flow through `computeTotals()`. Frequency defaults to "monthly" when undefined, ensuring backward compatibility with existing saved URLs.

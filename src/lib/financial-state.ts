@@ -1,6 +1,7 @@
 import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
+import { normalizeToMonthly } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import type { Goal } from "@/components/GoalEntry";
 import type { Property } from "@/components/PropertyEntry";
@@ -51,7 +52,7 @@ export const INITIAL_STATE: FinancialState = {
 export function computeTotals(state: FinancialState) {
   const totalAssets = state.assets.reduce((sum, a) => sum + a.amount, 0);
   const totalDebts = state.debts.reduce((sum, d) => sum + d.amount, 0);
-  const monthlyIncome = state.income.reduce((sum, i) => sum + i.amount, 0);
+  const monthlyIncome = state.income.reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency), 0);
   const monthlyExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
   // Properties: equity = value - mortgage. Counts toward net worth but NOT runway (illiquid).
   const properties = state.properties ?? [];

@@ -2,10 +2,43 @@
 
 import { useState, useRef, useEffect } from "react";
 
+export type IncomeFrequency = "monthly" | "weekly" | "biweekly" | "quarterly" | "semi-annually" | "annually";
+
 export interface IncomeItem {
   id: string;
   category: string;
   amount: number;
+  frequency?: IncomeFrequency;
+}
+
+const FREQUENCY_LABELS: Record<IncomeFrequency, string> = {
+  monthly: "Monthly",
+  weekly: "Weekly",
+  biweekly: "Biweekly",
+  quarterly: "Quarterly",
+  "semi-annually": "Semi-annually",
+  annually: "Annually",
+};
+
+const FREQUENCY_SHORT_LABELS: Record<IncomeFrequency, string> = {
+  monthly: "/mo",
+  weekly: "/wk",
+  biweekly: "/2wk",
+  quarterly: "/qtr",
+  "semi-annually": "/6mo",
+  annually: "/yr",
+};
+
+export function normalizeToMonthly(amount: number, frequency: IncomeFrequency = "monthly"): number {
+  switch (frequency) {
+    case "weekly": return amount * 52 / 12;
+    case "biweekly": return amount * 26 / 12;
+    case "quarterly": return amount / 3;
+    case "semi-annually": return amount / 6;
+    case "annually": return amount / 12;
+    case "monthly":
+    default: return amount;
+  }
 }
 
 const CATEGORY_SUGGESTIONS = [
@@ -95,6 +128,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
   const [addingNew, setAddingNew] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [newAmount, setNewAmount] = useState("");
+  const [newFrequency, setNewFrequency] = useState<IncomeFrequency>("monthly");
   const [showNewSuggestions, setShowNewSuggestions] = useState(false);
   const [animatingTotal, setAnimatingTotal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -103,7 +137,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const total = items.reduce((sum, item) => sum + item.amount, 0);
+  const total = items.reduce((sum, item) => sum + normalizeToMonthly(item.amount, item.frequency), 0);
 
   const triggerTotalAnimation = () => {
     if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
@@ -171,16 +205,29 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
+  const changeFrequency = (id: string, frequency: IncomeFrequency) => {
+    triggerTotalAnimation();
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, frequency } : item
+      )
+    );
+  };
+
   const addItem = () => {
     if (!newCategory.trim()) return;
     const amount = parseCurrencyInput(newAmount);
     triggerTotalAnimation();
-    setItems((prev) => [
-      ...prev,
-      { id: generateId(), category: newCategory.trim(), amount },
-    ]);
+    const newItem: IncomeItem = {
+      id: generateId(),
+      category: newCategory.trim(),
+      amount,
+      ...(newFrequency !== "monthly" ? { frequency: newFrequency } : {}),
+    };
+    setItems((prev) => [...prev, newItem]);
     setNewCategory("");
     setNewAmount("");
+    setNewFrequency("monthly");
     setAddingNew(false);
     setShowNewSuggestions(false);
   };
@@ -317,6 +364,21 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                     {formatCurrency(item.amount)}
                   </button>
                 )}
+
+                {/* Frequency badge/dropdown */}
+                <select
+                  value={item.frequency ?? "monthly"}
+                  onChange={(e) => changeFrequency(item.id, e.target.value as IncomeFrequency)}
+                  className="w-auto min-h-[44px] sm:min-h-0 rounded-md border border-stone-200 bg-stone-50 px-1.5 py-1 text-xs text-stone-500 transition-all duration-150 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 cursor-pointer"
+                  aria-label={`Change frequency for ${item.category}`}
+                  data-testid={`frequency-${item.id}`}
+                >
+                  {(Object.keys(FREQUENCY_SHORT_LABELS) as IncomeFrequency[]).map((freq) => (
+                    <option key={freq} value={freq}>
+                      {FREQUENCY_SHORT_LABELS[freq]}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Delete button */}
@@ -398,6 +460,19 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                 className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-right text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New income amount"
               />
+              <select
+                value={newFrequency}
+                onChange={(e) => setNewFrequency(e.target.value as IncomeFrequency)}
+                className="min-h-[44px] sm:min-h-0 rounded-md border border-blue-300 bg-white px-2 py-2 text-xs text-stone-600 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:py-1 cursor-pointer"
+                aria-label="New income frequency"
+                data-testid="new-income-frequency"
+              >
+                {(Object.keys(FREQUENCY_LABELS) as IncomeFrequency[]).map((freq) => (
+                  <option key={freq} value={freq}>
+                    {FREQUENCY_LABELS[freq]}
+                  </option>
+                ))}
+              </select>
               <button
                 type="button"
                 onClick={addItem}
@@ -442,7 +517,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
             animatingTotal ? "scale-110 text-green-600" : ""
           }`}
         >
-          Monthly Total: {formatCurrency(total)}
+          Monthly Total: <span data-testid="income-monthly-total">{formatCurrency(total)}</span>
         </span>
         {!addingNew && (
           <button

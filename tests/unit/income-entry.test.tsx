@@ -25,7 +25,7 @@ describe("IncomeEntry component", () => {
 
   it("shows monthly total of all income", () => {
     render(<IncomeEntry />);
-    expect(screen.getByText("Monthly Total: $6,300")).toBeInTheDocument();
+    expect(screen.getByTestId("income-monthly-total")).toHaveTextContent("$6,300");
   });
 
   it("renders the Add Income button", () => {
@@ -46,7 +46,7 @@ describe("IncomeEntry component", () => {
     render(<IncomeEntry />);
     await user.click(screen.getByLabelText("Delete Freelance"));
     expect(screen.queryByText("Freelance")).not.toBeInTheDocument();
-    expect(screen.getByText("Monthly Total: $5,500")).toBeInTheDocument();
+    expect(screen.getByTestId("income-monthly-total")).toHaveTextContent("$5,500");
   });
 
   it("shows click-to-edit input when category is clicked", async () => {
@@ -101,7 +101,7 @@ describe("IncomeEntry component", () => {
     await user.click(screen.getByLabelText("Confirm add income"));
     expect(screen.getByText("Side Hustle")).toBeInTheDocument();
     expect(screen.getByText("$500")).toBeInTheDocument();
-    expect(screen.getByText("Monthly Total: $6,800")).toBeInTheDocument();
+    expect(screen.getByTestId("income-monthly-total")).toHaveTextContent("$6,800");
   });
 });
 
