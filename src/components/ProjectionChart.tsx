@@ -50,6 +50,12 @@ const SCENARIO_COLORS: Record<Scenario, string> = {
   optimistic: "#3b82f6",
 };
 
+const SCENARIO_DESCRIPTIONS: Record<Scenario, string> = {
+  conservative: "30% below your entered returns — accounts for market downturns and lower growth",
+  moderate: "Uses your entered ROI values as-is — expected returns based on your inputs",
+  optimistic: "30% above your entered returns — best-case growth scenario",
+};
+
 interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{ value: number; name: string; color: string }>;
@@ -77,6 +83,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 export default function ProjectionChart({ state }: ProjectionChartProps) {
   const [years, setYears] = useState(10);
   const [scenario, setScenario] = useState<Scenario>("moderate");
+  const [legendOpen, setLegendOpen] = useState(false);
 
   const projection = useMemo(
     () => projectFinances(state, years, scenario),
@@ -129,6 +136,7 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
             <button
               key={s}
               onClick={() => setScenario(s)}
+              title={SCENARIO_DESCRIPTIONS[s]}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
                 scenario === s
                   ? "text-white shadow-sm"
@@ -290,6 +298,44 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
             <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />
             Goal reached
           </span>
+        )}
+      </div>
+
+      {/* Scenario legend */}
+      <div className="mt-3 border-t border-stone-100 pt-3" data-testid="scenario-legend">
+        <button
+          onClick={() => setLegendOpen(!legendOpen)}
+          className="flex w-full items-center gap-1.5 text-xs font-medium text-stone-500 transition-colors duration-200 hover:text-stone-700"
+          data-testid="scenario-legend-toggle"
+          aria-expanded={legendOpen}
+        >
+          <svg
+            className={`h-3 w-3 transition-transform duration-200 ${legendOpen ? "rotate-90" : ""}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+          What do the scenarios mean?
+        </button>
+        {legendOpen && (
+          <div className="mt-2 space-y-2" data-testid="scenario-legend-content">
+            {(Object.keys(SCENARIO_LABELS) as Scenario[]).map((s) => (
+              <div key={s} className="flex items-start gap-2">
+                <span
+                  className="mt-1.5 inline-block h-2 w-2 flex-shrink-0 rounded-full"
+                  style={{ backgroundColor: SCENARIO_COLORS[s] }}
+                />
+                <p className="text-xs text-stone-600">
+                  <span className="font-semibold">{SCENARIO_LABELS[s]}</span>
+                  {" — "}
+                  {SCENARIO_DESCRIPTIONS[s]}
+                </p>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

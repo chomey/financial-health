@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 33
-- **Completed**: 27
-- **Remaining**: 6
+- **Completed**: 28
+- **Remaining**: 5
 - **Last Updated**: 2026-02-27
 
 ---
@@ -751,3 +751,21 @@
   ![Chart at top of dashboard](screenshots/task-27-chart-at-top-of-dashboard.png)
   ![Dashboard flow](screenshots/task-27-dashboard-flow.png)
 - **Notes**: The projection chart is now the first thing users see in the dashboard column, making it the most prominent visual. The chart remains responsive and the rest of the dashboard (metric cards, insights) flows naturally below it. Changed the chart's root element to a `<section>` to preserve the existing aria-label test.
+
+---
+
+## Task 28: Add explanatory legend for projection scenario lines
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/ProjectionChart.tsx`: Added SCENARIO_DESCRIPTIONS constant with explanations for each scenario (Conservative = 30% below entered returns, Moderate = entered ROI as-is, Optimistic = 30% above). Added title attributes to scenario toggle buttons for native tooltips. Added collapsible "What do the scenarios mean?" legend section with colored dots and descriptions. Added legendOpen state for collapse/expand.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/scenario-legend.test.ts`: 6 tests — verifies SCENARIO_DESCRIPTIONS exists, buttons have title attributes, legend section has proper test IDs, aria-expanded attribute, descriptions explain multiplier assumptions, colored dots use scenario colors
+  - `tests/e2e/scenario-legend.spec.ts`: 5 tests — verifies tooltip descriptions on scenario buttons, legend starts collapsed with aria-expanded=false, clicking toggle expands and shows all three descriptions, clicking again collapses, colored dots match scenarios
+  - All T1 unit tests: 382 passed, 0 failed
+  - All T2 scenario legend tests: 5 passed, 0 failed
+- **Screenshots**:
+  ![Scenario legend expanded](screenshots/task-28-scenario-legend-expanded.png)
+  ![Scenario legend colors](screenshots/task-28-scenario-legend-colors.png)
+- **Notes**: The legend is collapsible to avoid cluttering the chart area. Each scenario button also has a native title tooltip for quick reference without needing to open the legend. Descriptions match the actual multipliers in projections.ts (0.7×, 1.0×, 1.3×).
