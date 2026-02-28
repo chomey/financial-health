@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 46
-- **Completed**: 44
-- **Remaining**: 2
+- **Completed**: 45
+- **Remaining**: 1
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1112,3 +1112,33 @@
   ![Projection chart](screenshots/task-45-projection-chart.png)
   ![All metrics with tax](screenshots/task-45-all-metrics-with-tax.png)
 - **Notes**: The tax summary and projection after-tax integration were largely done in Task 44. This task completed the feature by adding tax-related insights to the insights engine (effective rate info, capital gains lower rate messaging, high tax rate suggestions), wiring them to the Estimated Tax dashboard card, and writing comprehensive T1+T2 tests to verify projections correctly use after-tax values.
+
+## Task 46: [MILESTONE] Full E2E test for tax computation feature
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `tests/e2e/milestone-4-e2e.spec.ts`: New comprehensive T3 E2E test with 4 test cases covering all tax computation features from tasks 37-45: country selector switching (CA/US), province/state selector updating, income type selector with capital-gains visual styling, dashboard metrics with after-tax values, surplus reflecting tax deductions, capital gains vs employment effective rate differences, tax insights under Estimated Tax card, projection chart with after-tax data, and URL persistence of country/jurisdiction/incomeType across reload.
+  - `tests/unit/milestone-4-infra.test.ts`: T1 infrastructure verification test confirming all tax feature test files exist, tax-engine/tax-tables exports, INITIAL_STATE country/jurisdiction defaults, computeTotals after-tax fields, and URL state roundtrip encoding.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/milestone-4-infra.test.ts`: 8 tests — milestone E2E file exists, feature E2E files present, feature unit files present, tax-engine exports, tax-tables exports, INITIAL_STATE country/jurisdiction, computeTotals after-tax fields, URL state encoding (8 passed, 0 failed)
+  - `tests/e2e/milestone-4-e2e.spec.ts`: 4 tests — full journey (country/income type/tax metrics/surplus/capital gains/URL persistence), tax insights under Estimated Tax card, projection chart after-tax, province/state switching (4 passed, 0 failed)
+  - All unit tests: 558 passed, 0 failed
+  - All E2E tests: 138 passed, 0 failed
+- **Screenshots**:
+  ![Country selector default CA](screenshots/task-46-country-selector-default-ca.png)
+  ![Country selector US](screenshots/task-46-country-selector-us.png)
+  ![US NY selected](screenshots/task-46-us-ny-selected.png)
+  ![Five metric cards with tax](screenshots/task-46-five-metric-cards-with-tax.png)
+  ![Surplus after tax](screenshots/task-46-surplus-after-tax.png)
+  ![Income type capital gains](screenshots/task-46-income-type-capital-gains.png)
+  ![Employment vs capital gains rate](screenshots/task-46-employment-vs-capital-gains-rate.png)
+  ![Capital gains category suggestions](screenshots/task-46-capital-gains-category-suggestions.png)
+  ![Capital gains income added](screenshots/task-46-capital-gains-income-added.png)
+  ![US TX tax comparison](screenshots/task-46-us-tx-tax-comparison.png)
+  ![US NY vs TX tax](screenshots/task-46-us-ny-vs-tx-tax.png)
+  ![URL persistence after reload](screenshots/task-46-url-persistence-after-reload.png)
+  ![Tax insights](screenshots/task-46-tax-insights.png)
+  ![Projection chart after tax](screenshots/task-46-projection-chart-after-tax.png)
+  ![Province state switching](screenshots/task-46-province-state-switching.png)
+- **Notes**: This milestone E2E test validates the complete tax computation feature across tasks 37-45. All 558 unit tests and 138 E2E tests pass. The test covers country switching (CA→US→CA), jurisdiction dependent selection, income type selectors with capital-gains amber styling, after-tax dashboard metrics, tax rate differences between jurisdictions (US/TX no state tax vs US/NY with state tax), and full URL state persistence across page reload.
