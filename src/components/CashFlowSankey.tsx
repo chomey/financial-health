@@ -60,7 +60,7 @@ export default function CashFlowSankey({
   monthlyProvincialTax,
   monthlySurplus,
 }: CashFlowSankeyProps) {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<number | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{
