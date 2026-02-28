@@ -13,6 +13,7 @@ interface MetricData {
   breakdown?: string;
   effectiveRate?: number;
   valueWithEquity?: number; // net worth including property equity
+  ratioWithoutMortgage?: number; // debt-to-asset ratio excluding mortgage
 }
 
 // Mock values based on existing entry component mock data
@@ -178,6 +179,11 @@ function MetricCard({ metric, insights }: { metric: MetricData; insights: string
       {metric.valueWithEquity !== undefined && metric.valueWithEquity !== metric.value && (
         <p className="mt-0.5 text-sm text-stone-500" data-testid="net-worth-with-equity">
           ({formatMetricValue(metric.valueWithEquity, metric.format)} with home equity)
+        </p>
+      )}
+      {metric.ratioWithoutMortgage !== undefined && metric.ratioWithoutMortgage !== metric.value && (
+        <p className="mt-0.5 text-sm text-stone-500" data-testid="ratio-without-mortgage">
+          ({formatMetricValue(metric.ratioWithoutMortgage, metric.format)} without mortgage)
         </p>
       )}
       {/* Effective tax rate sub-line */}

@@ -99,7 +99,7 @@ function fmtShort(n: number): string {
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate } = computeTotals(state);
 
   // Net worth: show without property equity as primary, with equity as secondary
   const netWorthWithoutEquity = totalAssets + totalStocks - totalDebts;
@@ -111,9 +111,14 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const liquidTotal = totalAssets + totalStocks;
   const runway = monthlyExpenses > 0 ? liquidTotal / monthlyExpenses : 0;
   // Debt-to-asset ratio includes property: (debts + mortgages) / (liquid assets + stocks + property values)
-  const totalAllAssets = totalAssets + totalStocks + totalPropertyEquity;
+  // Use property VALUE (not equity) on asset side — equity already nets out the mortgage,
+  // so using equity + mortgage as debt would double-count the mortgage.
+  const totalAllAssets = totalAssets + totalStocks + totalPropertyValue;
   const totalAllDebts = totalDebts + totalPropertyMortgage;
   const debtToAssetRatio = totalAllAssets > 0 ? totalAllDebts / totalAllAssets : 0;
+  // Ratio excluding mortgage — just consumer debts vs liquid assets + stocks
+  const assetsWithoutProperty = totalAssets + totalStocks;
+  const debtToAssetWithoutMortgage = assetsWithoutProperty > 0 ? totalDebts / assetsWithoutProperty : 0;
 
   // Build breakdown strings
   const nwParts: string[] = [];
@@ -196,6 +201,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
         "Your total debts divided by your total assets. A lower ratio means stronger financial footing. Mortgages often push this higher — that's normal.",
       positive: debtToAssetRatio <= 1,
       breakdown: ratioBreakdown,
+      ratioWithoutMortgage: totalPropertyMortgage > 0 ? parseFloat(debtToAssetWithoutMortgage.toFixed(2)) : undefined,
     },
   ];
 }
