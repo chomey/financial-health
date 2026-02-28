@@ -118,7 +118,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
     // ========================================
     const incomeSection = page
       .locator("section", {
-        has: page.getByRole("heading", { name: "Monthly Income" }),
+        has: page.getByRole("heading", { name: "Income" }),
       })
       .first();
     const incomeList = page.getByRole("list", { name: "Income items" });
@@ -132,7 +132,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
 
     const expenseSection = page
       .locator("section", {
-        has: page.getByRole("heading", { name: "Monthly Expenses" }),
+        has: page.getByRole("heading", { name: "Expenses" }),
       })
       .first();
     const expenseList = page.getByRole("list", { name: "Expense items" });

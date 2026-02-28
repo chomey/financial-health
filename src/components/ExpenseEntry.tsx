@@ -55,9 +55,13 @@ interface ExpenseEntryProps {
   investmentContributions?: number;
   mortgagePayments?: number;
   surplus?: number;
+  surplusTargetName?: string;
+  federalTax?: number;
+  provincialStateTax?: number;
+  country?: "CA" | "US";
 }
 
-export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0, surplus = 0 }: ExpenseEntryProps = {}) {
+export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0, surplus = 0, surplusTargetName, federalTax = 0, provincialStateTax = 0, country = "CA" }: ExpenseEntryProps = {}) {
   const [items, setItems] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -104,14 +108,18 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   const [newAmount, setNewAmount] = useState("");
   const [showNewSuggestions, setShowNewSuggestions] = useState(false);
   const [animatingTotal, setAnimatingTotal] = useState(false);
+  const [viewMode, setViewMode] = useState<"monthly" | "yearly">("monthly");
   const inputRef = useRef<HTMLInputElement>(null);
   const newCategoryRef = useRef<HTMLInputElement>(null);
   const newAmountRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const mult = viewMode === "yearly" ? 12 : 1;
   const itemsTotal = items.reduce((sum, item) => sum + item.amount, 0);
-  const total = itemsTotal + investmentContributions + mortgagePayments;
+  const totalTax = federalTax + provincialStateTax;
+  const total = itemsTotal + investmentContributions + mortgagePayments + totalTax;
+  const provStateLabel = country === "US" ? "State" : "Provincial";
 
   const triggerTotalAnimation = () => {
     if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
@@ -220,10 +228,28 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
-      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-stone-800">
-        <span aria-hidden="true">🧾</span>
-        Monthly Expenses
-      </h2>
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-stone-800">
+          <span aria-hidden="true">🧾</span>
+          Expenses
+        </h2>
+        <div className="flex items-center rounded-full bg-stone-100 p-0.5" data-testid="expense-view-toggle">
+          <button
+            type="button"
+            onClick={() => setViewMode("monthly")}
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-200 ${viewMode === "monthly" ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"}`}
+          >
+            Monthly
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("yearly")}
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-200 ${viewMode === "yearly" ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"}`}
+          >
+            Yearly
+          </button>
+        </div>
+      </div>
 
       {items.length === 0 && !addingNew ? (
         <div className="flex flex-col items-center py-4 text-center" data-testid="expense-empty-state">
@@ -321,7 +347,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                     className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-amber-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-amber-50 hover:text-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-200"
                     aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
                   >
-                    {formatCurrency(item.amount)}
+                    {formatCurrency(item.amount * mult)}
                   </button>
                 )}
               </div>
@@ -351,6 +377,40 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
         </div>
       )}
 
+      {/* Auto-generated tax breakdown rows */}
+      {totalTax > 0 && (
+        <div className="mt-1 space-y-1" data-testid="tax-breakdown">
+          <div
+            className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200"
+            data-testid="federal-tax-row"
+          >
+            <div className="flex flex-1 items-center gap-2 min-w-0">
+              <span className="text-sm italic text-stone-500">Federal Tax</span>
+              <span className="inline-flex items-center rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-600" title="Estimated from your income and tax brackets">
+                est.
+              </span>
+            </div>
+            <span className="text-sm font-medium italic text-amber-600">
+              {formatCurrency(federalTax * mult)}
+            </span>
+          </div>
+          <div
+            className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200"
+            data-testid="provincial-state-tax-row"
+          >
+            <div className="flex flex-1 items-center gap-2 min-w-0">
+              <span className="text-sm italic text-stone-500">{provStateLabel} Tax</span>
+              <span className="inline-flex items-center rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-600" title="Estimated from your income and tax brackets">
+                est.
+              </span>
+            </div>
+            <span className="text-sm font-medium italic text-amber-600">
+              {formatCurrency(provincialStateTax * mult)}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Auto-generated investment contributions row */}
       {investmentContributions > 0 && (
         <div
@@ -366,7 +426,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
             </span>
           </div>
           <span className="text-sm font-medium italic text-amber-600">
-            {formatCurrency(investmentContributions)}
+            {formatCurrency(investmentContributions * mult)}
           </span>
         </div>
       )}
@@ -386,7 +446,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
             </span>
           </div>
           <span className="text-sm font-medium italic text-amber-600">
-            {formatCurrency(mortgagePayments)}
+            {formatCurrency(mortgagePayments * mult)}
           </span>
         </div>
       )}
@@ -401,12 +461,17 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
             <span className="text-sm italic text-stone-500">
               {surplus >= 0 ? "Surplus" : "Shortfall"}
             </span>
+            {surplus > 0 && surplusTargetName && (
+              <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600" title={`Monthly surplus allocated to ${surplusTargetName}`}>
+                → {surplusTargetName}
+              </span>
+            )}
             <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600" title="Auto-calculated from income minus expenses and contributions">
               auto
             </span>
           </div>
           <span className={`text-sm font-medium italic ${surplus >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
-            {surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus))}
+            {surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus) * mult)}
           </span>
         </div>
       )}
@@ -509,7 +574,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
             animatingTotal ? "scale-110 text-amber-600" : ""
           }`}
         >
-          Monthly Total: {formatCurrency(total)}
+          {viewMode === "yearly" ? "Yearly" : "Monthly"} Total: {formatCurrency(total * mult)}
         </span>
         {!addingNew && (
           <button

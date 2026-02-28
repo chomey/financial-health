@@ -24,10 +24,10 @@ test.describe("App shell layout", () => {
       page.getByRole("heading", { name: "Debts" })
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Monthly Income" })
+      page.getByRole("heading", { name: "Income" })
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Monthly Expenses" })
+      page.getByRole("heading", { name: "Expenses" })
     ).toBeVisible();
 
     // Dashboard metric cards (scoped to metric group elements)

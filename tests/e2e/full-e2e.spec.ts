@@ -39,7 +39,7 @@ test.describe("T3: Full end-to-end user journey", () => {
     await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$260,500");
 
     // --- Step 4: Add income and verify surplus updates ---
-    const incomeSection = page.locator("section", { has: page.getByText("Monthly Income") }).first();
+    const incomeSection = page.locator("section", { has: page.getByText("Income") }).first();
     await incomeSection.getByText("+ Add Income").click();
     await page.getByLabel("New income category").fill("Side Hustle");
     await page.getByLabel("New income amount").fill("2000");
@@ -49,7 +49,7 @@ test.describe("T3: Full end-to-end user journey", () => {
     await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$5,350");
 
     // --- Step 5: Add an expense and verify surplus + runway update ---
-    const expenseSection = page.locator("section", { has: page.getByText("Monthly Expenses") }).first();
+    const expenseSection = page.locator("section", { has: page.getByText("Expenses") }).first();
     await expenseSection.getByText("+ Add Expense").click();
     await page.getByLabel("New expense category").fill("Insurance");
     await page.getByLabel("New expense amount").fill("200");

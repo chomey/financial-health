@@ -67,6 +67,8 @@ export function computeTotals(state: FinancialState) {
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
   let totalAnnualTax = 0;
+  let totalFederalTax = 0;
+  let totalProvincialStateTax = 0;
   let totalAfterTaxAnnual = 0;
   let weightedEffectiveRate = 0;
 
@@ -76,6 +78,8 @@ export function computeTotals(state: FinancialState) {
     if (annualAmt <= 0) continue;
     const taxResult = computeTax(annualAmt, item.incomeType ?? "employment", country, jurisdiction);
     totalAnnualTax += taxResult.totalTax;
+    totalFederalTax += taxResult.federalTax;
+    totalProvincialStateTax += taxResult.provincialStateTax;
     totalAfterTaxAnnual += taxResult.afterTaxIncome;
     weightedEffectiveRate += taxResult.effectiveRate * annualAmt;
   }
@@ -85,7 +89,7 @@ export function computeTotals(state: FinancialState) {
   const monthlyAfterTaxIncome = totalAfterTaxAnnual / 12;
   const totalTaxEstimate = totalAnnualTax;
 
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate };
+  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax, totalProvincialStateTax, effectiveTaxRate };
 }
 
 function fmtShort(n: number): string {

@@ -6,7 +6,7 @@ test.describe("Income entry section", () => {
     await page.goto("/");
 
     await expect(
-      page.getByRole("heading", { name: "Monthly Income" })
+      page.getByRole("heading", { name: "Income" })
     ).toBeVisible();
 
     await expect(page.getByText("Salary")).toBeVisible();
@@ -46,7 +46,7 @@ test.describe("Income entry section", () => {
     await page.getByLabel("Confirm add income").click();
 
     // Scope to income section to avoid matching projection chart text
-    const incomeSection = page.locator("section", { has: page.getByRole("heading", { name: "Monthly Income" }) }).first();
+    const incomeSection = page.locator("section", { has: page.getByRole("heading", { name: "Income" }) }).first();
     await expect(incomeSection.getByText("Side Hustle")).toBeVisible();
     await expect(incomeSection.getByText("$500")).toBeVisible();
     await expect(incomeSection.getByText("Monthly Total: $6,800")).toBeVisible();
