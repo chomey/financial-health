@@ -22,15 +22,11 @@ describe("Deterministic IDs prevent hydration mismatch", () => {
 
     // Income should have i-prefixed IDs
     expect(restored.income[0].id).toBe("i1");
-    expect(restored.income[1].id).toBe("i2");
 
     // Expenses should have e-prefixed IDs
     expect(restored.expenses[0].id).toBe("e1");
     expect(restored.expenses[1].id).toBe("e2");
     expect(restored.expenses[2].id).toBe("e3");
-
-    // Properties should have p-prefixed IDs
-    expect(restored.properties[0].id).toBe("p1");
   });
 
   it("INITIAL_STATE IDs match fromCompact output after roundtrip", () => {
@@ -79,6 +75,6 @@ describe("Deterministic IDs prevent hydration mismatch", () => {
 
     // Same input should always produce the same IDs (deterministic)
     expect(restored1.assets[0].id).toBe(restored2.assets[0].id);
-    expect(restored1.properties[0].id).toBe(restored2.properties[0].id);
+    expect(restored1.debts[0].id).toBe(restored2.debts[0].id);
   });
 });

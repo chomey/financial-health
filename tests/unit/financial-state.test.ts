@@ -21,29 +21,29 @@ describe("financial-state", () => {
   describe("computeTotals", () => {
     it("sums assets correctly from initial state", () => {
       const { totalAssets } = computeTotals(INITIAL_STATE);
-      expect(totalAssets).toBe(12000 + 35000 + 18500);
+      expect(totalAssets).toBe(5000 + 22000 + 28000);
     });
 
     it("sums debts correctly from initial state", () => {
       const { totalDebts } = computeTotals(INITIAL_STATE);
-      expect(totalDebts).toBe(15000);
+      expect(totalDebts).toBe(5000);
     });
 
     it("sums income correctly from initial state", () => {
       const { monthlyIncome } = computeTotals(INITIAL_STATE);
-      expect(monthlyIncome).toBe(5500 + 800);
+      expect(monthlyIncome).toBe(4500);
     });
 
     it("sums expenses correctly from initial state", () => {
       const { monthlyExpenses } = computeTotals(INITIAL_STATE);
-      expect(monthlyExpenses).toBe(2200 + 600 + 150);
+      expect(monthlyExpenses).toBe(1800 + 500 + 50);
     });
 
     it("computes property equity from initial state", () => {
       const { totalPropertyEquity, totalPropertyValue, totalPropertyMortgage } = computeTotals(INITIAL_STATE);
-      expect(totalPropertyValue).toBe(450000);
-      expect(totalPropertyMortgage).toBe(280000);
-      expect(totalPropertyEquity).toBe(170000);
+      expect(totalPropertyValue).toBe(0);
+      expect(totalPropertyMortgage).toBe(0);
+      expect(totalPropertyEquity).toBe(0);
     });
 
     it("handles empty arrays", () => {
@@ -66,7 +66,7 @@ describe("financial-state", () => {
 
     it("computes after-tax monthly income for initial state", () => {
       const totals = computeTotals(INITIAL_STATE);
-      // Gross monthly: 6300, after-tax should be less
+      // Gross monthly: 4500, after-tax should be less
       expect(totals.monthlyAfterTaxIncome).toBeLessThan(totals.monthlyIncome);
       expect(totals.monthlyAfterTaxIncome).toBeGreaterThan(0);
       expect(totals.totalTaxEstimate).toBeGreaterThan(0);
@@ -76,12 +76,11 @@ describe("financial-state", () => {
 
     it("computes after-tax income matching individual tax computations", () => {
       const totals = computeTotals(INITIAL_STATE);
-      // Manually compute: Salary $66k + Freelance $9600, both employment, CA/ON
-      const salaryTax = computeTax(66000, "employment", "CA", "ON");
-      const freelanceTax = computeTax(9600, "employment", "CA", "ON");
-      const expectedAfterTaxAnnual = salaryTax.afterTaxIncome + freelanceTax.afterTaxIncome;
+      // Manually compute: Salary $54k, employment, CA/ON
+      const salaryTax = computeTax(54000, "employment", "CA", "ON");
+      const expectedAfterTaxAnnual = salaryTax.afterTaxIncome;
       expect(totals.monthlyAfterTaxIncome).toBeCloseTo(expectedAfterTaxAnnual / 12, 2);
-      expect(totals.totalTaxEstimate).toBeCloseTo(salaryTax.totalTax + freelanceTax.totalTax, 2);
+      expect(totals.totalTaxEstimate).toBeCloseTo(salaryTax.totalTax, 2);
     });
 
     it("handles capital gains income type for after-tax computation", () => {
@@ -126,8 +125,8 @@ describe("financial-state", () => {
       const metrics = computeMetrics(INITIAL_STATE);
       const netWorth = metrics.find((m) => m.title === "Net Worth");
       expect(netWorth).toBeDefined();
-      // liquid assets (65500) + property equity (170000) - debts (15000)
-      expect(netWorth!.value).toBe(65500 + 170000 - 15000);
+      // liquid assets (55000) + property equity (0) - debts (5000)
+      expect(netWorth!.value).toBe(55000 + 0 - 5000);
       expect(netWorth!.format).toBe("currency");
     });
 
@@ -135,8 +134,8 @@ describe("financial-state", () => {
       const metrics = computeMetrics(INITIAL_STATE);
       const surplus = metrics.find((m) => m.title === "Monthly Surplus");
       expect(surplus).toBeDefined();
-      // After-tax surplus should be less than pre-tax surplus (6300 - 2950 = 3350)
-      const preTaxSurplus = 6300 - 2950;
+      // After-tax surplus should be less than pre-tax surplus (4500 - 2350 = 2150)
+      const preTaxSurplus = 4500 - 2350;
       expect(surplus!.value).toBeLessThan(preTaxSurplus);
       expect(surplus!.value).toBeGreaterThan(0);
       expect(surplus!.positive).toBe(true);
@@ -172,7 +171,7 @@ describe("financial-state", () => {
       const metrics = computeMetrics(INITIAL_STATE);
       const runway = metrics.find((m) => m.title === "Financial Runway");
       expect(runway).toBeDefined();
-      expect(runway!.value).toBeCloseTo(65500 / 2950, 1);
+      expect(runway!.value).toBeCloseTo(55000 / 2350, 1);
       expect(runway!.format).toBe("months");
     });
 
@@ -180,8 +179,8 @@ describe("financial-state", () => {
       const metrics = computeMetrics(INITIAL_STATE);
       const ratio = metrics.find((m) => m.title === "Debt-to-Asset Ratio");
       expect(ratio).toBeDefined();
-      // (debts 15000 + mortgage 280000) / (liquid 65500 + equity 170000)
-      expect(ratio!.value).toBeCloseTo((15000 + 280000) / (65500 + 170000), 2);
+      // (debts 5000 + mortgage 0) / (liquid 55000 + equity 0)
+      expect(ratio!.value).toBeCloseTo((5000 + 0) / (55000 + 0), 2);
       expect(ratio!.format).toBe("ratio");
     });
 
@@ -279,19 +278,19 @@ describe("financial-state", () => {
   describe("toFinancialData", () => {
     it("converts state to FinancialData for insights", () => {
       const data = toFinancialData(INITIAL_STATE);
-      // totalAssets includes property value (not equity): 65500 + 450000
-      expect(data.totalAssets).toBe(65500 + 450000);
-      // totalDebts includes mortgage: 15000 + 280000
-      expect(data.totalDebts).toBe(15000 + 280000);
+      // totalAssets includes property value (not equity): 55000 + 0
+      expect(data.totalAssets).toBe(55000);
+      // totalDebts includes mortgage: 5000 + 0
+      expect(data.totalDebts).toBe(5000);
       // netWorth = totalAssets - totalDebts matches computeMetrics
-      expect(data.totalAssets - data.totalDebts).toBe(65500 + (450000 - 280000) - 15000);
+      expect(data.totalAssets - data.totalDebts).toBe(55000 - 5000);
       // liquidAssets excludes property
-      expect(data.liquidAssets).toBe(65500);
+      expect(data.liquidAssets).toBe(55000);
       // monthlyIncome now uses after-tax income
       const totals = computeTotals(INITIAL_STATE);
       expect(data.monthlyIncome).toBeCloseTo(totals.monthlyAfterTaxIncome, 2);
-      expect(data.monthlyIncome).toBeLessThan(6300); // less than gross
-      expect(data.monthlyExpenses).toBe(2950);
+      expect(data.monthlyIncome).toBeLessThan(4500); // less than gross
+      expect(data.monthlyExpenses).toBe(2350);
     });
   });
 });

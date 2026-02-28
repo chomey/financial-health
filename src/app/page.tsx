@@ -190,10 +190,11 @@ export default function Home() {
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  // Update URL whenever state changes
+  // Update URL whenever state changes (skip initial render to keep URL clean with defaults)
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
+      return;
     }
     updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction });
   }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction]);
