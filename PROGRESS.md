@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 55
-- **Completed**: 49
-- **Remaining**: 6
+- **Completed**: 50
+- **Remaining**: 5
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1195,3 +1195,18 @@
 - **Screenshots**:
   ![Expense breakdown chart](screenshots/task-49-expense-breakdown-chart.png)
 - **Notes**: Uses horizontal bar chart (not doughnut) for better readability of expense categories with labels. The income vs expenses comparison bar shows a green fill when under budget with surplus annotation, or red when over budget. Auto-generated categories are clearly distinguished with "auto" badges in both tooltip and legend.
+
+## Task 50: Build net worth breakdown waterfall chart
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/components/NetWorthWaterfallChart.tsx`: New component — horizontal waterfall/bridge chart showing how net worth is composed. Assets stack up as green bars, debts pull down as red bars, final net worth shown as blue bar. Uses recharts BarChart with stacked invisible base bars for waterfall positioning. Includes custom tooltip, legend, and responsive sizing.
+  - `src/app/page.tsx`: Added NetWorthWaterfallChart import and placed it after AssetAllocationChart in the dashboard column.
+- **Test tiers run**: T1, T2, T3 (50th completed task triggers T3)
+- **Tests**:
+  - `tests/unit/waterfall-chart.test.ts`: 9 passed, 0 failed (empty data, assets only, assets+debts, property equity/mortgage, stocks, zero-value filtering, negative net worth, duplicate category grouping, complex multi-type scenario)
+  - `tests/e2e/waterfall-chart.spec.ts`: 4 passed, 0 failed (renders with default data, empty state, dashboard positioning, ordering after allocation chart)
+  - All existing tests: 605 unit tests passed, 112 E2E tests passed
+- **Screenshots**:
+  ![Net worth waterfall chart](screenshots/task-50-waterfall-chart-default.png)
+- **Notes**: Waterfall chart uses stacked bars with an invisible "base" bar to achieve the bridge/waterfall effect. Property equity is shown separately from liquid assets, and property mortgages are shown separately from consumer debts, giving clear visibility into how each component contributes to net worth. Chart dynamically sizes based on number of segments.
