@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 46
-- **Completed**: 39
-- **Remaining**: 7
+- **Completed**: 40
+- **Remaining**: 6
 - **Last Updated**: 2026-02-27
 
 ---
@@ -1013,3 +1013,15 @@
   - `tests/unit/tax-tables.test.ts`: 24 tests covering: getCanadianBrackets lookup (valid codes, case-insensitive, all 13 provinces, unknown code error, unsupported year error), calculateProgressiveTax (zero/negative income, below BPA, $50k/$100k federal, $100k Ontario, combined federal+Ontario, $200k Alberta, high income top bracket, BPA credit floor), calculateCanadianCapitalGainsInclusion (zero/negative, under $250k at 50%, above $250k at 66.67%, exact $250k boundary), bracket table integrity (contiguous brackets, rates between 0 and 1, capital gains constants). All 24 passed, 0 failed.
   - All 463 unit tests passed, 0 failed.
 - **Notes**: Backend-only task ([@backend]), no screenshots required. Tax tables are data-only with pure utility functions — no UI changes. The `calculateProgressiveTax` function applies basic personal amount as a non-refundable credit at the lowest bracket rate, matching CRA methodology. Only 2025 tax year is supported; the lookup function throws for other years. Task 40 will add US federal and state tax tables to this same file.
+
+## Task 40: Build US federal and state tax bracket tables
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/tax-tables.ts`: Extended with 2025 US federal tax brackets (single filer, 7 brackets from 10% to 37%), US long-term capital gains brackets (0%/15%/20% thresholds), and all 50 state + DC income tax tables. Includes `US_FEDERAL_2025` with $15,000 standard deduction stored in `basicPersonalAmount`, `US_CAPITAL_GAINS_2025` bracket table, individual state exports (`US_AL_2025` through `US_WY_2025` plus `US_DC_2025`), `US_STATE_TABLES` lookup map, and `getUSBrackets(state, year?)` function. States with no income tax (AK, FL, NV, NH, SD, TN, TX, WA, WY) have empty bracket arrays. Flat-tax states (AZ, CO, GA, ID, IL, IN, IA, KY, LA, MI, MS, NC, PA, UT) have single-bracket arrays. Graduated-rate states have full bracket tables for single filers. JSDoc comments cite IRS and Tax Foundation sources.
+  - `tests/unit/tax-tables.test.ts`: Added 25 new tests for US tax tables
+- **Test tiers run**: T1
+- **Tests**:
+  - `tests/unit/tax-tables.test.ts`: 49 total tests (24 existing Canadian + 25 new US). New tests cover: getUSBrackets lookup (valid codes, case-insensitive, all 50 states + DC, no-tax states return empty brackets, unknown code error, unsupported year error), US federal tax calculations ($50k, $100k, $200k income with manual bracket math verification, zero income), US state tax calculations (California $100k ≈ $5,842, New York $100k ≈ $5,432, Texas $0, Florida $0, all no-tax states return $0), US capital gains brackets (0% below $48,350, 15% mid-range, 20% above $533,400, zero gains), US bracket table integrity (federal contiguous, capital gains contiguous, all state brackets contiguous, all rates 0–1, standard deduction = $15,000). All 49 passed, 0 failed.
+  - All 485 unit tests passed, 0 failed.
+- **Notes**: Backend-only task ([@backend]), no screenshots required. US standard deduction ($15,000) is stored in `basicPersonalAmount` for data consistency, but note that US deduction is subtracted from income (not applied as a credit like Canadian BPA) — the tax engine (Task 41) will handle this distinction. State `basicPersonalAmount` is set to 0 as state standard deductions vary widely. Washington state's 7% capital gains tax is noted in comments but the income tax bracket array is empty since it's not a general income tax.
