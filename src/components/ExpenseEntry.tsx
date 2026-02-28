@@ -54,9 +54,10 @@ interface ExpenseEntryProps {
   onChange?: (items: ExpenseItem[]) => void;
   investmentContributions?: number;
   mortgagePayments?: number;
+  surplus?: number;
 }
 
-export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0 }: ExpenseEntryProps = {}) {
+export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0, surplus = 0 }: ExpenseEntryProps = {}) {
   const [items, setItems] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -386,6 +387,26 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
           </div>
           <span className="text-sm font-medium italic text-amber-600">
             {formatCurrency(mortgagePayments)}
+          </span>
+        </div>
+      )}
+
+      {/* Auto-generated surplus row */}
+      {surplus !== 0 && (
+        <div
+          className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200 mt-1"
+          data-testid="surplus-row"
+        >
+          <div className="flex flex-1 items-center gap-2 min-w-0">
+            <span className="text-sm italic text-stone-500">
+              {surplus >= 0 ? "Surplus" : "Shortfall"}
+            </span>
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600" title="Auto-calculated from income minus expenses and contributions">
+              auto
+            </span>
+          </div>
+          <span className={`text-sm font-medium italic ${surplus >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+            {surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus))}
           </span>
         </div>
       )}

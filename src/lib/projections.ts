@@ -12,12 +12,6 @@ export interface ProjectionPoint {
   totalPropertyEquity: number;
 }
 
-export interface GoalMilestone {
-  goalName: string;
-  monthReached: number | null; // null if never reached in projection
-  targetAmount: number;
-}
-
 export interface Milestone {
   label: string;
   month: number;
@@ -34,7 +28,6 @@ const SCENARIO_MULTIPLIERS: Record<Scenario, number> = {
 
 export interface ProjectionResult {
   points: ProjectionPoint[];
-  goalMilestones: GoalMilestone[];
   debtFreeMonth: number | null;
   consumerDebtFreeMonth: number | null; // debts only (excludes mortgages)
   mortgageFreeMonth: number | null; // mortgages only
@@ -79,14 +72,6 @@ export function projectFinances(
     mortgage: p.mortgage,
     monthlyRate: ((p.interestRate ?? 0) * multiplier) / 100 / 12,
     monthlyPayment: p.monthlyPayment ?? 0,
-  }));
-
-  // Goal tracking — current amounts grow with surplus allocation
-  const goalProgress = state.goals.map((g) => ({
-    name: g.name,
-    current: g.currentAmount,
-    target: g.targetAmount,
-    reached: g.currentAmount >= g.targetAmount ? 0 : null as number | null,
   }));
 
   const points: ProjectionPoint[] = [];
@@ -142,13 +127,6 @@ export function projectFinances(
       debtFreeMonth = m;
     }
 
-    // Check goals
-    for (const goal of goalProgress) {
-      if (goal.reached === null && goal.current >= goal.target) {
-        goal.reached = m;
-      }
-    }
-
     // Advance one month (skip on last iteration)
     if (m < totalMonths) {
       // Grow assets by ROI and add contributions
@@ -179,24 +157,10 @@ export function projectFinances(
         assetBalances[idx].balance += baseSurplus * multiplier;
       }
 
-      // Goal progress: assume surplus contributes proportionally to goals
-      const unmetGoals = goalProgress.filter((g) => g.reached === null);
-      if (baseSurplus > 0 && unmetGoals.length > 0) {
-        const perGoal = (baseSurplus * multiplier) / unmetGoals.length;
-        for (const g of unmetGoals) {
-          g.current += perGoal;
-        }
-      }
     }
   }
 
-  const goalMilestones: GoalMilestone[] = goalProgress.map((g) => ({
-    goalName: g.name,
-    monthReached: g.reached,
-    targetAmount: g.target,
-  }));
-
-  return { points, goalMilestones, debtFreeMonth, consumerDebtFreeMonth, mortgageFreeMonth, milestones };
+  return { points, debtFreeMonth, consumerDebtFreeMonth, mortgageFreeMonth, milestones };
 }
 
 function formatMilestoneLabel(value: number): string {

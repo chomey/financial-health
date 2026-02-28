@@ -14,7 +14,6 @@ describe("financial-state", () => {
       expect(INITIAL_STATE.debts.length).toBeGreaterThan(0);
       expect(INITIAL_STATE.income.length).toBeGreaterThan(0);
       expect(INITIAL_STATE.expenses.length).toBeGreaterThan(0);
-      expect(INITIAL_STATE.goals.length).toBeGreaterThan(0);
     });
   });
 
@@ -52,7 +51,7 @@ describe("financial-state", () => {
         debts: [],
         income: [],
         expenses: [],
-        goals: [],
+
         properties: [],
       };
       const totals = computeTotals(empty);
@@ -168,14 +167,5 @@ describe("financial-state", () => {
       expect(data.monthlyExpenses).toBe(2950);
     });
 
-    it("maps goals correctly", () => {
-      const data = toFinancialData(INITIAL_STATE);
-      expect(data.goals).toHaveLength(3);
-      expect(data.goals[0]).toEqual({
-        name: "Rainy Day Fund",
-        target: 20000,
-        current: 14500,
-      });
-    });
   });
 });

@@ -76,13 +76,7 @@ test.describe("T3: Full end-to-end user journey", () => {
     // due to onChange timing with URL state sync (pre-existing issue).
     // The edit shows correctly in the entry component; dashboard catches up on next state change.
 
-    // --- Step 7: Verify goals section still functions ---
-    const goalsList = page.getByRole("list", { name: "Goal items" });
-    await expect(goalsList).toContainText("Rainy Day Fund");
-    await expect(goalsList).toContainText("New Car");
-    await expect(goalsList).toContainText("Vacation");
-
-    // --- Step 8: Verify insights reflect the current state ---
+    // --- Step 7: Verify insights reflect the current state ---
     const insightsPanel = page.locator('[data-testid="insights-panel"]');
     await expect(insightsPanel).toBeVisible();
     // Should still have insights based on updated numbers

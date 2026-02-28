@@ -235,22 +235,7 @@ test.describe("T3: Milestone 2 — Comprehensive E2E for features from tasks 22-
     await expect(moderateBtn).toHaveCSS("background-color", "rgb(16, 185, 129)");
 
     // ========================================
-    // Step 9: Verify goal milestones on chart
-    // ========================================
-    // Set timeline to 20 years for milestone visibility
-    await slider.fill("20");
-    await page.waitForTimeout(600);
-
-    // At least one goal should be marked as reached
-    const goalLabels = projChart.getByTestId("goal-reached-label");
-    const goalCount = await goalLabels.count();
-    // Vacation goal ($6200/$6500) should be reached quickly
-    expect(goalCount).toBeGreaterThanOrEqual(1);
-
-    await captureScreenshot(page, "task-26-goal-milestones");
-
-    // ========================================
-    // Step 10: Verify grouped suggestions in dropdowns
+    // Step 9: Verify grouped suggestions in dropdowns
     // ========================================
 
     // Open add asset form

@@ -118,7 +118,6 @@ describe("FinancialState no longer has region field", () => {
       debts: [{ id: "d1", category: "Car Loan", amount: 5000 }],
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
       expenses: [{ id: "e1", category: "Rent", amount: 1500 }],
-      goals: [{ id: "g1", name: "Vacation", targetAmount: 3000, currentAmount: 1000 }],
       properties: [],
     };
     const encoded = encodeState(state);

@@ -26,12 +26,11 @@ test.describe("Mobile responsiveness — 375px viewport", () => {
     await expect(entryPanel).toBeVisible();
     await expect(dashboardPanel).toBeVisible();
 
-    // All five entry sections should be visible (headings include emoji prefix)
+    // All four entry sections should be visible (headings include emoji prefix)
     await expect(page.locator("h2").filter({ hasText: "Assets" })).toBeVisible();
     await expect(page.locator("h2").filter({ hasText: "Debts" })).toBeVisible();
     await expect(page.locator("h2").filter({ hasText: "Monthly Income" })).toBeVisible();
     await expect(page.locator("h2").filter({ hasText: "Monthly Expenses" })).toBeVisible();
-    await expect(page.locator("h2").filter({ hasText: "Goals" })).toBeVisible();
 
     await captureScreenshot(page, "task-14-mobile-375-cards");
   });

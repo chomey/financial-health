@@ -14,12 +14,11 @@ export interface FinancialData {
   monthlyExpenses: number;
   /** Raw monthly expenses without investment contributions. Used for runway to match metric card. */
   rawMonthlyExpenses?: number;
-  goals: { name: string; target: number; current: number }[];
   /** Individual debt details for interest-based insights */
   debts?: DebtDetail[];
 }
 
-export type InsightType = "runway" | "surplus" | "goal" | "net-worth" | "savings-rate" | "debt-interest";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest";
 
 export interface Insight {
   id: string;
@@ -30,7 +29,7 @@ export interface Insight {
 
 export function generateInsights(data: FinancialData): Insight[] {
   const insights: Insight[] = [];
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, goals } = data;
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses } = data;
 
   const netWorth = totalAssets - totalDebts;
   const surplus = monthlyIncome - monthlyExpenses;
@@ -103,40 +102,6 @@ export function generateInsights(data: FinancialData): Insight[] {
       message: `You're saving ${Math.round(savingsRate)}% of your income — that's a healthy habit that adds up over time.`,
       icon: "⭐",
     });
-  }
-
-  // Goal insights — pick the closest-to-completion goal
-  const activeGoals = goals.filter((g) => g.target > 0);
-  if (activeGoals.length > 0) {
-    // Sort by completion percentage descending
-    const sorted = [...activeGoals].sort(
-      (a, b) => b.current / b.target - a.current / a.target
-    );
-    const top = sorted[0];
-    const pct = Math.round((top.current / top.target) * 100);
-
-    if (pct >= 100) {
-      insights.push({
-        id: "goal-reached",
-        type: "goal",
-        message: `Congratulations — you've reached your "${top.name}" goal! Time to celebrate and set your sights on what's next.`,
-        icon: "🎯",
-      });
-    } else if (pct >= 50) {
-      insights.push({
-        id: "goal-halfway",
-        type: "goal",
-        message: `Your savings are growing nicely — you're ${pct}% of the way to your "${top.name}" goal.`,
-        icon: "🎯",
-      });
-    } else if (pct > 0) {
-      insights.push({
-        id: "goal-started",
-        type: "goal",
-        message: `You've started saving toward "${top.name}" — every contribution gets you closer to your ${formatCurrency(top.target)} target.`,
-        icon: "🎯",
-      });
-    }
   }
 
   // High-interest debt insight — prioritize paying off highest-rate debt first

@@ -73,32 +73,4 @@ test.describe("setState-during-render fix — onChange fires via useEffect", () 
     await captureScreenshot(page, "task-16-expense-edit-updates-surplus");
   });
 
-  test("deleting a goal triggers onChange without render-phase warnings", async ({ page }) => {
-    const consoleWarnings: string[] = [];
-    page.on("console", (msg) => {
-      if (msg.type() === "warning" || msg.type() === "error") {
-        consoleWarnings.push(msg.text());
-      }
-    });
-
-    // Verify initial goal exists (scope to goals list to avoid matching projection chart)
-    const goalsList = page.getByRole("list", { name: "Goal items" });
-    await expect(goalsList.getByText("Rainy Day Fund")).toBeVisible();
-
-    // Delete it
-    const rainyDayRow = goalsList.getByRole("listitem").filter({ hasText: "Rainy Day Fund" });
-    await rainyDayRow.hover();
-    await rainyDayRow.getByLabel("Delete Rainy Day Fund").click();
-
-    // Goal should be gone
-    await expect(goalsList.getByText("Rainy Day Fund")).not.toBeVisible();
-
-    // No setState-during-render warnings
-    const setStateWarnings = consoleWarnings.filter(
-      (w) => w.includes("Cannot update") || w.includes("setState") || w.includes("during render")
-    );
-    expect(setStateWarnings).toHaveLength(0);
-
-    await captureScreenshot(page, "task-16-goal-delete-no-warnings");
-  });
 });

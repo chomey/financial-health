@@ -159,26 +159,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
     await captureScreenshot(page, "task-15-after-income-expenses");
 
     // ========================================
-    // Step 5: Add a goal
-    // ========================================
-    const goalSection = page
-      .locator("section", {
-        has: page.getByRole("heading", { name: "Goals" }),
-      })
-      .first();
-    const goalsList = page.getByRole("list", { name: "Goal items" });
-
-    await goalSection.getByText("+ Add Goal").click();
-    await page.getByLabel("New goal name").fill("Dream Home Down Payment");
-    await page.getByLabel("New goal target amount").fill("100000");
-    await page.getByLabel("New goal current amount").fill("15000");
-    await page.getByLabel("Confirm add goal").click();
-    await expect(goalsList).toContainText("Dream Home Down Payment");
-
-    await captureScreenshot(page, "task-15-after-adding-goal");
-
-    // ========================================
-    // Step 6: Verify dashboard metrics are correct
+    // Step 5: Verify dashboard metrics are correct
     // ========================================
     // All four metric cards should be present
     await expect(
@@ -270,15 +251,6 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
     await expect(expenseListAfterReload).toContainText("Subscriptions");
     const expenseCountAfterReload = await expenseListAfterReload.getByRole("listitem").count();
     expect(expenseCountAfterReload).toBeGreaterThanOrEqual(3);
-
-    // Verify goals (3 original + 1 added)
-    const goalsListAfterReload = page.getByRole("list", {
-      name: "Goal items",
-    });
-    await expect(goalsListAfterReload).toContainText("Rainy Day Fund");
-    await expect(goalsListAfterReload).toContainText("New Car");
-    await expect(goalsListAfterReload).toContainText("Vacation");
-    await expect(goalsListAfterReload).toContainText("Dream Home Down Payment");
 
     // Verify dashboard metrics are the same after reload
     const dashboardAfterReload = page.locator(

@@ -7,8 +7,6 @@ import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
-import GoalEntry from "@/components/GoalEntry";
-
 describe("Runway celebratory glow", () => {
   it("shows celebratory glow when runway exceeds 12 months", () => {
     const metrics: MetricData[] = [
@@ -104,13 +102,6 @@ describe("Empty state illustrations", () => {
     expect(screen.getByText(/Add your regular expenses/)).toBeInTheDocument();
   });
 
-  it("goal empty state shows icon and message", () => {
-    render(<GoalEntry items={[]} />);
-    const emptyState = screen.getByTestId("goal-empty-state");
-    expect(emptyState).toBeInTheDocument();
-    expect(emptyState.querySelector("svg")).toBeInTheDocument();
-    expect(screen.getByText(/Set financial goals/)).toBeInTheDocument();
-  });
 });
 
 describe("Active states on confirm buttons", () => {
@@ -130,11 +121,4 @@ describe("Active states on confirm buttons", () => {
     expect(confirmBtn.className).toContain("active:scale-95");
   });
 
-  it("Add Goal confirm button has active:scale-95 class", async () => {
-    const user = userEvent.setup();
-    render(<GoalEntry />);
-    await user.click(screen.getByText("+ Add Goal"));
-    const confirmBtn = screen.getByLabelText("Confirm add goal");
-    expect(confirmBtn.className).toContain("active:scale-95");
-  });
 });

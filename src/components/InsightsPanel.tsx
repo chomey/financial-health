@@ -14,11 +14,6 @@ const MOCK_FINANCIAL_DATA: FinancialData = {
   totalDebts: 295000,
   monthlyIncome: 6300,
   monthlyExpenses: 2950,
-  goals: [
-    { name: "Rainy Day Fund", target: 20000, current: 14500 },
-    { name: "New Car", target: 42000, current: 13500 },
-    { name: "Vacation", target: 6500, current: 6200 },
-  ],
 };
 
 export { MOCK_FINANCIAL_DATA };

@@ -121,7 +121,7 @@ describe("URL state roundtrip with frequency", () => {
         { id: "i2", category: "Rent", amount: 1200, frequency: "monthly" as IncomeFrequency },
       ],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
 
@@ -139,7 +139,7 @@ describe("URL state roundtrip with frequency", () => {
       debts: [],
       income: [{ id: "i1", category: "Salary", amount: 5500 }],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
 
@@ -160,7 +160,7 @@ describe("computeTotals with frequency", () => {
         { id: "i1", category: "Salary", amount: 12000, frequency: "annually" as IncomeFrequency },
       ],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
 
@@ -178,7 +178,7 @@ describe("computeTotals with frequency", () => {
         { id: "i3", category: "Dividends", amount: 3000, frequency: "quarterly" as IncomeFrequency },
       ],
       expenses: [],
-      goals: [],
+
       properties: [],
     };
 

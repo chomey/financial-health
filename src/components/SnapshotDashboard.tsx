@@ -208,12 +208,6 @@ export default function SnapshotDashboard({ metrics, financialData }: SnapshotDa
         .map((ins) => ins.message);
       insightsByMetric.set(metric.title, matched);
     }
-    // Goal insights go under the last card or first card
-    const goalInsights = allInsights.filter((ins) => ins.type === "goal").map((ins) => ins.message);
-    if (goalInsights.length > 0) {
-      const existing = insightsByMetric.get("Net Worth") ?? [];
-      insightsByMetric.set("Net Worth", [...existing, ...goalInsights]);
-    }
   }
 
   return (

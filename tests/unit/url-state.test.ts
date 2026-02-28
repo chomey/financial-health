@@ -66,7 +66,6 @@ describe("toCompact / fromCompact", () => {
     expect(compact.p![0]).toEqual({ n: "Home", v: 450000, m: 280000 });
     expect(compact.i[0]).toEqual({ c: "Salary", a: 5500 });
     expect(compact.e[0]).toEqual({ c: "Rent/Mortgage Payment", a: 2200 });
-    expect(compact.g[0]).toEqual({ n: "Rainy Day Fund", t: 20000, s: 14500 });
   });
 
   it("restores state from compact format with generated IDs", () => {
@@ -76,9 +75,6 @@ describe("toCompact / fromCompact", () => {
     expect(restored.assets[0].category).toBe("Savings Account");
     expect(restored.assets[0].amount).toBe(12000);
     expect(restored.assets[0].id).toBeTruthy();
-    expect(restored.goals[0].name).toBe("Rainy Day Fund");
-    expect(restored.goals[0].targetAmount).toBe(20000);
-    expect(restored.goals[0].currentAmount).toBe(14500);
     expect(restored.properties).toHaveLength(1);
     expect(restored.properties[0].name).toBe("Home");
     expect(restored.properties[0].value).toBe(450000);
@@ -130,7 +126,6 @@ describe("encodeState / decodeState", () => {
     expect(decoded!.debts).toHaveLength(INITIAL_STATE.debts.length);
     expect(decoded!.income).toHaveLength(INITIAL_STATE.income.length);
     expect(decoded!.expenses).toHaveLength(INITIAL_STATE.expenses.length);
-    expect(decoded!.goals).toHaveLength(INITIAL_STATE.goals.length);
   });
 
   it("roundtrips empty state", () => {
@@ -139,7 +134,6 @@ describe("encodeState / decodeState", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
       properties: [],
     };
     const encoded = encodeState(emptyState);
@@ -155,7 +149,6 @@ describe("encodeState / decodeState", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
       properties: [],
     };
     const encoded = encodeState(state);
@@ -183,7 +176,7 @@ describe("encodeState / decodeState", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [
         { id: "p1", name: "Home", value: 450000, mortgage: 280000, interestRate: 4.5, monthlyPayment: 1550, amortizationYears: 20 },
       ],
@@ -202,7 +195,7 @@ describe("encodeState / decodeState", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [
         { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
       ],
@@ -221,7 +214,7 @@ describe("encodeState / decodeState", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
       country: "CA",
@@ -240,7 +233,7 @@ describe("encodeState / decodeState", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
       country: "US",
@@ -260,7 +253,7 @@ describe("encodeState / decodeState", () => {
       debts: [],
       income: [],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
     };
@@ -288,7 +281,7 @@ describe("encodeState / decodeState", () => {
         debts: [],
         income: [],
         expenses: [],
-        goals: [],
+  
         properties: [],
         stocks: [],
         country: "US",
@@ -310,7 +303,7 @@ describe("incomeType encoding", () => {
       debts: [],
       income: [{ id: "i1", category: "Salary", amount: 5000, incomeType: "employment" }],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
     };
@@ -324,7 +317,7 @@ describe("incomeType encoding", () => {
       debts: [],
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
     };
@@ -338,7 +331,7 @@ describe("incomeType encoding", () => {
       debts: [],
       income: [{ id: "i1", category: "Stock Sale", amount: 10000, incomeType: "capital-gains" }],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
     };
@@ -352,7 +345,7 @@ describe("incomeType encoding", () => {
       debts: [],
       income: [{ id: "i1", category: "Gift", amount: 500, incomeType: "other" }],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
     };
@@ -366,7 +359,7 @@ describe("incomeType encoding", () => {
       debts: [],
       income: [{ id: "i1", category: "Stock Sale", amount: 10000, incomeType: "capital-gains", frequency: "annually" }],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
     };
@@ -385,7 +378,7 @@ describe("incomeType encoding", () => {
       debts: [],
       income: [{ id: "i1", category: "Gift", amount: 500, incomeType: "other" }],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
     };
@@ -401,7 +394,7 @@ describe("incomeType encoding", () => {
       debts: [],
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
     };
@@ -421,7 +414,7 @@ describe("incomeType encoding", () => {
         { id: "i3", category: "Side Job", amount: 800, incomeType: "other", frequency: "weekly" },
       ],
       expenses: [],
-      goals: [],
+
       properties: [],
       stocks: [],
     };

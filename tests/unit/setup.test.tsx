@@ -35,14 +35,13 @@ describe("App shell layout", () => {
     expect(dashboardPanel).toBeInTheDocument();
   });
 
-  it("renders all five entry sections", () => {
+  it("renders all four entry sections", () => {
     render(<Home />);
     // Use getAllByText for terms that appear in both entry sections and chart legend
     expect(screen.getAllByText("Assets").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Debts").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Monthly Income")).toBeInTheDocument();
     expect(screen.getByText("Monthly Expenses")).toBeInTheDocument();
-    expect(screen.getByText("Goals")).toBeInTheDocument();
   });
 
   it("renders all four dashboard metric cards", () => {
