@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 46
-- **Completed**: 40
-- **Remaining**: 6
+- **Completed**: 41
+- **Remaining**: 5
 - **Last Updated**: 2026-02-27
 
 ---
@@ -1025,3 +1025,15 @@
   - `tests/unit/tax-tables.test.ts`: 49 total tests (24 existing Canadian + 25 new US). New tests cover: getUSBrackets lookup (valid codes, case-insensitive, all 50 states + DC, no-tax states return empty brackets, unknown code error, unsupported year error), US federal tax calculations ($50k, $100k, $200k income with manual bracket math verification, zero income), US state tax calculations (California $100k ≈ $5,842, New York $100k ≈ $5,432, Texas $0, Florida $0, all no-tax states return $0), US capital gains brackets (0% below $48,350, 15% mid-range, 20% above $533,400, zero gains), US bracket table integrity (federal contiguous, capital gains contiguous, all state brackets contiguous, all rates 0–1, standard deduction = $15,000). All 49 passed, 0 failed.
   - All 485 unit tests passed, 0 failed.
 - **Notes**: Backend-only task ([@backend]), no screenshots required. US standard deduction ($15,000) is stored in `basicPersonalAmount` for data consistency, but note that US deduction is subtracted from income (not applied as a credit like Canadian BPA) — the tax engine (Task 41) will handle this distinction. State `basicPersonalAmount` is set to 0 as state standard deductions vary widely. Washington state's 7% capital gains tax is noted in comments but the income tax bracket array is empty since it's not a general income tax.
+
+## Task 41: Build tax computation engine
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/lib/tax-engine.ts`: Created tax computation engine with `computeTax(annualIncome, incomeType, country, jurisdiction)` returning `TaxResult` (federalTax, provincialStateTax, totalTax, effectiveRate, afterTaxIncome, marginalRate). Key design decisions: (1) US federal tax applies standard deduction as a deduction from gross income before brackets (via `calculateUSFederalTax`), unlike Canadian BPA which is a credit at the lowest rate; (2) Canadian capital gains apply 50%/66.67% inclusion rate then run through normal brackets; (3) US capital gains use separate long-term capital gains bracket table; (4) States tax capital gains as ordinary income; (5) Marginal rate for Canadian capital gains is adjusted by inclusion rate. Exports `computeTax`, `TaxResult`, and `IncomeType` types.
+  - `tests/unit/tax-engine.test.ts`: 34 comprehensive unit tests
+- **Test tiers run**: T1
+- **Tests**:
+  - `tests/unit/tax-engine.test.ts`: 34 tests covering: edge cases (zero/negative income for both countries), Canadian employment income (ON $50k/$100k, AB $100k, BC $200k, QC $500k, below BPA, other=employment equivalence), Canadian capital gains (50% inclusion, higher inclusion above $250k, lower effective rate than employment, marginal rate adjustment), US employment income (CA $50k, NY $100k, TX/FL no state tax, below standard deduction, $1M high income, other=employment equivalence, standard deduction verification), US capital gains (0% rate, 15% rate, employment comparison, state taxation, no-tax states), cross-country invariants (afterTax = income - totalTax, effectiveRate = totalTax / income, marginal >= effective), error handling (invalid province/state codes). All 34 passed, 0 failed.
+  - All 519 unit tests passed, 0 failed.
+- **Notes**: Backend-only task ([@backend]), no screenshots required. The key architectural distinction is how US vs CA handle deductions: US standard deduction ($15k) is subtracted from income before applying brackets, while Canadian BPA is applied as a non-refundable tax credit. The `calculateUSFederalTax` function handles this correctly by computing tax on `max(0, income - standardDeduction)` without using the BPA credit logic in `calculateProgressiveTax`.
