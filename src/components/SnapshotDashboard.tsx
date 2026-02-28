@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import InsightsPanel from "@/components/InsightsPanel";
-import type { FinancialData } from "@/lib/insights";
+import { useEffect, useRef, useState } from "react";
+import { generateInsights, type FinancialData, type InsightType } from "@/lib/insights";
 
 interface MetricData {
   title: string;
@@ -11,13 +10,10 @@ interface MetricData {
   icon: string;
   tooltip: string;
   positive: boolean;
+  breakdown?: string;
 }
 
 // Mock values based on existing entry component mock data
-// Assets: $12,000 + $35,000 + $18,500 = $65,500
-// Debts: $280,000 + $15,000 = $295,000
-// Income: $5,500 + $800 = $6,300
-// Expenses: $2,200 + $600 + $150 = $2,950
 const MOCK_METRICS: MetricData[] = [
   {
     title: "Net Worth",
@@ -78,6 +74,14 @@ function formatMetricValue(value: number, format: MetricData["format"]): string 
 export { formatMetricValue, MOCK_METRICS };
 export type { MetricData };
 
+// Map metric titles to insight types for matching
+const METRIC_TO_INSIGHT_TYPES: Record<string, InsightType[]> = {
+  "Net Worth": ["net-worth"],
+  "Monthly Surplus": ["surplus", "savings-rate"],
+  "Financial Runway": ["runway"],
+  "Debt-to-Asset Ratio": ["debt-interest"],
+};
+
 function useCountUp(target: number, duration: number = 1000): number {
   const [current, setCurrent] = useState(0);
   const animationRef = useRef<number | null>(null);
@@ -115,9 +119,9 @@ function useCountUp(target: number, duration: number = 1000): number {
   return current;
 }
 
-function MetricCard({ metric }: { metric: MetricData }) {
-  const [showTooltip, setShowTooltip] = useState(false);
+function MetricCard({ metric, insights }: { metric: MetricData; insights: string[] }) {
   const animatedValue = useCountUp(metric.value);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const valueColor = metric.positive
     ? "text-green-600"
@@ -133,20 +137,19 @@ function MetricCard({ metric }: { metric: MetricData }) {
 
   return (
     <div
-      className={`relative rounded-xl border bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default ${
-        showTooltip ? "z-20" : "z-0"
-      } ${
+      className={`relative rounded-xl border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default ${
         isRunwayCelebration
           ? "border-green-300 ring-1 ring-green-200 animate-glow-pulse"
           : "border-stone-200"
       }`}
-      onClick={() => setShowTooltip((prev) => !prev)}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
       role="group"
       aria-label={metric.title}
       data-runway-celebration={isRunwayCelebration || undefined}
-      data-tooltip-visible={showTooltip || undefined}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      onFocus={() => setShowTooltip(true)}
+      onBlur={() => setShowTooltip(false)}
+      tabIndex={0}
     >
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-stone-500">{metric.title}</h3>
@@ -155,25 +158,33 @@ function MetricCard({ metric }: { metric: MetricData }) {
         </span>
       </div>
       <p
-        className={`mt-2 text-3xl font-bold ${valueColor}`}
+        className={`mt-1.5 text-3xl font-bold ${valueColor}`}
         aria-label={`${metric.title}: ${formatMetricValue(metric.value, metric.format)}`}
       >
         {formatMetricValue(animatedValue, metric.format)}
       </p>
-      {isRunwayCelebration && (
+      {/* Contextual insights below value */}
+      {insights.length > 0 && (
+        <div className="mt-1.5 space-y-0.5">
+          {insights.map((msg, i) => (
+            <p key={i} className="text-xs font-medium text-green-600">{msg}</p>
+          ))}
+        </div>
+      )}
+      {isRunwayCelebration && insights.length === 0 && (
         <p className="mt-1 text-xs font-medium text-green-600" data-testid="runway-celebration-text">
           Excellent safety net!
         </p>
       )}
-
-      {showTooltip && (
-        <div
-          className="absolute left-0 right-0 top-full z-30 mt-2 rounded-lg border border-stone-200 bg-white p-3 text-xs text-stone-600 shadow-lg animate-fade-in"
-          role="tooltip"
-        >
-          {metric.tooltip}
-        </div>
+      {/* Breakdown on hover */}
+      {metric.breakdown && (
+        <p className={`mt-1.5 text-xs text-stone-400 leading-relaxed transition-opacity duration-200 ${showTooltip ? "opacity-100" : "opacity-0 h-0 overflow-hidden"}`}>
+          {metric.breakdown}
+        </p>
       )}
+      <p className="mt-1.5 text-xs text-stone-400 leading-relaxed">
+        {metric.tooltip}
+      </p>
     </div>
   );
 }
@@ -186,13 +197,34 @@ interface SnapshotDashboardProps {
 export default function SnapshotDashboard({ metrics, financialData }: SnapshotDashboardProps = {}) {
   const displayMetrics = metrics ?? MOCK_METRICS;
 
-  return (
-    <div className="space-y-6" data-testid="snapshot-dashboard">
-      {displayMetrics.map((metric) => (
-        <MetricCard key={metric.title} metric={metric} />
-      ))}
+  // Generate insights and map to metric cards
+  const insightsByMetric = new Map<string, string[]>();
+  if (financialData) {
+    const allInsights = generateInsights(financialData);
+    for (const metric of displayMetrics) {
+      const types = METRIC_TO_INSIGHT_TYPES[metric.title] ?? [];
+      const matched = allInsights
+        .filter((ins) => types.includes(ins.type))
+        .map((ins) => ins.message);
+      insightsByMetric.set(metric.title, matched);
+    }
+    // Goal insights go under the last card or first card
+    const goalInsights = allInsights.filter((ins) => ins.type === "goal").map((ins) => ins.message);
+    if (goalInsights.length > 0) {
+      const existing = insightsByMetric.get("Net Worth") ?? [];
+      insightsByMetric.set("Net Worth", [...existing, ...goalInsights]);
+    }
+  }
 
-      <InsightsPanel data={financialData} />
+  return (
+    <div className="space-y-4" data-testid="snapshot-dashboard">
+      {displayMetrics.map((metric) => (
+        <MetricCard
+          key={metric.title}
+          metric={metric}
+          insights={insightsByMetric.get(metric.title) ?? []}
+        />
+      ))}
     </div>
   );
 }

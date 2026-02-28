@@ -62,13 +62,12 @@ describe("Runway celebratory glow", () => {
   });
 });
 
-describe("Tooltip fade animation", () => {
-  it("tooltip has fade-in animation class", () => {
+describe("Metric descriptions always visible", () => {
+  it("shows description text without hover interaction", () => {
     render(<SnapshotDashboard />);
-    const card = screen.getByRole("group", { name: "Net Worth" });
-    fireEvent.mouseEnter(card);
-    const tooltip = screen.getByRole("tooltip");
-    expect(tooltip.className).toContain("animate-fade-in");
+    // Descriptions should be visible without any hover
+    expect(screen.getByText(/Your total assets minus total debts/)).toBeInTheDocument();
+    expect(screen.getByText(/How much more you earn than you spend/)).toBeInTheDocument();
   });
 });
 

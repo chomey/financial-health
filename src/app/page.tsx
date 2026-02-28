@@ -89,9 +89,80 @@ function CopyLinkButton() {
   );
 }
 
+function CollapsibleSection({
+  title,
+  icon,
+  summary,
+  children,
+  defaultOpen = true,
+}: {
+  title: string;
+  icon: string;
+  summary?: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex w-full items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm text-left transition-all duration-200 hover:shadow-md hover:bg-stone-50"
+        aria-expanded={false}
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <span aria-hidden="true">{icon}</span>
+          <h2 className="text-base font-semibold text-stone-800">{title}</h2>
+          {summary && (
+            <span className="ml-2 text-sm text-stone-400 truncate">{summary}</span>
+          )}
+        </div>
+        <svg
+          className="h-4 w-4 flex-shrink-0 text-stone-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        className="absolute right-3 top-3 z-10 rounded-md p-1 text-stone-400 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600"
+        aria-expanded={true}
+        aria-label={`Collapse ${title}`}
+      >
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+      </button>
+      {children}
+    </div>
+  );
+}
+
+function formatCurrencySummary(amount: number): string {
+  if (Math.abs(amount) >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
+  if (Math.abs(amount) >= 1_000) return `$${(amount / 1_000).toFixed(0)}k`;
+  return `$${amount.toFixed(0)}`;
+}
+
 export default function Home() {
-  // Always initialize with INITIAL_STATE for both server and client to avoid hydration mismatch.
-  // URL state is loaded after mount via useEffect.
   const [assets, setAssets] = useState<Asset[]>(INITIAL_STATE.assets);
   const [debts, setDebts] = useState<Debt[]>(INITIAL_STATE.debts);
   const [properties, setProperties] = useState<Property[]>(INITIAL_STATE.properties);
@@ -101,7 +172,7 @@ export default function Home() {
   const [goals, setGoals] = useState<Goal[]>(INITIAL_STATE.goals);
   const isFirstRender = useRef(true);
 
-  // Restore state from URL after hydration — prevents server/client mismatch
+  // Restore state from URL after hydration
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const urlState = getStateFromURL();
@@ -117,10 +188,9 @@ export default function Home() {
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  // Update URL whenever state changes (skip the initial render to avoid unnecessary write)
+  // Update URL whenever state changes
   useEffect(() => {
     if (isFirstRender.current) {
-      // Still write the URL on first render so the s= param is always present
       isFirstRender.current = false;
     }
     updateURL({ assets, debts, properties, stocks, income, expenses, goals });
@@ -130,6 +200,16 @@ export default function Home() {
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
   const totalInvestmentContributions = assets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
+  const totalMortgagePayments = properties.reduce((sum, p) => sum + (p.monthlyPayment ?? 0), 0);
+
+  // Summaries for collapsed sections
+  const assetTotal = assets.reduce((sum, a) => sum + a.amount, 0);
+  const debtTotal = debts.reduce((sum, d) => sum + d.amount, 0);
+  const goalCount = goals.length;
+  const incomeTotal = income.reduce((sum, i) => sum + i.amount, 0);
+  const expenseTotal = expenses.reduce((sum, e) => sum + e.amount, 0) + totalInvestmentContributions + totalMortgagePayments;
+  const propertyCount = properties.length;
+  const stockCount = stocks.length;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -161,20 +241,34 @@ export default function Home() {
             className="lg:col-span-7"
             aria-label="Financial data entry"
           >
-            <div className="space-y-6">
-              <AssetEntry items={assets} onChange={setAssets} />
+            <div className="space-y-3">
+              <CollapsibleSection title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)}>
+                <AssetEntry items={assets} onChange={setAssets} />
+              </CollapsibleSection>
 
-              <DebtEntry items={debts} onChange={setDebts} />
+              <CollapsibleSection title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"}>
+                <DebtEntry items={debts} onChange={setDebts} />
+              </CollapsibleSection>
 
-              <PropertyEntry items={properties} onChange={setProperties} />
+              <CollapsibleSection title="Goals" icon="🎯" summary={`${goalCount} goal${goalCount !== 1 ? "s" : ""}`}>
+                <GoalEntry items={goals} onChange={setGoals} />
+              </CollapsibleSection>
 
-              <StockEntry items={stocks} onChange={setStocks} />
+              <CollapsibleSection title="Monthly Income" icon="💵" summary={formatCurrencySummary(incomeTotal)}>
+                <IncomeEntry items={income} onChange={setIncome} />
+              </CollapsibleSection>
 
-              <IncomeEntry items={income} onChange={setIncome} />
+              <CollapsibleSection title="Monthly Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)}>
+                <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} />
+              </CollapsibleSection>
 
-              <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} />
+              <CollapsibleSection title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"}>
+                <PropertyEntry items={properties} onChange={setProperties} />
+              </CollapsibleSection>
 
-              <GoalEntry items={goals} onChange={setGoals} />
+              <CollapsibleSection title="Stocks" icon="📊" summary={stockCount > 0 ? `${stockCount} holding${stockCount !== 1 ? "s" : ""}` : "None"}>
+                <StockEntry items={stocks} onChange={setStocks} />
+              </CollapsibleSection>
             </div>
           </section>
 

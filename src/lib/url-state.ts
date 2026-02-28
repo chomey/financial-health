@@ -96,6 +96,7 @@ interface CompactAsset {
   a: number; // amount
   r?: number; // roi (annual %)
   m?: number; // monthlyContribution ($)
+  st?: 1; // surplusTarget
 }
 interface CompactDebt {
   c: string;
@@ -147,6 +148,7 @@ function toCompact(state: FinancialState): CompactState {
       const ca: CompactAsset = { c: x.category, a: x.amount };
       if (x.roi !== undefined) ca.r = x.roi;
       if (x.monthlyContribution !== undefined && x.monthlyContribution > 0) ca.m = x.monthlyContribution;
+      if (x.surplusTarget) ca.st = 1;
       return ca;
     }),
     d: state.debts.map((x) => {
@@ -188,9 +190,10 @@ function toCompact(state: FinancialState): CompactState {
 function fromCompact(compact: CompactState): FinancialState {
   return {
     assets: compact.a.map((x, i) => {
-      const asset: { id: string; category: string; amount: number; roi?: number; monthlyContribution?: number } = { id: `a${i + 1}`, category: x.c, amount: x.a };
+      const asset: { id: string; category: string; amount: number; roi?: number; monthlyContribution?: number; surplusTarget?: boolean } = { id: `a${i + 1}`, category: x.c, amount: x.a };
       if (x.r !== undefined) asset.roi = x.r;
       if (x.m !== undefined) asset.monthlyContribution = x.m;
+      if (x.st) asset.surplusTarget = true;
       return asset;
     }),
     debts: compact.d.map((x, i) => {

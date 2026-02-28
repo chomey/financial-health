@@ -94,39 +94,39 @@ describe("Mobile responsiveness — touch targets and layout", () => {
   });
 
   describe("Card padding responsive", () => {
-    it("asset card has responsive padding (p-4 sm:p-6)", () => {
+    it("asset card has responsive padding (p-3 sm:p-4)", () => {
       const { container } = render(<AssetEntry />);
       const card = container.firstElementChild;
-      expect(card?.className).toContain("p-4");
-      expect(card?.className).toContain("sm:p-6");
+      expect(card?.className).toContain("p-3");
+      expect(card?.className).toContain("sm:p-4");
     });
 
     it("debt card has responsive padding", () => {
       const { container } = render(<DebtEntry />);
       const card = container.firstElementChild;
-      expect(card?.className).toContain("p-4");
-      expect(card?.className).toContain("sm:p-6");
+      expect(card?.className).toContain("p-3");
+      expect(card?.className).toContain("sm:p-4");
     });
 
     it("income card has responsive padding", () => {
       const { container } = render(<IncomeEntry />);
       const card = container.firstElementChild;
-      expect(card?.className).toContain("p-4");
-      expect(card?.className).toContain("sm:p-6");
+      expect(card?.className).toContain("p-3");
+      expect(card?.className).toContain("sm:p-4");
     });
 
     it("expense card has responsive padding", () => {
       const { container } = render(<ExpenseEntry />);
       const card = container.firstElementChild;
-      expect(card?.className).toContain("p-4");
-      expect(card?.className).toContain("sm:p-6");
+      expect(card?.className).toContain("p-3");
+      expect(card?.className).toContain("sm:p-4");
     });
 
     it("goal card has responsive padding", () => {
       const { container } = render(<GoalEntry />);
       const card = container.firstElementChild;
-      expect(card?.className).toContain("p-4");
-      expect(card?.className).toContain("sm:p-6");
+      expect(card?.className).toContain("p-3");
+      expect(card?.className).toContain("sm:p-4");
     });
   });
 

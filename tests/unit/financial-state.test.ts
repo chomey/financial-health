@@ -156,10 +156,12 @@ describe("financial-state", () => {
   describe("toFinancialData", () => {
     it("converts state to FinancialData for insights", () => {
       const data = toFinancialData(INITIAL_STATE);
-      // totalAssets includes property equity: 65500 + 170000
-      expect(data.totalAssets).toBe(65500 + 170000);
+      // totalAssets includes property value (not equity): 65500 + 450000
+      expect(data.totalAssets).toBe(65500 + 450000);
       // totalDebts includes mortgage: 15000 + 280000
       expect(data.totalDebts).toBe(15000 + 280000);
+      // netWorth = totalAssets - totalDebts matches computeMetrics
+      expect(data.totalAssets - data.totalDebts).toBe(65500 + (450000 - 280000) - 15000);
       // liquidAssets excludes property
       expect(data.liquidAssets).toBe(65500);
       expect(data.monthlyIncome).toBe(6300);

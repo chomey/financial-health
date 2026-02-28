@@ -194,8 +194,8 @@ export default function GoalEntry({ items, onChange }: GoalEntryProps = {}) {
   };
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-6">
-      <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-stone-800">
+    <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
+      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-stone-800">
         <span aria-hidden="true">🎯</span>
         Goals
       </h2>

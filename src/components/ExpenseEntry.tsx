@@ -53,9 +53,10 @@ interface ExpenseEntryProps {
   items?: ExpenseItem[];
   onChange?: (items: ExpenseItem[]) => void;
   investmentContributions?: number;
+  mortgagePayments?: number;
 }
 
-export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0 }: ExpenseEntryProps = {}) {
+export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0 }: ExpenseEntryProps = {}) {
   const [items, setItems] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -109,7 +110,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const itemsTotal = items.reduce((sum, item) => sum + item.amount, 0);
-  const total = itemsTotal + investmentContributions;
+  const total = itemsTotal + investmentContributions + mortgagePayments;
 
   const triggerTotalAnimation = () => {
     if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
@@ -217,8 +218,8 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   };
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-6">
-      <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-stone-800">
+    <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
+      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-stone-800">
         <span aria-hidden="true">🧾</span>
         Monthly Expenses
       </h2>
@@ -365,6 +366,26 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
           </div>
           <span className="text-sm font-medium italic text-amber-600">
             {formatCurrency(investmentContributions)}
+          </span>
+        </div>
+      )}
+
+      {/* Auto-generated mortgage payments row */}
+      {mortgagePayments > 0 && (
+        <div
+          className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200 mt-1"
+          data-testid="mortgage-payments-row"
+        >
+          <div className="flex flex-1 items-center gap-2 min-w-0">
+            <span className="text-sm italic text-stone-500">
+              Mortgage Payments
+            </span>
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600" title="Auto-calculated from your property mortgage payments">
+              auto
+            </span>
+          </div>
+          <span className="text-sm font-medium italic text-amber-600">
+            {formatCurrency(mortgagePayments)}
           </span>
         </div>
       )}
