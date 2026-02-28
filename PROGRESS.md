@@ -9,8 +9,8 @@
 -->
 
 ## Summary
-- **Total Tasks**: 33
-- **Completed**: 31
+- **Total Tasks**: 34
+- **Completed**: 32
 - **Remaining**: 2
 - **Last Updated**: 2026-02-27
 
@@ -859,3 +859,29 @@
   ![Category selected from group](screenshots/task-31-category-selected.png)
   ![No dimming on items](screenshots/task-31-no-dimming.png)
 - **Notes**: The grouped suggestion dropdown headers changed from "🇨🇦 Canadian" / "🇺🇸 US" to "🇨🇦 Canada" / "🇺🇸 USA" for consistency. Flag emojis (🇨🇦/🇺🇸) still appear next to region-specific categories in the suggestion list and inline display via `getAssetCategoryFlag()` / `getDebtCategoryFlag()`. Old URLs with `r=CA` or `r=US` encoded will still decode correctly since `fromCompact()` simply ignores the unknown `r` field now.
+
+## Task 32: Add stock/equity holdings with live price lookup
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/components/StockEntry.tsx`: **New** — StockHolding interface and StockEntry component with ticker input, share count, manual price override, cost basis, gain/loss display, auto-fetch on add, refresh all button, URL state persistence
+  - `src/app/api/stock-price/route.ts`: **New** — Next.js Route Handler that proxies stock price requests to Yahoo Finance chart API with 5-minute in-memory cache, input validation, and error handling
+  - `src/lib/financial-state.ts`: Added `stocks: StockHolding[]` to FinancialState interface and INITIAL_STATE, updated computeTotals to include totalStocks, updated computeMetrics to include stocks in net worth and runway, updated toFinancialData to include stocks in totalAssets and liquidAssets
+  - `src/lib/url-state.ts`: Added CompactStock interface and stock encoding/decoding (ticker→t, shares→s, manualPrice→mp, costBasis→cb), backward compatible with old URLs
+  - `src/lib/projections.ts`: Updated projection calculations to include stock value in net worth and total assets
+  - `src/app/page.tsx`: Integrated StockEntry component between PropertyEntry and IncomeEntry, added stocks state management and URL sync
+  - `tests/unit/stock-entry.test.ts`: **New** — 23 unit tests for stock utilities and integration
+  - `tests/unit/stock-api.test.ts`: **New** — 5 unit tests for stock price API route
+  - `tests/e2e/stock-entry.spec.ts`: **New** — 9 E2E browser tests for stock entry interactions
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/stock-entry.test.ts`: 23 tests — getStockValue, getStockPrice, getStockGainLoss, computeTotals with stocks, computeMetrics with stocks, toFinancialData with stocks, URL encode/decode with stocks (23 passed, 0 failed)
+  - `tests/unit/stock-api.test.ts`: 5 tests — API validation, invalid ticker rejection, valid ticker acceptance (5 passed, 0 failed)
+  - `tests/e2e/stock-entry.spec.ts`: 9 tests — empty state, add stock, delete stock, cost basis/gain-loss, manual price, URL persistence, cancel (9 passed, 0 failed)
+  - All existing tests: 411 unit tests passed, E2E tests passed
+- **Screenshots**:
+  ![Stock added with manual price](screenshots/task-32-stock-added.png)
+  ![Stock gain/loss display](screenshots/task-32-stock-gain-loss.png)
+  ![Stock affects net worth](screenshots/task-32-stock-affects-networth.png)
+  ![Stock URL persistence](screenshots/task-32-stock-url-persistence.png)
+- **Notes**: Stocks are treated as liquid assets — they count toward net worth AND financial runway (unlike properties which are illiquid). The API route uses Yahoo Finance's chart endpoint with server-side proxying to avoid CORS issues. Fetched prices are NOT persisted in URL state (only ticker, shares, manual price, and cost basis are stored). Prices are re-fetched on page load for stocks without manual price overrides. The API route includes a 5-minute in-memory cache to reduce external API calls.
