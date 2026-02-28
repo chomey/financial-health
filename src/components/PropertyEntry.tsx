@@ -57,6 +57,51 @@ export function computeAmortizationInfo(
   return { totalInterest, payoffMonths: months };
 }
 
+/** Yearly summary for amortization schedule */
+export interface AmortizationYearSummary {
+  year: number;
+  interestPaid: number;
+  principalPaid: number;
+  endingBalance: number;
+}
+
+/** Compute a year-by-year amortization schedule */
+export function computeAmortizationSchedule(
+  mortgage: number,
+  annualRate: number,
+  monthlyPayment: number
+): AmortizationYearSummary[] {
+  if (mortgage <= 0 || monthlyPayment <= 0) return [];
+  const monthlyRate = annualRate / 100 / 12;
+  let balance = mortgage;
+  const schedule: AmortizationYearSummary[] = [];
+  const maxYears = 60;
+
+  for (let year = 1; year <= maxYears && balance > 0.01; year++) {
+    let yearInterest = 0;
+    let yearPrincipal = 0;
+    for (let month = 0; month < 12 && balance > 0.01; month++) {
+      const interest = balance * monthlyRate;
+      const principal = Math.min(monthlyPayment - interest, balance);
+      if (principal <= 0) {
+        // Payment doesn't cover interest
+        return schedule;
+      }
+      yearInterest += interest;
+      yearPrincipal += principal;
+      balance -= principal;
+    }
+    schedule.push({
+      year,
+      interestPaid: Math.round(yearInterest),
+      principalPaid: Math.round(yearPrincipal),
+      endingBalance: Math.max(0, Math.round(balance)),
+    });
+  }
+
+  return schedule;
+}
+
 /** Suggest a reasonable monthly payment from mortgage amount and rate */
 export function suggestMonthlyPayment(mortgage: number, annualRate: number, years: number = 25): number {
   if (mortgage <= 0) return 0;
@@ -132,6 +177,7 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
     onChangeRef.current?.(properties);
   }, [properties]);
 
+  const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<"name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | null>(null);
   const [editValue, setEditValue] = useState("");
@@ -401,6 +447,7 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                   const showComputed = property.mortgage > 0 && displayPayment > 0;
                   const breakdown = showComputed ? computeMortgageBreakdown(property.mortgage, displayRate, displayPayment) : null;
                   const amortInfo = showComputed ? computeAmortizationInfo(property.mortgage, displayRate, displayPayment) : null;
+                  const schedule = showComputed && amortInfo && amortInfo.payoffMonths > 0 ? computeAmortizationSchedule(property.mortgage, displayRate, displayPayment) : [];
 
                   return (
                     <div className="mt-1.5 space-y-1.5" data-testid={`property-details-${property.id}`}>
@@ -504,13 +551,30 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                       {showComputed && breakdown && amortInfo && amortInfo.payoffMonths > 0 && (
                         <div className="mx-1 rounded-md bg-stone-50 px-2 py-1.5 text-[11px] text-stone-500 space-y-0.5" data-testid={`mortgage-info-${property.id}`}>
                           <div className="flex justify-between">
-                            <span>Monthly interest</span>
+                            <span>Current month: interest</span>
                             <span className="font-medium text-rose-500">{formatCurrency(Math.round(breakdown.interestPortion))}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span>Monthly principal</span>
+                            <span>Current month: principal</span>
                             <span className="font-medium text-green-600">{formatCurrency(Math.round(breakdown.principalPortion))}</span>
                           </div>
+                          {schedule.length > 1 && (
+                            <div className="flex justify-between border-t border-stone-200 pt-0.5 mt-0.5">
+                              <span>First year avg interest</span>
+                              <span className="font-medium text-rose-400">{formatCurrency(Math.round(schedule[0].interestPaid / 12))}/mo</span>
+                            </div>
+                          )}
+                          {schedule.length > 1 && (() => {
+                            const lastYear = schedule[schedule.length - 1];
+                            const lastYearMonths = amortInfo.payoffMonths - (schedule.length - 1) * 12;
+                            const avgMonthlyInterest = Math.round(lastYear.interestPaid / (lastYearMonths > 0 ? lastYearMonths : 12));
+                            return (
+                              <div className="flex justify-between">
+                                <span>Last year avg interest</span>
+                                <span className="font-medium text-green-500">{formatCurrency(avgMonthlyInterest)}/mo</span>
+                              </div>
+                            );
+                          })()}
                           {amortInfo.totalInterest > 0 && (
                             <div className="flex justify-between border-t border-stone-200 pt-0.5 mt-0.5">
                               <span>Total interest remaining</span>
@@ -527,6 +591,43 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                               })()}
                             </span>
                           </div>
+                          {/* View schedule expandable */}
+                          {schedule.length > 0 && (
+                            <div className="border-t border-stone-200 pt-1 mt-1">
+                              <button
+                                type="button"
+                                onClick={() => setExpandedSchedule(expandedSchedule === property.id ? null : property.id)}
+                                className="text-[11px] text-blue-500 hover:text-blue-700 transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-blue-200 rounded px-1"
+                                data-testid={`view-schedule-${property.id}`}
+                              >
+                                {expandedSchedule === property.id ? "Hide schedule" : "View schedule"}
+                              </button>
+                              {expandedSchedule === property.id && (
+                                <div className="mt-1 overflow-x-auto" data-testid={`schedule-table-${property.id}`}>
+                                  <table className="w-full text-[10px] text-stone-500">
+                                    <thead>
+                                      <tr className="border-b border-stone-200">
+                                        <th className="py-0.5 text-left font-medium">Year</th>
+                                        <th className="py-0.5 text-right font-medium">Interest</th>
+                                        <th className="py-0.5 text-right font-medium">Principal</th>
+                                        <th className="py-0.5 text-right font-medium">Balance</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {schedule.map((row) => (
+                                        <tr key={row.year} className="border-b border-stone-100 last:border-0">
+                                          <td className="py-0.5">{row.year}</td>
+                                          <td className="py-0.5 text-right text-rose-400">{formatCurrency(row.interestPaid)}</td>
+                                          <td className="py-0.5 text-right text-green-500">{formatCurrency(row.principalPaid)}</td>
+                                          <td className="py-0.5 text-right">{formatCurrency(row.endingBalance)}</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                       {showComputed && amortInfo && amortInfo.payoffMonths === -1 && (

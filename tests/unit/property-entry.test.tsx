@@ -164,8 +164,8 @@ describe("PropertyEntry component", () => {
     render(<PropertyEntry items={items} />);
     const info = screen.getByTestId("mortgage-info-p1");
     expect(info).toBeInTheDocument();
-    expect(info).toHaveTextContent("Monthly interest");
-    expect(info).toHaveTextContent("Monthly principal");
+    expect(info).toHaveTextContent("Current month: interest");
+    expect(info).toHaveTextContent("Current month: principal");
     expect(info).toHaveTextContent("Total interest remaining");
     expect(info).toHaveTextContent("Estimated payoff");
   });
