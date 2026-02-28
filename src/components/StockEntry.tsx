@@ -169,6 +169,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
     onChangeRef.current?.(stocks);
   }, [stocks]);
 
+  const [sortBy, setSortBy] = useState<"alpha" | "position">("alpha");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
     "ticker" | "shares" | "costBasis" | "purchaseDate" | null
@@ -350,6 +351,12 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   const total = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
   const portfolio = getPortfolioSummary(stocks);
 
+  // Sort stocks for display (doesn't mutate source array)
+  const sortedStocks = [...stocks].sort((a, b) => {
+    if (sortBy === "alpha") return a.ticker.localeCompare(b.ticker);
+    return getStockValue(b) - getStockValue(a); // largest position first
+  });
+
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
       <div className="mb-3 flex items-center justify-between">
@@ -358,6 +365,35 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
           Stocks &amp; Equity
         </h2>
         {stocks.length > 0 && (
+          <div className="flex items-center gap-1">
+            <div className="flex rounded-md border border-stone-200 text-[10px]">
+              <button
+                type="button"
+                onClick={() => setSortBy("alpha")}
+                className={`px-1.5 py-0.5 rounded-l-md transition-colors duration-150 ${
+                  sortBy === "alpha"
+                    ? "bg-blue-50 text-blue-700 font-medium"
+                    : "text-stone-400 hover:bg-stone-50"
+                }`}
+                aria-label="Sort alphabetically"
+                aria-pressed={sortBy === "alpha"}
+              >
+                A-Z
+              </button>
+              <button
+                type="button"
+                onClick={() => setSortBy("position")}
+                className={`px-1.5 py-0.5 rounded-r-md transition-colors duration-150 ${
+                  sortBy === "position"
+                    ? "bg-blue-50 text-blue-700 font-medium"
+                    : "text-stone-400 hover:bg-stone-50"
+                }`}
+                aria-label="Sort by position size"
+                aria-pressed={sortBy === "position"}
+              >
+                Size
+              </button>
+            </div>
           <button
             type="button"
             onClick={refreshAllPrices}
@@ -383,6 +419,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
               </span>
             )}
           </button>
+          </div>
         )}
       </div>
 
@@ -417,7 +454,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
         </div>
       ) : (
         <div className="space-y-1" role="list" aria-label="Stock holdings">
-          {stocks.map((stock) => {
+          {sortedStocks.map((stock) => {
             const price = getStockPrice(stock);
             const value = getStockValue(stock);
             const gainLoss = getStockGainLoss(stock);

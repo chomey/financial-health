@@ -14,16 +14,16 @@ import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
 
-// Color palette matching the app's warm theme
+// High-contrast color palette — each color is visually distinct
 const COLORS = [
   "#059669", // emerald-600 (retirement)
-  "#0d9488", // teal-600 (savings)
-  "#2563eb", // blue-600 (brokerage)
+  "#2563eb", // blue-600 (savings)
+  "#d97706", // amber-600 (brokerage)
   "#7c3aed", // violet-600 (stocks)
-  "#d97706", // amber-600 (property)
-  "#dc2626", // red-600 (vehicle/other)
-  "#0891b2", // cyan-600
-  "#4f46e5", // indigo-600
+  "#dc2626", // red-600 (property)
+  "#0891b2", // cyan-600 (vehicle/other)
+  "#db2777", // pink-600
+  "#65a30d", // lime-600
 ];
 
 export type AllocationView = "category" | "liquidity";
