@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 46
-- **Completed**: 45
-- **Remaining**: 1
+- **Total Tasks**: 55
+- **Completed**: 47
+- **Remaining**: 8
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1142,3 +1142,24 @@
   ![Projection chart after tax](screenshots/task-46-projection-chart-after-tax.png)
   ![Province state switching](screenshots/task-46-province-state-switching.png)
 - **Notes**: This milestone E2E test validates the complete tax computation feature across tasks 37-45. All 558 unit tests and 138 E2E tests pass. The test covers country switching (CA→US→CA), jurisdiction dependent selection, income type selectors with capital-gains amber styling, after-tax dashboard metrics, tax rate differences between jurisdictions (US/TX no state tax vs US/NY with state tax), and full URL state persistence across page reload.
+
+## Task 47: Add appreciation/depreciation field to properties with dynamic icon
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/components/PropertyEntry.tsx`: Added `appreciation` field to Property interface; added `getDefaultAppreciation()` helper (returns +3% for home-like names, -15% for vehicle-like names); added `getPropertyIcon()` helper (🏠 for appreciating, 🚗 for depreciating); added appreciation badge in property name row; added editable appreciation rate badge in detail section; auto-set appreciation on new property creation based on name
+  - `src/lib/url-state.ts`: Added `ap` field to CompactProperty; updated toCompact/fromCompact for appreciation serialization; backward compatible (missing `ap` decodes as undefined)
+  - `src/lib/projections.ts`: Added property value appreciation/depreciation to monthly projection loop; property values now grow/shrink over time based on appreciation rate; imported `getDefaultAppreciation` for name-based defaults
+  - `tests/unit/property-appreciation.test.ts`: 14 unit tests covering getDefaultAppreciation, getPropertyIcon, URL round-trip encoding, and projection engine behavior with appreciating/depreciating properties
+  - `tests/e2e/property-appreciation.spec.ts`: 4 browser integration tests covering default badge display, editing appreciation, vehicle depreciation with car icon, and URL persistence
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/property-appreciation.test.ts`: 14 passed, 0 failed
+  - `tests/e2e/property-appreciation.spec.ts`: 4 passed, 0 failed
+  - All existing tests: 572 unit tests passed, build succeeded
+- **Screenshots**:
+  ![Default appreciation badge](screenshots/task-47-appreciation-default.png)
+  ![Edited appreciation rate](screenshots/task-47-appreciation-edited.png)
+  ![Vehicle depreciation](screenshots/task-47-appreciation-vehicle.png)
+  ![Appreciation persisted](screenshots/task-47-appreciation-persisted.png)
+- **Notes**: Properties now support appreciation/depreciation rates that affect projection chart values over time. Smart defaults: homes +3%/yr, vehicles -15%/yr. Dynamic icon changes from 🏠 to 🚗 for depreciating properties. The appreciation field is fully integrated into URL state encoding and the projection engine.

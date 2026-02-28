@@ -11,6 +11,7 @@ export interface Property {
   monthlyPayment?: number; // $ per month
   amortizationYears?: number; // original amortization term
   yearPurchased?: number; // year the property was purchased
+  appreciation?: number; // annual appreciation/depreciation % (negative for depreciating assets)
 }
 
 /** Compute remaining amortization years based on purchase year and original term */
@@ -132,6 +133,25 @@ export function suggestMonthlyPayment(mortgage: number, annualRate: number, year
   return Math.round(payment);
 }
 
+/** Suggest a default appreciation rate based on property name */
+export function getDefaultAppreciation(name: string): number | undefined {
+  const lower = name.toLowerCase();
+  if (/\b(home|house|condo|townhouse|apartment|duplex|triplex|rental|cottage|cabin)\b/.test(lower)) {
+    return 3;
+  }
+  if (/\b(car|vehicle|truck|suv|van|motorcycle|boat)\b/.test(lower)) {
+    return -15;
+  }
+  return undefined;
+}
+
+/** Get the property icon based on appreciation rate */
+export function getPropertyIcon(appreciation: number | undefined, name: string): string {
+  const rate = appreciation ?? getDefaultAppreciation(name);
+  if (rate !== undefined && rate < 0) return "🚗";
+  return "🏠";
+}
+
 const MOCK_PROPERTIES: Property[] = [
   { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
 ];
@@ -198,7 +218,7 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
 
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingField, setEditingField] = useState<"name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | "yearPurchased" | null>(null);
+  const [editingField, setEditingField] = useState<"name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | "yearPurchased" | "appreciation" | null>(null);
   const [editValue, setEditValue] = useState("");
   const [addingNew, setAddingNew] = useState(false);
   const [newName, setNewName] = useState("");
@@ -225,7 +245,7 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
     }
   }, [editingId, editingField]);
 
-  const startEdit = (id: string, field: "name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | "yearPurchased", currentValue: string) => {
+  const startEdit = (id: string, field: "name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | "yearPurchased" | "appreciation", currentValue: string) => {
     setEditingId(id);
     setEditingField(field);
     setEditValue(currentValue);
@@ -261,6 +281,10 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
             const val = parseInt(editValue);
             return { ...p, yearPurchased: isNaN(val) ? undefined : val };
           }
+          if (editingField === "appreciation") {
+            const val = parseFloat(editValue);
+            return { ...p, appreciation: isNaN(val) ? undefined : val };
+          }
           return p;
         })
       );
@@ -294,6 +318,9 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
     if (payment > 0) newProp.monthlyPayment = payment;
     const amort = parseFloat(newAmortization);
     if (!isNaN(amort) && amort > 0) newProp.amortizationYears = amort;
+    // Auto-set appreciation based on property name if not otherwise specified
+    const defaultAp = getDefaultAppreciation(newName.trim());
+    if (defaultAp !== undefined) newProp.appreciation = defaultAp;
     setProperties((prev) => [...prev, newProp]);
     setNewName("");
     setNewValue("");
@@ -329,7 +356,7 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
       <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-stone-800">
-        <span aria-hidden="true">🏠</span>
+        <span aria-hidden="true">{properties.some(p => (p.appreciation ?? getDefaultAppreciation(p.name) ?? 0) < 0) ? "🏠🚗" : "🏠"}</span>
         Property
       </h2>
 
@@ -375,7 +402,23 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                         className="min-h-[44px] sm:min-h-0 text-left text-sm font-medium text-stone-800 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-200"
                         aria-label={`Edit name for ${property.name}`}
                       >
+                        <span className="mr-1" aria-hidden="true">{getPropertyIcon(property.appreciation, property.name)}</span>
                         {property.name}
+                        {(() => {
+                          const ap = property.appreciation ?? getDefaultAppreciation(property.name);
+                          if (ap === undefined) return null;
+                          const isPositive = ap >= 0;
+                          return (
+                            <span
+                              className={`ml-1.5 inline-block rounded px-1 py-0.5 text-[10px] font-medium ${
+                                isPositive ? "bg-green-50 text-green-600" : "bg-rose-50 text-rose-600"
+                              }`}
+                              data-testid={`appreciation-badge-${property.id}`}
+                            >
+                              {isPositive ? "+" : ""}{ap}%/yr
+                            </span>
+                          );
+                        })()}
                       </button>
                     )}
                   </div>
@@ -598,6 +641,49 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                               data-testid={`year-badge-${property.id}`}
                             >
                               {hasYearPurchased ? `Bought ${property.yearPurchased}` : "Year purchased"}
+                            </button>
+                          );
+                        })()}
+
+                        {/* Appreciation/depreciation rate */}
+                        {(() => {
+                          const hasAppreciation = property.appreciation !== undefined;
+                          const defaultAp = getDefaultAppreciation(property.name);
+                          const displayAp = property.appreciation ?? defaultAp;
+                          const isNegative = displayAp !== undefined && displayAp < 0;
+                          return editingId === property.id && editingField === "appreciation" ? (
+                            <input
+                              ref={inputRef}
+                              type="text"
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              onBlur={commitEdit}
+                              onKeyDown={handleEditKeyDown}
+                              className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                              aria-label={`Edit appreciation rate for ${property.name}`}
+                              placeholder="e.g. 3 or -15"
+                            />
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => startEdit(property.id, "appreciation", String(property.appreciation ?? ""))}
+                              className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                                hasAppreciation
+                                  ? isNegative
+                                    ? "bg-rose-50 text-rose-600 hover:bg-rose-100"
+                                    : "bg-green-50 text-green-600 hover:bg-green-100"
+                                  : defaultAp !== undefined
+                                    ? "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
+                                    : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                              }`}
+                              aria-label={`Edit appreciation rate for ${property.name}${hasAppreciation ? `, currently ${property.appreciation}%` : ""}`}
+                              data-testid={`appreciation-edit-${property.id}`}
+                            >
+                              {hasAppreciation
+                                ? `${property.appreciation! >= 0 ? "+" : ""}${property.appreciation}%/yr`
+                                : defaultAp !== undefined
+                                  ? `${defaultAp >= 0 ? "+" : ""}${defaultAp}%/yr (suggested)`
+                                  : "Appreciation %"}
                             </button>
                           );
                         })()}
