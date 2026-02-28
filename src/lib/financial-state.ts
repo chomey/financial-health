@@ -195,7 +195,8 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 }
 
 export function toFinancialData(state: FinancialState): FinancialData {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalStocks, monthlyAfterTaxIncome } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate } = computeTotals(state);
+  const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
   return {
     totalAssets: totalAssets + totalStocks + totalPropertyValue,
@@ -210,5 +211,8 @@ export function toFinancialData(state: FinancialState): FinancialData {
       interestRate: d.interestRate,
       monthlyPayment: d.monthlyPayment,
     })),
+    effectiveTaxRate: effectiveTaxRate,
+    annualTax: totalTaxEstimate,
+    hasCapitalGains,
   };
 }
