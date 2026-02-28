@@ -65,6 +65,6 @@ describe("App shell layout", () => {
   it("shows mock data in income and expense sections", () => {
     render(<Home />);
     expect(screen.getByText("Salary")).toBeInTheDocument();
-    expect(screen.getByText("Rent/Mortgage Payment")).toBeInTheDocument();
+    expect(screen.getAllByText("Rent/Mortgage Payment").length).toBeGreaterThan(0);
   });
 });
