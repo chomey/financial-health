@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 26
-- **Completed**: 26
-- **Remaining**: 0
+- **Total Tasks**: 33
+- **Completed**: 27
+- **Remaining**: 6
 - **Last Updated**: 2026-02-27
 
 ---
@@ -732,3 +732,22 @@
   - All unit tests: 373 passed, 0 failed
   - All E2E tests: 152 passed, 0 failed
 - **Notes**: Fixed 4 pre-existing test failures caused by task 25's projection chart adding text elements (e.g., "$600k", "House Down Payment reached") that created strict mode violations in older tests using unscoped `getByText()` selectors. All tests now pass. This completes all 26 tasks in the project.
+
+---
+
+## Task 27: Move projection chart to top of dashboard
+- **Status**: Complete
+- **Date**: 2026-02-27
+- **Changes**:
+  - `src/app/page.tsx`: Moved `ProjectionChart` from a separate full-width `<section>` below the two-column grid into the dashboard column (`lg:col-span-5`), positioned above `SnapshotDashboard`. Added `space-y-6` to the dashboard wrapper for consistent spacing. Removed the standalone `<section aria-label="Financial projection">` wrapper.
+  - `src/components/ProjectionChart.tsx`: Changed root element from `<div>` to `<section>` with `aria-label="Financial projection"` so existing accessibility tests continue to pass.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/chart-position.test.ts`: 3 tests — verifies chart is inside dashboard section (not separate), renders before SnapshotDashboard, and has aria-label for accessibility
+  - `tests/e2e/chart-position.spec.ts`: 3 tests — verifies chart appears above metric cards in dashboard column, is not in a separate full-width section, and dashboard flows naturally (chart → metrics → insights)
+  - All T1 unit tests: 376 passed, 0 failed
+  - All existing T2 projection-chart tests: 6 passed, 0 failed
+- **Screenshots**:
+  ![Chart at top of dashboard](screenshots/task-27-chart-at-top-of-dashboard.png)
+  ![Dashboard flow](screenshots/task-27-dashboard-flow.png)
+- **Notes**: The projection chart is now the first thing users see in the dashboard column, making it the most prominent visual. The chart remains responsive and the rest of the dashboard (metric cards, insights) flows naturally below it. Changed the chart's root element to a `<section>` to preserve the existing aria-label test.
