@@ -349,6 +349,7 @@ export default function Home() {
                 federalTax={totals.totalFederalTax / 12}
                 provincialStateTax={totals.totalProvincialStateTax / 12}
                 monthlyAfterTaxIncome={totals.monthlyAfterTaxIncome}
+                monthlyGrossIncome={totals.monthlyIncome}
               />
               <AssetAllocationChart
                 assets={assets}
