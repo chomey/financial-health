@@ -15,6 +15,7 @@ import ExpenseBreakdownChart from "@/components/ExpenseBreakdownChart";
 import NetWorthWaterfallChart from "@/components/NetWorthWaterfallChart";
 import FastForwardPanel from "@/components/FastForwardPanel";
 import BenchmarkComparisons from "@/components/BenchmarkComparisons";
+import CashFlowSankey from "@/components/CashFlowSankey";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -319,6 +320,15 @@ export default function Home() {
                 debts={debts}
                 properties={properties}
                 stocks={stocks}
+              />
+              <CashFlowSankey
+                income={income}
+                expenses={expenses}
+                investmentContributions={totalInvestmentContributions}
+                mortgagePayments={totalMortgagePayments}
+                monthlyFederalTax={totals.totalFederalTax / 12}
+                monthlyProvincialTax={totals.totalProvincialStateTax / 12}
+                monthlySurplus={monthlySurplus}
               />
               <BenchmarkComparisons
                 age={age}
