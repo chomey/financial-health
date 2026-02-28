@@ -9,13 +9,11 @@ import ExpenseEntry from "@/components/ExpenseEntry";
 import GoalEntry from "@/components/GoalEntry";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
 import ProjectionChart from "@/components/ProjectionChart";
-import RegionToggle from "@/components/RegionToggle";
 import {
   INITIAL_STATE,
   computeMetrics,
   toFinancialData,
 } from "@/lib/financial-state";
-import type { Region } from "@/lib/financial-state";
 import { getStateFromURL, updateURL } from "@/lib/url-state";
 import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
@@ -98,9 +96,6 @@ export default function Home() {
   const [income, setIncome] = useState<IncomeItem[]>(INITIAL_STATE.income);
   const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
   const [goals, setGoals] = useState<Goal[]>(INITIAL_STATE.goals);
-  const [region, setRegion] = useState<Region>("both");
-  const [regionPulse, setRegionPulse] = useState(0);
-  const regionInitialized = useRef(false);
   const isFirstRender = useRef(true);
 
   // Restore state from URL after hydration — prevents server/client mismatch
@@ -114,19 +109,9 @@ export default function Home() {
       setIncome(urlState.income);
       setExpenses(urlState.expenses);
       setGoals(urlState.goals);
-      setRegion(urlState.region);
     }
-    regionInitialized.current = true;
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
-
-  // Handle user region change: update state and trigger pulse
-  const handleRegionChange = useCallback((newRegion: Region) => {
-    setRegion(newRegion);
-    if (regionInitialized.current) {
-      setRegionPulse((p) => p + 1);
-    }
-  }, []);
 
   // Update URL whenever state changes (skip the initial render to avoid unnecessary write)
   useEffect(() => {
@@ -134,10 +119,10 @@ export default function Home() {
       // Still write the URL on first render so the s= param is always present
       isFirstRender.current = false;
     }
-    updateURL({ assets, debts, properties, income, expenses, goals, region });
-  }, [assets, debts, properties, income, expenses, goals, region]);
+    updateURL({ assets, debts, properties, income, expenses, goals });
+  }, [assets, debts, properties, income, expenses, goals]);
 
-  const state = { assets, debts, properties, income, expenses, goals, region };
+  const state = { assets, debts, properties, income, expenses, goals };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
 
@@ -154,7 +139,6 @@ export default function Home() {
             </p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <RegionToggle region={region} onChange={handleRegionChange} />
             <CopyLinkButton />
           </div>
         </div>
@@ -168,13 +152,9 @@ export default function Home() {
             aria-label="Financial data entry"
           >
             <div className="space-y-6">
-              <div key={`asset-pulse-${regionPulse}`} className={regionPulse > 0 ? "animate-region-pulse rounded-xl" : ""} data-testid="asset-pulse-wrapper">
-                <AssetEntry items={assets} onChange={setAssets} region={region} />
-              </div>
+              <AssetEntry items={assets} onChange={setAssets} />
 
-              <div key={`debt-pulse-${regionPulse}`} className={regionPulse > 0 ? "animate-region-pulse rounded-xl" : ""} data-testid="debt-pulse-wrapper">
-                <DebtEntry items={debts} onChange={setDebts} region={region} />
-              </div>
+              <DebtEntry items={debts} onChange={setDebts} />
 
               <PropertyEntry items={properties} onChange={setProperties} />
 

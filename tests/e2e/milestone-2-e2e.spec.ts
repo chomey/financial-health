@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("T3: Milestone 2 — Comprehensive E2E for features from tasks 22-25", () => {
-  test("full journey: asset ROI, property mortgage, debt interest, projection chart, region toggle", async ({
+  test("full journey: asset ROI, property mortgage, debt interest, projection chart, grouped suggestions", async ({
     page,
   }) => {
     await page.goto("/");
@@ -250,55 +250,8 @@ test.describe("T3: Milestone 2 — Comprehensive E2E for features from tasks 22-
     await captureScreenshot(page, "task-26-goal-milestones");
 
     // ========================================
-    // Step 10: Test region toggle visibility improvements
+    // Step 10: Verify grouped suggestions in dropdowns
     // ========================================
-    const toggle = page.getByRole("radiogroup", {
-      name: /Filter account types by region/i,
-    });
-    await expect(toggle).toBeVisible();
-    await expect(toggle).toHaveAttribute("title", "Filter account types by region");
-
-    // Switch to US region
-    await toggle.getByRole("radio", { name: /US/i }).click();
-
-    // Toast should show
-    const toast = page.getByTestId("region-toast");
-    await expect(toast).toBeVisible();
-    await expect(toast).toHaveText("Showing US account types");
-
-    // TFSA should be dimmed (CA-specific account in US mode)
-    const tfsaItem = page.getByRole("button", { name: /Edit category for TFSA/i })
-      .locator("xpath=ancestor::div[@role='listitem']");
-    await expect(tfsaItem).toHaveClass(/opacity-50/);
-
-    // TFSA should show "CA" badge
-    const tfsaCatButton = page.getByRole("button", { name: /Edit category for TFSA/i });
-    await expect(tfsaCatButton).toContainText("CA");
-
-    // Savings Account should NOT be dimmed (universal)
-    const savingsItem = page.getByRole("button", { name: /Edit category for Savings Account/i })
-      .locator("xpath=ancestor::div[@role='listitem']");
-    await expect(savingsItem).not.toHaveClass(/opacity-50/);
-
-    await captureScreenshot(page, "task-26-region-us-dimmed");
-
-    // Switch to CA
-    await toggle.getByRole("radio", { name: /CA/i }).click();
-    await expect(toast).toHaveText("Showing Canadian account types");
-
-    // Switch back to Both
-    await toggle.getByRole("radio", { name: /Both/i }).click();
-    await expect(toast).toHaveText("Showing all account types");
-
-    // All items should be fully visible again
-    await expect(tfsaItem).not.toHaveClass(/opacity-50/);
-
-    await captureScreenshot(page, "task-26-region-both-restored");
-
-    // ========================================
-    // Step 11: Verify grouped suggestions in dropdowns
-    // ========================================
-    await toggle.getByRole("radio", { name: /Both/i }).click();
 
     // Open add asset form
     const assetSection = page
@@ -311,8 +264,8 @@ test.describe("T3: Milestone 2 — Comprehensive E2E for features from tasks 22-
     // Verify grouped suggestion headers
     const headers = page.locator("[data-testid='suggestion-group-header']");
     await expect(headers).toHaveCount(3);
-    await expect(headers.nth(0)).toContainText("Canadian");
-    await expect(headers.nth(1)).toContainText("US");
+    await expect(headers.nth(0)).toContainText("Canada");
+    await expect(headers.nth(1)).toContainText("USA");
     await expect(headers.nth(2)).toContainText("General");
 
     await captureScreenshot(page, "task-26-grouped-suggestions");

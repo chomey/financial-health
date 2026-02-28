@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import type { Region } from "@/lib/financial-state";
 import { calculateDebtPayoff, formatPayoffCurrency } from "@/lib/debt-payoff";
 
 export interface Debt {
@@ -30,13 +29,7 @@ export const CA_DEBT_CATEGORIES = new Set(DEBT_CATEGORY_SUGGESTIONS.CA);
 /** Set of US-specific debt category names */
 export const US_DEBT_CATEGORIES = new Set(DEBT_CATEGORY_SUGGESTIONS.US);
 
-export function getAllDebtCategorySuggestions(region?: Region): string[] {
-  if (region === "CA") {
-    return [...DEBT_CATEGORY_SUGGESTIONS.CA, ...DEBT_CATEGORY_SUGGESTIONS.universal];
-  }
-  if (region === "US") {
-    return [...DEBT_CATEGORY_SUGGESTIONS.US, ...DEBT_CATEGORY_SUGGESTIONS.universal];
-  }
+export function getAllDebtCategorySuggestions(): string[] {
   return [
     ...DEBT_CATEGORY_SUGGESTIONS.CA,
     ...DEBT_CATEGORY_SUGGESTIONS.US,
@@ -49,24 +42,12 @@ export interface DebtSuggestionGroup {
   items: string[];
 }
 
-export function getGroupedDebtCategorySuggestions(region?: Region): DebtSuggestionGroup[] {
-  const groups: DebtSuggestionGroup[] = [];
-  if (region !== "US") {
-    groups.push({ label: "🇨🇦 Canadian", items: DEBT_CATEGORY_SUGGESTIONS.CA });
-  }
-  if (region !== "CA") {
-    groups.push({ label: "🇺🇸 US", items: DEBT_CATEGORY_SUGGESTIONS.US });
-  }
-  groups.push({ label: "General", items: DEBT_CATEGORY_SUGGESTIONS.universal });
-  return groups;
-}
-
-/** Check if a debt category belongs to the "other" region (not selected) */
-export function isDebtOutOfRegion(category: string, region?: Region): boolean {
-  if (!region || region === "both") return false;
-  if (region === "CA" && US_DEBT_CATEGORIES.has(category)) return true;
-  if (region === "US" && CA_DEBT_CATEGORIES.has(category)) return true;
-  return false;
+export function getGroupedDebtCategorySuggestions(): DebtSuggestionGroup[] {
+  return [
+    { label: "🇨🇦 Canada", items: DEBT_CATEGORY_SUGGESTIONS.CA },
+    { label: "🇺🇸 USA", items: DEBT_CATEGORY_SUGGESTIONS.US },
+    { label: "General", items: DEBT_CATEGORY_SUGGESTIONS.universal },
+  ];
 }
 
 /** Returns a flag emoji if the category is region-specific, or empty string */
@@ -121,10 +102,9 @@ function parseCurrencyInput(value: string): number {
 interface DebtEntryProps {
   items?: Debt[];
   onChange?: (items: Debt[]) => void;
-  region?: Region;
 }
 
-export default function DebtEntry({ items, onChange, region }: DebtEntryProps = {}) {
+export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
   const [debts, setDebts] = useState<Debt[]>(items ?? MOCK_DEBTS);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -273,13 +253,13 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
   };
 
   const filteredSuggestions = (query: string) => {
-    const all = getAllDebtCategorySuggestions(region);
+    const all = getAllDebtCategorySuggestions();
     if (!query) return all;
     return all.filter((s) => s.toLowerCase().includes(query.toLowerCase()));
   };
 
   const filteredGroupedSuggestions = (query: string): DebtSuggestionGroup[] => {
-    const groups = getGroupedDebtCategorySuggestions(region);
+    const groups = getGroupedDebtCategorySuggestions();
     return groups
       .map((group) => ({
         ...group,
@@ -313,13 +293,12 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
       ) : (
         <div className="space-y-1" role="list" aria-label="Debt items">
           {debts.map((debt) => {
-            const outOfRegion = isDebtOutOfRegion(debt.category, region);
             const defaultInterest = getDefaultDebtInterest(debt.category);
             const displayInterest = debt.interestRate ?? defaultInterest;
             const hasInterest = debt.interestRate !== undefined;
             const hasPayment = debt.monthlyPayment !== undefined && debt.monthlyPayment > 0;
             return (
-            <div key={debt.id} role="listitem" className={outOfRegion ? "opacity-50" : ""}>
+            <div key={debt.id} role="listitem">
               <div
                 className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50"
               >
@@ -389,11 +368,6 @@ export default function DebtEntry({ items, onChange, region }: DebtEntryProps = 
                       <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(debt.category)}</span>
                     )}
                     {debt.category}
-                    {outOfRegion && (
-                      <span className="ml-1.5 inline-flex items-center rounded px-1 py-0.5 text-[10px] font-medium leading-none bg-stone-100 text-stone-400" data-testid={`region-badge-${debt.id}`}>
-                        {CA_DEBT_CATEGORIES.has(debt.category) ? "CA" : "US"}
-                      </span>
-                    )}
                   </button>
                 )}
 

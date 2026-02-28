@@ -4,7 +4,6 @@ import type { FinancialState } from "@/lib/financial-state";
 
 function makeState(overrides: Partial<FinancialState> = {}): FinancialState {
   return {
-    region: "both",
     assets: [],
     debts: [],
     income: [],

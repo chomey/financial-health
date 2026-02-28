@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import type { Region } from "@/lib/financial-state";
 
 export interface Asset {
   id: string;
@@ -28,13 +27,7 @@ export const CA_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.CA);
 /** Set of US-specific asset category names */
 export const US_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.US);
 
-export function getAllCategorySuggestions(region?: Region): string[] {
-  if (region === "CA") {
-    return [...CATEGORY_SUGGESTIONS.CA, ...CATEGORY_SUGGESTIONS.universal];
-  }
-  if (region === "US") {
-    return [...CATEGORY_SUGGESTIONS.US, ...CATEGORY_SUGGESTIONS.universal];
-  }
+export function getAllCategorySuggestions(): string[] {
   return [
     ...CATEGORY_SUGGESTIONS.CA,
     ...CATEGORY_SUGGESTIONS.US,
@@ -47,16 +40,12 @@ export interface SuggestionGroup {
   items: string[];
 }
 
-export function getGroupedCategorySuggestions(region?: Region): SuggestionGroup[] {
-  const groups: SuggestionGroup[] = [];
-  if (region !== "US") {
-    groups.push({ label: "🇨🇦 Canadian", items: CATEGORY_SUGGESTIONS.CA });
-  }
-  if (region !== "CA") {
-    groups.push({ label: "🇺🇸 US", items: CATEGORY_SUGGESTIONS.US });
-  }
-  groups.push({ label: "General", items: CATEGORY_SUGGESTIONS.universal });
-  return groups;
+export function getGroupedCategorySuggestions(): SuggestionGroup[] {
+  return [
+    { label: "🇨🇦 Canada", items: CATEGORY_SUGGESTIONS.CA },
+    { label: "🇺🇸 USA", items: CATEGORY_SUGGESTIONS.US },
+    { label: "General", items: CATEGORY_SUGGESTIONS.universal },
+  ];
 }
 
 /** Smart ROI defaults by account type (annual %) */
@@ -80,14 +69,6 @@ export const DEFAULT_ROI: Record<string, number> = {
 /** Get the suggested ROI for a category, or undefined if none */
 export function getDefaultRoi(category: string): number | undefined {
   return DEFAULT_ROI[category];
-}
-
-/** Check if a category belongs to the "other" region (not selected) */
-export function isOutOfRegion(category: string, region?: Region): boolean {
-  if (!region || region === "both") return false;
-  if (region === "CA" && US_ASSET_CATEGORIES.has(category)) return true;
-  if (region === "US" && CA_ASSET_CATEGORIES.has(category)) return true;
-  return false;
 }
 
 /** Returns a flag emoji if the category is region-specific, or empty string */
@@ -126,10 +107,9 @@ function parseCurrencyInput(value: string): number {
 interface AssetEntryProps {
   items?: Asset[];
   onChange?: (items: Asset[]) => void;
-  region?: Region;
 }
 
-export default function AssetEntry({ items, onChange, region }: AssetEntryProps = {}) {
+export default function AssetEntry({ items, onChange }: AssetEntryProps = {}) {
   const [assets, setAssets] = useState<Asset[]>(items ?? MOCK_ASSETS);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -278,13 +258,13 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
   };
 
   const filteredSuggestions = (query: string) => {
-    const all = getAllCategorySuggestions(region);
+    const all = getAllCategorySuggestions();
     if (!query) return all;
     return all.filter((s) => s.toLowerCase().includes(query.toLowerCase()));
   };
 
   const filteredGroupedSuggestions = (query: string): SuggestionGroup[] => {
-    const groups = getGroupedCategorySuggestions(region);
+    const groups = getGroupedCategorySuggestions();
     return groups
       .map((group) => ({
         ...group,
@@ -318,13 +298,12 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
       ) : (
         <div className="space-y-1" role="list" aria-label="Asset items">
           {assets.map((asset) => {
-            const outOfRegion = isOutOfRegion(asset.category, region);
             const defaultRoi = getDefaultRoi(asset.category);
             const displayRoi = asset.roi ?? defaultRoi;
             const hasRoi = asset.roi !== undefined;
             const hasContribution = asset.monthlyContribution !== undefined && asset.monthlyContribution > 0;
             return (
-            <div key={asset.id} role="listitem" className={outOfRegion ? "opacity-50" : ""}>
+            <div key={asset.id} role="listitem">
               <div
                 className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50"
               >
@@ -395,11 +374,6 @@ export default function AssetEntry({ items, onChange, region }: AssetEntryProps 
                         <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(asset.category)}</span>
                       )}
                       {asset.category}
-                      {outOfRegion && (
-                        <span className="ml-1.5 inline-flex items-center rounded px-1 py-0.5 text-[10px] font-medium leading-none bg-stone-100 text-stone-400" data-testid={`region-badge-${asset.id}`}>
-                          {CA_ASSET_CATEGORIES.has(asset.category) ? "CA" : "US"}
-                        </span>
-                      )}
                     </button>
                   )}
 
