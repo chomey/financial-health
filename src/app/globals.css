@@ -127,6 +127,20 @@ body {
   animation: glow-pulse 3s ease-in-out infinite;
 }
 
+/* Warning glow pulse for underwater/negative surplus */
+@keyframes warning-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.3), 0 0 16px rgba(244, 63, 94, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(244, 63, 94, 0.5), 0 0 32px rgba(244, 63, 94, 0.2);
+  }
+}
+
+.animate-warning-pulse {
+  animation: warning-pulse 3s ease-in-out infinite;
+}
+
 /* Tooltip fade transition */
 @keyframes fade-in {
   from {

@@ -4,6 +4,7 @@ import type { IncomeItem } from "@/components/IncomeEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import type { Property } from "@/components/PropertyEntry";
+import { getEffectivePayment } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
 import type { FinancialData } from "@/lib/insights";
@@ -56,6 +57,7 @@ export function computeTotals(state: FinancialState) {
   const totalPropertyEquity = properties.reduce((sum, p) => sum + Math.max(0, p.value - p.mortgage), 0);
   const totalPropertyValue = properties.reduce((sum, p) => sum + p.value, 0);
   const totalPropertyMortgage = properties.reduce((sum, p) => sum + p.mortgage, 0);
+  const totalMortgagePayments = properties.reduce((sum, p) => sum + getEffectivePayment(p), 0);
   // Stocks: total value of all holdings (liquid, counts toward net worth and runway)
   const stocks = state.stocks ?? [];
   const totalStocks = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
@@ -86,7 +88,7 @@ export function computeTotals(state: FinancialState) {
   const monthlyAfterTaxIncome = totalAfterTaxAnnual / 12;
   const totalTaxEstimate = totalAnnualTax;
 
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax, totalProvincialStateTax, effectiveTaxRate };
+  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax, totalProvincialStateTax, effectiveTaxRate };
 }
 
 function fmtShort(n: number): string {
@@ -97,12 +99,14 @@ function fmtShort(n: number): string {
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyMortgage, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate } = computeTotals(state);
 
-  // Net worth includes property equity + stocks: (liquid assets + stocks + property equity) - debts
-  const netWorth = totalAssets + totalStocks + totalPropertyEquity - totalDebts;
-  // Surplus uses after-tax income, excludes investment contributions (they're already allocated to specific assets)
-  const surplus = monthlyAfterTaxIncome - monthlyExpenses - totalMonthlyContributions;
+  // Net worth: show without property equity as primary, with equity as secondary
+  const netWorthWithoutEquity = totalAssets + totalStocks - totalDebts;
+  const netWorth = netWorthWithoutEquity;
+  const netWorthWithEquity = totalAssets + totalStocks + totalPropertyEquity - totalDebts;
+  // Surplus uses after-tax income, subtracts expenses, investment contributions, and mortgage payments
+  const surplus = monthlyAfterTaxIncome - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments;
   // Runway uses liquid assets + stocks (NOT property)
   const liquidTotal = totalAssets + totalStocks;
   const runway = monthlyExpenses > 0 ? liquidTotal / monthlyExpenses : 0;
@@ -150,6 +154,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
         "Your total assets minus total debts. This is a snapshot — it changes as you pay down debts and grow savings.",
       positive: netWorth >= 0,
       breakdown: netWorthBreakdown,
+      valueWithEquity: totalPropertyEquity > 0 ? netWorthWithEquity : undefined,
     },
     {
       title: "Monthly Surplus",
@@ -196,7 +201,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 }
 
 export function toFinancialData(state: FinancialState): FinancialData {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate } = computeTotals(state);
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
   return {
@@ -204,7 +209,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     totalDebts: totalDebts + totalPropertyMortgage,
     liquidAssets: totalAssets + totalStocks,
     monthlyIncome: monthlyAfterTaxIncome,
-    monthlyExpenses: monthlyExpenses + totalMonthlyContributions,
+    monthlyExpenses: monthlyExpenses + totalMonthlyContributions + totalMortgagePayments,
     rawMonthlyExpenses: monthlyExpenses,
     debts: state.debts.map((d) => ({
       category: d.category,

@@ -12,6 +12,7 @@ interface MetricData {
   positive: boolean;
   breakdown?: string;
   effectiveRate?: number;
+  valueWithEquity?: number; // net worth including property equity
 }
 
 // Mock values based on existing entry component mock data
@@ -140,12 +141,18 @@ function MetricCard({ metric, insights }: { metric: MetricData; insights: string
     metric.format === "months" &&
     metric.value > 12;
 
+  // Warning glow for negative Monthly Surplus (underwater)
+  const isUnderwaterWarning =
+    metric.title === "Monthly Surplus" && metric.value < 0;
+
   return (
     <div
       className={`relative rounded-xl border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default ${
         isRunwayCelebration
           ? "border-green-300 ring-1 ring-green-200 animate-glow-pulse"
-          : "border-stone-200"
+          : isUnderwaterWarning
+            ? "border-rose-300 ring-1 ring-rose-200 animate-warning-pulse"
+            : "border-stone-200"
       }`}
       role="group"
       aria-label={metric.title}
@@ -168,6 +175,11 @@ function MetricCard({ metric, insights }: { metric: MetricData; insights: string
       >
         {formatMetricValue(animatedValue, metric.format)}
       </p>
+      {metric.valueWithEquity !== undefined && metric.valueWithEquity !== metric.value && (
+        <p className="mt-0.5 text-sm text-stone-500" data-testid="net-worth-with-equity">
+          ({formatMetricValue(metric.valueWithEquity, metric.format)} with home equity)
+        </p>
+      )}
       {/* Effective tax rate sub-line */}
       {metric.effectiveRate !== undefined && metric.effectiveRate > 0 && (
         <p className="mt-0.5 text-sm text-stone-500" data-testid="effective-tax-rate">

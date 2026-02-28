@@ -9,7 +9,27 @@ export interface Property {
   mortgage: number;
   interestRate?: number; // annual %
   monthlyPayment?: number; // $ per month
-  amortizationYears?: number; // years remaining
+  amortizationYears?: number; // original amortization term
+  yearPurchased?: number; // year the property was purchased
+}
+
+/** Compute remaining amortization years based on purchase year and original term */
+export function computeRemainingYears(amortizationYears: number | undefined, yearPurchased: number | undefined): number {
+  const term = amortizationYears ?? 25;
+  if (yearPurchased === undefined) return term;
+  const elapsed = new Date().getFullYear() - yearPurchased;
+  return Math.max(1, term - elapsed);
+}
+
+/** Get the effective monthly payment for a property (explicit or suggested) */
+export function getEffectivePayment(property: Property): number {
+  if (property.monthlyPayment !== undefined && property.monthlyPayment > 0) {
+    return property.monthlyPayment;
+  }
+  if (property.mortgage <= 0) return 0;
+  const rate = property.interestRate ?? DEFAULT_INTEREST_RATE;
+  const remainingYears = computeRemainingYears(property.amortizationYears, property.yearPurchased);
+  return suggestMonthlyPayment(property.mortgage, rate, remainingYears);
 }
 
 /** Default interest rate suggestion for mortgages (annual %) */
@@ -178,7 +198,7 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
 
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingField, setEditingField] = useState<"name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | null>(null);
+  const [editingField, setEditingField] = useState<"name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | "yearPurchased" | null>(null);
   const [editValue, setEditValue] = useState("");
   const [addingNew, setAddingNew] = useState(false);
   const [newName, setNewName] = useState("");
@@ -205,7 +225,7 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
     }
   }, [editingId, editingField]);
 
-  const startEdit = (id: string, field: "name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears", currentValue: string) => {
+  const startEdit = (id: string, field: "name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | "yearPurchased", currentValue: string) => {
     setEditingId(id);
     setEditingField(field);
     setEditValue(currentValue);
@@ -236,6 +256,10 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
           if (editingField === "amortizationYears") {
             const val = parseFloat(editValue);
             return { ...p, amortizationYears: isNaN(val) ? undefined : val };
+          }
+          if (editingField === "yearPurchased") {
+            const val = parseInt(editValue);
+            return { ...p, yearPurchased: isNaN(val) ? undefined : val };
           }
           return p;
         })
@@ -437,7 +461,8 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                   const displayRate = rate ?? DEFAULT_INTEREST_RATE;
                   const payment = property.monthlyPayment;
                   const hasPayment = payment !== undefined && payment > 0;
-                  const suggestedPayment = property.mortgage > 0 ? suggestMonthlyPayment(property.mortgage, displayRate, property.amortizationYears ?? 25) : 0;
+                  const remainingYears = computeRemainingYears(property.amortizationYears, property.yearPurchased);
+                  const suggestedPayment = property.mortgage > 0 ? suggestMonthlyPayment(property.mortgage, displayRate, remainingYears) : 0;
                   const displayPayment = payment ?? suggestedPayment;
                   const amortYears = property.amortizationYears;
                   const hasAmort = amortYears !== undefined;
@@ -544,6 +569,38 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                             {hasAmort ? `${amortYears}yr term` : "Term years"}
                           </button>
                         )}
+
+                        {/* Year purchased */}
+                        {(() => {
+                          const hasYearPurchased = property.yearPurchased !== undefined;
+                          return editingId === property.id && editingField === "yearPurchased" ? (
+                            <input
+                              ref={inputRef}
+                              type="text"
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              onBlur={commitEdit}
+                              onKeyDown={handleEditKeyDown}
+                              className="w-16 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                              aria-label={`Edit year purchased for ${property.name}`}
+                              placeholder="e.g. 2020"
+                            />
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => startEdit(property.id, "yearPurchased", String(property.yearPurchased ?? ""))}
+                              className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                                hasYearPurchased
+                                  ? "bg-orange-50 text-orange-600 hover:bg-orange-100"
+                                  : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                              }`}
+                              aria-label={`Edit year purchased for ${property.name}${hasYearPurchased ? `, currently ${property.yearPurchased}` : ""}`}
+                              data-testid={`year-badge-${property.id}`}
+                            >
+                              {hasYearPurchased ? `Bought ${property.yearPurchased}` : "Year purchased"}
+                            </button>
+                          );
+                        })()}
                       </div>
 
                       {/* Computed mortgage info */}
@@ -578,6 +635,12 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                             <div className="flex justify-between border-t border-stone-200 pt-0.5 mt-0.5">
                               <span>Total interest remaining</span>
                               <span className="font-medium text-stone-600">{formatCurrency(Math.round(amortInfo.totalInterest))}</span>
+                            </div>
+                          )}
+                          {property.yearPurchased !== undefined && (
+                            <div className="flex justify-between">
+                              <span>Remaining term</span>
+                              <span className="font-medium text-stone-600">{remainingYears}yr of {property.amortizationYears ?? 25}yr</span>
                             </div>
                           )}
                           <div className="flex justify-between">
