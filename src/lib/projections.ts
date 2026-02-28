@@ -63,6 +63,12 @@ export function projectFinances(
     monthlyPayment: d.monthlyPayment ?? 0,
   }));
 
+  // Track stock holdings (static value — no growth projections for stocks)
+  const stocksTotal = (state.stocks ?? []).reduce((sum, s) => {
+    const price = s.manualPrice ?? s.lastFetchedPrice ?? 0;
+    return sum + s.shares * price;
+  }, 0);
+
   // Track each property mortgage for interest/payments
   const propertyBalances = state.properties.map((p) => ({
     value: p.value,
@@ -94,13 +100,13 @@ export function projectFinances(
       0
     );
     const totalMortgage = propertyBalances.reduce((s, p) => s + Math.max(0, p.mortgage), 0);
-    const netWorth = totalAssetValue + totalPropertyEquity - totalDebtValue;
+    const netWorth = totalAssetValue + stocksTotal + totalPropertyEquity - totalDebtValue;
 
     points.push({
       month: m,
       year: parseFloat((m / 12).toFixed(1)),
       netWorth: Math.round(netWorth),
-      totalAssets: Math.round(totalAssetValue),
+      totalAssets: Math.round(totalAssetValue + stocksTotal),
       totalDebts: Math.round(totalDebtValue + totalMortgage),
       totalPropertyEquity: Math.round(totalPropertyEquity),
     });

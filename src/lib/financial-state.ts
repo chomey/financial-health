@@ -5,6 +5,8 @@ import { normalizeToMonthly } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import type { Goal } from "@/components/GoalEntry";
 import type { Property } from "@/components/PropertyEntry";
+import type { StockHolding } from "@/components/StockEntry";
+import { getStockValue } from "@/components/StockEntry";
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
 
@@ -15,6 +17,7 @@ export interface FinancialState {
   expenses: ExpenseItem[];
   goals: Goal[];
   properties: Property[];
+  stocks: StockHolding[];
 }
 
 export const INITIAL_STATE: FinancialState = {
@@ -43,6 +46,7 @@ export const INITIAL_STATE: FinancialState = {
   properties: [
     { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
   ],
+  stocks: [],
 };
 
 export function computeTotals(state: FinancialState) {
@@ -55,19 +59,23 @@ export function computeTotals(state: FinancialState) {
   const totalPropertyEquity = properties.reduce((sum, p) => sum + Math.max(0, p.value - p.mortgage), 0);
   const totalPropertyValue = properties.reduce((sum, p) => sum + p.value, 0);
   const totalPropertyMortgage = properties.reduce((sum, p) => sum + p.mortgage, 0);
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage };
+  // Stocks: total value of all holdings (liquid, counts toward net worth and runway)
+  const stocks = state.stocks ?? [];
+  const totalStocks = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
+  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalStocks };
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyMortgage } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyMortgage, totalStocks } = computeTotals(state);
 
-  // Net worth includes property equity: (liquid assets + property equity) - debts
-  const netWorth = totalAssets + totalPropertyEquity - totalDebts;
+  // Net worth includes property equity + stocks: (liquid assets + stocks + property equity) - debts
+  const netWorth = totalAssets + totalStocks + totalPropertyEquity - totalDebts;
   const surplus = monthlyIncome - monthlyExpenses;
-  // Runway uses only liquid assets (NOT property)
-  const runway = monthlyExpenses > 0 ? totalAssets / monthlyExpenses : 0;
-  // Debt-to-asset ratio includes property: (debts + mortgages) / (liquid assets + property values)
-  const totalAllAssets = totalAssets + totalPropertyEquity;
+  // Runway uses liquid assets + stocks (NOT property)
+  const liquidTotal = totalAssets + totalStocks;
+  const runway = monthlyExpenses > 0 ? liquidTotal / monthlyExpenses : 0;
+  // Debt-to-asset ratio includes property: (debts + mortgages) / (liquid assets + stocks + property values)
+  const totalAllAssets = totalAssets + totalStocks + totalPropertyEquity;
   const totalAllDebts = totalDebts + totalPropertyMortgage;
   const debtToAssetRatio = totalAllAssets > 0 ? totalAllDebts / totalAllAssets : 0;
 
@@ -112,11 +120,11 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 }
 
 export function toFinancialData(state: FinancialState): FinancialData {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyMortgage } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyMortgage, totalStocks } = computeTotals(state);
   return {
-    totalAssets: totalAssets + totalPropertyEquity,
+    totalAssets: totalAssets + totalStocks + totalPropertyEquity,
     totalDebts: totalDebts + totalPropertyMortgage,
-    liquidAssets: totalAssets,
+    liquidAssets: totalAssets + totalStocks,
     monthlyIncome,
     monthlyExpenses,
     goals: state.goals.map((g) => ({

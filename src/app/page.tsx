@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import PropertyEntry from "@/components/PropertyEntry";
+import StockEntry from "@/components/StockEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import GoalEntry from "@/components/GoalEntry";
@@ -18,6 +19,7 @@ import { getStateFromURL, updateURL } from "@/lib/url-state";
 import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
 import type { Property } from "@/components/PropertyEntry";
+import type { StockHolding } from "@/components/StockEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import type { Goal } from "@/components/GoalEntry";
@@ -93,6 +95,7 @@ export default function Home() {
   const [assets, setAssets] = useState<Asset[]>(INITIAL_STATE.assets);
   const [debts, setDebts] = useState<Debt[]>(INITIAL_STATE.debts);
   const [properties, setProperties] = useState<Property[]>(INITIAL_STATE.properties);
+  const [stocks, setStocks] = useState<StockHolding[]>(INITIAL_STATE.stocks);
   const [income, setIncome] = useState<IncomeItem[]>(INITIAL_STATE.income);
   const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
   const [goals, setGoals] = useState<Goal[]>(INITIAL_STATE.goals);
@@ -106,6 +109,7 @@ export default function Home() {
       setAssets(urlState.assets);
       setDebts(urlState.debts);
       setProperties(urlState.properties);
+      setStocks(urlState.stocks);
       setIncome(urlState.income);
       setExpenses(urlState.expenses);
       setGoals(urlState.goals);
@@ -119,10 +123,10 @@ export default function Home() {
       // Still write the URL on first render so the s= param is always present
       isFirstRender.current = false;
     }
-    updateURL({ assets, debts, properties, income, expenses, goals });
-  }, [assets, debts, properties, income, expenses, goals]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, goals });
+  }, [assets, debts, properties, stocks, income, expenses, goals]);
 
-  const state = { assets, debts, properties, income, expenses, goals };
+  const state = { assets, debts, properties, stocks, income, expenses, goals };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
 
@@ -157,6 +161,8 @@ export default function Home() {
               <DebtEntry items={debts} onChange={setDebts} />
 
               <PropertyEntry items={properties} onChange={setProperties} />
+
+              <StockEntry items={stocks} onChange={setStocks} />
 
               <IncomeEntry items={income} onChange={setIncome} />
 
