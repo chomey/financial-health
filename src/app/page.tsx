@@ -204,7 +204,7 @@ export default function Home() {
   const totals = computeTotals(state);
   const totalInvestmentContributions = assets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   const totalMortgagePayments = properties.reduce((sum, p) => sum + (p.monthlyPayment ?? 0), 0);
-  const monthlySurplus = totals.monthlyIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
+  const monthlySurplus = totals.monthlyAfterTaxIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
 
   // Summaries for collapsed sections
   const assetTotal = assets.reduce((sum, a) => sum + a.amount, 0);

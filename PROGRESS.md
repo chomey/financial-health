@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 46
-- **Completed**: 42
-- **Remaining**: 4
+- **Completed**: 43
+- **Remaining**: 3
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1069,3 +1069,26 @@
   ![Capital gains suggestions](screenshots/task-43-income-type-capital-gains-suggestions.png)
   ![Income type persists after reload](screenshots/task-43-income-type-persists-after-reload.png)
 - **Notes**: The `IncomeType` type and `incomeType` field on `IncomeItem` already existed from Task 38. The URL state encoding (compact `it` field) was also already wired from Task 38. This task added the UI controls and visual feedback. Category suggestions are now context-sensitive: employment shows standard income categories, capital-gains shows Stock Sale/Property Sale/Crypto, and other shows all categories combined.
+
+## Task 44: Wire tax computation into financial metrics and surplus
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/lib/financial-state.ts`: Updated `computeTotals` to compute after-tax monthly income using the tax engine. For each income item, annualizes via `normalizeToMonthly * 12`, computes tax via `computeTax()` based on `incomeType` and `country`/`jurisdiction`, sums after-tax amounts and converts back to monthly. Added `monthlyAfterTaxIncome`, `totalTaxEstimate`, and `effectiveTaxRate` to the totals return value. Updated `computeMetrics` to use `monthlyAfterTaxIncome` for surplus calculation. Added a new "Estimated Tax" metric card with effective rate. Updated surplus breakdown to show "after-tax income". Updated `toFinancialData` to pass after-tax income to insights.
+  - `src/components/SnapshotDashboard.tsx`: Added `effectiveRate` to `MetricData` interface. Added effective tax rate display under the Estimated Tax metric card (e.g., "15.2% effective rate").
+  - `src/lib/projections.ts`: Updated projection engine to use `monthlyAfterTaxIncome` for surplus instead of gross income.
+  - `src/app/page.tsx`: Updated `monthlySurplus` calculation to use `monthlyAfterTaxIncome`.
+  - `tests/unit/financial-state.test.ts`: Updated existing tests for 5 metrics (was 4), after-tax surplus values, and added new tests for after-tax computation matching tax engine, capital gains handling, US income handling, and pre-tax vs after-tax comparison.
+  - `tests/unit/investment-contributions.test.ts`: Updated surplus and projection tests to account for after-tax income.
+  - `tests/unit/projections.test.ts`: Updated milestone test to work with after-tax surplus.
+  - `tests/e2e/tax-metrics.spec.ts`: New browser integration tests for tax metric card visibility, effective rate display, after-tax surplus tooltip, surplus value comparison, and breakdown text.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/financial-state.test.ts`: 27 tests (11 new/updated for after-tax). All 27 passed, 0 failed.
+  - `tests/e2e/tax-metrics.spec.ts`: 6 new browser tests. All 6 passed, 0 failed.
+  - All 536 unit tests passed, 0 failed. All 129 E2E tests passed, 0 failed. Build succeeded.
+- **Screenshots**:
+  ![Estimated Tax metric card](screenshots/task-44-tax-metric-card.png)
+  ![Five metric cards with tax](screenshots/task-44-five-metric-cards.png)
+  ![After-tax surplus breakdown](screenshots/task-44-surplus-after-tax-breakdown.png)
+- **Notes**: The tax computation runs per-income-item, annualizing each item and computing tax based on its `incomeType` and the global `country`/`jurisdiction`. This means mixed income types (employment + capital gains) each get taxed at their appropriate rates. The surplus, projections, and insights all now use after-tax values. The Estimated Tax card shows annual tax estimate and effective rate.

@@ -83,14 +83,14 @@ describe("projectFinances", () => {
   it("detects net worth milestones", () => {
     const state = makeState({
       assets: [{ id: "a1", category: "Savings", amount: 90000 }],
-      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      income: [{ id: "i1", category: "Salary", amount: 8000 }],
       expenses: [{ id: "e1", category: "Rent", amount: 3000 }],
     });
     const result = projectFinances(state, 5);
     const milestone100k = result.milestones.find((m) => m.label === "$100k");
     expect(milestone100k).toBeDefined();
     expect(milestone100k!.month).toBeGreaterThan(0);
-    expect(milestone100k!.month).toBeLessThan(10); // $2k surplus/month → ~5 months
+    expect(milestone100k!.month).toBeLessThan(10); // after-tax surplus still enough to reach $100k quickly
   });
 
   it("applies scenario multiplier to conservative", () => {
