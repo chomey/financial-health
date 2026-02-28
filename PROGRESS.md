@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 55
-- **Completed**: 51
-- **Remaining**: 4
+- **Completed**: 52
+- **Remaining**: 3
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1228,3 +1228,24 @@
   ![Debt toggled scenario](screenshots/task-51-debt-toggled.png)
   ![Windfall scenario](screenshots/task-51-windfall-scenario.png)
 - **Notes**: Scenarios are temporary and not persisted to URL. The panel reuses the existing projection engine (`projectFinances`) with a modified copy of the financial state. The comparison shows net worth deltas at 5 and 10 year milestones (extending to 20/30 for longer timelines), plus debt-free timeline differences when applicable.
+
+## Task 52: Add benchmark comparisons to dashboard
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/lib/benchmarks.ts`: **New** — Benchmark data tables for CA (StatsCan SFS 2023) and US (Federal Reserve SCF 2022) with 6 age groups each. Includes median net worth, savings rates, debt-to-income ratios, and emergency fund recommendations. Exports `getBenchmarkForAge()`, `computeBenchmarkComparisons()`, and `DATA_SOURCES`.
+  - `src/components/BenchmarkComparisons.tsx`: **New** — "How You Compare" section with optional age input, horizontal bar comparisons (user vs median) for 4 metrics, info button showing data sources, encouraging framing for all comparisons.
+  - `src/lib/financial-state.ts`: Added `age?: number` to `FinancialState` interface.
+  - `src/lib/url-state.ts`: Added `ag?: number` to `CompactState`, updated `toCompact`/`fromCompact` for age serialization. Backward compatible.
+  - `src/app/page.tsx`: Added age state, URL persistence, benchmark value computations (net worth, savings rate, emergency months, debt-to-income), and BenchmarkComparisons component in dashboard column after NetWorthWaterfallChart.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/benchmarks.test.ts`: 22 tests — benchmark data integrity, age lookup, comparison computation, encouraging messages, URL state round-trip with age (22 passed, 0 failed)
+  - `tests/e2e/benchmark-comparisons.spec.ts`: 6 tests — section rendering, age input, comparison bars, info sources, URL persistence, age removal, country switching (6 passed, 0 failed)
+  - All unit tests: 643 passed, 0 failed
+- **Screenshots**:
+  ![Benchmark comparisons with age 30](screenshots/task-52-benchmark-comparisons-age-30.png)
+  ![Data sources info](screenshots/task-52-benchmark-data-sources.png)
+  ![Age persisted after reload](screenshots/task-52-benchmark-url-persistence.png)
+  ![US benchmarks after country switch](screenshots/task-52-benchmark-us-sources.png)
+- **Notes**: Benchmarks are approximate medians from published statistical surveys. All comparison messages use encouraging, non-judgmental framing — gaps are framed as opportunities ("you're building toward it") not failures. The age field is optional and stored in URL state for persistence. The info button shows data source citations. Switching country updates both the benchmark values and the source citation.

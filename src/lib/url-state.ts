@@ -139,6 +139,7 @@ interface CompactState {
   st?: CompactStock[]; // stocks (optional for backward compat)
   co?: string; // country ("CA" | "US", optional for backward compat)
   ju?: string; // jurisdiction (province/state code, optional for backward compat)
+  ag?: number; // age (optional)
 }
 
 function toCompact(state: FinancialState): CompactState {
@@ -186,6 +187,7 @@ function toCompact(state: FinancialState): CompactState {
   }
   if (state.country) compact.co = state.country;
   if (state.jurisdiction) compact.ju = state.jurisdiction;
+  if (state.age !== undefined && state.age > 0) compact.ag = state.age;
   return compact;
 }
 
@@ -243,6 +245,7 @@ function fromCompact(compact: CompactState): FinancialState {
     }),
     country: (compact.co as "CA" | "US") ?? "CA",
     jurisdiction: compact.ju ?? "ON",
+    age: compact.ag,
   };
 }
 
