@@ -1052,3 +1052,20 @@
 - **Screenshots**:
   ![Country jurisdiction selector with US/NY selected](screenshots/task-42-country-jurisdiction-selector.png)
 - **Notes**: The selector uses a compact segmented control for country (showing flags on mobile, flags + text on desktop) and a native select dropdown for jurisdiction. Both persist through existing URL state mechanism (co/ju fields in CompactState). Warm styling consistent with the rest of the app.
+
+## Task 43: Add income type selector to IncomeEntry rows
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/components/IncomeEntry.tsx`: Added income type selector dropdown next to frequency selector on each income row. Added `INCOME_TYPE_LABELS` and `INCOME_TYPE_SHORT_LABELS` maps. Updated `CATEGORY_SUGGESTIONS` from a flat array to a per-income-type map: employment shows Salary/Freelance/etc, capital-gains shows Stock Sale/Property Sale/Crypto, other shows all categories. Updated `getAllIncomeCategorySuggestions()` to accept optional `incomeType` parameter. Added `changeIncomeType()` handler. Capital-gains rows get amber visual styling (bg-amber-50, border-l-2 border-amber-400) and the type selector itself gets amber-colored styling. Income type selector also appears in the "add new income" flow with its own state. Category suggestions in the dropdown update dynamically when income type changes.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/income-entry.test.tsx`: 26 tests (7 new for income type: renders selector, default value, capital-gains styling, no styling on employment, selector in add form, adds with type, changes type on existing row, amber selector styling). All 26 passed, 0 failed.
+  - `tests/e2e/income-type.spec.ts`: 6 new browser tests covering: selector visibility, capital-gains visual styling, selector in add form, adding capital-gains item, URL persistence after reload, category suggestions changing based on income type. All 6 passed, 0 failed.
+  - All 526 unit tests passed, 0 failed. Build succeeded.
+- **Screenshots**:
+  ![Capital gains income type styling](screenshots/task-43-income-type-capital-gains-styling.png)
+  ![Capital gains income added](screenshots/task-43-income-type-capital-gains-added.png)
+  ![Capital gains suggestions](screenshots/task-43-income-type-capital-gains-suggestions.png)
+  ![Income type persists after reload](screenshots/task-43-income-type-persists-after-reload.png)
+- **Notes**: The `IncomeType` type and `incomeType` field on `IncomeItem` already existed from Task 38. The URL state encoding (compact `it` field) was also already wired from Task 38. This task added the UI controls and visual feedback. Category suggestions are now context-sensitive: employment shows standard income categories, capital-gains shows Stock Sale/Property Sale/Crypto, and other shows all categories combined.
