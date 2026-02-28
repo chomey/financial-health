@@ -141,6 +141,7 @@ interface ExpenseBreakdownChartProps {
   federalTax?: number;
   provincialStateTax?: number;
   monthlyAfterTaxIncome?: number;
+  monthlyGrossIncome?: number;
 }
 
 export default function ExpenseBreakdownChart({
@@ -150,7 +151,14 @@ export default function ExpenseBreakdownChart({
   federalTax = 0,
   provincialStateTax = 0,
   monthlyAfterTaxIncome = 0,
+  monthlyGrossIncome,
 }: ExpenseBreakdownChartProps) {
+  // If taxes are shown as an expense slice, compare against gross income
+  // to avoid double-counting (taxes subtracted from income AND shown as expense)
+  const hasTaxSlice = federalTax + provincialStateTax > 0;
+  const incomeForComparison = hasTaxSlice
+    ? (monthlyGrossIncome ?? monthlyAfterTaxIncome)
+    : monthlyAfterTaxIncome;
   const data = useMemo(
     () =>
       computeExpenseBreakdown(
@@ -194,40 +202,40 @@ export default function ExpenseBreakdownChart({
       </h3>
 
       {/* Income vs Expenses comparison bar */}
-      {monthlyAfterTaxIncome > 0 && (
+      {incomeForComparison > 0 && (
         <div className="mb-4" data-testid="income-vs-expenses">
           <div className="mb-1 flex items-center justify-between text-xs text-stone-500">
             <span>Expenses: {formatCurrency(totalExpenses)}/mo</span>
-            <span>Income: {formatCurrency(monthlyAfterTaxIncome)}/mo</span>
+            <span>{hasTaxSlice ? "Gross Income" : "Income"}: {formatCurrency(incomeForComparison)}/mo</span>
           </div>
           <div className="relative h-4 w-full overflow-hidden rounded-full bg-stone-100">
             {/* Expense fill */}
             <div
               className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
               style={{
-                width: `${Math.min((totalExpenses / monthlyAfterTaxIncome) * 100, 100)}%`,
+                width: `${Math.min((totalExpenses / incomeForComparison) * 100, 100)}%`,
                 backgroundColor:
-                  totalExpenses > monthlyAfterTaxIncome ? "#dc2626" : "#059669",
+                  totalExpenses > incomeForComparison ? "#dc2626" : "#059669",
               }}
             />
             {/* Show surplus gap annotation if income > expenses */}
-            {monthlyAfterTaxIncome > totalExpenses && (
+            {incomeForComparison > totalExpenses && (
               <div
                 className="absolute inset-y-0 rounded-r-full bg-emerald-100 border-l-2 border-dashed border-emerald-400"
                 style={{
-                  left: `${(totalExpenses / monthlyAfterTaxIncome) * 100}%`,
-                  width: `${((monthlyAfterTaxIncome - totalExpenses) / monthlyAfterTaxIncome) * 100}%`,
+                  left: `${(totalExpenses / incomeForComparison) * 100}%`,
+                  width: `${((incomeForComparison - totalExpenses) / incomeForComparison) * 100}%`,
                 }}
               />
             )}
           </div>
-          {monthlyAfterTaxIncome > totalExpenses ? (
+          {incomeForComparison > totalExpenses ? (
             <p className="mt-1 text-xs text-emerald-600">
-              {formatCurrency(monthlyAfterTaxIncome - totalExpenses)}/mo surplus
+              {formatCurrency(incomeForComparison - totalExpenses)}/mo surplus
             </p>
-          ) : monthlyAfterTaxIncome < totalExpenses ? (
+          ) : incomeForComparison < totalExpenses ? (
             <p className="mt-1 text-xs text-rose-600">
-              {formatCurrency(totalExpenses - monthlyAfterTaxIncome)}/mo over budget
+              {formatCurrency(totalExpenses - incomeForComparison)}/mo over budget
             </p>
           ) : null}
         </div>
@@ -261,9 +269,9 @@ export default function ExpenseBreakdownChart({
               content={<CustomTooltip />}
               cursor={{ fill: "rgba(0,0,0,0.04)" }}
             />
-            {monthlyAfterTaxIncome > 0 && (
+            {incomeForComparison > 0 && (
               <ReferenceLine
-                x={monthlyAfterTaxIncome}
+                x={incomeForComparison}
                 stroke="#059669"
                 strokeDasharray="4 4"
                 strokeWidth={1}
