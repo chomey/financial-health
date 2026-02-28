@@ -39,6 +39,7 @@ describe("benchmarks", () => {
           expect(b.medianSavingsRate).toBeGreaterThan(0);
           expect(b.medianDebtToIncomeRatio).toBeGreaterThan(0);
           expect(b.recommendedEmergencyMonths).toBeGreaterThanOrEqual(3);
+          expect(b.medianIncome).toBeGreaterThan(0);
         }
       }
     });
@@ -144,6 +145,30 @@ describe("benchmarks", () => {
       const nw = comparisons.find((c) => c.metric === "Net Worth")!;
       expect(nw.benchmarkValue).toBe(135600);
       expect(nw.aboveBenchmark).toBe(true);
+    });
+
+    it("includes national average in comparisons", () => {
+      const comparisons = computeBenchmarkComparisons(30, "CA", 100000, 0.15, 6, 1.0);
+      const nw = comparisons.find((c) => c.metric === "Net Worth")!;
+      expect(nw.nationalAverage).toBe(330000);
+    });
+
+    it("returns 5 comparisons when income is provided", () => {
+      const comparisons = computeBenchmarkComparisons(30, "CA", 100000, 0.15, 6, 1.0, 70000);
+      expect(comparisons).toHaveLength(5);
+      const inc = comparisons.find((c) => c.metric === "Income")!;
+      expect(inc).toBeDefined();
+      expect(inc.userValue).toBe(70000);
+      expect(inc.benchmarkValue).toBe(58000); // CA 25-34 median income
+      expect(inc.nationalAverage).toBe(62000);
+      expect(inc.aboveBenchmark).toBe(true);
+    });
+
+    it("omits income comparison when annualIncome is 0 or undefined", () => {
+      const comparisons1 = computeBenchmarkComparisons(30, "CA", 100000, 0.15, 6, 1.0, 0);
+      expect(comparisons1.find((c) => c.metric === "Income")).toBeUndefined();
+      const comparisons2 = computeBenchmarkComparisons(30, "CA", 100000, 0.15, 6, 1.0);
+      expect(comparisons2.find((c) => c.metric === "Income")).toBeUndefined();
     });
   });
 

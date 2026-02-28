@@ -18,30 +18,60 @@ export interface AgeGroupBenchmark {
   medianSavingsRate: number; // as decimal (0.10 = 10%)
   medianDebtToIncomeRatio: number; // as decimal
   recommendedEmergencyMonths: number;
+  medianIncome: number; // annual household income
 }
 
-// Canadian benchmarks (CAD) — Statistics Canada SFS 2023
+/** National average values across all age groups */
+export interface NationalAverage {
+  netWorth: number;
+  savingsRate: number;
+  debtToIncomeRatio: number;
+  emergencyMonths: number;
+  income: number;
+}
+
+// Canadian benchmarks (CAD) — Statistics Canada SFS 2023, Census 2021
 const CA_BENCHMARKS: AgeGroupBenchmark[] = [
-  { ageMin: 18, ageMax: 24, label: "18–24", medianNetWorth: 5_000, medianSavingsRate: 0.05, medianDebtToIncomeRatio: 0.3, recommendedEmergencyMonths: 3 },
-  { ageMin: 25, ageMax: 34, label: "25–34", medianNetWorth: 48_800, medianSavingsRate: 0.10, medianDebtToIncomeRatio: 1.5, recommendedEmergencyMonths: 3 },
-  { ageMin: 35, ageMax: 44, label: "35–44", medianNetWorth: 234_400, medianSavingsRate: 0.12, medianDebtToIncomeRatio: 1.7, recommendedEmergencyMonths: 4 },
-  { ageMin: 45, ageMax: 54, label: "45–54", medianNetWorth: 351_400, medianSavingsRate: 0.15, medianDebtToIncomeRatio: 1.3, recommendedEmergencyMonths: 5 },
-  { ageMin: 55, ageMax: 64, label: "55–64", medianNetWorth: 543_200, medianSavingsRate: 0.18, medianDebtToIncomeRatio: 0.8, recommendedEmergencyMonths: 6 },
-  { ageMin: 65, ageMax: 120, label: "65+", medianNetWorth: 543_600, medianSavingsRate: 0.20, medianDebtToIncomeRatio: 0.3, recommendedEmergencyMonths: 6 },
+  { ageMin: 18, ageMax: 24, label: "18–24", medianNetWorth: 5_000, medianSavingsRate: 0.05, medianDebtToIncomeRatio: 0.3, recommendedEmergencyMonths: 3, medianIncome: 32_000 },
+  { ageMin: 25, ageMax: 34, label: "25–34", medianNetWorth: 48_800, medianSavingsRate: 0.10, medianDebtToIncomeRatio: 1.5, recommendedEmergencyMonths: 3, medianIncome: 58_000 },
+  { ageMin: 35, ageMax: 44, label: "35–44", medianNetWorth: 234_400, medianSavingsRate: 0.12, medianDebtToIncomeRatio: 1.7, recommendedEmergencyMonths: 4, medianIncome: 72_000 },
+  { ageMin: 45, ageMax: 54, label: "45–54", medianNetWorth: 351_400, medianSavingsRate: 0.15, medianDebtToIncomeRatio: 1.3, recommendedEmergencyMonths: 5, medianIncome: 76_000 },
+  { ageMin: 55, ageMax: 64, label: "55–64", medianNetWorth: 543_200, medianSavingsRate: 0.18, medianDebtToIncomeRatio: 0.8, recommendedEmergencyMonths: 6, medianIncome: 65_000 },
+  { ageMin: 65, ageMax: 120, label: "65+", medianNetWorth: 543_600, medianSavingsRate: 0.20, medianDebtToIncomeRatio: 0.3, recommendedEmergencyMonths: 6, medianIncome: 40_000 },
 ];
 
-// US benchmarks (USD) — Federal Reserve SCF 2022
+const CA_NATIONAL_AVERAGE: NationalAverage = {
+  netWorth: 330_000,
+  savingsRate: 0.13,
+  debtToIncomeRatio: 1.0,
+  emergencyMonths: 4,
+  income: 62_000,
+};
+
+// US benchmarks (USD) — Federal Reserve SCF 2022, Census Bureau
 const US_BENCHMARKS: AgeGroupBenchmark[] = [
-  { ageMin: 18, ageMax: 24, label: "18–24", medianNetWorth: 8_000, medianSavingsRate: 0.05, medianDebtToIncomeRatio: 0.4, recommendedEmergencyMonths: 3 },
-  { ageMin: 25, ageMax: 34, label: "25–34", medianNetWorth: 39_000, medianSavingsRate: 0.10, medianDebtToIncomeRatio: 1.3, recommendedEmergencyMonths: 3 },
-  { ageMin: 35, ageMax: 44, label: "35–44", medianNetWorth: 135_600, medianSavingsRate: 0.12, medianDebtToIncomeRatio: 1.5, recommendedEmergencyMonths: 4 },
-  { ageMin: 45, ageMax: 54, label: "45–54", medianNetWorth: 247_200, medianSavingsRate: 0.15, medianDebtToIncomeRatio: 1.1, recommendedEmergencyMonths: 5 },
-  { ageMin: 55, ageMax: 64, label: "55–64", medianNetWorth: 364_500, medianSavingsRate: 0.18, medianDebtToIncomeRatio: 0.7, recommendedEmergencyMonths: 6 },
-  { ageMin: 65, ageMax: 120, label: "65+", medianNetWorth: 409_900, medianSavingsRate: 0.20, medianDebtToIncomeRatio: 0.3, recommendedEmergencyMonths: 6 },
+  { ageMin: 18, ageMax: 24, label: "18–24", medianNetWorth: 8_000, medianSavingsRate: 0.05, medianDebtToIncomeRatio: 0.4, recommendedEmergencyMonths: 3, medianIncome: 30_000 },
+  { ageMin: 25, ageMax: 34, label: "25–34", medianNetWorth: 39_000, medianSavingsRate: 0.10, medianDebtToIncomeRatio: 1.3, recommendedEmergencyMonths: 3, medianIncome: 55_000 },
+  { ageMin: 35, ageMax: 44, label: "35–44", medianNetWorth: 135_600, medianSavingsRate: 0.12, medianDebtToIncomeRatio: 1.5, recommendedEmergencyMonths: 4, medianIncome: 68_000 },
+  { ageMin: 45, ageMax: 54, label: "45–54", medianNetWorth: 247_200, medianSavingsRate: 0.15, medianDebtToIncomeRatio: 1.1, recommendedEmergencyMonths: 5, medianIncome: 72_000 },
+  { ageMin: 55, ageMax: 64, label: "55–64", medianNetWorth: 364_500, medianSavingsRate: 0.18, medianDebtToIncomeRatio: 0.7, recommendedEmergencyMonths: 6, medianIncome: 65_000 },
+  { ageMin: 65, ageMax: 120, label: "65+", medianNetWorth: 409_900, medianSavingsRate: 0.20, medianDebtToIncomeRatio: 0.3, recommendedEmergencyMonths: 6, medianIncome: 38_000 },
 ];
+
+const US_NATIONAL_AVERAGE: NationalAverage = {
+  netWorth: 290_000,
+  savingsRate: 0.12,
+  debtToIncomeRatio: 1.0,
+  emergencyMonths: 4,
+  income: 59_000,
+};
 
 export function getBenchmarksForCountry(country: "CA" | "US"): AgeGroupBenchmark[] {
   return country === "CA" ? CA_BENCHMARKS : US_BENCHMARKS;
+}
+
+export function getNationalAverage(country: "CA" | "US"): NationalAverage {
+  return country === "CA" ? CA_NATIONAL_AVERAGE : US_NATIONAL_AVERAGE;
 }
 
 export function getBenchmarkForAge(age: number, country: "CA" | "US"): AgeGroupBenchmark | null {
@@ -53,6 +83,7 @@ export interface BenchmarkComparison {
   metric: string;
   userValue: number;
   benchmarkValue: number;
+  nationalAverage: number;
   format: "currency" | "percent" | "months" | "ratio";
   /** Encouraging message about the comparison */
   message: string;
@@ -78,10 +109,12 @@ export function computeBenchmarkComparisons(
   savingsRate: number, // surplus / income, as decimal
   emergencyMonths: number,
   debtToIncomeRatio: number, // total debts / annual income
+  annualIncome?: number, // annual gross income
 ): BenchmarkComparison[] {
   const benchmark = getBenchmarkForAge(age, country);
   if (!benchmark) return [];
 
+  const natl = getNationalAverage(country);
   const comparisons: BenchmarkComparison[] = [];
 
   // Net Worth comparison
@@ -93,10 +126,28 @@ export function computeBenchmarkComparisons(
     metric: "Net Worth",
     userValue: netWorth,
     benchmarkValue: benchmark.medianNetWorth,
+    nationalAverage: natl.netWorth,
     format: "currency",
     message: nwMessage,
     aboveBenchmark: nwAbove,
   });
+
+  // Income comparison
+  if (annualIncome !== undefined && annualIncome > 0) {
+    const incAbove = annualIncome >= benchmark.medianIncome;
+    const incMessage = incAbove
+      ? `Your income is above the median for your age group (${benchmark.label}) — nice work!`
+      : `The median income for the ${benchmark.label} age group is ${fmtCurrency(benchmark.medianIncome)} — you're on your way`;
+    comparisons.push({
+      metric: "Income",
+      userValue: annualIncome,
+      benchmarkValue: benchmark.medianIncome,
+      nationalAverage: natl.income,
+      format: "currency",
+      message: incMessage,
+      aboveBenchmark: incAbove,
+    });
+  }
 
   // Savings Rate comparison
   const srAbove = savingsRate >= benchmark.medianSavingsRate;
@@ -107,6 +158,7 @@ export function computeBenchmarkComparisons(
     metric: "Savings Rate",
     userValue: savingsRate,
     benchmarkValue: benchmark.medianSavingsRate,
+    nationalAverage: natl.savingsRate,
     format: "percent",
     message: srMessage,
     aboveBenchmark: srAbove,
@@ -121,6 +173,7 @@ export function computeBenchmarkComparisons(
     metric: "Emergency Fund",
     userValue: emergencyMonths,
     benchmarkValue: benchmark.recommendedEmergencyMonths,
+    nationalAverage: natl.emergencyMonths,
     format: "months",
     message: efMessage,
     aboveBenchmark: efAbove,
@@ -135,6 +188,7 @@ export function computeBenchmarkComparisons(
     metric: "Debt-to-Income",
     userValue: debtToIncomeRatio,
     benchmarkValue: benchmark.medianDebtToIncomeRatio,
+    nationalAverage: natl.debtToIncomeRatio,
     format: "ratio",
     message: diMessage,
     aboveBenchmark: diAbove,
@@ -144,6 +198,6 @@ export function computeBenchmarkComparisons(
 }
 
 export const DATA_SOURCES = {
-  CA: "Statistics Canada, Survey of Financial Security (SFS) 2023",
-  US: "Federal Reserve, Survey of Consumer Finances (SCF) 2022",
+  CA: "Statistics Canada, Survey of Financial Security (SFS) 2023, Census 2021",
+  US: "Federal Reserve, Survey of Consumer Finances (SCF) 2022, Census Bureau",
 };

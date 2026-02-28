@@ -17,6 +17,7 @@ import FastForwardPanel from "@/components/FastForwardPanel";
 import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import CashFlowSankey from "@/components/CashFlowSankey";
 import InsightsPanel from "@/components/InsightsPanel";
+import ZoomableCard from "@/components/ZoomableCard";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -261,7 +262,7 @@ export default function Home() {
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
         {/* Projection Chart — full-width above the two-column layout */}
         <section className="mb-6 space-y-4" aria-label="Financial projections">
-          <ProjectionChart state={state} />
+          <ZoomableCard><ProjectionChart state={state} /></ZoomableCard>
           <InsightsPanel data={financialData} />
         </section>
 
@@ -311,7 +312,7 @@ export default function Home() {
                   .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
                   .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
                 return (
-                  <div className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5" data-testid="portfolio-performance">
+                  <ZoomableCard><div className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5" data-testid="portfolio-performance">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-medium text-stone-500">Portfolio Performance</h3>
                       <span className="text-lg" aria-hidden="true">📊</span>
@@ -339,10 +340,10 @@ export default function Home() {
                     <p className="mt-1.5 text-xs text-stone-400 leading-relaxed">
                       Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
                     </p>
-                  </div>
+                  </div></ZoomableCard>
                 );
               })()}
-              <ExpenseBreakdownChart
+              <ZoomableCard><ExpenseBreakdownChart
                 expenses={expenses}
                 investmentContributions={totalInvestmentContributions}
                 mortgagePayments={totalMortgagePayments}
@@ -350,19 +351,19 @@ export default function Home() {
                 provincialStateTax={totals.totalProvincialStateTax / 12}
                 monthlyAfterTaxIncome={totals.monthlyAfterTaxIncome}
                 monthlyGrossIncome={totals.monthlyIncome}
-              />
-              <AssetAllocationChart
+              /></ZoomableCard>
+              <ZoomableCard><AssetAllocationChart
                 assets={assets}
                 properties={properties}
                 stocks={stocks}
-              />
-              <NetWorthWaterfallChart
+              /></ZoomableCard>
+              <ZoomableCard><NetWorthWaterfallChart
                 assets={assets}
                 debts={debts}
                 properties={properties}
                 stocks={stocks}
-              />
-              <CashFlowSankey
+              /></ZoomableCard>
+              <ZoomableCard><CashFlowSankey
                 income={income}
                 expenses={expenses}
                 investmentContributions={totalInvestmentContributions}
@@ -370,16 +371,17 @@ export default function Home() {
                 monthlyFederalTax={totals.totalFederalTax / 12}
                 monthlyProvincialTax={totals.totalProvincialStateTax / 12}
                 monthlySurplus={monthlySurplus}
-              />
-              <BenchmarkComparisons
+              /></ZoomableCard>
+              <ZoomableCard><BenchmarkComparisons
                 age={age}
                 country={country}
                 netWorth={benchmarkNetWorth}
                 savingsRate={benchmarkSavingsRate}
                 emergencyMonths={benchmarkEmergencyMonths}
                 debtToIncomeRatio={benchmarkDebtToIncome}
+                annualIncome={annualIncome}
                 onAgeChange={setAge}
-              />
+              /></ZoomableCard>
             </div>
           </section>
         </div>
