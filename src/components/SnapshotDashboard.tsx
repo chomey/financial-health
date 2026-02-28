@@ -11,6 +11,7 @@ interface MetricData {
   tooltip: string;
   positive: boolean;
   breakdown?: string;
+  effectiveRate?: number;
 }
 
 // Mock values based on existing entry component mock data
@@ -163,6 +164,12 @@ function MetricCard({ metric, insights }: { metric: MetricData; insights: string
       >
         {formatMetricValue(animatedValue, metric.format)}
       </p>
+      {/* Effective tax rate sub-line */}
+      {metric.effectiveRate !== undefined && metric.effectiveRate > 0 && (
+        <p className="mt-0.5 text-sm text-stone-500" data-testid="effective-tax-rate">
+          {(metric.effectiveRate * 100).toFixed(1)}% effective rate
+        </p>
+      )}
       {/* Contextual insights below value */}
       {insights.length > 0 && (
         <div className="mt-1.5 space-y-0.5">
