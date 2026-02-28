@@ -54,6 +54,8 @@ export function computeTotals(state: FinancialState) {
   const totalDebts = state.debts.reduce((sum, d) => sum + d.amount, 0);
   const monthlyIncome = state.income.reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency), 0);
   const monthlyExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
+  // Total monthly contributions to investment accounts (comes from income, not double-counted in expenses)
+  const totalMonthlyContributions = state.assets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   // Properties: equity = value - mortgage. Counts toward net worth but NOT runway (illiquid).
   const properties = state.properties ?? [];
   const totalPropertyEquity = properties.reduce((sum, p) => sum + Math.max(0, p.value - p.mortgage), 0);
@@ -62,15 +64,16 @@ export function computeTotals(state: FinancialState) {
   // Stocks: total value of all holdings (liquid, counts toward net worth and runway)
   const stocks = state.stocks ?? [];
   const totalStocks = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalStocks };
+  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalStocks };
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyMortgage, totalStocks } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyMortgage, totalStocks } = computeTotals(state);
 
   // Net worth includes property equity + stocks: (liquid assets + stocks + property equity) - debts
   const netWorth = totalAssets + totalStocks + totalPropertyEquity - totalDebts;
-  const surplus = monthlyIncome - monthlyExpenses;
+  // Surplus excludes investment contributions (they're already allocated to specific assets)
+  const surplus = monthlyIncome - monthlyExpenses - totalMonthlyContributions;
   // Runway uses liquid assets + stocks (NOT property)
   const liquidTotal = totalAssets + totalStocks;
   const runway = monthlyExpenses > 0 ? liquidTotal / monthlyExpenses : 0;
@@ -120,13 +123,13 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 }
 
 export function toFinancialData(state: FinancialState): FinancialData {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalPropertyEquity, totalPropertyMortgage, totalStocks } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyMortgage, totalStocks } = computeTotals(state);
   return {
     totalAssets: totalAssets + totalStocks + totalPropertyEquity,
     totalDebts: totalDebts + totalPropertyMortgage,
     liquidAssets: totalAssets + totalStocks,
     monthlyIncome,
-    monthlyExpenses,
+    monthlyExpenses: monthlyExpenses + totalMonthlyContributions,
     goals: state.goals.map((g) => ({
       name: g.name,
       target: g.targetAmount,

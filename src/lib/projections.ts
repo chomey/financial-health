@@ -45,9 +45,9 @@ export function projectFinances(
   const multiplier = SCENARIO_MULTIPLIERS[scenario];
   const totalMonths = years * 12;
 
-  // Initial values
-  const { monthlyIncome, monthlyExpenses } = computeTotals(state);
-  const baseSurplus = monthlyIncome - monthlyExpenses;
+  // Initial values — surplus excludes investment contributions (handled per-asset)
+  const { monthlyIncome, monthlyExpenses, totalMonthlyContributions } = computeTotals(state);
+  const baseSurplus = monthlyIncome - monthlyExpenses - totalMonthlyContributions;
 
   // Track each asset individually for ROI/contribution
   const assetBalances = state.assets.map((a) => ({
