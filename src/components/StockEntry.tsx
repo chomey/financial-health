@@ -33,9 +33,8 @@ export function getStockGainLoss(stock: StockHolding): { amount: number; percent
   return { amount, percentage };
 }
 
-let nextId = 200;
 function generateId(): string {
-  return `s${++nextId}`;
+  return `s${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 function formatCurrency(amount: number): string {

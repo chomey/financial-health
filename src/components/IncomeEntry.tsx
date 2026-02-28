@@ -58,9 +58,8 @@ const MOCK_INCOME: IncomeItem[] = [
   { id: "i2", category: "Freelance", amount: 800 },
 ];
 
-let nextId = 300;
 function generateId(): string {
-  return `i${++nextId}`;
+  return `i${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 function formatCurrency(amount: number): string {
@@ -171,16 +170,17 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
     }
   };
 
-  const commitEdit = () => {
+  const commitEdit = (overrideValue?: string) => {
+    const value = overrideValue ?? editValue;
     if (editingId && editingField) {
       triggerTotalAnimation();
       setItems((prev) =>
         prev.map((item) => {
           if (item.id !== editingId) return item;
           if (editingField === "category") {
-            return { ...item, category: editValue || item.category };
+            return { ...item, category: value || item.category };
           }
-          return { ...item, amount: parseCurrencyInput(editValue) };
+          return { ...item, amount: parseCurrencyInput(value) };
         })
       );
     }
@@ -315,9 +315,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                               type="button"
                               onMouseDown={(e) => {
                                 e.preventDefault();
-                                setEditValue(suggestion);
-                                setShowSuggestions(false);
-                                commitEdit();
+                                commitEdit(suggestion);
                               }}
                               className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
                             >
@@ -347,7 +345,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                     type="text"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={commitEdit}
+                    onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
                     aria-label={`Edit amount for ${item.category}`}

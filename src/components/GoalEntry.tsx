@@ -15,9 +15,8 @@ const MOCK_GOALS: Goal[] = [
   { id: "g3", name: "Vacation", targetAmount: 6500, currentAmount: 6200 },
 ];
 
-let nextId = 100;
 function generateId(): string {
-  return `g${++nextId}`;
+  return `g${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 function formatCurrency(amount: number): string {

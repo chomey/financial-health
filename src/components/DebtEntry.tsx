@@ -79,9 +79,8 @@ const MOCK_DEBTS: Debt[] = [
   { id: "d1", category: "Car Loan", amount: 15000 },
 ];
 
-let nextId = 200;
 function generateId(): string {
-  return `d${++nextId}`;
+  return `d${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 function formatCurrency(amount: number): string {
@@ -181,23 +180,24 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
     }
   };
 
-  const commitEdit = () => {
+  const commitEdit = (overrideValue?: string) => {
+    const value = overrideValue ?? editValue;
     if (editingId && editingField) {
       setDebts((prev) =>
         prev.map((d) => {
           if (d.id !== editingId) return d;
           if (editingField === "category") {
-            return { ...d, category: editValue || d.category };
+            return { ...d, category: value || d.category };
           }
           if (editingField === "interestRate") {
-            const val = parseFloat(editValue);
+            const val = parseFloat(value);
             return { ...d, interestRate: isNaN(val) ? undefined : val };
           }
           if (editingField === "monthlyPayment") {
-            const val = parseCurrencyInput(editValue);
+            const val = parseCurrencyInput(value);
             return { ...d, monthlyPayment: val || undefined };
           }
-          return { ...d, amount: parseCurrencyInput(editValue) };
+          return { ...d, amount: parseCurrencyInput(value) };
         })
       );
     }
@@ -338,9 +338,7 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
                                   type="button"
                                   onMouseDown={(e) => {
                                     e.preventDefault();
-                                    setEditValue(suggestion);
-                                    setShowSuggestions(false);
-                                    commitEdit();
+                                    commitEdit(suggestion);
                                   }}
                                   className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
                                 >
@@ -378,7 +376,7 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
                     type="text"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={commitEdit}
+                    onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
                     aria-label={`Edit amount for ${debt.category}`}
@@ -428,7 +426,7 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
                     type="text"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={commitEdit}
+                    onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
                     aria-label={`Edit interest rate for ${debt.category}`}
@@ -461,7 +459,7 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
                     type="text"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={commitEdit}
+                    onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-24 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
                     aria-label={`Edit monthly payment for ${debt.category}`}
