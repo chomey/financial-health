@@ -69,7 +69,7 @@ export function projectFinances(
 
   // Track stock holdings (static value — no growth projections for stocks)
   const stocksTotal = (state.stocks ?? []).reduce((sum, s) => {
-    const price = s.manualPrice ?? s.lastFetchedPrice ?? 0;
+    const price = s.lastFetchedPrice ?? 0;
     return sum + s.shares * price;
   }, 0);
 

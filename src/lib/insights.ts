@@ -39,7 +39,9 @@ export function generateInsights(data: FinancialData): Insight[] {
   const runwayAssets = data.liquidAssets ?? totalAssets;
   const rawExpenses = data.rawMonthlyExpenses ?? monthlyExpenses;
   const runway = rawExpenses > 0 ? runwayAssets / rawExpenses : 0;
-  const savingsRate = monthlyIncome > 0 ? (surplus / monthlyIncome) * 100 : 0;
+  // Savings rate includes both surplus AND investment contributions (which are a form of saving)
+  const totalSavings = monthlyIncome - rawExpenses;
+  const savingsRate = monthlyIncome > 0 ? (totalSavings / monthlyIncome) * 100 : 0;
 
   // Runway insight — use the same value shown on the metric card
   if (runway > 0) {

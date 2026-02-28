@@ -13,6 +13,7 @@ import ProjectionChart from "@/components/ProjectionChart";
 import {
   INITIAL_STATE,
   computeMetrics,
+  computeTotals,
   toFinancialData,
 } from "@/lib/financial-state";
 import { getStateFromURL, updateURL } from "@/lib/url-state";
@@ -203,8 +204,10 @@ export default function Home() {
   const state = { assets, debts, properties, stocks, income, expenses, goals, country, jurisdiction };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
+  const totals = computeTotals(state);
   const totalInvestmentContributions = assets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   const totalMortgagePayments = properties.reduce((sum, p) => sum + (p.monthlyPayment ?? 0), 0);
+  const monthlySurplus = totals.monthlyIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
 
   // Summaries for collapsed sections
   const assetTotal = assets.reduce((sum, a) => sum + a.amount, 0);
@@ -247,7 +250,7 @@ export default function Home() {
           >
             <div className="space-y-3">
               <CollapsibleSection title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)}>
-                <AssetEntry items={assets} onChange={setAssets} />
+                <AssetEntry items={assets} onChange={setAssets} monthlySurplus={monthlySurplus} />
               </CollapsibleSection>
 
               <CollapsibleSection title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"}>

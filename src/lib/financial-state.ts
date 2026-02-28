@@ -103,10 +103,12 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 
   const surplusTargetName = state.assets.find((a) => a.surplusTarget)?.category ?? state.assets[0]?.category;
 
-  const totalExp = monthlyExpenses + totalMonthlyContributions;
+  const surplusParts = [`${fmtShort(monthlyIncome)} income`];
+  if (monthlyExpenses > 0) surplusParts.push(`${fmtShort(monthlyExpenses)} expenses`);
+  if (totalMonthlyContributions > 0) surplusParts.push(`${fmtShort(totalMonthlyContributions)} contributions`);
   const surplusBreakdown = surplus > 0 && surplusTargetName
-    ? `${fmtShort(monthlyIncome)} income - ${fmtShort(totalExp)} expenses → going to ${surplusTargetName}`
-    : `${fmtShort(monthlyIncome)} income - ${fmtShort(totalExp)} expenses`;
+    ? `${surplusParts.join(" - ")} → ${fmtShort(surplus)}/mo to ${surplusTargetName}`
+    : surplusParts.join(" - ");
 
   const runwayBreakdown = monthlyExpenses > 0
     ? `${fmtShort(liquidTotal)} liquid / ${fmtShort(monthlyExpenses)}/mo expenses`
