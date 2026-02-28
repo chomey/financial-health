@@ -1,7 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import AssetEntry, { getAllCategorySuggestions } from "@/components/AssetEntry";
+import type { Asset } from "@/components/AssetEntry";
+
+/** Wrapper that provides controlled state so mutations are reflected in the UI */
+function ControlledAssetEntry({ items: initial }: { items?: Asset[] }) {
+  const [items, setItems] = useState(initial);
+  return <AssetEntry items={items} onChange={setItems} />;
+}
 
 describe("AssetEntry component", () => {
   it("renders the Assets heading", () => {
@@ -43,7 +51,7 @@ describe("AssetEntry component", () => {
 
   it("deletes an asset when delete button is clicked", async () => {
     const user = userEvent.setup();
-    render(<AssetEntry />);
+    render(<ControlledAssetEntry />);
     const deleteBtn = screen.getByLabelText("Delete Savings Account");
     await user.click(deleteBtn);
     expect(screen.queryByText("Savings Account")).not.toBeInTheDocument();
@@ -82,7 +90,7 @@ describe("AssetEntry component", () => {
 
   it("shows empty state when all assets are deleted", async () => {
     const user = userEvent.setup();
-    render(<AssetEntry />);
+    render(<ControlledAssetEntry />);
     // Delete all three
     await user.click(screen.getByLabelText("Delete Savings Account"));
     await user.click(screen.getByLabelText("Delete TFSA"));
@@ -98,7 +106,7 @@ describe("AssetEntry component", () => {
 describe("surplus target radio buttons", () => {
   it("selecting a surplus target radio deselects all others", async () => {
     const user = userEvent.setup();
-    render(<AssetEntry />);
+    render(<ControlledAssetEntry />);
 
     // Get all surplus target radios — mock has 3 assets
     const radios = screen.getAllByRole("radio");
