@@ -1,7 +1,7 @@
 import type { FinancialState } from "@/lib/financial-state";
 import { computeTotals } from "@/lib/financial-state";
 import { getDefaultRoi } from "@/components/AssetEntry";
-import { getEffectivePayment } from "@/components/PropertyEntry";
+import { getEffectivePayment, getDefaultAppreciation } from "@/components/PropertyEntry";
 
 export interface ProjectionPoint {
   month: number;
@@ -68,12 +68,13 @@ export function projectFinances(
     return sum + s.shares * price;
   }, 0);
 
-  // Track each property mortgage for interest/payments
+  // Track each property mortgage for interest/payments and value appreciation/depreciation
   const propertyBalances = state.properties.map((p) => ({
     value: p.value,
     mortgage: p.mortgage,
     monthlyRate: ((p.interestRate ?? 0) * multiplier) / 100 / 12,
     monthlyPayment: getEffectivePayment(p),
+    monthlyAppreciation: ((p.appreciation ?? getDefaultAppreciation(p.name) ?? 0) * multiplier) / 100 / 12,
   }));
 
   const points: ProjectionPoint[] = [];
@@ -144,8 +145,12 @@ export function projectFinances(
         }
       }
 
-      // Property mortgages: grow by interest, subtract payments
+      // Property: appreciate/depreciate value, grow mortgage by interest, subtract payments
       for (const p of propertyBalances) {
+        // Apply appreciation/depreciation to property value
+        p.value = p.value * (1 + p.monthlyAppreciation);
+        if (p.value < 0) p.value = 0;
+
         if (p.mortgage > 0) {
           p.mortgage = p.mortgage * (1 + p.monthlyRate) - p.monthlyPayment;
           if (p.mortgage < 0) p.mortgage = 0;
