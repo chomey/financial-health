@@ -19,10 +19,10 @@ describe("InsightsPanel", () => {
 
   it("renders icons for each insight", () => {
     render(<InsightsPanel />);
-    // Check that shield, chart, and money icons appear
-    expect(screen.getByText("🛡️")).toBeInTheDocument();
-    expect(screen.getByText("📈")).toBeInTheDocument();
-    expect(screen.getByText("💰")).toBeInTheDocument();
+    // Check that shield, chart, and money icons appear (some may appear multiple times)
+    expect(screen.getAllByText("🛡️").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("📈").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("💰").length).toBeGreaterThanOrEqual(1);
   });
 
   it("has the insights-panel test id", () => {
@@ -36,15 +36,15 @@ describe("InsightsPanel", () => {
     expect(articles.length).toBeGreaterThanOrEqual(3);
   });
 
-  it("returns null when no insights are generated", () => {
+  it("renders debt-free insight when all values are zero", () => {
     const emptyData = {
       totalAssets: 0,
       totalDebts: 0,
       monthlyIncome: 0,
       monthlyExpenses: 0,
     };
-    const { container } = render(<InsightsPanel data={emptyData} />);
-    expect(container.firstChild).toBeNull();
+    render(<InsightsPanel data={emptyData} />);
+    expect(screen.getByText(/debt-free/i)).toBeInTheDocument();
   });
 
   it("accepts custom financial data", () => {

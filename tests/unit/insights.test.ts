@@ -15,10 +15,10 @@ describe("generateInsights", () => {
     expect(insights.length).toBeGreaterThan(0);
   });
 
-  it("generates 3-5 insights for mock data", () => {
+  it("generates 3-7 insights for mock data", () => {
     const insights = generateInsights(mockData);
     expect(insights.length).toBeGreaterThanOrEqual(3);
-    expect(insights.length).toBeLessThanOrEqual(5);
+    expect(insights.length).toBeLessThanOrEqual(7);
   });
 
   it("each insight has required fields", () => {
@@ -101,7 +101,7 @@ describe("generateInsights", () => {
     const rate = insights.find((i) => i.type === "savings-rate");
     expect(rate).toBeDefined();
     expect(rate!.message).toContain("53%");
-    expect(rate!.message).toContain("excellent");
+    expect(rate!.message).toContain("fast track to financial independence");
     expect(rate!.icon).toBe("⭐");
   });
 
@@ -138,7 +138,7 @@ describe("generateInsights", () => {
     expect(nw!.message).toContain("positive");
   });
 
-  it("returns empty array when all values are zero", () => {
+  it("returns only debt-free insight when all values are zero", () => {
     const data: FinancialData = {
       totalAssets: 0,
       totalDebts: 0,
@@ -146,7 +146,8 @@ describe("generateInsights", () => {
       monthlyExpenses: 0,
     };
     const insights = generateInsights(data);
-    expect(insights).toEqual([]);
+    expect(insights).toHaveLength(1);
+    expect(insights[0].id).toBe("debt-free");
   });
 
   it("assigns unique ids to all insights", () => {

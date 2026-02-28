@@ -84,6 +84,14 @@ export function generateInsights(data: FinancialData): Insight[] {
       message: `You're spending less than you earn each month — that ${formatted} surplus is building your future.`,
       icon: "📈",
     });
+    // Annual projection
+    const annualSurplus = surplus * 12;
+    insights.push({
+      id: "surplus-annual",
+      type: "surplus",
+      message: `At this pace, you'll add ${formatCurrency(annualSurplus)} to your wealth this year.`,
+      icon: "📈",
+    });
   } else if (surplus === 0 && monthlyIncome > 0) {
     insights.push({
       id: "surplus-balanced",
@@ -94,7 +102,14 @@ export function generateInsights(data: FinancialData): Insight[] {
   }
 
   // Savings rate insight
-  if (savingsRate >= 20) {
+  if (savingsRate >= 50) {
+    insights.push({
+      id: "savings-rate-great",
+      type: "savings-rate",
+      message: `You're saving ${Math.round(savingsRate)}% of your income — you're on a fast track to financial independence.`,
+      icon: "⭐",
+    });
+  } else if (savingsRate >= 20) {
     insights.push({
       id: "savings-rate-great",
       type: "savings-rate",
@@ -110,9 +125,35 @@ export function generateInsights(data: FinancialData): Insight[] {
     });
   }
 
-  // High-interest debt insight — prioritize paying off highest-rate debt first
+  // Debt insights
+  const debtRatio = totalAssets > 0 ? totalDebts / totalAssets : 0;
   if (data.debts && data.debts.length > 0) {
     const debtsWithInterest = data.debts.filter((d) => d.interestRate !== undefined && d.interestRate > 0 && d.amount > 0);
+    const totalDebtBalance = data.debts.reduce((sum, d) => sum + d.amount, 0);
+
+    if (totalDebtBalance <= 0) {
+      insights.push({
+        id: "debt-free",
+        type: "debt-interest",
+        message: "You're debt-free! Every dollar you earn goes straight to building wealth.",
+        icon: "🎉",
+      });
+    } else if (debtRatio < 0.25 && totalAssets > 0) {
+      insights.push({
+        id: "debt-ratio-excellent",
+        type: "debt-interest",
+        message: `Your debts are less than 25% of your assets — that's a very strong financial position.`,
+        icon: "⚖️",
+      });
+    } else if (debtRatio < 0.5 && totalAssets > 0) {
+      insights.push({
+        id: "debt-ratio-good",
+        type: "debt-interest",
+        message: `You own more than twice what you owe — your assets are working in your favor.`,
+        icon: "⚖️",
+      });
+    }
+
     if (debtsWithInterest.length > 0) {
       const sorted = [...debtsWithInterest].sort((a, b) => (b.interestRate ?? 0) - (a.interestRate ?? 0));
       const highest = sorted[0];
@@ -132,6 +173,13 @@ export function generateInsights(data: FinancialData): Insight[] {
         });
       }
     }
+  } else if (totalDebts <= 0) {
+    insights.push({
+      id: "debt-free",
+      type: "debt-interest",
+      message: "You're debt-free! Every dollar you earn goes straight to building wealth.",
+      icon: "🎉",
+    });
   }
 
   // Tax insights
@@ -162,7 +210,14 @@ export function generateInsights(data: FinancialData): Insight[] {
   }
 
   // Net worth insight
-  if (netWorth > 0) {
+  if (netWorth >= 1_000_000) {
+    insights.push({
+      id: "networth-positive",
+      type: "net-worth",
+      message: `Your net worth is ${formatCompact(netWorth)} — you've reached a major milestone. Compound growth is your biggest advantage now.`,
+      icon: "💰",
+    });
+  } else if (netWorth > 0) {
     insights.push({
       id: "networth-positive",
       type: "net-worth",
@@ -178,6 +233,19 @@ export function generateInsights(data: FinancialData): Insight[] {
     });
   }
 
+  // Income efficiency insight
+  if (monthlyIncome > 0 && rawExpenses > 0) {
+    const wealthBuildingRate = ((monthlyIncome - rawExpenses) / monthlyIncome) * 100;
+    if (wealthBuildingRate >= 40) {
+      insights.push({
+        id: "income-efficiency",
+        type: "surplus",
+        message: `${Math.round(wealthBuildingRate)} cents of every dollar you earn goes toward building wealth — that's outstanding.`,
+        icon: "💪",
+      });
+    }
+  }
+
   return insights;
 }
 
@@ -187,4 +255,11 @@ function formatCurrency(amount: number): string {
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(Math.abs(amount));
+}
+
+function formatCompact(amount: number): string {
+  const abs = Math.abs(amount);
+  if (abs >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `$${(amount / 1_000).toFixed(0)}k`;
+  return formatCurrency(amount);
 }

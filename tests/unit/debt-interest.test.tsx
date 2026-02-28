@@ -234,7 +234,7 @@ describe("Insights with debt interest rates", () => {
         { category: "Car Loan", amount: 5000, interestRate: 6 },
       ],
     });
-    const debtInsight = insights.find((i) => i.type === "debt-interest");
+    const debtInsight = insights.find((i) => i.id === "debt-high-interest");
     expect(debtInsight).toBeDefined();
     expect(debtInsight!.message).toContain("Credit Card");
     expect(debtInsight!.message).toContain("19.9%");
@@ -252,13 +252,13 @@ describe("Insights with debt interest rates", () => {
         { category: "Personal Loan", amount: 10000, interestRate: 8 },
       ],
     });
-    const debtInsight = insights.find((i) => i.type === "debt-interest");
+    const debtInsight = insights.find((i) => i.id === "debt-priority");
     expect(debtInsight).toBeDefined();
     expect(debtInsight!.message).toContain("Personal Loan");
     expect(debtInsight!.message).toContain("8%");
   });
 
-  it("does not generate debt insight when no debts have interest rates", () => {
+  it("generates debt-ratio insight but no interest insight when no debts have interest rates", () => {
     const insights = generateInsights({
       totalAssets: 50000,
       totalDebts: 10000,
@@ -269,8 +269,12 @@ describe("Insights with debt interest rates", () => {
         { category: "Car Loan", amount: 10000 },
       ],
     });
-    const debtInsight = insights.find((i) => i.type === "debt-interest");
-    expect(debtInsight).toBeUndefined();
+    // No interest-specific insight, but debt-ratio insight may appear
+    const interestInsight = insights.find((i) => i.id === "debt-high-interest" || i.id === "debt-priority");
+    expect(interestInsight).toBeUndefined();
+    // Debt ratio insight should appear (10k/50k = 0.2 < 0.25)
+    const ratioInsight = insights.find((i) => i.id === "debt-ratio-excellent");
+    expect(ratioInsight).toBeDefined();
   });
 
   it("toFinancialData passes debt details through", () => {
