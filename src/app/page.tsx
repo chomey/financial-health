@@ -10,6 +10,7 @@ import ExpenseEntry from "@/components/ExpenseEntry";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
 import ProjectionChart from "@/components/ProjectionChart";
 import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
+import AssetAllocationChart from "@/components/AssetAllocationChart";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -286,6 +287,11 @@ export default function Home() {
           >
             <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
               <SnapshotDashboard metrics={metrics} financialData={financialData} />
+              <AssetAllocationChart
+                assets={assets}
+                properties={properties}
+                stocks={stocks}
+              />
             </div>
           </section>
         </div>

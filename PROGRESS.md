@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 55
-- **Completed**: 47
-- **Remaining**: 8
+- **Completed**: 48
+- **Remaining**: 7
 - **Last Updated**: 2026-02-28
 
 ---
@@ -1163,3 +1163,19 @@
   ![Vehicle depreciation](screenshots/task-47-appreciation-vehicle.png)
   ![Appreciation persisted](screenshots/task-47-appreciation-persisted.png)
 - **Notes**: Properties now support appreciation/depreciation rates that affect projection chart values over time. Smart defaults: homes +3%/yr, vehicles -15%/yr. Dynamic icon changes from 🏠 to 🚗 for depreciating properties. The appreciation field is fully integrated into URL state encoding and the projection engine.
+
+## Task 48: Build asset allocation pie/doughnut chart
+- **Status**: Complete
+- **Date**: 2026-02-28
+- **Changes**:
+  - `src/components/AssetAllocationChart.tsx`: New component with recharts PieChart (doughnut style). Shows asset allocation by category type (Retirement Accounts, Savings & Checking, Brokerage, Stocks, Property Equity, Vehicle, Other) or by liquidity (Liquid vs Illiquid). Interactive tooltips show name, value, and percentage. Toggle between "By Type" and "By Liquidity" views. Compact legend with colored dots, values, and percentages below the chart.
+  - `src/app/page.tsx`: Integrated AssetAllocationChart into the dashboard section, positioned after the metric cards.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/asset-allocation.test.ts`: 15 passed, 0 failed (category grouping, liquidity classification, percentages, edge cases)
+  - `tests/e2e/asset-allocation.spec.ts`: 4 passed, 0 failed (chart rendering, category view, liquidity toggle, dashboard positioning)
+  - All existing tests: 587 unit tests passed, build succeeded
+- **Screenshots**:
+  ![Asset allocation by category](screenshots/task-48-allocation-chart-category.png)
+  ![Asset allocation by liquidity](screenshots/task-48-allocation-chart-liquidity.png)
+- **Notes**: Category grouping uses flexible string matching (e.g., "Savings Account" matches "Savings & Checking" group). Recharts Legend renders alongside a custom compact legend with values. The chart is responsive and uses the app's warm color palette.
