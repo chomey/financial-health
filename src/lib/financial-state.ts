@@ -63,20 +63,29 @@ export function computeTotals(state: FinancialState) {
   const stocks = state.stocks ?? [];
   const totalStocks = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
 
-  // Compute after-tax income: annualize each income item, compute tax, sum after-tax amounts
+  // Compute after-tax income: aggregate income by type, then compute tax on each total.
+  // This ensures progressive brackets apply correctly across multiple income items.
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
+
+  // Aggregate annual income by type
+  const incomeByType: Record<string, number> = {};
+  for (const item of state.income) {
+    const monthlyAmt = normalizeToMonthly(item.amount, item.frequency);
+    const annualAmt = monthlyAmt * 12;
+    if (annualAmt <= 0) continue;
+    const type = item.incomeType ?? "employment";
+    incomeByType[type] = (incomeByType[type] ?? 0) + annualAmt;
+  }
+
   let totalAnnualTax = 0;
   let totalFederalTax = 0;
   let totalProvincialStateTax = 0;
   let totalAfterTaxAnnual = 0;
   let weightedEffectiveRate = 0;
 
-  for (const item of state.income) {
-    const monthlyAmt = normalizeToMonthly(item.amount, item.frequency);
-    const annualAmt = monthlyAmt * 12;
-    if (annualAmt <= 0) continue;
-    const taxResult = computeTax(annualAmt, item.incomeType ?? "employment", country, jurisdiction);
+  for (const [type, annualAmt] of Object.entries(incomeByType)) {
+    const taxResult = computeTax(annualAmt, type as "employment" | "capital-gains" | "other", country, jurisdiction);
     totalAnnualTax += taxResult.totalTax;
     totalFederalTax += taxResult.federalTax;
     totalProvincialStateTax += taxResult.provincialStateTax;
