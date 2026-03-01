@@ -47,8 +47,10 @@ export function generateInsights(data: FinancialData): Insight[] {
   const rawExpenses = data.rawMonthlyExpenses ?? monthlyExpenses;
   const monthlyObligations = rawExpenses + (data.monthlyMortgagePayments ?? 0);
   const runway = monthlyObligations > 0 ? runwayAssets / monthlyObligations : 0;
-  // Savings rate includes both surplus AND investment contributions (which are a form of saving)
-  const totalSavings = monthlyIncome - rawExpenses;
+  // Savings rate: after-tax income minus expenses and mortgage payments, divided by after-tax income
+  // Mortgage payments are excluded from savings since they include interest costs
+  const mortgagePayments = data.monthlyMortgagePayments ?? 0;
+  const totalSavings = monthlyIncome - rawExpenses - mortgagePayments;
   const savingsRate = monthlyIncome > 0 ? (totalSavings / monthlyIncome) * 100 : 0;
 
   // Runway insight — use the same value shown on the metric card
