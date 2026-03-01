@@ -89,9 +89,9 @@ export function generateInsights(data: FinancialData): Insight[] {
       message: `You're spending less than you earn each month — that ${formatted} surplus is building your future.`,
       icon: "📈",
     });
-    // Annual projection — wealth growth includes surplus + contributions + mortgage equity
-    // (contributions move money into assets, mortgage payments reduce debt = both grow net worth)
-    const annualWealthGrowth = (monthlyIncome - rawExpenses) * 12;
+    // Annual projection — wealth growth is surplus + investment contributions
+    // Mortgage payments are excluded since they include interest costs
+    const annualWealthGrowth = (monthlyIncome - rawExpenses - mortgagePayments) * 12;
     insights.push({
       id: "surplus-annual",
       type: "surplus",
@@ -239,9 +239,9 @@ export function generateInsights(data: FinancialData): Insight[] {
     });
   }
 
-  // Income efficiency insight
+  // Income efficiency insight (excludes mortgage payments from wealth building)
   if (monthlyIncome > 0 && rawExpenses > 0) {
-    const wealthBuildingRate = ((monthlyIncome - rawExpenses) / monthlyIncome) * 100;
+    const wealthBuildingRate = ((monthlyIncome - rawExpenses - mortgagePayments) / monthlyIncome) * 100;
     if (wealthBuildingRate >= 40) {
       insights.push({
         id: "income-efficiency",
