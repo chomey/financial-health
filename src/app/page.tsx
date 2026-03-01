@@ -231,7 +231,8 @@ export default function Home() {
   const benchmarkNetWorth = totals.totalAssets + totals.totalStocks + totals.totalPropertyEquity - totals.totalDebts;
   // Savings rate includes surplus + investment contributions (which are a form of saving)
   const benchmarkSavingsRate = totals.monthlyAfterTaxIncome > 0 ? (monthlySurplus + totals.totalMonthlyContributions) / totals.monthlyAfterTaxIncome : 0;
-  const benchmarkEmergencyMonths = totals.monthlyExpenses > 0 ? (totals.totalAssets + totals.totalStocks) / totals.monthlyExpenses : 0;
+  const benchmarkMonthlyObligations = totals.monthlyExpenses + totals.totalMortgagePayments;
+  const benchmarkEmergencyMonths = benchmarkMonthlyObligations > 0 ? (totals.totalAssets + totals.totalStocks) / benchmarkMonthlyObligations : 0;
   const annualIncome = totals.monthlyIncome * 12;
   const benchmarkDebtToIncome = annualIncome > 0 ? (debtTotal + totals.totalPropertyMortgage) / annualIncome : 0;
 
