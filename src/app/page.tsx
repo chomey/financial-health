@@ -223,7 +223,7 @@ export default function Home() {
   const assetTotal = assets.reduce((sum, a) => sum + a.amount, 0);
   const debtTotal = debts.reduce((sum, d) => sum + d.amount, 0);
   const incomeTotal = income.reduce((sum, i) => sum + i.amount, 0);
-  const expenseTotal = expenses.reduce((sum, e) => sum + e.amount, 0) + totalInvestmentContributions + totalMortgagePayments;
+  const expenseTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
   const propertyCount = properties.length;
   const stockCount = stocks.length;
 

@@ -144,6 +144,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const surplusParts = [`${fmtShort(monthlyAfterTaxIncome)} after-tax income`];
   if (monthlyExpenses > 0) surplusParts.push(`${fmtShort(monthlyExpenses)} expenses`);
   if (totalMonthlyContributions > 0) surplusParts.push(`${fmtShort(totalMonthlyContributions)} contributions`);
+  if (totalMortgagePayments > 0) surplusParts.push(`${fmtShort(totalMortgagePayments)} mortgage`);
   const surplusBreakdown = surplus > 0 && surplusTargetName
     ? `${surplusParts.join(" - ")} → ${fmtShort(surplus)}/mo to ${surplusTargetName}`
     : surplusParts.join(" - ");
