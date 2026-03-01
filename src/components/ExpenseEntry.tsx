@@ -568,24 +568,55 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
         </div>
       )}
 
-      {/* Total and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3">
-        <span
-          className={`text-sm font-medium text-stone-500 transition-all duration-300 ${
-            animatingTotal ? "scale-110 text-amber-600" : ""
-          }`}
-        >
-          {viewMode === "yearly" ? "Yearly" : "Monthly"} Total: {formatCurrency(total * mult)}
-        </span>
-        {!addingNew && (
-          <button
-            type="button"
-            onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition-all duration-150 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 active:bg-blue-100"
-          >
-            + Add Expense
-          </button>
+      {/* Total breakdown and Add button */}
+      <div className="mt-4 border-t border-stone-100 pt-3 space-y-1.5">
+        {/* Sub-totals breakdown */}
+        {(totalTax > 0 || investmentContributions > 0 || mortgagePayments > 0) && (
+          <div className="space-y-0.5 text-xs text-stone-400" data-testid="expense-subtotals">
+            <div className="flex justify-between">
+              <span>Expenses</span>
+              <span>{formatCurrency(itemsTotal * mult)}</span>
+            </div>
+            {totalTax > 0 && (
+              <div className="flex justify-between">
+                <span>Taxes (est.)</span>
+                <span>{formatCurrency(totalTax * mult)}</span>
+              </div>
+            )}
+            {investmentContributions > 0 && (
+              <div className="flex justify-between">
+                <span>Contributions</span>
+                <span>{formatCurrency(investmentContributions * mult)}</span>
+              </div>
+            )}
+            {mortgagePayments > 0 && (
+              <div className="flex justify-between">
+                <span>Mortgage</span>
+                <span>{formatCurrency(mortgagePayments * mult)}</span>
+              </div>
+            )}
+          </div>
         )}
+
+        {/* Grand total + Add button */}
+        <div className="flex items-center justify-between">
+          <span
+            className={`text-sm font-medium text-stone-500 transition-all duration-300 ${
+              animatingTotal ? "scale-110 text-amber-600" : ""
+            }`}
+          >
+            {viewMode === "yearly" ? "Yearly" : "Monthly"} Total: {formatCurrency(total * mult)}
+          </span>
+          {!addingNew && (
+            <button
+              type="button"
+              onClick={() => setAddingNew(true)}
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition-all duration-150 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 active:bg-blue-100"
+            >
+              + Add Expense
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
