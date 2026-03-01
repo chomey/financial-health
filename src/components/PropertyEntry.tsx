@@ -251,6 +251,14 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
     setEditValue(currentValue);
   };
 
+  /** Recalculate monthly payment from mortgage factors */
+  const recalcPayment = (p: Property): Property => {
+    if (p.mortgage <= 0) return { ...p, monthlyPayment: undefined };
+    const rate = p.interestRate ?? DEFAULT_INTEREST_RATE;
+    const remainingYears = computeRemainingYears(p.amortizationYears, p.yearPurchased);
+    return { ...p, monthlyPayment: suggestMonthlyPayment(p.mortgage, rate, remainingYears) };
+  };
+
   const commitEdit = () => {
     if (editingId && editingField) {
       setProperties((prev) =>
@@ -263,11 +271,13 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
             return { ...p, value: parseCurrencyInput(editValue) };
           }
           if (editingField === "mortgage") {
-            return { ...p, mortgage: parseCurrencyInput(editValue) };
+            const updated = { ...p, mortgage: parseCurrencyInput(editValue) };
+            return recalcPayment(updated);
           }
           if (editingField === "interestRate") {
             const val = parseFloat(editValue);
-            return { ...p, interestRate: isNaN(val) ? undefined : val };
+            const updated = { ...p, interestRate: isNaN(val) ? undefined : val };
+            return recalcPayment(updated);
           }
           if (editingField === "monthlyPayment") {
             const val = parseCurrencyInput(editValue);
@@ -275,11 +285,13 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
           }
           if (editingField === "amortizationYears") {
             const val = parseFloat(editValue);
-            return { ...p, amortizationYears: isNaN(val) ? undefined : val };
+            const updated = { ...p, amortizationYears: isNaN(val) ? undefined : val };
+            return recalcPayment(updated);
           }
           if (editingField === "yearPurchased") {
             const val = parseInt(editValue);
-            return { ...p, yearPurchased: isNaN(val) ? undefined : val };
+            const updated = { ...p, yearPurchased: isNaN(val) ? undefined : val };
+            return recalcPayment(updated);
           }
           if (editingField === "appreciation") {
             const val = parseFloat(editValue);
