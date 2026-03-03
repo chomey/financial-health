@@ -9,6 +9,7 @@ export interface Asset {
   roi?: number; // annual ROI percentage
   monthlyContribution?: number; // monthly contribution in $
   surplusTarget?: boolean; // monthly surplus is deposited here
+  computed?: boolean; // auto-computed from stocks/properties — amount is read-only
 }
 
 const CATEGORY_SUGGESTIONS = {
@@ -275,7 +276,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
       .filter((group) => group.items.length > 0);
   };
 
-  const total = assets.reduce((sum, a) => sum + a.amount, 0);
+  const total = assets.filter((a) => !a.computed).reduce((sum, a) => sum + a.amount, 0);
 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
@@ -297,19 +298,28 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
         </div>
       ) : (
         <div className="space-y-1" role="list" aria-label="Asset items">
-          {assets.map((asset) => {
+          {/* Regular assets first, computed assets at the bottom */}
+          {[...assets.filter((a) => !a.computed), ...assets.filter((a) => a.computed)].map((asset, idx, sortedAssets) => {
             const defaultRoi = getDefaultRoi(asset.category);
             const displayRoi = asset.roi ?? defaultRoi;
             const hasRoi = asset.roi !== undefined;
             const hasContribution = asset.monthlyContribution !== undefined && asset.monthlyContribution > 0;
+            const isComputed = asset.computed === true;
+            // Show separator before first computed asset
+            const isFirstComputed = isComputed && (idx === 0 || !sortedAssets[idx - 1].computed);
             return (
             <div key={asset.id} role="listitem">
+              {isFirstComputed && (
+                <div className="mt-2 mb-1 border-t border-dashed border-stone-200 pt-2 px-3">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Auto-computed</span>
+                </div>
+              )}
               <div
-                className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50"
+                className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 ${isComputed ? "bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 rounded-lg mx-1" : "hover:bg-stone-50"}`}
               >
                 <div className="flex flex-1 items-center gap-3 min-w-0">
                   {/* Category */}
-                  {editingId === asset.id && editingField === "category" ? (
+                  {editingId === asset.id && editingField === "category" && !isComputed ? (
                     <div className="relative flex-1 min-w-0">
                       <input
                         ref={inputRef}
@@ -360,6 +370,12 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
                         )}
                     </div>
                   ) : (
+                    isComputed ? (
+                      <span className="flex-1 min-w-0 truncate text-left text-sm text-stone-500 px-2 py-1">
+                        {asset.category}
+                        <span className="ml-1.5 inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide">auto</span>
+                      </span>
+                    ) : (
                     <button
                       type="button"
                       onClick={() =>
@@ -373,10 +389,11 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
                       )}
                       {asset.category}
                     </button>
+                    )
                   )}
 
                   {/* Amount */}
-                  {editingId === asset.id && editingField === "amount" ? (
+                  {editingId === asset.id && editingField === "amount" && !isComputed ? (
                     <input
                       ref={inputRef}
                       type="text"
@@ -388,6 +405,11 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
                       aria-label={`Edit amount for ${asset.category}`}
                     />
                   ) : (
+                    isComputed ? (
+                      <span className="w-28 text-right text-sm font-medium text-stone-400 px-2 py-1">
+                        {formatCurrency(asset.amount)}
+                      </span>
+                    ) : (
                     <button
                       type="button"
                       onClick={() =>
@@ -398,10 +420,12 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
                     >
                       {formatCurrency(asset.amount)}
                     </button>
+                    )
                   )}
                 </div>
 
-                {/* Delete button */}
+                {/* Delete button — hidden for computed assets */}
+                {!isComputed && (
                 <button
                   type="button"
                   onClick={() => deleteAsset(asset.id)}
@@ -421,10 +445,11 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
                     />
                   </svg>
                 </button>
+                )}
               </div>
 
-              {/* Secondary detail fields: ROI and Monthly Contribution */}
-              <div className="flex flex-wrap items-center gap-2 px-5 pb-1" data-testid={`asset-details-${asset.id}`}>
+              {/* Secondary detail fields */}
+              <div className={`flex flex-wrap items-center gap-2 pb-1 ${isComputed ? "px-6" : "px-5"}`} data-testid={`asset-details-${asset.id}`}>
                 {/* ROI badge/editor */}
                 {editingId === asset.id && editingField === "roi" ? (
                   <input
@@ -454,7 +479,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
                   >
                     {displayRoi !== undefined
                       ? `${displayRoi}% ROI${!hasRoi ? " (suggested)" : ""}`
-                      : "Annual return %"}
+                      : isComputed ? "Set estimated return %" : "Annual return %"}
                   </button>
                 )}
 
@@ -527,7 +552,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
                 const totalContrib = (asset.monthlyContribution ?? 0) + (asset.surplusTarget ? monthlySurplus : 0);
                 const showProjection = (displayRoi !== undefined && displayRoi > 0) || totalContrib > 0;
                 return showProjection ? (
-                  <div className="flex items-center gap-3 px-5 pb-1.5 text-[10px] text-stone-400" data-testid={`asset-projection-${asset.id}`}>
+                  <div className={`flex items-center gap-3 pb-1.5 text-[10px] text-stone-400 ${isComputed ? "px-6" : "px-5"}`} data-testid={`asset-projection-${asset.id}`}>
                     <span className="font-medium">Projected:</span>
                     <span>10yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 10))}</span></span>
                     <span>20yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 20))}</span></span>

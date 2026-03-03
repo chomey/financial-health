@@ -53,6 +53,9 @@ export interface FinancialState {
   country?: "CA" | "US";
   jurisdiction?: string;
   age?: number;
+  federalTaxOverride?: number; // annual override; undefined = use computed
+  provincialTaxOverride?: number; // annual override; undefined = use computed
+  surplusTargetComputedId?: string; // set when surplus target is a computed asset (e.g. "_computed_stocks")
 }
 
 export const INITIAL_STATE: FinancialState = {
@@ -79,12 +82,14 @@ export const INITIAL_STATE: FinancialState = {
 };
 
 export function computeTotals(state: FinancialState) {
-  const totalAssets = state.assets.reduce((sum, a) => sum + a.amount, 0);
+  // Exclude computed (auto-synced) assets — their values come from stocks/properties already
+  const realAssets = state.assets.filter((a) => !a.computed);
+  const totalAssets = realAssets.reduce((sum, a) => sum + a.amount, 0);
   const totalDebts = state.debts.reduce((sum, d) => sum + d.amount, 0);
   const monthlyIncome = state.income.reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency), 0);
   const monthlyExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
   // Total monthly contributions to investment accounts (comes from income, not double-counted in expenses)
-  const totalMonthlyContributions = state.assets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
+  const totalMonthlyContributions = realAssets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   // Properties: equity = value - mortgage. Counts toward net worth but NOT runway (illiquid).
   const properties = state.properties ?? [];
   const totalPropertyEquity = properties.reduce((sum, p) => sum + Math.max(0, p.value - p.mortgage), 0);
@@ -125,12 +130,18 @@ export function computeTotals(state: FinancialState) {
     weightedEffectiveRate += taxResult.effectiveRate * annualAmt;
   }
 
+  // Apply user overrides if present (annual amounts)
+  const finalFederalTax = state.federalTaxOverride ?? totalFederalTax;
+  const finalProvincialStateTax = state.provincialTaxOverride ?? totalProvincialStateTax;
+  const finalAnnualTax = finalFederalTax + finalProvincialStateTax;
   const totalAnnualIncome = monthlyIncome * 12;
-  const effectiveTaxRate = totalAnnualIncome > 0 ? weightedEffectiveRate / totalAnnualIncome : 0;
-  const monthlyAfterTaxIncome = totalAfterTaxAnnual / 12;
-  const totalTaxEstimate = totalAnnualTax;
+  const finalAfterTaxAnnual = totalAnnualIncome - finalAnnualTax;
+  const effectiveTaxRate = totalAnnualIncome > 0 ? finalAnnualTax / totalAnnualIncome : 0;
+  const monthlyAfterTaxIncome = finalAfterTaxAnnual / 12;
+  const totalTaxEstimate = finalAnnualTax;
 
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax, totalProvincialStateTax, effectiveTaxRate };
+  // Also export the computed (non-overridden) values so the UI can show defaults
+  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax };
 }
 
 function fmtShort(n: number): string {
@@ -155,17 +166,27 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const runway = monthlyObligations > 0 ? liquidTotal / monthlyObligations : 0;
 
   // Runway with investment growth: each asset account draws down proportionally, earning its own ROR.
-  // Stocks are excluded (too hard to estimate growth reliably).
+  // Computed assets (stocks, equity) use their user-set ROI; real assets use their own ROI.
   let runwayWithGrowth: number | undefined;
   if (monthlyObligations > 0 && liquidTotal > 0) {
     const buckets: { balance: number; ror: number }[] = [];
-    for (const asset of state.assets) {
+    const computedAssets = state.assets.filter((a) => a.computed);
+    const hasComputedStocks = computedAssets.some((a) => a.id === "_computed_stocks");
+
+    // Real assets
+    for (const asset of state.assets.filter((a) => !a.computed)) {
       if (asset.amount > 0) {
         buckets.push({ balance: asset.amount, ror: asset.roi ?? getDefaultRoi(asset.category) ?? 0 });
       }
     }
-    // Stocks contribute to liquid total but at 0% growth
-    if (totalStocks > 0) {
+    // Computed assets (stocks, equity) — use their user-set ROI
+    for (const asset of computedAssets) {
+      if (asset.amount > 0) {
+        buckets.push({ balance: asset.amount, ror: asset.roi ?? 0 });
+      }
+    }
+    // Stocks without a computed asset entry: fall back to 0% growth
+    if (!hasComputedStocks && totalStocks > 0) {
       buckets.push({ balance: totalStocks, ror: 0 });
     }
     // Any bucket with growth? If all are 0%, no point simulating.

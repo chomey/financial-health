@@ -58,11 +58,17 @@ interface ExpenseEntryProps {
   surplusTargetName?: string;
   federalTax?: number;
   provincialStateTax?: number;
+  computedFederalTax?: number; // auto-computed default (monthly)
+  computedProvincialStateTax?: number; // auto-computed default (monthly)
+  federalTaxOverride?: number; // user override (monthly), undefined = auto
+  provincialTaxOverride?: number;
+  onFederalTaxOverride?: (monthly: number | undefined) => void;
+  onProvincialTaxOverride?: (monthly: number | undefined) => void;
   country?: "CA" | "US";
   isUnderwater?: boolean;
 }
 
-export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0, surplus = 0, surplusTargetName, federalTax = 0, provincialStateTax = 0, country = "CA", isUnderwater = false }: ExpenseEntryProps = {}) {
+export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0, surplus = 0, surplusTargetName, federalTax = 0, provincialStateTax = 0, computedFederalTax, computedProvincialStateTax, federalTaxOverride, provincialTaxOverride, onFederalTaxOverride, onProvincialTaxOverride, country = "CA", isUnderwater = false }: ExpenseEntryProps = {}) {
   const [items, setItems] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -110,6 +116,9 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   const [showNewSuggestions, setShowNewSuggestions] = useState(false);
   const [animatingTotal, setAnimatingTotal] = useState(false);
   const [viewMode, setViewMode] = useState<"monthly" | "yearly">("monthly");
+  const [editingTax, setEditingTax] = useState<"federal" | "provincial" | null>(null);
+  const [editTaxValue, setEditTaxValue] = useState("");
+  const taxInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const newCategoryRef = useRef<HTMLInputElement>(null);
   const newAmountRef = useRef<HTMLInputElement>(null);
@@ -140,6 +149,13 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       inputRef.current.select();
     }
   }, [editingId, editingField]);
+
+  useEffect(() => {
+    if (editingTax && taxInputRef.current) {
+      taxInputRef.current.focus();
+      taxInputRef.current.select();
+    }
+  }, [editingTax]);
 
   const startEdit = (
     id: string,
@@ -378,36 +394,123 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
         </div>
       )}
 
-      {/* Auto-generated tax breakdown rows */}
+      {/* Auto-computed section */}
+      {(totalTax > 0 || investmentContributions > 0 || mortgagePayments > 0 || surplus > 0) && (
+        <div className="mt-2 mb-1 border-t border-dashed border-stone-200 pt-2 px-3">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Auto-computed</span>
+        </div>
+      )}
+
+      {/* Tax rows — editable override, click amount to change */}
       {totalTax > 0 && (
-        <div className="mt-1 space-y-1" data-testid="tax-breakdown">
+        <div className="space-y-1" data-testid="tax-breakdown">
+          {/* Federal Tax */}
           <div
-            className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200"
+            className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1"
             data-testid="federal-tax-row"
           >
             <div className="flex flex-1 items-center gap-2 min-w-0">
-              <span className="text-sm italic text-stone-500">Federal Tax</span>
-              <span className="inline-flex items-center rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-600" title="Estimated from your income and tax brackets">
-                est.
-              </span>
+              <span className="text-sm text-stone-500">Federal Tax</span>
+              {federalTaxOverride !== undefined ? (
+                <span className="inline-flex items-center rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-medium text-blue-500 uppercase tracking-wide" title="You've overridden this value. Clear to reset.">
+                  override
+                </span>
+              ) : (
+                <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-estimated from your income and tax brackets">
+                  auto
+                </span>
+              )}
             </div>
-            <span className="text-sm font-medium italic text-amber-600">
-              {formatCurrency(federalTax * mult)}
-            </span>
+            {editingTax === "federal" ? (
+              <input
+                ref={taxInputRef}
+                type="text"
+                value={editTaxValue}
+                onChange={(e) => setEditTaxValue(e.target.value)}
+                onBlur={() => {
+                  const val = parseCurrencyInput(editTaxValue);
+                  // Empty or 0 = reset to auto
+                  if (!editTaxValue.trim() || val === 0) {
+                    onFederalTaxOverride?.(undefined);
+                  } else {
+                    onFederalTaxOverride?.(viewMode === "yearly" ? val / 12 : val);
+                  }
+                  setEditingTax(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                  if (e.key === "Escape") setEditingTax(null);
+                }}
+                className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                aria-label="Override federal tax amount"
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingTax("federal");
+                  setEditTaxValue(String(Math.round(federalTax * mult)));
+                }}
+                className="text-sm font-medium text-stone-400 rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                aria-label={`Edit federal tax, currently ${formatCurrency(federalTax * mult)}`}
+              >
+                {formatCurrency(federalTax * mult)}
+              </button>
+            )}
           </div>
+
+          {/* Provincial/State Tax */}
           <div
-            className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200"
+            className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1"
             data-testid="provincial-state-tax-row"
           >
             <div className="flex flex-1 items-center gap-2 min-w-0">
-              <span className="text-sm italic text-stone-500">{provStateLabel} Tax</span>
-              <span className="inline-flex items-center rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-600" title="Estimated from your income and tax brackets">
-                est.
-              </span>
+              <span className="text-sm text-stone-500">{provStateLabel} Tax</span>
+              {provincialTaxOverride !== undefined ? (
+                <span className="inline-flex items-center rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-medium text-blue-500 uppercase tracking-wide" title="You've overridden this value. Clear to reset.">
+                  override
+                </span>
+              ) : (
+                <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-estimated from your income and tax brackets">
+                  auto
+                </span>
+              )}
             </div>
-            <span className="text-sm font-medium italic text-amber-600">
-              {formatCurrency(provincialStateTax * mult)}
-            </span>
+            {editingTax === "provincial" ? (
+              <input
+                ref={taxInputRef}
+                type="text"
+                value={editTaxValue}
+                onChange={(e) => setEditTaxValue(e.target.value)}
+                onBlur={() => {
+                  const val = parseCurrencyInput(editTaxValue);
+                  if (!editTaxValue.trim() || val === 0) {
+                    onProvincialTaxOverride?.(undefined);
+                  } else {
+                    onProvincialTaxOverride?.(viewMode === "yearly" ? val / 12 : val);
+                  }
+                  setEditingTax(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                  if (e.key === "Escape") setEditingTax(null);
+                }}
+                className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                aria-label={`Override ${provStateLabel.toLowerCase()} tax amount`}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingTax("provincial");
+                  setEditTaxValue(String(Math.round(provincialStateTax * mult)));
+                }}
+                className="text-sm font-medium text-stone-400 rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                aria-label={`Edit ${provStateLabel.toLowerCase()} tax, currently ${formatCurrency(provincialStateTax * mult)}`}
+              >
+                {formatCurrency(provincialStateTax * mult)}
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -415,18 +518,18 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       {/* Auto-generated investment contributions row */}
       {investmentContributions > 0 && (
         <div
-          className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200 mt-1"
+          className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1 mt-1"
           data-testid="investment-contributions-row"
         >
           <div className="flex flex-1 items-center gap-2 min-w-0">
-            <span className="text-sm italic text-stone-500">
+            <span className="text-sm text-stone-500">
               Investment Contributions
             </span>
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600" title="Auto-calculated from your asset monthly contributions">
+            <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-calculated from your asset monthly contributions">
               auto
             </span>
           </div>
-          <span className="text-sm font-medium italic text-amber-600">
+          <span className="text-sm font-medium text-stone-400">
             {formatCurrency(investmentContributions * mult)}
           </span>
         </div>
@@ -435,18 +538,18 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       {/* Auto-generated mortgage payments row */}
       {mortgagePayments > 0 && (
         <div
-          className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200 mt-1"
+          className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1 mt-1"
           data-testid="mortgage-payments-row"
         >
           <div className="flex flex-1 items-center gap-2 min-w-0">
-            <span className="text-sm italic text-stone-500">
+            <span className="text-sm text-stone-500">
               Mortgage Payments
             </span>
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600" title="Auto-calculated from your property mortgage payments">
+            <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-calculated from your property mortgage payments">
               auto
             </span>
           </div>
-          <span className="text-sm font-medium italic text-amber-600">
+          <span className="text-sm font-medium text-stone-400">
             {formatCurrency(mortgagePayments * mult)}
           </span>
         </div>
@@ -455,11 +558,11 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       {/* Auto-generated surplus row */}
       {surplus > 0 && (
         <div
-          className="flex items-center justify-between rounded-lg px-3 py-2 bg-stone-50/60 border border-dashed border-stone-200 mt-1"
+          className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1 mt-1"
           data-testid="surplus-row"
         >
           <div className="flex flex-1 items-center gap-2 min-w-0">
-            <span className="text-sm italic text-stone-500">
+            <span className="text-sm text-stone-500">
               Surplus
             </span>
             {surplus > 0 && surplusTargetName && (
@@ -467,11 +570,11 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                 → {surplusTargetName}
               </span>
             )}
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600" title="Auto-calculated from income minus expenses and contributions">
+            <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-calculated from income minus expenses and contributions">
               auto
             </span>
           </div>
-          <span className={`text-sm font-medium italic ${surplus >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+          <span className={`text-sm font-medium ${surplus >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
             {surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus) * mult)}
           </span>
         </div>

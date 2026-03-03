@@ -141,11 +141,17 @@ interface CompactState {
   co?: string; // country ("CA" | "US", optional for backward compat)
   ju?: string; // jurisdiction (province/state code, optional for backward compat)
   ag?: number; // age (optional)
+  ft?: number; // federal tax override (annual)
+  pt?: number; // provincial/state tax override (annual)
+  sr?: string; // surplusTargetComputedId — set when surplus target is a computed asset (e.g. "_computed_stocks")
 }
 
 function toCompact(state: FinancialState): CompactState {
+  // Filter out auto-computed assets (stocks/equity synced from other sections) —
+  // they get re-derived on load, so persisting them causes duplicates.
+  const realAssets = state.assets.filter((a) => !a.computed);
   const compact: CompactState = {
-    a: state.assets.map((x) => {
+    a: realAssets.map((x) => {
       const ca: CompactAsset = { c: x.category, a: x.amount };
       if (x.roi !== undefined) ca.r = x.roi;
       if (x.monthlyContribution !== undefined && x.monthlyContribution > 0) ca.m = x.monthlyContribution;
@@ -190,6 +196,12 @@ function toCompact(state: FinancialState): CompactState {
   if (state.country) compact.co = state.country;
   if (state.jurisdiction) compact.ju = state.jurisdiction;
   if (state.age !== undefined && state.age > 0) compact.ag = state.age;
+  if (state.federalTaxOverride !== undefined) compact.ft = state.federalTaxOverride;
+  if (state.provincialTaxOverride !== undefined) compact.pt = state.provincialTaxOverride;
+  // Persist surplus target if it's on a computed asset (which isn't in the `a` array)
+  const computedSurplusTarget = state.assets.find((a) => a.computed && a.surplusTarget);
+  const surplusComputedId = computedSurplusTarget?.id ?? state.surplusTargetComputedId;
+  if (surplusComputedId) compact.sr = surplusComputedId;
   return compact;
 }
 
@@ -203,8 +215,8 @@ function fromCompact(compact: CompactState): FinancialState {
         if (x.st) asset.surplusTarget = true;
         return asset;
       });
-      // Ensure exactly one asset is the surplus target
-      if (assets.length > 0 && !assets.some((a) => a.surplusTarget)) {
+      // Ensure exactly one asset is the surplus target — but not if a computed asset owns it (sr field)
+      if (assets.length > 0 && !assets.some((a) => a.surplusTarget) && !compact.sr) {
         assets[0].surplusTarget = true;
       }
       return assets;
@@ -249,6 +261,9 @@ function fromCompact(compact: CompactState): FinancialState {
     country: (compact.co as "CA" | "US") ?? "CA",
     jurisdiction: compact.ju ?? "ON",
     age: compact.ag,
+    federalTaxOverride: compact.ft,
+    provincialTaxOverride: compact.pt,
+    surplusTargetComputedId: compact.sr,
   };
 }
 
