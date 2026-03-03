@@ -7,6 +7,38 @@ import type { Property } from "@/components/PropertyEntry";
 import { getEffectivePayment } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
+import { getDefaultRoi } from "@/components/AssetEntry";
+
+/**
+ * Simulate how many months a set of accounts last when drawing down a fixed monthly amount.
+ * Each account earns its own monthly return. Withdrawals are taken proportionally from each
+ * account based on current balances each month. Returns months until total balance hits 0.
+ * Caps at 1200 months (100 years) to avoid infinite loops.
+ */
+function simulateRunwayWithGrowth(
+  buckets: { balance: number; monthlyRate: number }[],
+  monthlyWithdrawal: number,
+): number {
+  if (monthlyWithdrawal <= 0) return 0;
+  const balances = buckets.map((b) => b.balance);
+  const rates = buckets.map((b) => b.monthlyRate);
+  const MAX_MONTHS = 1200;
+
+  for (let month = 0; month < MAX_MONTHS; month++) {
+    let total = 0;
+    for (let i = 0; i < balances.length; i++) total += balances[i];
+    if (total <= 0) return month;
+
+    // Withdraw proportionally, then apply growth to remaining balance
+    for (let i = 0; i < balances.length; i++) {
+      const share = balances[i] / total;
+      balances[i] -= monthlyWithdrawal * share;
+      if (balances[i] < 0) balances[i] = 0;
+      balances[i] *= 1 + rates[i];
+    }
+  }
+  return MAX_MONTHS;
+}
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
 import { computeTax } from "@/lib/tax-engine";
@@ -121,6 +153,31 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const liquidTotal = totalAssets + totalStocks;
   const monthlyObligations = monthlyExpenses + totalMortgagePayments;
   const runway = monthlyObligations > 0 ? liquidTotal / monthlyObligations : 0;
+
+  // Runway with investment growth: each asset account draws down proportionally, earning its own ROR.
+  // Stocks are excluded (too hard to estimate growth reliably).
+  let runwayWithGrowth: number | undefined;
+  if (monthlyObligations > 0 && liquidTotal > 0) {
+    const buckets: { balance: number; ror: number }[] = [];
+    for (const asset of state.assets) {
+      if (asset.amount > 0) {
+        buckets.push({ balance: asset.amount, ror: asset.roi ?? getDefaultRoi(asset.category) ?? 0 });
+      }
+    }
+    // Stocks contribute to liquid total but at 0% growth
+    if (totalStocks > 0) {
+      buckets.push({ balance: totalStocks, ror: 0 });
+    }
+    // Any bucket with growth? If all are 0%, no point simulating.
+    const hasGrowth = buckets.some((b) => b.ror > 0);
+    if (hasGrowth) {
+      const simBuckets = buckets.map((b) => ({ balance: b.balance, monthlyRate: b.ror / 100 / 12 }));
+      const months = simulateRunwayWithGrowth(simBuckets, monthlyObligations);
+      if (months - runway > 0.5) {
+        runwayWithGrowth = months >= 1200 ? Infinity : parseFloat(months.toFixed(1));
+      }
+    }
+  }
   // Debt-to-asset ratio includes property: (debts + mortgages) / (liquid assets + stocks + property values)
   // Use property VALUE (not equity) on asset side — equity already nets out the mortgage,
   // so using equity + mortgage as debt would double-count the mortgage.
@@ -203,6 +260,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
         "How many months your liquid assets could cover your expenses and mortgage payments. 3–6 months is a solid emergency fund.",
       positive: runway >= 3,
       breakdown: runwayBreakdown,
+      runwayWithGrowth,
     },
     {
       title: "Debt-to-Asset Ratio",

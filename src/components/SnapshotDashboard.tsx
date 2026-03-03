@@ -14,6 +14,7 @@ interface MetricData {
   effectiveRate?: number;
   valueWithEquity?: number; // net worth including property equity
   ratioWithoutMortgage?: number; // debt-to-asset ratio excluding mortgage
+  runwayWithGrowth?: number; // runway in months factoring in asset ROR
 }
 
 // Mock values based on existing entry component mock data
@@ -181,6 +182,11 @@ function MetricCard({ metric, insights }: { metric: MetricData; insights: string
       {metric.ratioWithoutMortgage !== undefined && metric.ratioWithoutMortgage !== metric.value && (
         <p className="mt-0.5 text-sm text-stone-500" data-testid="ratio-without-mortgage">
           ({formatMetricValue(metric.ratioWithoutMortgage, metric.format)} without mortgage)
+        </p>
+      )}
+      {metric.runwayWithGrowth !== undefined && (
+        <p className="mt-0.5 text-sm text-stone-500" data-testid="runway-with-growth">
+          ({metric.runwayWithGrowth === Infinity ? "∞" : formatMetricValue(metric.runwayWithGrowth, "months")} with investment growth)
         </p>
       )}
       {/* Effective tax rate sub-line */}
