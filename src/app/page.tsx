@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import PropertyEntry from "@/components/PropertyEntry";
-import StockEntry from "@/components/StockEntry";
+import StockEntry, { getStockValue } from "@/components/StockEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
@@ -98,6 +98,41 @@ function CopyLinkButton() {
   );
 }
 
+function WelcomeBanner() {
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) return null;
+
+  return (
+    <div className="relative mb-6 rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-sky-50 px-4 py-4 shadow-sm sm:px-6 sm:py-5">
+      <button
+        type="button"
+        onClick={() => setDismissed(true)}
+        className="absolute right-3 top-3 rounded-md p-1 text-stone-400 transition-colors hover:bg-white/60 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        aria-label="Dismiss welcome message"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+        </svg>
+      </button>
+      <h2 className="mb-2 text-base font-semibold text-stone-800 sm:text-lg">
+        Welcome! Here&apos;s how this works
+      </h2>
+      <div className="space-y-2 text-sm leading-relaxed text-stone-600">
+        <p>
+          This is a simple tool to help you see your <strong>full financial picture in one place</strong>. Just fill in some rough numbers for your savings, debts, income, and expenses — it doesn&apos;t need to be exact.
+        </p>
+        <p>
+          You&apos;ll get a snapshot of where you stand, plus a projection of how things could look in 10, 20, or 30 years.
+        </p>
+        <div className="mt-3 rounded-lg bg-white/60 px-3 py-2.5 text-xs text-stone-500 sm:text-sm">
+          <strong className="text-stone-700">Your privacy is fully protected.</strong> Nothing you enter is stored on any server or sent anywhere. All your data stays right here in your browser. The numbers are saved in the page link itself — so you can bookmark it or share it, but nobody can see your information unless you give them that link.
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CollapsibleSection({
   title,
   icon,
@@ -181,6 +216,9 @@ export default function Home() {
   const [country, setCountry] = useState<"CA" | "US">(INITIAL_STATE.country ?? "CA");
   const [jurisdiction, setJurisdiction] = useState<string>(INITIAL_STATE.jurisdiction ?? "ON");
   const [age, setAge] = useState<number | undefined>(INITIAL_STATE.age);
+  const [federalTaxOverride, setFederalTaxOverride] = useState<number | undefined>(undefined);
+  const [provincialTaxOverride, setProvincialTaxOverride] = useState<number | undefined>(undefined);
+  const [surplusTargetComputedId, setSurplusTargetComputedId] = useState<string | undefined>(undefined);
   const isFirstRender = useRef(true);
 
   // Restore state from URL after hydration
@@ -197,6 +235,9 @@ export default function Home() {
       if (urlState.country) setCountry(urlState.country);
       if (urlState.jurisdiction) setJurisdiction(urlState.jurisdiction);
       if (urlState.age !== undefined) setAge(urlState.age);
+      setFederalTaxOverride(urlState.federalTaxOverride);
+      setProvincialTaxOverride(urlState.provincialTaxOverride);
+      setSurplusTargetComputedId(urlState.surplusTargetComputedId);
     }
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -207,20 +248,76 @@ export default function Home() {
       isFirstRender.current = false;
       return;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age });
-  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId });
+  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId]);
 
-  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age };
+  // Sync computed assets for stocks and property equity (auto-update amounts, preserve ROI & surplusTarget)
+  const syncComputedAssets = useCallback(() => {
+    const totalStockValue = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
+    const totalEquity = properties.reduce((sum, p) => sum + Math.max(0, p.value - p.mortgage), 0);
+
+    setAssets((prev) => {
+      let next = [...prev];
+      const stocksIdx = next.findIndex((a) => a.id === "_computed_stocks");
+
+      if (totalStockValue > 0) {
+        const existing = stocksIdx >= 0 ? next[stocksIdx] : undefined;
+        const isSurplusTarget = existing?.surplusTarget || surplusTargetComputedId === "_computed_stocks";
+        const entry: Asset = { id: "_computed_stocks", category: "Stocks & Equity", amount: totalStockValue, computed: true as const, roi: existing?.roi, surplusTarget: isSurplusTarget || undefined };
+        if (stocksIdx >= 0) next[stocksIdx] = entry;
+        else next = [entry, ...next];
+      } else if (stocksIdx >= 0) {
+        next.splice(stocksIdx, 1);
+      }
+
+      const equityIdxAfter = next.findIndex((a) => a.id === "_computed_equity");
+      if (totalEquity > 0) {
+        const existing = equityIdxAfter >= 0 ? next[equityIdxAfter] : undefined;
+        const isSurplusTarget = existing?.surplusTarget || surplusTargetComputedId === "_computed_equity";
+        const entry: Asset = { id: "_computed_equity", category: "Property Equity", amount: totalEquity, computed: true as const, roi: existing?.roi, surplusTarget: isSurplusTarget || undefined };
+        if (equityIdxAfter >= 0) next[equityIdxAfter] = entry;
+        else {
+          const insertIdx = next.findIndex((a) => a.id === "_computed_stocks") >= 0 ? 1 : 0;
+          next.splice(insertIdx, 0, entry);
+        }
+      } else if (equityIdxAfter >= 0) {
+        next.splice(equityIdxAfter, 1);
+      }
+
+      // If a computed asset is the surplus target, clear it from real assets
+      const computedHasSurplus = next.some((a) => a.computed && a.surplusTarget);
+      if (computedHasSurplus) {
+        next = next.map((a) => a.computed ? a : { ...a, surplusTarget: false });
+      }
+
+      return next;
+    });
+  }, [stocks, properties, surplusTargetComputedId]);
+
+  // Sync on stocks/properties change
+  useEffect(() => {
+    syncComputedAssets();
+  }, [syncComputedAssets]);
+
+  // Wrap setAssets to track surplus target on computed assets
+  const handleAssetsChange = useCallback((newAssets: Asset[]) => {
+    setAssets(newAssets);
+    const computedSurplus = newAssets.find((a) => a.computed && a.surplusTarget);
+    setSurplusTargetComputedId(computedSurplus?.id);
+  }, []);
+
+  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
   const totals = computeTotals(state);
-  const totalInvestmentContributions = assets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
+  const totalInvestmentContributions = assets.filter((a) => !a.computed).reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   const totalMortgagePayments = totals.totalMortgagePayments;
   const monthlySurplus = totals.monthlyAfterTaxIncome - totals.monthlyExpenses - totals.totalMonthlyContributions - totalMortgagePayments;
-  const surplusTargetName = assets.find((a) => a.surplusTarget)?.category ?? assets[0]?.category;
+  const realAssets = assets.filter((a) => !a.computed);
+  const surplusTargetName = realAssets.find((a) => a.surplusTarget)?.category ?? realAssets[0]?.category;
 
   // Summaries for collapsed sections
-  const assetTotal = assets.reduce((sum, a) => sum + a.amount, 0);
+  const assetTotal = assets.filter((a) => !a.computed).reduce((sum, a) => sum + a.amount, 0);
   const debtTotal = debts.reduce((sum, d) => sum + d.amount, 0);
   const incomeTotal = income.reduce((sum, i) => sum + i.amount, 0);
   const expenseTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -261,6 +358,9 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+        {/* Welcome explainer for first-time visitors */}
+        <WelcomeBanner />
+
         {/* Projection Chart — full-width above the two-column layout */}
         <section className="mb-6 space-y-4" aria-label="Financial projections">
           <ZoomableCard><ProjectionChart state={state} /></ZoomableCard>
@@ -275,7 +375,7 @@ export default function Home() {
           >
             <div className="space-y-3">
               <CollapsibleSection title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)}>
-                <AssetEntry items={assets} onChange={setAssets} monthlySurplus={monthlySurplus} />
+                <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} />
               </CollapsibleSection>
 
               <CollapsibleSection title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"}>
@@ -287,7 +387,7 @@ export default function Home() {
               </CollapsibleSection>
 
               <CollapsibleSection title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)}>
-                <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} surplusTargetName={surplusTargetName} federalTax={totals.totalFederalTax / 12} provincialStateTax={totals.totalProvincialStateTax / 12} country={country} isUnderwater={monthlySurplus < 0} />
+                <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} surplusTargetName={surplusTargetName} federalTax={totals.totalFederalTax / 12} provincialStateTax={totals.totalProvincialStateTax / 12} computedFederalTax={totals.computedFederalTax / 12} computedProvincialStateTax={totals.computedProvincialStateTax / 12} federalTaxOverride={federalTaxOverride !== undefined ? federalTaxOverride / 12 : undefined} provincialTaxOverride={provincialTaxOverride !== undefined ? provincialTaxOverride / 12 : undefined} onFederalTaxOverride={(monthly) => setFederalTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} onProvincialTaxOverride={(monthly) => setProvincialTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} country={country} isUnderwater={monthlySurplus < 0} />
               </CollapsibleSection>
 
               <CollapsibleSection title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"}>

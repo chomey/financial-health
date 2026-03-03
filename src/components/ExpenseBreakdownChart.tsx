@@ -123,7 +123,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
       <div className="flex items-center gap-1.5">
         <p className="text-sm font-medium text-stone-800">{item.name}</p>
         {item.isAuto && (
-          <span className="inline-flex items-center rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-600">
+          <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide">
             auto
           </span>
         )}
