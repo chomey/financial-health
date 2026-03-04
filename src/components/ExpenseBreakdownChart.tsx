@@ -279,7 +279,7 @@ export default function ExpenseBreakdownChart({
         className="w-full"
         style={{ height: Math.max(data.length * 36 + 20, 80) }}
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
           <BarChart
             data={barData}
             layout="vertical"
