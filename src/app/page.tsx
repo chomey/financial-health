@@ -134,12 +134,14 @@ function WelcomeBanner() {
 }
 
 function CollapsibleSection({
+  id,
   title,
   icon,
   summary,
   children,
   defaultOpen = true,
 }: {
+  id?: string;
   title: string;
   icon: string;
   summary?: string;
@@ -152,8 +154,9 @@ function CollapsibleSection({
     return (
       <button
         type="button"
+        id={id}
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm text-left transition-all duration-200 hover:shadow-md hover:bg-stone-50"
+        className="flex w-full items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm text-left transition-all duration-200 hover:shadow-md hover:bg-stone-50 scroll-mt-16"
         aria-expanded={false}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -177,7 +180,7 @@ function CollapsibleSection({
   }
 
   return (
-    <div className="relative">
+    <div id={id} className="relative scroll-mt-16">
       <button
         type="button"
         onClick={() => setOpen(false)}
@@ -357,12 +360,42 @@ export default function Home() {
         </div>
       </header>
 
+      <nav className="sticky top-0 z-30 border-b border-stone-200 bg-white/95 backdrop-blur-sm shadow-sm">
+        <div className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6">
+          <div className="flex items-center gap-1 py-1.5 text-sm">
+            {[
+              { id: "projections", icon: "📈", label: "Projections" },
+              { id: "assets", icon: "💰", label: "Assets" },
+              { id: "debts", icon: "💳", label: "Debts" },
+              { id: "income", icon: "💵", label: "Income" },
+              { id: "expenses", icon: "🧾", label: "Expenses" },
+              { id: "property", icon: "🏠", label: "Property" },
+              { id: "stocks", icon: "📊", label: "Stocks" },
+              { id: "dashboard", icon: "🎯", label: "Dashboard" },
+              { id: "scenarios", icon: "🔮", label: "What If" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                className="flex-shrink-0 rounded-md px-2.5 py-1.5 font-medium text-stone-500 transition-all duration-150 hover:bg-stone-100 hover:text-stone-800 focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95"
+              >
+                <span aria-hidden="true" className="mr-1">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
         {/* Welcome explainer for first-time visitors */}
         <WelcomeBanner />
 
         {/* Projection Chart — full-width above the two-column layout */}
-        <section className="mb-6 space-y-4" aria-label="Financial projections">
+        <section id="projections" className="mb-6 space-y-4 scroll-mt-16" aria-label="Financial projections">
           <ZoomableCard><ProjectionChart state={state} /></ZoomableCard>
           <InsightsPanel data={financialData} />
         </section>
@@ -374,27 +407,27 @@ export default function Home() {
             aria-label="Financial data entry"
           >
             <div className="space-y-3">
-              <CollapsibleSection title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)}>
+              <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)}>
                 <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} />
               </CollapsibleSection>
 
-              <CollapsibleSection title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"}>
+              <CollapsibleSection id="debts" title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"}>
                 <DebtEntry items={debts} onChange={setDebts} />
               </CollapsibleSection>
 
-<CollapsibleSection title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)}>
+<CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)}>
                 <IncomeEntry items={income} onChange={setIncome} />
               </CollapsibleSection>
 
-              <CollapsibleSection title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)}>
+              <CollapsibleSection id="expenses" title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)}>
                 <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} surplusTargetName={surplusTargetName} federalTax={totals.totalFederalTax / 12} provincialStateTax={totals.totalProvincialStateTax / 12} computedFederalTax={totals.computedFederalTax / 12} computedProvincialStateTax={totals.computedProvincialStateTax / 12} federalTaxOverride={federalTaxOverride !== undefined ? federalTaxOverride / 12 : undefined} provincialTaxOverride={provincialTaxOverride !== undefined ? provincialTaxOverride / 12 : undefined} onFederalTaxOverride={(monthly) => setFederalTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} onProvincialTaxOverride={(monthly) => setProvincialTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} country={country} isUnderwater={monthlySurplus < 0} />
               </CollapsibleSection>
 
-              <CollapsibleSection title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"}>
+              <CollapsibleSection id="property" title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"}>
                 <PropertyEntry items={properties} onChange={setProperties} />
               </CollapsibleSection>
 
-              <CollapsibleSection title="Stocks" icon="📊" summary={stockCount > 0 ? `${stockCount} holding${stockCount !== 1 ? "s" : ""}` : "None"}>
+              <CollapsibleSection id="stocks" title="Stocks" icon="📊" summary={stockCount > 0 ? `${stockCount} holding${stockCount !== 1 ? "s" : ""}` : "None"}>
                 <StockEntry items={stocks} onChange={setStocks} />
               </CollapsibleSection>
             </div>
@@ -402,7 +435,8 @@ export default function Home() {
 
           {/* Dashboard Panel — right side on desktop, bottom on mobile */}
           <section
-            className="lg:col-span-5"
+            id="dashboard"
+            className="lg:col-span-5 scroll-mt-16"
             aria-label="Financial dashboard"
           >
             <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
@@ -488,7 +522,7 @@ export default function Home() {
         </div>
 
         {/* What If scenario panel — full-width at the bottom */}
-        <section className="mt-8" aria-label="Scenario modeling">
+        <section id="scenarios" className="mt-8 scroll-mt-16" aria-label="Scenario modeling">
           <FastForwardPanel state={state} />
         </section>
       </main>

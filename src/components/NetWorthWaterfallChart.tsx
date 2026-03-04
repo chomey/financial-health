@@ -215,7 +215,7 @@ export default function NetWorthWaterfallChart({
       </h3>
 
       <div style={{ height: barHeight }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
           <BarChart
             data={data}
             layout="vertical"
