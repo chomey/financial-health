@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 68
-- **Completed**: 62
-- **Remaining**: 6
+- **Completed**: 63
+- **Remaining**: 5
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1332,3 +1332,15 @@
   ![Changelog entries order](screenshots/task-62-changelog-entries-order.png)
   ![Changelog from main page](screenshots/task-62-changelog-from-main.png)
 - **Notes**: The changelog page is a server component (no client interactivity needed). Entries are grouped into 6 milestones matching the project's development phases. The page uses the same warm design language as the main app with stone/green color palette, hover lift effects on cards, and version badges. A "Changelog" link in the main page header provides easy navigation.
+
+## Task 63: Classify account types by tax treatment for withdrawal modeling
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/lib/withdrawal-tax.ts`: New module with `TaxTreatment` type ("tax-free" | "tax-deferred" | "taxable"), `getTaxTreatment()` classification function mapping all known account categories, and `getWithdrawalTaxRate()` function computing withdrawal tax impact including capital gains handling with cost basis support.
+  - `src/lib/changelog.ts`: Added v63 entry for withdrawal tax classification.
+- **Test tiers run**: T1
+- **Tests**:
+  - `tests/unit/withdrawal-tax.test.ts`: 39 tests — getTaxTreatment (tax-free: 3, tax-deferred: 7, taxable: 6, unknown defaults: 1), getWithdrawalTaxRate (zero/negative: 2, tax-free accounts: 3, tax-deferred accounts: 7, taxable accounts: 7, cross-jurisdiction: 2, cost basis clamping: 1)
+  - All unit tests: 785 passed, 0 failed (48 test files)
+- **Notes**: Data/logic layer only — no UI changes. The `getWithdrawalTaxRate` function delegates to `computeTax` from tax-engine.ts, using "employment" income type for tax-deferred withdrawals and "capital-gains" for taxable account gains. Cost basis percent defaults to 100% (all contributions, no gains) so existing accounts aren't penalized. Tasks 64-67 will wire this into runway, projections, dashboard, and UI.

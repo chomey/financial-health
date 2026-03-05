@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Withdrawal Tax Modeling (Milestone 7)
+  {
+    version: 63,
+    title: "Account tax treatment classification",
+    description: "New withdrawal-tax module classifies accounts as tax-free (TFSA, Roth IRA), tax-deferred (RRSP, 401k), or taxable (Brokerage) and computes withdrawal tax impact including capital gains handling.",
+    date: "2026-03-05",
+  },
   // Multi-Currency Support (Milestone 6)
   {
     version: 61,
