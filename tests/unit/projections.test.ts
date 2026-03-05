@@ -252,6 +252,70 @@ describe("surplus target affects projections", () => {
   });
 });
 
+describe("projectFinances — currency conversion", () => {
+  it("converts foreign-currency asset to home currency", () => {
+    const state = makeState({
+      country: "CA",
+      assets: [{ id: "a1", category: "Savings", amount: 10000, roi: 0, currency: "USD" }],
+      income: [{ id: "i1", category: "Salary", amount: 0 }],
+      expenses: [],
+    });
+    const result = projectFinances(state, 1);
+    // USD 10,000 → CAD at fallback rate 1.37 = 13,700
+    expect(result.points[0].totalAssets).toBe(13700);
+  });
+
+  it("converts foreign-currency debt to home currency", () => {
+    const state = makeState({
+      country: "CA",
+      assets: [{ id: "a1", category: "Savings", amount: 20000, roi: 0 }],
+      debts: [{ id: "d1", category: "Credit Card", amount: 5000, interestRate: 0, currency: "USD" }],
+      income: [{ id: "i1", category: "Salary", amount: 0 }],
+      expenses: [],
+    });
+    const result = projectFinances(state, 1);
+    // Debt: USD 5,000 → CAD at 1.37 = 6,850
+    expect(result.points[0].consumerDebts).toBe(6850);
+  });
+
+  it("uses manual FX override rate for conversion", () => {
+    const state = makeState({
+      country: "CA",
+      fxManualOverride: 1.5, // 1 USD = 1.5 CAD
+      assets: [{ id: "a1", category: "Savings", amount: 10000, roi: 0, currency: "USD" }],
+      income: [{ id: "i1", category: "Salary", amount: 0 }],
+      expenses: [],
+    });
+    const result = projectFinances(state, 1);
+    // USD 10,000 × 1.5 = CAD 15,000
+    expect(result.points[0].totalAssets).toBe(15000);
+  });
+
+  it("does not convert home-currency items", () => {
+    const state = makeState({
+      country: "CA",
+      assets: [{ id: "a1", category: "Savings", amount: 10000, roi: 0 }], // no currency = home
+      income: [{ id: "i1", category: "Salary", amount: 0 }],
+      expenses: [],
+    });
+    const result = projectFinances(state, 1);
+    expect(result.points[0].totalAssets).toBe(10000);
+  });
+});
+
+describe("projectAssets — currency conversion", () => {
+  it("converts foreign-currency asset values", () => {
+    const assets = [
+      { id: "a1", category: "Savings", amount: 10000, roi: 0, currency: "USD" as const },
+    ];
+    const result = projectAssets(assets, "moderate", [1], 0, "CAD", { USD_CAD: 1.37, CAD_USD: 0.73 });
+    // Starting value: 10000 × 1.37 ≈ 13700
+    expect(result[0].currentValue).toBeCloseTo(13700, 0);
+    // After 1 year with 0 ROI, still 13700
+    expect(result[0].milestoneValues[0]).toBe(13700);
+  });
+});
+
 describe("downsamplePoints", () => {
   it("returns original array if under maxPoints", () => {
     const points = Array.from({ length: 50 }, (_, i) => ({
