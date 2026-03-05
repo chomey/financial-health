@@ -16,6 +16,7 @@ import NetWorthWaterfallChart from "@/components/NetWorthWaterfallChart";
 import FastForwardPanel from "@/components/FastForwardPanel";
 import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import CashFlowSankey from "@/components/CashFlowSankey";
+import FxRateDisplay from "@/components/FxRateDisplay";
 import InsightsPanel from "@/components/InsightsPanel";
 import ZoomableCard from "@/components/ZoomableCard";
 import {
@@ -25,6 +26,8 @@ import {
   toFinancialData,
 } from "@/lib/financial-state";
 import { getStateFromURL, updateURL } from "@/lib/url-state";
+import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey } from "@/lib/currency";
+import type { FxRates, SupportedCurrency } from "@/lib/currency";
 import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
 import type { Property } from "@/components/PropertyEntry";
@@ -222,6 +225,8 @@ export default function Home() {
   const [federalTaxOverride, setFederalTaxOverride] = useState<number | undefined>(undefined);
   const [provincialTaxOverride, setProvincialTaxOverride] = useState<number | undefined>(undefined);
   const [surplusTargetComputedId, setSurplusTargetComputedId] = useState<string | undefined>(undefined);
+  const [fxManualOverride, setFxManualOverride] = useState<number | undefined>(undefined);
+  const [fxRates, setFxRates] = useState<FxRates | undefined>(undefined);
   const isFirstRender = useRef(true);
 
   // Restore state from URL after hydration
@@ -241,9 +246,34 @@ export default function Home() {
       setFederalTaxOverride(urlState.federalTaxOverride);
       setProvincialTaxOverride(urlState.provincialTaxOverride);
       setSurplusTargetComputedId(urlState.surplusTargetComputedId);
+      setFxManualOverride(urlState.fxManualOverride);
     }
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Fetch live FX rates on mount and when country changes (skip if manual override is set)
+  useEffect(() => {
+    if (fxManualOverride !== undefined && fxManualOverride > 0) return;
+    const homeCurrency = getHomeCurrency(country);
+    const foreignCurrency = getForeignCurrency(homeCurrency);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/fx-rate?from=${foreignCurrency}&to=${homeCurrency}`);
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        if (cancelled) return;
+        const rate = data.rate as number;
+        setFxRates({
+          [fxPairKey(foreignCurrency, homeCurrency)]: rate,
+          [fxPairKey(homeCurrency, foreignCurrency)]: 1 / rate,
+        });
+      } catch {
+        // Silently fall back to hardcoded rates
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [country, fxManualOverride]);
 
   // Update URL whenever state changes (skip initial render to keep URL clean with defaults)
   useEffect(() => {
@@ -251,8 +281,8 @@ export default function Home() {
       isFirstRender.current = false;
       return;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId });
-  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride });
+  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride]);
 
   // Sync computed assets for stocks and property equity (auto-update amounts, preserve ROI & surplusTarget)
   const syncComputedAssets = useCallback(() => {
@@ -309,7 +339,10 @@ export default function Home() {
     setSurplusTargetComputedId(computedSurplus?.id);
   }, []);
 
-  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId };
+  const homeCurrency = getHomeCurrency(country);
+  const foreignCurrency = getForeignCurrency(homeCurrency);
+  const effectiveFxRates = getEffectiveFxRates(homeCurrency, fxManualOverride, fxRates);
+  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride };
   const metrics = computeMetrics(state);
   const financialData = toFinancialData(state);
   const totals = computeTotals(state);
@@ -346,14 +379,28 @@ export default function Home() {
             </h1>
             <p className="text-xs text-stone-500 sm:text-sm">
               Your finances at a glance — no judgment, just clarity
+              <span className="mx-1.5 text-stone-300">·</span>
+              <a
+                href="/changelog"
+                className="text-blue-500 transition-colors duration-200 hover:text-blue-700 hover:underline"
+              >
+                Changelog
+              </a>
             </p>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <CountryJurisdictionSelector
               country={country}
               jurisdiction={jurisdiction}
               onCountryChange={setCountry}
               onJurisdictionChange={setJurisdiction}
+            />
+            <FxRateDisplay
+              homeCurrency={homeCurrency}
+              foreignCurrency={foreignCurrency}
+              fxRates={effectiveFxRates}
+              fxManualOverride={fxManualOverride}
+              onManualOverrideChange={setFxManualOverride}
             />
             <CopyLinkButton />
           </div>
@@ -408,11 +455,11 @@ export default function Home() {
           >
             <div className="space-y-3">
               <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)}>
-                <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} />
+                <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
               <CollapsibleSection id="debts" title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"}>
-                <DebtEntry items={debts} onChange={setDebts} />
+                <DebtEntry items={debts} onChange={setDebts} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
 <CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)}>
@@ -424,7 +471,7 @@ export default function Home() {
               </CollapsibleSection>
 
               <CollapsibleSection id="property" title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"}>
-                <PropertyEntry items={properties} onChange={setProperties} />
+                <PropertyEntry items={properties} onChange={setProperties} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
               <CollapsibleSection id="stocks" title="Stocks" icon="📊" summary={stockCount > 0 ? `${stockCount} holding${stockCount !== 1 ? "s" : ""}` : "None"}>
@@ -440,7 +487,7 @@ export default function Home() {
             aria-label="Financial dashboard"
           >
             <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
-              <SnapshotDashboard metrics={metrics} financialData={financialData} />
+              <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} />
               {stocks.length > 0 && (() => {
                 const portfolio = getPortfolioSummary(stocks);
                 const stocksWithReturns = stocks
@@ -453,7 +500,7 @@ export default function Home() {
                       <span className="text-lg" aria-hidden="true">📊</span>
                     </div>
                     <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-green-600" : "text-rose-600"}`}>
-                      {portfolio.totalGainLoss >= 0 ? "+" : ""}{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(portfolio.totalGainLoss)}
+                      {portfolio.totalGainLoss >= 0 ? "+" : ""}{new Intl.NumberFormat("en-US", { style: "currency", currency: homeCurrency, maximumFractionDigits: 0 }).format(portfolio.totalGainLoss)}
                     </p>
                     {portfolio.totalCostBasis > 0 && (
                       <p className="mt-0.5 text-sm text-stone-500" data-testid="portfolio-return-pct">
