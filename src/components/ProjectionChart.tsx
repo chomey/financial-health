@@ -12,6 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { computeTotals, type FinancialState } from "@/lib/financial-state";
+import { getHomeCurrency, getEffectiveFxRates } from "@/lib/currency";
 import {
   projectFinances,
   downsamplePoints,
@@ -30,10 +31,10 @@ function formatCurrency(value: number): string {
   return `$${value.toFixed(0)}`;
 }
 
-function formatFullCurrency(value: number): string {
+function formatFullCurrency(value: number, currencyCode: string = "USD"): string {
   return value.toLocaleString("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: currencyCode,
     maximumFractionDigits: 0,
   });
 }
@@ -62,7 +63,7 @@ interface CustomTooltipProps {
   label?: number;
 }
 
-function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+function CustomTooltip({ active, payload, label, currencyCode }: CustomTooltipProps & { currencyCode?: string }) {
   if (!active || !payload?.length) return null;
 
   const years = label ?? 0;
@@ -73,7 +74,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
       <p className="mb-1 text-xs font-medium text-stone-500">{yearLabel} from now</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-sm font-semibold" style={{ color: entry.color }}>
-          {entry.name}: {formatFullCurrency(entry.value)}
+          {entry.name}: {formatFullCurrency(entry.value, currencyCode)}
         </p>
       ))}
     </div>
@@ -96,6 +97,7 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
   const [years, setYears] = useState<number>(10);
   const [scenario, setScenario] = useState<Scenario>("moderate");
   const [legendOpen, setLegendOpen] = useState(false);
+  const currencyCode = getHomeCurrency(state.country ?? "CA");
 
   // Always project 30 years for the summary table; chart uses selected timeline
   const fullProjection = useMemo(
@@ -159,7 +161,9 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
   const assetProjections = useMemo(() => {
     const totals = computeTotals(state);
     const surplus = totals.monthlyAfterTaxIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
-    return projectAssets(state.assets, scenario, milestoneYears, surplus);
+    const homeCurrency = getHomeCurrency(state.country ?? "CA");
+    const fxRates = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
+    return projectAssets(state.assets, scenario, milestoneYears, surplus, homeCurrency, fxRates);
   }, [state, scenario, milestoneYears]);
 
   return (
@@ -297,7 +301,7 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
               tickFormatter={formatCurrency}
               width={60}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip currencyCode={currencyCode} />} />
 
             {/* Net Worth line */}
             <Line

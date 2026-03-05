@@ -2,6 +2,7 @@ import type { FinancialState } from "@/lib/financial-state";
 import { computeTotals } from "@/lib/financial-state";
 import { getDefaultRoi } from "@/components/AssetEntry";
 import { getEffectivePayment, getDefaultAppreciation } from "@/components/PropertyEntry";
+import { getHomeCurrency, getEffectiveFxRates, convertToHome, type SupportedCurrency } from "@/lib/currency";
 
 export interface ProjectionPoint {
   month: number;
@@ -44,36 +45,44 @@ export function projectFinances(
   const multiplier = SCENARIO_MULTIPLIERS[scenario];
   const totalMonths = years * 12;
 
+  // Currency conversion setup
+  const homeCurrency = getHomeCurrency(state.country ?? "CA");
+  const fxRates = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
+  const toHome = (amount: number, itemCurrency?: SupportedCurrency) =>
+    convertToHome(amount, itemCurrency ?? homeCurrency, homeCurrency, fxRates);
+
   // Initial values — surplus uses after-tax income, excludes investment contributions (handled per-asset)
   const { monthlyAfterTaxIncome, monthlyExpenses, totalMonthlyContributions } = computeTotals(state);
   const baseSurplus = monthlyAfterTaxIncome - monthlyExpenses - totalMonthlyContributions;
 
-  // Track each asset individually for ROI/contribution
+  // Track each asset individually for ROI/contribution (converted to home currency)
   const assetBalances = state.assets.map((a) => ({
-    balance: a.amount,
+    balance: toHome(a.amount, a.currency),
     monthlyROI: ((a.roi ?? getDefaultRoi(a.category) ?? 0) * multiplier) / 100 / 12,
-    monthlyContribution: (a.monthlyContribution ?? 0) * multiplier,
+    monthlyContribution: toHome(a.monthlyContribution ?? 0, a.currency) * multiplier,
   }));
 
-  // Track each debt individually for interest/payments
+  // Track each debt individually for interest/payments (converted to home currency)
   const debtBalances = state.debts.map((d) => ({
-    balance: d.amount,
+    balance: toHome(d.amount, d.currency),
     monthlyRate: ((d.interestRate ?? 0) * multiplier) / 100 / 12,
-    monthlyPayment: d.monthlyPayment ?? 0,
+    monthlyPayment: toHome(d.monthlyPayment ?? 0, d.currency),
   }));
 
   // Track stock holdings (static value — no growth projections for stocks)
+  // Convert each stock's value using its detected price currency
   const stocksTotal = (state.stocks ?? []).reduce((sum, s) => {
     const price = s.lastFetchedPrice ?? 0;
-    return sum + s.shares * price;
+    const value = s.shares * price;
+    return sum + toHome(value, s.priceCurrency);
   }, 0);
 
   // Track each property mortgage for interest/payments and value appreciation/depreciation
   const propertyBalances = state.properties.map((p) => ({
-    value: p.value,
-    mortgage: p.mortgage,
+    value: toHome(p.value, p.currency),
+    mortgage: toHome(p.mortgage, p.currency),
     monthlyRate: ((p.interestRate ?? 0) * multiplier) / 100 / 12,
-    monthlyPayment: getEffectivePayment(p),
+    monthlyPayment: toHome(getEffectivePayment(p), p.currency),
     monthlyAppreciation: ((p.appreciation ?? getDefaultAppreciation(p.name) ?? 0) * multiplier) / 100 / 12,
   }));
 
@@ -188,17 +197,24 @@ export function projectAssets(
   assets: FinancialState["assets"],
   scenario: Scenario = "moderate",
   milestoneYears: number[] = [10, 20, 30],
-  monthlySurplus: number = 0
+  monthlySurplus: number = 0,
+  homeCurrency?: SupportedCurrency,
+  fxRates?: import("@/lib/currency").FxRates,
 ): AssetProjection[] {
   const multiplier = SCENARIO_MULTIPLIERS[scenario];
   const maxMonth = Math.max(...milestoneYears) * 12;
   const milestoneMonths = new Set(milestoneYears.map((y) => y * 12));
 
+  const toHome = homeCurrency && fxRates
+    ? (amount: number, itemCurrency?: SupportedCurrency) =>
+        convertToHome(amount, itemCurrency ?? homeCurrency, homeCurrency, fxRates)
+    : (amount: number) => amount;
+
   return assets.map((a) => {
     const monthlyROI = ((a.roi ?? getDefaultRoi(a.category) ?? 0) * multiplier) / 100 / 12;
     const surplusContrib = a.surplusTarget && monthlySurplus > 0 ? monthlySurplus : 0;
-    const monthlyContribution = ((a.monthlyContribution ?? 0) + surplusContrib) * multiplier;
-    let balance = a.amount;
+    const monthlyContribution = (toHome(a.monthlyContribution ?? 0, a.currency) + surplusContrib) * multiplier;
+    let balance = toHome(a.amount, a.currency);
     const snapshots: Map<number, number> = new Map();
     for (let m = 1; m <= maxMonth; m++) {
       balance = balance * (1 + monthlyROI) + monthlyContribution;
@@ -208,7 +224,7 @@ export function projectAssets(
     }
     return {
       category: a.category,
-      currentValue: a.amount,
+      currentValue: toHome(a.amount, a.currency),
       milestoneValues: milestoneYears.map((y) => snapshots.get(y * 12) ?? Math.round(balance)),
     };
   });
