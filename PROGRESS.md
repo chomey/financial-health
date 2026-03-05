@@ -9,10 +9,10 @@
 -->
 
 ## Summary
-- **Total Tasks**: 55
-- **Completed**: 55
-- **Remaining**: 0
-- **Last Updated**: 2026-02-28
+- **Total Tasks**: 68
+- **Completed**: 62
+- **Remaining**: 6
+- **Last Updated**: 2026-03-05
 
 ---
 
@@ -1314,3 +1314,21 @@
   ![Stock ROI performance](screenshots/task-55-stock-roi-performance.png)
   ![Full page top](screenshots/task-55-full-page-top.png)
 - **Notes**: Fixed 2 pre-existing test failures (committed separately) before proceeding with the milestone task. The Sankey component starts expanded by default (collapsed: false), and the FastForwardPanel replaces its toggle button with a close button when open — both required careful test ID handling. All 55 tasks are now complete.
+
+## Task 62: Build changelog page with version history
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/lib/changelog.ts`: New data file with `ChangelogEntry` interface, `CHANGELOG` array (61 entries for all completed tasks), and `getChangelogByMilestone()` function grouping entries into 6 milestones.
+  - `src/app/changelog/page.tsx`: New server component page at `/changelog` displaying version history grouped by milestone in reverse chronological order. Warm card design with version badges, descriptions, dates, hover lift effects, and "Back to App" link.
+  - `src/app/page.tsx`: Added changelog link in the header tagline area with dot separator.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/changelog.test.ts`: 11 tests — entry count, unique versions, full coverage 1-61, reverse order, required fields, valid dates, milestone count, total entries, range correctness, non-empty names, no duplicates (11 passed, 0 failed)
+  - `tests/e2e/changelog.spec.ts`: 6 tests — page renders with headings/milestones/badges, reverse order within milestones, Back to App link, main page changelog link navigation, hover lift classes, 6 milestone sections (6 passed, 0 failed)
+  - All unit tests: 746 passed, 0 failed
+- **Screenshots**:
+  ![Changelog page](screenshots/task-62-changelog-page.png)
+  ![Changelog entries order](screenshots/task-62-changelog-entries-order.png)
+  ![Changelog from main page](screenshots/task-62-changelog-from-main.png)
+- **Notes**: The changelog page is a server component (no client interactivity needed). Entries are grouped into 6 milestones matching the project's development phases. The page uses the same warm design language as the main app with stone/green color palette, hover lift effects on cards, and version badges. A "Changelog" link in the main page header provides easy navigation.
