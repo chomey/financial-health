@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Withdrawal Tax Modeling (Milestone 7)
   {
+    version: 64,
+    title: "Tax-adjusted financial runway",
+    description: "Financial runway now accounts for withdrawal taxes using smart ordering: tax-free accounts (TFSA, Roth IRA) are drawn first, then taxable, then tax-deferred (RRSP, 401k). Shows adjusted runway alongside base runway.",
+    date: "2026-03-05",
+  },
+  {
     version: 63,
     title: "Account tax treatment classification",
     description: "New withdrawal-tax module classifies accounts as tax-free (TFSA, Roth IRA), tax-deferred (RRSP, 401k), or taxable (Brokerage) and computes withdrawal tax impact including capital gains handling.",
@@ -401,7 +407,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "Withdrawal Tax Modeling", range: [62, 63] as const },
+    { milestone: "Withdrawal Tax Modeling", range: [62, 68] as const },
     { milestone: "Multi-Currency Support", range: [56, 61] as const },
     { milestone: "Kubera-Inspired Visualizations", range: [48, 55] as const },
     { milestone: "Tax Computation & Enhancements", range: [37, 47] as const },

@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 68
-- **Completed**: 63
-- **Remaining**: 5
+- **Completed**: 64
+- **Remaining**: 4
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1344,3 +1344,20 @@
   - `tests/unit/withdrawal-tax.test.ts`: 39 tests — getTaxTreatment (tax-free: 3, tax-deferred: 7, taxable: 6, unknown defaults: 1), getWithdrawalTaxRate (zero/negative: 2, tax-free accounts: 3, tax-deferred accounts: 7, taxable accounts: 7, cross-jurisdiction: 2, cost basis clamping: 1)
   - All unit tests: 785 passed, 0 failed (48 test files)
 - **Notes**: Data/logic layer only — no UI changes. The `getWithdrawalTaxRate` function delegates to `computeTax` from tax-engine.ts, using "employment" income type for tax-deferred withdrawals and "capital-gains" for taxable account gains. Cost basis percent defaults to 100% (all contributions, no gains) so existing accounts aren't penalized. Tasks 64-67 will wire this into runway, projections, dashboard, and UI.
+
+## Task 64: Apply withdrawal tax to financial runway calculation
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/lib/financial-state.ts`: Added `simulateRunwayWithTax()` function that simulates runway with tax-aware withdrawal ordering (tax-free first, taxable second, tax-deferred last) and grosses up withdrawals for tax impact. Updated `computeMetrics()` to build detailed buckets with tax treatment info and compute `runwayAfterTax`. Added import of `getTaxTreatment`, `getWithdrawalTaxRate`, `TaxTreatment` from withdrawal-tax module.
+  - `src/components/SnapshotDashboard.tsx`: Added `runwayAfterTax` field to `MetricData` interface. Added display of tax-adjusted runway in amber text below the growth-aware runway line.
+  - `src/lib/changelog.ts`: Added v64 entry, added missing v62 entry, expanded Withdrawal Tax Modeling milestone range to 62-68.
+  - `tests/unit/changelog.test.ts`: Updated expectations for 64 entries and 7 milestones (pre-existing fix for task 63's missing updates).
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/financial-state.test.ts`: 4 new tests — shows runwayAfterTax for RRSP-heavy portfolio, no runwayAfterTax for all-tax-free accounts, tax-adjusted runway lower than growth-aware for US 401k, mixed portfolio benefits from tax-free-first ordering. 37 passed, 0 failed.
+  - `tests/e2e/withdrawal-tax-runway.spec.ts`: 2 new browser tests — shows tax-adjusted runway with large RRSP balance, no tax-adjusted runway for tax-free-only portfolio. 2 passed, 0 failed.
+  - All unit tests: 789 passed, 0 failed (48 test files)
+- **Screenshots**:
+  ![Tax-adjusted runway display](screenshots/task-64-withdrawal-tax-runway.png)
+- **Notes**: The tax-adjusted runway compares against the growth-aware baseline (not simple division), since accounts like 401k/RRSP have default ROI that adds growth during drawdown. The `runwayAfterTax` is only shown when the difference exceeds 0.3 months to avoid clutter. Pre-existing test failure in changelog tests was fixed in a separate commit.
