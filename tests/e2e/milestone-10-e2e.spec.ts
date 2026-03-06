@@ -99,6 +99,9 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
       await expect(
         page.locator('[data-testid="tax-federal-brackets-table"]')
       ).toBeVisible();
+      await expect(
+        page.locator('[data-testid^="tax-federal-brackets-fill-"]')
+      ).not.toBeVisible();
 
       await captureScreenshot(page, "task-96-tax-zero-income");
       await page.keyboard.press("Escape");
@@ -197,11 +200,11 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
         page.locator('[data-testid="explainer-sources"]')
       ).not.toBeVisible();
 
-      // Bracket bar with colored segments
-      const bracketBar = page.locator('[data-testid="tax-bracket-bar"]');
-      await expect(bracketBar).toBeVisible();
-      const segments = page.locator('[data-testid^="tax-bracket-segment-"]');
-      expect(await segments.count()).toBeGreaterThan(0);
+      // Tiered bracket bars with filled segments
+      const bracketTable = page.locator('[data-testid="tax-federal-brackets-table"]');
+      await expect(bracketTable).toBeVisible();
+      const fills = page.locator('[data-testid^="tax-federal-brackets-fill-"]');
+      expect(await fills.count()).toBeGreaterThan(0);
 
       // Federal/provincial breakdown
       const breakdown = modal.locator('[data-testid="tax-breakdown"]');

@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Tax bracket redesign
+  {
+    version: 102,
+    title: "Tiered fill bar tax bracket visualization",
+    description: "Replaced the flat stacked bracket bar and table with a tiered waterfall visualization. Each tax bracket is shown as a horizontal bar filled proportionally to income in that bracket, stacked vertically with lowest bracket at bottom. Filled brackets use a green-to-teal color gradient; unfilled brackets above your income show as dashed gray outlines. Both federal and provincial/state brackets are shown separately with subtotals. The visualization replaces both the old stacked bar and the bracket table.",
+    date: "2026-03-06",
+  },
   // Milestone E2E: unified chart and enhancements
   {
     version: 101,
@@ -646,7 +653,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 101] as const },
+    { milestone: "UI Polish", range: [88, 108] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

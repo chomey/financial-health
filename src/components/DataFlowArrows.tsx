@@ -470,7 +470,12 @@ function CountUpValue({ formattedValue }: { formattedValue: string }) {
 
 // --- TaxExplainerContent ---
 
-function BracketTable({
+// Color palette for bracket tiers: lighter green for low rates, deeper teal for higher
+const BRACKET_COLORS = [
+  "#d1fae5", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981", "#059669", "#047857", "#065f46",
+];
+
+function TieredBracketBars({
   title,
   brackets,
   isZeroIncome,
@@ -491,30 +496,71 @@ function BracketTable({
 
   if (brackets.length === 0) return null;
 
+  // For fill percentage, we need the bracket capacity
+  const getBracketCapacity = (seg: TaxBracketSegment) => {
+    if (seg.max >= Infinity || seg.max >= 1e12) {
+      // Unbounded top bracket — use amountInBracket as capacity (fills 100% if any income)
+      return seg.amountInBracket > 0 ? seg.amountInBracket : 1;
+    }
+    return seg.max - seg.min;
+  };
+
   return (
     <div data-testid={`${testIdPrefix}-table`}>
       <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">{title}</p>
-      <div className="overflow-hidden rounded-lg border border-stone-200">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-stone-50 text-xs text-stone-500">
-              <th className="px-3 py-1.5 text-left font-medium">Range</th>
-              <th className="px-3 py-1.5 text-right font-medium">Rate</th>
-              <th className="px-3 py-1.5 text-right font-medium">Tax</th>
-            </tr>
-          </thead>
-          <tbody>
-            {brackets.map((seg, i) => (
-              <tr key={i} className="border-t border-stone-100" data-testid={`${testIdPrefix}-row-${i}`}>
-                <td className="px-3 py-1.5 text-stone-600">{fmtRange(seg.min, seg.max)}</td>
-                <td className="px-3 py-1.5 text-right font-semibold text-stone-700">{(seg.rate * 100).toFixed(1)}%</td>
-                <td className="px-3 py-1.5 text-right text-stone-600">
-                  {isZeroIncome ? "—" : fmt(seg.taxInBracket)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="flex flex-col-reverse gap-1.5">
+        {brackets.map((seg, i) => {
+          const capacity = getBracketCapacity(seg);
+          const fillPct = isZeroIncome ? 0 : Math.min((seg.amountInBracket / capacity) * 100, 100);
+          const isFilled = seg.amountInBracket > 0 && !isZeroIncome;
+          const color = BRACKET_COLORS[Math.min(i, BRACKET_COLORS.length - 1)];
+
+          return (
+            <div
+              key={i}
+              className="relative"
+              data-testid={`${testIdPrefix}-row-${i}`}
+            >
+              {/* Bar container */}
+              <div
+                className={`relative h-9 w-full rounded-lg overflow-hidden border transition-colors ${
+                  isFilled ? "border-stone-200" : "border-stone-200 border-dashed"
+                }`}
+                style={{ backgroundColor: isFilled ? "#f5f5f4" : "#fafaf9" }}
+              >
+                {/* Fill bar */}
+                {isFilled && (
+                  <div
+                    className="absolute inset-y-0 left-0 rounded-lg transition-all duration-300"
+                    style={{ width: `${fillPct}%`, backgroundColor: color }}
+                    data-testid={`${testIdPrefix}-fill-${i}`}
+                  />
+                )}
+                {/* Content overlay */}
+                <div className="absolute inset-0 flex items-center justify-between px-3">
+                  <span className="text-xs text-stone-500 truncate mr-2">
+                    {fmtRange(seg.min, seg.max)}
+                  </span>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span
+                      className={`text-xs font-bold ${
+                        isFilled
+                          ? i >= 4 ? "text-white" : "text-emerald-800"
+                          : "text-stone-400"
+                      }`}
+                      style={isFilled && fillPct > 40 ? { textShadow: i >= 4 ? "0 1px 2px rgba(0,0,0,0.2)" : undefined } : undefined}
+                    >
+                      {(seg.rate * 100).toFixed(1)}%
+                    </span>
+                    <span className={`text-xs ${isFilled ? "font-semibold text-stone-700" : "text-stone-400"}`}>
+                      {isZeroIncome ? "—" : isFilled ? fmt(seg.taxInBracket) : "—"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
       {!isZeroIncome && (
         <div className="mt-1.5 flex justify-end">
@@ -531,15 +577,6 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
   const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
   const isZeroIncome = details.grossIncome <= 0;
-
-  // Build bracket bar segments — only include brackets with income in them
-  const activeSegments = details.brackets.filter((b) => b.amountInBracket > 0);
-  const totalIncome = details.grossIncome;
-
-  // Color palette: lighter green for low rates, deeper for higher
-  const bracketColors = [
-    "#d1fae5", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981", "#059669", "#047857", "#065f46",
-  ];
 
   const federalSubtotal = details.brackets.reduce((s, b) => s + b.taxInBracket, 0);
   const provincialSubtotal = (details.provincialBrackets ?? []).reduce((s, b) => s + b.taxInBracket, 0);
@@ -560,50 +597,8 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
         </div>
       )}
 
-      {/* Bracket bar visualization (only when there's income) */}
-      {!isZeroIncome && activeSegments.length > 0 && totalIncome > 0 && (
-        <div data-testid="tax-bracket-bar">
-          <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Income by Tax Bracket</p>
-          <div className="flex h-8 w-full overflow-hidden rounded-lg" role="img" aria-label="Tax bracket visualization">
-            {activeSegments.map((seg, i) => {
-              const widthPct = (seg.amountInBracket / totalIncome) * 100;
-              if (widthPct < 1) return null;
-              const color = bracketColors[Math.min(i, bracketColors.length - 1)];
-              return (
-                <div
-                  key={i}
-                  className="flex items-center justify-center text-xs font-semibold"
-                  style={{
-                    width: `${widthPct}%`,
-                    backgroundColor: color,
-                    color: i >= 4 ? "#fff" : "#065f46",
-                    minWidth: widthPct > 5 ? undefined : "24px",
-                  }}
-                  title={`${fmt(seg.amountInBracket)} at ${(seg.rate * 100).toFixed(1)}%`}
-                  data-testid={`tax-bracket-segment-${i}`}
-                >
-                  {widthPct > 8 ? `${(seg.rate * 100).toFixed(0)}%` : ""}
-                </div>
-              );
-            })}
-          </div>
-          {/* Bracket legend below */}
-          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
-            {activeSegments.map((seg, i) => {
-              const color = bracketColors[Math.min(i, bracketColors.length - 1)];
-              return (
-                <span key={i} className="flex items-center gap-1 text-xs text-stone-500">
-                  <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: color }} />
-                  {(seg.rate * 100).toFixed(1)}%: {fmt(seg.amountInBracket)}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Federal bracket table */}
-      <BracketTable
+      {/* Federal tiered bracket bars */}
+      <TieredBracketBars
         title="Federal Tax Brackets"
         brackets={details.brackets}
         isZeroIncome={isZeroIncome}
@@ -611,9 +606,9 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
         testIdPrefix="tax-federal-brackets"
       />
 
-      {/* Provincial/State bracket table */}
+      {/* Provincial/State tiered bracket bars */}
       {details.provincialBrackets && details.provincialBrackets.length > 0 && (
-        <BracketTable
+        <TieredBracketBars
           title={provincialTableTitle}
           brackets={details.provincialBrackets}
           isZeroIncome={isZeroIncome}

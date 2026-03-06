@@ -258,3 +258,13 @@
   ![Scrollable source cards](screenshots/task-101-scrollable-source-cards.png)
   ![Full journey complete](screenshots/task-101-full-journey-complete.png)
 - **Notes**: All 101 tasks are now complete. This milestone covers the unified chart and final enhancements from tasks 97-101, validating the merged projection/burndown chart with mode tabs, 50-year projections, dual bracket tables, investment income tax, withdrawal tax merged into runway, and all modal interactions. The full E2E suite (314 tests) passes across all milestone test files. Pre-existing changelog test failure (expected 99 entries but had 100) was fixed in a separate commit.
+
+## Task 102: Redesign tax bracket visualization with tiered fill bars
+- **Date**: 2026-03-06
+- **Files**: `src/components/DataFlowArrows.tsx` (replaced `BracketTable` with `TieredBracketBars`, removed stacked bracket bar), `src/lib/financial-state.ts` (updated `computeBracketSegments` to return ALL brackets including unfilled ones above income), `src/lib/changelog.ts`, `tests/unit/tiered-bracket-bars.test.tsx` (new), `tests/e2e/tiered-bracket-bars.spec.ts` (new), `tests/unit/tax-explainer.test.tsx` (updated test IDs), `tests/unit/milestone-10-e2e-infra.test.ts` (updated test IDs), `tests/unit/changelog.test.ts`
+- **Tests**: T1: 1245 passed, 0 failed (76 files). T2: 36 passed, 0 failed (tiered-bracket-bars + tax-explainer + milestone-10 + milestone-11)
+- **Screenshots**:
+  ![Tiered bracket bars](screenshots/task-102-tiered-bracket-bars.png)
+  ![Provincial bracket bars](screenshots/task-102-provincial-bracket-bars.png)
+  ![Unfilled bracket tiers](screenshots/task-102-unfilled-bracket-tiers.png)
+- **Notes**: Pre-existing test failures in zero-income E2E tests were fixed in a separate commit — they assumed deleting salary alone produced zero income, but Task 100's investment interest from assets kept income non-zero. Fix: also delete assets before checking zero-income behavior.

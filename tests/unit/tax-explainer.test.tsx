@@ -42,13 +42,14 @@ describe("TaxExplainerContent", () => {
     expect(screen.getByTestId("tax-explainer")).toBeInTheDocument();
   });
 
-  it("renders bracket bar with segments", () => {
+  it("renders tiered bracket bars with fill indicators", () => {
     render(<TaxExplainerContent details={sampleDetails} />);
-    expect(screen.getByTestId("tax-bracket-bar")).toBeInTheDocument();
-    expect(screen.getByTestId("tax-bracket-segment-0")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-table")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-row-0")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-fill-0")).toBeInTheDocument();
   });
 
-  it("renders multiple bracket segments when income spans brackets", () => {
+  it("renders multiple tiered bracket rows when income spans brackets", () => {
     const multiDetails: TaxExplainerDetails = {
       ...sampleDetails,
       grossIncome: 100000,
@@ -58,8 +59,10 @@ describe("TaxExplainerContent", () => {
       ],
     };
     render(<TaxExplainerContent details={multiDetails} />);
-    expect(screen.getByTestId("tax-bracket-segment-0")).toBeInTheDocument();
-    expect(screen.getByTestId("tax-bracket-segment-1")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-row-0")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-row-1")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-fill-0")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-fill-1")).toBeInTheDocument();
   });
 
   it("renders federal and provincial tax amounts", () => {
@@ -273,9 +276,9 @@ describe("TaxExplainerContent zero income", () => {
     expect(screen.getByTestId("tax-federal-brackets-row-2")).toBeInTheDocument();
   });
 
-  it("does NOT render bracket bar visualization for zero income", () => {
+  it("does NOT render fill bars for zero income brackets", () => {
     render(<TaxExplainerContent details={zeroIncomeDetails} />);
-    expect(screen.queryByTestId("tax-bracket-bar")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("tax-federal-brackets-fill-0")).not.toBeInTheDocument();
   });
 
   it("shows dash for tax amount in zero-income brackets", () => {
