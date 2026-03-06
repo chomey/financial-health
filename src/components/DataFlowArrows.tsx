@@ -82,6 +82,7 @@ export interface RunwayTimeSeriesPoint {
 export interface RunwayWithdrawalOrderEntry {
   category: string;
   taxTreatment: string;
+  roiTaxTreatment?: "capital-gains" | "income";
   startingBalance: number;
   estimatedTaxCost: number;
 }
@@ -754,19 +755,27 @@ function RunwayExplainerContent({ details }: { details: RunwayExplainerDetails }
         // Group by treatment
         const grouped: Record<string, { categories: string[]; total: number }> = {
           "tax-free": { categories: [], total: 0 },
-          "taxable": { categories: [], total: 0 },
+          "taxable-income": { categories: [], total: 0 },
+          "taxable-capgains": { categories: [], total: 0 },
           "tax-deferred": { categories: [], total: 0 },
         };
         for (const entry of details.withdrawalOrder) {
-          const g = grouped[entry.taxTreatment];
-          if (g) {
-            g.categories.push(entry.category);
-            g.total += entry.startingBalance;
+          if (entry.taxTreatment === "taxable") {
+            const key = entry.roiTaxTreatment === "income" ? "taxable-income" : "taxable-capgains";
+            grouped[key].categories.push(entry.category);
+            grouped[key].total += entry.startingBalance;
+          } else {
+            const g = grouped[entry.taxTreatment];
+            if (g) {
+              g.categories.push(entry.category);
+              g.total += entry.startingBalance;
+            }
           }
         }
         const treatments = [
           { label: "Tax-free", sublabel: "No tax on withdrawal", color: "bg-green-100 text-green-700 border-green-200", barColor: "bg-green-400", data: grouped["tax-free"] },
-          { label: "Taxable", sublabel: "Gains taxed at capital gains rate", color: "bg-amber-50 text-amber-700 border-amber-200", barColor: "bg-amber-400", data: grouped["taxable"] },
+          { label: "Taxable (Interest)", sublabel: "Returns taxed annually as income", color: "bg-orange-50 text-orange-700 border-orange-200", barColor: "bg-orange-400", data: grouped["taxable-income"] },
+          { label: "Taxable (Capital Gains)", sublabel: "Gains taxed only on withdrawal", color: "bg-amber-50 text-amber-700 border-amber-200", barColor: "bg-amber-400", data: grouped["taxable-capgains"] },
           { label: "Tax-deferred", sublabel: "Full withdrawal taxed as income", color: "bg-rose-50 text-rose-700 border-rose-200", barColor: "bg-rose-400", data: grouped["tax-deferred"] },
         ];
 
