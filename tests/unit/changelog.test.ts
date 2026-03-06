@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for all 61 completed tasks", () => {
-    expect(CHANGELOG.length).toBe(61);
+  it("contains entries for all 63 completed tasks", () => {
+    expect(CHANGELOG.length).toBe(63);
   });
 
   it("has unique version numbers", () => {
@@ -11,11 +11,11 @@ describe("changelog data", () => {
     expect(new Set(versions).size).toBe(versions.length);
   });
 
-  it("covers versions 1 through 61", () => {
+  it("covers versions 1 through 63", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(61);
-    for (let i = 1; i <= 61; i++) {
+    expect(versions[versions.length - 1]).toBe(63);
+    for (let i = 1; i <= 63; i++) {
       expect(versions).toContain(i);
     }
   });
@@ -48,25 +48,29 @@ describe("changelog data", () => {
 describe("getChangelogByMilestone", () => {
   it("returns 6 milestone groups", () => {
     const milestones = getChangelogByMilestone();
-    expect(milestones.length).toBe(6);
+    expect(milestones.length).toBe(7);
   });
 
-  it("contains all 61 entries across all groups", () => {
+  it("contains all 63 entries across all groups", () => {
     const milestones = getChangelogByMilestone();
     const totalEntries = milestones.reduce((sum, m) => sum + m.entries.length, 0);
-    expect(totalEntries).toBe(61);
+    expect(totalEntries).toBe(63);
   });
 
   it("groups entries correctly by milestone range", () => {
     const milestones = getChangelogByMilestone();
+    // Withdrawal Tax Modeling: 62-63
+    expect(milestones[0].milestone).toBe("Withdrawal Tax Modeling");
+    expect(milestones[0].entries.length).toBe(2);
+    expect(milestones[0].entries.every((e) => e.version >= 62 && e.version <= 63)).toBe(true);
     // Multi-Currency: 56-61
-    expect(milestones[0].milestone).toBe("Multi-Currency Support");
-    expect(milestones[0].entries.length).toBe(6);
-    expect(milestones[0].entries.every((e) => e.version >= 56 && e.version <= 61)).toBe(true);
+    expect(milestones[1].milestone).toBe("Multi-Currency Support");
+    expect(milestones[1].entries.length).toBe(6);
+    expect(milestones[1].entries.every((e) => e.version >= 56 && e.version <= 61)).toBe(true);
     // Foundation: 1-14
-    expect(milestones[5].milestone).toBe("Foundation & Initial Build");
-    expect(milestones[5].entries.length).toBe(14);
-    expect(milestones[5].entries.every((e) => e.version >= 1 && e.version <= 14)).toBe(true);
+    expect(milestones[6].milestone).toBe("Foundation & Initial Build");
+    expect(milestones[6].entries.length).toBe(14);
+    expect(milestones[6].entries.every((e) => e.version >= 1 && e.version <= 14)).toBe(true);
   });
 
   it("each milestone has a non-empty name", () => {
