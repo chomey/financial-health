@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Full currency formatting in explainer modals
+  {
+    version: 103,
+    title: "Full currency formatting in explainer modals",
+    description: "Explainer modal totals and item rows now show full formatted currency (e.g., CA$12,476,711) instead of abbreviated values like $12477k. Items in a foreign currency display the currency code (e.g., USD). All explainer content — tax brackets, runway obligations, withdrawal order — uses proper Intl.NumberFormat with the correct currency code.",
+    date: "2026-03-06",
+  },
   // Tax bracket redesign
   {
     version: 102,
