@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 76
-- **Completed**: 70
-- **Remaining**: 6
+- **Completed**: 71
+- **Remaining**: 5
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1491,3 +1491,23 @@
   ![Collapsed section with source attribute](screenshots/task-70-collapsed-section-source.png)
   ![Sources registered, no arrows](screenshots/task-70-sources-registered-no-arrows.png)
 - **Notes**: Pre-existing changelog test failure (expected 69 entries but test checked for 68) was fixed in a separate commit. The `useOptionalDataFlow` hook was created to prevent entry component unit tests from crashing when rendered outside a DataFlowProvider. All 6 entry components now register individual rows as sub-sources, enabling future tasks (71-74) to target specific items with arrows.
+
+## Task 71: Wire Net Worth metric card to show data-flow arrows on hover
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/SnapshotDashboard.tsx`: Updated MetricCard to register as a data-flow target via DataFlowContext. Added `DataFlowConnectionDef` type and `connections` prop. On hover/focus, MetricCard activates arrow connections and highlights source sections with `data-dataflow-highlighted` attribute (positive=green, negative=red). On leave/blur, arrows fade and highlights clear. Added `data-testid` for each metric card. Breakdown text gets enhanced styling when arrows are active.
+  - `src/app/page.tsx`: Built Net Worth connection definitions mapping to section-assets (green), section-stocks (green), section-property (green, conditional on equity > 0), and section-debts (red). Passes `dataFlowConnections` prop to SnapshotDashboard.
+  - `src/app/globals.css`: Added CSS keyframe animations for source highlighting (`source-highlight-green`, `source-highlight-red`) and attribute selectors for `[data-dataflow-highlighted]`.
+  - `src/lib/changelog.ts`: Added v71 entry.
+  - `tests/unit/changelog.test.ts`: Updated expectations for 71 entries and 3 milestone-8 entries.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/net-worth-data-flow.test.tsx`: 13 tests — MetricCard rendering with data-testid, connections without provider, connection type structure, zero-value filtering, property equity connection, hover/leave/focus interactions, positive/negative sign mapping, label formatting, backward compatibility (13 passed, 0 failed)
+  - `tests/e2e/net-worth-data-flow.spec.ts`: 5 tests — hover shows overlay with arrow paths, source sections highlighted (assets=positive, debts=negative), arrows disappear on leave, breakdown visible on hover, keyboard focus activates arrows (5 passed, 0 failed)
+  - All unit tests: 881 passed, 0 failed (54 test files)
+- **Screenshots**:
+  ![Net Worth arrows on hover](screenshots/task-71-net-worth-arrows.png)
+  ![Source section highlights](screenshots/task-71-source-highlights.png)
+  ![Keyboard focus arrows](screenshots/task-71-keyboard-focus-arrows.png)
+- **Notes**: The `DataFlowConnectionDef` type is exported from SnapshotDashboard for use by page.tsx. MetricCard uses `useOptionalDataFlow` to gracefully handle rendering outside a DataFlowProvider (unit tests). Source highlighting uses CSS attribute selectors on `[data-dataflow-highlighted]` with keyframe glow animations. Connections with value=0 are filtered out to avoid drawing arrows to empty sections. The fmtLabel helper formats values as compact +$Xk/-$Xk labels for arrow midpoint pills.
