@@ -139,19 +139,17 @@ describe("investment contributions in surplus", () => {
 
     it("contributions compound with ROI over multiple years", () => {
       // $500/mo contribution at 12% annual ROI (1% monthly) on $10,000 starting balance
+      // Income must exceed expenses after tax to avoid triggering drawdown mode
       const state = makeState({
         assets: [{ id: "a1", category: "Savings", amount: 10000, roi: 12, monthlyContribution: 500 }],
-        income: [{ id: "i1", category: "Salary", amount: 5000 }],
+        income: [{ id: "i1", category: "Salary", amount: 7000 }],
         expenses: [{ id: "e1", category: "Rent", amount: 4500 }],
       });
       const result = projectFinances(state, 3);
 
-      // Contributions still compound with ROI regardless of tax
       // After year 1: FV of $10k at 1%/mo + $500/mo annuity contribution
       const year1 = result.points[12].totalAssets;
-      // After-tax surplus is small or negative, but contributions of $500 still happen
       // Base case: 10000*(1.01)^12 ≈ 11268 + annuity FV ≈ 6341 = ~17609
-      // With after-tax surplus being small/negative, less surplus is added
       expect(year1).toBeGreaterThan(17000);
 
       // Compounding should still accelerate gains
