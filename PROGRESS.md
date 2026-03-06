@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 92
-- **Completed**: 90
-- **Remaining**: 2
+- **Completed**: 91
+- **Remaining**: 1
 - **Last Updated**: 2026-03-06
 
 ---
@@ -1940,3 +1940,22 @@
   ![Withdrawal order on main page](screenshots/task-90-withdrawal-order-main.png)
   ![Runway explainer condensed](screenshots/task-90-runway-explainer-condensed.png)
 - **Notes**: The burndown chart is now full-width on the main page, making it much easier to read compared to the narrow modal sidebar. The recharts Legend component renders `<li>` elements containing category names (TFSA, RRSP, etc.), which caused strict mode violations in Playwright tests that used `getByRole("listitem")` to find asset rows. Fixed by scoping selectors to `#assets`/`#income` sections. Pre-existing changelog test failure (expected 88 entries, had 89) was fixed in a separate commit.
+
+## Task 91: Asset ROI tax treatment toggle — income vs capital gains
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/AssetEntry.tsx`: Added `RoiTaxTreatment` type (`"capital-gains" | "income"`) and `roiTaxTreatment` field to `Asset` interface. Added `getDefaultRoiTaxTreatment()` (savings-type → "income", investment → "capital-gains"), `shouldShowRoiTaxToggle()` (hides for TFSA, Roth IRA, FHSA, HSA). Added toggle button in asset detail row between ROI badge and monthly contribution badge, shown only when ROI > 0 and not tax-sheltered.
+  - `src/lib/withdrawal-tax.ts`: Added optional `roiTaxTreatment` parameter to `getWithdrawalTaxRate()`. When "income", taxable account gains use employment income tax rate instead of capital gains rate.
+  - `src/lib/financial-state.ts`: Updated `DetailedBucket` type, `simulateRunwayWithTax()`, `simulateRunwayTimeSeries()`, `computeMetrics()`, and `computeWithdrawalTaxSummary()` to pass `roiTaxTreatment` through the withdrawal tax simulation pipeline.
+  - `src/lib/url-state.ts`: Added `rt` field to `CompactAsset`. Encodes `roiTaxTreatment` only when "income" (omits default "capital-gains"). Decodes on load.
+  - `src/lib/changelog.ts`: Added v91 changelog entry.
+  - `tests/unit/changelog.test.ts`: Updated to expect 91 entries, 4 entries in UI Polish milestone group.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/roi-tax-treatment.test.ts`: 12 tests — getDefaultRoiTaxTreatment (savings-type returns "income", investment returns "capital-gains"), shouldShowRoiTaxToggle (false for tax-sheltered, true for taxable/deferred), getWithdrawalTaxRate with roiTaxTreatment (income higher than cap gains, no effect on tax-free/deferred), URL state roundtrip (persists "income", omits undefined, omits "capital-gains"). All 12 passed, 0 failed.
+  - `tests/e2e/roi-tax-treatment.spec.ts`: 6 tests — shows toggle for savings with ROI > 0, hidden for TFSA, toggles between values, shows on Brokerage with cap-gains default, persists through URL reload. All 6 passed, 0 failed.
+  - All T1 unit tests: 1087 passed, 0 failed.
+- **Screenshots**:
+  ![ROI tax treatment toggle](screenshots/task-91-roi-tax-treatment-toggle.png)
+- **Notes**: The toggle uses a compact button with amber styling for "Interest income" and blue for "Capital gains". Tax-sheltered accounts (TFSA, Roth IRA, FHSA, HSA) hide the toggle since ROI is tax-free regardless. The `roiTaxTreatment` is only stored in URL state when explicitly set to "income" — "capital-gains" is the URL default and is omitted for compactness.
