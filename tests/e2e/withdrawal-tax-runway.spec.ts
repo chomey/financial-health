@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Withdrawal Tax Runway", () => {
-  test("shows tax drag on main page burndown chart with large RRSP balance", async ({ page }) => {
+  test("shows tax drag in burndown summary with large RRSP balance", async ({ page }) => {
     await page.goto("/");
 
     // Default state has Savings ($5k), TFSA ($22k), RRSP ($28k)
@@ -16,16 +16,20 @@ test.describe("Withdrawal Tax Runway", () => {
     // Wait for dashboard metrics to recalculate with animation
     await page.waitForTimeout(1500);
 
-    // Tax drag annotation should be visible on the main page burndown chart
-    const taxDrag = page.locator('[data-testid="burndown-tax-drag"]');
-    await expect(taxDrag).toBeVisible({ timeout: 5000 });
-    const taxDragText = await taxDrag.textContent();
-    expect(taxDragText).toContain("months tax drag");
+    // Switch to Income Stops mode to see burndown
+    const chart = page.locator('[data-testid="projection-chart"]');
+    await chart.locator('[data-testid="mode-income-stops"]').click();
+
+    // Tax drag info should be in the burndown summary text
+    const burndownSummary = chart.locator('[data-testid="burndown-summary"]');
+    await expect(burndownSummary).toBeVisible({ timeout: 5000 });
+    const summaryText = await burndownSummary.textContent();
+    expect(summaryText).toContain("withdrawal taxes");
 
     await captureScreenshot(page, "task-64-withdrawal-tax-runway");
   });
 
-  test("no tax drag on main page when only tax-free accounts", async ({ page }) => {
+  test("no tax drag in summary when only tax-free accounts", async ({ page }) => {
     await page.goto("/");
 
     // Delete RRSP (tax-deferred) and Savings Account (taxable)
@@ -43,8 +47,14 @@ test.describe("Withdrawal Tax Runway", () => {
     await page.getByLabel("Delete Savings Account").click();
     await page.waitForTimeout(1500);
 
-    // Only TFSA (tax-free) remains — no tax drag annotation on main page
-    const taxDrag = page.locator('[data-testid="burndown-tax-drag"]');
-    await expect(taxDrag).not.toBeVisible();
+    // Switch to Income Stops mode
+    const chart = page.locator('[data-testid="projection-chart"]');
+    await chart.locator('[data-testid="mode-income-stops"]').click();
+
+    // Only TFSA (tax-free) remains — summary should NOT mention withdrawal taxes
+    const burndownSummary = chart.locator('[data-testid="burndown-summary"]');
+    await expect(burndownSummary).toBeVisible({ timeout: 5000 });
+    const summaryText = await burndownSummary.textContent();
+    expect(summaryText).not.toContain("withdrawal taxes");
   });
 });

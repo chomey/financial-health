@@ -699,9 +699,9 @@ function RunwayExplainerContent({ details }: { details: RunwayExplainerDetails }
 
   return (
     <div className="space-y-5" data-testid="runway-explainer">
-      {/* Note pointing to main page chart */}
+      {/* Note pointing to unified chart */}
       <p className="text-xs text-stone-500 italic" data-testid="runway-chart-note">
-        See the burndown chart above for the full visualization.
+        Switch to &quot;Income Stops&quot; mode on the projection chart above for the full burndown visualization.
       </p>
 
       {/* Monthly obligation breakdown */}

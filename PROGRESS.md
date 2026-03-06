@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 99
-- **Completed**: 97
-- **Remaining**: 2
+- **Completed**: 98
+- **Remaining**: 1
 - **Last Updated**: 2026-03-06
 
 ---
@@ -2118,3 +2118,35 @@
   ![Runway explainer with withdrawal tax content](screenshots/task-97-runway-explainer-with-withdrawal-tax.png)
   ![Runway card with after-tax sub-line](screenshots/task-97-runway-card-after-tax.png)
 - **Notes**: The `WithdrawalTaxSummary` component file still exists but is no longer rendered on the page. It could be deleted in a future cleanup task. All withdrawal tax information is now consolidated in the Financial Runway explainer modal, accessible by clicking the Financial Runway metric card.
+
+## Task 98: Merge projection chart and runway burndown into a single multi-mode chart
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/ProjectionChart.tsx`: Added `runwayDetails` prop, `ChartMode` state ("keep-earning" / "income-stops"), pill-style mode tabs, burndown chart view (summary, legend, chart, starting balances, withdrawal order), surplus subtitle ("Income $X - Expenses $Y = $W surplus/mo"), stopPropagation on mode tabs to prevent ZoomableCard overlay triggering. Imported `RunwayExplainerDetails` and `buildSummary` from existing components.
+  - `src/app/page.tsx`: Removed `RunwayBurndownChart` import and standalone rendering. Passes `runwayDetails` prop to `ProjectionChart` for unified chart.
+  - `src/components/DataFlowArrows.tsx`: Updated `RunwayExplainerContent` chart note from "burndown chart above" to "Income Stops mode on the projection chart above".
+  - `tests/unit/unified-chart.test.tsx`: **New** — 12 T1 unit tests for mode tabs, mode switching, burndown view content, scenario button visibility, surplus subtitle.
+  - `tests/e2e/runway-burndown-main.spec.ts`: Rewritten — 4 tests for unified chart mode switching, burndown in Income Stops mode, explainer modal referencing Income Stops.
+  - `tests/e2e/withdrawal-tax-runway.spec.ts`: Updated to switch to Income Stops mode before checking burndown summary.
+  - `tests/e2e/runway-explainer.spec.ts`: Updated chart note text to "Income Stops", tax drag test uses mode-income-stops tab.
+  - `tests/e2e/withdrawal-pills-overflow.spec.ts`: Updated to switch to Income Stops mode for burndown pills test.
+  - `tests/e2e/milestone-6-e2e.spec.ts`: Updated burndown-summary references to use Income Stops tab switching.
+  - `tests/e2e/milestone-10-e2e.spec.ts`: Updated burndown tests to use mode-income-stops tab, chart note to reference "Income Stops".
+  - `tests/unit/milestone-10-e2e-infra.test.ts`: Updated expected testid from `runway-burndown-main` to `mode-income-stops`.
+  - `tests/unit/changelog.test.ts`: Updated counts for 98 entries and 11 entries in UI Polish milestone group.
+  - `src/lib/changelog.ts`: Added v98 changelog entry.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/unified-chart.test.tsx`: 12 passed (all new)
+  - All 73 unit test files: 1204 passed, 0 failed
+  - `tests/e2e/runway-burndown-main.spec.ts`: 4 passed
+  - `tests/e2e/withdrawal-tax-runway.spec.ts`: 2 passed
+  - `tests/e2e/runway-explainer.spec.ts`: 6 passed
+  - `tests/e2e/withdrawal-pills-overflow.spec.ts`: 2 passed
+  - `tests/e2e/milestone-6-e2e.spec.ts`: 5 passed
+  - `tests/e2e/milestone-10-e2e.spec.ts`: 11 passed
+- **Screenshots**:
+  ![Income Stops burndown view](screenshots/task-98-burndown-income-stops.png)
+  ![Withdrawal order in Income Stops](screenshots/task-98-withdrawal-order.png)
+- **Notes**: The `RunwayBurndownChart` component file still exists and exports `buildSummary` which is imported by the unified `ProjectionChart`. The component itself is no longer rendered standalone. Mode tabs use `stopPropagation` on click to prevent the parent `ZoomableCard` overlay from opening when switching modes. Pre-existing test failures were fixed in a separate commit (runway-explainer tests had incorrect testids and stale assertions).

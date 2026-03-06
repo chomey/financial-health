@@ -30,12 +30,12 @@ test.describe("Withdrawal order pills overflow fix", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // The burndown chart should be visible on the page
-    const burndown = page.locator('[data-testid="runway-burndown-main"]');
-    await expect(burndown).toBeVisible();
+    // Switch to Income Stops mode to see burndown content
+    const chart = page.locator('[data-testid="projection-chart"]');
+    await chart.locator('[data-testid="mode-income-stops"]').click();
 
     // Check withdrawal order section exists in burndown
-    const withdrawalOrder = burndown.locator('[data-testid="burndown-withdrawal-order"]');
+    const withdrawalOrder = chart.locator('[data-testid="burndown-withdrawal-order"]');
     await expect(withdrawalOrder).toBeVisible();
 
     // Check that pills container uses flex-wrap

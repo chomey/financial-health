@@ -69,11 +69,14 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await rrspInput.press("Enter");
     await page.waitForTimeout(1500);
 
-    // Tax drag info is in the burndown chart summary text
-    const burndownSummary = page.locator('[data-testid="burndown-summary"]');
+    // Tax drag info is in the burndown chart summary text (switch to Income Stops mode)
+    const projChart = page.locator('[data-testid="projection-chart"]');
+    await projChart.locator('[data-testid="mode-income-stops"]').click();
+    const burndownSummary = projChart.locator('[data-testid="burndown-summary"]');
     await expect(burndownSummary).toBeVisible({ timeout: 5000 });
     const summaryText = await burndownSummary.textContent();
     expect(summaryText).toContain("withdrawal taxes");
+    await projChart.locator('[data-testid="mode-keep-earning"]').click();
 
     await captureScreenshot(page, "task-68-runway-after-tax-rrsp-heavy");
 
@@ -184,12 +187,15 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await page.getByLabel("Delete Savings Account").click();
     await page.waitForTimeout(1500);
 
-    // Only TFSA (tax-free) remains — summary should not mention withdrawal taxes
-    const burndownSummaryTf = page.locator('[data-testid="burndown-summary"]');
+    // Only TFSA (tax-free) remains — switch to Income Stops and verify no tax drag
+    const tfChart = page.locator('[data-testid="projection-chart"]');
+    await tfChart.locator('[data-testid="mode-income-stops"]').click();
+    const burndownSummaryTf = tfChart.locator('[data-testid="burndown-summary"]');
     if (await burndownSummaryTf.isVisible()) {
       const text = await burndownSummaryTf.textContent();
       expect(text).not.toContain("withdrawal taxes");
     }
+    await tfChart.locator('[data-testid="mode-keep-earning"]').click();
 
     await captureScreenshot(page, "task-68-tax-free-only-no-drag");
   });
@@ -253,9 +259,12 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     const k401CostBasis = k401Row.locator('[data-testid^="cost-basis-badge-"]');
     await expect(k401CostBasis).toHaveCount(0);
 
-    // Tax drag info is in the burndown chart summary text
-    const usBurndownSummary = page.locator('[data-testid="burndown-summary"]');
+    // Tax drag info is in the burndown chart summary text (switch to Income Stops mode)
+    const usChart = page.locator('[data-testid="projection-chart"]');
+    await usChart.locator('[data-testid="mode-income-stops"]').click();
+    const usBurndownSummary = usChart.locator('[data-testid="burndown-summary"]');
     await expect(usBurndownSummary).toBeVisible({ timeout: 5000 });
+    await usChart.locator('[data-testid="mode-keep-earning"]').click();
 
     // Withdrawal tax content should be in Financial Runway explainer
     const usRunwayCard = page.locator('[data-testid="metric-card-financial-runway"]');
