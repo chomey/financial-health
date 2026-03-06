@@ -13,6 +13,12 @@ export const CHANGELOG: ChangelogEntry[] = [
     description: "New withdrawal-tax module classifies accounts as tax-free (TFSA, Roth IRA), tax-deferred (RRSP, 401k), or taxable (Brokerage) and computes withdrawal tax impact including capital gains handling.",
     date: "2026-03-05",
   },
+  {
+    version: 62,
+    title: "Changelog page",
+    description: "New /changelog page displaying version history grouped by milestone with all completed tasks.",
+    date: "2026-03-05",
+  },
   // Multi-Currency Support (Milestone 6)
   {
     version: 61,
@@ -395,6 +401,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
+    { milestone: "Withdrawal Tax Modeling", range: [62, 63] as const },
     { milestone: "Multi-Currency Support", range: [56, 61] as const },
     { milestone: "Kubera-Inspired Visualizations", range: [48, 55] as const },
     { milestone: "Tax Computation & Enhancements", range: [37, 47] as const },
