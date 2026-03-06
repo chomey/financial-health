@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Metric-Specific Explainers (Milestone 11)
   {
+    version: 85,
+    title: "Interactive burndown chart in Financial Runway explainer",
+    description: "Clicking the Financial Runway metric card now opens a burndown chart showing account balances depleting over time as stacked areas per account category (using recharts AreaChart). Includes a dashed 'without growth' comparison line, a tax drag overlay showing the impact of withdrawal taxes, a numbered withdrawal order list with tax treatment labels and estimated tax costs, and a monthly obligations breakdown. The runwayAfterTax sub-line was removed from the metric card since tax drag is now visualized directly in the chart.",
+    date: "2026-03-06",
+  },
+  {
     version: 84,
     title: "Tax bracket visualization in Estimated Tax explainer",
     description: "Clicking the Estimated Tax metric card now opens a tax-specific explainer modal with a horizontal stacked bar showing income by tax bracket (colored segments from light to deep green), federal and provincial/state tax breakdown with jurisdiction name, effective vs marginal rate comparison, capital gains section (CA inclusion rates or US bracket rates) when applicable, and a Gross → Tax → After-tax income flow summary.",

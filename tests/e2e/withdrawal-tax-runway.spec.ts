@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Withdrawal Tax Runway", () => {
-  test("shows tax-adjusted runway with large RRSP balance", async ({ page }) => {
+  test("shows tax drag in runway explainer with large RRSP balance", async ({ page }) => {
     await page.goto("/");
 
     // Default state has Savings ($5k), TFSA ($22k), RRSP ($28k)
@@ -16,21 +16,24 @@ test.describe("Withdrawal Tax Runway", () => {
     // Wait for dashboard metrics to recalculate with animation
     await page.waitForTimeout(1500);
 
-    // Verify Financial Runway card exists
+    // Click Financial Runway card to open explainer
     const runwayCard = page.locator('[aria-label="Financial Runway"]');
     await expect(runwayCard).toBeVisible();
+    await runwayCard.click();
 
-    // The tax-adjusted runway annotation should appear
-    const afterTaxElement = page.locator('[data-testid="runway-after-tax"]');
-    await expect(afterTaxElement).toBeVisible({ timeout: 5000 });
-    const afterTaxText = await afterTaxElement.textContent();
-    expect(afterTaxText).toContain("after withdrawal tax");
-    expect(afterTaxText).toContain("mo");
+    // Tax drag is now shown in the explainer modal, not as a sub-line
+    const modal = page.locator('[data-testid="explainer-modal"]');
+    await expect(modal).toBeVisible();
+
+    const taxDrag = page.locator('[data-testid="runway-tax-drag"]');
+    await expect(taxDrag).toBeVisible({ timeout: 5000 });
+    const taxDragText = await taxDrag.textContent();
+    expect(taxDragText).toContain("Tax drag:");
 
     await captureScreenshot(page, "task-64-withdrawal-tax-runway");
   });
 
-  test("no tax-adjusted runway when only tax-free accounts", async ({ page }) => {
+  test("no tax drag in runway explainer when only tax-free accounts", async ({ page }) => {
     await page.goto("/");
 
     // Delete RRSP (tax-deferred) and Savings Account (taxable)
@@ -44,8 +47,15 @@ test.describe("Withdrawal Tax Runway", () => {
     await page.getByLabel("Delete Savings Account").click();
     await page.waitForTimeout(1500);
 
-    // Only TFSA (tax-free) remains — no tax drag
-    const afterTaxElement = page.locator('[data-testid="runway-after-tax"]');
-    await expect(afterTaxElement).not.toBeVisible();
+    // Open runway explainer
+    const runwayCard = page.locator('[aria-label="Financial Runway"]');
+    await runwayCard.click();
+
+    const modal = page.locator('[data-testid="explainer-modal"]');
+    await expect(modal).toBeVisible();
+
+    // Only TFSA (tax-free) remains — no tax drag annotation
+    const taxDrag = page.locator('[data-testid="runway-tax-drag"]');
+    await expect(taxDrag).not.toBeVisible();
   });
 });

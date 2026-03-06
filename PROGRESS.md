@@ -9,8 +9,8 @@
 -->
 
 ## Summary
-- **Total Tasks**: 87
-- **Completed**: 84
+- **Total Tasks**: 88
+- **Completed**: 85
 - **Remaining**: 3
 - **Last Updated**: 2026-03-06
 
@@ -1819,3 +1819,25 @@
 - **Screenshots**:
   ![Tax explainer with bracket visualization](screenshots/task-84-tax-explainer.png)
 - **Notes**: Fixed pre-existing changelog test failure (task 83 added v83 entry but tests expected 82; committed fix separately). The `metricType` field on `ActiveTargetMeta` enables the ExplainerModal to render metric-specific content — the tax explainer replaces the generic source-card layout with a rich bracket visualization. The `TaxExplainerDetails` are computed in `financial-state.ts` and passed through the MetricData → MetricCard → DataFlowContext → ExplainerModal chain. This pattern is extensible for future metric-specific explainers (tasks 85-86).
+
+## Task 85: Build Financial Runway explainer with interactive burndown chart
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/lib/financial-state.ts`: Added `simulateRunwayTimeSeries()` function that runs three parallel month-by-month simulations (with growth, without growth, with tax-aware withdrawals) and returns time series data for charting. Added `buildRunwayExplainerDetails()` that assembles the RunwayExplainerDetails from detailed buckets. Added `RunwayExplainerDetails` data to the Financial Runway MetricData.
+  - `src/components/DataFlowArrows.tsx`: Added `RunwayExplainerContent` component with recharts AreaChart showing stacked account balances, dashed "without growth" comparison line, amber "with tax" overlay, growth extension and tax drag annotations, numbered withdrawal order list with tax treatment labels and estimated tax costs, and monthly obligations breakdown. Added `RunwayTimeSeriesPoint`, `RunwayWithdrawalOrderEntry`, `RunwayExplainerDetails` interfaces. Wired into ExplainerModal for `metricType === "financial-runway"`.
+  - `src/components/SnapshotDashboard.tsx`: Added `runwayDetails` field to MetricData. Removed `runwayAfterTax` sub-line from MetricCard (tax drag now shown in explainer chart). Passes `runwayDetails` to ActiveTargetMeta when Financial Runway is clicked.
+  - `tests/e2e/withdrawal-tax-runway.spec.ts`: Updated to check tax drag in explainer modal instead of removed sub-line
+  - `tests/e2e/milestone-6-e2e.spec.ts`: Updated all `runway-after-tax` assertions to use explainer modal `runway-tax-drag` instead
+  - `tests/unit/milestone-6-e2e-infra.test.ts`: Updated to check for `runway-tax-drag` instead of `runway-after-tax`
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/runway-explainer.test.ts`: 12 tests — simulateRunwayTimeSeries (empty cases, initial balances, depletion, growth extension, tax drag, multiple categories), computeMetrics runwayDetails (presence, withdrawal order sorting, mortgage in obligations, time series data, no obligations case)
+  - `tests/e2e/runway-explainer.spec.ts`: 6 tests — burndown chart opens, withdrawal order with labels, close on Escape, close on backdrop click, runwayAfterTax sub-line removed, tax drag annotation visible
+  - All T1 unit tests: 1051 passed, 0 failed (65 test files)
+  - All T2 E2E tests: 253 passed, 0 failed
+- **Screenshots**:
+  ![Runway burndown chart explainer](screenshots/task-85-runway-explainer-chart.png)
+  ![Withdrawal order](screenshots/task-85-withdrawal-order.png)
+  ![Tax drag annotation](screenshots/task-85-runway-tax-drag.png)
+- **Notes**: The `simulateRunwayTimeSeries` function runs three parallel simulations: (1) with growth + proportional withdrawal, (2) without growth + proportional withdrawal, (3) with growth + tax-aware priority withdrawal. The tax scenario uses the same ordering as `simulateRunwayWithTax` (tax-free → taxable → tax-deferred) and the same gross-up logic. The `runwayAfterTax` sub-line was removed from the MetricCard as the task requires — tax drag is now visualized directly on the burndown chart with a shaded amber area. The `runwayAfterTax` field still exists in MetricData for backward compatibility with any code that reads it.

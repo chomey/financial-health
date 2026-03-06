@@ -109,10 +109,149 @@ function simulateRunwayWithTax(
   return MAX_MONTHS;
 }
 
+/**
+ * Simulate runway month-by-month, returning a time series for charting.
+ * Captures per-account balances each month with both growth-aware and no-growth scenarios.
+ * Uses tax-aware withdrawal ordering (tax-free → taxable → tax-deferred).
+ */
+export function simulateRunwayTimeSeries(
+  buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number }[],
+  monthlyWithdrawal: number,
+  country: "CA" | "US",
+  jurisdiction: string,
+): { withGrowth: RunwayTimeSeriesPoint[]; withoutGrowth: RunwayTimeSeriesPoint[]; withTax: RunwayTimeSeriesPoint[] } {
+  if (monthlyWithdrawal <= 0 || buckets.length === 0) {
+    return { withGrowth: [], withoutGrowth: [], withTax: [] };
+  }
+
+  const MAX_MONTHS = 600; // Cap at 50 years for charting
+  const categories = buckets.map((b) => b.category);
+
+  // Priority order: tax-free (0), taxable (1), tax-deferred (2)
+  const priorityMap: Record<TaxTreatment, number> = { "tax-free": 0, "taxable": 1, "tax-deferred": 2 };
+  const sortedIndices = buckets
+    .map((_, i) => i)
+    .sort((a, b) => priorityMap[buckets[a].taxTreatment] - priorityMap[buckets[b].taxTreatment]);
+
+  // Scenario 1: With growth, proportional withdrawal (no tax)
+  const growthBalances = buckets.map((b) => b.balance);
+  const withGrowth: RunwayTimeSeriesPoint[] = [];
+
+  // Scenario 2: Without growth, proportional withdrawal (no tax)
+  const noGrowthBalances = buckets.map((b) => b.balance);
+  const withoutGrowth: RunwayTimeSeriesPoint[] = [];
+
+  // Scenario 3: With growth + tax-aware withdrawal ordering
+  const taxBalances = buckets.map((b) => b.balance);
+  const withTax: RunwayTimeSeriesPoint[] = [];
+
+  const snapshot = (bals: number[]): RunwayTimeSeriesPoint => {
+    const balancesByCategory: Record<string, number> = {};
+    let total = 0;
+    for (let i = 0; i < bals.length; i++) {
+      balancesByCategory[categories[i]] = (balancesByCategory[categories[i]] ?? 0) + bals[i];
+      total += bals[i];
+    }
+    return { month: 0, balances: balancesByCategory, totalBalance: total };
+  };
+
+  // Record initial state
+  const g0 = snapshot(growthBalances); g0.month = 0;
+  withGrowth.push(g0);
+  const n0 = snapshot(noGrowthBalances); n0.month = 0;
+  withoutGrowth.push(n0);
+  const t0 = snapshot(taxBalances); t0.month = 0;
+  withTax.push(t0);
+
+  let growthDone = false, noGrowthDone = false, taxDone = false;
+
+  for (let month = 1; month <= MAX_MONTHS; month++) {
+    if (growthDone && noGrowthDone && taxDone) break;
+
+    // --- With growth (proportional withdrawal) ---
+    if (!growthDone) {
+      let total = 0;
+      for (let i = 0; i < growthBalances.length; i++) total += growthBalances[i];
+      if (total <= 0) { growthDone = true; } else {
+        for (let i = 0; i < growthBalances.length; i++) {
+          const share = growthBalances[i] / total;
+          growthBalances[i] -= monthlyWithdrawal * share;
+          if (growthBalances[i] < 0) growthBalances[i] = 0;
+          growthBalances[i] *= 1 + buckets[i].monthlyRate;
+        }
+        const pt = snapshot(growthBalances);
+        pt.month = month;
+        withGrowth.push(pt);
+        if (pt.totalBalance <= 0) growthDone = true;
+      }
+    }
+
+    // --- Without growth (proportional withdrawal) ---
+    if (!noGrowthDone) {
+      let total = 0;
+      for (let i = 0; i < noGrowthBalances.length; i++) total += noGrowthBalances[i];
+      if (total <= 0) { noGrowthDone = true; } else {
+        for (let i = 0; i < noGrowthBalances.length; i++) {
+          const share = noGrowthBalances[i] / total;
+          noGrowthBalances[i] -= monthlyWithdrawal * share;
+          if (noGrowthBalances[i] < 0) noGrowthBalances[i] = 0;
+          // No growth applied
+        }
+        const pt = snapshot(noGrowthBalances);
+        pt.month = month;
+        withoutGrowth.push(pt);
+        if (pt.totalBalance <= 0) noGrowthDone = true;
+      }
+    }
+
+    // --- With tax (priority withdrawal + tax gross-up + growth) ---
+    if (!taxDone) {
+      let total = 0;
+      for (let i = 0; i < taxBalances.length; i++) total += taxBalances[i];
+      if (total <= 0) { taxDone = true; } else {
+        let remaining = monthlyWithdrawal;
+        for (const idx of sortedIndices) {
+          if (remaining <= 0) break;
+          if (taxBalances[idx] <= 0) continue;
+          const treatment = buckets[idx].taxTreatment;
+          let grossWithdrawal: number;
+          if (treatment === "tax-free") {
+            grossWithdrawal = Math.min(remaining, taxBalances[idx]);
+            remaining -= grossWithdrawal;
+          } else {
+            const annualizedWithdrawal = remaining * 12;
+            const taxResult = getWithdrawalTaxRate(
+              buckets[idx].category, country, jurisdiction,
+              annualizedWithdrawal, buckets[idx].costBasisPercent
+            );
+            const effectiveRate = taxResult.effectiveRate;
+            const grossUpFactor = effectiveRate < 1 ? 1 / (1 - effectiveRate) : 10;
+            grossWithdrawal = Math.min(remaining * grossUpFactor, taxBalances[idx]);
+            const afterTax = grossWithdrawal / grossUpFactor;
+            remaining -= afterTax;
+          }
+          taxBalances[idx] -= grossWithdrawal;
+          if (taxBalances[idx] < 0) taxBalances[idx] = 0;
+        }
+        // Apply growth
+        for (let i = 0; i < taxBalances.length; i++) {
+          taxBalances[i] *= 1 + buckets[i].monthlyRate;
+        }
+        const pt = snapshot(taxBalances);
+        pt.month = month;
+        withTax.push(pt);
+        if (pt.totalBalance <= 0) taxDone = true;
+      }
+    }
+  }
+
+  return { withGrowth, withoutGrowth, withTax };
+}
+
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
 import { computeTax } from "@/lib/tax-engine";
-import type { TaxExplainerDetails, TaxBracketSegment } from "@/components/DataFlowArrows";
+import type { TaxExplainerDetails, TaxBracketSegment, RunwayExplainerDetails, RunwayTimeSeriesPoint, RunwayWithdrawalOrderEntry } from "@/components/DataFlowArrows";
 import { getCanadianBrackets, getUSBrackets, calculateCanadianCapitalGainsInclusion, US_CAPITAL_GAINS_2025, type BracketTable } from "@/lib/tax-tables";
 import { CA_PROVINCES, US_STATES } from "@/components/CountryJurisdictionSelector";
 
@@ -238,6 +377,87 @@ function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: numb
         .filter((i) => i.incomeType === "capital-gains")
         .reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency) * 12, 0),
     } : undefined,
+  };
+}
+
+/**
+ * Build RunwayExplainerDetails for the burndown chart in the Financial Runway explainer.
+ */
+type DetailedBucket = { balance: number; ror: number; category: string; taxTreatment: TaxTreatment; costBasisPercent: number };
+function buildRunwayExplainerDetails(
+  detailedBuckets: DetailedBucket[],
+  monthlyObligations: number,
+  monthlyExpenses: number,
+  totalMortgagePayments: number,
+  runway: number,
+  runwayWithGrowth: number | undefined,
+  runwayAfterTax: number | undefined,
+  country: "CA" | "US",
+  jurisdiction: string,
+): RunwayExplainerDetails | undefined {
+  if (detailedBuckets.length === 0 || monthlyObligations <= 0) return undefined;
+
+  const taxBuckets = detailedBuckets.map((b) => ({
+    balance: b.balance,
+    monthlyRate: b.ror / 100 / 12,
+    taxTreatment: b.taxTreatment,
+    category: b.category,
+    costBasisPercent: b.costBasisPercent,
+  }));
+
+  const timeSeries = simulateRunwayTimeSeries(taxBuckets, monthlyObligations, country, jurisdiction);
+
+  // Deduplicated category list preserving order
+  const categories = [...new Set(detailedBuckets.map((b) => b.category))];
+
+  // Withdrawal order sorted by tax priority
+  const priorityMap: Record<TaxTreatment, number> = { "tax-free": 0, "taxable": 1, "tax-deferred": 2 };
+  const sortedBuckets = [...detailedBuckets].sort((a, b) => priorityMap[a.taxTreatment] - priorityMap[b.taxTreatment]);
+
+  const withdrawalOrder: RunwayWithdrawalOrderEntry[] = sortedBuckets.map((b) => {
+    // Estimate tax cost: for tax-free it's 0, for others rough estimate
+    let estimatedTaxCost = 0;
+    if (b.taxTreatment === "tax-deferred") {
+      // Rough: assume ~25% effective rate on full balance
+      estimatedTaxCost = b.balance * 0.25;
+    } else if (b.taxTreatment === "taxable") {
+      // Rough: gains portion at ~15% rate
+      const gainsPercent = (100 - b.costBasisPercent) / 100;
+      estimatedTaxCost = b.balance * gainsPercent * 0.15;
+    }
+    return {
+      category: b.category,
+      taxTreatment: b.taxTreatment,
+      startingBalance: b.balance,
+      estimatedTaxCost: Math.round(estimatedTaxCost),
+    };
+  });
+
+  // Growth extension
+  const growthExtensionMonths = runwayWithGrowth !== undefined && runwayWithGrowth !== Infinity
+    ? runwayWithGrowth - runway
+    : undefined;
+
+  // Tax drag
+  const baselineRunway = runwayWithGrowth ?? runway;
+  const taxDragMonths = runwayAfterTax !== undefined && baselineRunway !== Infinity
+    ? baselineRunway - runwayAfterTax
+    : undefined;
+
+  return {
+    withGrowth: timeSeries.withGrowth,
+    withoutGrowth: timeSeries.withoutGrowth,
+    withTax: timeSeries.withTax,
+    withdrawalOrder,
+    monthlyExpenses,
+    monthlyMortgage: totalMortgagePayments,
+    monthlyTotal: monthlyObligations,
+    runwayMonths: runway,
+    runwayWithGrowthMonths: runwayWithGrowth,
+    runwayAfterTaxMonths: runwayAfterTax,
+    growthExtensionMonths,
+    taxDragMonths,
+    categories,
   };
 }
 
@@ -493,6 +713,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       breakdown: runwayBreakdown,
       runwayWithGrowth,
       runwayAfterTax,
+      runwayDetails: buildRunwayExplainerDetails(detailedBuckets, monthlyObligations, monthlyExpenses, totalMortgagePayments, runway, runwayWithGrowth, runwayAfterTax, country, jurisdiction),
     },
     {
       title: "Debt-to-Asset Ratio",

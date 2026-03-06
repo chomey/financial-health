@@ -45,7 +45,7 @@ describe("Milestone 6 E2E test infrastructure", () => {
 
   it("covers runway with vs without withdrawal tax", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
-    expect(content).toContain("runway-after-tax");
+    expect(content).toContain("runway-tax-drag");
   });
 
   it("covers both CA and US jurisdictions", () => {
