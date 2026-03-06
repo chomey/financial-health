@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Milestone E2E: unified chart and enhancements
+  {
+    version: 101,
+    title: "Milestone E2E: unified chart and final enhancements",
+    description: "Comprehensive E2E test suite covering the unified projection/burndown chart with mode tabs, 50-year projections with 40yr/50yr columns, dual federal/provincial bracket tables, investment income tax in the explainer, merged withdrawal tax in Financial Runway, $0 income tax explainer, ROI tax treatment toggle, scrollable source summary cards, and all modal close mechanisms. Full multi-step journey test across all features.",
+    date: "2026-03-06",
+  },
   // Investment return taxes in Estimated Tax
   {
     version: 100,
@@ -639,7 +646,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 100] as const },
+    { milestone: "UI Polish", range: [88, 101] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

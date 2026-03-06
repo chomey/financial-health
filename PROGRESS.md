@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 101
-- **Completed**: 100
-- **Remaining**: 1
+- **Completed**: 101
+- **Remaining**: 0
 - **Last Updated**: 2026-03-06
 
 ---
@@ -2191,3 +2191,31 @@
 - **Screenshots**:
   ![Investment income in tax explainer](screenshots/task-100-investment-income-tax-explainer.png)
 - **Notes**: Pre-existing E2E test failures in `snapshot-dashboard.spec.ts` (6 tests referencing `role="tooltip"` and hardcoded metric values that had drifted) were fixed in a separate commit. Investment interest is added to the "employment" income type bucket so progressive brackets apply correctly across salary + interest income combined. Only taxable accounts with `roiTaxTreatment === "income"` are included — capital-gains ROI, tax-free, and tax-deferred accounts are all excluded per the task requirements.
+
+## Task 101: [MILESTONE] E2E test for unified chart and enhancements
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `tests/e2e/milestone-11-e2e.spec.ts`: **New** — Comprehensive milestone E2E test suite with 12 tests covering: (1) Unified chart mode tabs (Keep Earning/Income Stops), (2) 50-year chart with 40yr/50yr columns in summary and asset tables, (3) Dual federal/provincial bracket tables with subtotals, (4) Investment income tax section in explainer, (5) Withdrawal tax merged into Financial Runway explainer with suggested order and disclaimer, (6) $0 income tax explainer with bracket reference, (7) Modal close mechanisms (Escape, X button, backdrop), (8) ROI tax treatment toggle, (9) Scrollable source summary cards with sticky total, (10) Full multi-step journey across all features.
+  - `tests/unit/milestone-11-e2e-infra.test.ts`: **New** — 16 T1 unit tests verifying milestone E2E test structure: existence, imports, coverage of unified chart, 50yr columns, dual brackets, investment income, withdrawal tax merge, $0 tax, ROI toggle, scrollable cards, close mechanisms, journey test, test count, screenshots, and related feature files.
+  - `src/lib/changelog.ts`: Added v101 changelog entry. Extended UI Polish milestone range to [88, 101].
+  - `tests/unit/changelog.test.ts`: Updated counts to 101 entries, 14 entries in UI Polish milestone group.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/milestone-11-e2e-infra.test.ts`: 16 passed, 0 failed
+  - `tests/unit/changelog.test.ts`: 11 passed, 0 failed
+  - All T1 unit tests: 1234 passed, 0 failed (75 test files)
+  - `tests/e2e/milestone-11-e2e.spec.ts`: 12 passed, 0 failed
+  - All T2/T3 E2E tests: 314 passed, 0 failed
+- **Screenshots**:
+  ![Unified chart Keep Earning](screenshots/task-101-unified-chart-keep-earning.png)
+  ![Unified chart Income Stops](screenshots/task-101-unified-chart-income-stops.png)
+  ![50yr summary table](screenshots/task-101-50yr-summary-table.png)
+  ![Dual bracket tables](screenshots/task-101-dual-bracket-tables.png)
+  ![Investment income tax](screenshots/task-101-investment-income-tax.png)
+  ![Runway with withdrawal tax](screenshots/task-101-runway-withdrawal-tax.png)
+  ![Zero income tax explainer](screenshots/task-101-zero-income-tax-explainer.png)
+  ![ROI tax toggle](screenshots/task-101-roi-tax-toggle.png)
+  ![Scrollable source cards](screenshots/task-101-scrollable-source-cards.png)
+  ![Full journey complete](screenshots/task-101-full-journey-complete.png)
+- **Notes**: All 101 tasks are now complete. This milestone covers the unified chart and final enhancements from tasks 97-101, validating the merged projection/burndown chart with mode tabs, 50-year projections, dual bracket tables, investment income tax, withdrawal tax merged into runway, and all modal interactions. The full E2E suite (314 tests) passes across all milestone test files. Pre-existing changelog test failure (expected 99 entries but had 100) was fixed in a separate commit.
