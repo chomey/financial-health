@@ -20,7 +20,7 @@ test.describe("Withdrawal Tax Summary", () => {
     await captureScreenshot(page, "task-66-withdrawal-tax-summary");
   });
 
-  test("expand/collapse details shows account breakdown and withdrawal order", async ({ page }) => {
+  test("details are always visible with account breakdown and withdrawal order", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -28,19 +28,17 @@ test.describe("Withdrawal Tax Summary", () => {
     await summary.scrollIntoViewIfNeeded();
     await expect(summary).toBeVisible();
 
-    // Details should be hidden initially
+    // Details should be visible by default (no toggle)
     const details = page.locator('[data-testid="withdrawal-tax-details"]');
-    await expect(details).not.toBeVisible();
-
-    // Click to expand
-    const toggle = page.locator('[data-testid="withdrawal-tax-toggle"]');
-    await toggle.click();
-
-    // Details should now be visible
     await expect(details).toBeVisible();
 
-    // Should show optimal withdrawal order
-    await expect(details.locator("text=Optimal withdrawal order")).toBeVisible();
+    // Should show suggested withdrawal order
+    await expect(details.locator("text=Suggested withdrawal order")).toBeVisible();
+
+    // Should show disclaimer
+    const disclaimer = page.locator('[data-testid="withdrawal-order-disclaimer"]');
+    await expect(disclaimer).toBeVisible();
+    await expect(disclaimer).toContainText("rough suggestion");
 
     // Should show account categories
     // Default state has TFSA (tax-free), RRSP (tax-deferred), Savings Account (taxable)
@@ -48,10 +46,6 @@ test.describe("Withdrawal Tax Summary", () => {
     await expect(details.locator("text=Tax-deferred")).toBeVisible();
 
     await captureScreenshot(page, "task-66-withdrawal-tax-details");
-
-    // Click to collapse
-    await toggle.click();
-    await expect(details).not.toBeVisible();
   });
 
   test("shows withdrawal-tax insights in insights panel", async ({ page }) => {

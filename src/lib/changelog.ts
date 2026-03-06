@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // UI Polish (Milestone 12)
   {
+    version: 88,
+    title: "Withdrawal Tax Impact card auto-expanded with disclaimer",
+    description: "The Withdrawal Tax Impact card now shows account breakdowns and withdrawal order expanded by default instead of hiding them behind a 'Show details' toggle. The withdrawal order is renamed from 'Optimal' to 'Suggested' with a subtle disclaimer noting that it's a rough suggestion and users should consult a tax professional for personalized advice.",
+    date: "2026-03-06",
+  },
+  {
     version: 87,
     title: "Scrollable source summary cards with frozen total pane",
     description: "Source summary cards in explainer modals now show all items instead of truncating at 5 with '+N more'. Long item lists scroll vertically within a 200px container with a thin stone-colored scrollbar. The total row is sticky at the bottom with a subtle shadow separator so it stays visible while scrolling. Cards have increased padding and larger total font, and the explainer modal is wider (max-w-xl) for more breathing room.",
@@ -551,6 +557,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
+    { milestone: "UI Polish", range: [88, 92] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },
