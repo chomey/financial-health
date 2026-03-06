@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 76
-- **Completed**: 75
-- **Remaining**: 1
+- **Completed**: 76
+- **Remaining**: 0
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1592,3 +1592,30 @@
   ![Label pills](screenshots/task-75-label-pills.png)
   ![Mobile highlight-only](screenshots/task-75-mobile-highlight-only.png)
 - **Notes**: Five polish features implemented: (1) Flowing particles: 3 circles per arrow with staggered `animateMotion`, lighter style gets 2.5s duration vs 2s default. (2) Responsive: mobile (< 768px) suppresses SVG overlay entirely; source highlights still work via CSS with infinite pulsing border animations. (3) Accessibility: arrows are decorative-only (aria-hidden), aria-live polite region announces sources on focus/hover for screen readers. (4) Performance: rAF throttle (existing), will-change on SVG, max 8 arrows prioritized by absolute value. (5) Label pills: capsule-shaped (rx=10) with slightly thicker stroke and higher fill opacity.
+
+## Task 76: [MILESTONE] Full E2E test for data-flow arrow visualization
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `tests/e2e/milestone-8-e2e.spec.ts`: New comprehensive T3 E2E test with 10 test cases covering all data-flow arrow features from tasks 69-75: Net Worth card arrows (assets/stocks/property positive, debts negative), Monthly Surplus arrows (income positive, expenses negative), Estimated Tax/Financial Runway/Debt-to-Asset Ratio arrows, insight card hover arrows, arrow disappearance on mouse leave, source section highlight correctness (positive/negative), collapsed section arrow rendering, mobile highlight-only mode, arrows updating after data changes, and keyboard focus accessibility with aria-live.
+  - `tests/unit/milestone-8-e2e-infra.test.ts`: 17 T1 unit tests verifying E2E test infrastructure — file existence, Playwright imports, screenshot helper, feature coverage (all 5 metric cards, insight cards, highlights, collapsed sections, mobile viewport, data changes, keyboard focus, aria-live), test count, screenshot capture points, feature test file existence, DataFlowArrows module exports.
+  - `src/lib/changelog.ts`: Added v76 entry for data-flow arrow visualization E2E milestone.
+  - `tests/unit/changelog.test.ts`: Updated expectations for 76 entries, 8 milestones with 8 entries in milestone 8.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/milestone-8-e2e-infra.test.ts`: 17 tests — file existence, imports, feature coverage, screenshots, module exports (17 passed, 0 failed)
+  - `tests/e2e/milestone-8-e2e.spec.ts`: 10 tests — Net Worth arrows, Monthly Surplus arrows, Tax/Runway/DebtRatio arrows, insight arrows, disappear on leave, highlight correctness, collapsed sections, mobile highlight-only, data change update, keyboard focus accessibility (10 passed, 0 failed)
+  - All unit tests: 945 passed, 0 failed (59 test files)
+  - All E2E tests: 210 passed, 0 failed
+- **Screenshots**:
+  ![Net Worth arrows](screenshots/task-76-net-worth-arrows.png)
+  ![Monthly Surplus arrows](screenshots/task-76-monthly-surplus-arrows.png)
+  ![Estimated Tax arrows](screenshots/task-76-estimated-tax-arrows.png)
+  ![Financial Runway arrows](screenshots/task-76-financial-runway-arrows.png)
+  ![Debt-to-Asset Ratio arrows](screenshots/task-76-debt-to-asset-arrows.png)
+  ![Source highlights](screenshots/task-76-source-highlights.png)
+  ![Collapsed section arrows](screenshots/task-76-collapsed-section-arrows.png)
+  ![Mobile highlight-only](screenshots/task-76-mobile-highlight-only.png)
+  ![Arrows after data change](screenshots/task-76-arrows-after-data-change.png)
+  ![Keyboard focus arrows](screenshots/task-76-keyboard-focus-arrows.png)
+- **Notes**: This milestone E2E test validates all data-flow arrow visualization features from tasks 69-75 in integrated journeys. All 76 tasks are now complete — the entire TASKS.md backlog is done.

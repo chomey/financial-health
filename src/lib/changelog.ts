@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Data Flow Visualization (Milestone 8)
   {
+    version: 76,
+    title: "Full E2E test for data-flow arrow visualization",
+    description: "Comprehensive milestone E2E test covering all data-flow arrow features from tasks 69-75: hovering each metric card (Net Worth, Monthly Surplus, Estimated Tax, Financial Runway, Debt-to-Asset Ratio) shows correct source arrows; insight card hover shows light-style arrows; arrows disappear on mouse leave; source sections highlight with correct positive/negative signs; collapsed sections still receive arrows; mobile viewport uses highlight-only mode without SVG overlay; arrows update when financial data changes; keyboard focus activates arrows with aria-live announcements.",
+    date: "2026-03-05",
+  },
+  {
     version: 75,
     title: "Arrow visual polish — particles, responsive, and accessibility",
     description: "Flowing particle animation along arrow paths with staggered timing. Mobile (< 768px) switches to highlight-only mode with pulsing borders instead of SVG arrows. Accessibility: aria-live region announces data sources to screen readers. Performance: max 8 simultaneous arrows prioritized by value, will-change: transform on SVG overlay. Label pills styled as rounded capsules matching arrow color.",
