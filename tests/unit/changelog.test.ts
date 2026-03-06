@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for all 91 completed tasks", () => {
-    expect(CHANGELOG.length).toBe(91);
+  it("contains entries for all 92 completed tasks", () => {
+    expect(CHANGELOG.length).toBe(92);
   });
 
   it("has unique version numbers", () => {
@@ -11,11 +11,11 @@ describe("changelog data", () => {
     expect(new Set(versions).size).toBe(versions.length);
   });
 
-  it("covers versions 1 through 91", () => {
+  it("covers versions 1 through 92", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(91);
-    for (let i = 1; i <= 91; i++) {
+    expect(versions[versions.length - 1]).toBe(92);
+    for (let i = 1; i <= 92; i++) {
       expect(versions).toContain(i);
     }
   });
@@ -54,14 +54,14 @@ describe("getChangelogByMilestone", () => {
   it("contains all entries across all groups", () => {
     const milestones = getChangelogByMilestone();
     const totalEntries = milestones.reduce((sum, m) => sum + m.entries.length, 0);
-    expect(totalEntries).toBe(91);
+    expect(totalEntries).toBe(92);
   });
 
   it("groups entries correctly by milestone range", () => {
     const milestones = getChangelogByMilestone();
     // UI Polish: 88-92
     expect(milestones[0].milestone).toBe("UI Polish");
-    expect(milestones[0].entries.length).toBe(4); // 88, 89, 90, 91 so far
+    expect(milestones[0].entries.length).toBe(5); // 88, 89, 90, 91, 92
     expect(milestones[0].entries.every((e) => e.version >= 88 && e.version <= 92)).toBe(true);
     // Metric-Specific Explainers: 83-87
     expect(milestones[1].milestone).toBe("Metric-Specific Explainers");
