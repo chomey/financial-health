@@ -20,7 +20,7 @@ import FxRateDisplay from "@/components/FxRateDisplay";
 import WithdrawalTaxSummary from "@/components/WithdrawalTaxSummary";
 import InsightsPanel from "@/components/InsightsPanel";
 import ZoomableCard from "@/components/ZoomableCard";
-import { DataFlowProvider, useOptionalDataFlow } from "@/components/DataFlowArrows";
+import { DataFlowProvider, useOptionalDataFlow, type SourceMetadataItem } from "@/components/DataFlowArrows";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -148,6 +148,7 @@ function CollapsibleSection({
   dataFlowId,
   dataFlowValue,
   dataFlowLabel,
+  dataFlowItems,
 }: {
   id?: string;
   title: string;
@@ -158,6 +159,7 @@ function CollapsibleSection({
   dataFlowId?: string;
   dataFlowValue?: number;
   dataFlowLabel?: string;
+  dataFlowItems?: SourceMetadataItem[];
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const collapsedRef = useRef<HTMLButtonElement>(null);
@@ -171,9 +173,10 @@ function CollapsibleSection({
     ctx.registerSource(dataFlowId, ref, {
       label: dataFlowLabel ?? title,
       value: dataFlowValue ?? 0,
+      items: dataFlowItems,
     });
     return () => ctx.unregisterSource(dataFlowId);
-  }, [dataFlowId, dataFlowLabel, dataFlowValue, title, open, ctx]);
+  }, [dataFlowId, dataFlowLabel, dataFlowValue, dataFlowItems, title, open, ctx]);
 
   if (!open) {
     return (
@@ -384,6 +387,14 @@ export default function Home() {
   const propertyCount = properties.length;
   const stockCount = stocks.length;
 
+  // Build item-level data for source summary cards in explainer modal
+  const assetItems: SourceMetadataItem[] = assets.filter((a) => !a.computed).map((a) => ({ label: a.category, value: a.amount }));
+  const debtItems: SourceMetadataItem[] = debts.map((d) => ({ label: d.category, value: d.amount }));
+  const incomeItems: SourceMetadataItem[] = income.map((i) => ({ label: i.category, value: i.amount }));
+  const expenseItems: SourceMetadataItem[] = expenses.map((e) => ({ label: e.category, value: e.amount }));
+  const propertyItems: SourceMetadataItem[] = properties.map((p) => ({ label: p.name, value: Math.max(0, p.value - p.mortgage) }));
+  const stockItems: SourceMetadataItem[] = stocks.map((s) => ({ label: s.ticker, value: getStockValue(s) }));
+
   // Data-flow connections for metric cards
   const fmtLabel = (v: number) => {
     const sign = v >= 0 ? "+" : "-";
@@ -562,27 +573,27 @@ export default function Home() {
             aria-label="Financial data entry"
           >
             <div className="space-y-3">
-              <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)} dataFlowId="section-assets" dataFlowValue={assetTotal} dataFlowLabel="Assets">
+              <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)} dataFlowId="section-assets" dataFlowValue={assetTotal} dataFlowLabel="Assets" dataFlowItems={assetItems}>
                 <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="debts" title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"} dataFlowId="section-debts" dataFlowValue={debtTotal} dataFlowLabel="Debts">
+              <CollapsibleSection id="debts" title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"} dataFlowId="section-debts" dataFlowValue={debtTotal} dataFlowLabel="Debts" dataFlowItems={debtItems}>
                 <DebtEntry items={debts} onChange={setDebts} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)} dataFlowId="section-income" dataFlowValue={incomeTotal} dataFlowLabel="Income">
+              <CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)} dataFlowId="section-income" dataFlowValue={incomeTotal} dataFlowLabel="Income" dataFlowItems={incomeItems}>
                 <IncomeEntry items={income} onChange={setIncome} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="expenses" title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)} dataFlowId="section-expenses" dataFlowValue={expenseTotal} dataFlowLabel="Expenses">
+              <CollapsibleSection id="expenses" title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)} dataFlowId="section-expenses" dataFlowValue={expenseTotal} dataFlowLabel="Expenses" dataFlowItems={expenseItems}>
                 <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} surplusTargetName={surplusTargetName} federalTax={totals.totalFederalTax / 12} provincialStateTax={totals.totalProvincialStateTax / 12} computedFederalTax={totals.computedFederalTax / 12} computedProvincialStateTax={totals.computedProvincialStateTax / 12} federalTaxOverride={federalTaxOverride !== undefined ? federalTaxOverride / 12 : undefined} provincialTaxOverride={provincialTaxOverride !== undefined ? provincialTaxOverride / 12 : undefined} onFederalTaxOverride={(monthly) => setFederalTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} onProvincialTaxOverride={(monthly) => setProvincialTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} country={country} isUnderwater={monthlySurplus < 0} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="property" title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"} dataFlowId="section-property" dataFlowValue={totals.totalPropertyEquity} dataFlowLabel="Property">
+              <CollapsibleSection id="property" title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"} dataFlowId="section-property" dataFlowValue={totals.totalPropertyEquity} dataFlowLabel="Property" dataFlowItems={propertyItems}>
                 <PropertyEntry items={properties} onChange={setProperties} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="stocks" title="Stocks" icon="📊" summary={stockCount > 0 ? `${stockCount} holding${stockCount !== 1 ? "s" : ""}` : "None"} dataFlowId="section-stocks" dataFlowValue={totals.totalStocks} dataFlowLabel="Stocks">
+              <CollapsibleSection id="stocks" title="Stocks" icon="📊" summary={stockCount > 0 ? `${stockCount} holding${stockCount !== 1 ? "s" : ""}` : "None"} dataFlowId="section-stocks" dataFlowValue={totals.totalStocks} dataFlowLabel="Stocks" dataFlowItems={stockItems}>
                 <StockEntry items={stocks} onChange={setStocks} />
               </CollapsibleSection>
             </div>

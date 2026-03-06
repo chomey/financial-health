@@ -148,8 +148,8 @@ describe("ExplainerModal", () => {
         getSourceMetadata={mockGetSourceMetadata}
       />
     );
-    expect(screen.getByTestId("explainer-oval-section-assets")).toBeInTheDocument();
-    expect(screen.getByTestId("explainer-oval-section-debts")).toBeInTheDocument();
+    expect(screen.getByTestId("source-summary-oval-section-assets")).toBeInTheDocument();
+    expect(screen.getByTestId("source-summary-oval-section-debts")).toBeInTheDocument();
   });
 
   it("renders the result section with sum bar", () => {
@@ -252,8 +252,8 @@ describe("ExplainerModal", () => {
         getSourceMetadata={mockGetSourceMetadata}
       />
     );
-    const assetsCard = screen.getByTestId("explainer-source-section-assets");
-    const debtsCard = screen.getByTestId("explainer-source-section-debts");
+    const assetsCard = screen.getByTestId("source-summary-section-assets");
+    const debtsCard = screen.getByTestId("source-summary-section-debts");
     expect(assetsCard.className).toContain("border-l-green-500");
     expect(debtsCard.className).toContain("border-l-rose-500");
   });

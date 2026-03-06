@@ -13,10 +13,16 @@ import React, {
 
 // --- Types ---
 
+export interface SourceMetadataItem {
+  label: string;
+  value: number;
+}
+
 export interface SourceMetadata {
   label: string;
   value: number;
   color?: string;
+  items?: SourceMetadataItem[];
 }
 
 export interface ActiveConnection {
@@ -183,6 +189,105 @@ export function DataFlowSourceItem({
   return <div ref={ref} data-dataflow-source={id}>{children}</div>;
 }
 
+// --- Section icon mapping ---
+
+const SECTION_ICONS: Record<string, string> = {
+  "section-assets": "💰",
+  "section-debts": "💳",
+  "section-income": "💵",
+  "section-expenses": "🧾",
+  "section-property": "🏠",
+  "section-stocks": "📊",
+};
+
+// --- SourceSummaryCard ---
+
+const MAX_VISIBLE_ITEMS = 5;
+
+export function SourceSummaryCard({
+  sourceId,
+  sectionName,
+  items,
+  total,
+  isPositive,
+  ovalSeed,
+}: {
+  sourceId: string;
+  sectionName: string;
+  items?: SourceMetadataItem[];
+  total: string;
+  isPositive: boolean;
+  ovalSeed: number;
+}) {
+  const icon = SECTION_ICONS[sourceId] || "";
+  const visibleItems = items && items.length > MAX_VISIBLE_ITEMS ? items.slice(0, MAX_VISIBLE_ITEMS) : items;
+  const hiddenCount = items ? Math.max(0, items.length - MAX_VISIBLE_ITEMS) : 0;
+
+  return (
+    <div
+      className={`relative rounded-xl border-l-4 bg-white p-4 shadow-sm ${
+        isPositive ? "border-l-green-500" : "border-l-rose-500"
+      }`}
+      data-testid={`source-summary-${sourceId}`}
+    >
+      {/* Header: icon + title */}
+      <div className="mb-2 flex items-center gap-2">
+        {icon && <span aria-hidden="true" className="text-base">{icon}</span>}
+        <span className="text-sm font-semibold text-stone-700" data-testid={`source-summary-title-${sourceId}`}>{sectionName}</span>
+      </div>
+
+      {/* Item list */}
+      {visibleItems && visibleItems.length > 0 && (
+        <ul className="mb-3 space-y-1" data-testid={`source-summary-items-${sourceId}`}>
+          {visibleItems.map((item, i) => (
+            <li key={i} className="flex items-center justify-between text-sm">
+              <span className="text-stone-500 truncate mr-2">{item.label}</span>
+              <span className="font-medium text-stone-700 whitespace-nowrap">${Math.abs(item.value).toLocaleString()}</span>
+            </li>
+          ))}
+          {hiddenCount > 0 && (
+            <li className="text-xs text-stone-400 italic" data-testid={`source-summary-more-${sourceId}`}>
+              +{hiddenCount} more
+            </li>
+          )}
+        </ul>
+      )}
+
+      {/* Total with hand-drawn oval */}
+      <div className="flex items-center justify-between border-t border-stone-100 pt-2">
+        <span className="text-xs font-medium text-stone-500 uppercase tracking-wide">Total</span>
+        <div className="relative">
+          <span
+            className={`text-lg font-bold ${isPositive ? "text-green-600" : "text-rose-600"}`}
+            data-testid={`source-summary-total-${sourceId}`}
+          >
+            {total}
+          </span>
+          {/* Hand-drawn oval annotation */}
+          <svg
+            className="pointer-events-none absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)]"
+            viewBox="0 0 100 40"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+            data-testid={`source-summary-oval-${sourceId}`}
+          >
+            <path
+              d={handDrawnOval(50, 20, 45, 16, ovalSeed)}
+              fill="none"
+              stroke={isPositive ? "#059669" : "#e11d48"}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity="0.6"
+              className="animate-draw-oval"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // --- ExplainerModal ---
 
 function ExplainerModal({
@@ -260,7 +365,7 @@ function ExplainerModal({
           <p className="mt-1 text-3xl font-bold text-stone-900" data-testid="explainer-value">{targetMeta.formattedValue}</p>
         </div>
 
-        {/* Source cards with hand-drawn annotations */}
+        {/* Source summary cards */}
         <div className="space-y-3" data-testid="explainer-sources">
           {connections.map((conn, i) => {
             const meta = getSourceMetadata(conn.sourceId);
@@ -270,7 +375,7 @@ function ExplainerModal({
             const displayValue = conn.label || (meta ? `$${Math.abs(meta.value).toLocaleString()}` : "");
 
             return (
-              <div key={conn.sourceId + i}>
+              <div key={conn.sourceId + i} data-testid={`explainer-source-${conn.sourceId}`}>
                 {showOperator && (
                   <div className="flex justify-center py-1">
                     <span
@@ -281,43 +386,14 @@ function ExplainerModal({
                     </span>
                   </div>
                 )}
-                <div
-                  className={`relative rounded-xl border-l-4 bg-white p-4 shadow-sm ${
-                    isPositive ? "border-l-green-500" : "border-l-rose-500"
-                  }`}
-                  data-testid={`explainer-source-${conn.sourceId}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-stone-700">{sectionName}</span>
-                    <div className="relative">
-                      <span
-                        className={`text-lg font-bold ${isPositive ? "text-green-600" : "text-rose-600"}`}
-                        data-testid={`explainer-source-value-${conn.sourceId}`}
-                      >
-                        {displayValue}
-                      </span>
-                      {/* Hand-drawn oval annotation around the value */}
-                      <svg
-                        className="pointer-events-none absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)]"
-                        viewBox="0 0 100 40"
-                        preserveAspectRatio="none"
-                        aria-hidden="true"
-                        data-testid={`explainer-oval-${conn.sourceId}`}
-                      >
-                        <path
-                          d={handDrawnOval(50, 20, 45, 16, i + 1)}
-                          fill="none"
-                          stroke={isPositive ? "#059669" : "#e11d48"}
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          opacity="0.6"
-                          className="animate-draw-oval"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
+                <SourceSummaryCard
+                  sourceId={conn.sourceId}
+                  sectionName={sectionName}
+                  items={meta?.items}
+                  total={displayValue}
+                  isPositive={isPositive}
+                  ovalSeed={i + 1}
+                />
               </div>
             );
           })}
