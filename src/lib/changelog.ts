@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Milestone E2E: Explainer & Tax Treatment Enhancements
+  {
+    version: 96,
+    title: "E2E tests for explainer and tax treatment enhancements",
+    description: "Comprehensive milestone E2E test suite covering withdrawal tax auto-expand, $0 income tax explainer, runway burndown on main page, tax bracket visualization, ROI tax treatment toggle, scrollable source summary cards, and modal close mechanisms.",
+    date: "2026-03-06",
+  },
   // Withdrawal Pills Overflow Fix
   {
     version: 95,
@@ -604,7 +611,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 95] as const },
+    { milestone: "UI Polish", range: [88, 96] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },
