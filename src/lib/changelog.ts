@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Withdrawal Tax Modeling (Milestone 7)
   {
+    version: 65,
+    title: "Tax-aware projection drawdown",
+    description: "Projection engine now models withdrawal taxes during drawdown. When expenses exceed income (retirement scenario), assets are drawn in tax-optimal order with gross-up for taxes. Chart tooltip shows cumulative withdrawal tax paid.",
+    date: "2026-03-05",
+  },
+  {
     version: 64,
     title: "Tax-adjusted financial runway",
     description: "Financial runway now accounts for withdrawal taxes using smart ordering: tax-free accounts (TFSA, Roth IRA) are drawn first, then taxable, then tax-deferred (RRSP, 401k). Shows adjusted runway alongside base runway.",

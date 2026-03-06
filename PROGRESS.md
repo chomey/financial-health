@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 68
-- **Completed**: 64
-- **Remaining**: 4
+- **Completed**: 65
+- **Remaining**: 3
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1361,3 +1361,20 @@
 - **Screenshots**:
   ![Tax-adjusted runway display](screenshots/task-64-withdrawal-tax-runway.png)
 - **Notes**: The tax-adjusted runway compares against the growth-aware baseline (not simple division), since accounts like 401k/RRSP have default ROI that adds growth during drawdown. The `runwayAfterTax` is only shown when the difference exceeds 0.3 months to avoid clutter. Pre-existing test failure in changelog tests was fixed in a separate commit.
+
+## Task 65: Apply withdrawal tax to projection engine
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/lib/projections.ts`: Added tax treatment tracking (`taxTreatment`, `category`, `costBasisPercent`) to asset buckets in `projectFinances`. Added drawdown logic that activates when `monthlyAfterTaxIncome < monthlyExpenses` (with $50 threshold to avoid tax rounding triggers). In drawdown mode: withdraws from assets in tax-optimal order (tax-free first, taxable second, tax-deferred last), grosses up taxed withdrawals so after-tax covers the shortfall, skips contributions (can't save when can't pay bills), and tracks cumulative `withdrawalTaxDrag` on each `ProjectionPoint`. Added `withdrawalTaxDrag` field to `ProjectionPoint` interface.
+  - `src/components/ProjectionChart.tsx`: Updated `CustomTooltip` to display cumulative withdrawal tax paid during drawdown years. Updated `chartData` mapping to pass through `withdrawalTaxDrag` from projection points.
+  - `src/lib/changelog.ts`: Added v65 changelog entry.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/projections.test.ts`: 5 new tests — tracks cumulative withdrawal tax for RRSP drawdown, no tax drag for TFSA-only drawdown, withdraws from tax-free before tax-deferred, mixed portfolio has more tax drag than pure tax-free, positive surplus creates no tax drag. 28 passed, 0 failed.
+  - `tests/e2e/projection-drawdown-tax.spec.ts`: 2 new browser tests — projection chart renders in drawdown scenario with RRSP, mixed tax-free/tax-deferred drawdown renders correctly. 2 passed, 0 failed.
+  - All unit tests: 794 passed, 0 failed (48 test files)
+- **Screenshots**:
+  ![Projection drawdown with tax drag](screenshots/task-65-projection-drawdown-tax.png)
+  ![Mixed drawdown scenario](screenshots/task-65-projection-mixed-drawdown.png)
+- **Notes**: Two pre-existing test failures were fixed in separate commits — tests assumed gross income = expenses was breakeven, but after the tax feature (Task 44), after-tax income falls below expenses creating unintended drawdown scenarios. The drawdown threshold of $50/month prevents triggering on small tax rounding when gross income ≈ expenses.

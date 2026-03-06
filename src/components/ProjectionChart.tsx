@@ -59,7 +59,7 @@ const SCENARIO_DESCRIPTIONS: Record<Scenario, string> = {
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: Array<{ value: number; name: string; color: string }>;
+  payload?: Array<{ value: number; name: string; color: string; payload?: Record<string, unknown> }>;
   label?: number;
 }
 
@@ -69,6 +69,10 @@ function CustomTooltip({ active, payload, label, currencyCode }: CustomTooltipPr
   const years = label ?? 0;
   const yearLabel = years === 1 ? "1 year" : `${years} years`;
 
+  // Extract withdrawal tax drag from the data point (available via the first payload entry)
+  const dataPoint = payload[0]?.payload;
+  const withdrawalTaxDrag = typeof dataPoint?.withdrawalTaxDrag === "number" ? dataPoint.withdrawalTaxDrag : 0;
+
   return (
     <div className="rounded-lg border border-stone-200 bg-white p-3 shadow-lg">
       <p className="mb-1 text-xs font-medium text-stone-500">{yearLabel} from now</p>
@@ -77,6 +81,11 @@ function CustomTooltip({ active, payload, label, currencyCode }: CustomTooltipPr
           {entry.name}: {formatFullCurrency(entry.value, currencyCode)}
         </p>
       ))}
+      {withdrawalTaxDrag > 0 && (
+        <p className="mt-1 text-xs text-amber-600" data-testid="tooltip-tax-drag">
+          Withdrawal tax paid: {formatFullCurrency(withdrawalTaxDrag, currencyCode)}
+        </p>
+      )}
     </div>
   );
 }
@@ -117,6 +126,7 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
       netWorth: p.netWorth,
       assets: p.totalAssets,
       debts: -p.totalDebts, // show as negative for visual clarity
+      withdrawalTaxDrag: p.withdrawalTaxDrag ?? 0,
     }));
   }, [projection]);
 

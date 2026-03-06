@@ -3,6 +3,7 @@ import { computeTotals } from "@/lib/financial-state";
 import { getDefaultRoi } from "@/components/AssetEntry";
 import { getEffectivePayment, getDefaultAppreciation } from "@/components/PropertyEntry";
 import { getHomeCurrency, getEffectiveFxRates, convertToHome, type SupportedCurrency } from "@/lib/currency";
+import { getTaxTreatment, getWithdrawalTaxRate, type TaxTreatment } from "@/lib/withdrawal-tax";
 
 export interface ProjectionPoint {
   month: number;
@@ -13,6 +14,7 @@ export interface ProjectionPoint {
   consumerDebts: number;
   mortgageDebts: number;
   totalPropertyEquity: number;
+  withdrawalTaxDrag?: number; // cumulative tax paid on withdrawals during drawdown
 }
 
 export interface Milestone {
@@ -54,13 +56,30 @@ export function projectFinances(
   // Initial values — surplus uses after-tax income, excludes investment contributions (handled per-asset)
   const { monthlyAfterTaxIncome, monthlyExpenses, totalMonthlyContributions } = computeTotals(state);
   const baseSurplus = monthlyAfterTaxIncome - monthlyExpenses - totalMonthlyContributions;
+  // True drawdown: income can't meaningfully cover expenses (retirement/drawdown scenario).
+  // Contributions and mortgage payments are modeled separately in the projection loop.
+  // Only trigger drawdown when there's a meaningful shortfall (> $50/mo threshold to
+  // avoid triggering on small tax rounding when gross income ≈ expenses).
+  const expenseShortfall = monthlyExpenses - monthlyAfterTaxIncome;
+  const DRAWDOWN_THRESHOLD = 50;
+  const isDrawdown = expenseShortfall > DRAWDOWN_THRESHOLD;
+  const monthlyDrawdown = isDrawdown ? expenseShortfall : 0;
 
   // Track each asset individually for ROI/contribution (converted to home currency)
   const assetBalances = state.assets.map((a) => ({
     balance: toHome(a.amount, a.currency),
     monthlyROI: ((a.roi ?? getDefaultRoi(a.category) ?? 0) * multiplier) / 100 / 12,
     monthlyContribution: toHome(a.monthlyContribution ?? 0, a.currency) * multiplier,
+    taxTreatment: getTaxTreatment(a.category),
+    category: a.category,
+    costBasisPercent: (a as { costBasisPercent?: number }).costBasisPercent ?? 100,
   }));
+
+  // Withdrawal order priority: tax-free first, taxable second, tax-deferred last
+  const withdrawalPriority: Record<TaxTreatment, number> = { "tax-free": 0, "taxable": 1, "tax-deferred": 2 };
+  const country = state.country ?? "CA";
+  const jurisdiction = state.jurisdiction ?? "ON";
+  let cumulativeWithdrawalTax = 0;
 
   // Track each debt individually for interest/payments (converted to home currency)
   const debtBalances = state.debts.map((d) => ({
@@ -114,6 +133,7 @@ export function projectFinances(
       consumerDebts: Math.round(totalDebtValue),
       mortgageDebts: Math.round(totalMortgage),
       totalPropertyEquity: Math.round(totalPropertyEquity),
+      withdrawalTaxDrag: cumulativeWithdrawalTax > 0 ? Math.round(cumulativeWithdrawalTax) : undefined,
     });
 
     // Check milestones
@@ -141,9 +161,9 @@ export function projectFinances(
 
     // Advance one month (skip on last iteration)
     if (m < totalMonths) {
-      // Grow assets by ROI and add contributions
+      // Grow assets by ROI and add contributions (skip contributions in drawdown — can't save when income < expenses)
       for (const a of assetBalances) {
-        a.balance = a.balance * (1 + a.monthlyROI) + a.monthlyContribution;
+        a.balance = a.balance * (1 + a.monthlyROI) + (isDrawdown ? 0 : a.monthlyContribution);
       }
 
       // Grow debts by interest, subtract payments
@@ -167,10 +187,50 @@ export function projectFinances(
       }
 
       // Monthly surplus goes to the designated surplus target account, or first asset as fallback
-      if (baseSurplus > 0 && assetBalances.length > 0) {
+      if (!isDrawdown && baseSurplus > 0 && assetBalances.length > 0) {
         const targetIdx = state.assets.findIndex((a) => a.surplusTarget);
         const idx = targetIdx >= 0 ? targetIdx : 0;
         assetBalances[idx].balance += baseSurplus * multiplier;
+      } else if (isDrawdown && assetBalances.length > 0) {
+        // Drawdown phase: income doesn't cover expenses + mortgage.
+        // Withdraw from assets in tax-optimal order to cover the shortfall.
+        let shortfall = monthlyDrawdown * multiplier;
+
+        // Sort asset indices by withdrawal priority
+        const sortedAssetIndices = assetBalances
+          .map((_, i) => i)
+          .filter((i) => assetBalances[i].balance > 0)
+          .sort((a, b) => withdrawalPriority[assetBalances[a].taxTreatment] - withdrawalPriority[assetBalances[b].taxTreatment]);
+
+        for (const idx of sortedAssetIndices) {
+          if (shortfall <= 0) break;
+          const bucket = assetBalances[idx];
+          if (bucket.balance <= 0) continue;
+
+          if (bucket.taxTreatment === "tax-free") {
+            // No tax on withdrawal
+            const withdrawal = Math.min(shortfall, bucket.balance);
+            bucket.balance -= withdrawal;
+            shortfall -= withdrawal;
+          } else {
+            // Compute gross-up for tax
+            const annualizedShortfall = shortfall * 12;
+            const taxResult = getWithdrawalTaxRate(
+              bucket.category, country, jurisdiction,
+              annualizedShortfall, bucket.costBasisPercent
+            );
+            const effectiveRate = taxResult.effectiveRate;
+            const grossUpFactor = effectiveRate < 1 ? 1 / (1 - effectiveRate) : 10;
+            const grossWithdrawal = Math.min(shortfall * grossUpFactor, bucket.balance);
+            const afterTax = grossWithdrawal / grossUpFactor;
+            const taxPaid = grossWithdrawal - afterTax;
+            cumulativeWithdrawalTax += taxPaid;
+            bucket.balance -= grossWithdrawal;
+            shortfall -= afterTax;
+          }
+
+          if (bucket.balance < 0) bucket.balance = 0;
+        }
       }
 
     }

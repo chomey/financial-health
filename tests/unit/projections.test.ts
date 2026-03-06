@@ -318,6 +318,113 @@ describe("projectAssets — currency conversion", () => {
   });
 });
 
+describe("projectFinances — withdrawal tax during drawdown", () => {
+  it("tracks cumulative withdrawal tax when surplus is negative", () => {
+    // State: high expenses, low income → drawdown from RRSP (tax-deferred)
+    const state = makeState({
+      assets: [{ id: "a1", category: "RRSP", amount: 100000, roi: 0 }],
+      income: [{ id: "i1", category: "Salary", amount: 0 }],
+      expenses: [{ id: "e1", category: "Living", amount: 3000 }],
+      country: "CA",
+      jurisdiction: "ON",
+    });
+    const result = projectFinances(state, 3);
+    // After some months of drawdown, cumulative tax should be > 0
+    // because RRSP is tax-deferred (full withdrawal taxed as income)
+    const lastPoint = result.points[result.points.length - 1];
+    expect(lastPoint.withdrawalTaxDrag).toBeDefined();
+    expect(lastPoint.withdrawalTaxDrag!).toBeGreaterThan(0);
+  });
+
+  it("no withdrawal tax drag when drawing from tax-free accounts", () => {
+    // State: only TFSA (tax-free), drawdown scenario
+    const state = makeState({
+      assets: [{ id: "a1", category: "TFSA", amount: 100000, roi: 0 }],
+      income: [{ id: "i1", category: "Salary", amount: 0 }],
+      expenses: [{ id: "e1", category: "Living", amount: 3000 }],
+      country: "CA",
+      jurisdiction: "ON",
+    });
+    const result = projectFinances(state, 3);
+    // TFSA withdrawals are tax-free, so no tax drag
+    const lastPoint = result.points[result.points.length - 1];
+    expect(lastPoint.withdrawalTaxDrag).toBeUndefined();
+  });
+
+  it("withdraws from tax-free accounts before tax-deferred", () => {
+    // Two accounts: TFSA (tax-free) and RRSP (tax-deferred), same amount
+    // After drawdown, TFSA should be depleted first
+    const state = makeState({
+      assets: [
+        { id: "a1", category: "TFSA", amount: 50000, roi: 0 },
+        { id: "a2", category: "RRSP", amount: 50000, roi: 0 },
+      ],
+      income: [{ id: "i1", category: "Salary", amount: 0 }],
+      expenses: [{ id: "e1", category: "Living", amount: 3000 }],
+      country: "CA",
+      jurisdiction: "ON",
+    });
+    const result = projectFinances(state, 3);
+
+    // Find the month where TFSA should be depleted (50000 / 3000 ≈ 16.7 months)
+    // At month 17, the tax drag should start appearing (withdrawals from RRSP)
+    const point17 = result.points[17];
+    // By month 17, we should have started drawing from RRSP, incurring tax
+    // The earlier months (0-16) should have no/minimal tax drag since we drew from TFSA
+    const point10 = result.points[10];
+    expect(point10.withdrawalTaxDrag ?? 0).toBe(0); // still drawing from TFSA
+
+    // Later months should show tax drag
+    const laterPoint = result.points[25];
+    expect(laterPoint.withdrawalTaxDrag).toBeDefined();
+    expect(laterPoint.withdrawalTaxDrag!).toBeGreaterThan(0);
+  });
+
+  it("mixed account drawdown has more tax drag than pure tax-free", () => {
+    const taxFreeState = makeState({
+      assets: [{ id: "a1", category: "TFSA", amount: 100000, roi: 0 }],
+      income: [{ id: "i1", category: "Salary", amount: 0 }],
+      expenses: [{ id: "e1", category: "Living", amount: 2000 }],
+      country: "CA",
+      jurisdiction: "ON",
+    });
+    const mixedState = makeState({
+      assets: [
+        { id: "a1", category: "TFSA", amount: 50000, roi: 0 },
+        { id: "a2", category: "RRSP", amount: 50000, roi: 0 },
+      ],
+      income: [{ id: "i1", category: "Salary", amount: 0 }],
+      expenses: [{ id: "e1", category: "Living", amount: 2000 }],
+      country: "CA",
+      jurisdiction: "ON",
+    });
+
+    const taxFreeResult = projectFinances(taxFreeState, 5);
+    const mixedResult = projectFinances(mixedState, 5);
+
+    // The mixed portfolio should accumulate withdrawal tax drag
+    const taxFreeLast = taxFreeResult.points[taxFreeResult.points.length - 1];
+    const mixedLast = mixedResult.points[mixedResult.points.length - 1];
+
+    expect(taxFreeLast.withdrawalTaxDrag ?? 0).toBe(0);
+    expect(mixedLast.withdrawalTaxDrag ?? 0).toBeGreaterThan(0);
+  });
+
+  it("positive surplus does not create withdrawal tax drag", () => {
+    const state = makeState({
+      assets: [{ id: "a1", category: "RRSP", amount: 50000, roi: 0 }],
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      expenses: [{ id: "e1", category: "Living", amount: 2000 }],
+      country: "CA",
+      jurisdiction: "ON",
+    });
+    const result = projectFinances(state, 3);
+    const lastPoint = result.points[result.points.length - 1];
+    // Surplus is positive, no drawdown, no tax drag
+    expect(lastPoint.withdrawalTaxDrag).toBeUndefined();
+  });
+});
+
 describe("downsamplePoints", () => {
   it("returns original array if under maxPoints", () => {
     const points = Array.from({ length: 50 }, (_, i) => ({
