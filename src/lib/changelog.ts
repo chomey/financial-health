@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Data Flow Visualization (Milestone 8)
   {
+    version: 74,
+    title: "Insight panel cards show data-flow arrows on hover",
+    description: "Each insight card in the InsightsPanel now shows animated SVG arrows to its relevant source sections on hover or focus. Insight types map to sources: runway → assets + expenses, surplus → income + expenses, net-worth → assets + debts, savings-rate → income + expenses, debt-interest → debts, tax → income, withdrawal-tax → assets. Insight arrows use a lighter style (thinner, more transparent) than metric card arrows to avoid visual overload.",
+    date: "2026-03-05",
+  },
+  {
     version: 73,
     title: "Wire remaining metric cards with data-flow arrows",
     description: "Estimated Tax, Financial Runway, and Debt-to-Asset Ratio metric cards now show data-flow arrows on hover. Estimated Tax shows a green arrow from Income with the effective tax rate and gross income. Financial Runway shows green arrows from Assets and Stocks (numerator) and red arrows from Expenses and Mortgage (denominator). Debt-to-Asset Ratio shows green arrows from all asset sources and red arrows from Debts and Mortgage. All five metric cards are now fully wired.",

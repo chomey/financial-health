@@ -438,6 +438,35 @@ export default function Home() {
     "Debt-to-Asset Ratio": debtToAssetConnections,
   };
 
+  // Insight-type data-flow connections (keyed by InsightType)
+  const insightConnections: Record<string, DataFlowConnectionDef[]> = {
+    "runway": [
+      { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" },
+      { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
+    ],
+    "surplus": [
+      { sourceId: "section-income", label: fmtLabel(totals.monthlyAfterTaxIncome), value: totals.monthlyAfterTaxIncome, sign: "positive" },
+      { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
+    ],
+    "net-worth": [
+      { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" },
+      { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
+    ],
+    "savings-rate": [
+      { sourceId: "section-income", label: fmtLabel(totals.monthlyAfterTaxIncome), value: totals.monthlyAfterTaxIncome, sign: "positive" },
+      { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
+    ],
+    "debt-interest": [
+      { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
+    ],
+    "tax": [
+      { sourceId: "section-income", label: fmtLabel(totals.monthlyIncome * 12), value: totals.monthlyIncome, sign: "positive" },
+    ],
+    "withdrawal-tax": [
+      { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" },
+    ],
+  };
+
   // Benchmark comparison values
   const benchmarkNetWorth = totals.totalAssets + totals.totalStocks + totals.totalPropertyEquity - totals.totalDebts;
   // Savings rate includes surplus + investment contributions (which are a form of saving)
@@ -523,7 +552,7 @@ export default function Home() {
         {/* Projection Chart — full-width above the two-column layout */}
         <section id="projections" className="mb-6 space-y-4 scroll-mt-16" aria-label="Financial projections">
           <ZoomableCard><ProjectionChart state={state} /></ZoomableCard>
-          <InsightsPanel data={financialData} />
+          <InsightsPanel data={financialData} insightConnections={insightConnections} />
         </section>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">

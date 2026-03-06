@@ -25,6 +25,8 @@ export interface ActiveConnection {
   label?: string;
   value?: number;
   sign?: "positive" | "negative";
+  /** "light" renders thinner, more transparent arrows (used by insight cards) */
+  style?: "default" | "light";
 }
 
 interface RegisteredElement {
@@ -254,6 +256,7 @@ interface ArrowData {
   label?: string;
   labelPos: Point;
   delay: number;
+  light?: boolean;
 }
 
 function DataFlowArrowOverlay({
@@ -311,6 +314,7 @@ function DataFlowArrowOverlay({
         label: conn.label,
         labelPos,
         delay: index * 50,
+        light: conn.style === "light",
       });
     });
 
@@ -411,6 +415,9 @@ function DataFlowArrowOverlay({
 
       {arrows.map((arrow, i) => {
         const isPositive = arrow.color.includes("129");
+        const glowWidth = arrow.light ? 2 : 4;
+        const strokeWidth = arrow.light ? 1.5 : 2.5;
+        const glowOpacity = arrow.light ? 0.15 : 0.3;
         return (
           <g key={i}>
             {/* Background glow path */}
@@ -418,8 +425,8 @@ function DataFlowArrowOverlay({
               d={arrow.path}
               fill="none"
               stroke={arrow.color}
-              strokeWidth={4}
-              opacity={0.3}
+              strokeWidth={glowWidth}
+              opacity={glowOpacity}
               filter="url(#arrow-glow)"
               style={{
                 animation: `arrow-fade-in 0.3s ease-out ${arrow.delay}ms both`,
@@ -430,7 +437,7 @@ function DataFlowArrowOverlay({
               d={arrow.path}
               fill="none"
               stroke={arrow.color}
-              strokeWidth={2.5}
+              strokeWidth={strokeWidth}
               strokeLinecap="round"
               markerEnd={`url(#arrowhead-${isPositive ? "positive" : "negative"})`}
               style={{
