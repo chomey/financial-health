@@ -438,6 +438,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
+    { milestone: "Data Flow Visualization", range: [69, 76] as const },
     { milestone: "Withdrawal Tax Modeling", range: [62, 68] as const },
     { milestone: "Multi-Currency Support", range: [56, 61] as const },
     { milestone: "Kubera-Inspired Visualizations", range: [48, 55] as const },
