@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 73
-- **Completed**: 69
-- **Remaining**: 4
+- **Total Tasks**: 76
+- **Completed**: 70
+- **Remaining**: 6
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1467,3 +1467,27 @@
 - **Screenshots**:
   ![Data flow arrows base state](screenshots/task-69-data-flow-arrows-base.png)
 - **Notes**: This task creates the foundational arrow overlay infrastructure. The overlay renders nothing until a target is activated (via setActiveTarget + setActiveConnections). Tasks 70-73 will wire up source registrations on sections and target activations on metric cards to trigger the arrows on hover. Exported pure functions (getCenterPoint, getEdgePoint, calculateArrowPath, approximatePathLength) are tested independently for path math correctness.
+
+## Task 70: Add data-flow source registration to all entry sections
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Added `DataFlowSourceItem` component for sub-source registration and `useOptionalDataFlow()` hook that returns null outside a provider (safe for unit tests). DataFlowSourceItem wraps children with a div carrying `data-dataflow-source` attribute and auto-registers/unregisters via context.
+  - `src/app/page.tsx`: Enhanced `CollapsibleSection` with `dataFlowId`, `dataFlowValue`, `dataFlowLabel` props. Registers collapsed header (button) or expanded wrapper (div) as the source element depending on open/closed state. Uses `useOptionalDataFlow` for graceful no-op in tests. Wired all 6 sections with source IDs: `section-assets`, `section-debts`, `section-income`, `section-expenses`, `section-property`, `section-stocks`.
+  - `src/components/AssetEntry.tsx`: Wrapped each asset row with `DataFlowSourceItem` using id `asset:{id}`, label from category, value from amount.
+  - `src/components/DebtEntry.tsx`: Wrapped each debt row with `DataFlowSourceItem` using id `debt:{id}`.
+  - `src/components/IncomeEntry.tsx`: Wrapped each income row with `DataFlowSourceItem` using id `income:{id}`.
+  - `src/components/ExpenseEntry.tsx`: Wrapped each expense row with `DataFlowSourceItem` using id `expense:{id}`.
+  - `src/components/PropertyEntry.tsx`: Wrapped each property row with `DataFlowSourceItem` using id `property:{id}`, value from equity.
+  - `src/components/StockEntry.tsx`: Wrapped each stock row with `DataFlowSourceItem` using id `stock:{id}`, value from computed stock value.
+  - `src/lib/changelog.ts`: Added v70 entry and new "Data Flow Visualization" milestone (69-76).
+  - `tests/unit/changelog.test.ts`: Updated expectations for 70 entries and 8 milestones.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/data-flow-source-registration.test.tsx`: 16 tests — DataFlowSourceItem rendering, registration, unregistration, value/label updates, multiple sources, source ID naming conventions, exports, entry component imports (16 passed, 0 failed)
+  - `tests/e2e/data-flow-sources.spec.ts`: 5 tests — all 6 section sources registered, sub-sources for default entries, collapsed section source attribute, re-registration on expand, overlay dormant without targets (5 passed, 0 failed)
+  - All unit tests: 868 passed, 0 failed (53 test files)
+- **Screenshots**:
+  ![Collapsed section with source attribute](screenshots/task-70-collapsed-section-source.png)
+  ![Sources registered, no arrows](screenshots/task-70-sources-registered-no-arrows.png)
+- **Notes**: Pre-existing changelog test failure (expected 69 entries but test checked for 68) was fixed in a separate commit. The `useOptionalDataFlow` hook was created to prevent entry component unit tests from crashing when rendered outside a DataFlowProvider. All 6 entry components now register individual rows as sub-sources, enabling future tasks (71-74) to target specific items with arrows.

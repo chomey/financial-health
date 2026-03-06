@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import CurrencyBadge from "@/components/CurrencyBadge";
+import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 
 export interface Property {
   id: string;
@@ -392,8 +393,8 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
           {properties.map((property) => {
             const equity = Math.max(0, property.value - property.mortgage);
             return (
+              <DataFlowSourceItem key={property.id} id={`property:${property.id}`} label={property.name} value={equity}>
               <div
-                key={property.id}
                 role="listitem"
                 className="group rounded-lg border border-stone-100 px-3 py-2 transition-colors duration-150 hover:bg-stone-50"
               >
@@ -818,6 +819,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                   );
                 })()}
               </div>
+            </DataFlowSourceItem>
             );
           })}
         </div>
