@@ -488,6 +488,7 @@ function buildRunwayExplainerDetails(
     return {
       category: b.category,
       taxTreatment: b.taxTreatment,
+      roiTaxTreatment: b.roiTaxTreatment,
       startingBalance: b.balance,
       estimatedTaxCost: Math.round(estimatedTaxCost),
     };
