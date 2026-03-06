@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for all 77 completed tasks", () => {
-    expect(CHANGELOG.length).toBe(77);
+  it("contains entries for all 78 completed tasks", () => {
+    expect(CHANGELOG.length).toBe(78);
   });
 
   it("has unique version numbers", () => {
@@ -11,11 +11,11 @@ describe("changelog data", () => {
     expect(new Set(versions).size).toBe(versions.length);
   });
 
-  it("covers versions 1 through 77", () => {
+  it("covers versions 1 through 78", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(77);
-    for (let i = 1; i <= 77; i++) {
+    expect(versions[versions.length - 1]).toBe(78);
+    for (let i = 1; i <= 78; i++) {
       expect(versions).toContain(i);
     }
   });
@@ -54,14 +54,14 @@ describe("getChangelogByMilestone", () => {
   it("contains all entries across all groups", () => {
     const milestones = getChangelogByMilestone();
     const totalEntries = milestones.reduce((sum, m) => sum + m.entries.length, 0);
-    expect(totalEntries).toBe(77);
+    expect(totalEntries).toBe(78);
   });
 
   it("groups entries correctly by milestone range", () => {
     const milestones = getChangelogByMilestone();
     // Spotlight Dimming System: 77-78
     expect(milestones[0].milestone).toBe("Spotlight Dimming System");
-    expect(milestones[0].entries.length).toBe(1);
+    expect(milestones[0].entries.length).toBe(2);
     expect(milestones[0].entries.every((e) => e.version >= 77 && e.version <= 78)).toBe(true);
     // Data Flow Visualization: 69-76
     expect(milestones[1].milestone).toBe("Data Flow Visualization");

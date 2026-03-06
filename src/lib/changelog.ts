@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Spotlight Dimming System (Milestone 9)
   {
+    version: 78,
+    title: "E2E test for spotlight dimming system",
+    description: "Comprehensive milestone E2E test validating the spotlight dimming system: Net Worth card shows dim overlay with spotlighted assets/debts/stocks sections and color-coded formula bar terms; Monthly Surplus formula bar shows after-tax income minus expenses; formula bar displays correct terms for Estimated Tax, Financial Runway, and Debt-to-Asset Ratio; spotlight clears on mouse leave with no residual highlights; mobile viewport shows formula bar fixed at bottom; keyboard Tab triggers spotlight on focus with aria-live announcements; no Cumulative Layout Shift during spotlight activation/deactivation; insight card hover shows spotlight with data-dataflow-active-target attribute.",
+    date: "2026-03-05",
+  },
+  {
     version: 77,
     title: "Replace SVG arrow overlay with spotlight dimming system",
     description: "Replaced SVG arrow overlay with a spotlight dimming system: a dark backdrop dims the page while source sections and the active metric card rise above it with colored borders and shadows. Added FormulaBar component showing color-coded computation terms as pills (green positive, red negative, bold result). Added activeTargetMeta to DataFlowContext for formula display. Mobile formula bar fixed at bottom of viewport. Removed all SVG geometry functions, arrow animations, and particle effects.",
