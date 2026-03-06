@@ -151,14 +151,16 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
   );
 
   const chartData = useMemo(() => {
-    const sampled = downsamplePoints(projection.points);
-    return sampled.map((p) => ({
-      year: p.year,
-      netWorth: p.netWorth,
-      assets: p.totalAssets,
-      debts: -p.totalDebts, // show as negative for visual clarity
-      withdrawalTaxDrag: p.withdrawalTaxDrag ?? 0,
-    }));
+    // Sample at whole-year intervals so tooltip snaps to integer years
+    return projection.points
+      .filter((p) => p.month % 12 === 0)
+      .map((p) => ({
+        year: Math.round(p.month / 12),
+        netWorth: p.netWorth,
+        assets: p.totalAssets,
+        debts: -p.totalDebts, // show as negative for visual clarity
+        withdrawalTaxDrag: p.withdrawalTaxDrag ?? 0,
+      }));
   }, [projection]);
 
   const xTicks = useMemo(() => computeXTicks(years), [years]);
@@ -221,22 +223,15 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
   const burndownData = useMemo(() => {
     if (!runwayDetails) return null;
     const hasTaxDrag = (runwayDetails.taxDragMonths ?? 0) > 0;
-    const maxLen = Math.max(runwayDetails.withGrowth.length, runwayDetails.withoutGrowth.length, runwayDetails.withTax.length);
-    // Pad burndown to 50 years (600 months) if shorter, so both modes share the same X-axis range
-    const targetLen = Math.max(maxLen, 600);
-    const step = targetLen > 300 ? Math.ceil(targetLen / 300) : 1;
+    // Sample at whole-year intervals (every 12 months) so tooltip snaps to integer years
     const data: { year: number; withGrowth: number; withoutGrowth: number; withTax: number }[] = [];
-    for (let i = 0; i < targetLen; i += step) {
-      const gPt = runwayDetails.withGrowth[Math.min(i, runwayDetails.withGrowth.length - 1)];
-      const nPt = runwayDetails.withoutGrowth[Math.min(i, runwayDetails.withoutGrowth.length - 1)];
-      const tPt = runwayDetails.withTax[Math.min(i, runwayDetails.withTax.length - 1)];
-      const month = gPt?.month ?? i;
-      // If past the end of data, balance stays at $0
-      const gBal = i < runwayDetails.withGrowth.length ? Math.round(gPt?.totalBalance ?? 0) : 0;
-      const nBal = i < runwayDetails.withoutGrowth.length ? Math.round(nPt?.totalBalance ?? 0) : 0;
-      const tBal = i < runwayDetails.withTax.length ? Math.round(tPt?.totalBalance ?? 0) : 0;
+    for (let yr = 0; yr <= 50; yr++) {
+      const i = yr * 12;
+      const gBal = i < runwayDetails.withGrowth.length ? Math.round(runwayDetails.withGrowth[i]?.totalBalance ?? 0) : 0;
+      const nBal = i < runwayDetails.withoutGrowth.length ? Math.round(runwayDetails.withoutGrowth[i]?.totalBalance ?? 0) : 0;
+      const tBal = i < runwayDetails.withTax.length ? Math.round(runwayDetails.withTax[i]?.totalBalance ?? 0) : 0;
       data.push({
-        year: parseFloat((month / 12).toFixed(2)),
+        year: yr,
         withGrowth: gBal,
         withoutGrowth: nBal,
         withTax: tBal,
