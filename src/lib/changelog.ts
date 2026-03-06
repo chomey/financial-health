@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Whiteboard Explainer Mode (Milestone 10)
   {
+    version: 80,
+    title: "Source summary cards for explainer modal",
+    description: "Added SourceSummaryCard component to the explainer modal. Each source section now shows a detailed read-only card with section icon, individual items with values, a bold total with hand-drawn oval annotation, and colored left border (green for positive, red for negative). Sections with many items show top 5 by position and a '+N more' summary row. Extended SourceMetadata with items array and updated CollapsibleSection to pass item-level data from all 6 entry types (assets, debts, income, expenses, property, stocks).",
+    date: "2026-03-05",
+  },
+  {
     version: 79,
     title: "Replace spotlight dimming with click-to-explain whiteboard mode",
     description: "Complete overhaul of data-flow visualization: removed hover-triggered spotlight/dimming system (SpotlightOverlay, FormulaBar, full-page overlay, data-dataflow-highlighted CSS). Replaced with click-triggered whiteboard explainer modal that opens when clicking any metric card or insight card. Modal shows metric title, value, source summary cards with colored left borders (green positive, red negative), hand-drawn SVG oval annotations around values, arithmetic operators between sources, and a sum bar with result. Hand-drawn SVG utilities (handDrawnOval, handDrawnLine) create wobbly organic paths. Modal animates in/out with scale+fade. Closes on Escape, X button, or backdrop click. Added 'click to explain' hint on metric cards.",

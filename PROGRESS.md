@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 82
-- **Completed**: 79
-- **Remaining**: 3
+- **Completed**: 80
+- **Remaining**: 2
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1715,3 +1715,25 @@
   ![Explainer modal — mobile](screenshots/task-79-explainer-modal-mobile.png)
   ![Explainer modal — insight card](screenshots/task-79-explainer-modal-insight.png)
 - **Notes**: Complete replacement of the hover-triggered spotlight/dimming system with a click-triggered whiteboard-style explainer modal. The modal uses hand-drawn SVG annotations (wobbly ovals around values, wobbly sum bar line) with sequenced draw-on animations. Source cards use colored left borders (green for positive contributions, red for negative). All 19 affected test files (unit + E2E) were updated to reflect the new interaction model. No spotlight overlay, formula bar, or data-dataflow-highlighted attributes remain in the codebase.
+
+---
+
+## Task 80: Build source summary cards for explainer modal
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Added `SourceMetadataItem` interface and `items` field to `SourceMetadata`. Created `SourceSummaryCard` component with section icon, individual items list (top 5 with "+N more" for >5 items), bold total with hand-drawn oval annotation, and colored left border (green positive, red negative). Added `SECTION_ICONS` mapping. Updated `ExplainerModal` to use `SourceSummaryCard` instead of inline source cards.
+  - `src/app/page.tsx`: Added `SourceMetadataItem` import and `dataFlowItems` prop to `CollapsibleSection`. Built item arrays for all 6 sections (assets, debts, income, expenses, property equity, stocks). Passed `dataFlowItems` to each `CollapsibleSection` for registration with the DataFlowContext.
+  - `tests/unit/explainer-modal.test.tsx`: Updated 2 tests to use new `source-summary-*` testids instead of old `explainer-oval-*` and `explainer-source-*` testids.
+  - `src/lib/changelog.ts`: Added v80 changelog entry. Added "Whiteboard Explainer Mode" milestone group (79-82).
+  - `tests/unit/changelog.test.ts`: Updated to expect 80 entries in Whiteboard Explainer Mode milestone group.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/source-summary-card.test.tsx`: 14 tests — SourceSummaryCard rendering (icon, items, total, oval, green/red border, +N more, empty items, absolute values, section icons), ExplainerModal integration (items detail, oval annotations, operators)
+  - All T1 unit tests: 972 passed, 0 failed (62 test files)
+  - `tests/e2e/source-summary-cards.spec.ts`: 6 tests — Net Worth summary cards with items, colored borders, Monthly Surplus with income/expense cards, structure verification, modal close/reopen, SVG path validation
+  - All T2 E2E tests: 222 passed, 0 failed
+- **Screenshots**:
+  ![Net Worth summary cards](screenshots/task-80-net-worth-summary-cards.png)
+  ![Monthly Surplus summary cards](screenshots/task-80-monthly-surplus-summary-cards.png)
+- **Notes**: Fixed pre-existing test failure from task 79 (changelog test expected 78 entries but 79 existed). The SourceSummaryCard replaces the old flat source cards in the ExplainerModal with rich detail cards showing individual items per section. Item data flows from page.tsx through CollapsibleSection's dataFlowItems prop into the DataFlowContext's SourceMetadata, which the ExplainerModal reads when rendering each source card.
