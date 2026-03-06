@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // SVG Refinements
+  {
+    version: 83,
+    title: "Smoother hand-drawn SVG circles and lines",
+    description: "Replaced the jittery 24-segment quadratic bezier ovals with smooth 4-curve cubic bezier ovals (one per quadrant) that look like a confident teacher circling something with a single fluid pen stroke. Reduced line jitter from max 4px to 2.5px for gentler curves. Jitter amplitude now scales with oval size (1-2px for small, 2-3px for large).",
+    date: "2026-03-06",
+  },
   // Whiteboard Explainer Mode (Milestone 10)
   {
     version: 82,

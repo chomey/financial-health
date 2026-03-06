@@ -9,10 +9,10 @@
 -->
 
 ## Summary
-- **Total Tasks**: 82
-- **Completed**: 82
-- **Remaining**: 0
-- **Last Updated**: 2026-03-05
+- **Total Tasks**: 87
+- **Completed**: 83
+- **Remaining**: 4
+- **Last Updated**: 2026-03-06
 
 ---
 
@@ -1784,3 +1784,17 @@
   ![Mobile explainer at 375px](screenshots/task-82-mobile-explainer.png)
   ![Full journey complete](screenshots/task-82-full-journey-complete.png)
 - **Notes**: Fixed pre-existing changelog test failure (task 81 added v81 entry but tests expected 80 entries; committed fix separately). All 82 tasks are now complete. The whiteboard explainer modal milestone (tasks 79-82) is fully covered with unit tests, E2E tests, and screenshots. The full E2E suite (247 tests) passes across all milestone test files.
+
+## Task 83: Refine hand-drawn SVG circles to use larger sweeping arcs
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Rewrote `handDrawnOval` to use 4 cubic bezier curves (one per quadrant) instead of 24 quadratic bezier segments. Jitter amplitude now scales with oval size (1-2px for small ovals, 2-3px for large). Uses kappa constant (0.5523) for proper circle approximation with gentle sinusoidal undulations. Rewrote `handDrawnLine` to reduce max jitter from 4px to 2.5px for gentler curves.
+  - `tests/unit/explainer-modal.test.tsx`: Updated tests to verify 4 cubic bezier curves (C commands) instead of 24 quadratic beziers (Q commands), added test for fewer control points, tightened wobble bounds from 1.3x to 1.15x, reduced line jitter bounds from 10px to 5px.
+  - `src/lib/changelog.ts`: Added v83 changelog entry.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/explainer-modal.test.tsx`: 52 tests passed, 0 failed (updated hand-drawn SVG tests for new implementation)
+  - All 1014 unit tests passed, 0 failed
+  - All 246 Playwright E2E tests passed, 0 failed
+- **Notes**: The new oval implementation produces much smoother, more confident-looking circles. Instead of many small jittery segments, each quadrant is a single smooth cubic bezier with subtle undulation — like a teacher circling something with one fluid stroke.
