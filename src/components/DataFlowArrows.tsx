@@ -10,12 +10,14 @@ import React, {
   type RefObject,
   type ReactNode,
 } from "react";
+import { formatCurrency, type SupportedCurrency } from "@/lib/currency";
 
 // --- Types ---
 
 export interface SourceMetadataItem {
   label: string;
   value: number;
+  currency?: import("@/lib/currency").SupportedCurrency;
 }
 
 export interface SourceMetadata {
@@ -135,6 +137,7 @@ interface DataFlowContextValue {
   activeTargetMeta: ActiveTargetMeta | null;
   setActiveTargetMeta: (meta: ActiveTargetMeta | null) => void;
   getSourceMetadata: (id: string) => SourceMetadata | undefined;
+  homeCurrency: import("@/lib/currency").SupportedCurrency;
 }
 
 // --- Constants ---
@@ -294,6 +297,7 @@ export function SourceSummaryCard({
   total,
   isPositive,
   ovalSeed,
+  homeCurrency,
 }: {
   sourceId: string;
   sectionName: string;
@@ -301,8 +305,10 @@ export function SourceSummaryCard({
   total: string;
   isPositive: boolean;
   ovalSeed: number;
+  homeCurrency?: SupportedCurrency;
 }) {
   const icon = SECTION_ICONS[sourceId] || "";
+  const cur = homeCurrency ?? "USD";
 
   return (
     <div
@@ -321,12 +327,19 @@ export function SourceSummaryCard({
       {items && items.length > 0 && (
         <div className="max-h-[200px] overflow-y-auto mb-3 scrollbar-thin" data-testid={`source-summary-items-${sourceId}`}>
           <ul className="space-y-1">
-            {items.map((item, i) => (
-              <li key={i} className="flex items-center justify-between text-sm">
-                <span className="text-stone-500 truncate mr-2">{item.label}</span>
-                <span className="font-medium text-stone-700 whitespace-nowrap">${Math.abs(item.value).toLocaleString()}</span>
-              </li>
-            ))}
+            {items.map((item, i) => {
+              const itemCur = item.currency ?? cur;
+              const showCurrencyCode = item.currency && item.currency !== cur;
+              return (
+                <li key={i} className="flex items-center justify-between text-sm">
+                  <span className="text-stone-500 truncate mr-2">{item.label}</span>
+                  <span className="font-medium text-stone-700 whitespace-nowrap">
+                    {formatCurrency(Math.abs(item.value), itemCur)}
+                    {showCurrencyCode && <span className="ml-1 text-xs text-stone-400">{itemCur}</span>}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
@@ -481,14 +494,16 @@ function TieredBracketBars({
   isZeroIncome,
   subtotal,
   testIdPrefix,
+  homeCurrency,
 }: {
   title: string;
   brackets: TaxBracketSegment[];
   isZeroIncome: boolean;
   subtotal: number;
   testIdPrefix: string;
+  homeCurrency?: SupportedCurrency;
 }) {
-  const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  const fmt = (n: number) => formatCurrency(Math.abs(n), homeCurrency ?? "USD");
   const fmtRange = (min: number, max: number) => {
     if (max >= Infinity || max >= 1e12) return `${fmt(min)}+`;
     return `${fmt(min)} – ${fmt(max)}`;
@@ -573,8 +588,9 @@ function TieredBracketBars({
   );
 }
 
-function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
-  const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerDetails; homeCurrency?: SupportedCurrency }) {
+  const cur = homeCurrency ?? "USD";
+  const fmt = (n: number) => formatCurrency(Math.abs(n), cur);
 
   const isZeroIncome = details.grossIncome <= 0;
 
@@ -604,6 +620,7 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
         isZeroIncome={isZeroIncome}
         subtotal={federalSubtotal}
         testIdPrefix="tax-federal-brackets"
+        homeCurrency={cur}
       />
 
       {/* Provincial/State tiered bracket bars */}
@@ -614,6 +631,7 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
           isZeroIncome={isZeroIncome}
           subtotal={provincialSubtotal}
           testIdPrefix="tax-provincial-brackets"
+          homeCurrency={cur}
         />
       )}
 
@@ -718,8 +736,8 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
 
 // --- RunwayExplainerContent ---
 
-function RunwayExplainerContent({ details }: { details: RunwayExplainerDetails }) {
-  const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+function RunwayExplainerContent({ details, homeCurrency }: { details: RunwayExplainerDetails; homeCurrency?: SupportedCurrency }) {
+  const fmt = (n: number) => formatCurrency(Math.abs(n), homeCurrency ?? "USD");
 
   return (
     <div className="space-y-5" data-testid="runway-explainer">
@@ -864,11 +882,13 @@ function RunwayExplainerContent({ details }: { details: RunwayExplainerDetails }
 
 // --- InvestmentReturnsSummary ---
 
-function InvestmentReturnsSummary({ returns }: { returns: SurplusInvestmentReturn[] }) {
-  const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+function InvestmentReturnsSummary({ returns, homeCurrency }: { returns: SurplusInvestmentReturn[]; homeCurrency?: SupportedCurrency }) {
+  const cur = homeCurrency ?? "USD";
+  const fmt = (n: number) => formatCurrency(Math.abs(n), cur);
   const fmtBalance = (n: number) => {
-    if (n >= 1000) return `$${(n / 1000).toFixed(0)}k`;
-    return `$${n.toFixed(0)}`;
+    const symbol = cur === "CAD" ? "CA$" : "$";
+    if (n >= 1000) return `${symbol}${(n / 1000).toFixed(0)}k`;
+    return `${symbol}${n.toFixed(0)}`;
   };
   const totalReturns = returns.reduce((sum, r) => sum + r.amount, 0);
 
@@ -913,11 +933,13 @@ function ExplainerModal({
   targetMeta,
   onClose,
   getSourceMetadata,
+  homeCurrency: homeCurrencyProp = "USD" as SupportedCurrency,
 }: {
   connections: ActiveConnection[];
   targetMeta: ActiveTargetMeta;
   onClose: () => void;
   getSourceMetadata: (id: string) => SourceMetadata | undefined;
+  homeCurrency?: SupportedCurrency;
 }) {
   const [closing, setClosing] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -985,9 +1007,9 @@ function ExplainerModal({
 
         {/* Metric-specific content or generic source cards */}
         {targetMeta.metricType === "estimated-tax" && targetMeta.taxDetails ? (
-          <TaxExplainerContent details={targetMeta.taxDetails} />
+          <TaxExplainerContent details={targetMeta.taxDetails} homeCurrency={homeCurrencyProp} />
         ) : targetMeta.metricType === "financial-runway" && targetMeta.runwayDetails ? (
-          <RunwayExplainerContent details={targetMeta.runwayDetails} />
+          <RunwayExplainerContent details={targetMeta.runwayDetails} homeCurrency={homeCurrencyProp} />
         ) : (
           <>
             {/* Source summary cards with connectors */}
@@ -997,7 +1019,7 @@ function ExplainerModal({
                 const isPositive = conn.sign !== "negative";
                 const showOperator = i > 0;
                 const sectionName = meta?.label || conn.label || conn.sourceId.replace("section-", "");
-                const displayValue = conn.label || (meta ? `$${Math.abs(meta.value).toLocaleString()}` : "");
+                const displayValue = meta ? formatCurrency(Math.abs(meta.value), homeCurrencyProp) : (conn.label || "");
                 const cardDelay = i * 50; // Stagger card fade-ins
 
                 return (
@@ -1024,6 +1046,7 @@ function ExplainerModal({
                         total={displayValue}
                         isPositive={isPositive}
                         ovalSeed={i + 1}
+                        homeCurrency={homeCurrencyProp}
                       />
                     </div>
                     {/* Connector line from this card toward the result */}
@@ -1078,7 +1101,7 @@ export { ExplainerModal, ConnectorLine, CountUpValue, TaxExplainerContent, Runwa
 
 // --- Provider ---
 
-export function DataFlowProvider({ children }: { children: ReactNode }) {
+export function DataFlowProvider({ children, homeCurrency = "USD" as import("@/lib/currency").SupportedCurrency }: { children: ReactNode; homeCurrency?: import("@/lib/currency").SupportedCurrency }) {
   const sourcesRef = useRef<Map<string, RegisteredElement>>(new Map());
   const targetsRef = useRef<Map<string, RegisteredElement>>(new Map());
   const [activeTarget, setActiveTarget] = useState<string | null>(null);
@@ -1136,6 +1159,7 @@ export function DataFlowProvider({ children }: { children: ReactNode }) {
     activeTargetMeta,
     setActiveTargetMeta,
     getSourceMetadata,
+    homeCurrency,
   };
 
   return (
@@ -1147,6 +1171,7 @@ export function DataFlowProvider({ children }: { children: ReactNode }) {
           targetMeta={activeTargetMeta}
           onClose={handleClose}
           getSourceMetadata={getSourceMetadata}
+          homeCurrency={homeCurrency}
         />
       )}
     </DataFlowContext.Provider>

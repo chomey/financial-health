@@ -9,35 +9,16 @@
 -->
 
 ## Summary
-- **Total Tasks**: 101
-- **Completed**: 101
-- **Remaining**: 0
+- **Total Tasks**: 108
+- **Completed**: 103
+- **Remaining**: 5
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 93: Support Roth 401k as a distinct account category
-- **Status**: Complete
-- **Date**: 2026-03-06
-- **Changes**:
-  - `src/components/AssetEntry.tsx`: Added "Roth 401k" to US category suggestions (after "401k"), DEFAULT_ROI (7%), and TAX_SHELTERED_CATEGORIES
-  - `src/lib/withdrawal-tax.ts`: Added "Roth 401k" as "tax-free" in TAX_TREATMENT_MAP
-  - `src/components/AssetAllocationChart.tsx`: Added "Roth 401k" to RETIREMENT_CATEGORIES
-  - `src/lib/changelog.ts`: Added v93 changelog entry, extended UI Polish milestone range to [88, 94]
-  - `tests/unit/changelog.test.ts`: Updated counts for 93 entries (also fixed pre-existing failure from task 92)
-  - `tests/unit/asset-entry.test.tsx`: Updated suggestion count from 15 to 16
-- **Test tiers run**: T1, T2
-- **Tests**:
-  - `tests/unit/roth-401k.test.ts`: 9 passed, 0 failed (category suggestions, default ROI, tax treatment, ROI toggle hidden, allocation grouping)
-  - All T1 unit tests: 1102 passed, 0 failed
-  - `tests/e2e/roth-401k.spec.ts`: 3 passed, 0 failed (suggestion appears, can add asset, ROI shown + no tax toggle)
-- **Screenshots**:
-  ![Roth 401k suggestion](screenshots/task-93-roth-401k-suggestion.png)
-  ![Roth 401k added](screenshots/task-93-roth-401k-added.png)
-  ![Roth 401k ROI no tax toggle](screenshots/task-93-roth-401k-roi-no-tax-toggle.png)
-- **Notes**: Simple lookup table additions. "Roth 401k" is classified as tax-free (like Roth IRA) since qualified withdrawals are not taxed. ROI tax treatment toggle is hidden for tax-sheltered accounts. Pre-existing test failure in changelog.test.ts was fixed in a separate commit.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 94: Smart tax treatment classification with keyword matching and user override
 - **Status**: Complete
@@ -268,3 +249,12 @@
   ![Provincial bracket bars](screenshots/task-102-provincial-bracket-bars.png)
   ![Unfilled bracket tiers](screenshots/task-102-unfilled-bracket-tiers.png)
 - **Notes**: Pre-existing test failures in zero-income E2E tests were fixed in a separate commit — they assumed deleting salary alone produced zero income, but Task 100's investment interest from assets kept income non-zero. Fix: also delete assets before checking zero-income behavior.
+
+## Task 103: Fix currency formatting in explainer modals
+- **Date**: 2026-03-06
+- **Files**: `src/components/DataFlowArrows.tsx` (added `formatCurrency` import, `homeCurrency` to context/provider/ExplainerModal/SourceSummaryCard/TaxExplainerContent/RunwayExplainerContent/InvestmentReturnsSummary, `currency` field on SourceMetadataItem, replaced hardcoded "$" formatting with Intl.NumberFormat), `src/app/page.tsx` (pass `homeCurrency` to DataFlowProvider, `currency` to asset/debt/property items, updated `fmtLabel` to use `formatCurrencyCompact`), `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`, `tests/unit/explainer-currency-formatting.test.tsx` (new), `tests/e2e/explainer-currency-formatting.spec.ts` (new)
+- **Tests**: T1: 1256 passed, 0 failed (77 files). T2: 4 passed, 0 failed.
+- **Screenshots**:
+  ![Explainer full currency](screenshots/task-103-explainer-full-currency.png)
+  ![Explainer CAD currency](screenshots/task-103-explainer-cad-currency.png)
+  ![Tax explainer full currency](screenshots/task-103-tax-explainer-full-currency.png)

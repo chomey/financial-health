@@ -28,7 +28,7 @@ import {
   toFinancialData,
 } from "@/lib/financial-state";
 import { getStateFromURL, updateURL } from "@/lib/url-state";
-import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey } from "@/lib/currency";
+import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey, formatCurrencyCompact } from "@/lib/currency";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
 import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
@@ -391,24 +391,20 @@ export default function Home() {
   const stockCount = stocks.length;
 
   // Build item-level data for source summary cards in explainer modal
-  const assetItems: SourceMetadataItem[] = assets.filter((a) => !a.computed).map((a) => ({ label: a.category, value: a.amount }));
-  const debtItems: SourceMetadataItem[] = debts.map((d) => ({ label: d.category, value: d.amount }));
+  const assetItems: SourceMetadataItem[] = assets.filter((a) => !a.computed).map((a) => ({ label: a.category, value: a.amount, currency: a.currency }));
+  const debtItems: SourceMetadataItem[] = debts.map((d) => ({ label: d.category, value: d.amount, currency: d.currency }));
   const incomeItems: SourceMetadataItem[] = [
     ...income.map((i) => ({ label: i.category, value: i.amount })),
     ...monthlyInvestmentReturns.map((r) => ({ label: `${r.label} returns`, value: Math.round(r.amount) })),
   ];
   const expenseItems: SourceMetadataItem[] = expenses.map((e) => ({ label: e.category, value: e.amount }));
-  const propertyItems: SourceMetadataItem[] = properties.map((p) => ({ label: p.name, value: Math.max(0, p.value - p.mortgage) }));
+  const propertyItems: SourceMetadataItem[] = properties.map((p) => ({ label: p.name, value: Math.max(0, p.value - p.mortgage), currency: p.currency }));
   const stockItems: SourceMetadataItem[] = stocks.map((s) => ({ label: s.ticker, value: getStockValue(s) }));
 
   // Data-flow connections for metric cards
   const fmtLabel = (v: number) => {
     const sign = v >= 0 ? "+" : "-";
-    const abs = Math.abs(v);
-    const formatted = abs >= 1000
-      ? `$${(abs / 1000).toFixed(abs >= 10000 ? 0 : 1)}k`
-      : `$${abs.toFixed(0)}`;
-    return `${sign}${formatted}`;
+    return `${sign}${formatCurrencyCompact(Math.abs(v), homeCurrency)}`;
   };
 
   const netWorthConnections: DataFlowConnectionDef[] = [
@@ -495,7 +491,7 @@ export default function Home() {
   const benchmarkDebtToIncome = annualIncome > 0 ? (debtTotal + totals.totalPropertyMortgage) / annualIncome : 0;
 
   return (
-    <DataFlowProvider>
+    <DataFlowProvider homeCurrency={homeCurrency}>
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white px-4 py-3 shadow-sm sm:px-6 sm:py-4">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
