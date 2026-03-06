@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { generateInsights, type FinancialData, type InsightType } from "@/lib/insights";
-import { useOptionalDataFlow, type ActiveConnection } from "@/components/DataFlowArrows";
+import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections } from "@/components/DataFlowArrows";
 
 interface MetricData {
   title: string;
@@ -136,6 +136,7 @@ function useCountUp(target: number, duration: number = 1000): number {
 function MetricCard({ metric, insights, homeCurrency, connections }: { metric: MetricData; insights: string[]; homeCurrency?: string; connections?: DataFlowConnectionDef[] }) {
   const animatedValue = useCountUp(metric.value);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [ariaAnnouncement, setAriaAnnouncement] = useState("");
   const cardRef = useRef<HTMLDivElement>(null);
   const ctx = useOptionalDataFlow();
   const targetId = `metric-${metric.title.toLowerCase().replace(/\s+/g, "-")}`;
@@ -149,20 +150,25 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
 
   const activateArrows = useCallback(() => {
     if (!ctx || !connections || connections.length === 0) return;
-    const activeConns: ActiveConnection[] = connections
-      .filter((c) => c.value === undefined || c.value > 0)
-      .map((c) => ({
+    const filtered = connections.filter((c) => c.value === undefined || c.value > 0);
+    const prioritized = prioritizeConnections(
+      filtered.map((c) => ({
         sourceId: c.sourceId,
         targetId,
         label: c.label,
         value: c.value,
         sign: c.sign,
-      }));
-    ctx.setActiveConnections(activeConns);
+      }))
+    );
+    ctx.setActiveConnections(prioritized);
     ctx.setActiveTarget(targetId);
 
+    // Build aria-live announcement
+    const parts = prioritized.map((c) => c.label || c.sourceId.replace("section-", ""));
+    setAriaAnnouncement(`${metric.title} is calculated from: ${parts.join(", ")}`);
+
     // Highlight source elements
-    for (const conn of activeConns) {
+    for (const conn of prioritized) {
       const el = document.querySelector(`[data-dataflow-source="${conn.sourceId}"]`);
       if (el instanceof HTMLElement) {
         el.setAttribute("data-dataflow-highlighted", conn.sign === "negative" ? "negative" : "positive");
@@ -173,12 +179,13 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
         }
       }
     }
-  }, [ctx, connections, targetId]);
+  }, [ctx, connections, targetId, metric.title]);
 
   const deactivateArrows = useCallback(() => {
     if (!ctx) return;
     ctx.setActiveConnections([]);
     ctx.setActiveTarget(null);
+    setAriaAnnouncement("");
 
     // Remove all highlights
     document.querySelectorAll("[data-dataflow-highlighted]").forEach((el) => {
@@ -284,6 +291,10 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       <p className="mt-1.5 text-xs text-stone-400 leading-relaxed">
         {metric.tooltip}
       </p>
+      {/* Accessibility: announce data sources to screen readers */}
+      <span className="sr-only" aria-live="polite" data-testid="dataflow-aria-live">
+        {ariaAnnouncement}
+      </span>
     </div>
   );
 }

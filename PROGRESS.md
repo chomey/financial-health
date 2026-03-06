@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 76
-- **Completed**: 74
-- **Remaining**: 2
+- **Completed**: 75
+- **Remaining**: 1
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1571,3 +1571,24 @@
   ![Insight runway arrows](screenshots/task-74-insight-runway-arrows.png)
   ![Insight net-worth arrows](screenshots/task-74-insight-net-worth-arrows.png)
 - **Notes**: Pre-existing changelog test failure fixed in separate commit. Insight arrows use a lighter style (thinner strokes, lower glow opacity) than metric card arrows to avoid visual overload since insights are more numerous. Each insight type maps to the same source sections it conceptually references. The `INSIGHT_TYPE_SOURCES` constant in InsightsPanel documents the mapping but the actual connections (with labels and values) come from page.tsx for consistency with the metric card connection definitions.
+
+## Task 75: Arrow visual polish — animated flow, responsive handling, and accessibility
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Added flowing particle animation (3 `<circle>` elements per arrow with `<animateMotion>` along the path, staggered timing). Added `prioritizeConnections()` to cap at MAX_ARROWS=8, sorted by absolute value magnitude. Added `isMobile` state that detects `< 768px` viewport and suppresses SVG overlay rendering. Added `willChange: "transform"` to SVG overlay style. Label pill rects changed to `rx={10}` (capsule shape) with `fillOpacity={0.95}` and `strokeWidth={1.5}`.
+  - `src/components/SnapshotDashboard.tsx`: MetricCard now uses `prioritizeConnections()` for active connections. Added `ariaAnnouncement` state and `<span className="sr-only" aria-live="polite">` region that announces data sources on hover/focus (e.g., "Net Worth is calculated from: +$65k, +$12k, -$295k"). Cleared on mouse leave.
+  - `src/components/InsightsPanel.tsx`: InsightCard now uses `prioritizeConnections()` for active connections.
+  - `src/app/globals.css`: Added mobile-specific CSS with `@media (max-width: 767px)` overriding data-flow highlights with `mobile-border-pulse-green` and `mobile-border-pulse-red` keyframe animations (infinite pulsing border).
+  - `src/lib/changelog.ts`: Added v75 entry.
+  - `tests/unit/changelog.test.ts`: Updated expectations for 75 entries and 7 milestone-8 entries.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/arrow-polish.test.tsx`: 9 tests — prioritizeConnections (under limit, over limit, by value magnitude, without value, MAX_ARROWS constant), aria-live region rendering, mobile SVG suppression, aria-hidden attribute, will-change style (9 passed, 0 failed)
+  - `tests/e2e/arrow-polish.spec.ts`: 6 tests — flowing particles with animateMotion, rounded label pills (rx=10), aria-hidden + will-change on overlay, aria-live announcements, mobile highlight-only mode, arrows/highlights clear on leave (6 passed, 0 failed)
+  - All unit tests: 928 passed, 0 failed (58 test files)
+- **Screenshots**:
+  ![Flowing particles](screenshots/task-75-flowing-particles.png)
+  ![Label pills](screenshots/task-75-label-pills.png)
+  ![Mobile highlight-only](screenshots/task-75-mobile-highlight-only.png)
+- **Notes**: Five polish features implemented: (1) Flowing particles: 3 circles per arrow with staggered `animateMotion`, lighter style gets 2.5s duration vs 2s default. (2) Responsive: mobile (< 768px) suppresses SVG overlay entirely; source highlights still work via CSS with infinite pulsing border animations. (3) Accessibility: arrows are decorative-only (aria-hidden), aria-live polite region announces sources on focus/hover for screen readers. (4) Performance: rAF throttle (existing), will-change on SVG, max 8 arrows prioritized by absolute value. (5) Label pills: capsule-shaped (rx=10) with slightly thicker stroke and higher fill opacity.

@@ -49,6 +49,11 @@ interface DataFlowContextValue {
   setActiveConnections: (connections: ActiveConnection[]) => void;
 }
 
+// --- Constants ---
+
+/** Maximum simultaneous arrows to render (prioritize by absolute value) */
+export const MAX_ARROWS = 8;
+
 // --- Context ---
 
 const DataFlowContext = createContext<DataFlowContextValue | null>(null);
@@ -155,6 +160,19 @@ export function approximatePathLength(from: Point, to: Point): number {
   return Math.sqrt(dx * dx + dy * dy) * 1.2;
 }
 
+/**
+ * Prioritize connections by absolute value magnitude, returning at most MAX_ARROWS.
+ */
+export function prioritizeConnections(
+  connections: ActiveConnection[],
+  maxArrows: number = MAX_ARROWS
+): ActiveConnection[] {
+  if (connections.length <= maxArrows) return connections;
+  return [...connections]
+    .sort((a, b) => Math.abs(b.value ?? 0) - Math.abs(a.value ?? 0))
+    .slice(0, maxArrows);
+}
+
 // --- DataFlowSourceItem (wrapper for sub-source registration) ---
 
 export function DataFlowSourceItem({
@@ -259,6 +277,9 @@ interface ArrowData {
   light?: boolean;
 }
 
+/** Number of flowing particles per arrow path */
+const PARTICLES_PER_ARROW = 3;
+
 function DataFlowArrowOverlay({
   sources,
   targets,
@@ -267,7 +288,16 @@ function DataFlowArrowOverlay({
 }: ArrowOverlayProps) {
   const [arrows, setArrows] = useState<ArrowData[]>([]);
   const [visible, setVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const recalcRef = useRef<number>(0);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const calculateArrows = useCallback(() => {
     if (!activeTarget || connections.length === 0) {
@@ -287,7 +317,10 @@ function DataFlowArrowOverlay({
 
     const newArrows: ArrowData[] = [];
 
-    connections.forEach((conn, index) => {
+    // Prioritize by value magnitude, cap at MAX_ARROWS
+    const prioritized = prioritizeConnections(connections);
+
+    prioritized.forEach((conn, index) => {
       const sourceEntry = sources.current.get(conn.sourceId);
       if (!sourceEntry?.ref.current) return;
 
@@ -322,7 +355,7 @@ function DataFlowArrowOverlay({
     setVisible(true);
   }, [activeTarget, connections, sources, targets]);
 
-  // Recalculate on scroll/resize
+  // Recalculate on scroll/resize — throttled to 1 frame per event
   useEffect(() => {
     if (!activeTarget) {
       setArrows([]);
@@ -361,7 +394,8 @@ function DataFlowArrowOverlay({
     };
   }, [activeTarget, connections, calculateArrows, sources, targets]);
 
-  if (!visible || arrows.length === 0) return null;
+  // On mobile, don't render SVG arrows — highlight-only mode is handled via CSS
+  if (isMobile || !visible || arrows.length === 0) return null;
 
   return (
     <svg
@@ -374,6 +408,7 @@ function DataFlowArrowOverlay({
         height: "100vh",
         pointerEvents: "none",
         zIndex: 50,
+        willChange: "transform",
       }}
       aria-hidden="true"
     >
@@ -418,6 +453,8 @@ function DataFlowArrowOverlay({
         const glowWidth = arrow.light ? 2 : 4;
         const strokeWidth = arrow.light ? 1.5 : 2.5;
         const glowOpacity = arrow.light ? 0.15 : 0.3;
+        const particleRadius = arrow.light ? 2.5 : 3.5;
+        const particleDuration = arrow.light ? "2.5s" : "2s";
         return (
           <g key={i}>
             {/* Background glow path */}
@@ -431,6 +468,13 @@ function DataFlowArrowOverlay({
               style={{
                 animation: `arrow-fade-in 0.3s ease-out ${arrow.delay}ms both`,
               }}
+            />
+            {/* Hidden path for particle motion reference */}
+            <path
+              id={`arrow-path-${i}`}
+              d={arrow.path}
+              fill="none"
+              stroke="none"
             />
             {/* Main animated path */}
             <path
@@ -446,7 +490,26 @@ function DataFlowArrowOverlay({
                 animation: `arrow-draw 1.2s ease-out ${arrow.delay}ms forwards`,
               }}
             />
-            {/* Label */}
+            {/* Flowing particles along the path */}
+            {Array.from({ length: PARTICLES_PER_ARROW }).map((_, pi) => (
+              <circle
+                key={pi}
+                r={particleRadius}
+                fill={arrow.color}
+                opacity={0}
+                style={{
+                  animation: `arrow-fade-in 0.3s ease-out ${arrow.delay + 1000}ms both`,
+                }}
+              >
+                <animateMotion
+                  dur={particleDuration}
+                  repeatCount="indefinite"
+                  begin={`${arrow.delay / 1000 + 1 + (pi * (parseFloat(particleDuration) / PARTICLES_PER_ARROW))}s`}
+                  path={arrow.path}
+                />
+              </circle>
+            ))}
+            {/* Label pill at midpoint */}
             {arrow.label && (
               <g
                 style={{
@@ -458,11 +521,11 @@ function DataFlowArrowOverlay({
                   y={arrow.labelPos.y - 10}
                   width={80}
                   height={20}
-                  rx={4}
+                  rx={10}
                   fill="white"
-                  fillOpacity={0.9}
+                  fillOpacity={0.95}
                   stroke={arrow.color}
-                  strokeWidth={1}
+                  strokeWidth={1.5}
                 />
                 <text
                   x={arrow.labelPos.x}

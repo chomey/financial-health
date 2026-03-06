@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Data Flow Visualization (Milestone 8)
   {
+    version: 75,
+    title: "Arrow visual polish — particles, responsive, and accessibility",
+    description: "Flowing particle animation along arrow paths with staggered timing. Mobile (< 768px) switches to highlight-only mode with pulsing borders instead of SVG arrows. Accessibility: aria-live region announces data sources to screen readers. Performance: max 8 simultaneous arrows prioritized by value, will-change: transform on SVG overlay. Label pills styled as rounded capsules matching arrow color.",
+    date: "2026-03-05",
+  },
+  {
     version: 74,
     title: "Insight panel cards show data-flow arrows on hover",
     description: "Each insight card in the InsightsPanel now shows animated SVG arrows to its relevant source sections on hover or focus. Insight types map to sources: runway → assets + expenses, surplus → income + expenses, net-worth → assets + debts, savings-rate → income + expenses, debt-interest → debts, tax → income, withdrawal-tax → assets. Insight arrows use a lighter style (thinner, more transparent) than metric card arrows to avoid visual overload.",
