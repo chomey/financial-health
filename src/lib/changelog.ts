@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Data Flow Visualization (Milestone 8)
   {
+    version: 71,
+    title: "Net Worth metric card data-flow arrows on hover",
+    description: "Hovering the Net Worth metric card now shows animated SVG arrows connecting it to the Assets, Stocks, Property (if present), and Debts source sections. Green arrows for positive contributions, red for debts. Source sections get a color-matched highlight glow. Arrows fade in with staggered animation and disappear on mouse leave. Works with keyboard focus too.",
+    date: "2026-03-05",
+  },
+  {
     version: 70,
     title: "Data-flow source registration for all entry sections",
     description: "All 6 entry sections (Assets, Debts, Income, Expenses, Property, Stocks) now register as data-flow sources via DataFlowContext. Individual entry rows also register as sub-sources for granular arrow targeting. CollapsibleSection switches registration between collapsed header and expanded container. DataFlowSourceItem component handles row-level registration with graceful no-op outside provider.",

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { generateInsights, type FinancialData, type InsightType } from "@/lib/insights";
+import { useOptionalDataFlow, type ActiveConnection } from "@/components/DataFlowArrows";
 
 interface MetricData {
   title: string;
@@ -76,6 +77,13 @@ function formatMetricValue(value: number, format: MetricData["format"], currency
   }
 }
 
+export interface DataFlowConnectionDef {
+  sourceId: string;
+  label?: string;
+  value?: number;
+  sign: "positive" | "negative";
+}
+
 export { formatMetricValue, MOCK_METRICS };
 export type { MetricData };
 
@@ -125,9 +133,58 @@ function useCountUp(target: number, duration: number = 1000): number {
   return current;
 }
 
-function MetricCard({ metric, insights, homeCurrency }: { metric: MetricData; insights: string[]; homeCurrency?: string }) {
+function MetricCard({ metric, insights, homeCurrency, connections }: { metric: MetricData; insights: string[]; homeCurrency?: string; connections?: DataFlowConnectionDef[] }) {
   const animatedValue = useCountUp(metric.value);
   const [showTooltip, setShowTooltip] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const ctx = useOptionalDataFlow();
+  const targetId = `metric-${metric.title.toLowerCase().replace(/\s+/g, "-")}`;
+
+  // Register as a data-flow target
+  useEffect(() => {
+    if (!ctx) return;
+    ctx.registerTarget(targetId, cardRef);
+    return () => ctx.unregisterTarget(targetId);
+  }, [ctx, targetId]);
+
+  const activateArrows = useCallback(() => {
+    if (!ctx || !connections || connections.length === 0) return;
+    const activeConns: ActiveConnection[] = connections
+      .filter((c) => c.value === undefined || c.value > 0)
+      .map((c) => ({
+        sourceId: c.sourceId,
+        targetId,
+        label: c.label,
+        value: c.value,
+        sign: c.sign,
+      }));
+    ctx.setActiveConnections(activeConns);
+    ctx.setActiveTarget(targetId);
+
+    // Highlight source elements
+    for (const conn of activeConns) {
+      const el = document.querySelector(`[data-dataflow-source="${conn.sourceId}"]`);
+      if (el instanceof HTMLElement) {
+        el.setAttribute("data-dataflow-highlighted", conn.sign === "negative" ? "negative" : "positive");
+        // Scroll into view if off-screen
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) {
+          el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      }
+    }
+  }, [ctx, connections, targetId]);
+
+  const deactivateArrows = useCallback(() => {
+    if (!ctx) return;
+    ctx.setActiveConnections([]);
+    ctx.setActiveTarget(null);
+
+    // Remove all highlights
+    document.querySelectorAll("[data-dataflow-highlighted]").forEach((el) => {
+      el.removeAttribute("data-dataflow-highlighted");
+    });
+  }, [ctx]);
 
   const valueColor = metric.positive
     ? "text-green-600"
@@ -145,8 +202,11 @@ function MetricCard({ metric, insights, homeCurrency }: { metric: MetricData; in
   const isUnderwaterWarning =
     metric.title === "Monthly Surplus" && metric.value < 0;
 
+  const hasConnections = connections && connections.length > 0;
+
   return (
     <div
+      ref={cardRef}
       className={`relative rounded-xl border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default ${
         isRunwayCelebration
           ? "border-green-300 ring-1 ring-green-200 animate-glow-pulse"
@@ -156,11 +216,12 @@ function MetricCard({ metric, insights, homeCurrency }: { metric: MetricData; in
       }`}
       role="group"
       aria-label={metric.title}
+      data-testid={`metric-card-${metric.title.toLowerCase().replace(/\s+/g, "-")}`}
       data-runway-celebration={isRunwayCelebration || undefined}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-      onFocus={() => setShowTooltip(true)}
-      onBlur={() => setShowTooltip(false)}
+      onMouseEnter={() => { setShowTooltip(true); activateArrows(); }}
+      onMouseLeave={() => { setShowTooltip(false); deactivateArrows(); }}
+      onFocus={() => { setShowTooltip(true); activateArrows(); }}
+      onBlur={() => { setShowTooltip(false); deactivateArrows(); }}
       tabIndex={0}
     >
       <div className="flex items-center justify-between">
@@ -214,9 +275,9 @@ function MetricCard({ metric, insights, homeCurrency }: { metric: MetricData; in
           Excellent safety net!
         </p>
       )}
-      {/* Breakdown on hover */}
+      {/* Breakdown on hover — highlighted when data-flow arrows are active */}
       {metric.breakdown && (
-        <p className={`mt-1.5 text-xs text-stone-400 leading-relaxed transition-opacity duration-200 ${showTooltip ? "opacity-100" : "opacity-0 h-0 overflow-hidden"}`}>
+        <p className={`mt-1.5 text-xs leading-relaxed transition-all duration-200 ${showTooltip ? `opacity-100 ${hasConnections ? "text-stone-600 font-medium" : "text-stone-400"}` : "opacity-0 h-0 overflow-hidden"}`} data-testid="metric-breakdown">
           {metric.breakdown}
         </p>
       )}
@@ -231,9 +292,10 @@ interface SnapshotDashboardProps {
   metrics?: MetricData[];
   financialData?: FinancialData;
   homeCurrency?: string;
+  dataFlowConnections?: Record<string, DataFlowConnectionDef[]>;
 }
 
-export default function SnapshotDashboard({ metrics, financialData, homeCurrency }: SnapshotDashboardProps = {}) {
+export default function SnapshotDashboard({ metrics, financialData, homeCurrency, dataFlowConnections }: SnapshotDashboardProps = {}) {
   const displayMetrics = metrics ?? MOCK_METRICS;
 
   // Generate insights and map to metric cards
@@ -257,6 +319,7 @@ export default function SnapshotDashboard({ metrics, financialData, homeCurrency
           metric={metric}
           insights={insightsByMetric.get(metric.title) ?? []}
           homeCurrency={homeCurrency}
+          connections={dataFlowConnections?.[metric.title]}
         />
       ))}
     </div>

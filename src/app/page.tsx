@@ -7,7 +7,7 @@ import PropertyEntry from "@/components/PropertyEntry";
 import StockEntry, { getStockValue } from "@/components/StockEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
-import SnapshotDashboard from "@/components/SnapshotDashboard";
+import SnapshotDashboard, { type DataFlowConnectionDef } from "@/components/SnapshotDashboard";
 import ProjectionChart from "@/components/ProjectionChart";
 import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
 import AssetAllocationChart from "@/components/AssetAllocationChart";
@@ -384,6 +384,27 @@ export default function Home() {
   const propertyCount = properties.length;
   const stockCount = stocks.length;
 
+  // Data-flow connections for metric cards
+  const fmtLabel = (v: number) => {
+    const sign = v >= 0 ? "+" : "-";
+    const abs = Math.abs(v);
+    const formatted = abs >= 1000
+      ? `$${(abs / 1000).toFixed(abs >= 10000 ? 0 : 1)}k`
+      : `$${abs.toFixed(0)}`;
+    return `${sign}${formatted}`;
+  };
+
+  const netWorthConnections: DataFlowConnectionDef[] = [
+    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" },
+    { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" },
+    ...(totals.totalPropertyEquity > 0 ? [{ sourceId: "section-property", label: fmtLabel(totals.totalPropertyEquity), value: totals.totalPropertyEquity, sign: "positive" as const }] : []),
+    { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
+  ];
+
+  const dataFlowConnections: Record<string, DataFlowConnectionDef[]> = {
+    "Net Worth": netWorthConnections,
+  };
+
   // Benchmark comparison values
   const benchmarkNetWorth = totals.totalAssets + totals.totalStocks + totals.totalPropertyEquity - totals.totalDebts;
   // Savings rate includes surplus + investment contributions (which are a form of saving)
@@ -512,7 +533,7 @@ export default function Home() {
             aria-label="Financial dashboard"
           >
             <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
-              <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} />
+              <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
               {financialData.withdrawalTax && (
                 <ZoomableCard>
                   <WithdrawalTaxSummary
