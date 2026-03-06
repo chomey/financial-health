@@ -58,7 +58,10 @@ export interface TaxExplainerDetails {
   grossIncome: number;
   totalTax: number;
   afterTaxIncome: number;
-  brackets: TaxBracketSegment[]; // combined federal bracket segments for the bar
+  brackets: TaxBracketSegment[]; // federal bracket segments for the bar
+  provincialBrackets?: TaxBracketSegment[]; // provincial/state bracket segments
+  federalBasicPersonalAmount?: number;
+  provincialBasicPersonalAmount?: number;
   hasCapitalGains: boolean;
   capitalGainsInfo?: {
     country: "CA" | "US";
@@ -462,12 +465,65 @@ function CountUpValue({ formattedValue }: { formattedValue: string }) {
 
 // --- TaxExplainerContent ---
 
-function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
+function BracketTable({
+  title,
+  brackets,
+  isZeroIncome,
+  subtotal,
+  testIdPrefix,
+}: {
+  title: string;
+  brackets: TaxBracketSegment[];
+  isZeroIncome: boolean;
+  subtotal: number;
+  testIdPrefix: string;
+}) {
   const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
   const fmtRange = (min: number, max: number) => {
     if (max >= Infinity || max >= 1e12) return `${fmt(min)}+`;
     return `${fmt(min)} – ${fmt(max)}`;
   };
+
+  if (brackets.length === 0) return null;
+
+  return (
+    <div data-testid={`${testIdPrefix}-table`}>
+      <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">{title}</p>
+      <div className="overflow-hidden rounded-lg border border-stone-200">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-stone-50 text-xs text-stone-500">
+              <th className="px-3 py-1.5 text-left font-medium">Range</th>
+              <th className="px-3 py-1.5 text-right font-medium">Rate</th>
+              <th className="px-3 py-1.5 text-right font-medium">Tax</th>
+            </tr>
+          </thead>
+          <tbody>
+            {brackets.map((seg, i) => (
+              <tr key={i} className="border-t border-stone-100" data-testid={`${testIdPrefix}-row-${i}`}>
+                <td className="px-3 py-1.5 text-stone-600">{fmtRange(seg.min, seg.max)}</td>
+                <td className="px-3 py-1.5 text-right font-semibold text-stone-700">{(seg.rate * 100).toFixed(1)}%</td>
+                <td className="px-3 py-1.5 text-right text-stone-600">
+                  {isZeroIncome ? "—" : fmt(seg.taxInBracket)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {!isZeroIncome && (
+        <div className="mt-1.5 flex justify-end">
+          <span className="text-xs font-semibold text-stone-700" data-testid={`${testIdPrefix}-subtotal`}>
+            {title.split(" ")[0]} total: {fmt(subtotal)}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
+  const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
   const isZeroIncome = details.grossIncome <= 0;
 
@@ -480,6 +536,11 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
     "#d1fae5", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981", "#059669", "#047857", "#065f46",
   ];
 
+  const federalSubtotal = details.brackets.reduce((s, b) => s + b.taxInBracket, 0);
+  const provincialSubtotal = (details.provincialBrackets ?? []).reduce((s, b) => s + b.taxInBracket, 0);
+
+  const provincialTableTitle = `${details.jurisdictionType}: ${details.jurisdictionLabel} Tax Brackets`;
+
   return (
     <div className="space-y-5" data-testid="tax-explainer">
       {/* Zero income message */}
@@ -489,7 +550,7 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
             No income entered — add income to see your estimated tax breakdown.
           </p>
           <p className="mt-1 text-sm text-stone-500">
-            Here are the <span className="font-semibold">{details.jurisdictionLabel}</span> federal tax brackets for reference:
+            Here are the <span className="font-semibold">{details.jurisdictionLabel}</span> tax brackets for reference:
           </p>
         </div>
       )}
@@ -536,28 +597,27 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
         </div>
       )}
 
-      {/* Bracket reference table (zero income) */}
-      {isZeroIncome && details.brackets.length > 0 && (
-        <div data-testid="tax-bracket-reference">
-          <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Federal Tax Brackets</p>
-          <div className="space-y-1">
-            {details.brackets.map((seg, i) => {
-              const color = bracketColors[Math.min(i, bracketColors.length - 1)];
-              return (
-                <div key={i} className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-1.5" data-testid={`tax-bracket-ref-${i}`}>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: color }} />
-                    <span className="text-sm text-stone-600">{fmtRange(seg.min, seg.max)}</span>
-                  </div>
-                  <span className="text-sm font-semibold text-stone-700">{(seg.rate * 100).toFixed(1)}%</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      {/* Federal bracket table */}
+      <BracketTable
+        title="Federal Tax Brackets"
+        brackets={details.brackets}
+        isZeroIncome={isZeroIncome}
+        subtotal={federalSubtotal}
+        testIdPrefix="tax-federal-brackets"
+      />
+
+      {/* Provincial/State bracket table */}
+      {details.provincialBrackets && details.provincialBrackets.length > 0 && (
+        <BracketTable
+          title={provincialTableTitle}
+          brackets={details.provincialBrackets}
+          isZeroIncome={isZeroIncome}
+          subtotal={provincialSubtotal}
+          testIdPrefix="tax-provincial-brackets"
+        />
       )}
 
-      {/* Federal & Provincial/State breakdown */}
+      {/* Federal & Provincial/State totals */}
       <div className="space-y-1.5" data-testid="tax-breakdown">
         <div className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2">
           <span className="text-sm text-stone-600">Federal</span>

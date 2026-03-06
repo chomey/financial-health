@@ -125,8 +125,8 @@ test.describe("Tax Explainer - Zero Income", () => {
     await expect(zeroMsg).toContainText("No income entered");
     await expect(zeroMsg).toContainText("Ontario");
 
-    // Should show bracket reference table (not the bar)
-    await expect(page.locator('[data-testid="tax-bracket-reference"]')).toBeVisible();
+    // Should show bracket tables (not the bar)
+    await expect(page.locator('[data-testid="tax-federal-brackets-table"]')).toBeVisible();
     await expect(page.locator('[data-testid="tax-bracket-bar"]')).not.toBeVisible();
 
     // Should show 0.0% rates

@@ -264,17 +264,23 @@ describe("TaxExplainerContent zero income", () => {
     expect(msg).toHaveTextContent("Ontario");
   });
 
-  it("renders bracket reference table for zero income", () => {
+  it("renders federal bracket table for zero income", () => {
     render(<TaxExplainerContent details={zeroIncomeDetails} />);
-    expect(screen.getByTestId("tax-bracket-reference")).toBeInTheDocument();
-    expect(screen.getByTestId("tax-bracket-ref-0")).toBeInTheDocument();
-    expect(screen.getByTestId("tax-bracket-ref-1")).toBeInTheDocument();
-    expect(screen.getByTestId("tax-bracket-ref-2")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-table")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-row-0")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-row-1")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-row-2")).toBeInTheDocument();
   });
 
   it("does NOT render bracket bar visualization for zero income", () => {
     render(<TaxExplainerContent details={zeroIncomeDetails} />);
     expect(screen.queryByTestId("tax-bracket-bar")).not.toBeInTheDocument();
+  });
+
+  it("shows dash for tax amount in zero-income brackets", () => {
+    render(<TaxExplainerContent details={zeroIncomeDetails} />);
+    const row = screen.getByTestId("tax-federal-brackets-row-0");
+    expect(row).toHaveTextContent("—");
   });
 
   it("does NOT render after-tax income flow for zero income", () => {
@@ -303,6 +309,112 @@ describe("TaxExplainerContent zero income", () => {
     render(<TaxExplainerContent details={usZeroDetails} />);
     expect(screen.getByTestId("tax-zero-income-message")).toHaveTextContent("California");
     expect(screen.getByTestId("tax-breakdown")).toHaveTextContent("State: California");
+  });
+});
+
+// --- Provincial/State bracket tables ---
+
+describe("TaxExplainerContent dual bracket tables", () => {
+  const detailsWithProvincial: TaxExplainerDetails = {
+    ...sampleDetails,
+    provincialBrackets: [
+      { min: 0, max: 51446, rate: 0.0505, amountInBracket: 51446, taxInBracket: 2598 },
+      { min: 51446, max: 54000, rate: 0.0915, amountInBracket: 2554, taxInBracket: 234 },
+    ],
+    federalBasicPersonalAmount: 16129,
+    provincialBasicPersonalAmount: 11865,
+  };
+
+  it("renders federal bracket table with income", () => {
+    render(<TaxExplainerContent details={detailsWithProvincial} />);
+    expect(screen.getByTestId("tax-federal-brackets-table")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-federal-brackets-row-0")).toBeInTheDocument();
+  });
+
+  it("renders provincial bracket table with income", () => {
+    render(<TaxExplainerContent details={detailsWithProvincial} />);
+    expect(screen.getByTestId("tax-provincial-brackets-table")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-provincial-brackets-row-0")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-provincial-brackets-row-1")).toBeInTheDocument();
+  });
+
+  it("shows tax amounts in bracket rows when income > 0", () => {
+    render(<TaxExplainerContent details={detailsWithProvincial} />);
+    const fedRow = screen.getByTestId("tax-federal-brackets-row-0");
+    expect(fedRow).toHaveTextContent("$8,100"); // taxInBracket
+    const provRow = screen.getByTestId("tax-provincial-brackets-row-0");
+    expect(provRow).toHaveTextContent("$2,598");
+  });
+
+  it("shows federal subtotal", () => {
+    render(<TaxExplainerContent details={detailsWithProvincial} />);
+    expect(screen.getByTestId("tax-federal-brackets-subtotal")).toHaveTextContent("$8,100");
+  });
+
+  it("shows provincial subtotal", () => {
+    render(<TaxExplainerContent details={detailsWithProvincial} />);
+    expect(screen.getByTestId("tax-provincial-brackets-subtotal")).toHaveTextContent("$2,832");
+  });
+
+  it("provincial table title includes jurisdiction label", () => {
+    render(<TaxExplainerContent details={detailsWithProvincial} />);
+    const table = screen.getByTestId("tax-provincial-brackets-table");
+    expect(table).toHaveTextContent("Provincial: Ontario");
+  });
+
+  it("US state shows State label in provincial table title", () => {
+    const usDetails: TaxExplainerDetails = {
+      ...detailsWithProvincial,
+      jurisdictionLabel: "California",
+      jurisdictionType: "State",
+    };
+    render(<TaxExplainerContent details={usDetails} />);
+    const table = screen.getByTestId("tax-provincial-brackets-table");
+    expect(table).toHaveTextContent("State: California");
+  });
+
+  it("does not render provincial table when provincialBrackets is undefined", () => {
+    const noProvincial: TaxExplainerDetails = { ...sampleDetails };
+    delete (noProvincial as Record<string, unknown>)["provincialBrackets"];
+    render(<TaxExplainerContent details={noProvincial} />);
+    expect(screen.queryByTestId("tax-provincial-brackets-table")).not.toBeInTheDocument();
+  });
+});
+
+describe("computeMetrics provincialBrackets integration", () => {
+  it("taxDetails includes provincialBrackets for CA/ON", () => {
+    const metrics = computeMetrics(INITIAL_STATE);
+    const taxMetric = metrics.find((m) => m.title === "Estimated Tax")!;
+    expect(taxMetric.taxDetails!.provincialBrackets).toBeDefined();
+    expect(taxMetric.taxDetails!.provincialBrackets!.length).toBeGreaterThan(0);
+  });
+
+  it("taxDetails includes provincialBrackets for US/CA", () => {
+    const usState: FinancialState = {
+      ...INITIAL_STATE,
+      country: "US",
+      jurisdiction: "CA",
+    };
+    const metrics = computeMetrics(usState);
+    const taxMetric = metrics.find((m) => m.title === "Estimated Tax")!;
+    expect(taxMetric.taxDetails!.provincialBrackets).toBeDefined();
+    expect(taxMetric.taxDetails!.provincialBrackets!.length).toBeGreaterThan(0);
+  });
+
+  it("zero-income taxDetails has provincial reference brackets with zero amounts", () => {
+    const noIncome: FinancialState = { ...INITIAL_STATE, income: [] };
+    const metrics = computeMetrics(noIncome);
+    const taxMetric = metrics.find((m) => m.title === "Estimated Tax")!;
+    expect(taxMetric.taxDetails!.provincialBrackets).toBeDefined();
+    expect(taxMetric.taxDetails!.provincialBrackets!.length).toBeGreaterThan(0);
+    expect(taxMetric.taxDetails!.provincialBrackets!.every(b => b.amountInBracket === 0)).toBe(true);
+  });
+
+  it("taxDetails includes federalBasicPersonalAmount and provincialBasicPersonalAmount", () => {
+    const metrics = computeMetrics(INITIAL_STATE);
+    const taxMetric = metrics.find((m) => m.title === "Estimated Tax")!;
+    expect(taxMetric.taxDetails!.federalBasicPersonalAmount).toBeGreaterThan(0);
+    expect(taxMetric.taxDetails!.provincialBasicPersonalAmount).toBeDefined();
   });
 });
 

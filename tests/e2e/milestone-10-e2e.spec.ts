@@ -79,7 +79,7 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
 
       // Bracket reference table visible, not the bar
       await expect(
-        page.locator('[data-testid="tax-bracket-reference"]')
+        page.locator('[data-testid="tax-federal-brackets-table"]')
       ).toBeVisible();
       await expect(
         page.locator('[data-testid="tax-bracket-bar"]')
@@ -477,7 +477,7 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
         page.locator('[data-testid="tax-zero-income-message"]')
       ).toBeVisible();
       await expect(
-        page.locator('[data-testid="tax-bracket-reference"]')
+        page.locator('[data-testid="tax-federal-brackets-table"]')
       ).toBeVisible();
       await page.keyboard.press("Escape");
 

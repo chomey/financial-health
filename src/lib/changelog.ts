@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Dual Federal + Provincial/State Bracket Tables
+  {
+    version: 97,
+    title: "Federal and provincial/state bracket tables in tax explainer",
+    description: "The tax explainer now shows both federal and provincial/state bracket tables side by side, each with range, rate, and tax amount columns. Subtotals appear under each table. Zero-income mode shows bracket ranges and rates with dashes for tax amounts.",
+    date: "2026-03-06",
+  },
   // Milestone E2E: Explainer & Tax Treatment Enhancements
   {
     version: 96,

@@ -334,16 +334,29 @@ function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: numb
   // can still show the jurisdiction's tax bracket structure for reference
   if (grossAnnualIncome <= 0) {
     let referenceBrackets: TaxBracketSegment[];
+    let provincialReferenceBrackets: TaxBracketSegment[];
+    let federalBPA: number;
+    let provincialBPA: number;
     if (country === "CA") {
-      const { federal } = getCanadianBrackets(jurisdiction);
+      const { federal, provincial } = getCanadianBrackets(jurisdiction);
       referenceBrackets = federal.brackets.map((b) => ({
         min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
       }));
+      provincialReferenceBrackets = provincial.brackets.map((b) => ({
+        min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
+      }));
+      federalBPA = federal.basicPersonalAmount;
+      provincialBPA = provincial.basicPersonalAmount;
     } else {
-      const { federal } = getUSBrackets(jurisdiction);
+      const { federal, state: stateTable } = getUSBrackets(jurisdiction);
       referenceBrackets = federal.brackets.map((b) => ({
         min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
       }));
+      provincialReferenceBrackets = stateTable.brackets.map((b) => ({
+        min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
+      }));
+      federalBPA = federal.basicPersonalAmount;
+      provincialBPA = stateTable.basicPersonalAmount;
     }
     return {
       federalTax: 0,
@@ -356,34 +369,45 @@ function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: numb
       totalTax: 0,
       afterTaxIncome: 0,
       brackets: referenceBrackets,
+      provincialBrackets: provincialReferenceBrackets,
+      federalBasicPersonalAmount: federalBPA,
+      provincialBasicPersonalAmount: provincialBPA,
       hasCapitalGains: false,
     };
   }
 
   // Compute bracket segments for the bar visualization (using federal brackets)
   let brackets: TaxBracketSegment[];
+  let provincialBrackets: TaxBracketSegment[];
+  let federalBPA: number;
+  let provincialBPA: number;
+
+  const capGainsTotal = state.income
+    .filter((i) => i.incomeType === "capital-gains")
+    .reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency) * 12, 0);
+
   if (country === "CA") {
-    const { federal } = getCanadianBrackets(jurisdiction);
-    const capGainsTotal = state.income
-      .filter((i) => i.incomeType === "capital-gains")
-      .reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency) * 12, 0);
+    const { federal, provincial } = getCanadianBrackets(jurisdiction);
     const otherIncome = grossAnnualIncome - capGainsTotal;
     const taxableIncome = otherIncome + (capGainsTotal > 0 ? calculateCanadianCapitalGainsInclusion(capGainsTotal) : 0);
     brackets = computeBracketSegments(taxableIncome, federal);
+    provincialBrackets = computeBracketSegments(taxableIncome, provincial);
+    federalBPA = federal.basicPersonalAmount;
+    provincialBPA = provincial.basicPersonalAmount;
   } else {
-    const { federal } = getUSBrackets(jurisdiction);
-    // Check if all income is capital gains
-    const capGainsTotal = state.income
-      .filter((i) => i.incomeType === "capital-gains")
-      .reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency) * 12, 0);
+    const { federal, state: stateTable } = getUSBrackets(jurisdiction);
     if (capGainsTotal > 0 && capGainsTotal >= grossAnnualIncome * 0.99) {
       // Show capital gains brackets
       brackets = computeBracketSegments(grossAnnualIncome, US_CAPITAL_GAINS_2025);
+      provincialBrackets = computeBracketSegments(Math.max(0, grossAnnualIncome - stateTable.basicPersonalAmount), stateTable);
     } else {
       // Show federal brackets (after standard deduction)
       const taxableIncome = Math.max(0, grossAnnualIncome - federal.basicPersonalAmount);
       brackets = computeBracketSegments(taxableIncome, federal);
+      provincialBrackets = computeBracketSegments(Math.max(0, grossAnnualIncome - stateTable.basicPersonalAmount), stateTable);
     }
+    federalBPA = federal.basicPersonalAmount;
+    provincialBPA = stateTable.basicPersonalAmount;
   }
 
   // Compute marginal rate
@@ -400,12 +424,13 @@ function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: numb
     totalTax,
     afterTaxIncome: grossAnnualIncome - totalTax,
     brackets,
+    provincialBrackets,
+    federalBasicPersonalAmount: federalBPA,
+    provincialBasicPersonalAmount: provincialBPA,
     hasCapitalGains,
     capitalGainsInfo: hasCapitalGains ? {
       country,
-      totalCapitalGains: state.income
-        .filter((i) => i.incomeType === "capital-gains")
-        .reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency) * 12, 0),
+      totalCapitalGains: capGainsTotal,
     } : undefined,
   };
 }
