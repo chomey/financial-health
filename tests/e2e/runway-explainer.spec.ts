@@ -18,9 +18,11 @@ test.describe("Financial Runway Explainer", () => {
     const runwayExplainer = page.locator('[data-testid="runway-explainer"]');
     await expect(runwayExplainer).toBeVisible();
 
-    // Should have a burndown chart
-    const chart = page.locator('[data-testid="runway-burndown-chart"]');
-    await expect(chart).toBeVisible();
+    // Should have a note pointing to the main page chart
+    const chartNote = page.locator('[data-testid="runway-chart-note"]');
+    await expect(chartNote).toBeVisible();
+    const noteText = await chartNote.textContent();
+    expect(noteText).toContain("burndown chart above");
 
     // Should show monthly obligations breakdown
     const obligations = page.locator('[data-testid="runway-monthly-obligations"]');
@@ -110,19 +112,11 @@ test.describe("Financial Runway Explainer", () => {
     await editInput.press("Enter");
     await page.waitForTimeout(1500);
 
-    // Open runway explainer
-    const runwayCard = page.locator('[aria-label="Financial Runway"]');
-    await runwayCard.click();
-
-    const modal = page.locator('[data-testid="explainer-modal"]');
-    await expect(modal).toBeVisible();
-
-    // Tax drag annotation should show
-    const taxDrag = page.locator('[data-testid="runway-tax-drag"]');
+    // Tax drag annotation should show on the main page burndown chart
+    const taxDrag = page.locator('[data-testid="burndown-tax-drag"]');
     await expect(taxDrag).toBeVisible({ timeout: 5000 });
     const taxDragText = await taxDrag.textContent();
-    expect(taxDragText).toContain("Tax drag:");
-    expect(taxDragText).toContain("months");
+    expect(taxDragText).toContain("months tax drag");
 
     await captureScreenshot(page, "task-85-runway-tax-drag");
   });

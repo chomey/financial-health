@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 92
-- **Completed**: 89
-- **Remaining**: 3
+- **Completed**: 90
+- **Remaining**: 2
 - **Last Updated**: 2026-03-06
 
 ---
@@ -1916,3 +1916,27 @@
 - **Screenshots**:
   ![Tax explainer with zero income](screenshots/task-89-tax-explainer-zero-income.png)
 - **Notes**: The explainer now shows the jurisdiction's federal tax bracket structure for reference even when no income is entered. Bracket reference table shows rate ranges without amounts. The after-tax flow bar and bracket bar visualization are hidden for zero income since they'd be empty.
+
+## Task 90: Move runway burndown chart from explainer modal to main page
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/RunwayBurndownChart.tsx`: New component rendering the runway burndown chart (stacked area chart with categories, without-growth dashed line, after-tax overlay, growth extension/tax drag annotations, and suggested withdrawal order). Full-width display with taller chart (h-72/h-80) compared to the old modal version.
+  - `src/app/page.tsx`: Added RunwayBurndownChart import, extracted `runwayDetails` from metrics, rendered in projections section wrapped in ZoomableCard below ProjectionChart and above InsightsPanel.
+  - `src/components/DataFlowArrows.tsx`: Simplified RunwayExplainerContent — removed the full burndown chart, recharts imports, CATEGORY_COLORS, and useMemo. Now shows a condensed summary with a note ("See the burndown chart above"), monthly obligations breakdown, and withdrawal order.
+  - `tests/e2e/withdrawal-tax-runway.spec.ts`: Updated to check for `burndown-tax-drag` on main page instead of `runway-tax-drag` in modal. Scoped asset row selectors to `#assets` to avoid recharts legend collision.
+  - `tests/e2e/runway-explainer.spec.ts`: Updated to check for `runway-chart-note` instead of `runway-burndown-chart` in modal. Updated tax drag test to check main page.
+  - `tests/e2e/milestone-6-e2e.spec.ts`: Updated tax drag test IDs from `runway-tax-drag` to `burndown-tax-drag`. Scoped all asset/income row selectors to `#assets`/`#income` to avoid recharts legend collision.
+  - `tests/unit/milestone-6-e2e-infra.test.ts`: Updated expected test ID from `runway-tax-drag` to `burndown-tax-drag`.
+  - `src/lib/changelog.ts`: Added changelog entry for task 90.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/runway-burndown-chart.test.tsx`: 11 new tests — renders chart, title, growth extension, tax drag annotations, withdrawal order, tax treatment labels, null render for single point, empty withdrawal order, suggested label. 11 passed, 0 failed.
+  - `tests/e2e/runway-burndown-main.spec.ts`: 4 new E2E tests — renders in projections section, shows withdrawal order, modal shows condensed content with chart note, wrapped in ZoomableCard. 4 passed, 0 failed.
+  - All T1 unit tests: 1075 passed, 0 failed
+  - Full T3 E2E suite: 262 passed, 0 failed
+- **Screenshots**:
+  ![Runway burndown on main page](screenshots/task-90-runway-burndown-main.png)
+  ![Withdrawal order on main page](screenshots/task-90-withdrawal-order-main.png)
+  ![Runway explainer condensed](screenshots/task-90-runway-explainer-condensed.png)
+- **Notes**: The burndown chart is now full-width on the main page, making it much easier to read compared to the narrow modal sidebar. The recharts Legend component renders `<li>` elements containing category names (TFSA, RRSP, etc.), which caused strict mode violations in Playwright tests that used `getByRole("listitem")` to find asset rows. Fixed by scoping selectors to `#assets`/`#income` sections. Pre-existing changelog test failure (expected 88 entries, had 89) was fixed in a separate commit.

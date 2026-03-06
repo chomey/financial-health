@@ -19,6 +19,7 @@ import CashFlowSankey from "@/components/CashFlowSankey";
 import FxRateDisplay from "@/components/FxRateDisplay";
 import WithdrawalTaxSummary from "@/components/WithdrawalTaxSummary";
 import InsightsPanel from "@/components/InsightsPanel";
+import RunwayBurndownChart from "@/components/RunwayBurndownChart";
 import ZoomableCard from "@/components/ZoomableCard";
 import { DataFlowProvider, useOptionalDataFlow, type SourceMetadataItem } from "@/components/DataFlowArrows";
 import {
@@ -372,6 +373,7 @@ export default function Home() {
   const effectiveFxRates = getEffectiveFxRates(homeCurrency, fxManualOverride, fxRates);
   const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride };
   const metrics = computeMetrics(state);
+  const runwayDetails = metrics.find(m => m.title === "Financial Runway")?.runwayDetails;
   const financialData = toFinancialData(state);
   const totals = computeTotals(state);
   const totalInvestmentContributions = assets.filter((a) => !a.computed).reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
@@ -567,6 +569,9 @@ export default function Home() {
         {/* Projection Chart — full-width above the two-column layout */}
         <section id="projections" className="mb-6 space-y-4 scroll-mt-16" aria-label="Financial projections">
           <ZoomableCard><ProjectionChart state={state} /></ZoomableCard>
+          {runwayDetails && (
+            <ZoomableCard><RunwayBurndownChart details={runwayDetails} /></ZoomableCard>
+          )}
           <InsightsPanel data={financialData} insightConnections={insightConnections} />
         </section>
 
