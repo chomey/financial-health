@@ -269,7 +269,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
           ror: asset.roi ?? getDefaultRoi(asset.category) ?? 0,
           category: asset.category,
           taxTreatment: getTaxTreatment(asset.category),
-          costBasisPercent: (asset as { costBasisPercent?: number }).costBasisPercent ?? 100,
+          costBasisPercent: asset.costBasisPercent ?? 100,
         });
       }
     }
@@ -281,7 +281,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
           ror: asset.roi ?? 0,
           category: asset.category,
           taxTreatment: getTaxTreatment(asset.category),
-          costBasisPercent: (asset as { costBasisPercent?: number }).costBasisPercent ?? 100,
+          costBasisPercent: asset.costBasisPercent ?? 100,
         });
       }
     }
@@ -504,7 +504,7 @@ export function computeWithdrawalTaxSummary(
         monthlyRate: (a.roi ?? getDefaultRoi(a.category) ?? 0) / 100 / 12,
         taxTreatment: getTaxTreatment(a.category),
         category: a.category,
-        costBasisPercent: (a as { costBasisPercent?: number }).costBasisPercent ?? 100,
+        costBasisPercent: a.costBasisPercent ?? 100,
       }));
 
     const hasTaxedAccounts = taxBuckets.some((b) => b.taxTreatment !== "tax-free");

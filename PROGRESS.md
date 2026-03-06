@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 68
-- **Completed**: 66
-- **Remaining**: 2
+- **Completed**: 67
+- **Remaining**: 1
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1400,3 +1400,22 @@
   ![Withdrawal tax insights](screenshots/task-66-withdrawal-tax-insights.png)
   ![Runway with withdrawal tax](screenshots/task-66-runway-with-withdrawal-tax.png)
 - **Notes**: Pre-existing changelog test failure (expected 64 entries but task 65 added 65th) was fixed in a separate commit. The WithdrawalTaxSummary component uses `stopPropagation` on the toggle button click to prevent the ZoomableCard wrapper from intercepting the event. Withdrawal-tax insights are mapped to the Financial Runway metric card via `METRIC_TO_INSIGHT_TYPES`.
+
+## Task 67: Add capital gains tracking to brokerage/taxable accounts
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/AssetEntry.tsx`: Added `costBasisPercent` field to Asset interface. Added cost basis % editor badge (only visible for taxable accounts per `getTaxTreatment`). Shows unrealized gains badge when cost basis < 100%. Includes tooltip explaining the field.
+  - `src/lib/url-state.ts`: Added `cb` field to CompactAsset. Updated `toCompact` to serialize (omits when 100/default). Updated `fromCompact` to deserialize.
+  - `src/lib/financial-state.ts`: Removed type casts `(asset as { costBasisPercent?: number })` — now uses `asset.costBasisPercent` directly since it's in the Asset interface.
+  - `src/lib/projections.ts`: Same type cast cleanup.
+  - `src/lib/changelog.ts`: Added v67 entry.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/cost-basis-percent.test.ts`: 15 tests — URL state round-trip encoding, compact omission at 100%, compact inclusion below 100%, preservation of 0%, backward compatibility, tax treatment classification (Brokerage/TFSA/RRSP), withdrawal tax effects (100% basis, lower basis, 0% basis, US taxable), unrealized gains calculation. 15 passed, 0 failed.
+  - `tests/e2e/cost-basis.spec.ts`: 4 tests — cost basis badge visibility for taxable assets, no badge for tax-free assets, setting cost basis and seeing unrealized gains badge, URL persistence through reload. 4 passed, 0 failed.
+  - All unit tests: 823 passed, 0 failed (50 test files)
+- **Screenshots**:
+  ![Cost basis set on Brokerage](screenshots/task-67-cost-basis-set.png)
+  ![Cost basis persisted after reload](screenshots/task-67-cost-basis-persisted.png)
+- **Notes**: The cost basis % field only appears for accounts classified as "taxable" by `getTaxTreatment()` (Brokerage, Savings, Checking, etc.). Tax-free (TFSA, Roth IRA) and tax-deferred (RRSP, 401k) accounts don't show it since their withdrawal tax treatment doesn't depend on cost basis. Capital gains tax rates respect jurisdiction: Canada's 50% inclusion rate for first $250k, US long-term capital gains brackets (0%/15%/20%).

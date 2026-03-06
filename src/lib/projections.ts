@@ -72,7 +72,7 @@ export function projectFinances(
     monthlyContribution: toHome(a.monthlyContribution ?? 0, a.currency) * multiplier,
     taxTreatment: getTaxTreatment(a.category),
     category: a.category,
-    costBasisPercent: (a as { costBasisPercent?: number }).costBasisPercent ?? 100,
+    costBasisPercent: a.costBasisPercent ?? 100,
   }));
 
   // Withdrawal order priority: tax-free first, taxable second, tax-deferred last
