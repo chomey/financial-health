@@ -97,10 +97,10 @@ function CustomTooltip({ active, payload, label, currencyCode }: CustomTooltipPr
 
 const TABLE_MILESTONES = [10, 20, 30, 40, 50];
 
-/** Compute X-axis tick values: every year */
+/** Compute X-axis tick values: every 5 years */
 function computeXTicks(years: number): number[] {
   const ticks: number[] = [];
-  for (let y = 0; y <= years; y += 1) {
+  for (let y = 0; y <= years; y += 5) {
     ticks.push(y);
   }
   return ticks;
@@ -673,6 +673,7 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
                   dataKey="year"
                   tick={{ fontSize: 11, fill: "#78716c" }}
                   tickFormatter={(v) => `${v}y`}
+                  ticks={xTicks}
                 />
                 <YAxis
                   tick={{ fontSize: 11, fill: "#78716c" }}
