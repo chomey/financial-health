@@ -40,7 +40,7 @@ Complete exactly ONE task from TASKS.md, then stop.
    - `[@security]` → `agents/SECURITY-ENGINEER.md`
    - `[@fullstack]` → `agents/FULLSTACK-ENGINEER.md`
 
-3. **Read PROGRESS.md** — Understand what has already been done. Check for any notes about blockers or context from previous iterations.
+3. **Read PROGRESS.md** — Skim the last ~5 task entries for recent context and blockers. Do NOT read the entire file — older tasks are archived in PROGRESS-ARCHIVE.md and are rarely relevant.
 
 4. **Check External Dependencies** — Read the `## External Dependencies` section in CLAUDE.md. Each dependency has an optional `required_by` field listing which task numbers need it. Only check dependencies that apply to your current task (i.e., your task number is in `required_by`, or `required_by` is omitted meaning it applies to all tasks). For each applicable dependency, run its `check` command to verify it's available. If ANY applicable dependency check fails:
    - Print an `ACTION REQUIRED` block listing every failing dependency and the exact `start` command the user must run (see CLAUDE.md for the format)
@@ -82,29 +82,26 @@ Complete exactly ONE task from TASKS.md, then stop.
 
    Tests should cover the happy path and key edge cases. Follow the loaded agent's required test tiers.
 
-8. **Capture Screenshots** (visual products only) — If this project has a visual UI, automate screenshots using the project's screenshot tooling (e.g. Playwright, Puppeteer, or equivalent). Save screenshots to `screenshots/` with descriptive filenames like `task-[NUMBER]-[description].png`. If the project is not visual (CLI, library, API-only), skip this step. **Exception**: During T3/regression QA tasks, do NOT capture or commit new screenshots — just verify existing tests pass and report "all tests pass".
+8. **Verify & Capture Screenshots** — Run all T1 tests (`npm test`) plus `npm run build`. For Playwright:
+   - **T2 (per-task)**: Run ONLY the new/changed test file(s), not the full suite: `CAPTURE_SCREENSHOTS=1 npx playwright test tests/e2e/<your-new-test>.spec.ts`. This takes ~10-30s instead of ~5 minutes.
+   - **T3 (full E2E)**: Run the full suite: `CAPTURE_SCREENSHOTS=1 npx playwright test`. Only triggered for `[@qa]` tasks, `[E2E]`/`[MILESTONE]` tags, or every 5th task.
+   - This single Playwright run both verifies tests AND captures screenshots — do NOT run Playwright twice.
+   - **If tests you did NOT write are now failing**, `git stash` your changes, fix the pre-existing failure, commit the fix with `ralph: fix pre-existing test failure during task [N]`, then `git stash pop` and continue.
+   - **Exception**: During T3/regression QA tasks, omit `CAPTURE_SCREENSHOTS=1` to avoid overwriting existing screenshots.
 
-9. **Verify** — Run all T1 tests plus any new tests you wrote, plus build/lint. Run T2 tests only if required by the agent tag. Run T3 tests only when triggered (see step 7). All required-tier tests MUST pass before proceeding. **If tests you did NOT write are now failing**, `git stash` your changes, fix the pre-existing failure, commit the fix with `ralph: fix pre-existing test failure during task [N]`, then `git stash pop` and continue.
+9. **Update TASKS.md** — Mark your task as complete: change `- [ ]` to `- [x]`.
 
-10. **Update TASKS.md** — Mark your task as complete: change `- [ ]` to `- [x]`.
-
-11. **Update PROGRESS.md** — Add an entry at the bottom with:
+10. **Update PROGRESS.md** — Add a brief entry at the bottom. Keep it concise — future iterations only need enough context to avoid re-doing work or hitting known issues:
    ```
    ## Task [NUMBER]: [TASK_TITLE]
-   - **Status**: Complete
    - **Date**: [TODAY]
-   - **Changes**:
-     - [File changed]: [What was done]
-   - **Test tiers run**: T1 (or T1, T2 / T1, T2, T3 as applicable)
-   - **Tests**:
-     - [Test file]: [What is tested]
-     - [Test results summary: X passed, 0 failed]
-   - **Screenshots** (if visual):
-     ![Description](screenshots/task-NUMBER-description.png)
-   - **Notes**: [Any context for future iterations]
+   - **Files**: [list of files changed, one line]
+   - **Tests**: [X passed, 0 failed] (T1/T2/T3)
+   - **Screenshots**: ![desc](screenshots/task-NUMBER-desc.png)
+   - **Notes**: [Only if there are blockers or gotchas for future tasks]
    ```
 
-12. **Commit** — Stage and commit all changes (including screenshots) with a message like:
+11. **Commit** — Stage and commit all changes (including screenshots) with a message like:
    `ralph: complete task [NUMBER] - [SHORT_DESCRIPTION]`
 
    **Git LFS**: Before committing any image files, ensure `.gitattributes` tracks image formats (`*.png`, `*.jpg`, `*.jpeg`, `*.gif`, `*.webp`, `*.svg`) via Git LFS. If it doesn't exist, create it.

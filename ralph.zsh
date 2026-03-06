@@ -27,6 +27,123 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
+TASKS_ARCHIVE="$SCRIPT_DIR/TASKS-ARCHIVE.md"
+PROGRESS_ARCHIVE="$SCRIPT_DIR/PROGRESS-ARCHIVE.md"
+
+# Rolling archive thresholds
+PROGRESS_MAX_ENTRIES=10   # Keep last N task entries in PROGRESS.md
+TASKS_MAX_COMPLETED=20    # Keep last N completed tasks in TASKS.md
+
+# archive_progress — moves older entries from PROGRESS.md to PROGRESS-ARCHIVE.md
+# Keeps header (everything before first ## Task) + last N task entries.
+archive_progress() {
+  local file="$PROGRESS_FILE"
+  local archive="$PROGRESS_ARCHIVE"
+
+  # Count task entries
+  local entry_count
+  entry_count=$(grep -c '^## Task ' "$file" 2>/dev/null || true)
+  entry_count=${entry_count:-0}
+
+  if [[ "$entry_count" -le "$PROGRESS_MAX_ENTRIES" ]]; then
+    return 0
+  fi
+
+  local to_archive=$((entry_count - PROGRESS_MAX_ENTRIES))
+  print "${CYAN}  Archiving ${to_archive} old progress entries...${NC}"
+
+  # Find the line number of the first ## Task header
+  local first_task_line
+  first_task_line=$(grep -n '^## Task ' "$file" | head -1 | cut -d: -f1)
+
+  # Find the line number of the (to_archive+1)th ## Task header (where we keep from)
+  local keep_from_line
+  keep_from_line=$(grep -n '^## Task ' "$file" | sed -n "$((to_archive + 1))p" | cut -d: -f1)
+
+  # Extract header (before first task)
+  local header
+  header=$(head -n $((first_task_line - 1)) "$file")
+
+  # Extract entries to archive
+  local archive_content
+  archive_content=$(sed -n "${first_task_line},$((keep_from_line - 1))p" "$file")
+
+  # Extract entries to keep
+  local keep_content
+  keep_content=$(tail -n +"${keep_from_line}" "$file")
+
+  # Append to archive file
+  if [[ -f "$archive" ]]; then
+    printf '\n%s' "$archive_content" >> "$archive"
+  else
+    printf '# Progress Archive\n\n%s' "$archive_content" > "$archive"
+  fi
+
+  # Rewrite PROGRESS.md with header + archive marker + kept entries
+  printf '%s\n\n<!-- Older entries archived to PROGRESS-ARCHIVE.md -->\n\n%s\n' "$header" "$keep_content" > "$file"
+}
+
+# archive_tasks — moves older completed tasks from TASKS.md to TASKS-ARCHIVE.md
+# Keeps the file header, last N completed tasks, and all unchecked tasks.
+archive_tasks() {
+  local file="$TASKS_FILE"
+  local archive="$TASKS_ARCHIVE"
+
+  # Count completed tasks
+  local completed_count
+  completed_count=$(grep -c '^\- \[x\]' "$file" 2>/dev/null || true)
+  completed_count=${completed_count:-0}
+
+  if [[ "$completed_count" -le "$TASKS_MAX_COMPLETED" ]]; then
+    return 0
+  fi
+
+  local to_archive=$((completed_count - TASKS_MAX_COMPLETED))
+  print "${CYAN}  Archiving ${to_archive} old completed tasks...${NC}"
+
+  # Build archive content: the first N completed task lines
+  local archive_lines
+  archive_lines=$(grep '^\- \[x\]' "$file" | head -n "$to_archive")
+
+  # Append to archive
+  if [[ -f "$archive" ]]; then
+    printf '\n%s\n' "$archive_lines" >> "$archive"
+  else
+    printf '# Tasks Archive\n\n%s\n' "$archive_lines" > "$archive"
+  fi
+
+  # Remove those lines from the original file.
+  # Strategy: collect line numbers of completed tasks to remove, then delete them.
+  local lines_to_remove
+  lines_to_remove=$(grep -n '^\- \[x\]' "$file" | head -n "$to_archive" | cut -d: -f1)
+
+  # Build sed delete command (e.g., "3d;5d;7d")
+  local sed_cmd=""
+  while IFS= read -r linenum; do
+    # Also remove the blank line after each task (tasks are separated by blank lines)
+    sed_cmd="${sed_cmd}${linenum}d;"
+    # Check if next line is blank and delete it too
+    local next=$((linenum + 1))
+    local next_content
+    next_content=$(sed -n "${next}p" "$file")
+    if [[ -z "$next_content" ]]; then
+      sed_cmd="${sed_cmd}${next}d;"
+    fi
+  done <<< "$lines_to_remove"
+
+  if [[ -n "$sed_cmd" ]]; then
+    sed -i '' "$sed_cmd" "$file"
+  fi
+
+  # Add archive marker if not already present
+  if ! grep -q 'Older tasks archived' "$file"; then
+    # Insert after the header line
+    sed -i '' '1 a\
+\
+<!-- Older tasks archived to TASKS-ARCHIVE.md -->' "$file"
+  fi
+}
+
 START_TIME=$(date +%s)
 START_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
@@ -148,6 +265,10 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
     print "${RED}Claude exited with error on iteration ${i}. Stopping.${NC}"
     exit 1
   fi
+
+  # Auto-archive if files have grown too large
+  archive_progress
+  archive_tasks
 
   # Iteration timing
   ITER_END=$(date +%s)
