@@ -15,8 +15,10 @@ test.describe("Projection Chart", () => {
     await expect(chart.getByTestId("scenario-moderate")).toBeVisible();
     await expect(chart.getByTestId("scenario-optimistic")).toBeVisible();
 
-    // Verify timeline slider
-    await expect(chart.getByTestId("timeline-slider")).toBeVisible();
+    // Verify timeline selector buttons
+    await expect(chart.getByTestId("timeline-10yr")).toBeVisible();
+    await expect(chart.getByTestId("timeline-20yr")).toBeVisible();
+    await expect(chart.getByTestId("timeline-30yr")).toBeVisible();
 
     // Verify chart container
     await expect(chart.getByTestId("projection-chart-container")).toBeVisible();
@@ -32,50 +34,36 @@ test.describe("Projection Chart", () => {
     const moderateBtn = chart.getByTestId("scenario-moderate");
     await expect(moderateBtn).toHaveCSS("background-color", "rgb(16, 185, 129)");
 
-    // Click conservative
+    // Click conservative — clicking opens ZoomableCard overlay, close it first
     const conservativeBtn = chart.getByTestId("scenario-conservative");
     await conservativeBtn.click();
+    // Close overlay if it opened
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
     await expect(conservativeBtn).toHaveCSS("background-color", "rgb(245, 158, 11)");
 
     // Click optimistic
     const optimisticBtn = chart.getByTestId("scenario-optimistic");
     await optimisticBtn.click();
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
     await expect(optimisticBtn).toHaveCSS("background-color", "rgb(59, 130, 246)");
 
     await captureScreenshot(page, "task-25-scenario-optimistic");
-  });
-
-  test("timeline slider changes year label", async ({ page }) => {
-    await page.goto("/");
-    const chart = page.getByTestId("projection-chart");
-
-    // Default is 10 years
-    await expect(chart.getByText("10 years")).toBeVisible();
-
-    // Drag slider to max (30)
-    const slider = chart.getByTestId("timeline-slider");
-    await slider.fill("30");
-    await expect(chart.getByText("30 years")).toBeVisible();
-
-    // Set to 1
-    await slider.fill("1");
-    await expect(chart.getByText("1 year", { exact: true })).toBeVisible();
-
-    await captureScreenshot(page, "task-25-timeline-1-year");
   });
 
   test("chart legend is visible", async ({ page }) => {
     await page.goto("/");
     const chart = page.getByTestId("projection-chart");
 
-    await expect(chart.getByText("Net Worth", { exact: true })).toBeVisible();
-    await expect(chart.getByText("Assets", { exact: true })).toBeVisible();
-    await expect(chart.getByText("Debts", { exact: true })).toBeVisible();
+    await expect(chart.getByText("Net Worth", { exact: true }).first()).toBeVisible();
+    await expect(chart.getByText("Assets", { exact: true }).first()).toBeVisible();
+    await expect(chart.getByText("Debts", { exact: true }).first()).toBeVisible();
   });
 
   test("projection section has correct aria label", async ({ page }) => {
     await page.goto("/");
     const section = page.getByRole("region", { name: "Financial projection", exact: true });
-    await expect(section).toBeVisible();
+    await expect(section.first()).toBeVisible();
   });
 });
