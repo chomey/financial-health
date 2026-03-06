@@ -207,3 +207,56 @@ body {
   animation: draw-line 300ms ease-out 600ms both;
 }
 
+/* Sequenced whiteboard animations for explainer modal */
+
+/* Source cards fade in: 0-200ms */
+@keyframes source-card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Connector line draw: 400-800ms */
+@keyframes draw-connector {
+  from { stroke-dashoffset: 200; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Operator fade in: 600-800ms */
+@keyframes operator-in {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Sum bar draw: 800-1000ms */
+@keyframes draw-sum-bar {
+  from { stroke-dashoffset: 500; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Result count up fade: 1000-1200ms */
+@keyframes result-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-source-card-in {
+  opacity: 0;
+  animation: source-card-in 200ms ease-out both;
+}
+.animate-draw-connector {
+  stroke-dasharray: 200;
+  animation: draw-connector 400ms ease-out 400ms both;
+}
+.animate-operator-in {
+  opacity: 0;
+  animation: operator-in 200ms ease-out 600ms both;
+}
+.animate-draw-sum-bar {
+  stroke-dasharray: 500;
+  animation: draw-sum-bar 200ms ease-out 800ms both;
+}
+.animate-result-in {
+  opacity: 0;
+  animation: result-in 200ms ease-out 1000ms both;
+}
+

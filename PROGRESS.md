@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 82
-- **Completed**: 80
-- **Remaining**: 2
+- **Completed**: 81
+- **Remaining**: 1
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1737,3 +1737,25 @@
   ![Net Worth summary cards](screenshots/task-80-net-worth-summary-cards.png)
   ![Monthly Surplus summary cards](screenshots/task-80-monthly-surplus-summary-cards.png)
 - **Notes**: Fixed pre-existing test failure from task 79 (changelog test expected 78 entries but 79 existed). The SourceSummaryCard replaces the old flat source cards in the ExplainerModal with rich detail cards showing individual items per section. Item data flows from page.tsx through CollapsibleSection's dataFlowItems prop into the DataFlowContext's SourceMetadata, which the ExplainerModal reads when rendering each source card.
+
+## Task 81: Add whiteboard-style SVG annotations and arithmetic layout to explainer modal
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Added `ConnectorLine` component with hand-drawn SVG lines and triangular arrowhead markers (green for positive, red for negative). Added `CountUpValue` component with requestAnimationFrame count-up animation (1000ms delay, 200ms duration, ease-out quad). Updated `ExplainerModal` with sequenced animations: source cards fade in (staggered by 50ms), operators pop in (600ms+ delay), connector lines draw on (400ms+ delay), sum bar draws (800ms delay), result counts up and fades in (1000ms delay). Updated oval opacity from 0.6 to 0.7 for hand-drawn style tuning. Added `data-testid` attributes for sum bar, result area, and connectors. Exported `ConnectorLine` and `CountUpValue` for testing.
+  - `src/app/globals.css`: Added 5 new animation keyframes and classes: `animate-source-card-in` (0-200ms fade+slide), `animate-draw-connector` (400ms stroke-dashoffset), `animate-operator-in` (600ms scale+fade), `animate-draw-sum-bar` (800ms stroke-dashoffset), `animate-result-in` (1000ms scale+fade).
+  - `tests/unit/explainer-modal.test.tsx`: Added 24 new tests covering hand-drawn path wobble bounds (oval coordinates within ellipse bounds, Q command count, jitter proportional to radius), hand-drawn line jitter bounds, ConnectorLine rendering (SVG, arrowhead markers, green/red colors, animation class, staggered delays), CountUpValue rendering (positive, negative, zero values), and sequenced animation verification (source card classes/delays, connector lines, operator animation, sum bar class, result area class, oval opacity 0.7, stroke linecap/linejoin round, arrowhead markers, connector colors).
+  - `tests/e2e/whiteboard-annotations.spec.ts`: **New** — 6 E2E tests: connector lines render with valid SVG paths and arrowhead markers, connector colors match positive/negative, sum bar has hand-drawn path with round stroke caps, oval annotations have opacity 0.7, result value visible after animation, Monthly Surplus full whiteboard layout.
+  - `src/lib/changelog.ts`: Added v81 changelog entry.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/explainer-modal.test.tsx`: 50 tests (24 new) — hand-drawn path wobble bounds, ConnectorLine, CountUpValue, sequenced animations (50 passed, 0 failed)
+  - `tests/unit/source-summary-card.test.tsx`: 14 tests — pre-existing (14 passed, 0 failed)
+  - All T1 unit tests: 995 passed, 0 failed (62 test files)
+  - `tests/e2e/whiteboard-annotations.spec.ts`: 6 tests — connectors, colors, sum bar, ovals, result, full layout (6 passed, 0 failed)
+  - `tests/e2e/source-summary-cards.spec.ts`: 6 tests — pre-existing (6 passed, 0 failed)
+- **Screenshots**:
+  ![Connector lines with arrowheads](screenshots/task-81-connector-lines.png)
+  ![Whiteboard result with count-up](screenshots/task-81-whiteboard-result.png)
+  ![Monthly Surplus whiteboard layout](screenshots/task-81-whiteboard-surplus.png)
+- **Notes**: The sequenced animation creates a satisfying reveal effect: source cards slide in first, then ovals draw on, then connector lines draw down with arrowheads, operators pop in, the sum bar draws across, and finally the result value counts up from zero. ConnectorLine uses vertical hand-drawn paths with SVG marker arrowheads. CountUpValue parses the formatted dollar string, counts up using requestAnimationFrame with ease-out quad easing, and snaps to the exact formatted value at the end. Oval opacity tuned from 0.6 to 0.7 per task spec.

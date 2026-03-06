@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Whiteboard Explainer Mode (Milestone 10)
   {
+    version: 81,
+    title: "Whiteboard-style SVG annotations and arithmetic layout",
+    description: "Enhanced ExplainerModal with full whiteboard aesthetic: hand-drawn connector lines with arrowheads (green for positive, red for negative) flowing from source cards to the result area, sequenced animations (source cards fade in, ovals draw on, connectors draw, operators pop in, sum bar draws, result counts up), count-up animation for the result value using requestAnimationFrame, and tuned hand-drawn style with opacity 0.7, round stroke caps/joins, and sinusoidal jitter for organic whiteboard feel.",
+    date: "2026-03-05",
+  },
+  {
     version: 80,
     title: "Source summary cards for explainer modal",
     description: "Added SourceSummaryCard component to the explainer modal. Each source section now shows a detailed read-only card with section icon, individual items with values, a bold total with hand-drawn oval annotation, and colored left border (green for positive, red for negative). Sections with many items show top 5 by position and a '+N more' summary row. Extended SourceMetadata with items array and updated CollapsibleSection to pass item-level data from all 6 entry types (assets, debts, income, expenses, property, stocks).",
