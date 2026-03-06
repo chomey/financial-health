@@ -44,13 +44,9 @@ test.describe("Financial Runway Explainer", () => {
     const modal = page.locator('[data-testid="explainer-modal"]');
     await expect(modal).toBeVisible();
 
-    // Should show withdrawal order section
-    const withdrawalOrder = page.locator('[data-testid="runway-withdrawal-order"]');
-    await expect(withdrawalOrder).toBeVisible();
-
     // Default state has TFSA (tax-free), Savings Account (taxable), RRSP (tax-deferred)
     // TFSA should be first (tax-free first)
-    const firstEntry = page.locator('[data-testid="withdrawal-order-0"]');
+    const firstEntry = modal.locator('[data-testid="withdrawal-order-0"]');
     await expect(firstEntry).toBeVisible();
     const firstText = await firstEntry.textContent();
     expect(firstText).toContain("TFSA");
@@ -87,7 +83,7 @@ test.describe("Financial Runway Explainer", () => {
     await expect(modal).not.toBeVisible({ timeout: 1000 });
   });
 
-  test("runwayAfterTax sub-line is removed from metric card", async ({ page }) => {
+  test("runwayAfterTax sub-line shows on metric card when tax drag exists", async ({ page }) => {
     await page.goto("/");
 
     // Increase RRSP to make tax impact significant
@@ -97,12 +93,14 @@ test.describe("Financial Runway Explainer", () => {
     await editInput.press("Enter");
     await page.waitForTimeout(1500);
 
-    // The runwayAfterTax sub-line should NOT be visible anymore
+    // The runwayAfterTax sub-line should be visible (added in task 97)
     const afterTaxElement = page.locator('[data-testid="runway-after-tax"]');
-    await expect(afterTaxElement).not.toBeVisible();
+    await expect(afterTaxElement).toBeVisible();
+    const text = await afterTaxElement.textContent();
+    expect(text).toContain("after withdrawal taxes");
   });
 
-  test("shows tax drag annotation in chart when tax-deferred accounts exist", async ({ page }) => {
+  test("shows tax drag in burndown summary when tax-deferred accounts exist", async ({ page }) => {
     await page.goto("/");
 
     // Increase RRSP to make tax impact significant
@@ -112,11 +110,11 @@ test.describe("Financial Runway Explainer", () => {
     await editInput.press("Enter");
     await page.waitForTimeout(1500);
 
-    // Tax drag annotation should show on the main page burndown chart
-    const taxDrag = page.locator('[data-testid="burndown-tax-drag"]');
-    await expect(taxDrag).toBeVisible({ timeout: 5000 });
-    const taxDragText = await taxDrag.textContent();
-    expect(taxDragText).toContain("months tax drag");
+    // Tax drag info should be in the burndown summary text
+    const burndownSummary = page.locator('[data-testid="burndown-summary"]');
+    await expect(burndownSummary).toBeVisible({ timeout: 5000 });
+    const summaryText = await burndownSummary.textContent();
+    expect(summaryText).toContain("withdrawal taxes");
 
     await captureScreenshot(page, "task-85-runway-tax-drag");
   });
