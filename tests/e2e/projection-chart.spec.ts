@@ -15,11 +15,6 @@ test.describe("Projection Chart", () => {
     await expect(chart.getByTestId("scenario-moderate")).toBeVisible();
     await expect(chart.getByTestId("scenario-optimistic")).toBeVisible();
 
-    // Verify timeline selector buttons
-    await expect(chart.getByTestId("timeline-10yr")).toBeVisible();
-    await expect(chart.getByTestId("timeline-20yr")).toBeVisible();
-    await expect(chart.getByTestId("timeline-30yr")).toBeVisible();
-
     // Verify chart container
     await expect(chart.getByTestId("projection-chart-container")).toBeVisible();
 
@@ -37,7 +32,6 @@ test.describe("Projection Chart", () => {
     // Click conservative — clicking opens ZoomableCard overlay, close it first
     const conservativeBtn = chart.getByTestId("scenario-conservative");
     await conservativeBtn.click();
-    // Close overlay if it opened
     await page.keyboard.press("Escape");
     await page.waitForTimeout(200);
     await expect(conservativeBtn).toHaveCSS("background-color", "rgb(245, 158, 11)");

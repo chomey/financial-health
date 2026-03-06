@@ -256,7 +256,7 @@ export interface AssetProjection {
 export function projectAssets(
   assets: FinancialState["assets"],
   scenario: Scenario = "moderate",
-  milestoneYears: number[] = [10, 20, 30],
+  milestoneYears: number[] = [10, 20, 30, 40, 50],
   monthlySurplus: number = 0,
   homeCurrency?: SupportedCurrency,
   fxRates?: import("@/lib/currency").FxRates,

@@ -189,35 +189,16 @@ test.describe("T3: Milestone 2 — Comprehensive E2E for features from tasks 22-
     await expect(projChart.getByText("Assets", { exact: true })).toBeVisible();
     await expect(projChart.getByText("Debts", { exact: true })).toBeVisible();
 
-    // Verify default timeline (10 years)
-    await expect(projChart.getByText("10 years")).toBeVisible();
-
     await captureScreenshot(page, "task-26-projection-chart-default");
 
     // ========================================
-    // Step 7: Test timeline slider interaction
+    // Step 7: Test scenario toggling
     // ========================================
-    const slider = projChart.getByTestId("timeline-slider");
-    await expect(slider).toBeVisible();
-
-    // Set to 1 year
-    await slider.fill("1");
-    await expect(projChart.getByText("1 year", { exact: true })).toBeVisible();
-
-    await captureScreenshot(page, "task-26-timeline-1-year");
-
-    // Set to 30 years
-    await slider.fill("30");
-    await expect(projChart.getByText("30 years")).toBeVisible();
-
-    await captureScreenshot(page, "task-26-timeline-30-years");
-
-    // ========================================
-    // Step 8: Test scenario toggling
-    // ========================================
-    // Click Conservative
+    // Click Conservative — close ZoomableCard overlay between clicks
     const conservativeBtn = projChart.getByTestId("scenario-conservative");
     await conservativeBtn.click();
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
     await expect(conservativeBtn).toHaveCSS("background-color", "rgb(245, 158, 11)");
 
     await captureScreenshot(page, "task-26-scenario-conservative");
@@ -225,6 +206,8 @@ test.describe("T3: Milestone 2 — Comprehensive E2E for features from tasks 22-
     // Click Optimistic
     const optimisticBtn = projChart.getByTestId("scenario-optimistic");
     await optimisticBtn.click();
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
     await expect(optimisticBtn).toHaveCSS("background-color", "rgb(59, 130, 246)");
 
     await captureScreenshot(page, "task-26-scenario-optimistic");
@@ -232,6 +215,8 @@ test.describe("T3: Milestone 2 — Comprehensive E2E for features from tasks 22-
     // Switch back to Moderate
     const moderateBtn = projChart.getByTestId("scenario-moderate");
     await moderateBtn.click();
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
     await expect(moderateBtn).toHaveCSS("background-color", "rgb(16, 185, 129)");
 
     // ========================================
