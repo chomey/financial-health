@@ -22,7 +22,7 @@ export interface Asset {
 
 const CATEGORY_SUGGESTIONS = {
   CA: ["TFSA", "RRSP", "RESP", "FHSA", "LIRA"],
-  US: ["401k", "IRA", "Roth IRA", "529", "HSA"],
+  US: ["401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA"],
   universal: [
     "Savings",
     "Checking",
@@ -61,6 +61,7 @@ export function getGroupedCategorySuggestions(): SuggestionGroup[] {
 /** Smart ROI defaults by account type (annual %) */
 export const DEFAULT_ROI: Record<string, number> = {
   "401k": 7,
+  "Roth 401k": 7,
   "IRA": 7,
   "Roth IRA": 7,
   "TFSA": 5,
@@ -88,7 +89,7 @@ const INCOME_TAX_ROI_CATEGORIES = new Set([
 
 /** Tax-sheltered accounts where ROI is tax-free — toggle should be hidden */
 const TAX_SHELTERED_CATEGORIES = new Set([
-  "TFSA", "Roth IRA", "FHSA", "HSA",
+  "TFSA", "Roth IRA", "Roth 401k", "FHSA", "HSA",
 ]);
 
 /** Get the default ROI tax treatment for a category */

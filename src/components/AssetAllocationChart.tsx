@@ -36,7 +36,7 @@ export interface AllocationSlice {
 
 const RETIREMENT_CATEGORIES = new Set([
   "TFSA", "RRSP", "RESP", "FHSA", "LIRA",
-  "401k", "IRA", "Roth IRA", "529", "HSA",
+  "401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA",
 ]);
 
 function getCategoryGroup(category: string): string {
