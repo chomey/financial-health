@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 97
+- **Total Tasks**: 99
 - **Completed**: 97
-- **Remaining**: 1
+- **Remaining**: 2
 - **Last Updated**: 2026-03-06
 
 ---
@@ -2087,3 +2087,34 @@
   ![Tax explainer with dual bracket tables](screenshots/task-84-tax-explainer.png)
   ![Zero income bracket reference](screenshots/task-89-tax-explainer-zero-income.png)
 - **Notes**: The bracket reference table for zero-income was replaced with the same BracketTable component used for income > 0, showing "—" in the tax amount column. Test IDs updated from `tax-bracket-reference`/`tax-bracket-ref-*` to `tax-federal-brackets-table`/`tax-federal-brackets-row-*`.
+
+## Task 97: Show after-tax runway on metric card and merge Withdrawal Tax Impact into Financial Runway
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/SnapshotDashboard.tsx`: Added `runwayAfterTax` sub-line to Financial Runway metric card. Shows "X.X mo after withdrawal taxes" in amber when it differs from both `runwayWithGrowth` and the base value.
+  - `src/app/page.tsx`: Removed `WithdrawalTaxSummary` component from dashboard sidebar. Removed import.
+  - `src/components/DataFlowArrows.tsx`: Expanded `RunwayExplainerContent` to include full withdrawal tax content: tax treatment breakdown bar (green/amber/rose), account groupings by treatment, suggested withdrawal order with disclaimer, and tax drag summary. Content derived from existing `withdrawalOrder` data in `RunwayExplainerDetails`.
+  - `src/lib/changelog.ts`: Added task 97 entry. Fixed pre-existing duplicate entries for task 96. Updated UI Polish milestone range to [88, 99].
+  - `tests/e2e/withdrawal-tax-summary.spec.ts`: Rewritten to test withdrawal tax in Financial Runway explainer modal instead of standalone card.
+  - `tests/e2e/withdrawal-pills-overflow.spec.ts`: Updated to test withdrawal order in explainer modal.
+  - `tests/e2e/milestone-10-e2e.spec.ts`: Updated withdrawal tax test to check explainer modal.
+  - `tests/e2e/milestone-6-e2e.spec.ts`: Updated all withdrawal tax references to explainer modal. Fixed pre-existing `burndown-tax-drag` testid references.
+  - `tests/unit/milestone-6-e2e-infra.test.ts`: Updated string checks for refactored E2E test.
+  - `tests/unit/milestone-10-e2e-infra.test.ts`: Updated string checks for refactored E2E test.
+  - `tests/unit/snapshot-dashboard.test.tsx`: Added 4 tests for `runwayAfterTax` sub-line visibility logic.
+  - `tests/unit/runway-withdrawal-tax-merge.test.ts`: New file with 4 tests verifying `RunwayExplainerDetails` contains all data needed for merged withdrawal tax view.
+  - `tests/unit/changelog.test.ts`: Updated counts for 97 entries and milestone range.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/snapshot-dashboard.test.tsx`: 21 passed (4 new for runwayAfterTax)
+  - `tests/unit/runway-withdrawal-tax-merge.test.ts`: 4 passed (all new)
+  - All 72 unit test files: 1192 passed, 0 failed
+  - `tests/e2e/withdrawal-tax-summary.spec.ts`: 3 passed
+  - `tests/e2e/withdrawal-pills-overflow.spec.ts`: 2 passed
+  - `tests/e2e/milestone-10-e2e.spec.ts`: 11 passed
+  - `tests/e2e/milestone-6-e2e.spec.ts`: 5 passed
+- **Screenshots**:
+  ![Runway explainer with withdrawal tax content](screenshots/task-97-runway-explainer-with-withdrawal-tax.png)
+  ![Runway card with after-tax sub-line](screenshots/task-97-runway-card-after-tax.png)
+- **Notes**: The `WithdrawalTaxSummary` component file still exists but is no longer rendered on the page. It could be deleted in a future cleanup task. All withdrawal tax information is now consolidated in the Financial Runway explainer modal, accessible by clicking the Financial Runway metric card.

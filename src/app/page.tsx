@@ -17,7 +17,6 @@ import FastForwardPanel from "@/components/FastForwardPanel";
 import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import CashFlowSankey from "@/components/CashFlowSankey";
 import FxRateDisplay from "@/components/FxRateDisplay";
-import WithdrawalTaxSummary from "@/components/WithdrawalTaxSummary";
 import InsightsPanel from "@/components/InsightsPanel";
 import RunwayBurndownChart from "@/components/RunwayBurndownChart";
 import ZoomableCard from "@/components/ZoomableCard";
@@ -616,16 +615,6 @@ export default function Home() {
           >
             <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
               <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
-              {financialData.withdrawalTax && (
-                <ZoomableCard>
-                  <WithdrawalTaxSummary
-                    taxDragMonths={financialData.withdrawalTax.taxDragMonths}
-                    withdrawalOrder={financialData.withdrawalTax.withdrawalOrder}
-                    accountsByTreatment={financialData.withdrawalTax.accountsByTreatment}
-                    homeCurrency={homeCurrency}
-                  />
-                </ZoomableCard>
-              )}
               {stocks.length > 0 && (() => {
                 const portfolio = getPortfolioSummary(stocks);
                 const stocksWithReturns = stocks

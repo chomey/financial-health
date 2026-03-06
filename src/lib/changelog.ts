@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // After-tax runway + merge withdrawal tax into runway
+  {
+    version: 97,
+    title: "After-tax runway and merged withdrawal tax impact",
+    description: "Financial Runway metric card now shows after-tax runway sub-line. Standalone Withdrawal Tax Impact card removed from sidebar — its content (tax treatment breakdown bar, account groupings, suggested withdrawal order with disclaimer, tax drag summary) is now consolidated into the Financial Runway explainer modal.",
+    date: "2026-03-06",
+  },
   // Dual Federal + Provincial/State Bracket Tables
   {
     version: 96,
@@ -611,7 +618,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 96] as const },
+    { milestone: "UI Polish", range: [88, 99] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

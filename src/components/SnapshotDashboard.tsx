@@ -250,6 +250,11 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
           ({metric.runwayWithGrowth === Infinity ? "∞" : formatMetricValue(metric.runwayWithGrowth, "months", homeCurrency)} with investment growth)
         </p>
       )}
+      {metric.runwayAfterTax !== undefined && metric.runwayAfterTax !== metric.runwayWithGrowth && metric.runwayAfterTax !== metric.value && (
+        <p className="mt-0.5 text-sm text-amber-600" data-testid="runway-after-tax">
+          ({formatMetricValue(metric.runwayAfterTax, "months", homeCurrency)} after withdrawal taxes)
+        </p>
+      )}
       {/* Effective tax rate sub-line */}
       {metric.effectiveRate !== undefined && metric.effectiveRate > 0 && (
         <p className="mt-0.5 text-sm text-stone-500" data-testid="effective-tax-rate">

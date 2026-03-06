@@ -720,34 +720,112 @@ function RunwayExplainerContent({ details }: { details: RunwayExplainerDetails }
         </div>
       </div>
 
-      {/* Withdrawal order */}
-      {details.withdrawalOrder.length > 0 && (
-        <div data-testid="runway-withdrawal-order">
-          <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Withdrawal Order</p>
-          <ol className="space-y-1.5">
-            {details.withdrawalOrder.map((entry, i) => {
-              const treatmentLabel = entry.taxTreatment === "tax-free" ? "tax-free"
-                : entry.taxTreatment === "tax-deferred" ? "taxed as income"
-                : "capital gains";
-              return (
-                <li key={i} className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2" data-testid={`withdrawal-order-${i}`}>
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-stone-200 text-xs font-bold text-stone-600">{i + 1}</span>
-                    <span className="text-sm text-stone-700">{entry.category}</span>
-                    <span className="text-xs text-stone-400">({treatmentLabel})</span>
+      {/* Withdrawal Tax Impact */}
+      {details.withdrawalOrder.length > 0 && (() => {
+        const totalLiquid = details.withdrawalOrder.reduce((sum, e) => sum + e.startingBalance, 0);
+        // Group by treatment
+        const grouped: Record<string, { categories: string[]; total: number }> = {
+          "tax-free": { categories: [], total: 0 },
+          "taxable": { categories: [], total: 0 },
+          "tax-deferred": { categories: [], total: 0 },
+        };
+        for (const entry of details.withdrawalOrder) {
+          const g = grouped[entry.taxTreatment];
+          if (g) {
+            g.categories.push(entry.category);
+            g.total += entry.startingBalance;
+          }
+        }
+        const treatments = [
+          { label: "Tax-free", sublabel: "No tax on withdrawal", color: "bg-green-100 text-green-700 border-green-200", barColor: "bg-green-400", data: grouped["tax-free"] },
+          { label: "Taxable", sublabel: "Gains taxed at capital gains rate", color: "bg-amber-50 text-amber-700 border-amber-200", barColor: "bg-amber-400", data: grouped["taxable"] },
+          { label: "Tax-deferred", sublabel: "Full withdrawal taxed as income", color: "bg-rose-50 text-rose-700 border-rose-200", barColor: "bg-rose-400", data: grouped["tax-deferred"] },
+        ];
+
+        return (
+          <div data-testid="runway-withdrawal-tax">
+            <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Withdrawal Tax Impact</p>
+
+            {/* Tax drag summary */}
+            {details.taxDragMonths !== undefined && details.taxDragMonths > 0.5 && (
+              <p className="mb-3 text-sm text-amber-600" data-testid="runway-tax-drag-summary">
+                Withdrawal taxes reduce your runway by ~{details.taxDragMonths.toFixed(1)} months
+              </p>
+            )}
+            {details.taxDragMonths !== undefined && details.taxDragMonths <= 0.5 && (
+              <p className="mb-3 text-sm text-green-600" data-testid="runway-tax-drag-summary">
+                Minimal withdrawal tax impact on your runway
+              </p>
+            )}
+
+            {/* Tax treatment breakdown bar */}
+            {totalLiquid > 0 && (
+              <div className="mb-3">
+                <div className="flex h-3 w-full overflow-hidden rounded-full bg-stone-100" data-testid="runway-tax-treatment-bar">
+                  {treatments.map((t) => {
+                    const pct = (t.data.total / totalLiquid) * 100;
+                    if (pct <= 0) return null;
+                    return (
+                      <div
+                        key={t.label}
+                        className={`${t.barColor} transition-all duration-500`}
+                        style={{ width: `${pct}%` }}
+                        title={`${t.label}: ${fmt(t.data.total)} (${Math.round(pct)}%)`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Account groupings by treatment */}
+            <div className="mb-3 space-y-2" data-testid="runway-tax-account-groups">
+              {treatments.map((t) => {
+                if (t.data.total <= 0) return null;
+                const pct = totalLiquid > 0 ? Math.round((t.data.total / totalLiquid) * 100) : 0;
+                return (
+                  <div key={t.label} className={`rounded-lg border px-3 py-2 ${t.color}`}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold">{t.label}</span>
+                      <span className="text-xs font-medium">{fmt(t.data.total)} ({pct}%)</span>
+                    </div>
+                    <p className="mt-0.5 text-xs opacity-75">{t.sublabel}</p>
+                    <p className="mt-0.5 text-xs opacity-60">{t.data.categories.join(", ")}</p>
                   </div>
-                  <div className="text-right">
-                    <span className="text-sm font-semibold text-stone-800">{fmt(entry.startingBalance)}</span>
-                    {entry.estimatedTaxCost > 0 && (
-                      <span className="ml-1.5 text-xs text-amber-600">~{fmt(entry.estimatedTaxCost)} tax</span>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-      )}
+                );
+              })}
+            </div>
+
+            {/* Suggested withdrawal order */}
+            <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Suggested Withdrawal Order</p>
+            <ol className="space-y-1.5">
+              {details.withdrawalOrder.map((entry, i) => {
+                const treatmentLabel = entry.taxTreatment === "tax-free" ? "tax-free"
+                  : entry.taxTreatment === "tax-deferred" ? "taxed as income"
+                  : "capital gains";
+                return (
+                  <li key={i} className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2" data-testid={`withdrawal-order-${i}`}>
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-stone-200 text-xs font-bold text-stone-600">{i + 1}</span>
+                      <span className="text-sm text-stone-700">{entry.category}</span>
+                      <span className="text-xs text-stone-400">({treatmentLabel})</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold text-stone-800">{fmt(entry.startingBalance)}</span>
+                      {entry.estimatedTaxCost > 0 && (
+                        <span className="ml-1.5 text-xs text-amber-600">~{fmt(entry.estimatedTaxCost)} tax</span>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+            <p className="mt-1.5 text-xs text-stone-400 italic" data-testid="withdrawal-order-disclaimer">
+              We don&apos;t have full visibility into each account&apos;s tax implications — this is a rough suggestion. Consult a tax professional for personalized advice.
+            </p>
+          </div>
+        );
+      })()}
     </div>
   );
 }

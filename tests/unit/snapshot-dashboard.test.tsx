@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
-import { formatMetricValue, MOCK_METRICS } from "@/components/SnapshotDashboard";
+import { formatMetricValue, MOCK_METRICS, type MetricData } from "@/components/SnapshotDashboard";
 
 describe("SnapshotDashboard", () => {
   it("renders all four metric cards", () => {
@@ -81,6 +81,44 @@ describe("SnapshotDashboard", () => {
     expect(groups.length).toBe(4);
   });
 
+});
+
+describe("runwayAfterTax sub-line", () => {
+  const baseRunwayMetric: MetricData = {
+    title: "Financial Runway",
+    value: 20,
+    format: "months",
+    icon: "🛡️",
+    tooltip: "test",
+    positive: true,
+    runwayWithGrowth: 25,
+  };
+
+  it("shows after-tax runway when it differs from growth-adjusted value", () => {
+    const metrics: MetricData[] = [{ ...baseRunwayMetric, runwayAfterTax: 22 }];
+    render(<SnapshotDashboard metrics={metrics} />);
+    expect(screen.getByTestId("runway-after-tax")).toBeInTheDocument();
+    expect(screen.getByTestId("runway-after-tax").textContent).toContain("22.0 mo");
+    expect(screen.getByTestId("runway-after-tax").textContent).toContain("after withdrawal taxes");
+  });
+
+  it("hides after-tax runway when it equals runwayWithGrowth", () => {
+    const metrics: MetricData[] = [{ ...baseRunwayMetric, runwayAfterTax: 25 }];
+    render(<SnapshotDashboard metrics={metrics} />);
+    expect(screen.queryByTestId("runway-after-tax")).not.toBeInTheDocument();
+  });
+
+  it("hides after-tax runway when it equals base value", () => {
+    const metrics: MetricData[] = [{ ...baseRunwayMetric, runwayWithGrowth: undefined, runwayAfterTax: 20 }];
+    render(<SnapshotDashboard metrics={metrics} />);
+    expect(screen.queryByTestId("runway-after-tax")).not.toBeInTheDocument();
+  });
+
+  it("hides after-tax runway when undefined", () => {
+    const metrics: MetricData[] = [{ ...baseRunwayMetric }];
+    render(<SnapshotDashboard metrics={metrics} />);
+    expect(screen.queryByTestId("runway-after-tax")).not.toBeInTheDocument();
+  });
 });
 
 describe("formatMetricValue", () => {
