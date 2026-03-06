@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Withdrawal Pills Overflow Fix
+  {
+    version: 95,
+    title: "Fix withdrawal order pills overflowing container",
+    description: "Withdrawal order pills now wrap to multiple lines instead of overflowing their container when there are many accounts. Long account names are truncated with ellipsis at 150px max width. Applied to both the Withdrawal Tax Summary card and the Runway Burndown chart.",
+    date: "2026-03-06",
+  },
   // Smart Tax Classification
   {
     version: 94,
@@ -597,7 +604,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 94] as const },
+    { milestone: "UI Polish", range: [88, 95] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

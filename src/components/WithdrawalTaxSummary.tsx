@@ -135,15 +135,15 @@ export default function WithdrawalTaxSummary({
               <p className="text-xs font-medium text-stone-500 mb-1">
                 Suggested withdrawal order:
               </p>
-              <div className="flex items-center gap-1 text-xs text-stone-600">
+              <div className="flex flex-wrap gap-1.5 text-xs text-stone-600">
                 {withdrawalOrder.map((cat, i) => (
                   <span key={cat} className="flex items-center gap-1">
                     {i > 0 && (
-                      <svg className="h-3 w-3 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg className="h-3 w-3 shrink-0 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                       </svg>
                     )}
-                    <span className="rounded bg-stone-100 px-1.5 py-0.5 font-medium">
+                    <span className="max-w-[150px] truncate rounded bg-stone-100 px-1.5 py-0.5 font-medium">
                       {cat}
                     </span>
                   </span>

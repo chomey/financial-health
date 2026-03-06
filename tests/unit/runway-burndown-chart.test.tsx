@@ -100,6 +100,18 @@ describe("RunwayBurndownChart", () => {
     expect(screen.getByText("RRSP")).toBeInTheDocument();
   });
 
+  it("truncates long category names in withdrawal order pills", () => {
+    const details = makeDetails({
+      withdrawalOrder: [
+        { category: "My Extremely Long Account Name TFSA", taxTreatment: "tax-free", startingBalance: 10000, estimatedTaxCost: 0 },
+      ],
+    });
+    render(<RunwayBurndownChart details={details} />);
+    const nameSpan = screen.getByText("My Extremely Long Account Name TFSA");
+    expect(nameSpan.className).toContain("max-w-[150px]");
+    expect(nameSpan.className).toContain("truncate");
+  });
+
   it("shows tax treatment labels for withdrawal order", () => {
     render(<RunwayBurndownChart details={makeDetails()} />);
     expect(screen.getByText("(tax-free)")).toBeInTheDocument();

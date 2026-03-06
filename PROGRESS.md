@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 96
-- **Completed**: 94
-- **Remaining**: 2
+- **Completed**: 95
+- **Remaining**: 1
 - **Last Updated**: 2026-03-06
 
 ---
@@ -2022,3 +2022,22 @@
   ![Tax treatment pill cycled](screenshots/task-94-tax-treatment-pill-cycled.png)
   ![Keyword matched custom account](screenshots/task-94-keyword-matched-custom-account.png)
 - **Notes**: FHSA was reclassified from tax-deferred to tax-free. The keyword-based approach correctly identifies it via the "fhsa" keyword in the tax-free list, matching its treatment in `TAX_SHELTERED_CATEGORIES`. Custom account names like "BP 401k", "Company RRSP", "Fidelity Roth" are now correctly classified without exact name matches.
+
+## Task 95: Fix withdrawal order pills overflowing container
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/WithdrawalTaxSummary.tsx`: Changed pills container from `flex items-center gap-1` to `flex flex-wrap gap-1.5` for line wrapping. Added `max-w-[150px] truncate` to category name spans. Added `shrink-0` to chevron SVGs.
+  - `src/components/RunwayBurndownChart.tsx`: Added `max-w-[150px] truncate` to category name spans in withdrawal order pills (container already had `flex-wrap`).
+  - `src/lib/changelog.ts`: Added changelog entry for task 95, updated milestone range to [88, 95].
+  - `tests/unit/changelog.test.ts`: Updated expectations from 94 to 95 entries.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/withdrawal-pills-overflow.test.tsx`: 2 tests — flex-wrap on pills container, max-w/truncate on name spans. 2 passed, 0 failed.
+  - `tests/unit/runway-burndown-chart.test.tsx`: Added 1 test for truncation classes on long category names. 13 passed, 0 failed.
+  - `tests/e2e/withdrawal-pills-overflow.spec.ts`: 2 tests — withdrawal tax summary pills wrap, burndown chart pills wrap. 2 passed, 0 failed.
+  - All T1 unit tests: 1157 passed, 0 failed
+- **Screenshots**:
+  ![Withdrawal pills wrap](screenshots/task-95-withdrawal-pills-wrap.png)
+  ![Burndown pills wrap](screenshots/task-95-burndown-pills-wrap.png)
+- **Notes**: Pre-existing changelog test failure (expected 93 entries but had 94) was fixed in a separate commit before applying task changes.

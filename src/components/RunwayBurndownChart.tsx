@@ -262,7 +262,7 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
               return (
                 <span key={i} className="inline-flex items-center gap-1.5 rounded-lg bg-stone-50 px-2.5 py-1.5 text-xs" data-testid={`burndown-withdrawal-${i}`}>
                   <span className="flex h-4 w-4 items-center justify-center rounded-full bg-stone-200 text-[10px] font-bold text-stone-600">{i + 1}</span>
-                  <span className="text-stone-700 font-medium">{entry.category}</span>
+                  <span className="max-w-[150px] truncate text-stone-700 font-medium">{entry.category}</span>
                   <span className="text-stone-400">({treatmentLabel})</span>
                 </span>
               );
