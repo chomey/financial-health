@@ -475,6 +475,12 @@ function CountUpValue({ formattedValue }: { formattedValue: string }) {
 
 function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
   const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  const fmtRange = (min: number, max: number) => {
+    if (max >= Infinity || max >= 1e12) return `${fmt(min)}+`;
+    return `${fmt(min)} – ${fmt(max)}`;
+  };
+
+  const isZeroIncome = details.grossIncome <= 0;
 
   // Build bracket bar segments — only include brackets with income in them
   const activeSegments = details.brackets.filter((b) => b.amountInBracket > 0);
@@ -487,8 +493,20 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
 
   return (
     <div className="space-y-5" data-testid="tax-explainer">
-      {/* Bracket bar visualization */}
-      {activeSegments.length > 0 && totalIncome > 0 && (
+      {/* Zero income message */}
+      {isZeroIncome && (
+        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4" data-testid="tax-zero-income-message">
+          <p className="text-sm text-stone-600">
+            No income entered — add income to see your estimated tax breakdown.
+          </p>
+          <p className="mt-1 text-sm text-stone-500">
+            Here are the <span className="font-semibold">{details.jurisdictionLabel}</span> federal tax brackets for reference:
+          </p>
+        </div>
+      )}
+
+      {/* Bracket bar visualization (only when there's income) */}
+      {!isZeroIncome && activeSegments.length > 0 && totalIncome > 0 && (
         <div data-testid="tax-bracket-bar">
           <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Income by Tax Bracket</p>
           <div className="flex h-8 w-full overflow-hidden rounded-lg" role="img" aria-label="Tax bracket visualization">
@@ -523,6 +541,27 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
                   <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: color }} />
                   {(seg.rate * 100).toFixed(1)}%: {fmt(seg.amountInBracket)}
                 </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Bracket reference table (zero income) */}
+      {isZeroIncome && details.brackets.length > 0 && (
+        <div data-testid="tax-bracket-reference">
+          <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Federal Tax Brackets</p>
+          <div className="space-y-1">
+            {details.brackets.map((seg, i) => {
+              const color = bracketColors[Math.min(i, bracketColors.length - 1)];
+              return (
+                <div key={i} className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-1.5" data-testid={`tax-bracket-ref-${i}`}>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: color }} />
+                    <span className="text-sm text-stone-600">{fmtRange(seg.min, seg.max)}</span>
+                  </div>
+                  <span className="text-sm font-semibold text-stone-700">{(seg.rate * 100).toFixed(1)}%</span>
+                </div>
               );
             })}
           </div>
@@ -585,19 +624,21 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
         </div>
       )}
 
-      {/* After-tax income flow */}
-      <div className="flex items-center justify-between rounded-xl bg-stone-50 px-4 py-3" data-testid="tax-after-tax-flow">
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-stone-500">Gross</span>
-          <span className="font-semibold text-stone-800">{fmt(details.grossIncome)}</span>
-          <span className="text-stone-400">→</span>
-          <span className="text-stone-500">Tax</span>
-          <span className="font-semibold text-rose-600">{fmt(details.totalTax)}</span>
-          <span className="text-stone-400">→</span>
-          <span className="text-stone-500">After-tax</span>
-          <span className="font-semibold text-green-600">{fmt(details.afterTaxIncome)}</span>
+      {/* After-tax income flow (only when there's income) */}
+      {!isZeroIncome && (
+        <div className="flex items-center justify-between rounded-xl bg-stone-50 px-4 py-3" data-testid="tax-after-tax-flow">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-stone-500">Gross</span>
+            <span className="font-semibold text-stone-800">{fmt(details.grossIncome)}</span>
+            <span className="text-stone-400">→</span>
+            <span className="text-stone-500">Tax</span>
+            <span className="font-semibold text-rose-600">{fmt(details.totalTax)}</span>
+            <span className="text-stone-400">→</span>
+            <span className="text-stone-500">After-tax</span>
+            <span className="font-semibold text-green-600">{fmt(details.afterTaxIncome)}</span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

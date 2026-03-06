@@ -175,14 +175,22 @@ describe("computeMetrics taxDetails integration", () => {
     expect(brackets[0].amountInBracket).toBeGreaterThan(0);
   });
 
-  it("taxDetails is undefined when income is 0", () => {
+  it("taxDetails is defined with zero-income bracket reference when income is 0", () => {
     const noIncome: FinancialState = {
       ...INITIAL_STATE,
       income: [],
     };
     const metrics = computeMetrics(noIncome);
     const taxMetric = metrics.find((m) => m.title === "Estimated Tax")!;
-    expect(taxMetric.taxDetails).toBeUndefined();
+    expect(taxMetric.taxDetails).toBeDefined();
+    expect(taxMetric.taxDetails!.grossIncome).toBe(0);
+    expect(taxMetric.taxDetails!.totalTax).toBe(0);
+    expect(taxMetric.taxDetails!.effectiveRate).toBe(0);
+    expect(taxMetric.taxDetails!.marginalRate).toBe(0);
+    expect(taxMetric.taxDetails!.jurisdictionLabel).toBe("Ontario");
+    // Should have reference brackets with zero amounts
+    expect(taxMetric.taxDetails!.brackets.length).toBeGreaterThan(0);
+    expect(taxMetric.taxDetails!.brackets.every(b => b.amountInBracket === 0)).toBe(true);
   });
 
   it("taxDetails has effectiveRate matching the metric effectiveRate", () => {
@@ -224,6 +232,77 @@ describe("computeMetrics taxDetails integration", () => {
     const taxMetric = metrics.find((m) => m.title === "Estimated Tax")!;
     const details = taxMetric.taxDetails!;
     expect(details.marginalRate).toBeGreaterThanOrEqual(details.effectiveRate);
+  });
+});
+
+// --- TaxExplainerContent zero income rendering ---
+
+describe("TaxExplainerContent zero income", () => {
+  const zeroIncomeDetails: TaxExplainerDetails = {
+    federalTax: 0,
+    provincialStateTax: 0,
+    jurisdictionLabel: "Ontario",
+    jurisdictionType: "Provincial",
+    effectiveRate: 0,
+    marginalRate: 0,
+    grossIncome: 0,
+    totalTax: 0,
+    afterTaxIncome: 0,
+    brackets: [
+      { min: 0, max: 57375, rate: 0.15, amountInBracket: 0, taxInBracket: 0 },
+      { min: 57375, max: 114750, rate: 0.205, amountInBracket: 0, taxInBracket: 0 },
+      { min: 114750, max: 158468, rate: 0.26, amountInBracket: 0, taxInBracket: 0 },
+    ],
+    hasCapitalGains: false,
+  };
+
+  it("renders zero-income message with jurisdiction name", () => {
+    render(<TaxExplainerContent details={zeroIncomeDetails} />);
+    const msg = screen.getByTestId("tax-zero-income-message");
+    expect(msg).toBeInTheDocument();
+    expect(msg).toHaveTextContent("No income entered");
+    expect(msg).toHaveTextContent("Ontario");
+  });
+
+  it("renders bracket reference table for zero income", () => {
+    render(<TaxExplainerContent details={zeroIncomeDetails} />);
+    expect(screen.getByTestId("tax-bracket-reference")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-bracket-ref-0")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-bracket-ref-1")).toBeInTheDocument();
+    expect(screen.getByTestId("tax-bracket-ref-2")).toBeInTheDocument();
+  });
+
+  it("does NOT render bracket bar visualization for zero income", () => {
+    render(<TaxExplainerContent details={zeroIncomeDetails} />);
+    expect(screen.queryByTestId("tax-bracket-bar")).not.toBeInTheDocument();
+  });
+
+  it("does NOT render after-tax income flow for zero income", () => {
+    render(<TaxExplainerContent details={zeroIncomeDetails} />);
+    expect(screen.queryByTestId("tax-after-tax-flow")).not.toBeInTheDocument();
+  });
+
+  it("shows 0.0% effective and marginal rates", () => {
+    render(<TaxExplainerContent details={zeroIncomeDetails} />);
+    expect(screen.getByTestId("tax-effective-rate")).toHaveTextContent("0.0%");
+    expect(screen.getByTestId("tax-marginal-rate")).toHaveTextContent("0.0%");
+  });
+
+  it("shows $0 federal and provincial tax amounts", () => {
+    render(<TaxExplainerContent details={zeroIncomeDetails} />);
+    expect(screen.getByTestId("tax-federal-amount")).toHaveTextContent("$0");
+    expect(screen.getByTestId("tax-provincial-amount")).toHaveTextContent("$0");
+  });
+
+  it("US jurisdiction shows state label for zero income", () => {
+    const usZeroDetails: TaxExplainerDetails = {
+      ...zeroIncomeDetails,
+      jurisdictionLabel: "California",
+      jurisdictionType: "State",
+    };
+    render(<TaxExplainerContent details={usZeroDetails} />);
+    expect(screen.getByTestId("tax-zero-income-message")).toHaveTextContent("California");
+    expect(screen.getByTestId("tax-breakdown")).toHaveTextContent("State: California");
   });
 });
 

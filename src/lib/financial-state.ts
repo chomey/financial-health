@@ -319,8 +319,6 @@ function computeBracketSegments(taxableIncome: number, table: BracketTable): Tax
  * Build TaxExplainerDetails from the current financial state.
  */
 function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: number, federalTax: number, provincialStateTax: number, effectiveTaxRate: number, totalTax: number): TaxExplainerDetails | undefined {
-  if (grossAnnualIncome <= 0) return undefined;
-
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
@@ -329,6 +327,36 @@ function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: numb
   const jurisdictions = country === "CA" ? CA_PROVINCES : US_STATES;
   const jurisdictionLabel = jurisdictions.find((j) => j.code === jurisdiction)?.name ?? jurisdiction;
   const jurisdictionType = country === "CA" ? "Provincial" as const : "State" as const;
+
+  // Zero income: return details with empty bracket amounts so the explainer
+  // can still show the jurisdiction's tax bracket structure for reference
+  if (grossAnnualIncome <= 0) {
+    let referenceBrackets: TaxBracketSegment[];
+    if (country === "CA") {
+      const { federal } = getCanadianBrackets(jurisdiction);
+      referenceBrackets = federal.brackets.map((b) => ({
+        min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
+      }));
+    } else {
+      const { federal } = getUSBrackets(jurisdiction);
+      referenceBrackets = federal.brackets.map((b) => ({
+        min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
+      }));
+    }
+    return {
+      federalTax: 0,
+      provincialStateTax: 0,
+      jurisdictionLabel,
+      jurisdictionType,
+      effectiveRate: 0,
+      marginalRate: 0,
+      grossIncome: 0,
+      totalTax: 0,
+      afterTaxIncome: 0,
+      brackets: referenceBrackets,
+      hasCapitalGains: false,
+    };
+  }
 
   // Compute bracket segments for the bar visualization (using federal brackets)
   let brackets: TaxBracketSegment[];

@@ -96,3 +96,63 @@ test.describe("Tax Explainer Modal", () => {
     await captureScreenshot(page, "task-84-tax-explainer");
   });
 });
+
+test.describe("Tax Explainer - Zero Income", () => {
+  test("clicking Estimated Tax card with $0 income opens explainer with bracket reference", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForSelector('[data-testid="metric-card-estimated-tax"]');
+
+    // Remove all income to get $0 income
+    const salaryRow = page.getByRole("listitem").filter({ hasText: "Salary" });
+    await salaryRow.hover();
+    await page.getByLabel("Delete Salary").click();
+    await page.waitForTimeout(300);
+
+    // Estimated Tax should show CA$0
+    const taxCard = page.locator('[data-testid="metric-card-estimated-tax"]');
+    await expect(taxCard).toContainText("CA$0");
+
+    // Click should still open the explainer
+    await taxCard.click();
+    await page.waitForSelector('[data-testid="explainer-modal"]');
+
+    // Should show tax explainer content
+    await expect(page.locator('[data-testid="tax-explainer"]')).toBeVisible();
+
+    // Should show the zero-income message
+    const zeroMsg = page.locator('[data-testid="tax-zero-income-message"]');
+    await expect(zeroMsg).toBeVisible();
+    await expect(zeroMsg).toContainText("No income entered");
+    await expect(zeroMsg).toContainText("Ontario");
+
+    // Should show bracket reference table (not the bar)
+    await expect(page.locator('[data-testid="tax-bracket-reference"]')).toBeVisible();
+    await expect(page.locator('[data-testid="tax-bracket-bar"]')).not.toBeVisible();
+
+    // Should show 0.0% rates
+    await expect(page.locator('[data-testid="tax-effective-rate"]')).toContainText("0.0%");
+    await expect(page.locator('[data-testid="tax-marginal-rate"]')).toContainText("0.0%");
+
+    // Should NOT show after-tax flow
+    await expect(page.locator('[data-testid="tax-after-tax-flow"]')).not.toBeVisible();
+
+    await captureScreenshot(page, "task-89-tax-explainer-zero-income");
+  });
+
+  test("zero income explainer closes on Escape", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForSelector('[data-testid="metric-card-estimated-tax"]');
+
+    // Remove income
+    const salaryRow = page.getByRole("listitem").filter({ hasText: "Salary" });
+    await salaryRow.hover();
+    await page.getByLabel("Delete Salary").click();
+    await page.waitForTimeout(300);
+
+    // Open and close
+    await page.click('[data-testid="metric-card-estimated-tax"]');
+    await page.waitForSelector('[data-testid="tax-explainer"]');
+    await page.keyboard.press("Escape");
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible();
+  });
+});

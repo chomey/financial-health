@@ -153,7 +153,8 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
 
   const handleClick = useCallback(() => {
     if (!ctx || !connections || connections.length === 0) return;
-    const filtered = connections.filter((c) => c.value === undefined || c.value > 0);
+    const isEstimatedTax = metric.title === "Estimated Tax";
+    const filtered = connections.filter((c) => c.value === undefined || c.value > 0 || isEstimatedTax);
     const prioritized = prioritizeConnections(
       filtered.map((c) => ({
         sourceId: c.sourceId,
