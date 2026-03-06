@@ -101,8 +101,10 @@ export function prioritizeConnections(
 // --- Hand-drawn SVG utilities ---
 
 /**
- * Generate a wobbly SVG oval path that looks hand-drawn.
- * Uses sinusoidal jitter to create organic imperfection.
+ * Generate a smooth hand-drawn SVG oval path.
+ * Uses 4 cubic bezier curves (one per quadrant) with gentle sinusoidal
+ * undulations — like a confident teacher circling something with a single
+ * fluid pen stroke.
  */
 export function handDrawnOval(
   cx: number,
@@ -111,36 +113,45 @@ export function handDrawnOval(
   ry: number,
   seed: number = 0
 ): string {
-  const points = 24;
-  const jitterAmp = Math.min(rx, ry) * 0.08; // 8% of smaller radius
-  const coords: [number, number][] = [];
+  // Scale jitter with oval size: small ovals 1-2px, large ovals 2-3px
+  const minR = Math.min(rx, ry);
+  const jitterAmp = minR < 20 ? Math.min(minR * 0.06, 2) : Math.min(minR * 0.04, 3);
 
-  for (let i = 0; i <= points; i++) {
-    const angle = (i / points) * Math.PI * 2;
-    // Sinusoidal jitter with seed for deterministic but varied results
-    const jx = jitterAmp * Math.sin(angle * 5 + seed * 1.7);
-    const jy = jitterAmp * Math.cos(angle * 7 + seed * 2.3);
-    coords.push([
-      cx + (rx + jx) * Math.cos(angle),
-      cy + (ry + jy) * Math.sin(angle),
-    ]);
-  }
+  // Kappa for cubic bezier circle approximation (~0.5523)
+  const k = 0.5523;
 
-  let d = `M ${coords[0][0].toFixed(1)} ${coords[0][1].toFixed(1)}`;
-  for (let i = 1; i < coords.length; i++) {
-    const prev = coords[i - 1];
-    const curr = coords[i];
-    // Quadratic bezier with midpoint control for smoothness
-    const cpx = (prev[0] + curr[0]) / 2 + jitterAmp * Math.sin(i * 3.1 + seed);
-    const cpy = (prev[1] + curr[1]) / 2 + jitterAmp * Math.cos(i * 2.7 + seed);
-    d += ` Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${curr[0].toFixed(1)} ${curr[1].toFixed(1)}`;
-  }
-  d += " Z";
+  // 4 cardinal anchor points with gentle jitter
+  const jx = (i: number) => jitterAmp * Math.sin(seed * 1.7 + i * 2.3);
+  const jy = (i: number) => jitterAmp * Math.cos(seed * 2.3 + i * 1.7);
+
+  const right: [number, number] = [cx + rx + jx(0), cy + jy(0)];
+  const bottom: [number, number] = [cx + jx(1), cy + ry + jy(1)];
+  const left: [number, number] = [cx - rx + jx(2), cy + jy(2)];
+  const top: [number, number] = [cx + jx(3), cy - ry + jy(3)];
+
+  // Control point jitter — gentle undulations along the curve
+  const cj = (i: number) => jitterAmp * Math.sin(seed * 3.1 + i * 1.9);
+
+  // Build 4 cubic bezier curves (right→bottom→left→top→close)
+  const d = [
+    `M ${right[0].toFixed(1)} ${right[1].toFixed(1)}`,
+    // Q1: right → bottom
+    `C ${(cx + rx * 1).toFixed(1)} ${(cy + ry * k + cj(0)).toFixed(1)} ${(cx + rx * k + cj(1)).toFixed(1)} ${(cy + ry * 1).toFixed(1)} ${bottom[0].toFixed(1)} ${bottom[1].toFixed(1)}`,
+    // Q2: bottom → left
+    `C ${(cx - rx * k + cj(2)).toFixed(1)} ${(cy + ry * 1).toFixed(1)} ${(cx - rx * 1).toFixed(1)} ${(cy + ry * k + cj(3)).toFixed(1)} ${left[0].toFixed(1)} ${left[1].toFixed(1)}`,
+    // Q3: left → top
+    `C ${(cx - rx * 1).toFixed(1)} ${(cy - ry * k + cj(4)).toFixed(1)} ${(cx - rx * k + cj(5)).toFixed(1)} ${(cy - ry * 1).toFixed(1)} ${top[0].toFixed(1)} ${top[1].toFixed(1)}`,
+    // Q4: top → right (close)
+    `C ${(cx + rx * k + cj(6)).toFixed(1)} ${(cy - ry * 1).toFixed(1)} ${(cx + rx * 1).toFixed(1)} ${(cy - ry * k + cj(7)).toFixed(1)} ${right[0].toFixed(1)} ${right[1].toFixed(1)}`,
+    "Z",
+  ].join(" ");
+
   return d;
 }
 
 /**
- * Generate a wobbly hand-drawn line path with slight curve.
+ * Generate a smooth hand-drawn line path with 1-2 gentle bends.
+ * Uses a single cubic bezier with subtle perpendicular offset.
  */
 export function handDrawnLine(
   x1: number,
@@ -152,8 +163,8 @@ export function handDrawnLine(
   const dx = x2 - x1;
   const dy = y2 - y1;
   const len = Math.sqrt(dx * dx + dy * dy);
-  const jitter = Math.min(len * 0.05, 4); // Max 4px jitter
-  // Perpendicular offset for curve
+  const jitter = Math.min(len * 0.025, 2.5); // Gentler: max 2.5px jitter
+  // Perpendicular offset for a single gentle bend
   const nx = -dy / len;
   const ny = dx / len;
   const cp1x = x1 + dx * 0.33 + nx * jitter * Math.sin(seed * 1.3);

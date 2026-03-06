@@ -51,9 +51,16 @@ describe("handDrawnOval", () => {
     expect(Math.abs(y - 200)).toBeLessThan(10);
   });
 
-  it("contains Q (quadratic bezier) commands", () => {
+  it("contains C (cubic bezier) commands instead of Q commands", () => {
     const path = handDrawnOval(50, 50, 30, 20);
-    expect(path).toContain(" Q ");
+    expect(path).toContain(" C ");
+    expect(path).not.toContain(" Q ");
+  });
+
+  it("uses exactly 4 cubic bezier curves (one per quadrant)", () => {
+    const path = handDrawnOval(50, 50, 30, 20);
+    const cCount = (path.match(/ C /g) || []).length;
+    expect(cCount).toBe(4);
   });
 });
 
@@ -359,18 +366,26 @@ describe("handDrawnOval path wobble bounds", () => {
     for (let i = 0; i < numbers.length; i += 2) {
       const x = numbers[i];
       const y = numbers[i + 1];
-      // Should be within ~20% of the ellipse bounds (jitter + bezier control points)
-      expect(x).toBeGreaterThan(cx - rx * 1.3);
-      expect(x).toBeLessThan(cx + rx * 1.3);
-      expect(y).toBeGreaterThan(cy - ry * 1.3);
-      expect(y).toBeLessThan(cy + ry * 1.3);
+      // Should be within ~15% of the ellipse bounds (tighter with smoother curves)
+      expect(x).toBeGreaterThan(cx - rx * 1.15);
+      expect(x).toBeLessThan(cx + rx * 1.15);
+      expect(y).toBeGreaterThan(cy - ry * 1.15);
+      expect(y).toBeLessThan(cy + ry * 1.15);
     }
   });
 
-  it("produces roughly 24 segments (Q commands)", () => {
+  it("uses exactly 4 cubic bezier curves (one per quadrant)", () => {
     const path = handDrawnOval(50, 50, 30, 20, 0);
-    const qCount = (path.match(/ Q /g) || []).length;
-    expect(qCount).toBe(24); // 24 points = 24 Q commands
+    const cCount = (path.match(/ C /g) || []).length;
+    expect(cCount).toBe(4);
+  });
+
+  it("has fewer control points than the old 24-segment implementation", () => {
+    const path = handDrawnOval(50, 50, 30, 20, 0);
+    // 4 C commands × 3 coordinate pairs = 12, plus 1 M = 13 coordinate pairs
+    const numbers = path.match(/-?[\d.]+/g)!;
+    // Should have significantly fewer numbers than old 24-segment version
+    expect(numbers.length).toBeLessThanOrEqual(30); // 4 C × 6 nums + M × 2 = 26
   });
 
   it("jitter amplitude is proportional to smaller radius", () => {
@@ -390,14 +405,14 @@ describe("handDrawnOval path wobble bounds", () => {
 });
 
 describe("handDrawnLine wobble bounds", () => {
-  it("jitter stays within 4px of the straight line", () => {
+  it("jitter stays within 2.5px of the straight line", () => {
     // Horizontal line
     const path = handDrawnLine(0, 50, 400, 50, 5);
     const numbers = path.match(/-?[\d.]+/g)!.map(Number);
-    // Y values of control points should be near 50 (within jitter bounds)
+    // Y values of control points should be near 50 (within gentler jitter bounds)
     for (let i = 1; i < numbers.length; i += 2) {
-      expect(numbers[i]).toBeGreaterThan(50 - 10);
-      expect(numbers[i]).toBeLessThan(50 + 10);
+      expect(numbers[i]).toBeGreaterThan(50 - 5);
+      expect(numbers[i]).toBeLessThan(50 + 5);
     }
   });
 });
