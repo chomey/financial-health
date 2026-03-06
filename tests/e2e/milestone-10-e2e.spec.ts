@@ -103,34 +103,36 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
       await page.goto("/");
       await page.waitForLoadState("networkidle");
 
-      // Chart on main page
-      const burndown = page.locator('[data-testid="runway-burndown-main"]');
-      await expect(burndown).toBeVisible({ timeout: 5000 });
+      // Unified chart with mode tabs
+      const chart = page.locator('[data-testid="projection-chart"]');
+      await expect(chart).toBeVisible({ timeout: 5000 });
 
-      // Inside projections section
-      const projections = page.locator("section#projections");
-      await expect(projections).toBeVisible();
-      await expect(
-        projections.locator('[data-testid="runway-burndown-main"]')
-      ).toBeVisible();
+      // Mode tabs visible
+      await expect(chart.locator('[data-testid="chart-mode-tabs"]')).toBeVisible();
+
+      // Switch to Income Stops
+      await chart.locator('[data-testid="mode-income-stops"]').click();
 
       // Has summary, legend, and starting balances
       await expect(
-        burndown.locator('[data-testid="burndown-summary"]')
+        chart.locator('[data-testid="burndown-summary"]')
       ).toBeVisible();
       await expect(
-        burndown.locator('[data-testid="burndown-legend"]')
+        chart.locator('[data-testid="burndown-legend"]')
       ).toBeVisible();
       await expect(
-        burndown.locator('[data-testid="burndown-starting-balances"]')
+        chart.locator('[data-testid="burndown-starting-balances"]')
       ).toBeVisible();
 
-      // Withdrawal order present on main page
+      // Withdrawal order present
       await expect(
-        burndown.locator('[data-testid="burndown-withdrawal-order"]')
+        chart.locator('[data-testid="burndown-withdrawal-order"]')
       ).toBeVisible();
 
       await captureScreenshot(page, "task-96-runway-burndown-main");
+
+      // Switch back to Keep Earning for subsequent tests
+      await chart.locator('[data-testid="mode-keep-earning"]').click();
     });
 
     test("runway explainer modal shows condensed content referencing main chart", async ({
@@ -152,7 +154,7 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
       // Should show note pointing to main page chart
       const chartNote = modal.locator('[data-testid="runway-chart-note"]');
       await expect(chartNote).toBeVisible();
-      await expect(chartNote).toContainText("burndown chart above");
+      await expect(chartNote).toContainText("Income Stops");
 
       await page.keyboard.press("Escape");
       await expect(modal).not.toBeVisible({ timeout: 3000 });
@@ -409,9 +411,12 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
       await page.keyboard.press("Escape");
       await expect(modalStep1).not.toBeVisible({ timeout: 3000 });
 
-      // Step 2: Verify runway burndown on main page
-      const burndown = page.locator('[data-testid="runway-burndown-main"]');
-      await expect(burndown).toBeVisible({ timeout: 5000 });
+      // Step 2: Verify burndown available in Income Stops mode
+      const chart = page.locator('[data-testid="projection-chart"]');
+      await expect(chart.locator('[data-testid="chart-mode-tabs"]')).toBeVisible();
+      await chart.locator('[data-testid="mode-income-stops"]').click();
+      await expect(chart.locator('[data-testid="burndown-summary"]')).toBeVisible();
+      await chart.locator('[data-testid="mode-keep-earning"]').click();
 
       // Step 3: Open Estimated Tax explainer with income
       const taxCard = page.locator(

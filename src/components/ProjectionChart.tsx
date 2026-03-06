@@ -19,9 +19,14 @@ import {
   projectAssets,
 } from "@/lib/projections";
 import type { Scenario, Milestone } from "@/lib/projections";
+import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
+import { buildSummary } from "@/components/RunwayBurndownChart";
+
+type ChartMode = "keep-earning" | "income-stops";
 
 interface ProjectionChartProps {
   state: FinancialState;
+  runwayDetails?: RunwayExplainerDetails;
 }
 
 function formatCurrency(value: number): string {
@@ -102,10 +107,35 @@ function computeXTicks(years: number): number[] {
   return ticks;
 }
 
-export default function ProjectionChart({ state }: ProjectionChartProps) {
+function fmtDuration(months: number): string {
+  if (months < 12) return `${Math.round(months)} mo`;
+  const years = months / 12;
+  return years % 1 === 0 ? `${years} yr` : `${years.toFixed(1)} yr`;
+}
+
+function BurndownTooltip({ active, payload, label }: CustomTooltipProps) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-lg border border-stone-200 bg-white p-3 shadow-lg">
+      <p className="mb-1 text-xs font-medium text-stone-500">Month {label}</p>
+      {payload.map((entry, i) => {
+        const n = String(entry.name ?? "");
+        const displayName = n === "withGrowth" ? "With growth" : n === "withoutGrowth" ? "Without growth" : n === "withTax" ? "After taxes" : n;
+        return (
+          <p key={i} className="text-sm font-semibold" style={{ color: entry.color }}>
+            {displayName}: ${Math.abs(entry.value).toLocaleString("en-US", { maximumFractionDigits: 0 })}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function ProjectionChart({ state, runwayDetails }: ProjectionChartProps) {
   const [years, setYears] = useState<number>(10);
   const [scenario, setScenario] = useState<Scenario>("moderate");
   const [legendOpen, setLegendOpen] = useState(false);
+  const [mode, setMode] = useState<ChartMode>("keep-earning");
   const currencyCode = getHomeCurrency(state.country ?? "CA");
 
   // Always project 30 years for the summary table; chart uses selected timeline
@@ -176,6 +206,50 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
     return projectAssets(state.assets, scenario, milestoneYears, surplus, homeCurrency, fxRates);
   }, [state, scenario, milestoneYears]);
 
+  // Surplus subtitle
+  const surplusInfo = useMemo(() => {
+    const totals = computeTotals(state);
+    const income = totals.monthlyAfterTaxIncome;
+    const expenses = totals.monthlyExpenses;
+    const contributions = totals.totalMonthlyContributions;
+    const surplus = income - expenses - contributions;
+    return { income, expenses, contributions, surplus };
+  }, [state]);
+
+  // Burndown chart data (only if runwayDetails is provided)
+  const burndownData = useMemo(() => {
+    if (!runwayDetails) return null;
+    const hasTaxDrag = (runwayDetails.taxDragMonths ?? 0) > 0;
+    const maxLen = Math.max(runwayDetails.withGrowth.length, runwayDetails.withoutGrowth.length, runwayDetails.withTax.length);
+    const step = maxLen > 300 ? Math.ceil(maxLen / 300) : 1;
+    const data: { month: number; withGrowth: number; withoutGrowth: number; withTax: number }[] = [];
+    for (let i = 0; i < maxLen; i += step) {
+      const gPt = runwayDetails.withGrowth[Math.min(i, runwayDetails.withGrowth.length - 1)];
+      const nPt = runwayDetails.withoutGrowth[Math.min(i, runwayDetails.withoutGrowth.length - 1)];
+      const tPt = runwayDetails.withTax[Math.min(i, runwayDetails.withTax.length - 1)];
+      data.push({
+        month: gPt?.month ?? i,
+        withGrowth: Math.round(gPt?.totalBalance ?? 0),
+        withoutGrowth: Math.round(nPt?.totalBalance ?? 0),
+        withTax: Math.round(tPt?.totalBalance ?? 0),
+      });
+    }
+
+    // Zero-crossing months
+    let growthZero: number | null = null;
+    let noGrowthZero: number | null = null;
+    let taxZero: number | null = null;
+    for (const pt of data) {
+      if (growthZero === null && pt.withGrowth <= 0) growthZero = pt.month;
+      if (noGrowthZero === null && pt.withoutGrowth <= 0) noGrowthZero = pt.month;
+      if (taxZero === null && pt.withTax <= 0) taxZero = pt.month;
+    }
+
+    const emergencyFund = runwayDetails.monthlyTotal * 6;
+
+    return { data, growthZero, noGrowthZero, taxZero, emergencyFund, hasTaxDrag };
+  }, [runwayDetails]);
+
   return (
     <section
       className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-6"
@@ -186,26 +260,64 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
         <h3 className="text-lg font-semibold text-stone-800">
           Financial Projection
         </h3>
-        <div className="flex items-center gap-2">
-          {(Object.keys(SCENARIO_LABELS) as Scenario[]).map((s) => (
-            <button
-              key={s}
-              onClick={() => setScenario(s)}
-              title={SCENARIO_DESCRIPTIONS[s]}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
-                scenario === s
-                  ? "text-white shadow-sm"
-                  : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-              }`}
-              style={scenario === s ? { backgroundColor: SCENARIO_COLORS[s] } : undefined}
-              data-testid={`scenario-${s}`}
-            >
-              {SCENARIO_LABELS[s]}
-            </button>
-          ))}
-        </div>
+        {mode === "keep-earning" && (
+          <div className="flex items-center gap-2">
+            {(Object.keys(SCENARIO_LABELS) as Scenario[]).map((s) => (
+              <button
+                key={s}
+                onClick={() => setScenario(s)}
+                title={SCENARIO_DESCRIPTIONS[s]}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                  scenario === s
+                    ? "text-white shadow-sm"
+                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                }`}
+                style={scenario === s ? { backgroundColor: SCENARIO_COLORS[s] } : undefined}
+                data-testid={`scenario-${s}`}
+              >
+                {SCENARIO_LABELS[s]}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* Mode tabs */}
+      {runwayDetails && (
+        <div className="mb-4 flex gap-1" data-testid="chart-mode-tabs">
+          <button
+            onClick={(e) => { e.stopPropagation(); setMode("keep-earning"); }}
+            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
+              mode === "keep-earning"
+                ? "bg-stone-800 text-white shadow-sm"
+                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+            }`}
+            data-testid="mode-keep-earning"
+          >
+            Keep Earning
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setMode("income-stops"); }}
+            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
+              mode === "income-stops"
+                ? "bg-stone-800 text-white shadow-sm"
+                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+            }`}
+            data-testid="mode-income-stops"
+          >
+            Income Stops
+          </button>
+        </div>
+      )}
+
+      {/* Surplus subtitle for Keep Earning mode */}
+      {mode === "keep-earning" && surplusInfo.income > 0 && (
+        <p className="mb-3 text-xs text-stone-500" data-testid="projection-surplus-subtitle">
+          Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)}{surplusInfo.contributions > 0 ? ` − Contributions ${formatCurrency(surplusInfo.contributions)}` : ""} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-emerald-600" : "font-medium text-rose-600"}>{formatCurrency(surplusInfo.surplus)}</span> surplus/mo
+        </p>
+      )}
+
+      {mode === "keep-earning" && (<>
       {/* Summary table: dynamic milestone year projections */}
       <div className="mb-4" data-testid="projection-summary-table">
         <div className="overflow-x-auto">
@@ -537,6 +649,118 @@ export default function ProjectionChart({ state }: ProjectionChartProps) {
             </table>
           </div>
         </div>
+      )}
+      </>)}
+
+      {/* Income Stops (Burndown) mode */}
+      {mode === "income-stops" && runwayDetails && burndownData && burndownData.data.length > 1 && (
+        <>
+          {/* Plain-English summary */}
+          <p className="mb-4 text-sm text-stone-600" data-testid="burndown-summary">{buildSummary(runwayDetails)}</p>
+
+          {/* Legend */}
+          <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" data-testid="burndown-legend">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-4 rounded bg-emerald-500" style={{ height: 2 }} />
+              <span className="text-stone-600">With investment growth</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-4 rounded" style={{ height: 2, borderTop: "2px dashed #9ca3af", background: "none" }} />
+              <span className="text-stone-600">Without growth</span>
+            </span>
+            {burndownData.hasTaxDrag && (
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block w-4 rounded bg-amber-500" style={{ height: 2 }} />
+                <span className="text-stone-600">After withdrawal taxes</span>
+              </span>
+            )}
+          </div>
+
+          <div className="h-72 sm:h-80 w-full" data-testid="burndown-chart-container">
+            <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
+              <LineChart data={burndownData.data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                <XAxis
+                  dataKey="month"
+                  tick={{ fontSize: 11, fill: "#78716c" }}
+                  label={{ value: "Months", position: "insideBottom", offset: -2, fontSize: 11, fill: "#78716c" }}
+                />
+                <YAxis
+                  tick={{ fontSize: 11, fill: "#78716c" }}
+                  tickFormatter={(v: number) => v >= 1000 ? `$${(v/1000).toFixed(0)}k` : `$${v}`}
+                />
+                <Tooltip content={<BurndownTooltip />} />
+
+                {/* 6-month emergency fund */}
+                {burndownData.emergencyFund > 0 && (
+                  <ReferenceLine
+                    y={burndownData.emergencyFund}
+                    stroke="#d6d3d1"
+                    strokeDasharray="4 4"
+                    strokeWidth={1}
+                    label={{ value: "6-mo emergency fund", position: "right", fontSize: 10, fill: "#a8a29e" }}
+                  />
+                )}
+
+                {/* Zero-crossing markers */}
+                {burndownData.noGrowthZero !== null && (
+                  <ReferenceLine x={burndownData.noGrowthZero} stroke="#9ca3af" strokeDasharray="3 3" strokeWidth={1}
+                    label={{ value: fmtDuration(burndownData.noGrowthZero), position: "top", fontSize: 10, fill: "#78716c" }} />
+                )}
+                {burndownData.growthZero !== null && burndownData.growthZero !== burndownData.noGrowthZero && (
+                  <ReferenceLine x={burndownData.growthZero} stroke="#10b981" strokeDasharray="3 3" strokeWidth={1}
+                    label={{ value: fmtDuration(burndownData.growthZero), position: "top", fontSize: 10, fill: "#059669" }} />
+                )}
+                {burndownData.taxZero !== null && burndownData.taxZero !== burndownData.growthZero && burndownData.taxZero !== burndownData.noGrowthZero && (
+                  <ReferenceLine x={burndownData.taxZero} stroke="#f59e0b" strokeDasharray="3 3" strokeWidth={1}
+                    label={{ value: fmtDuration(burndownData.taxZero), position: "top", fontSize: 10, fill: "#d97706" }} />
+                )}
+
+                <Line type="monotone" dataKey="withGrowth" stroke="#10b981" strokeWidth={2.5} dot={false} name="withGrowth" />
+                <Line type="monotone" dataKey="withoutGrowth" stroke="#9ca3af" strokeWidth={2} strokeDasharray="6 3" dot={false} name="withoutGrowth" />
+                {burndownData.hasTaxDrag && (
+                  <Line type="monotone" dataKey="withTax" stroke="#f59e0b" strokeWidth={2} dot={false} name="withTax" />
+                )}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Starting balances */}
+          {runwayDetails.withGrowth[0] && (
+            <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs text-stone-500" data-testid="burndown-starting-balances">
+              <span className="font-medium text-stone-600">Starting:</span>
+              {runwayDetails.categories
+                .map(cat => ({ category: cat, balance: runwayDetails.withGrowth[0]?.balances[cat] ?? 0 }))
+                .filter(b => b.balance > 0)
+                .map((b, i, arr) => (
+                  <span key={b.category}>
+                    {b.category} ${Math.abs(b.balance).toLocaleString("en-US", { maximumFractionDigits: 0 })}{i < arr.length - 1 ? " ·" : ""}
+                  </span>
+                ))}
+            </div>
+          )}
+
+          {/* Withdrawal order */}
+          {runwayDetails.withdrawalOrder.length > 0 && (
+            <div className="mt-4" data-testid="burndown-withdrawal-order">
+              <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Suggested Withdrawal Order</p>
+              <div className="flex flex-wrap gap-2">
+                {runwayDetails.withdrawalOrder.map((entry, i) => {
+                  const treatmentLabel = entry.taxTreatment === "tax-free" ? "tax-free"
+                    : entry.taxTreatment === "tax-deferred" ? "taxed as income"
+                    : "capital gains";
+                  return (
+                    <span key={i} className="inline-flex items-center gap-1.5 rounded-lg bg-stone-50 px-2.5 py-1.5 text-xs" data-testid={`burndown-withdrawal-${i}`}>
+                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-stone-200 text-[10px] font-bold text-stone-600">{i + 1}</span>
+                      <span className="max-w-[150px] truncate text-stone-700 font-medium">{entry.category}</span>
+                      <span className="text-stone-400">({treatmentLabel})</span>
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </section>
   );

@@ -44,7 +44,7 @@ describe("Milestone 10 E2E test infrastructure — Explainer & Tax Treatment Enh
 
   it("covers runway burndown chart on main page", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
-    expect(content).toContain("runway-burndown-main");
+    expect(content).toContain("mode-income-stops");
     expect(content).toContain("burndown-summary");
     expect(content).toContain("burndown-legend");
     expect(content).toContain("burndown-starting-balances");

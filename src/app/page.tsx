@@ -18,7 +18,6 @@ import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import CashFlowSankey from "@/components/CashFlowSankey";
 import FxRateDisplay from "@/components/FxRateDisplay";
 import InsightsPanel from "@/components/InsightsPanel";
-import RunwayBurndownChart from "@/components/RunwayBurndownChart";
 import ZoomableCard from "@/components/ZoomableCard";
 import { DataFlowProvider, useOptionalDataFlow, type SourceMetadataItem } from "@/components/DataFlowArrows";
 import {
@@ -567,10 +566,7 @@ export default function Home() {
 
         {/* Projection Chart — full-width above the two-column layout */}
         <section id="projections" className="mb-6 space-y-4 scroll-mt-16" aria-label="Financial projections">
-          <ZoomableCard><ProjectionChart state={state} /></ZoomableCard>
-          {runwayDetails && (
-            <ZoomableCard><RunwayBurndownChart details={runwayDetails} /></ZoomableCard>
-          )}
+          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} /></ZoomableCard>
           <InsightsPanel data={financialData} insightConnections={insightConnections} />
         </section>
 

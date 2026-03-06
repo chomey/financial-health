@@ -1,32 +1,36 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-test.describe("Runway Burndown Chart on Main Page", () => {
-  test("renders simplified burndown chart with summary, legend, and starting balances", async ({ page }) => {
+test.describe("Runway Burndown in Unified Projection Chart", () => {
+  test("renders burndown view when Income Stops tab is clicked", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // The burndown chart should be visible on the main page
-    const burndownChart = page.locator('[data-testid="runway-burndown-main"]');
-    await expect(burndownChart).toBeVisible({ timeout: 5000 });
+    // The projection chart should be visible
+    const chart = page.locator('[data-testid="projection-chart"]');
+    await expect(chart).toBeVisible({ timeout: 5000 });
 
-    // Should show "Runway Burndown" title
-    await expect(burndownChart.getByText("Runway Burndown")).toBeVisible();
+    // Mode tabs should be visible
+    const modeTabs = chart.locator('[data-testid="chart-mode-tabs"]');
+    await expect(modeTabs).toBeVisible();
+
+    // Click "Income Stops" tab
+    await chart.locator('[data-testid="mode-income-stops"]').click();
 
     // Should show plain-English summary
-    const summary = burndownChart.locator('[data-testid="burndown-summary"]');
+    const summary = chart.locator('[data-testid="burndown-summary"]');
     await expect(summary).toBeVisible();
     const summaryText = await summary.textContent();
     expect(summaryText).toContain("Your savings could last");
 
     // Should show clean legend with line descriptions
-    const legend = burndownChart.locator('[data-testid="burndown-legend"]');
+    const legend = chart.locator('[data-testid="burndown-legend"]');
     await expect(legend).toBeVisible();
     await expect(legend.getByText("With investment growth")).toBeVisible();
     await expect(legend.getByText("Without growth")).toBeVisible();
 
     // Should show starting balances
-    const balances = burndownChart.locator('[data-testid="burndown-starting-balances"]');
+    const balances = chart.locator('[data-testid="burndown-starting-balances"]');
     await expect(balances).toBeVisible();
     const balancesText = await balances.textContent();
     expect(balancesText).toContain("Starting:");
@@ -34,32 +38,30 @@ test.describe("Runway Burndown Chart on Main Page", () => {
     // Should be inside the projections section
     const projections = page.locator('section#projections');
     await expect(projections).toBeVisible();
-    const burndownInProjections = projections.locator('[data-testid="runway-burndown-main"]');
-    await expect(burndownInProjections).toBeVisible();
 
-    await captureScreenshot(page, "task-92-runway-burndown-simplified");
+    await captureScreenshot(page, "task-98-burndown-income-stops");
   });
 
-  test("shows withdrawal order on main page chart", async ({ page }) => {
+  test("shows withdrawal order in Income Stops view", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const burndownChart = page.locator('[data-testid="runway-burndown-main"]');
-    await expect(burndownChart).toBeVisible({ timeout: 5000 });
+    const chart = page.locator('[data-testid="projection-chart"]');
+    await chart.locator('[data-testid="mode-income-stops"]').click();
 
     // Should show suggested withdrawal order
-    const withdrawalOrder = burndownChart.locator('[data-testid="burndown-withdrawal-order"]');
+    const withdrawalOrder = chart.locator('[data-testid="burndown-withdrawal-order"]');
     await expect(withdrawalOrder).toBeVisible();
     await expect(withdrawalOrder.getByText("Suggested Withdrawal Order")).toBeVisible();
 
     // Should have at least one entry (TFSA from default state)
-    const firstEntry = burndownChart.locator('[data-testid="burndown-withdrawal-0"]');
+    const firstEntry = chart.locator('[data-testid="burndown-withdrawal-0"]');
     await expect(firstEntry).toBeVisible();
 
-    await captureScreenshot(page, "task-92-withdrawal-order");
+    await captureScreenshot(page, "task-98-withdrawal-order");
   });
 
-  test("runway explainer modal shows condensed content with chart note", async ({ page }) => {
+  test("runway explainer modal references Income Stops mode", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -71,34 +73,40 @@ test.describe("Runway Burndown Chart on Main Page", () => {
     const modal = page.locator('[data-testid="explainer-modal"]');
     await expect(modal).toBeVisible();
 
-    // Should show the note pointing to main page chart
+    // Should show the note pointing to Income Stops mode
     const chartNote = modal.locator('[data-testid="runway-chart-note"]');
     await expect(chartNote).toBeVisible();
     const noteText = await chartNote.textContent();
-    expect(noteText).toContain("burndown chart above");
+    expect(noteText).toContain("Income Stops");
 
     // Should still show monthly obligations
     const obligations = modal.locator('[data-testid="runway-monthly-obligations"]');
     await expect(obligations).toBeVisible();
 
-    // Should still show withdrawal order
-    const withdrawalOrder = modal.locator('[data-testid="runway-withdrawal-order"]');
-    await expect(withdrawalOrder).toBeVisible();
+    // Should still show withdrawal order in the explainer
+    const withdrawalEntry = modal.locator('[data-testid="withdrawal-order-0"]');
+    await expect(withdrawalEntry).toBeVisible();
   });
 
-  test("burndown chart is wrapped in ZoomableCard", async ({ page }) => {
+  test("mode tabs switch between Keep Earning and Income Stops views", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const burndownChart = page.locator('[data-testid="runway-burndown-main"]');
-    await expect(burndownChart).toBeVisible({ timeout: 5000 });
+    const chart = page.locator('[data-testid="projection-chart"]');
+    await expect(chart).toBeVisible({ timeout: 5000 });
 
-    // The chart's parent should be a ZoomableCard (has zoom-in icon on hover)
-    const zoomableParent = burndownChart.locator("..");
-    await zoomableParent.hover();
+    // Default mode is Keep Earning — projection summary table should be visible
+    await expect(chart.locator('[data-testid="projection-summary-table"]')).toBeVisible();
+    await expect(chart.locator('[data-testid="burndown-summary"]')).not.toBeVisible();
 
-    // Check the zoom icon becomes visible on hover
-    const zoomIcon = zoomableParent.locator('svg');
-    await expect(zoomIcon.first()).toBeVisible({ timeout: 2000 });
+    // Switch to Income Stops
+    await chart.locator('[data-testid="mode-income-stops"]').click();
+    await expect(chart.locator('[data-testid="burndown-summary"]')).toBeVisible();
+    await expect(chart.locator('[data-testid="projection-summary-table"]')).not.toBeVisible();
+
+    // Switch back to Keep Earning
+    await chart.locator('[data-testid="mode-keep-earning"]').click();
+    await expect(chart.locator('[data-testid="projection-summary-table"]')).toBeVisible();
+    await expect(chart.locator('[data-testid="burndown-summary"]')).not.toBeVisible();
   });
 });

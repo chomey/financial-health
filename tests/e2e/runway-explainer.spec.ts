@@ -22,7 +22,7 @@ test.describe("Financial Runway Explainer", () => {
     const chartNote = page.locator('[data-testid="runway-chart-note"]');
     await expect(chartNote).toBeVisible();
     const noteText = await chartNote.textContent();
-    expect(noteText).toContain("burndown chart above");
+    expect(noteText).toContain("Income Stops");
 
     // Should show monthly obligations breakdown
     const obligations = page.locator('[data-testid="runway-monthly-obligations"]');
@@ -110,8 +110,12 @@ test.describe("Financial Runway Explainer", () => {
     await editInput.press("Enter");
     await page.waitForTimeout(1500);
 
+    // Switch to Income Stops mode to see burndown summary
+    const chart = page.locator('[data-testid="projection-chart"]');
+    await chart.locator('[data-testid="mode-income-stops"]').click();
+
     // Tax drag info should be in the burndown summary text
-    const burndownSummary = page.locator('[data-testid="burndown-summary"]');
+    const burndownSummary = chart.locator('[data-testid="burndown-summary"]');
     await expect(burndownSummary).toBeVisible({ timeout: 5000 });
     const summaryText = await burndownSummary.textContent();
     expect(summaryText).toContain("withdrawal taxes");

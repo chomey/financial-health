@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Unified multi-mode chart
+  {
+    version: 98,
+    title: "Unified projection and burndown chart",
+    description: "Merged the projection chart and runway burndown into a single multi-mode chart with 'Keep Earning' and 'Income Stops' tabs. Keep Earning shows net worth growth projections with scenario toggles. Income Stops shows how long savings last if income stops. Added income/expense surplus subtitle to the projection view.",
+    date: "2026-03-06",
+  },
   // After-tax runway + merge withdrawal tax into runway
   {
     version: 97,
