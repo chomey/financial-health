@@ -15,6 +15,7 @@ interface MetricData {
   valueWithEquity?: number; // net worth including property equity
   ratioWithoutMortgage?: number; // debt-to-asset ratio excluding mortgage
   runwayWithGrowth?: number; // runway in months factoring in asset ROR
+  runwayAfterTax?: number; // runway in months after withdrawal taxes
 }
 
 // Mock values based on existing entry component mock data
@@ -57,13 +58,13 @@ const MOCK_METRICS: MetricData[] = [
   },
 ];
 
-function formatMetricValue(value: number, format: MetricData["format"]): string {
+function formatMetricValue(value: number, format: MetricData["format"], currencyCode?: string): string {
   switch (format) {
     case "currency": {
       const absValue = Math.abs(value);
       const formatted = absValue.toLocaleString("en-US", {
         style: "currency",
-        currency: "USD",
+        currency: currencyCode ?? "USD",
         maximumFractionDigits: 0,
       });
       return value < 0 ? `-${formatted}` : formatted;
@@ -124,7 +125,7 @@ function useCountUp(target: number, duration: number = 1000): number {
   return current;
 }
 
-function MetricCard({ metric, insights }: { metric: MetricData; insights: string[] }) {
+function MetricCard({ metric, insights, homeCurrency }: { metric: MetricData; insights: string[]; homeCurrency?: string }) {
   const animatedValue = useCountUp(metric.value);
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -170,23 +171,28 @@ function MetricCard({ metric, insights }: { metric: MetricData; insights: string
       </div>
       <p
         className={`mt-1.5 text-3xl font-bold ${valueColor}`}
-        aria-label={`${metric.title}: ${formatMetricValue(metric.value, metric.format)}`}
+        aria-label={`${metric.title}: ${formatMetricValue(metric.value, metric.format, homeCurrency)}`}
       >
-        {formatMetricValue(animatedValue, metric.format)}
+        {formatMetricValue(animatedValue, metric.format, homeCurrency)}
       </p>
       {metric.valueWithEquity !== undefined && metric.valueWithEquity !== metric.value && (
         <p className="mt-0.5 text-sm text-stone-500" data-testid="net-worth-with-equity">
-          ({formatMetricValue(metric.valueWithEquity, metric.format)} with home equity)
+          ({formatMetricValue(metric.valueWithEquity, metric.format, homeCurrency)} with home equity)
         </p>
       )}
       {metric.ratioWithoutMortgage !== undefined && metric.ratioWithoutMortgage !== metric.value && (
         <p className="mt-0.5 text-sm text-stone-500" data-testid="ratio-without-mortgage">
-          ({formatMetricValue(metric.ratioWithoutMortgage, metric.format)} without mortgage)
+          ({formatMetricValue(metric.ratioWithoutMortgage, metric.format, homeCurrency)} without mortgage)
         </p>
       )}
       {metric.runwayWithGrowth !== undefined && (
         <p className="mt-0.5 text-sm text-stone-500" data-testid="runway-with-growth">
-          ({metric.runwayWithGrowth === Infinity ? "∞" : formatMetricValue(metric.runwayWithGrowth, "months")} with investment growth)
+          ({metric.runwayWithGrowth === Infinity ? "∞" : formatMetricValue(metric.runwayWithGrowth, "months", homeCurrency)} with investment growth)
+        </p>
+      )}
+      {metric.runwayAfterTax !== undefined && (
+        <p className="mt-0.5 text-sm text-amber-600" data-testid="runway-after-tax">
+          ({formatMetricValue(metric.runwayAfterTax, "months", homeCurrency)} after withdrawal tax)
         </p>
       )}
       {/* Effective tax rate sub-line */}
@@ -224,9 +230,10 @@ function MetricCard({ metric, insights }: { metric: MetricData; insights: string
 interface SnapshotDashboardProps {
   metrics?: MetricData[];
   financialData?: FinancialData;
+  homeCurrency?: string;
 }
 
-export default function SnapshotDashboard({ metrics, financialData }: SnapshotDashboardProps = {}) {
+export default function SnapshotDashboard({ metrics, financialData, homeCurrency }: SnapshotDashboardProps = {}) {
   const displayMetrics = metrics ?? MOCK_METRICS;
 
   // Generate insights and map to metric cards
@@ -249,6 +256,7 @@ export default function SnapshotDashboard({ metrics, financialData }: SnapshotDa
           key={metric.title}
           metric={metric}
           insights={insightsByMetric.get(metric.title) ?? []}
+          homeCurrency={homeCurrency}
         />
       ))}
     </div>

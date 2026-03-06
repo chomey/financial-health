@@ -24,6 +24,8 @@ export interface FinancialData {
   annualTax?: number;
   /** Whether any income is capital gains type */
   hasCapitalGains?: boolean;
+  /** Home currency code (e.g., "CAD", "USD") for formatting */
+  homeCurrency?: string;
 }
 
 export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax";
@@ -36,6 +38,7 @@ export interface Insight {
 }
 
 export function generateInsights(data: FinancialData): Insight[] {
+  _insightCurrency = data.homeCurrency ?? "USD";
   const insights: Insight[] = [];
   const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses } = data;
 
@@ -255,10 +258,13 @@ export function generateInsights(data: FinancialData): Insight[] {
   return insights;
 }
 
+// Module-level currency code, set per generateInsights call
+let _insightCurrency = "USD";
+
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: _insightCurrency,
     maximumFractionDigits: 0,
   }).format(Math.abs(amount));
 }

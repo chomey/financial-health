@@ -10,6 +10,7 @@ export interface StockHolding {
   purchaseDate?: string; // ISO date string (YYYY-MM-DD) for annualized return calc
   lastFetchedPrice?: number; // auto-fetched price (not persisted in URL)
   lastUpdated?: string; // timestamp of last price fetch (not persisted)
+  priceCurrency?: import("@/lib/currency").SupportedCurrency; // currency of the fetched price (transient, not URL-persisted)
 }
 
 /** Compute total value of a stock holding */
@@ -104,13 +105,13 @@ interface StockEntryProps {
   onChange?: (items: StockHolding[]) => void;
 }
 
-async function fetchStockPrice(ticker: string): Promise<{ price: number; timestamp: string } | null> {
+async function fetchStockPrice(ticker: string): Promise<{ price: number; timestamp: string; currency?: string } | null> {
   try {
     const res = await fetch(`/api/stock-price?ticker=${encodeURIComponent(ticker.toUpperCase())}`);
     if (!res.ok) return null;
     const data = await res.json();
     if (data.price !== undefined && data.price !== null) {
-      return { price: data.price, timestamp: data.timestamp || new Date().toISOString() };
+      return { price: data.price, timestamp: data.timestamp || new Date().toISOString(), currency: data.currency };
     }
     return null;
   } catch {
@@ -139,12 +140,12 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
         // Merge lastFetchedPrice/lastUpdated from local state so concurrent
         // fetch responses aren't overwritten by stale parent items
         const localPrices = new Map(
-          prev.map((s) => [s.id, { lastFetchedPrice: s.lastFetchedPrice, lastUpdated: s.lastUpdated }])
+          prev.map((s) => [s.id, { lastFetchedPrice: s.lastFetchedPrice, lastUpdated: s.lastUpdated, priceCurrency: s.priceCurrency }])
         );
         return items.map((item) => {
           const local = localPrices.get(item.id);
           if (local?.lastFetchedPrice && !item.lastFetchedPrice) {
-            return { ...item, lastFetchedPrice: local.lastFetchedPrice, lastUpdated: local.lastUpdated };
+            return { ...item, lastFetchedPrice: local.lastFetchedPrice, lastUpdated: local.lastUpdated, priceCurrency: local.priceCurrency };
           }
           return item;
         });
@@ -205,7 +206,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
       setStocks((prev) =>
         prev.map((s) =>
           s.id === stockId
-            ? { ...s, lastFetchedPrice: result.price, lastUpdated: result.timestamp }
+            ? { ...s, lastFetchedPrice: result.price, lastUpdated: result.timestamp, priceCurrency: result.currency as import("@/lib/currency").SupportedCurrency | undefined }
             : s
         )
       );
@@ -230,7 +231,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
           setStocks((prev) =>
             prev.map((s) =>
               s.id === stock.id
-                ? { ...s, lastFetchedPrice: result.price, lastUpdated: result.timestamp }
+                ? { ...s, lastFetchedPrice: result.price, lastUpdated: result.timestamp, priceCurrency: result.currency as import("@/lib/currency").SupportedCurrency | undefined }
                 : s
             )
           );

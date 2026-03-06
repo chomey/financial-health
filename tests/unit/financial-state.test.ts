@@ -275,6 +275,187 @@ describe("financial-state", () => {
     });
   });
 
+  describe("currency conversion in computeTotals", () => {
+    it("converts USD asset to CAD for CA user", () => {
+      const state: FinancialState = {
+        ...INITIAL_STATE,
+        assets: [{ id: "a1", category: "Brokerage", amount: 10000, currency: "USD" }],
+        debts: [],
+        country: "CA",
+        fxRates: { USD_CAD: 1.37, CAD_USD: 0.73 },
+      };
+      const totals = computeTotals(state);
+      expect(totals.totalAssets).toBeCloseTo(13700, 0);
+      expect(totals.homeCurrency).toBe("CAD");
+    });
+
+    it("converts CAD debt to USD for US user", () => {
+      const state: FinancialState = {
+        ...INITIAL_STATE,
+        assets: [],
+        debts: [{ id: "d1", category: "Loan", amount: 10000, currency: "CAD" }],
+        country: "US",
+        jurisdiction: "CA",
+        fxRates: { USD_CAD: 1.37, CAD_USD: 0.73 },
+      };
+      const totals = computeTotals(state);
+      expect(totals.totalDebts).toBeCloseTo(7300, 0);
+      expect(totals.homeCurrency).toBe("USD");
+    });
+
+    it("does not convert when item currency matches home currency", () => {
+      const state: FinancialState = {
+        ...INITIAL_STATE,
+        assets: [{ id: "a1", category: "TFSA", amount: 10000, currency: "CAD" }],
+        debts: [],
+        country: "CA",
+        fxRates: { USD_CAD: 1.37, CAD_USD: 0.73 },
+      };
+      const totals = computeTotals(state);
+      expect(totals.totalAssets).toBe(10000);
+    });
+
+    it("does not convert when no currency is specified (defaults to home)", () => {
+      const state: FinancialState = {
+        ...INITIAL_STATE,
+        assets: [{ id: "a1", category: "TFSA", amount: 10000 }],
+        debts: [],
+        country: "CA",
+      };
+      const totals = computeTotals(state);
+      expect(totals.totalAssets).toBe(10000);
+    });
+
+    it("uses manual FX override when set", () => {
+      const state: FinancialState = {
+        ...INITIAL_STATE,
+        assets: [{ id: "a1", category: "Brokerage", amount: 10000, currency: "USD" }],
+        debts: [],
+        country: "CA",
+        fxManualOverride: 1.40, // 1 USD = 1.40 CAD
+      };
+      const totals = computeTotals(state);
+      expect(totals.totalAssets).toBeCloseTo(14000, 0);
+    });
+
+    it("converts property values and mortgages", () => {
+      const state: FinancialState = {
+        ...INITIAL_STATE,
+        assets: [],
+        debts: [],
+        properties: [{ id: "p1", name: "US Condo", value: 200000, mortgage: 150000, currency: "USD" }],
+        country: "CA",
+        fxRates: { USD_CAD: 1.37, CAD_USD: 0.73 },
+      };
+      const totals = computeTotals(state);
+      expect(totals.totalPropertyValue).toBeCloseTo(200000 * 1.37, 0);
+      expect(totals.totalPropertyMortgage).toBeCloseTo(150000 * 1.37, 0);
+      expect(totals.totalPropertyEquity).toBeCloseTo(50000 * 1.37, 0);
+    });
+  });
+
+  describe("tax-adjusted runway", () => {
+    it("shows runwayAfterTax when portfolio has tax-deferred accounts with high expenses", () => {
+      // Large RRSP balance with high monthly expenses → higher tax rate on withdrawals
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "TFSA", amount: 50000 },
+          { id: "a2", category: "RRSP", amount: 200000 },
+        ],
+        debts: [],
+        income: [],
+        expenses: [{ id: "e1", category: "Living", amount: 5000 }],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+      const metrics = computeMetrics(state);
+      const runway = metrics.find((m) => m.title === "Financial Runway");
+      expect(runway).toBeDefined();
+      // Base runway: 250000 / 5000 = 50 months
+      expect(runway!.value).toBeCloseTo(50, 1);
+      // Tax-adjusted runway should be less because RRSP withdrawals are taxed ($60k/yr)
+      expect(runway!.runwayAfterTax).toBeDefined();
+      expect(runway!.runwayAfterTax!).toBeLessThan(runway!.value);
+      expect(runway!.runwayAfterTax!).toBeGreaterThan(0);
+    });
+
+    it("does not show runwayAfterTax when all accounts are tax-free", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "TFSA", amount: 20000 },
+          { id: "a2", category: "Roth IRA", amount: 30000 },
+        ],
+        debts: [],
+        income: [],
+        expenses: [{ id: "e1", category: "Living", amount: 2000 }],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+      const metrics = computeMetrics(state);
+      const runway = metrics.find((m) => m.title === "Financial Runway");
+      // All tax-free, no meaningful tax drag
+      expect(runway!.runwayAfterTax).toBeUndefined();
+    });
+
+    it("tax-adjusted runway is lower than growth-aware runway for US 401k", () => {
+      // Large 401k with high expenses → significant tax on $60k/yr withdrawals
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "401k", amount: 300000 },
+        ],
+        debts: [],
+        income: [],
+        expenses: [{ id: "e1", category: "Living", amount: 5000 }],
+        properties: [],
+        stocks: [],
+        country: "US",
+        jurisdiction: "CA",
+      };
+      const metrics = computeMetrics(state);
+      const runway = metrics.find((m) => m.title === "Financial Runway");
+      expect(runway!.value).toBeCloseTo(60, 1);
+      // 401k has 7% default ROI, so runwayWithGrowth is set
+      expect(runway!.runwayWithGrowth).toBeDefined();
+      // Tax-adjusted should be less than growth-aware (tax eats into the benefit)
+      expect(runway!.runwayAfterTax).toBeDefined();
+      expect(runway!.runwayAfterTax!).toBeLessThan(runway!.runwayWithGrowth!);
+      expect(runway!.runwayAfterTax!).toBeGreaterThan(0);
+    });
+
+    it("mixed portfolio: tax-free accounts withdrawn first extend runway", () => {
+      // Compare: all RRSP vs half TFSA + half RRSP with high expenses
+      const allDeferred: FinancialState = {
+        assets: [{ id: "a1", category: "RRSP", amount: 200000 }],
+        debts: [], income: [],
+        expenses: [{ id: "e1", category: "Living", amount: 5000 }],
+        properties: [], stocks: [],
+        country: "CA", jurisdiction: "ON",
+      };
+      const mixed: FinancialState = {
+        assets: [
+          { id: "a1", category: "TFSA", amount: 100000 },
+          { id: "a2", category: "RRSP", amount: 100000 },
+        ],
+        debts: [], income: [],
+        expenses: [{ id: "e1", category: "Living", amount: 5000 }],
+        properties: [], stocks: [],
+        country: "CA", jurisdiction: "ON",
+      };
+      const deferredMetrics = computeMetrics(allDeferred);
+      const mixedMetrics = computeMetrics(mixed);
+      const deferredRunway = deferredMetrics.find((m) => m.title === "Financial Runway")!;
+      const mixedRunway = mixedMetrics.find((m) => m.title === "Financial Runway")!;
+      // Both have same base runway (40 months)
+      expect(deferredRunway.value).toBeCloseTo(mixedRunway.value, 1);
+      // Mixed should have better tax-adjusted runway because TFSA is withdrawn first
+      expect(mixedRunway.runwayAfterTax!).toBeGreaterThan(deferredRunway.runwayAfterTax!);
+    });
+  });
+
   describe("toFinancialData", () => {
     it("converts state to FinancialData for insights", () => {
       const data = toFinancialData(INITIAL_STATE);

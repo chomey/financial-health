@@ -450,6 +450,147 @@ describe("getStateFromURL", () => {
   });
 });
 
+describe("currency encoding", () => {
+  it("omits currency when it matches home currency (CA user with CAD asset)", () => {
+    const state: FinancialState = {
+      assets: [{ id: "a1", category: "TFSA", amount: 10000, currency: "CAD" }],
+      debts: [],
+      income: [],
+      expenses: [],
+      properties: [],
+      stocks: [],
+      country: "CA",
+    };
+    const compact = toCompact(state);
+    expect(compact.a[0].cu).toBeUndefined();
+  });
+
+  it("encodes currency when it differs from home currency (CA user with USD asset)", () => {
+    const state: FinancialState = {
+      assets: [{ id: "a1", category: "Brokerage", amount: 5000, currency: "USD" }],
+      debts: [],
+      income: [],
+      expenses: [],
+      properties: [],
+      stocks: [],
+      country: "CA",
+    };
+    const compact = toCompact(state);
+    expect(compact.a[0].cu).toBe("USD");
+  });
+
+  it("roundtrips asset with foreign currency", () => {
+    const state: FinancialState = {
+      assets: [{ id: "a1", category: "Brokerage", amount: 5000, currency: "USD" }],
+      debts: [],
+      income: [],
+      expenses: [],
+      properties: [],
+      stocks: [],
+      country: "CA",
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.assets[0].currency).toBe("USD");
+  });
+
+  it("roundtrips debt with foreign currency", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [{ id: "d1", category: "Credit Card", amount: 3000, currency: "USD" }],
+      income: [],
+      expenses: [],
+      properties: [],
+      stocks: [],
+      country: "CA",
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.debts[0].currency).toBe("USD");
+  });
+
+  it("roundtrips property with foreign currency", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [],
+      expenses: [],
+      properties: [{ id: "p1", name: "US Condo", value: 200000, mortgage: 150000, currency: "USD" }],
+      stocks: [],
+      country: "CA",
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.properties[0].currency).toBe("USD");
+  });
+
+  it("omits currency for US user with USD items", () => {
+    const state: FinancialState = {
+      assets: [{ id: "a1", category: "401k", amount: 50000, currency: "USD" }],
+      debts: [{ id: "d1", category: "Car Loan", amount: 10000, currency: "USD" }],
+      income: [],
+      expenses: [],
+      properties: [],
+      stocks: [],
+      country: "US",
+    };
+    const compact = toCompact(state);
+    expect(compact.a[0].cu).toBeUndefined();
+    expect(compact.d[0].cu).toBeUndefined();
+  });
+
+  it("roundtrips fxManualOverride", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [],
+      expenses: [],
+      properties: [],
+      stocks: [],
+      country: "CA",
+      fxManualOverride: 1.35,
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.fxManualOverride).toBe(1.35);
+  });
+
+  it("omits fxManualOverride when not set", () => {
+    const state: FinancialState = {
+      assets: [],
+      debts: [],
+      income: [],
+      expenses: [],
+      properties: [],
+      stocks: [],
+      country: "CA",
+    };
+    const compact = toCompact(state);
+    expect(compact.fxm).toBeUndefined();
+  });
+
+  it("backward compat: missing currency fields default to undefined", () => {
+    const state: FinancialState = {
+      assets: [{ id: "a1", category: "TFSA", amount: 10000 }],
+      debts: [{ id: "d1", category: "Car Loan", amount: 5000 }],
+      income: [],
+      expenses: [],
+      properties: [],
+      stocks: [],
+    };
+    const encoded = encodeState(state);
+    const decoded = decodeState(encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.assets[0].currency).toBeUndefined();
+    expect(decoded!.debts[0].currency).toBeUndefined();
+    expect(decoded!.fxManualOverride).toBeUndefined();
+  });
+});
+
 describe("updateURL", () => {
   beforeEach(() => {
     window.history.replaceState(null, "", "/");

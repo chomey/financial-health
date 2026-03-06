@@ -1,4 +1,6 @@
 import type { FinancialState } from "@/lib/financial-state";
+import { getHomeCurrency } from "@/lib/currency";
+import type { SupportedCurrency } from "@/lib/currency";
 import { deflate, inflate } from "pako";
 
 // ASCII85 (base85) encoding/decoding for compact URL state
@@ -98,12 +100,14 @@ interface CompactAsset {
   r?: number; // roi (annual %)
   m?: number; // monthlyContribution ($)
   st?: 1; // surplusTarget
+  cu?: string; // currency override (omitted when home currency)
 }
 interface CompactDebt {
   c: string;
   a: number;
   ir?: number; // interestRate (annual %)
   mp?: number; // monthlyPayment ($)
+  cu?: string; // currency override
 }
 interface CompactIncome {
   c: string;
@@ -124,6 +128,7 @@ interface CompactProperty {
   ay?: number; // amortizationYears
   yp?: number; // yearPurchased
   ap?: number; // appreciation (annual %)
+  cu?: string; // currency override
 }
 interface CompactStock {
   t: string; // ticker
@@ -144,24 +149,28 @@ interface CompactState {
   ft?: number; // federal tax override (annual)
   pt?: number; // provincial/state tax override (annual)
   sr?: string; // surplusTargetComputedId — set when surplus target is a computed asset (e.g. "_computed_stocks")
+  fxm?: number; // FX manual override: 1 foreign = X home
 }
 
 function toCompact(state: FinancialState): CompactState {
   // Filter out auto-computed assets (stocks/equity synced from other sections) —
   // they get re-derived on load, so persisting them causes duplicates.
   const realAssets = state.assets.filter((a) => !a.computed);
+  const homeCurrency = getHomeCurrency(state.country ?? "CA");
   const compact: CompactState = {
     a: realAssets.map((x) => {
       const ca: CompactAsset = { c: x.category, a: x.amount };
       if (x.roi !== undefined) ca.r = x.roi;
       if (x.monthlyContribution !== undefined && x.monthlyContribution > 0) ca.m = x.monthlyContribution;
       if (x.surplusTarget) ca.st = 1;
+      if (x.currency && x.currency !== homeCurrency) ca.cu = x.currency;
       return ca;
     }),
     d: state.debts.map((x) => {
       const cd: CompactDebt = { c: x.category, a: x.amount };
       if (x.interestRate !== undefined) cd.ir = x.interestRate;
       if (x.monthlyPayment !== undefined && x.monthlyPayment > 0) cd.mp = x.monthlyPayment;
+      if (x.currency && x.currency !== homeCurrency) cd.cu = x.currency;
       return cd;
     }),
     i: state.income.map((x) => {
@@ -181,6 +190,7 @@ function toCompact(state: FinancialState): CompactState {
       if (x.amortizationYears !== undefined) cp.ay = x.amortizationYears;
       if (x.yearPurchased !== undefined) cp.yp = x.yearPurchased;
       if (x.appreciation !== undefined) cp.ap = x.appreciation;
+      if (x.currency && x.currency !== homeCurrency) cp.cu = x.currency;
       return cp;
     });
   }
@@ -202,6 +212,7 @@ function toCompact(state: FinancialState): CompactState {
   const computedSurplusTarget = state.assets.find((a) => a.computed && a.surplusTarget);
   const surplusComputedId = computedSurplusTarget?.id ?? state.surplusTargetComputedId;
   if (surplusComputedId) compact.sr = surplusComputedId;
+  if (state.fxManualOverride !== undefined && state.fxManualOverride > 0) compact.fxm = state.fxManualOverride;
   return compact;
 }
 
@@ -209,10 +220,11 @@ function fromCompact(compact: CompactState): FinancialState {
   return {
     assets: (() => {
       const assets = compact.a.map((x, i) => {
-        const asset: { id: string; category: string; amount: number; roi?: number; monthlyContribution?: number; surplusTarget?: boolean } = { id: `a${i + 1}`, category: x.c, amount: x.a };
+        const asset: { id: string; category: string; amount: number; roi?: number; monthlyContribution?: number; surplusTarget?: boolean; currency?: SupportedCurrency } = { id: `a${i + 1}`, category: x.c, amount: x.a };
         if (x.r !== undefined) asset.roi = x.r;
         if (x.m !== undefined) asset.monthlyContribution = x.m;
         if (x.st) asset.surplusTarget = true;
+        if (x.cu) asset.currency = x.cu as SupportedCurrency;
         return asset;
       });
       // Ensure exactly one asset is the surplus target — but not if a computed asset owns it (sr field)
@@ -222,9 +234,10 @@ function fromCompact(compact: CompactState): FinancialState {
       return assets;
     })(),
     debts: compact.d.map((x, i) => {
-      const debt: { id: string; category: string; amount: number; interestRate?: number; monthlyPayment?: number } = { id: `d${i + 1}`, category: x.c, amount: x.a };
+      const debt: { id: string; category: string; amount: number; interestRate?: number; monthlyPayment?: number; currency?: SupportedCurrency } = { id: `d${i + 1}`, category: x.c, amount: x.a };
       if (x.ir !== undefined) debt.interestRate = x.ir;
       if (x.mp !== undefined) debt.monthlyPayment = x.mp;
+      if (x.cu) debt.currency = x.cu as SupportedCurrency;
       return debt;
     }),
     income: compact.i.map((x, i) => {
@@ -235,7 +248,7 @@ function fromCompact(compact: CompactState): FinancialState {
     }),
     expenses: compact.e.map((x, i) => ({ id: `e${i + 1}`, category: x.c, amount: x.a })),
     properties: (compact.p ?? []).map((x, i) => {
-      const prop: { id: string; name: string; value: number; mortgage: number; interestRate?: number; monthlyPayment?: number; amortizationYears?: number; yearPurchased?: number; appreciation?: number } = {
+      const prop: { id: string; name: string; value: number; mortgage: number; interestRate?: number; monthlyPayment?: number; amortizationYears?: number; yearPurchased?: number; appreciation?: number; currency?: SupportedCurrency } = {
         id: `p${i + 1}`,
         name: x.n,
         value: x.v,
@@ -246,6 +259,7 @@ function fromCompact(compact: CompactState): FinancialState {
       if (x.ay !== undefined) prop.amortizationYears = x.ay;
       if (x.yp !== undefined) prop.yearPurchased = x.yp;
       if (x.ap !== undefined) prop.appreciation = x.ap;
+      if (x.cu) prop.currency = x.cu as SupportedCurrency;
       return prop;
     }),
     stocks: (compact.st ?? []).map((x, i) => {
@@ -264,6 +278,7 @@ function fromCompact(compact: CompactState): FinancialState {
     federalTaxOverride: compact.ft,
     provincialTaxOverride: compact.pt,
     surplusTargetComputedId: compact.sr,
+    fxManualOverride: compact.fxm,
   };
 }
 
