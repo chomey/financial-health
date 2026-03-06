@@ -278,7 +278,7 @@ export function SourceSummaryCard({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              opacity="0.6"
+              opacity="0.7"
               className="animate-draw-oval"
             />
           </svg>
@@ -286,6 +286,108 @@ export function SourceSummaryCard({
       </div>
     </div>
   );
+}
+
+// --- ConnectorLine: hand-drawn line with arrowhead ---
+
+function ConnectorLine({
+  isPositive,
+  seed,
+  index,
+}: {
+  isPositive: boolean;
+  seed: number;
+  index: number;
+}) {
+  const color = isPositive ? "#059669" : "#e11d48";
+  const delayMs = 400 + index * 50; // Stagger connector draws
+  return (
+    <svg
+      className="mx-auto h-6 w-12"
+      viewBox="0 0 48 24"
+      aria-hidden="true"
+      data-testid={`explainer-connector-${index}`}
+    >
+      {/* Arrow marker definition */}
+      <defs>
+        <marker
+          id={`arrowhead-${index}`}
+          markerWidth="8"
+          markerHeight="6"
+          refX="8"
+          refY="3"
+          orient="auto"
+        >
+          <polygon points="0 0, 8 3, 0 6" fill={color} opacity="0.7" />
+        </marker>
+      </defs>
+      <path
+        d={handDrawnLine(24, 2, 24, 18, seed)}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.7"
+        markerEnd={`url(#arrowhead-${index})`}
+        className="animate-draw-connector"
+        style={{ animationDelay: `${delayMs}ms` }}
+      />
+    </svg>
+  );
+}
+
+// --- CountUpValue: animated count-up for result ---
+
+function CountUpValue({ formattedValue }: { formattedValue: string }) {
+  const [displayed, setDisplayed] = useState(formattedValue);
+  const rafRef = useRef<number>(0);
+
+  useEffect(() => {
+    // Parse numeric value from formatted string like "$30,000" or "-$230,000"
+    const numMatch = formattedValue.replace(/[^0-9.-]/g, "");
+    const target = parseFloat(numMatch) || 0;
+    if (target === 0) {
+      setDisplayed(formattedValue);
+      return;
+    }
+
+    const prefix = formattedValue.match(/^[^0-9]*/)?.[0] || "";
+    const suffix = formattedValue.match(/[^0-9]*$/)?.[0] || "";
+    const isNegative = formattedValue.includes("-");
+    const absTarget = Math.abs(target);
+
+    const startTime = performance.now();
+    const startDelay = 1000; // Wait for earlier animations
+    const duration = 200; // Count up duration
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      if (elapsed < startDelay) {
+        setDisplayed(isNegative ? `${prefix}0${suffix}` : `${prefix}0${suffix}`);
+        rafRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      const t = Math.min((elapsed - startDelay) / duration, 1);
+      // Ease out quad
+      const eased = 1 - (1 - t) * (1 - t);
+      const current = Math.round(absTarget * eased);
+      const formatted = current.toLocaleString();
+      setDisplayed(
+        isNegative ? `-${prefix.replace("-", "")}${formatted}${suffix}` : `${prefix}${formatted}${suffix}`
+      );
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      } else {
+        setDisplayed(formattedValue);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [formattedValue]);
+
+  return <>{displayed}</>;
 }
 
 // --- ExplainerModal ---
@@ -365,34 +467,47 @@ function ExplainerModal({
           <p className="mt-1 text-3xl font-bold text-stone-900" data-testid="explainer-value">{targetMeta.formattedValue}</p>
         </div>
 
-        {/* Source summary cards */}
-        <div className="space-y-3" data-testid="explainer-sources">
+        {/* Source summary cards with connectors */}
+        <div className="space-y-1" data-testid="explainer-sources">
           {connections.map((conn, i) => {
             const meta = getSourceMetadata(conn.sourceId);
             const isPositive = conn.sign !== "negative";
             const showOperator = i > 0;
             const sectionName = meta?.label || conn.label || conn.sourceId.replace("section-", "");
             const displayValue = conn.label || (meta ? `$${Math.abs(meta.value).toLocaleString()}` : "");
+            const cardDelay = i * 50; // Stagger card fade-ins
 
             return (
               <div key={conn.sourceId + i} data-testid={`explainer-source-${conn.sourceId}`}>
                 {showOperator && (
                   <div className="flex justify-center py-1">
                     <span
-                      className={`text-2xl font-bold ${isPositive ? "text-green-600" : "text-rose-600"}`}
+                      className={`text-2xl font-bold animate-operator-in ${isPositive ? "text-green-600" : "text-rose-600"}`}
                       data-testid={`explainer-operator-${i}`}
+                      style={{ animationDelay: `${600 + i * 50}ms` }}
                     >
                       {isPositive ? "+" : "\u2212"}
                     </span>
                   </div>
                 )}
-                <SourceSummaryCard
-                  sourceId={conn.sourceId}
-                  sectionName={sectionName}
-                  items={meta?.items}
-                  total={displayValue}
+                <div
+                  className="animate-source-card-in"
+                  style={{ animationDelay: `${cardDelay}ms` }}
+                >
+                  <SourceSummaryCard
+                    sourceId={conn.sourceId}
+                    sectionName={sectionName}
+                    items={meta?.items}
+                    total={displayValue}
+                    isPositive={isPositive}
+                    ovalSeed={i + 1}
+                  />
+                </div>
+                {/* Connector line from this card toward the result */}
+                <ConnectorLine
                   isPositive={isPositive}
-                  ovalSeed={i + 1}
+                  seed={i + 10}
+                  index={i}
                 />
               </div>
             );
@@ -400,28 +515,29 @@ function ExplainerModal({
         </div>
 
         {/* Sum bar and result */}
-        <div className="mt-6" data-testid="explainer-result-section">
-          {/* Hand-drawn horizontal line */}
-          <svg className="h-3 w-full" viewBox="0 0 400 12" preserveAspectRatio="none" aria-hidden="true">
+        <div className="mt-2" data-testid="explainer-result-section">
+          {/* Hand-drawn horizontal sum bar */}
+          <svg className="h-3 w-full" viewBox="0 0 400 12" preserveAspectRatio="none" aria-hidden="true" data-testid="explainer-sum-bar">
             <path
               d={handDrawnLine(10, 6, 390, 6, 42)}
               fill="none"
               stroke="#78716c"
               strokeWidth="2"
               strokeLinecap="round"
-              opacity="0.5"
-              className="animate-draw-line"
+              strokeLinejoin="round"
+              opacity="0.7"
+              className="animate-draw-sum-bar"
             />
           </svg>
-          <div className="mt-3 flex items-center justify-center gap-2">
+          <div className="mt-3 flex items-center justify-center gap-2 animate-result-in" data-testid="explainer-result-area">
             <span className="text-xl font-bold text-stone-500">=</span>
             <span className="text-2xl font-bold text-stone-900" data-testid="explainer-result-value">
-              {targetMeta.formattedValue}
+              <CountUpValue formattedValue={targetMeta.formattedValue} />
             </span>
           </div>
           {/* Summary: positive vs negative */}
           {positiveConns.length > 0 && negativeConns.length > 0 && (
-            <p className="mt-2 text-center text-xs text-stone-400" data-testid="explainer-summary">
+            <p className="mt-2 text-center text-xs text-stone-400 animate-result-in" data-testid="explainer-summary" style={{ animationDelay: "1100ms" }}>
               {positiveConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" + ")}
               {" \u2212 "}
               {negativeConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" \u2212 ")}
@@ -433,7 +549,7 @@ function ExplainerModal({
   );
 }
 
-export { ExplainerModal };
+export { ExplainerModal, ConnectorLine, CountUpValue };
 
 // --- Provider ---
 
