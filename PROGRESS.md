@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 87
-- **Completed**: 83
-- **Remaining**: 4
+- **Completed**: 84
+- **Remaining**: 3
 - **Last Updated**: 2026-03-06
 
 ---
@@ -1798,3 +1798,24 @@
   - All 1014 unit tests passed, 0 failed
   - All 246 Playwright E2E tests passed, 0 failed
 - **Notes**: The new oval implementation produces much smoother, more confident-looking circles. Instead of many small jittery segments, each quadrant is a single smooth cubic bezier with subtle undulation — like a teacher circling something with one fluid stroke.
+
+---
+
+## Task 84: Build Estimated Tax explainer with bracket visualization
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Added `TaxExplainerDetails`, `TaxBracketSegment` interfaces to `ActiveTargetMeta`. Added `metricType` and `taxDetails` optional fields to `ActiveTargetMeta`. Created `TaxExplainerContent` component with bracket bar visualization (horizontal stacked bar with colored segments), federal/provincial breakdown rows, effective vs marginal rate comparison, capital gains section (CA inclusion rates, US bracket rates), and after-tax income flow (Gross → Tax → After-tax). Updated `ExplainerModal` to conditionally render `TaxExplainerContent` when `metricType === "estimated-tax"`.
+  - `src/components/SnapshotDashboard.tsx`: Added `taxDetails` to `MetricData` interface. Updated `handleClick` in `MetricCard` to pass `metricType` (derived from title) and `taxDetails` when setting `activeTargetMeta`.
+  - `src/lib/financial-state.ts`: Added `computeBracketSegments` function to compute how income is distributed across tax brackets. Added `buildTaxExplainerDetails` function to build full `TaxExplainerDetails` from financial state (bracket segments, federal/provincial split, jurisdiction label, marginal rate, capital gains info). Updated `computeMetrics` to include `taxDetails` in the Estimated Tax metric entry.
+  - `src/lib/changelog.ts`: Added v84 changelog entry. Added "Metric-Specific Explainers" milestone group (83-87).
+  - `tests/unit/changelog.test.ts`: Updated to expect 84 entries, 11 milestone groups.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/tax-explainer.test.tsx`: 25 tests — TaxExplainerContent rendering (bracket bar, segments, federal/provincial amounts, jurisdiction labels CA/US, effective/marginal rates, after-tax flow, capital gains CA/US/above threshold), computeMetrics integration (taxDetails presence, jurisdiction labels, bracket data, zero income, rate matching, tax arithmetic, capital gains flag, marginal >= effective)
+  - `tests/e2e/tax-explainer.spec.ts`: 7 tests — tax-specific explainer opens (no generic source cards), bracket bar with colored segments, federal/provincial breakdown with Ontario label, effective/marginal rates displayed, after-tax income flow, modal closes on Escape, screenshot capture
+  - All T1 unit tests: 1039 passed, 0 failed (64 test files)
+  - All T2 E2E tests: 250 passed, 0 failed
+- **Screenshots**:
+  ![Tax explainer with bracket visualization](screenshots/task-84-tax-explainer.png)
+- **Notes**: Fixed pre-existing changelog test failure (task 83 added v83 entry but tests expected 82; committed fix separately). The `metricType` field on `ActiveTargetMeta` enables the ExplainerModal to render metric-specific content — the tax explainer replaces the generic source-card layout with a rich bracket visualization. The `TaxExplainerDetails` are computed in `financial-state.ts` and passed through the MetricData → MetricCard → DataFlowContext → ExplainerModal chain. This pattern is extensible for future metric-specific explainers (tasks 85-86).

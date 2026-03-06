@@ -112,6 +112,9 @@ function simulateRunwayWithTax(
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
 import { computeTax } from "@/lib/tax-engine";
+import type { TaxExplainerDetails, TaxBracketSegment } from "@/components/DataFlowArrows";
+import { getCanadianBrackets, getUSBrackets, calculateCanadianCapitalGainsInclusion, US_CAPITAL_GAINS_2025, type BracketTable } from "@/lib/tax-tables";
+import { CA_PROVINCES, US_STATES } from "@/components/CountryJurisdictionSelector";
 
 export interface FinancialState {
   assets: Asset[];
@@ -152,6 +155,91 @@ export const INITIAL_STATE: FinancialState = {
   country: "CA",
   jurisdiction: "ON",
 };
+
+/**
+ * Compute how income is distributed across tax brackets.
+ * Returns one segment per bracket with amountInBracket and taxInBracket.
+ */
+function computeBracketSegments(taxableIncome: number, table: BracketTable): TaxBracketSegment[] {
+  const segments: TaxBracketSegment[] = [];
+  for (const bracket of table.brackets) {
+    if (taxableIncome <= bracket.min) break;
+    const amountInBracket = Math.min(taxableIncome, bracket.max) - bracket.min;
+    segments.push({
+      min: bracket.min,
+      max: bracket.max,
+      rate: bracket.rate,
+      amountInBracket,
+      taxInBracket: amountInBracket * bracket.rate,
+    });
+  }
+  return segments;
+}
+
+/**
+ * Build TaxExplainerDetails from the current financial state.
+ */
+function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: number, federalTax: number, provincialStateTax: number, effectiveTaxRate: number, totalTax: number): TaxExplainerDetails | undefined {
+  if (grossAnnualIncome <= 0) return undefined;
+
+  const country = state.country ?? "CA";
+  const jurisdiction = state.jurisdiction ?? "ON";
+  const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
+
+  // Get jurisdiction label
+  const jurisdictions = country === "CA" ? CA_PROVINCES : US_STATES;
+  const jurisdictionLabel = jurisdictions.find((j) => j.code === jurisdiction)?.name ?? jurisdiction;
+  const jurisdictionType = country === "CA" ? "Provincial" as const : "State" as const;
+
+  // Compute bracket segments for the bar visualization (using federal brackets)
+  let brackets: TaxBracketSegment[];
+  if (country === "CA") {
+    const { federal } = getCanadianBrackets(jurisdiction);
+    const capGainsTotal = state.income
+      .filter((i) => i.incomeType === "capital-gains")
+      .reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency) * 12, 0);
+    const otherIncome = grossAnnualIncome - capGainsTotal;
+    const taxableIncome = otherIncome + (capGainsTotal > 0 ? calculateCanadianCapitalGainsInclusion(capGainsTotal) : 0);
+    brackets = computeBracketSegments(taxableIncome, federal);
+  } else {
+    const { federal } = getUSBrackets(jurisdiction);
+    // Check if all income is capital gains
+    const capGainsTotal = state.income
+      .filter((i) => i.incomeType === "capital-gains")
+      .reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency) * 12, 0);
+    if (capGainsTotal > 0 && capGainsTotal >= grossAnnualIncome * 0.99) {
+      // Show capital gains brackets
+      brackets = computeBracketSegments(grossAnnualIncome, US_CAPITAL_GAINS_2025);
+    } else {
+      // Show federal brackets (after standard deduction)
+      const taxableIncome = Math.max(0, grossAnnualIncome - federal.basicPersonalAmount);
+      brackets = computeBracketSegments(taxableIncome, federal);
+    }
+  }
+
+  // Compute marginal rate
+  const taxResult = computeTax(grossAnnualIncome, hasCapitalGains ? "capital-gains" : "employment", country, jurisdiction);
+
+  return {
+    federalTax,
+    provincialStateTax,
+    jurisdictionLabel,
+    jurisdictionType,
+    effectiveRate: effectiveTaxRate,
+    marginalRate: taxResult.marginalRate,
+    grossIncome: grossAnnualIncome,
+    totalTax,
+    afterTaxIncome: grossAnnualIncome - totalTax,
+    brackets,
+    hasCapitalGains,
+    capitalGainsInfo: hasCapitalGains ? {
+      country,
+      totalCapitalGains: state.income
+        .filter((i) => i.incomeType === "capital-gains")
+        .reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency) * 12, 0),
+    } : undefined,
+  };
+}
 
 export function computeTotals(state: FinancialState) {
   const homeCurrency = getHomeCurrency(state.country ?? "CA");
@@ -233,7 +321,7 @@ function fmtShort(n: number, currency?: SupportedCurrency): string {
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax } = computeTotals(state);
 
   // Net worth: show without property equity as primary, with equity as secondary
   const netWorthWithoutEquity = totalAssets + totalStocks - totalDebts;
@@ -392,6 +480,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       positive: true,
       breakdown: taxBreakdown,
       effectiveRate: effectiveTaxRate,
+      taxDetails: buildTaxExplainerDetails(state, monthlyIncome * 12, totalFederalTax, totalProvincialStateTax, effectiveTaxRate, totalTaxEstimate),
     },
     {
       title: "Financial Runway",

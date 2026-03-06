@@ -40,9 +40,37 @@ interface RegisteredElement {
   metadata?: SourceMetadata;
 }
 
+export interface TaxBracketSegment {
+  min: number;
+  max: number;
+  rate: number;
+  amountInBracket: number;
+  taxInBracket: number;
+}
+
+export interface TaxExplainerDetails {
+  federalTax: number;
+  provincialStateTax: number;
+  jurisdictionLabel: string; // e.g. "Ontario" or "California"
+  jurisdictionType: "Provincial" | "State"; // CA = Provincial, US = State
+  effectiveRate: number;
+  marginalRate: number;
+  grossIncome: number;
+  totalTax: number;
+  afterTaxIncome: number;
+  brackets: TaxBracketSegment[]; // combined federal bracket segments for the bar
+  hasCapitalGains: boolean;
+  capitalGainsInfo?: {
+    country: "CA" | "US";
+    totalCapitalGains: number;
+  };
+}
+
 export interface ActiveTargetMeta {
   label: string;
   formattedValue: string;
+  metricType?: string;
+  taxDetails?: TaxExplainerDetails;
 }
 
 interface DataFlowContextValue {
@@ -401,6 +429,137 @@ function CountUpValue({ formattedValue }: { formattedValue: string }) {
   return <>{displayed}</>;
 }
 
+// --- TaxExplainerContent ---
+
+function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
+  const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+
+  // Build bracket bar segments — only include brackets with income in them
+  const activeSegments = details.brackets.filter((b) => b.amountInBracket > 0);
+  const totalIncome = details.grossIncome;
+
+  // Color palette: lighter green for low rates, deeper for higher
+  const bracketColors = [
+    "#d1fae5", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981", "#059669", "#047857", "#065f46",
+  ];
+
+  return (
+    <div className="space-y-5" data-testid="tax-explainer">
+      {/* Bracket bar visualization */}
+      {activeSegments.length > 0 && totalIncome > 0 && (
+        <div data-testid="tax-bracket-bar">
+          <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Income by Tax Bracket</p>
+          <div className="flex h-8 w-full overflow-hidden rounded-lg" role="img" aria-label="Tax bracket visualization">
+            {activeSegments.map((seg, i) => {
+              const widthPct = (seg.amountInBracket / totalIncome) * 100;
+              if (widthPct < 1) return null;
+              const color = bracketColors[Math.min(i, bracketColors.length - 1)];
+              return (
+                <div
+                  key={i}
+                  className="flex items-center justify-center text-xs font-semibold"
+                  style={{
+                    width: `${widthPct}%`,
+                    backgroundColor: color,
+                    color: i >= 4 ? "#fff" : "#065f46",
+                    minWidth: widthPct > 5 ? undefined : "24px",
+                  }}
+                  title={`${fmt(seg.amountInBracket)} at ${(seg.rate * 100).toFixed(1)}%`}
+                  data-testid={`tax-bracket-segment-${i}`}
+                >
+                  {widthPct > 8 ? `${(seg.rate * 100).toFixed(0)}%` : ""}
+                </div>
+              );
+            })}
+          </div>
+          {/* Bracket legend below */}
+          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+            {activeSegments.map((seg, i) => {
+              const color = bracketColors[Math.min(i, bracketColors.length - 1)];
+              return (
+                <span key={i} className="flex items-center gap-1 text-xs text-stone-500">
+                  <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: color }} />
+                  {(seg.rate * 100).toFixed(1)}%: {fmt(seg.amountInBracket)}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Federal & Provincial/State breakdown */}
+      <div className="space-y-1.5" data-testid="tax-breakdown">
+        <div className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2">
+          <span className="text-sm text-stone-600">Federal</span>
+          <span className="text-sm font-semibold text-stone-800" data-testid="tax-federal-amount">{fmt(details.federalTax)}</span>
+        </div>
+        <div className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2">
+          <span className="text-sm text-stone-600">{details.jurisdictionType}: {details.jurisdictionLabel}</span>
+          <span className="text-sm font-semibold text-stone-800" data-testid="tax-provincial-amount">{fmt(details.provincialStateTax)}</span>
+        </div>
+      </div>
+
+      {/* Effective vs marginal rate */}
+      <div className="rounded-xl border border-stone-200 p-4" data-testid="tax-rates">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-2xl font-bold text-stone-800" data-testid="tax-effective-rate">
+              {(details.effectiveRate * 100).toFixed(1)}%
+            </p>
+            <p className="text-xs text-stone-500">Effective rate</p>
+          </div>
+          <div className="text-right">
+            <p className="text-lg font-semibold text-stone-500" data-testid="tax-marginal-rate">
+              {(details.marginalRate * 100).toFixed(1)}%
+            </p>
+            <p className="text-xs text-stone-400">Marginal rate</p>
+          </div>
+        </div>
+        {details.marginalRate > details.effectiveRate && (
+          <p className="mt-2 text-xs text-stone-400">
+            Your effective rate is lower because only income above each bracket threshold is taxed at the higher rate.
+          </p>
+        )}
+      </div>
+
+      {/* Capital gains section */}
+      {details.hasCapitalGains && details.capitalGainsInfo && (
+        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4" data-testid="tax-capital-gains">
+          <p className="text-sm font-semibold text-stone-700 mb-1">Capital Gains</p>
+          {details.capitalGainsInfo.country === "CA" ? (
+            <div className="text-xs text-stone-600 space-y-1">
+              <p>Canada taxes capital gains at a reduced inclusion rate:</p>
+              <p className="font-medium">First $250,000: 50% included in income</p>
+              {details.capitalGainsInfo.totalCapitalGains > 250000 && (
+                <p className="font-medium">Above $250,000: 66.67% included</p>
+              )}
+            </div>
+          ) : (
+            <div className="text-xs text-stone-600 space-y-1">
+              <p>US long-term capital gains have their own bracket rates:</p>
+              <p className="font-medium">0% up to $48,350 · 15% up to $533,400 · 20% above</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* After-tax income flow */}
+      <div className="flex items-center justify-between rounded-xl bg-stone-50 px-4 py-3" data-testid="tax-after-tax-flow">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-stone-500">Gross</span>
+          <span className="font-semibold text-stone-800">{fmt(details.grossIncome)}</span>
+          <span className="text-stone-400">→</span>
+          <span className="text-stone-500">Tax</span>
+          <span className="font-semibold text-rose-600">{fmt(details.totalTax)}</span>
+          <span className="text-stone-400">→</span>
+          <span className="text-stone-500">After-tax</span>
+          <span className="font-semibold text-green-600">{fmt(details.afterTaxIncome)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // --- ExplainerModal ---
 
 function ExplainerModal({
@@ -478,89 +637,96 @@ function ExplainerModal({
           <p className="mt-1 text-3xl font-bold text-stone-900" data-testid="explainer-value">{targetMeta.formattedValue}</p>
         </div>
 
-        {/* Source summary cards with connectors */}
-        <div className="space-y-1" data-testid="explainer-sources">
-          {connections.map((conn, i) => {
-            const meta = getSourceMetadata(conn.sourceId);
-            const isPositive = conn.sign !== "negative";
-            const showOperator = i > 0;
-            const sectionName = meta?.label || conn.label || conn.sourceId.replace("section-", "");
-            const displayValue = conn.label || (meta ? `$${Math.abs(meta.value).toLocaleString()}` : "");
-            const cardDelay = i * 50; // Stagger card fade-ins
+        {/* Metric-specific content or generic source cards */}
+        {targetMeta.metricType === "estimated-tax" && targetMeta.taxDetails ? (
+          <TaxExplainerContent details={targetMeta.taxDetails} />
+        ) : (
+          <>
+            {/* Source summary cards with connectors */}
+            <div className="space-y-1" data-testid="explainer-sources">
+              {connections.map((conn, i) => {
+                const meta = getSourceMetadata(conn.sourceId);
+                const isPositive = conn.sign !== "negative";
+                const showOperator = i > 0;
+                const sectionName = meta?.label || conn.label || conn.sourceId.replace("section-", "");
+                const displayValue = conn.label || (meta ? `$${Math.abs(meta.value).toLocaleString()}` : "");
+                const cardDelay = i * 50; // Stagger card fade-ins
 
-            return (
-              <div key={conn.sourceId + i} data-testid={`explainer-source-${conn.sourceId}`}>
-                {showOperator && (
-                  <div className="flex justify-center py-1">
-                    <span
-                      className={`text-2xl font-bold animate-operator-in ${isPositive ? "text-green-600" : "text-rose-600"}`}
-                      data-testid={`explainer-operator-${i}`}
-                      style={{ animationDelay: `${600 + i * 50}ms` }}
+                return (
+                  <div key={conn.sourceId + i} data-testid={`explainer-source-${conn.sourceId}`}>
+                    {showOperator && (
+                      <div className="flex justify-center py-1">
+                        <span
+                          className={`text-2xl font-bold animate-operator-in ${isPositive ? "text-green-600" : "text-rose-600"}`}
+                          data-testid={`explainer-operator-${i}`}
+                          style={{ animationDelay: `${600 + i * 50}ms` }}
+                        >
+                          {isPositive ? "+" : "\u2212"}
+                        </span>
+                      </div>
+                    )}
+                    <div
+                      className="animate-source-card-in"
+                      style={{ animationDelay: `${cardDelay}ms` }}
                     >
-                      {isPositive ? "+" : "\u2212"}
-                    </span>
+                      <SourceSummaryCard
+                        sourceId={conn.sourceId}
+                        sectionName={sectionName}
+                        items={meta?.items}
+                        total={displayValue}
+                        isPositive={isPositive}
+                        ovalSeed={i + 1}
+                      />
+                    </div>
+                    {/* Connector line from this card toward the result */}
+                    <ConnectorLine
+                      isPositive={isPositive}
+                      seed={i + 10}
+                      index={i}
+                    />
                   </div>
-                )}
-                <div
-                  className="animate-source-card-in"
-                  style={{ animationDelay: `${cardDelay}ms` }}
-                >
-                  <SourceSummaryCard
-                    sourceId={conn.sourceId}
-                    sectionName={sectionName}
-                    items={meta?.items}
-                    total={displayValue}
-                    isPositive={isPositive}
-                    ovalSeed={i + 1}
-                  />
-                </div>
-                {/* Connector line from this card toward the result */}
-                <ConnectorLine
-                  isPositive={isPositive}
-                  seed={i + 10}
-                  index={i}
-                />
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
 
-        {/* Sum bar and result */}
-        <div className="mt-2" data-testid="explainer-result-section">
-          {/* Hand-drawn horizontal sum bar */}
-          <svg className="h-3 w-full" viewBox="0 0 400 12" preserveAspectRatio="none" aria-hidden="true" data-testid="explainer-sum-bar">
-            <path
-              d={handDrawnLine(10, 6, 390, 6, 42)}
-              fill="none"
-              stroke="#78716c"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity="0.7"
-              className="animate-draw-sum-bar"
-            />
-          </svg>
-          <div className="mt-3 flex items-center justify-center gap-2 animate-result-in" data-testid="explainer-result-area">
-            <span className="text-xl font-bold text-stone-500">=</span>
-            <span className="text-2xl font-bold text-stone-900" data-testid="explainer-result-value">
-              <CountUpValue formattedValue={targetMeta.formattedValue} />
-            </span>
-          </div>
-          {/* Summary: positive vs negative */}
-          {positiveConns.length > 0 && negativeConns.length > 0 && (
-            <p className="mt-2 text-center text-xs text-stone-400 animate-result-in" data-testid="explainer-summary" style={{ animationDelay: "1100ms" }}>
-              {positiveConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" + ")}
-              {" \u2212 "}
-              {negativeConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" \u2212 ")}
-            </p>
-          )}
-        </div>
+            {/* Sum bar and result */}
+            <div className="mt-2" data-testid="explainer-result-section">
+              {/* Hand-drawn horizontal sum bar */}
+              <svg className="h-3 w-full" viewBox="0 0 400 12" preserveAspectRatio="none" aria-hidden="true" data-testid="explainer-sum-bar">
+                <path
+                  d={handDrawnLine(10, 6, 390, 6, 42)}
+                  fill="none"
+                  stroke="#78716c"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity="0.7"
+                  className="animate-draw-sum-bar"
+                />
+              </svg>
+              <div className="mt-3 flex items-center justify-center gap-2 animate-result-in" data-testid="explainer-result-area">
+                <span className="text-xl font-bold text-stone-500">=</span>
+                <span className="text-2xl font-bold text-stone-900" data-testid="explainer-result-value">
+                  <CountUpValue formattedValue={targetMeta.formattedValue} />
+                </span>
+              </div>
+              {/* Summary: positive vs negative */}
+              {positiveConns.length > 0 && negativeConns.length > 0 && (
+                <p className="mt-2 text-center text-xs text-stone-400 animate-result-in" data-testid="explainer-summary" style={{ animationDelay: "1100ms" }}>
+                  {positiveConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" + ")}
+                  {" \u2212 "}
+                  {negativeConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" \u2212 ")}
+                </p>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-export { ExplainerModal, ConnectorLine, CountUpValue };
+export { ExplainerModal, ConnectorLine, CountUpValue, TaxExplainerContent };
 
 // --- Provider ---
 
