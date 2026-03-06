@@ -260,3 +260,19 @@ body {
   animation: result-in 200ms ease-out 1000ms both;
 }
 
+/* Thin scrollbar for source summary cards */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #a8a29e transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #a8a29e;
+  border-radius: 3px;
+}
+

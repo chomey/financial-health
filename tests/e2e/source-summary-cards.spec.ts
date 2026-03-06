@@ -35,7 +35,12 @@ test.describe("Source Summary Cards in Explainer Modal", () => {
     const assetsOval = page.locator('[data-testid="source-summary-oval-section-assets"]');
     await expect(assetsOval).toBeVisible();
 
-    await captureScreenshot(page, "task-80-net-worth-summary-cards");
+    // Modal should use max-w-xl
+    const maxWidth = await modal.evaluate((el) => getComputedStyle(el).maxWidth);
+    // Tailwind max-w-xl = 36rem = 576px
+    expect(parseInt(maxWidth)).toBeGreaterThanOrEqual(576);
+
+    await captureScreenshot(page, "task-87-scrollable-summary-cards");
   });
 
   test("source summary cards have colored left borders", async ({ page }) => {
@@ -78,15 +83,10 @@ test.describe("Source Summary Cards in Explainer Modal", () => {
     await captureScreenshot(page, "task-80-monthly-surplus-summary-cards");
   });
 
-  test("source summary cards show +N more for many items", async ({ page }) => {
+  test("source summary cards show all items in scrollable container with sticky total", async ({ page }) => {
     await page.goto("/");
 
-    // Add 7 assets to trigger the "+N more" display
-    const addAssetBtn = page.locator("#assets").locator("xpath=..").locator('button:has-text("Add")').first();
-    // We need to use the default data which already has some items
-    // Let's check if any section has >5 items by adding them
-
-    // Click Net Worth to check items display
+    // Click Net Worth to open explainer
     const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
     await netWorthCard.scrollIntoViewIfNeeded();
     await netWorthCard.click();
@@ -94,12 +94,24 @@ test.describe("Source Summary Cards in Explainer Modal", () => {
     const modal = page.locator('[data-testid="explainer-modal"]');
     await expect(modal).toBeVisible();
 
-    // Check that item lists exist and are properly bounded
-    // The default state may not have >5 items, so we just verify the structure
-    const sources = page.locator('[data-testid="explainer-sources"]');
-    await expect(sources).toBeVisible();
+    // Items container should be scrollable (overflow-y-auto)
+    const assetsItems = page.locator('[data-testid="source-summary-items-section-assets"]');
+    await expect(assetsItems).toBeVisible();
+    const overflowY = await assetsItems.evaluate((el) => getComputedStyle(el).overflowY);
+    expect(overflowY).toBe("auto");
+
+    // Total row should have sticky positioning
+    const totalRow = page.locator('[data-testid="source-summary-total-row-section-assets"]');
+    await expect(totalRow).toBeVisible();
+    const position = await totalRow.evaluate((el) => getComputedStyle(el).position);
+    expect(position).toBe("sticky");
+
+    // No "+N more" text should exist anywhere
+    await expect(page.locator('text=/\\+\\d+ more/')).not.toBeVisible();
 
     // Each source card should have a total
+    const sources = page.locator('[data-testid="explainer-sources"]');
+    await expect(sources).toBeVisible();
     const totals = sources.locator('[data-testid^="source-summary-total-"]');
     const totalCount = await totals.count();
     expect(totalCount).toBeGreaterThan(0);

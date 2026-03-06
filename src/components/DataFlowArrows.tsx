@@ -290,8 +290,6 @@ const SECTION_ICONS: Record<string, string> = {
 
 // --- SourceSummaryCard ---
 
-const MAX_VISIBLE_ITEMS = 5;
-
 export function SourceSummaryCard({
   sourceId,
   sectionName,
@@ -308,12 +306,10 @@ export function SourceSummaryCard({
   ovalSeed: number;
 }) {
   const icon = SECTION_ICONS[sourceId] || "";
-  const visibleItems = items && items.length > MAX_VISIBLE_ITEMS ? items.slice(0, MAX_VISIBLE_ITEMS) : items;
-  const hiddenCount = items ? Math.max(0, items.length - MAX_VISIBLE_ITEMS) : 0;
 
   return (
     <div
-      className={`relative rounded-xl border-l-4 bg-white p-4 shadow-sm ${
+      className={`relative flex flex-col rounded-xl border-l-4 bg-white p-5 shadow-sm ${
         isPositive ? "border-l-green-500" : "border-l-rose-500"
       }`}
       data-testid={`source-summary-${sourceId}`}
@@ -324,29 +320,26 @@ export function SourceSummaryCard({
         <span className="text-sm font-semibold text-stone-700" data-testid={`source-summary-title-${sourceId}`}>{sectionName}</span>
       </div>
 
-      {/* Item list */}
-      {visibleItems && visibleItems.length > 0 && (
-        <ul className="mb-3 space-y-1" data-testid={`source-summary-items-${sourceId}`}>
-          {visibleItems.map((item, i) => (
-            <li key={i} className="flex items-center justify-between text-sm">
-              <span className="text-stone-500 truncate mr-2">{item.label}</span>
-              <span className="font-medium text-stone-700 whitespace-nowrap">${Math.abs(item.value).toLocaleString()}</span>
-            </li>
-          ))}
-          {hiddenCount > 0 && (
-            <li className="text-xs text-stone-400 italic" data-testid={`source-summary-more-${sourceId}`}>
-              +{hiddenCount} more
-            </li>
-          )}
-        </ul>
+      {/* Scrollable item list */}
+      {items && items.length > 0 && (
+        <div className="max-h-[200px] overflow-y-auto mb-3 scrollbar-thin" data-testid={`source-summary-items-${sourceId}`}>
+          <ul className="space-y-1">
+            {items.map((item, i) => (
+              <li key={i} className="flex items-center justify-between text-sm">
+                <span className="text-stone-500 truncate mr-2">{item.label}</span>
+                <span className="font-medium text-stone-700 whitespace-nowrap">${Math.abs(item.value).toLocaleString()}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
-      {/* Total with hand-drawn oval */}
-      <div className="flex items-center justify-between border-t border-stone-100 pt-2">
+      {/* Total with hand-drawn oval — sticky at bottom */}
+      <div className="sticky bottom-0 flex items-center justify-between border-t border-stone-100 pt-2 bg-white shadow-[0_-2px_4px_rgba(0,0,0,0.05)]" data-testid={`source-summary-total-row-${sourceId}`}>
         <span className="text-xs font-medium text-stone-500 uppercase tracking-wide">Total</span>
         <div className="relative">
           <span
-            className={`text-lg font-bold ${isPositive ? "text-green-600" : "text-rose-600"}`}
+            className={`text-xl font-bold ${isPositive ? "text-green-600" : "text-rose-600"}`}
             data-testid={`source-summary-total-${sourceId}`}
           >
             {total}
@@ -892,7 +885,7 @@ function ExplainerModal({
       <div
         ref={modalRef}
         data-testid="explainer-modal"
-        className={`relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl sm:p-8 ${closing ? "animate-modal-content-out" : "animate-modal-content-in"}`}
+        className={`relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl sm:p-8 ${closing ? "animate-modal-content-out" : "animate-modal-content-in"}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}

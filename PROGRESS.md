@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 88
-- **Completed**: 86
-- **Remaining**: 2
+- **Total Tasks**: 92
+- **Completed**: 87
+- **Remaining**: 5
 - **Last Updated**: 2026-03-06
 
 ---
@@ -1863,3 +1863,21 @@
 - **Screenshots**:
   ![Monthly Surplus explainer with investment returns](screenshots/task-86-surplus-investment-returns.png)
 - **Notes**: Investment returns are computed from both real and computed assets (stocks, property equity entries). The default ROIs from `AssetEntry.DEFAULT_ROI` apply when no explicit ROI is set (e.g., TFSA 5%, RRSP 5%, Savings Account 2%, 401k 7%). This is especially important for retirees with no employment income — without ROI, their surplus would just be negative expenses. Fixed pre-existing changelog test failure (task 85 added entry 85 but tests expected 84).
+
+## Task 87: Scrollable source summary cards with frozen total pane
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Removed MAX_VISIBLE_ITEMS constant and truncation logic. All items now render in a scrollable container (max-h-[200px] overflow-y-auto) with thin scrollbar styling. Total row is sticky at bottom with shadow separator. Increased card padding from p-4 to p-5, total font from text-lg to text-xl. ExplainerModal max-width changed from max-w-lg to max-w-xl.
+  - `src/app/globals.css`: Added .scrollbar-thin CSS class with thin scrollbar-width, stone-colored thumb, and WebKit scrollbar pseudo-element styles.
+  - `tests/unit/source-summary-card.test.tsx`: Replaced "+N more" truncation tests with tests verifying all items render, scrollable container has overflow-y-auto and max-h-[200px], and total row has sticky positioning.
+  - `tests/e2e/source-summary-cards.spec.ts`: Updated "+N more" test to verify scrollable container (overflow-y: auto), sticky total row (position: sticky), no truncation text, and wider modal (max-w-xl >= 576px).
+  - `src/lib/changelog.ts`: Added changelog entry for task 87.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/source-summary-card.test.tsx`: 15 passed, 0 failed
+  - `tests/e2e/source-summary-cards.spec.ts`: 6 passed, 0 failed
+  - All T1 unit tests: 1057 passed, 0 failed
+- **Screenshots**:
+  ![Scrollable source summary cards with frozen total](screenshots/task-87-scrollable-summary-cards.png)
+- **Notes**: The scrollbar-thin class uses both standard scrollbar-width/scrollbar-color properties and WebKit-specific pseudo-elements for cross-browser support. The sticky total row uses a subtle upward box-shadow to visually separate from scrolling content.
