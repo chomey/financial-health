@@ -403,6 +403,8 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
             <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
             <XAxis
               dataKey="year"
+              type="number"
+              domain={[0, 50]}
               tick={{ fontSize: 11, fill: "#78716c" }}
               tickFormatter={(v) => `${v}y`}
               ticks={xTicks}
@@ -671,6 +673,8 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
                 <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
                 <XAxis
                   dataKey="year"
+                  type="number"
+                  domain={[0, 50]}
                   tick={{ fontSize: 11, fill: "#78716c" }}
                   tickFormatter={(v) => `${v}y`}
                   ticks={xTicks}
