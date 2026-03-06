@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import CurrencyBadge from "@/components/CurrencyBadge";
 
 export interface Asset {
   id: string;
@@ -10,6 +11,7 @@ export interface Asset {
   monthlyContribution?: number; // monthly contribution in $
   surplusTarget?: boolean; // monthly surplus is deposited here
   computed?: boolean; // auto-computed from stocks/properties — amount is read-only
+  currency?: import("@/lib/currency").SupportedCurrency; // per-item currency override
 }
 
 const CATEGORY_SUGGESTIONS = {
@@ -126,9 +128,11 @@ interface AssetEntryProps {
   items?: Asset[];
   onChange?: (items: Asset[]) => void;
   monthlySurplus?: number;
+  homeCurrency?: import("@/lib/currency").SupportedCurrency;
+  fxRates?: import("@/lib/currency").FxRates;
 }
 
-export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: AssetEntryProps = {}) {
+export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCurrency, fxRates }: AssetEntryProps = {}) {
   const assets = items ?? MOCK_ASSETS;
 
   const updateAssets = useCallback((updater: Asset[] | ((prev: Asset[]) => Asset[])) => {
@@ -450,6 +454,18 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0 }: Asse
 
               {/* Secondary detail fields */}
               <div className={`flex flex-wrap items-center gap-2 pb-1 ${isComputed ? "px-6" : "px-5"}`} data-testid={`asset-details-${asset.id}`}>
+                {/* Currency badge */}
+                {homeCurrency && fxRates && !isComputed && (
+                  <CurrencyBadge
+                    currency={asset.currency}
+                    homeCurrency={homeCurrency}
+                    amount={asset.amount}
+                    fxRates={fxRates}
+                    onCurrencyChange={(cu) => {
+                      updateAssets(assets.map((a) => a.id === asset.id ? { ...a, currency: cu } : a));
+                    }}
+                  />
+                )}
                 {/* ROI badge/editor */}
                 {editingId === asset.id && editingField === "roi" ? (
                   <input

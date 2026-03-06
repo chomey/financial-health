@@ -116,10 +116,11 @@ When operating in Ralph Loop mode (invoked via `ralph.zsh`), follow these rules:
 6. **Mark the task as done** in TASKS.md (`- [x]`)
 7. **Log your work** in PROGRESS.md with a timestamped entry, including integration test results and any screenshots
 8. **Run tests/build** after each change to verify nothing is broken. Run all T1 tests plus any new tests you wrote. Run T2 tests only if the agent tag requires it (`[@frontend]`, `[@fullstack]`, `[@qa]`). Run T3 tests only when triggered (every 5 completed tasks, `[E2E]`/`[MILESTONE]` tags, or `[@qa]` tasks). All required-tier tests MUST pass. **If tests you did NOT write are now failing**, `git stash` your changes, fix the pre-existing failure, commit the fix with `ralph: fix pre-existing test failure during task [N]`, then `git stash pop` and continue.
-9. **Commit your changes** with a descriptive message referencing the task
-10. Do NOT skip ahead or do multiple tasks at once
-11. **NEVER modify completed (`- [x]`) or in-progress tasks in TASKS.md.** Only unchecked/unstarted tasks (`- [ ]`) may be edited, reordered, or removed. Completed and in-progress tasks are immutable records.
-12. If a task is blocked, note it in PROGRESS.md and move to the next unblocked task
+9. **Update the changelog** — After completing a task, add an entry to `src/lib/changelog.ts` with the task number as the version, title, short description, and today's date. This keeps the `/changelog` page up to date automatically.
+10. **Commit your changes** with a descriptive message referencing the task
+11. Do NOT skip ahead or do multiple tasks at once
+12. **NEVER modify completed (`- [x]`) or in-progress tasks in TASKS.md.** Only unchecked/unstarted tasks (`- [ ]`) may be edited, reordered, or removed. Completed and in-progress tasks are immutable records.
+13. If a task is blocked, note it in PROGRESS.md and move to the next unblocked task
 
 ## Task Ordering: Dependencies First, Then UI-First
 When generating or ordering tasks in TASKS.md, **set up external dependencies early** and then **prioritize getting a visible, working UI as soon as possible** so that progress is verifiable by human eyes. Follow this order:

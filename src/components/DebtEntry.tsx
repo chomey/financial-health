@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { calculateDebtPayoff, formatPayoffCurrency } from "@/lib/debt-payoff";
+import CurrencyBadge from "@/components/CurrencyBadge";
 
 export interface Debt {
   id: string;
@@ -9,6 +10,7 @@ export interface Debt {
   amount: number;
   interestRate?: number; // annual interest rate %
   monthlyPayment?: number; // minimum monthly payment $
+  currency?: import("@/lib/currency").SupportedCurrency; // per-item currency override
 }
 
 const DEBT_CATEGORY_SUGGESTIONS = {
@@ -101,9 +103,11 @@ function parseCurrencyInput(value: string): number {
 interface DebtEntryProps {
   items?: Debt[];
   onChange?: (items: Debt[]) => void;
+  homeCurrency?: import("@/lib/currency").SupportedCurrency;
+  fxRates?: import("@/lib/currency").FxRates;
 }
 
-export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
+export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: DebtEntryProps = {}) {
   const [debts, setDebts] = useState<Debt[]>(items ?? MOCK_DEBTS);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -419,6 +423,18 @@ export default function DebtEntry({ items, onChange }: DebtEntryProps = {}) {
 
               {/* Secondary detail fields: interest rate and monthly payment */}
               <div className="flex flex-wrap items-center gap-2 px-5 pb-1" data-testid={`debt-details-${debt.id}`}>
+                {/* Currency badge */}
+                {homeCurrency && fxRates && (
+                  <CurrencyBadge
+                    currency={debt.currency}
+                    homeCurrency={homeCurrency}
+                    amount={debt.amount}
+                    fxRates={fxRates}
+                    onCurrencyChange={(cu) => {
+                      setDebts(debts.map((d) => d.id === debt.id ? { ...d, currency: cu } : d));
+                    }}
+                  />
+                )}
                 {/* Interest rate badge/editor */}
                 {editingId === debt.id && editingField === "interestRate" ? (
                   <input

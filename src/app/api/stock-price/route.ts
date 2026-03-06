@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Simple in-memory cache to avoid hammering the API
-const priceCache = new Map<string, { price: number; timestamp: string; expiry: number }>();
+const priceCache = new Map<string, { price: number; currency?: string; timestamp: string; expiry: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function GET(request: NextRequest) {
@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       ticker,
       price: cached.price,
+      currency: cached.currency,
       timestamp: cached.timestamp,
       cached: true,
     });
@@ -45,6 +46,7 @@ export async function GET(request: NextRequest) {
     const data = await res.json();
     const meta = data?.chart?.result?.[0]?.meta;
     const price = meta?.regularMarketPrice;
+    const currency = meta?.currency as string | undefined; // e.g., "USD", "CAD"
 
     if (price === undefined || price === null) {
       return NextResponse.json(
@@ -58,6 +60,7 @@ export async function GET(request: NextRequest) {
     // Cache the result
     priceCache.set(ticker, {
       price,
+      currency,
       timestamp,
       expiry: Date.now() + CACHE_TTL_MS,
     });
@@ -65,6 +68,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       ticker,
       price,
+      currency,
       timestamp,
       cached: false,
     });

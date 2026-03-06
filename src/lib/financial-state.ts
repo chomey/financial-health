@@ -8,6 +8,9 @@ import { getEffectivePayment } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { getDefaultRoi } from "@/components/AssetEntry";
+import { getHomeCurrency, getEffectiveFxRates, convertToHome, formatCurrencyCompact } from "@/lib/currency";
+import type { SupportedCurrency, FxRates } from "@/lib/currency";
+import { getTaxTreatment, getWithdrawalTaxRate, type TaxTreatment } from "@/lib/withdrawal-tax";
 
 /**
  * Simulate how many months a set of accounts last when drawing down a fixed monthly amount.
@@ -39,6 +42,73 @@ function simulateRunwayWithGrowth(
   }
   return MAX_MONTHS;
 }
+/**
+ * Simulate runway with tax-aware withdrawal ordering.
+ * Withdraws from accounts in tax-optimal order: tax-free first, taxable second, tax-deferred last.
+ * Grosses up withdrawals from taxed accounts so after-tax amount covers the monthly obligation.
+ */
+function simulateRunwayWithTax(
+  buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number }[],
+  monthlyWithdrawal: number,
+  country: "CA" | "US",
+  jurisdiction: string,
+): number {
+  if (monthlyWithdrawal <= 0) return 0;
+  const balances = buckets.map((b) => b.balance);
+  const rates = buckets.map((b) => b.monthlyRate);
+  const MAX_MONTHS = 1200;
+
+  // Priority order: tax-free (0), taxable (1), tax-deferred (2)
+  const priorityMap: Record<TaxTreatment, number> = { "tax-free": 0, "taxable": 1, "tax-deferred": 2 };
+  const sortedIndices = buckets
+    .map((_, i) => i)
+    .sort((a, b) => priorityMap[buckets[a].taxTreatment] - priorityMap[buckets[b].taxTreatment]);
+
+  for (let month = 0; month < MAX_MONTHS; month++) {
+    let total = 0;
+    for (let i = 0; i < balances.length; i++) total += balances[i];
+    if (total <= 0) return month;
+
+    // Withdraw in priority order, grossing up for taxes
+    let remaining = monthlyWithdrawal;
+    for (const idx of sortedIndices) {
+      if (remaining <= 0) break;
+      if (balances[idx] <= 0) continue;
+
+      const treatment = buckets[idx].taxTreatment;
+      let grossWithdrawal: number;
+
+      if (treatment === "tax-free") {
+        grossWithdrawal = Math.min(remaining, balances[idx]);
+        remaining -= grossWithdrawal;
+      } else {
+        // Compute effective tax rate for this account type at annualized withdrawal rate
+        const annualizedWithdrawal = remaining * 12;
+        const taxResult = getWithdrawalTaxRate(
+          buckets[idx].category, country, jurisdiction,
+          annualizedWithdrawal, buckets[idx].costBasisPercent
+        );
+        const effectiveRate = taxResult.effectiveRate;
+        // Gross up: need to withdraw more to cover tax so after-tax = remaining
+        const grossUpFactor = effectiveRate < 1 ? 1 / (1 - effectiveRate) : 10;
+        grossWithdrawal = Math.min(remaining * grossUpFactor, balances[idx]);
+        // After-tax value of what we withdrew
+        const afterTax = grossWithdrawal / grossUpFactor;
+        remaining -= afterTax;
+      }
+
+      balances[idx] -= grossWithdrawal;
+      if (balances[idx] < 0) balances[idx] = 0;
+    }
+
+    // Apply growth to remaining balances
+    for (let i = 0; i < balances.length; i++) {
+      balances[i] *= 1 + rates[i];
+    }
+  }
+  return MAX_MONTHS;
+}
+
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
 import { computeTax } from "@/lib/tax-engine";
@@ -56,6 +126,8 @@ export interface FinancialState {
   federalTaxOverride?: number; // annual override; undefined = use computed
   provincialTaxOverride?: number; // annual override; undefined = use computed
   surplusTargetComputedId?: string; // set when surplus target is a computed asset (e.g. "_computed_stocks")
+  fxRates?: import("@/lib/currency").FxRates; // live FX rates (transient, not URL-persisted)
+  fxManualOverride?: number; // manual FX override: 1 foreign = X home (persisted in URL)
 }
 
 export const INITIAL_STATE: FinancialState = {
@@ -82,23 +154,31 @@ export const INITIAL_STATE: FinancialState = {
 };
 
 export function computeTotals(state: FinancialState) {
+  const homeCurrency = getHomeCurrency(state.country ?? "CA");
+  const fxRates = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
+
+  // Helper to convert an item amount to home currency
+  const toHome = (amount: number, itemCurrency?: SupportedCurrency) =>
+    convertToHome(amount, itemCurrency ?? homeCurrency, homeCurrency, fxRates);
+
   // Exclude computed (auto-synced) assets — their values come from stocks/properties already
   const realAssets = state.assets.filter((a) => !a.computed);
-  const totalAssets = realAssets.reduce((sum, a) => sum + a.amount, 0);
-  const totalDebts = state.debts.reduce((sum, d) => sum + d.amount, 0);
+  const totalAssets = realAssets.reduce((sum, a) => sum + toHome(a.amount, a.currency), 0);
+  const totalDebts = state.debts.reduce((sum, d) => sum + toHome(d.amount, d.currency), 0);
   const monthlyIncome = state.income.reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency), 0);
   const monthlyExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
   // Total monthly contributions to investment accounts (comes from income, not double-counted in expenses)
   const totalMonthlyContributions = realAssets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   // Properties: equity = value - mortgage. Counts toward net worth but NOT runway (illiquid).
   const properties = state.properties ?? [];
-  const totalPropertyEquity = properties.reduce((sum, p) => sum + Math.max(0, p.value - p.mortgage), 0);
-  const totalPropertyValue = properties.reduce((sum, p) => sum + p.value, 0);
-  const totalPropertyMortgage = properties.reduce((sum, p) => sum + p.mortgage, 0);
-  const totalMortgagePayments = properties.reduce((sum, p) => sum + getEffectivePayment(p), 0);
+  const totalPropertyEquity = properties.reduce((sum, p) => sum + toHome(Math.max(0, p.value - p.mortgage), p.currency), 0);
+  const totalPropertyValue = properties.reduce((sum, p) => sum + toHome(p.value, p.currency), 0);
+  const totalPropertyMortgage = properties.reduce((sum, p) => sum + toHome(p.mortgage, p.currency), 0);
+  const totalMortgagePayments = properties.reduce((sum, p) => sum + toHome(getEffectivePayment(p), p.currency), 0);
   // Stocks: total value of all holdings (liquid, counts toward net worth and runway)
+  // Stock values are converted using the stock's priceCurrency if available
   const stocks = state.stocks ?? [];
-  const totalStocks = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
+  const totalStocks = stocks.reduce((sum, s) => sum + toHome(getStockValue(s), s.priceCurrency), 0);
 
   // Compute after-tax income: aggregate income by type, then compute tax on each total.
   // This ensures progressive brackets apply correctly across multiple income items.
@@ -141,10 +221,11 @@ export function computeTotals(state: FinancialState) {
   const totalTaxEstimate = finalAnnualTax;
 
   // Also export the computed (non-overridden) values so the UI can show defaults
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax };
+  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency };
 }
 
-function fmtShort(n: number): string {
+function fmtShort(n: number, currency?: SupportedCurrency): string {
+  if (currency) return formatCurrencyCompact(n, currency);
   const abs = Math.abs(n);
   if (abs >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
   if (abs >= 1_000) return `$${(n / 1_000).toFixed(0)}k`;
@@ -168,34 +249,74 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   // Runway with investment growth: each asset account draws down proportionally, earning its own ROR.
   // Computed assets (stocks, equity) use their user-set ROI; real assets use their own ROI.
   let runwayWithGrowth: number | undefined;
+  let runwayAfterTax: number | undefined;
+  const country = state.country ?? "CA";
+  const jurisdiction = state.jurisdiction ?? "ON";
+
+  // Build detailed buckets with tax treatment info for both growth and tax-adjusted simulations
+  type DetailedBucket = { balance: number; ror: number; category: string; taxTreatment: TaxTreatment; costBasisPercent: number };
+  const detailedBuckets: DetailedBucket[] = [];
+
   if (monthlyObligations > 0 && liquidTotal > 0) {
-    const buckets: { balance: number; ror: number }[] = [];
     const computedAssets = state.assets.filter((a) => a.computed);
     const hasComputedStocks = computedAssets.some((a) => a.id === "_computed_stocks");
 
     // Real assets
     for (const asset of state.assets.filter((a) => !a.computed)) {
       if (asset.amount > 0) {
-        buckets.push({ balance: asset.amount, ror: asset.roi ?? getDefaultRoi(asset.category) ?? 0 });
+        detailedBuckets.push({
+          balance: asset.amount,
+          ror: asset.roi ?? getDefaultRoi(asset.category) ?? 0,
+          category: asset.category,
+          taxTreatment: getTaxTreatment(asset.category),
+          costBasisPercent: (asset as { costBasisPercent?: number }).costBasisPercent ?? 100,
+        });
       }
     }
     // Computed assets (stocks, equity) — use their user-set ROI
     for (const asset of computedAssets) {
       if (asset.amount > 0) {
-        buckets.push({ balance: asset.amount, ror: asset.roi ?? 0 });
+        detailedBuckets.push({
+          balance: asset.amount,
+          ror: asset.roi ?? 0,
+          category: asset.category,
+          taxTreatment: getTaxTreatment(asset.category),
+          costBasisPercent: (asset as { costBasisPercent?: number }).costBasisPercent ?? 100,
+        });
       }
     }
-    // Stocks without a computed asset entry: fall back to 0% growth
+    // Stocks without a computed asset entry: fall back to 0% growth, taxable
     if (!hasComputedStocks && totalStocks > 0) {
-      buckets.push({ balance: totalStocks, ror: 0 });
+      detailedBuckets.push({ balance: totalStocks, ror: 0, category: "Brokerage", taxTreatment: "taxable", costBasisPercent: 100 });
     }
-    // Any bucket with growth? If all are 0%, no point simulating.
-    const hasGrowth = buckets.some((b) => b.ror > 0);
+
+    // Runway with growth (existing, no tax)
+    const hasGrowth = detailedBuckets.some((b) => b.ror > 0);
     if (hasGrowth) {
-      const simBuckets = buckets.map((b) => ({ balance: b.balance, monthlyRate: b.ror / 100 / 12 }));
+      const simBuckets = detailedBuckets.map((b) => ({ balance: b.balance, monthlyRate: b.ror / 100 / 12 }));
       const months = simulateRunwayWithGrowth(simBuckets, monthlyObligations);
       if (months - runway > 0.5) {
         runwayWithGrowth = months >= 1200 ? Infinity : parseFloat(months.toFixed(1));
+      }
+    }
+
+    // Tax-adjusted runway: uses smart withdrawal order and grosses up for taxes
+    const hasTaxedAccounts = detailedBuckets.some((b) => b.taxTreatment !== "tax-free");
+    if (hasTaxedAccounts) {
+      const taxBuckets = detailedBuckets.map((b) => ({
+        balance: b.balance,
+        monthlyRate: b.ror / 100 / 12,
+        taxTreatment: b.taxTreatment,
+        category: b.category,
+        costBasisPercent: b.costBasisPercent,
+      }));
+      const taxMonths = simulateRunwayWithTax(taxBuckets, monthlyObligations, country, jurisdiction);
+      const taxRunway = taxMonths >= 1200 ? Infinity : parseFloat(taxMonths.toFixed(1));
+      // Compare against the growth-aware baseline (or simple runway if no growth)
+      const baselineRunway = runwayWithGrowth ?? runway;
+      const diff = baselineRunway === Infinity ? 0 : baselineRunway - taxRunway;
+      if (diff > 0.3) {
+        runwayAfterTax = taxRunway;
       }
     }
   }
@@ -282,6 +403,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       positive: runway >= 3,
       breakdown: runwayBreakdown,
       runwayWithGrowth,
+      runwayAfterTax,
     },
     {
       title: "Debt-to-Asset Ratio",
@@ -298,7 +420,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 }
 
 export function toFinancialData(state: FinancialState): FinancialData {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, homeCurrency } = computeTotals(state);
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
   return {
@@ -318,5 +440,6 @@ export function toFinancialData(state: FinancialState): FinancialData {
     effectiveTaxRate: effectiveTaxRate,
     annualTax: totalTaxEstimate,
     hasCapitalGains,
+    homeCurrency,
   };
 }

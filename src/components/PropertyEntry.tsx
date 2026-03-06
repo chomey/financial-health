@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import CurrencyBadge from "@/components/CurrencyBadge";
 
 export interface Property {
   id: string;
@@ -12,6 +13,7 @@ export interface Property {
   amortizationYears?: number; // original amortization term
   yearPurchased?: number; // year the property was purchased
   appreciation?: number; // annual appreciation/depreciation % (negative for depreciating assets)
+  currency?: import("@/lib/currency").SupportedCurrency; // per-item currency override
 }
 
 /** Compute remaining amortization years based on purchase year and original term */
@@ -178,9 +180,11 @@ function parseCurrencyInput(value: string): number {
 interface PropertyEntryProps {
   items?: Property[];
   onChange?: (items: Property[]) => void;
+  homeCurrency?: import("@/lib/currency").SupportedCurrency;
+  fxRates?: import("@/lib/currency").FxRates;
 }
 
-export default function PropertyEntry({ items, onChange }: PropertyEntryProps = {}) {
+export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }: PropertyEntryProps = {}) {
   const [properties, setProperties] = useState<Property[]>(items ?? MOCK_PROPERTIES);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
@@ -508,6 +512,21 @@ export default function PropertyEntry({ items, onChange }: PropertyEntryProps = 
                     </p>
                   </div>
                 </div>
+
+                {/* Currency badge */}
+                {homeCurrency && fxRates && (
+                  <div className="flex items-center gap-2 px-5 pb-1">
+                    <CurrencyBadge
+                      currency={property.currency}
+                      homeCurrency={homeCurrency}
+                      amount={property.value}
+                      fxRates={fxRates}
+                      onCurrencyChange={(cu) => {
+                        setProperties(properties.map((p) => p.id === property.id ? { ...p, currency: cu } : p));
+                      }}
+                    />
+                  </div>
+                )}
 
                 {/* Secondary detail fields: interest rate, monthly payment, amortization */}
                 {(() => {
