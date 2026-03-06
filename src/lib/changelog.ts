@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Smart Tax Classification
+  {
+    version: 94,
+    title: "Smart tax treatment classification with overrides",
+    description: "Tax treatment is now auto-detected using keyword matching instead of exact name lookups. Custom account names like 'BP 401k' or 'Company RRSP' are correctly classified. Each asset shows a colored pill (green=tax-free, rose=tax-deferred, amber=taxable) that can be clicked to override the auto-detected classification. Overrides persist in URL state.",
+    date: "2026-03-06",
+  },
   // New Account Category
   {
     version: 93,

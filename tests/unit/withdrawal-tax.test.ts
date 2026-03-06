@@ -3,13 +3,13 @@ import { getTaxTreatment, getWithdrawalTaxRate, type TaxTreatment } from "@/lib/
 
 describe("getTaxTreatment", () => {
   describe("tax-free accounts", () => {
-    it.each(["TFSA", "Roth IRA", "HSA"])("classifies %s as tax-free", (category) => {
+    it.each(["TFSA", "Roth IRA", "HSA", "FHSA"])("classifies %s as tax-free", (category) => {
       expect(getTaxTreatment(category)).toBe("tax-free");
     });
   });
 
   describe("tax-deferred accounts", () => {
-    it.each(["RRSP", "401k", "IRA", "LIRA", "RESP", "FHSA", "529"])("classifies %s as tax-deferred", (category) => {
+    it.each(["RRSP", "401k", "IRA", "LIRA", "RESP", "529"])("classifies %s as tax-deferred", (category) => {
       expect(getTaxTreatment(category)).toBe("tax-deferred");
     });
   });

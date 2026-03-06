@@ -18,40 +18,43 @@ export interface WithdrawalTaxResult {
 }
 
 /**
- * Auto-classification of known account categories by tax treatment.
+ * Keyword lists for auto-classifying account categories by tax treatment.
+ * Matched case-insensitively against any substring of the category name.
+ * Tax-free keywords are checked first so "Roth 401k" → tax-free, not tax-deferred.
+ */
+const TAX_FREE_KEYWORDS = ["tfsa", "roth", "hsa", "fhsa", "tax-free", "tax free"];
+const TAX_DEFERRED_KEYWORDS = ["rrsp", "401k", "ira", "lira", "resp", "529", "pension", "retirement"];
+
+/**
+ * Classify an account category by tax treatment using keyword matching.
+ * Tax-free keywords take priority over tax-deferred (e.g. "Roth 401k" → tax-free).
  * Unknown categories default to "taxable".
  */
-const TAX_TREATMENT_MAP: Record<string, TaxTreatment> = {
-  // Tax-free accounts — withdrawals are never taxed
-  "TFSA": "tax-free",
-  "Roth IRA": "tax-free",
-  "Roth 401k": "tax-free",
-  "HSA": "tax-free",
+export function classifyTaxTreatment(category: string): TaxTreatment {
+  const lower = category.toLowerCase();
 
-  // Tax-deferred accounts — full withdrawal taxed as income
-  "RRSP": "tax-deferred",
-  "401k": "tax-deferred",
-  "IRA": "tax-deferred",
-  "LIRA": "tax-deferred",
-  "RESP": "tax-deferred",
-  "FHSA": "tax-deferred",
-  "529": "tax-deferred",
+  // Tax-free keywords take priority (so "Roth 401k" matches "roth" → tax-free)
+  if (TAX_FREE_KEYWORDS.some((kw) => lower.includes(kw))) {
+    return "tax-free";
+  }
 
-  // Taxable accounts — only gains portion is taxed
-  "Savings": "taxable",
-  "Savings Account": "taxable",
-  "Checking": "taxable",
-  "Brokerage": "taxable",
-  "Vehicle": "taxable",
-  "Other": "taxable",
-};
+  // Tax-deferred keywords
+  if (TAX_DEFERRED_KEYWORDS.some((kw) => lower.includes(kw))) {
+    return "tax-deferred";
+  }
+
+  // Everything else is taxable
+  return "taxable";
+}
 
 /**
  * Get the tax treatment for a given account category.
- * Returns the classified treatment, or "taxable" for unknown categories.
+ * If an override is provided, it takes priority over keyword matching.
+ * Otherwise, uses keyword-based auto-classification.
  */
-export function getTaxTreatment(category: string): TaxTreatment {
-  return TAX_TREATMENT_MAP[category] ?? "taxable";
+export function getTaxTreatment(category: string, override?: TaxTreatment): TaxTreatment {
+  if (override) return override;
+  return classifyTaxTreatment(category);
 }
 
 /**

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
-import { getTaxTreatment } from "@/lib/withdrawal-tax";
+import { getTaxTreatment, type TaxTreatment } from "@/lib/withdrawal-tax";
 
 export type RoiTaxTreatment = "capital-gains" | "income";
 
@@ -18,6 +18,7 @@ export interface Asset {
   computed?: boolean; // auto-computed from stocks/properties — amount is read-only
   currency?: import("@/lib/currency").SupportedCurrency; // per-item currency override
   costBasisPercent?: number; // 0-100: % of balance that is original contributions (only for taxable accounts)
+  taxTreatment?: TaxTreatment; // user override for tax treatment (auto-detected if not set)
 }
 
 const CATEGORY_SUGGESTIONS = {
@@ -98,8 +99,8 @@ export function getDefaultRoiTaxTreatment(category: string): RoiTaxTreatment {
 }
 
 /** Whether the ROI tax treatment toggle should be shown for a category */
-export function shouldShowRoiTaxToggle(category: string): boolean {
-  return !TAX_SHELTERED_CATEGORIES.has(category) && getTaxTreatment(category) !== "tax-free";
+export function shouldShowRoiTaxToggle(category: string, taxTreatmentOverride?: TaxTreatment): boolean {
+  return !TAX_SHELTERED_CATEGORIES.has(category) && getTaxTreatment(category, taxTreatmentOverride) !== "tax-free";
 }
 
 /** Returns a flag emoji if the category is region-specific, or empty string */
@@ -500,6 +501,40 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     }}
                   />
                 )}
+                {/* Tax treatment pill — auto-detected, click to override */}
+                {(() => {
+                  const autoDetected = getTaxTreatment(asset.category);
+                  const effective = asset.taxTreatment ?? autoDetected;
+                  const isOverridden = asset.taxTreatment !== undefined;
+                  const treatments: TaxTreatment[] = ["tax-free", "tax-deferred", "taxable"];
+                  const labels: Record<TaxTreatment, string> = { "tax-free": "Tax-free", "tax-deferred": "Tax-deferred", "taxable": "Taxable" };
+                  const colors: Record<TaxTreatment, string> = {
+                    "tax-free": "bg-green-100 text-green-700 hover:bg-green-200",
+                    "tax-deferred": "bg-rose-100 text-rose-700 hover:bg-rose-200",
+                    "taxable": "bg-amber-100 text-amber-700 hover:bg-amber-200",
+                  };
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        // Cycle to next treatment
+                        const currentIdx = treatments.indexOf(effective);
+                        const nextTreatment = treatments[(currentIdx + 1) % treatments.length];
+                        // If cycling back to auto-detected, clear the override
+                        const override = nextTreatment === autoDetected ? undefined : nextTreatment;
+                        updateAssets(assets.map((a) =>
+                          a.id === asset.id ? { ...a, taxTreatment: override } : a
+                        ));
+                      }}
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${colors[effective]}`}
+                      aria-label={`Tax treatment for ${asset.category}: ${labels[effective]}${isOverridden ? " (overridden)" : " (auto-detected)"}. Click to change.`}
+                      data-testid={`tax-treatment-pill-${asset.id}`}
+                    >
+                      {labels[effective]}{isOverridden ? " *" : ""}
+                    </button>
+                  );
+                })()}
+
                 {/* ROI badge/editor */}
                 {editingId === asset.id && editingField === "roi" ? (
                   <input
@@ -534,7 +569,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 )}
 
                 {/* ROI tax treatment toggle — only when ROI > 0 and not tax-sheltered */}
-                {displayRoi !== undefined && displayRoi > 0 && shouldShowRoiTaxToggle(asset.category) && (() => {
+                {displayRoi !== undefined && displayRoi > 0 && shouldShowRoiTaxToggle(asset.category, asset.taxTreatment) && (() => {
                   const effectiveTreatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
                   const isIncome = effectiveTreatment === "income";
                   const isExplicit = asset.roiTaxTreatment !== undefined;
@@ -594,7 +629,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 )}
 
                 {/* Cost basis % — only for taxable accounts */}
-                {getTaxTreatment(asset.category) === "taxable" && asset.amount > 0 && (
+                {getTaxTreatment(asset.category, asset.taxTreatment) === "taxable" && asset.amount > 0 && (
                   editingId === asset.id && editingField === "costBasisPercent" ? (
                     <input
                       ref={inputRef}
@@ -631,7 +666,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 )}
 
                 {/* Unrealized gains badge */}
-                {getTaxTreatment(asset.category) === "taxable" && asset.costBasisPercent !== undefined && asset.costBasisPercent < 100 && asset.amount > 0 && (
+                {getTaxTreatment(asset.category, asset.taxTreatment) === "taxable" && asset.costBasisPercent !== undefined && asset.costBasisPercent < 100 && asset.amount > 0 && (
                   <span className="rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-600" data-testid={`unrealized-gains-${asset.id}`}>
                     ~{formatCurrency(Math.round(asset.amount * (100 - asset.costBasisPercent) / 100))} unrealized gains
                   </span>
