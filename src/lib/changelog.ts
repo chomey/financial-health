@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Data Flow Visualization (Milestone 8)
   {
+    version: 73,
+    title: "Wire remaining metric cards with data-flow arrows",
+    description: "Estimated Tax, Financial Runway, and Debt-to-Asset Ratio metric cards now show data-flow arrows on hover. Estimated Tax shows a green arrow from Income with the effective tax rate and gross income. Financial Runway shows green arrows from Assets and Stocks (numerator) and red arrows from Expenses and Mortgage (denominator). Debt-to-Asset Ratio shows green arrows from all asset sources and red arrows from Debts and Mortgage. All five metric cards are now fully wired.",
+    date: "2026-03-05",
+  },
+  {
     version: 72,
     title: "Monthly Surplus metric card data-flow arrows on hover",
     description: "Hovering the Monthly Surplus metric card now shows animated SVG arrows: green arrow from Income (after-tax amount), red arrows from Expenses, asset Contributions (if any), and Mortgage payments (if any). The surplus formula is immediately obvious — income flows in green, everything else flows in red. Same staggered entrance, source highlights, and fade-out behavior as Net Worth.",
