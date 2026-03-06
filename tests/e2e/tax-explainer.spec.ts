@@ -17,21 +17,21 @@ test.describe("Tax Explainer Modal", () => {
     await expect(page.locator('[data-testid="explainer-sources"]')).not.toBeVisible();
   });
 
-  test("shows bracket bar with colored segments", async ({ page }) => {
+  test("shows tiered bracket bars with filled segments", async ({ page }) => {
     await page.click('[data-testid="metric-card-estimated-tax"]');
     await page.waitForSelector('[data-testid="tax-explainer"]');
 
-    const bracketBar = page.locator('[data-testid="tax-bracket-bar"]');
-    await expect(bracketBar).toBeVisible();
+    const bracketTable = page.locator('[data-testid="tax-federal-brackets-table"]');
+    await expect(bracketTable).toBeVisible();
 
-    // At least one bracket segment should exist
-    const segments = page.locator('[data-testid^="tax-bracket-segment-"]');
-    const count = await segments.count();
+    // At least one bracket row should exist with a fill bar
+    const fills = page.locator('[data-testid^="tax-federal-brackets-fill-"]');
+    const count = await fills.count();
     expect(count).toBeGreaterThan(0);
 
-    // Segments should have background colors
-    const firstSegment = segments.first();
-    const bgColor = await firstSegment.evaluate((el) =>
+    // Fill bars should have background colors
+    const firstFill = fills.first();
+    const bgColor = await firstFill.evaluate((el) =>
       window.getComputedStyle(el).backgroundColor
     );
     expect(bgColor).not.toBe("rgba(0, 0, 0, 0)");
@@ -139,8 +139,9 @@ test.describe("Tax Explainer - Zero Income", () => {
     await expect(zeroMsg).toContainText("No income entered");
     await expect(zeroMsg).toContainText("Ontario");
 
-    // Should show bracket tables (unfilled for zero income)
+    // Should show bracket tiers (unfilled for zero income)
     await expect(page.locator('[data-testid="tax-federal-brackets-table"]')).toBeVisible();
+    await expect(page.locator('[data-testid^="tax-federal-brackets-fill-"]')).not.toBeVisible();
 
     // Should show 0.0% rates
     await expect(page.locator('[data-testid="tax-effective-rate"]')).toContainText("0.0%");

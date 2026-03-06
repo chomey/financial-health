@@ -55,8 +55,8 @@ describe("Milestone 10 E2E test infrastructure — Explainer & Tax Treatment Enh
   it("covers tax bracket visualization with income", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
     expect(content).toContain("tax-explainer");
-    expect(content).toContain("tax-bracket-bar");
-    expect(content).toContain("tax-bracket-segment-");
+    expect(content).toContain("tax-federal-brackets-table");
+    expect(content).toContain("tax-federal-brackets-fill-");
     expect(content).toContain("tax-breakdown");
     expect(content).toContain("tax-federal-amount");
     expect(content).toContain("tax-provincial-amount");

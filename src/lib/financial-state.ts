@@ -302,19 +302,19 @@ export const INITIAL_STATE: FinancialState = {
  * Returns one segment per bracket with amountInBracket and taxInBracket.
  */
 function computeBracketSegments(taxableIncome: number, table: BracketTable): TaxBracketSegment[] {
-  const segments: TaxBracketSegment[] = [];
-  for (const bracket of table.brackets) {
-    if (taxableIncome <= bracket.min) break;
+  return table.brackets.map((bracket) => {
+    if (taxableIncome <= bracket.min) {
+      return { min: bracket.min, max: bracket.max, rate: bracket.rate, amountInBracket: 0, taxInBracket: 0 };
+    }
     const amountInBracket = Math.min(taxableIncome, bracket.max) - bracket.min;
-    segments.push({
+    return {
       min: bracket.min,
       max: bracket.max,
       rate: bracket.rate,
       amountInBracket,
       taxInBracket: amountInBracket * bracket.rate,
-    });
-  }
-  return segments;
+    };
+  });
 }
 
 /**

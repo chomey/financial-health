@@ -230,6 +230,9 @@ test.describe("Milestone 11: Unified Chart & Final Enhancements (Tasks 97-101)",
       // Federal bracket table still visible for reference
       await expect(page.locator('[data-testid="tax-federal-brackets-table"]')).toBeVisible();
 
+      // Fill bars should NOT be visible (no income to fill)
+      await expect(page.locator('[data-testid^="tax-federal-brackets-fill-"]')).not.toBeVisible();
+
       await captureScreenshot(page, "task-101-zero-income-tax-explainer");
       await page.keyboard.press("Escape");
     });
