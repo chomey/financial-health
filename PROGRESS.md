@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 68
-- **Completed**: 68
-- **Remaining**: 0
+- **Total Tasks**: 73
+- **Completed**: 69
+- **Remaining**: 4
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1450,3 +1450,20 @@
   ![Drawdown withdrawal tax summary](screenshots/task-68-drawdown-withdrawal-tax-summary.png)
   ![Withdrawal order all three types](screenshots/task-68-withdrawal-order-all-three-types.png)
 - **Notes**: This milestone E2E test validates all withdrawal tax features from tasks 63-67 in integrated journeys. Tests cover both CA (TFSA/RRSP) and US (Roth IRA/401k) jurisdictions, verifying tax treatment classification, runway tax drag, projection drawdown behavior, cost basis tracking with unrealized gains, and URL persistence. All 68 tasks are now complete.
+
+## Task 69: Build SVG arrow overlay system and source-target element registry
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Created — DataFlowContext with registerSource/registerTarget/setActiveTarget/setActiveConnections API, DataFlowProvider component, full-viewport SVG overlay with cubic bezier arrow paths, CSS stroke-dasharray draw animation, green (positive) and red (negative) color coding, arrowhead markers, label rendering, scroll/resize recalculation via ResizeObserver
+  - `src/app/globals.css`: Added arrow-draw, arrow-flow, and arrow-fade-in CSS keyframe animations
+  - `src/app/page.tsx`: Wrapped Home component return with DataFlowProvider
+  - `src/lib/changelog.ts`: Added task 69 changelog entry
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/data-flow-arrows.test.tsx`: 16 tests — getCenterPoint, getEdgePoint edge selection, calculateArrowPath SVG path generation, approximatePathLength, DataFlowProvider context access, context error outside provider, source/target registration, active target and connections state, overlay hidden when inactive (16 passed, 0 failed)
+  - `tests/e2e/data-flow-arrows.spec.ts`: 3 tests — provider renders without errors, SVG overlay system available, arrow CSS animations exist (3 passed, 0 failed)
+  - All existing tests: 852 passed, 0 failed
+- **Screenshots**:
+  ![Data flow arrows base state](screenshots/task-69-data-flow-arrows-base.png)
+- **Notes**: This task creates the foundational arrow overlay infrastructure. The overlay renders nothing until a target is activated (via setActiveTarget + setActiveConnections). Tasks 70-73 will wire up source registrations on sections and target activations on metric cards to trigger the arrows on hover. Exported pure functions (getCenterPoint, getEdgePoint, calculateArrowPath, approximatePathLength) are tested independently for path math correctness.

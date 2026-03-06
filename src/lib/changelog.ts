@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Data Flow Visualization (Milestone 8)
+  {
+    version: 69,
+    title: "SVG arrow overlay system and data-flow context",
+    description: "New DataFlowArrows component with a full-viewport SVG overlay that renders animated flowing arrows between source and target elements. Includes DataFlowContext for registering sources and targets, cubic bezier path calculation, CSS stroke-dasharray animations, green/red color coding for positive/negative contributions, and scroll/resize recalculation.",
+    date: "2026-03-05",
+  },
   // Withdrawal Tax Modeling (Milestone 7)
   {
     version: 68,
