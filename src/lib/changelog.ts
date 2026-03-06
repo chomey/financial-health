@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Metric-Specific Explainers (Milestone 11)
+  {
+    version: 84,
+    title: "Tax bracket visualization in Estimated Tax explainer",
+    description: "Clicking the Estimated Tax metric card now opens a tax-specific explainer modal with a horizontal stacked bar showing income by tax bracket (colored segments from light to deep green), federal and provincial/state tax breakdown with jurisdiction name, effective vs marginal rate comparison, capital gains section (CA inclusion rates or US bracket rates) when applicable, and a Gross → Tax → After-tax income flow summary.",
+    date: "2026-03-06",
+  },
   // SVG Refinements
   {
     version: 83,
@@ -525,6 +532,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
+    { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },
     { milestone: "Data Flow Visualization", range: [69, 76] as const },

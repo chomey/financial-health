@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { generateInsights, type FinancialData, type InsightType } from "@/lib/insights";
-import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type ActiveTargetMeta } from "@/components/DataFlowArrows";
+import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type ActiveTargetMeta, type TaxExplainerDetails } from "@/components/DataFlowArrows";
 
 interface MetricData {
   title: string;
@@ -17,6 +17,7 @@ interface MetricData {
   ratioWithoutMortgage?: number; // debt-to-asset ratio excluding mortgage
   runwayWithGrowth?: number; // runway in months factoring in asset ROR
   runwayAfterTax?: number; // runway in months after withdrawal taxes
+  taxDetails?: TaxExplainerDetails; // detailed tax breakdown for explainer
 }
 
 // Mock values based on existing entry component mock data
@@ -162,9 +163,12 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     );
     ctx.setActiveConnections(prioritized);
     ctx.setActiveTarget(targetId);
+    const metricType = metric.title.toLowerCase().replace(/\s+/g, "-");
     ctx.setActiveTargetMeta({
       label: metric.title,
       formattedValue: formatMetricValue(metric.value, metric.format, homeCurrency),
+      metricType,
+      taxDetails: metricType === "estimated-tax" ? metric.taxDetails : undefined,
     });
 
     // Build aria-live announcement
