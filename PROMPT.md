@@ -29,7 +29,7 @@ Complete exactly ONE task from TASKS.md, then stop.
 
 ## Steps
 
-1. **Read TASKS.md** — Find the first unchecked task (`- [ ]`). This is your task for this iteration.
+1. **Find your task** — Search TASKS.md for the first unchecked task (`- [ ]`). Read only that task's description — do NOT read completed tasks or the full file. Completed tasks are kept for reference but are irrelevant to your work.
 
 2. **Load Specialized Agent** — Parse the agent tag from the task (e.g., `[@frontend]`, `[@backend]`). If present, read the corresponding agent file from `agents/` (e.g., `agents/FRONTEND-ENGINEER.md`) and apply its domain-specific guidance, quality checklists, and testing expectations throughout this iteration. If no tag is present, default to `[@fullstack]` and load `agents/FULLSTACK-ENGINEER.md`. The tag-to-file mapping:
    - `[@frontend]` → `agents/FRONTEND-ENGINEER.md`
@@ -78,7 +78,7 @@ Complete exactly ONE task from TASKS.md, then stop.
    | `[@fullstack]` | T1 + T2 | T3 |
    | `[@qa]` | T1 + T2 + T3 | — |
 
-   **T3 triggers** (outside `[@qa]` tasks): every 5 completed tasks (count `- [x]` lines in TASKS.md), any task tagged `[E2E]` or `[MILESTONE]`, or user adds `[E2E]` to a task.
+   **T3 triggers** (outside `[@qa]` tasks): every 5 completed tasks (count `- [x]` lines in both TASKS.md and TASKS-ARCHIVE.md), any task tagged `[E2E]` or `[MILESTONE]`, or user adds `[E2E]` to a task.
 
    Tests should cover the happy path and key edge cases. Follow the loaded agent's required test tiers.
 

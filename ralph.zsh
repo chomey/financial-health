@@ -183,15 +183,20 @@ if [[ -f "$CLAUDE_FILE" ]]; then
 fi
 print ""
 
-# Count total tasks and completed tasks
-total_tasks=$(grep -c '^\- \[' "$TASKS_FILE" 2>/dev/null || true)
-total_tasks=${total_tasks:-0}
+# Count total tasks and completed tasks (including archived)
 completed_tasks=$(grep -c '^\- \[x\]' "$TASKS_FILE" 2>/dev/null || true)
 completed_tasks=${completed_tasks:-0}
-remaining_tasks=$((total_tasks - completed_tasks))
+archived_tasks=0
+if [[ -f "$TASKS_ARCHIVE" ]]; then
+  archived_tasks=$(grep -c '^\- \[x\]' "$TASKS_ARCHIVE" 2>/dev/null || true)
+  archived_tasks=${archived_tasks:-0}
+fi
+remaining_tasks=$(grep -c '^\- \[ \]' "$TASKS_FILE" 2>/dev/null || true)
+remaining_tasks=${remaining_tasks:-0}
+total_tasks=$((completed_tasks + archived_tasks + remaining_tasks))
 
 print "${YELLOW}Total tasks:     ${total_tasks}${NC}"
-print "${GREEN}Completed:       ${completed_tasks}${NC}"
+print "${GREEN}Completed:       $((completed_tasks + archived_tasks))${NC}"
 print "${BLUE}Remaining:       ${remaining_tasks}${NC}"
 print ""
 
@@ -276,10 +281,15 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   ITER_MINS=$((ITER_ELAPSED / 60))
   ITER_SECS=$((ITER_ELAPSED % 60))
 
-  # Re-check progress after each iteration
+  # Re-check progress after each iteration (include archived)
   completed_now=$(grep -c '^\- \[x\]' "$TASKS_FILE" 2>/dev/null || true)
   completed_now=${completed_now:-0}
-  print "${GREEN}Progress: ${completed_now}/${total_tasks} tasks complete (iteration took ${ITER_MINS}m ${ITER_SECS}s)${NC}"
+  archived_now=0
+  if [[ -f "$TASKS_ARCHIVE" ]]; then
+    archived_now=$(grep -c '^\- \[x\]' "$TASKS_ARCHIVE" 2>/dev/null || true)
+    archived_now=${archived_now:-0}
+  fi
+  print "${GREEN}Progress: $((completed_now + archived_now))/${total_tasks} tasks complete (iteration took ${ITER_MINS}m ${ITER_SECS}s)${NC}"
 
   # Brief pause between iterations to avoid rate limiting
   if [[ "$i" -lt "$TASK_COUNT" ]]; then
@@ -298,9 +308,14 @@ print "${GREEN}║  Ralph Loop complete!                ║${NC}"
 print "${GREEN}║ \"Me fail English? That's unpossible!\"║${NC}"
 print "${GREEN}╚══════════════════════════════════════╝${NC}"
 
-# Final summary
+# Final summary (include archived)
 completed_final=$(grep -c '^\- \[x\]' "$TASKS_FILE" 2>/dev/null || true)
 completed_final=${completed_final:-0}
-print "${YELLOW}Final progress: ${completed_final}/${total_tasks} tasks complete${NC}"
+archived_final=0
+if [[ -f "$TASKS_ARCHIVE" ]]; then
+  archived_final=$(grep -c '^\- \[x\]' "$TASKS_ARCHIVE" 2>/dev/null || true)
+  archived_final=${archived_final:-0}
+fi
+print "${YELLOW}Final progress: $((completed_final + archived_final))/${total_tasks} tasks complete${NC}"
 print "${CYAN}Total time: ${TOTAL_MINS}m ${TOTAL_SECS}s${NC}"
 print "${CYAN}Finished: $(date '+%Y-%m-%d %H:%M:%S')${NC}"
