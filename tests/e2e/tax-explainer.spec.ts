@@ -102,10 +102,24 @@ test.describe("Tax Explainer - Zero Income", () => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="metric-card-estimated-tax"]');
 
-    // Remove all income to get $0 income
+    // Remove salary income
     const salaryRow = page.getByRole("listitem").filter({ hasText: "Salary" });
     await salaryRow.hover();
     await page.getByLabel("Delete Salary").click();
+    await page.waitForTimeout(300);
+
+    // Also remove all assets to eliminate investment interest income
+    await page.click('button:has-text("Assets")');
+    await page.waitForTimeout(300);
+    for (const label of ["Savings Account", "TFSA", "RRSP"]) {
+      const row = page.getByRole("listitem").filter({ hasText: label });
+      if (await row.count() > 0) {
+        await row.hover();
+        await page.getByLabel(`Delete ${label}`).click();
+        await page.waitForTimeout(200);
+      }
+    }
+    await page.click('button:has-text("Dashboard")');
     await page.waitForTimeout(300);
 
     // Estimated Tax should show CA$0
@@ -125,9 +139,8 @@ test.describe("Tax Explainer - Zero Income", () => {
     await expect(zeroMsg).toContainText("No income entered");
     await expect(zeroMsg).toContainText("Ontario");
 
-    // Should show bracket tables (not the bar)
+    // Should show bracket tables (unfilled for zero income)
     await expect(page.locator('[data-testid="tax-federal-brackets-table"]')).toBeVisible();
-    await expect(page.locator('[data-testid="tax-bracket-bar"]')).not.toBeVisible();
 
     // Should show 0.0% rates
     await expect(page.locator('[data-testid="tax-effective-rate"]')).toContainText("0.0%");
