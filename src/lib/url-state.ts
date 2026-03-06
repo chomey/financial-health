@@ -98,6 +98,7 @@ interface CompactAsset {
   c: string; // category
   a: number; // amount
   r?: number; // roi (annual %)
+  rt?: string; // roiTaxTreatment ("income" only, omitted when "capital-gains"/default)
   m?: number; // monthlyContribution ($)
   st?: 1; // surplusTarget
   cu?: string; // currency override (omitted when home currency)
@@ -162,6 +163,7 @@ function toCompact(state: FinancialState): CompactState {
     a: realAssets.map((x) => {
       const ca: CompactAsset = { c: x.category, a: x.amount };
       if (x.roi !== undefined) ca.r = x.roi;
+      if (x.roiTaxTreatment && x.roiTaxTreatment !== "capital-gains") ca.rt = x.roiTaxTreatment;
       if (x.monthlyContribution !== undefined && x.monthlyContribution > 0) ca.m = x.monthlyContribution;
       if (x.surplusTarget) ca.st = 1;
       if (x.currency && x.currency !== homeCurrency) ca.cu = x.currency;
@@ -222,8 +224,9 @@ function fromCompact(compact: CompactState): FinancialState {
   return {
     assets: (() => {
       const assets = compact.a.map((x, i) => {
-        const asset: { id: string; category: string; amount: number; roi?: number; monthlyContribution?: number; surplusTarget?: boolean; currency?: SupportedCurrency; costBasisPercent?: number } = { id: `a${i + 1}`, category: x.c, amount: x.a };
+        const asset: { id: string; category: string; amount: number; roi?: number; roiTaxTreatment?: import("@/components/AssetEntry").RoiTaxTreatment; monthlyContribution?: number; surplusTarget?: boolean; currency?: SupportedCurrency; costBasisPercent?: number } = { id: `a${i + 1}`, category: x.c, amount: x.a };
         if (x.r !== undefined) asset.roi = x.r;
+        if (x.rt) asset.roiTaxTreatment = x.rt as import("@/components/AssetEntry").RoiTaxTreatment;
         if (x.m !== undefined) asset.monthlyContribution = x.m;
         if (x.st) asset.surplusTarget = true;
         if (x.cu) asset.currency = x.cu as SupportedCurrency;

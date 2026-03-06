@@ -5,11 +5,14 @@ import CurrencyBadge from "@/components/CurrencyBadge";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { getTaxTreatment } from "@/lib/withdrawal-tax";
 
+export type RoiTaxTreatment = "capital-gains" | "income";
+
 export interface Asset {
   id: string;
   category: string;
   amount: number;
   roi?: number; // annual ROI percentage
+  roiTaxTreatment?: RoiTaxTreatment; // how ROI is taxed: capital gains vs interest income
   monthlyContribution?: number; // monthly contribution in $
   surplusTarget?: boolean; // monthly surplus is deposited here
   computed?: boolean; // auto-computed from stocks/properties — amount is read-only
@@ -76,6 +79,26 @@ export const DEFAULT_ROI: Record<string, number> = {
 /** Get the suggested ROI for a category, or undefined if none */
 export function getDefaultRoi(category: string): number | undefined {
   return DEFAULT_ROI[category];
+}
+
+/** Categories whose ROI is taxed as interest income (not capital gains) by default */
+const INCOME_TAX_ROI_CATEGORIES = new Set([
+  "Savings", "Savings Account", "Checking", "GIC", "Money Market", "HISA",
+]);
+
+/** Tax-sheltered accounts where ROI is tax-free — toggle should be hidden */
+const TAX_SHELTERED_CATEGORIES = new Set([
+  "TFSA", "Roth IRA", "FHSA", "HSA",
+]);
+
+/** Get the default ROI tax treatment for a category */
+export function getDefaultRoiTaxTreatment(category: string): RoiTaxTreatment {
+  return INCOME_TAX_ROI_CATEGORIES.has(category) ? "income" : "capital-gains";
+}
+
+/** Whether the ROI tax treatment toggle should be shown for a category */
+export function shouldShowRoiTaxToggle(category: string): boolean {
+  return !TAX_SHELTERED_CATEGORIES.has(category) && getTaxTreatment(category) !== "tax-free";
 }
 
 /** Returns a flag emoji if the category is region-specific, or empty string */
@@ -508,6 +531,35 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       : isComputed ? "Set estimated return %" : "Annual return %"}
                   </button>
                 )}
+
+                {/* ROI tax treatment toggle — only when ROI > 0 and not tax-sheltered */}
+                {displayRoi !== undefined && displayRoi > 0 && shouldShowRoiTaxToggle(asset.category) && (() => {
+                  const effectiveTreatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
+                  const isIncome = effectiveTreatment === "income";
+                  const isExplicit = asset.roiTaxTreatment !== undefined;
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newTreatment = isIncome ? "capital-gains" : "income";
+                        updateAssets(assets.map((a) =>
+                          a.id === asset.id ? { ...a, roiTaxTreatment: newTreatment } : a
+                        ));
+                      }}
+                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                        isExplicit
+                          ? isIncome
+                            ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                            : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                          : "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
+                      }`}
+                      aria-label={`Toggle ROI tax treatment for ${asset.category}, currently ${isIncome ? "interest income" : "capital gains"}`}
+                      data-testid={`roi-tax-treatment-${asset.id}`}
+                    >
+                      {isIncome ? "Interest income" : "Capital gains"}
+                    </button>
+                  );
+                })()}
 
                 {/* Monthly contribution badge/editor */}
                 {editingId === asset.id && editingField === "monthlyContribution" ? (

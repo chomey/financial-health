@@ -48,7 +48,7 @@ function simulateRunwayWithGrowth(
  * Grosses up withdrawals from taxed accounts so after-tax amount covers the monthly obligation.
  */
 function simulateRunwayWithTax(
-  buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number }[],
+  buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number; roiTaxTreatment?: "capital-gains" | "income" }[],
   monthlyWithdrawal: number,
   country: "CA" | "US",
   jurisdiction: string,
@@ -86,7 +86,8 @@ function simulateRunwayWithTax(
         const annualizedWithdrawal = remaining * 12;
         const taxResult = getWithdrawalTaxRate(
           buckets[idx].category, country, jurisdiction,
-          annualizedWithdrawal, buckets[idx].costBasisPercent
+          annualizedWithdrawal, buckets[idx].costBasisPercent,
+          buckets[idx].roiTaxTreatment
         );
         const effectiveRate = taxResult.effectiveRate;
         // Gross up: need to withdraw more to cover tax so after-tax = remaining
@@ -115,7 +116,7 @@ function simulateRunwayWithTax(
  * Uses tax-aware withdrawal ordering (tax-free → taxable → tax-deferred).
  */
 export function simulateRunwayTimeSeries(
-  buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number }[],
+  buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number; roiTaxTreatment?: "capital-gains" | "income" }[],
   monthlyWithdrawal: number,
   country: "CA" | "US",
   jurisdiction: string,
@@ -222,7 +223,8 @@ export function simulateRunwayTimeSeries(
             const annualizedWithdrawal = remaining * 12;
             const taxResult = getWithdrawalTaxRate(
               buckets[idx].category, country, jurisdiction,
-              annualizedWithdrawal, buckets[idx].costBasisPercent
+              annualizedWithdrawal, buckets[idx].costBasisPercent,
+              buckets[idx].roiTaxTreatment
             );
             const effectiveRate = taxResult.effectiveRate;
             const grossUpFactor = effectiveRate < 1 ? 1 / (1 - effectiveRate) : 10;
@@ -411,7 +413,7 @@ function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: numb
 /**
  * Build RunwayExplainerDetails for the burndown chart in the Financial Runway explainer.
  */
-type DetailedBucket = { balance: number; ror: number; category: string; taxTreatment: TaxTreatment; costBasisPercent: number };
+type DetailedBucket = { balance: number; ror: number; category: string; taxTreatment: TaxTreatment; costBasisPercent: number; roiTaxTreatment?: "capital-gains" | "income" };
 function buildRunwayExplainerDetails(
   detailedBuckets: DetailedBucket[],
   monthlyObligations: number,
@@ -431,6 +433,7 @@ function buildRunwayExplainerDetails(
     taxTreatment: b.taxTreatment,
     category: b.category,
     costBasisPercent: b.costBasisPercent,
+    roiTaxTreatment: b.roiTaxTreatment,
   }));
 
   const timeSeries = simulateRunwayTimeSeries(taxBuckets, monthlyObligations, country, jurisdiction);
@@ -621,7 +624,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const jurisdiction = state.jurisdiction ?? "ON";
 
   // Build detailed buckets with tax treatment info for both growth and tax-adjusted simulations
-  type DetailedBucket = { balance: number; ror: number; category: string; taxTreatment: TaxTreatment; costBasisPercent: number };
+  type DetailedBucket = { balance: number; ror: number; category: string; taxTreatment: TaxTreatment; costBasisPercent: number; roiTaxTreatment?: "capital-gains" | "income" };
   const detailedBuckets: DetailedBucket[] = [];
 
   if (monthlyObligations > 0 && liquidTotal > 0) {
@@ -637,6 +640,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
           category: asset.category,
           taxTreatment: getTaxTreatment(asset.category),
           costBasisPercent: asset.costBasisPercent ?? 100,
+          roiTaxTreatment: asset.roiTaxTreatment,
         });
       }
     }
@@ -649,6 +653,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
           category: asset.category,
           taxTreatment: getTaxTreatment(asset.category),
           costBasisPercent: asset.costBasisPercent ?? 100,
+          roiTaxTreatment: asset.roiTaxTreatment,
         });
       }
     }
@@ -676,6 +681,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
         taxTreatment: b.taxTreatment,
         category: b.category,
         costBasisPercent: b.costBasisPercent,
+        roiTaxTreatment: b.roiTaxTreatment,
       }));
       const taxMonths = simulateRunwayWithTax(taxBuckets, monthlyObligations, country, jurisdiction);
       const taxRunway = taxMonths >= 1200 ? Infinity : parseFloat(taxMonths.toFixed(1));
@@ -876,6 +882,7 @@ export function computeWithdrawalTaxSummary(
         taxTreatment: getTaxTreatment(a.category),
         category: a.category,
         costBasisPercent: a.costBasisPercent ?? 100,
+        roiTaxTreatment: a.roiTaxTreatment,
       }));
 
     const hasTaxedAccounts = taxBuckets.some((b) => b.taxTreatment !== "tax-free");

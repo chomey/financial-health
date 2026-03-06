@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Tax Treatment Enhancements
+  {
+    version: 91,
+    title: "Asset ROI tax treatment toggle",
+    description: "Added a toggle on asset entries to specify whether investment returns are taxed as capital gains or interest income. Savings-type accounts (Savings, GIC, HISA, Money Market) default to interest income; investment accounts default to capital gains. Tax-sheltered accounts (TFSA, Roth IRA, FHSA, HSA) hide the toggle since ROI is tax-free. The setting affects withdrawal tax simulations and persists in URL state.",
+    date: "2026-03-06",
+  },
   // UI Polish (Milestone 12)
   {
     version: 90,
