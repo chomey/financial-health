@@ -1,18 +1,18 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import RunwayBurndownChart from "@/components/RunwayBurndownChart";
+import RunwayBurndownChart, { buildSummary } from "@/components/RunwayBurndownChart";
 import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
 
 // Mock recharts to avoid rendering issues in jsdom
 vi.mock("recharts", () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div data-testid="responsive-container">{children}</div>,
-  AreaChart: ({ children }: { children: React.ReactNode }) => <div data-testid="area-chart">{children}</div>,
-  Area: () => <div data-testid="area" />,
+  LineChart: ({ children }: { children: React.ReactNode }) => <div data-testid="line-chart">{children}</div>,
+  Line: () => <div data-testid="line" />,
   XAxis: () => <div />,
   YAxis: () => <div />,
   CartesianGrid: () => <div />,
   Tooltip: () => <div />,
-  Legend: () => <div />,
+  ReferenceLine: () => <div data-testid="reference-line" />,
 }));
 
 function makeDetails(overrides?: Partial<RunwayExplainerDetails>): RunwayExplainerDetails {
@@ -58,24 +58,37 @@ describe("RunwayBurndownChart", () => {
     expect(screen.getByText("Runway Burndown")).toBeInTheDocument();
   });
 
-  it("shows growth extension annotation", () => {
-    render(<RunwayBurndownChart details={makeDetails({ growthExtensionMonths: 5 })} />);
-    expect(screen.getByTestId("burndown-growth-extension")).toHaveTextContent("+5 months from growth");
+  it("renders a plain-English summary", () => {
+    render(<RunwayBurndownChart details={makeDetails()} />);
+    const summary = screen.getByTestId("burndown-summary");
+    expect(summary).toBeInTheDocument();
+    expect(summary.textContent).toContain("Your savings could last");
   });
 
-  it("shows tax drag annotation", () => {
-    render(<RunwayBurndownChart details={makeDetails({ taxDragMonths: 3 })} />);
-    expect(screen.getByTestId("burndown-tax-drag")).toHaveTextContent("-3 months tax drag");
+  it("renders a clean legend", () => {
+    render(<RunwayBurndownChart details={makeDetails()} />);
+    const legend = screen.getByTestId("burndown-legend");
+    expect(legend).toBeInTheDocument();
+    expect(legend.textContent).toContain("With investment growth");
+    expect(legend.textContent).toContain("Without growth");
+    expect(legend.textContent).toContain("After withdrawal taxes");
   });
 
-  it("hides growth extension when zero or undefined", () => {
-    render(<RunwayBurndownChart details={makeDetails({ growthExtensionMonths: 0 })} />);
-    expect(screen.queryByTestId("burndown-growth-extension")).not.toBeInTheDocument();
+  it("hides tax line from legend when no tax drag", () => {
+    render(<RunwayBurndownChart details={makeDetails({ taxDragMonths: 0 })} />);
+    const legend = screen.getByTestId("burndown-legend");
+    expect(legend.textContent).not.toContain("After withdrawal taxes");
   });
 
-  it("hides tax drag when zero or undefined", () => {
-    render(<RunwayBurndownChart details={makeDetails({ taxDragMonths: undefined })} />);
-    expect(screen.queryByTestId("burndown-tax-drag")).not.toBeInTheDocument();
+  it("renders starting balances", () => {
+    render(<RunwayBurndownChart details={makeDetails()} />);
+    const balances = screen.getByTestId("burndown-starting-balances");
+    expect(balances).toBeInTheDocument();
+    expect(balances.textContent).toContain("Starting:");
+    expect(balances.textContent).toContain("TFSA");
+    expect(balances.textContent).toContain("RRSP");
+    expect(balances.textContent).toContain("$10,000");
+    expect(balances.textContent).toContain("$5,000");
   });
 
   it("renders withdrawal order entries", () => {
@@ -111,5 +124,51 @@ describe("RunwayBurndownChart", () => {
   it("labels withdrawal order as Suggested", () => {
     render(<RunwayBurndownChart details={makeDetails()} />);
     expect(screen.getByText("Suggested Withdrawal Order")).toBeInTheDocument();
+  });
+
+  it("uses LineChart instead of AreaChart (no stacked areas)", () => {
+    render(<RunwayBurndownChart details={makeDetails()} />);
+    expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+    expect(screen.queryByTestId("area-chart")).not.toBeInTheDocument();
+  });
+});
+
+describe("buildSummary", () => {
+  it("generates basic summary with growth and tax drag", () => {
+    const details = makeDetails();
+    const summary = buildSummary(details);
+    expect(summary).toContain("Your savings could last ~6 mo");
+    expect(summary).toContain("Investment growth adds ~2 mo");
+    expect(summary).toContain("withdrawal taxes reduce it by ~1 mo");
+  });
+
+  it("shows only growth when no tax drag", () => {
+    const details = makeDetails({ taxDragMonths: 0 });
+    const summary = buildSummary(details);
+    expect(summary).toContain("Investment growth extends this by ~2 mo");
+    expect(summary).not.toContain("taxes");
+  });
+
+  it("formats years for long runways", () => {
+    const details = makeDetails({ runwayMonths: 24 });
+    const summary = buildSummary(details);
+    expect(summary).toContain("~2 yr");
+  });
+
+  it("formats fractional years", () => {
+    const details = makeDetails({ runwayMonths: 18 });
+    const summary = buildSummary(details);
+    expect(summary).toContain("~1.5 yr");
+  });
+
+  it("handles no growth and no tax", () => {
+    const details = makeDetails({
+      growthExtensionMonths: undefined,
+      taxDragMonths: undefined,
+      runwayWithGrowthMonths: undefined,
+      runwayAfterTaxMonths: undefined,
+    });
+    const summary = buildSummary(details);
+    expect(summary).toBe("Your savings could last ~6 mo.");
   });
 });

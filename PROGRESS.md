@@ -10,7 +10,7 @@
 
 ## Summary
 - **Total Tasks**: 92
-- **Completed**: 91
+- **Completed**: 92
 - **Remaining**: 1
 - **Last Updated**: 2026-03-06
 
@@ -1959,3 +1959,22 @@
 - **Screenshots**:
   ![ROI tax treatment toggle](screenshots/task-91-roi-tax-treatment-toggle.png)
 - **Notes**: The toggle uses a compact button with amber styling for "Interest income" and blue for "Capital gains". Tax-sheltered accounts (TFSA, Roth IRA, FHSA, HSA) hide the toggle since ROI is tax-free regardless. The `roiTaxTreatment` is only stored in URL state when explicitly set to "income" — "capital-gains" is the URL default and is omitted for compactness.
+
+## Task 92: Simplify runway burndown chart for clarity
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/RunwayBurndownChart.tsx`: Complete redesign — replaced stacked per-category AreaChart with a clean LineChart using 2-3 simple lines (solid green "With investment growth", dashed gray "Without growth", amber "After withdrawal taxes" only when tax drag > 0). Added ReferenceLine milestone markers at zero-crossing months with duration labels, 6-month emergency fund horizontal threshold line, plain-English summary sentence above chart generated dynamically from runway data, clean custom legend replacing recharts Legend, and compact starting balances row below chart. Exported `buildSummary()` for testability. Kept withdrawal order pills as-is.
+  - `tests/unit/runway-burndown-chart.test.tsx`: Rewrote to 17 tests — updated recharts mocks from AreaChart to LineChart, added tests for summary rendering, legend visibility, tax line legend hiding when no tax drag, starting balances display, LineChart presence (no AreaChart). Added `buildSummary()` unit tests: growth+tax, growth-only, year formatting, fractional years, no-growth/no-tax.
+  - `tests/e2e/runway-burndown-main.spec.ts`: Updated first test to verify summary, legend, and starting balances elements. Updated screenshot filenames.
+  - `src/lib/changelog.ts`: Added v92 changelog entry.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/runway-burndown-chart.test.tsx`: 17 passed, 0 failed (12 component + 5 buildSummary)
+  - All T1 unit tests: 1093 passed, 0 failed
+  - `tests/e2e/runway-burndown-main.spec.ts`: 4 passed, 0 failed
+  - All T2 E2E tests: 265 passed, 0 failed
+- **Screenshots**:
+  ![Simplified burndown chart](screenshots/task-92-runway-burndown-simplified.png)
+  ![Withdrawal order](screenshots/task-92-withdrawal-order.png)
+- **Notes**: Replaced recharts AreaChart+Area with LineChart+Line for clarity. The amber "After withdrawal taxes" line only appears when taxDragMonths > 0 to avoid clutter. The buildSummary function uses fmtDuration to intelligently format months vs years (e.g., "6 mo", "2 yr", "1.5 yr"). Starting balances row shows per-account detail without cluttering the chart itself.

@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Runway Burndown Chart on Main Page", () => {
-  test("renders burndown chart in projections section", async ({ page }) => {
+  test("renders simplified burndown chart with summary, legend, and starting balances", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -13,13 +13,31 @@ test.describe("Runway Burndown Chart on Main Page", () => {
     // Should show "Runway Burndown" title
     await expect(burndownChart.getByText("Runway Burndown")).toBeVisible();
 
+    // Should show plain-English summary
+    const summary = burndownChart.locator('[data-testid="burndown-summary"]');
+    await expect(summary).toBeVisible();
+    const summaryText = await summary.textContent();
+    expect(summaryText).toContain("Your savings could last");
+
+    // Should show clean legend with line descriptions
+    const legend = burndownChart.locator('[data-testid="burndown-legend"]');
+    await expect(legend).toBeVisible();
+    await expect(legend.getByText("With investment growth")).toBeVisible();
+    await expect(legend.getByText("Without growth")).toBeVisible();
+
+    // Should show starting balances
+    const balances = burndownChart.locator('[data-testid="burndown-starting-balances"]');
+    await expect(balances).toBeVisible();
+    const balancesText = await balances.textContent();
+    expect(balancesText).toContain("Starting:");
+
     // Should be inside the projections section
     const projections = page.locator('section#projections');
     await expect(projections).toBeVisible();
     const burndownInProjections = projections.locator('[data-testid="runway-burndown-main"]');
     await expect(burndownInProjections).toBeVisible();
 
-    await captureScreenshot(page, "task-90-runway-burndown-main");
+    await captureScreenshot(page, "task-92-runway-burndown-simplified");
   });
 
   test("shows withdrawal order on main page chart", async ({ page }) => {
@@ -38,7 +56,7 @@ test.describe("Runway Burndown Chart on Main Page", () => {
     const firstEntry = burndownChart.locator('[data-testid="burndown-withdrawal-0"]');
     await expect(firstEntry).toBeVisible();
 
-    await captureScreenshot(page, "task-90-withdrawal-order-main");
+    await captureScreenshot(page, "task-92-withdrawal-order");
   });
 
   test("runway explainer modal shows condensed content with chart note", async ({ page }) => {
@@ -66,8 +84,6 @@ test.describe("Runway Burndown Chart on Main Page", () => {
     // Should still show withdrawal order
     const withdrawalOrder = modal.locator('[data-testid="runway-withdrawal-order"]');
     await expect(withdrawalOrder).toBeVisible();
-
-    await captureScreenshot(page, "task-90-runway-explainer-condensed");
   });
 
   test("burndown chart is wrapped in ZoomableCard", async ({ page }) => {

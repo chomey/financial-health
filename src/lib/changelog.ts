@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Chart Clarity
+  {
+    version: 92,
+    title: "Simplified runway burndown chart",
+    description: "Redesigned the runway burndown chart for clarity. Replaced confusing stacked per-account areas with 2-3 simple lines: solid green for 'With investment growth', dashed gray for 'Without growth', and amber for 'After withdrawal taxes' (only when tax drag > 0). Added milestone markers where each scenario hits $0, a 6-month emergency fund threshold line, a plain-English summary sentence above the chart, a clean legend, and a compact starting balances row below.",
+    date: "2026-03-06",
+  },
   // Tax Treatment Enhancements
   {
     version: 91,

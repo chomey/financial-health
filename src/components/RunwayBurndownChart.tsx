@@ -2,75 +2,146 @@
 
 import { useMemo } from "react";
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
+  ReferenceLine,
 } from "recharts";
 import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
-
-const CATEGORY_COLORS = [
-  "#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ec4899", "#6366f1", "#14b8a6", "#f97316",
-];
 
 function fmt(n: number) {
   return `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 }
 
+function fmtDuration(months: number): string {
+  if (months < 12) return `${Math.round(months)} mo`;
+  const years = months / 12;
+  return years % 1 === 0 ? `${years} yr` : `${years.toFixed(1)} yr`;
+}
+
+export function buildSummary(details: RunwayExplainerDetails): string {
+  const baseMonths = details.runwayMonths;
+  const growthMonths = details.runwayWithGrowthMonths;
+  const taxMonths = details.runwayAfterTaxMonths;
+  const growthExt = details.growthExtensionMonths;
+  const taxDrag = details.taxDragMonths;
+
+  let sentence = `Your savings could last ~${fmtDuration(baseMonths)}.`;
+
+  if (growthExt && growthExt > 0 && taxDrag && taxDrag > 0) {
+    sentence += ` Investment growth adds ~${fmtDuration(growthExt)}, but withdrawal taxes reduce it by ~${fmtDuration(taxDrag)}.`;
+  } else if (growthExt && growthExt > 0) {
+    sentence += ` Investment growth extends this by ~${fmtDuration(growthExt)}.`;
+  } else if (taxDrag && taxDrag > 0 && growthMonths !== undefined) {
+    sentence += ` Withdrawal taxes reduce it by ~${fmtDuration(taxDrag)}.`;
+  }
+
+  // Add the effective runway
+  const effectiveMonths = taxMonths ?? growthMonths ?? baseMonths;
+  if (effectiveMonths !== baseMonths) {
+    sentence += ` Effective runway: ~${fmtDuration(effectiveMonths)}.`;
+  }
+
+  return sentence;
+}
+
 export default function RunwayBurndownChart({ details }: { details: RunwayExplainerDetails }) {
+  const hasTaxData = details.runwayAfterTaxMonths !== undefined;
+  const hasTaxDrag = (details.taxDragMonths ?? 0) > 0;
+
   const chartData = useMemo(() => {
     const maxLen = Math.max(details.withGrowth.length, details.withoutGrowth.length, details.withTax.length);
     const step = maxLen > 300 ? Math.ceil(maxLen / 300) : 1;
-    const data: Record<string, number | string>[] = [];
+    const data: { month: number; withGrowth: number; withoutGrowth: number; withTax: number }[] = [];
 
     for (let i = 0; i < maxLen; i += step) {
       const gPt = details.withGrowth[Math.min(i, details.withGrowth.length - 1)];
       const nPt = details.withoutGrowth[Math.min(i, details.withoutGrowth.length - 1)];
       const tPt = details.withTax[Math.min(i, details.withTax.length - 1)];
 
-      const point: Record<string, number | string> = { month: gPt?.month ?? i };
-      if (gPt) {
-        for (const cat of details.categories) {
-          point[cat] = Math.round(gPt.balances[cat] ?? 0);
-        }
-      }
-      point["_withoutGrowth"] = Math.round(nPt?.totalBalance ?? 0);
-      point["_withTax"] = Math.round(tPt?.totalBalance ?? 0);
-      data.push(point);
+      data.push({
+        month: gPt?.month ?? i,
+        withGrowth: Math.round(gPt?.totalBalance ?? 0),
+        withoutGrowth: Math.round(nPt?.totalBalance ?? 0),
+        withTax: Math.round(tPt?.totalBalance ?? 0),
+      });
     }
     return data;
   }, [details]);
 
-  const hasGrowthData = details.runwayWithGrowthMonths !== undefined;
-  const hasTaxData = details.runwayAfterTaxMonths !== undefined;
+  // Find zero-crossing months for milestone markers
+  const growthZeroMonth = useMemo(() => {
+    for (const pt of chartData) {
+      if (pt.withGrowth <= 0) return pt.month;
+    }
+    return null;
+  }, [chartData]);
+
+  const noGrowthZeroMonth = useMemo(() => {
+    for (const pt of chartData) {
+      if (pt.withoutGrowth <= 0) return pt.month;
+    }
+    return null;
+  }, [chartData]);
+
+  const taxZeroMonth = useMemo(() => {
+    if (!hasTaxData) return null;
+    for (const pt of chartData) {
+      if (pt.withTax <= 0) return pt.month;
+    }
+    return null;
+  }, [chartData, hasTaxData]);
+
+  // 6-month emergency fund threshold
+  const emergencyFundThreshold = details.monthlyTotal * 6;
+
+  // Starting balances per category
+  const startingBalances = useMemo(() => {
+    const first = details.withGrowth[0];
+    if (!first) return [];
+    return details.categories
+      .map(cat => ({ category: cat, balance: first.balances[cat] ?? 0 }))
+      .filter(b => b.balance > 0);
+  }, [details]);
+
+  const summary = useMemo(() => buildSummary(details), [details]);
 
   if (chartData.length <= 1) return null;
 
   return (
     <div data-testid="runway-burndown-main" className="rounded-2xl border border-stone-200 bg-white p-4 sm:p-6">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-1">
         <h3 className="text-sm font-semibold text-stone-700">Runway Burndown</h3>
-        <div className="flex flex-wrap gap-3">
-          {details.growthExtensionMonths !== undefined && details.growthExtensionMonths > 0 && (
-            <p className="text-xs text-green-600 font-medium" data-testid="burndown-growth-extension">
-              +{details.growthExtensionMonths.toFixed(0)} months from growth
-            </p>
-          )}
-          {details.taxDragMonths !== undefined && details.taxDragMonths > 0 && (
-            <p className="text-xs text-amber-600 font-medium" data-testid="burndown-tax-drag">
-              -{details.taxDragMonths.toFixed(0)} months tax drag
-            </p>
-          )}
-        </div>
+      </div>
+
+      {/* Plain-English summary */}
+      <p className="mb-4 text-sm text-stone-600" data-testid="burndown-summary">{summary}</p>
+
+      {/* Clean legend */}
+      <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" data-testid="burndown-legend">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-0.5 w-4 rounded bg-emerald-500" style={{ height: 2 }} />
+          <span className="text-stone-600">With investment growth</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-0.5 w-4 rounded bg-stone-400" style={{ height: 2, borderTop: "2px dashed #9ca3af", background: "none" }} />
+          <span className="text-stone-600">Without growth</span>
+        </span>
+        {hasTaxData && hasTaxDrag && (
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-0.5 w-4 rounded bg-amber-500" style={{ height: 2 }} />
+            <span className="text-stone-600">After withdrawal taxes</span>
+          </span>
+        )}
       </div>
 
       <div className="h-72 sm:h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
             <XAxis
               dataKey="month"
@@ -86,59 +157,98 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
               formatter={(value: any, name: any) => {
                 const v = Number(value) || 0;
                 const n = String(name ?? "");
-                if (n === "_withoutGrowth") return [fmt(v), "Without growth"];
-                if (n === "_withTax") return [fmt(v), "After tax"];
+                if (n === "withGrowth") return [fmt(v), "With growth"];
+                if (n === "withoutGrowth") return [fmt(v), "Without growth"];
+                if (n === "withTax") return [fmt(v), "After taxes"];
                 return [fmt(v), n];
               }}
               labelFormatter={(label: unknown) => `Month ${label}`}
               contentStyle={{ fontSize: 12, borderRadius: 8 }}
             />
-            {details.categories.map((cat, i) => (
-              <Area
-                key={cat}
-                type="monotone"
-                dataKey={cat}
-                stackId="accounts"
-                fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]}
-                stroke={CATEGORY_COLORS[i % CATEGORY_COLORS.length]}
-                fillOpacity={0.6}
+
+            {/* 6-month emergency fund threshold */}
+            {emergencyFundThreshold > 0 && (
+              <ReferenceLine
+                y={emergencyFundThreshold}
+                stroke="#d6d3d1"
+                strokeDasharray="4 4"
                 strokeWidth={1}
-              />
-            ))}
-            {hasGrowthData && (
-              <Area
-                type="monotone"
-                dataKey="_withoutGrowth"
-                fill="none"
-                stroke="#9ca3af"
-                strokeWidth={2}
-                strokeDasharray="6 3"
-                fillOpacity={0}
-                name="_withoutGrowth"
+                label={{ value: "6-mo emergency fund", position: "right", fontSize: 10, fill: "#a8a29e" }}
               />
             )}
-            {hasTaxData && (
-              <Area
+
+            {/* Zero-crossing milestone markers */}
+            {noGrowthZeroMonth !== null && (
+              <ReferenceLine
+                x={noGrowthZeroMonth}
+                stroke="#9ca3af"
+                strokeDasharray="3 3"
+                strokeWidth={1}
+                label={{ value: fmtDuration(noGrowthZeroMonth), position: "top", fontSize: 10, fill: "#78716c" }}
+              />
+            )}
+            {growthZeroMonth !== null && growthZeroMonth !== noGrowthZeroMonth && (
+              <ReferenceLine
+                x={growthZeroMonth}
+                stroke="#10b981"
+                strokeDasharray="3 3"
+                strokeWidth={1}
+                label={{ value: fmtDuration(growthZeroMonth), position: "top", fontSize: 10, fill: "#059669" }}
+              />
+            )}
+            {taxZeroMonth !== null && taxZeroMonth !== growthZeroMonth && taxZeroMonth !== noGrowthZeroMonth && (
+              <ReferenceLine
+                x={taxZeroMonth}
+                stroke="#f59e0b"
+                strokeDasharray="3 3"
+                strokeWidth={1}
+                label={{ value: fmtDuration(taxZeroMonth), position: "top", fontSize: 10, fill: "#d97706" }}
+              />
+            )}
+
+            {/* Main lines */}
+            <Line
+              type="monotone"
+              dataKey="withGrowth"
+              stroke="#10b981"
+              strokeWidth={2.5}
+              dot={false}
+              name="withGrowth"
+            />
+            <Line
+              type="monotone"
+              dataKey="withoutGrowth"
+              stroke="#9ca3af"
+              strokeWidth={2}
+              strokeDasharray="6 3"
+              dot={false}
+              name="withoutGrowth"
+            />
+            {hasTaxData && hasTaxDrag && (
+              <Line
                 type="monotone"
-                dataKey="_withTax"
-                fill="#fef3c7"
+                dataKey="withTax"
                 stroke="#f59e0b"
                 strokeWidth={2}
-                fillOpacity={0.2}
-                name="_withTax"
+                dot={false}
+                name="withTax"
               />
             )}
-            <Legend
-              formatter={(value: string) => {
-                if (value === "_withoutGrowth") return "Without growth";
-                if (value === "_withTax") return "After tax drag";
-                return value;
-              }}
-              wrapperStyle={{ fontSize: 11 }}
-            />
-          </AreaChart>
+          </LineChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Starting balances */}
+      {startingBalances.length > 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs text-stone-500" data-testid="burndown-starting-balances">
+          <span className="font-medium text-stone-600">Starting:</span>
+          {startingBalances.map((b, i) => (
+            <span key={b.category}>
+              {b.category} {fmt(b.balance)}{i < startingBalances.length - 1 ? " ·" : ""}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Withdrawal order */}
       {details.withdrawalOrder.length > 0 && (
