@@ -33,9 +33,9 @@ describe("Milestone 6 E2E test infrastructure", () => {
     expect(content).toContain("taxable");
   });
 
-  it("covers withdrawal tax summary component", () => {
+  it("covers withdrawal tax content in runway explainer", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
-    expect(content).toContain("withdrawal-tax-summary");
+    expect(content).toContain("runway-withdrawal-tax");
   });
 
   it("covers cost basis percent for brokerage accounts", () => {
@@ -45,7 +45,7 @@ describe("Milestone 6 E2E test infrastructure", () => {
 
   it("covers runway with vs without withdrawal tax", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
-    expect(content).toContain("burndown-tax-drag");
+    expect(content).toContain("burndown-summary");
   });
 
   it("covers both CA and US jurisdictions", () => {

@@ -26,30 +26,37 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await captureScreenshot(page, "task-68-default-tax-classification");
 
     // ========================================
-    // Step 2: Verify withdrawal tax summary card is present
+    // Step 2: Verify withdrawal tax content in Financial Runway explainer
     // ========================================
 
-    const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
-    await summary.scrollIntoViewIfNeeded();
-    await expect(summary).toBeVisible();
-    await expect(summary.locator("text=Withdrawal Tax Impact")).toBeVisible();
+    const runwayCard = page.locator('[data-testid="metric-card-financial-runway"]');
+    await runwayCard.scrollIntoViewIfNeeded();
+    await runwayCard.click();
+    const explainerModal = page.locator('[data-testid="explainer-modal"]');
+    await expect(explainerModal).toBeVisible({ timeout: 3000 });
 
-    const dragSummary = page.locator('[data-testid="tax-drag-summary"]');
+    const withdrawalTax = explainerModal.locator('[data-testid="runway-withdrawal-tax"]');
+    await expect(withdrawalTax).toBeVisible();
+    await expect(withdrawalTax.locator("text=Withdrawal Tax Impact")).toBeVisible();
+
+    const dragSummary = explainerModal.locator('[data-testid="runway-tax-drag-summary"]');
     await expect(dragSummary).toBeVisible();
 
     await captureScreenshot(page, "task-68-withdrawal-tax-summary-default");
 
     // ========================================
-    // Step 3: Verify withdrawal tax details are visible by default
+    // Step 3: Verify withdrawal tax details with account groups and withdrawal order
     // ========================================
 
-    const details = page.locator('[data-testid="withdrawal-tax-details"]');
-    await expect(details).toBeVisible();
-    await expect(details.locator("text=Suggested withdrawal order")).toBeVisible();
-    await expect(details.locator("text=Tax-free")).toBeVisible();
-    await expect(details.locator("text=Tax-deferred")).toBeVisible();
+    const accountGroups = explainerModal.locator('[data-testid="runway-tax-account-groups"]');
+    await expect(accountGroups).toBeVisible();
+    await expect(accountGroups.locator("text=Tax-free")).toBeVisible();
+    await expect(accountGroups.locator("text=Tax-deferred")).toBeVisible();
+    await expect(withdrawalTax.locator("text=Suggested Withdrawal Order")).toBeVisible();
 
     await captureScreenshot(page, "task-68-withdrawal-tax-details-expanded");
+    await page.keyboard.press("Escape");
+    await expect(explainerModal).not.toBeVisible({ timeout: 3000 });
 
     // ========================================
     // Step 4: Increase RRSP to make tax drag significant on runway
@@ -153,12 +160,7 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     const reloadedGains = page.locator('[data-testid^="unrealized-gains-"]').last();
     await expect(reloadedGains).toContainText("$40,000 unrealized gains");
 
-    // Withdrawal tax summary should still be visible
-    const summaryReloaded = page.locator('[data-testid="withdrawal-tax-summary"]');
-    await summaryReloaded.scrollIntoViewIfNeeded();
-    await expect(summaryReloaded).toBeVisible();
-
-    // Tax drag is now in the explainer modal — verify the runway card still exists
+    // Financial Runway card should still exist
     const runwayCardReloaded = page.locator('[aria-label="Financial Runway"]');
     await expect(runwayCardReloaded).toBeVisible();
 
@@ -255,18 +257,22 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     const usBurndownSummary = page.locator('[data-testid="burndown-summary"]');
     await expect(usBurndownSummary).toBeVisible({ timeout: 5000 });
 
-    // Withdrawal tax summary should show US tax treatments
-    const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
-    await summary.scrollIntoViewIfNeeded();
-    await expect(summary).toBeVisible();
+    // Withdrawal tax content should be in Financial Runway explainer
+    const usRunwayCard = page.locator('[data-testid="metric-card-financial-runway"]');
+    await usRunwayCard.scrollIntoViewIfNeeded();
+    await usRunwayCard.click();
+    const usModal = page.locator('[data-testid="explainer-modal"]');
+    await expect(usModal).toBeVisible({ timeout: 3000 });
 
-    // Details should be visible by default (no toggle)
-    const taxDetails = page.locator('[data-testid="withdrawal-tax-details"]');
-    await expect(taxDetails).toBeVisible();
-    await expect(taxDetails.locator("text=Tax-free")).toBeVisible();
-    await expect(taxDetails.locator("text=Tax-deferred")).toBeVisible();
+    const usWithdrawalTax = usModal.locator('[data-testid="runway-withdrawal-tax"]');
+    await expect(usWithdrawalTax).toBeVisible();
+    const usAccountGroups = usModal.locator('[data-testid="runway-tax-account-groups"]');
+    await expect(usAccountGroups).toBeVisible();
+    await expect(usAccountGroups.locator("text=Tax-free")).toBeVisible();
+    await expect(usAccountGroups.locator("text=Tax-deferred")).toBeVisible();
 
     await captureScreenshot(page, "task-68-us-withdrawal-tax-details");
+    await page.keyboard.press("Escape");
 
     // Verify URL persistence with US jurisdiction
     await page.waitForFunction(() => window.location.search.includes("s="));
@@ -320,12 +326,16 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
 
     await captureScreenshot(page, "task-68-projection-drawdown-tax-drag");
 
-    // Withdrawal tax summary should show high tax drag in drawdown
-    const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
-    await summary.scrollIntoViewIfNeeded();
-    await expect(summary).toBeVisible();
+    // Withdrawal tax content should be in Financial Runway explainer
+    const drawdownRunwayCard = page.locator('[data-testid="metric-card-financial-runway"]');
+    await drawdownRunwayCard.scrollIntoViewIfNeeded();
+    await drawdownRunwayCard.click();
+    const drawdownModal = page.locator('[data-testid="explainer-modal"]');
+    await expect(drawdownModal).toBeVisible({ timeout: 3000 });
+    await expect(drawdownModal.locator('[data-testid="runway-withdrawal-tax"]')).toBeVisible();
 
     await captureScreenshot(page, "task-68-drawdown-withdrawal-tax-summary");
+    await page.keyboard.press("Escape");
   });
 
   test("withdrawal order recommendation shows optimal tax ordering", async ({ page }) => {
@@ -343,22 +353,26 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await page.click('[aria-label="Confirm add asset"]');
     await page.waitForTimeout(1500);
 
-    // Withdrawal tax details should be visible by default
-    const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
-    await summary.scrollIntoViewIfNeeded();
-    await expect(summary).toBeVisible();
+    // Open Financial Runway explainer to see withdrawal tax details
+    const orderRunwayCard = page.locator('[data-testid="metric-card-financial-runway"]');
+    await orderRunwayCard.scrollIntoViewIfNeeded();
+    await orderRunwayCard.click();
+    const orderModal = page.locator('[data-testid="explainer-modal"]');
+    await expect(orderModal).toBeVisible({ timeout: 3000 });
 
-    const taxDetails2 = page.locator('[data-testid="withdrawal-tax-details"]');
-    await expect(taxDetails2).toBeVisible();
+    const orderWithdrawalTax = orderModal.locator('[data-testid="runway-withdrawal-tax"]');
+    await expect(orderWithdrawalTax).toBeVisible();
 
     // Should show suggested withdrawal order
-    await expect(taxDetails2.locator("text=Suggested withdrawal order")).toBeVisible();
+    await expect(orderWithdrawalTax.locator("text=Suggested Withdrawal Order")).toBeVisible();
 
     // All three treatments should be listed
-    await expect(taxDetails2.locator("text=Tax-free")).toBeVisible();
-    await expect(taxDetails2.locator("text=Taxable")).toBeVisible();
-    await expect(taxDetails2.locator("text=Tax-deferred")).toBeVisible();
+    const orderAccountGroups = orderModal.locator('[data-testid="runway-tax-account-groups"]');
+    await expect(orderAccountGroups.locator("text=Tax-free")).toBeVisible();
+    await expect(orderAccountGroups.locator("text=Taxable")).toBeVisible();
+    await expect(orderAccountGroups.locator("text=Tax-deferred")).toBeVisible();
 
     await captureScreenshot(page, "task-68-withdrawal-order-all-three-types");
+    await page.keyboard.press("Escape");
   });
 });

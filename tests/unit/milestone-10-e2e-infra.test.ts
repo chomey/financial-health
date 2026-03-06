@@ -27,11 +27,10 @@ describe("Milestone 10 E2E test infrastructure — Explainer & Tax Treatment Enh
     );
   });
 
-  it("covers withdrawal tax auto-expanded details", () => {
+  it("covers withdrawal tax content in runway explainer", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
-    expect(content).toContain("withdrawal-tax-summary");
-    expect(content).toContain("withdrawal-tax-details");
-    expect(content).toContain("Suggested withdrawal order");
+    expect(content).toContain("runway-withdrawal-tax");
+    expect(content).toContain("Suggested Withdrawal Order");
     expect(content).toContain("withdrawal-order-disclaimer");
   });
 

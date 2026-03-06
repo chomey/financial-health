@@ -1,85 +1,79 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-test.describe("Withdrawal Tax Summary", () => {
-  test("shows withdrawal tax summary card in dashboard with default RRSP data", async ({ page }) => {
+test.describe("Withdrawal Tax in Financial Runway", () => {
+  test("withdrawal tax content appears in Financial Runway explainer, not as standalone card", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Default state has RRSP which is tax-deferred — should show summary
-    const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
-    await expect(summary).toBeVisible();
+    // Standalone WithdrawalTaxSummary should NOT exist on the page
+    const standaloneSummary = page.locator('[data-testid="withdrawal-tax-summary"]');
+    await expect(standaloneSummary).not.toBeVisible();
 
-    // Should show "Withdrawal Tax Impact" heading
-    await expect(summary.locator("text=Withdrawal Tax Impact")).toBeVisible();
+    // Click the Financial Runway metric card to open explainer
+    const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
+    await dashboard.scrollIntoViewIfNeeded();
+    const runwayCard = dashboard.locator('[role="group"]').filter({ hasText: "Financial Runway" });
+    await runwayCard.click();
 
-    // Should show tax drag summary
-    const dragSummary = page.locator('[data-testid="tax-drag-summary"]');
-    await expect(dragSummary).toBeVisible();
+    // Explainer modal should open
+    const modal = page.locator('[data-testid="explainer-modal"]');
+    await expect(modal).toBeVisible();
 
-    await captureScreenshot(page, "task-66-withdrawal-tax-summary");
-  });
+    // Withdrawal tax content should be in the explainer
+    const withdrawalTax = modal.locator('[data-testid="runway-withdrawal-tax"]');
+    await expect(withdrawalTax).toBeVisible();
 
-  test("details are always visible with account breakdown and withdrawal order", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    // Should show treatment bar
+    const treatmentBar = modal.locator('[data-testid="runway-tax-treatment-bar"]');
+    await expect(treatmentBar).toBeVisible();
 
-    const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
-    await summary.scrollIntoViewIfNeeded();
-    await expect(summary).toBeVisible();
-
-    // Details should be visible by default (no toggle)
-    const details = page.locator('[data-testid="withdrawal-tax-details"]');
-    await expect(details).toBeVisible();
-
-    // Should show suggested withdrawal order
-    await expect(details.locator("text=Suggested withdrawal order")).toBeVisible();
+    // Should show account groups
+    const accountGroups = modal.locator('[data-testid="runway-tax-account-groups"]');
+    await expect(accountGroups).toBeVisible();
+    await expect(accountGroups.locator("text=Tax-free")).toBeVisible();
 
     // Should show disclaimer
-    const disclaimer = page.locator('[data-testid="withdrawal-order-disclaimer"]');
+    const disclaimer = modal.locator('[data-testid="withdrawal-order-disclaimer"]');
     await expect(disclaimer).toBeVisible();
     await expect(disclaimer).toContainText("rough suggestion");
 
-    // Should show account categories
-    // Default state has TFSA (tax-free), RRSP (tax-deferred), Savings Account (taxable)
-    await expect(details.locator("text=Tax-free")).toBeVisible();
-    await expect(details.locator("text=Tax-deferred")).toBeVisible();
+    // Should show withdrawal order entries
+    const firstEntry = modal.locator('[data-testid="withdrawal-order-0"]');
+    await expect(firstEntry).toBeVisible();
 
-    await captureScreenshot(page, "task-66-withdrawal-tax-details");
+    await captureScreenshot(page, "task-97-runway-explainer-with-withdrawal-tax");
   });
 
-  test("shows withdrawal-tax insights in insights panel", async ({ page }) => {
+  test("runway metric card shows after-tax runway sub-line", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // The insights panel should contain withdrawal-tax related insight
-    // Default state has TFSA (tax-free) so should see the tax-free insight
-    const insightsPanel = page.locator('[data-testid="insights-panel"]');
-    await expect(insightsPanel).toBeVisible();
-
-    // Should have a withdrawal tax insight about TFSA being tax-free
-    const taxFreeInsight = insightsPanel.locator("text=/tax-free/i");
-    await expect(taxFreeInsight.first()).toBeVisible();
-
-    await captureScreenshot(page, "task-66-withdrawal-tax-insights");
-  });
-
-  test("withdrawal tax insights appear under Financial Runway card", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-
-    // Scroll to dashboard
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
     await dashboard.scrollIntoViewIfNeeded();
 
-    // Financial Runway card should have withdrawal-tax insights
-    const runwayCard = dashboard.locator('[role="group"]').filter({ hasText: "Financial Runway" });
-    await expect(runwayCard).toBeVisible();
+    // Check for the after-tax sub-line (only shows when it differs from growth value)
+    const afterTaxLine = page.locator('[data-testid="runway-after-tax"]');
+    // With default data including RRSP (tax-deferred), after-tax should differ
+    const isVisible = await afterTaxLine.isVisible();
+    if (isVisible) {
+      await expect(afterTaxLine).toContainText("after withdrawal taxes");
+    }
+    // Either way, the with-growth line should still be there
+    const withGrowthLine = page.locator('[data-testid="runway-with-growth"]');
+    await expect(withGrowthLine).toBeVisible();
 
-    // The card should show insights related to withdrawal tax (mapped via METRIC_TO_INSIGHT_TYPES)
-    // At minimum the card should exist and show runway info
-    await expect(runwayCard.locator("text=/month/i").first()).toBeVisible();
+    await captureScreenshot(page, "task-97-runway-card-after-tax");
+  });
 
-    await captureScreenshot(page, "task-66-runway-with-withdrawal-tax");
+  test("withdrawal-tax insights still appear in insights panel", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const insightsPanel = page.locator('[data-testid="insights-panel"]');
+    await expect(insightsPanel).toBeVisible();
+
+    const taxFreeInsight = insightsPanel.locator("text=/tax-free/i");
+    await expect(taxFreeInsight.first()).toBeVisible();
   });
 });

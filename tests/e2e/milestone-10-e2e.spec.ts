@@ -2,39 +2,43 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96)", () => {
-  test.describe("1. Withdrawal Tax Impact card auto-expanded", () => {
-    test("shows details without toggle, 'Suggested' label, and disclaimer", async ({
+  test.describe("1. Withdrawal Tax Impact in Financial Runway explainer", () => {
+    test("shows withdrawal tax content in runway explainer with 'Suggested' label and disclaimer", async ({
       page,
     }) => {
       test.setTimeout(60000);
       await page.goto("/");
       await page.waitForLoadState("networkidle");
 
-      const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
-      await summary.scrollIntoViewIfNeeded();
-      await expect(summary).toBeVisible();
+      // Standalone card should NOT exist
+      await expect(page.locator('[data-testid="withdrawal-tax-summary"]')).not.toBeVisible();
 
-      // Details visible by default (no toggle button)
-      const details = page.locator('[data-testid="withdrawal-tax-details"]');
-      await expect(details).toBeVisible();
+      // Open Financial Runway explainer
+      const runwayCard = page.locator('[data-testid="metric-card-financial-runway"]');
+      await runwayCard.scrollIntoViewIfNeeded();
+      await runwayCard.click();
 
-      // No "Show details" or "Hide details" toggle
-      await expect(summary.locator("text=Show details")).not.toBeVisible();
-      await expect(summary.locator("text=Hide details")).not.toBeVisible();
+      const modal = page.locator('[data-testid="explainer-modal"]');
+      await expect(modal).toBeVisible({ timeout: 3000 });
+
+      // Withdrawal tax content visible in explainer
+      const withdrawalTax = modal.locator('[data-testid="runway-withdrawal-tax"]');
+      await expect(withdrawalTax).toBeVisible();
 
       // Withdrawal order labeled "Suggested"
       await expect(
-        details.locator("text=Suggested withdrawal order")
+        withdrawalTax.locator("text=Suggested Withdrawal Order")
       ).toBeVisible();
 
       // Disclaimer text visible
-      const disclaimer = page.locator(
+      const disclaimer = modal.locator(
         '[data-testid="withdrawal-order-disclaimer"]'
       );
       await expect(disclaimer).toBeVisible();
       await expect(disclaimer).toContainText("rough suggestion");
 
       await captureScreenshot(page, "task-96-withdrawal-tax-auto-expanded");
+      await page.keyboard.press("Escape");
     });
   });
 
@@ -391,15 +395,19 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
       await page.goto("/");
       await page.waitForLoadState("networkidle");
 
-      // Step 1: Verify withdrawal tax details auto-expanded
-      const withdrawalSummary = page.locator(
-        '[data-testid="withdrawal-tax-summary"]'
+      // Step 1: Verify withdrawal tax content in Financial Runway explainer
+      const runwayCardStep1 = page.locator(
+        '[data-testid="metric-card-financial-runway"]'
       );
-      await withdrawalSummary.scrollIntoViewIfNeeded();
-      await expect(withdrawalSummary).toBeVisible();
+      await runwayCardStep1.scrollIntoViewIfNeeded();
+      await runwayCardStep1.click();
+      let modalStep1 = page.locator('[data-testid="explainer-modal"]');
+      await expect(modalStep1).toBeVisible({ timeout: 3000 });
       await expect(
-        page.locator('[data-testid="withdrawal-tax-details"]')
+        modalStep1.locator('[data-testid="runway-withdrawal-tax"]')
       ).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(modalStep1).not.toBeVisible({ timeout: 3000 });
 
       // Step 2: Verify runway burndown on main page
       const burndown = page.locator('[data-testid="runway-burndown-main"]');
