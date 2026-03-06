@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 96
-- **Completed**: 96
-- **Remaining**: 0
+- **Total Tasks**: 97
+- **Completed**: 97
+- **Remaining**: 1
 - **Last Updated**: 2026-03-06
 
 ---
@@ -2066,3 +2066,24 @@
   ![Scrollable source cards](screenshots/task-96-scrollable-source-cards.png)
   ![Full journey complete](screenshots/task-96-full-journey-complete.png)
 - **Notes**: All 96 tasks are now complete. This milestone covers the explainer and tax treatment enhancements from tasks 83-96, validating withdrawal tax auto-expand, $0 income tax explainer, runway burndown on main page, tax bracket visualization, ROI tax treatment toggle, scrollable source cards, and modal close mechanisms. The full E2E suite (283 tests) passes across all milestone test files.
+
+## Task 96: Show both federal and provincial/state bracket tables in tax explainer
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Added `provincialBrackets`, `federalBasicPersonalAmount`, `provincialBasicPersonalAmount` to `TaxExplainerDetails` interface. Created reusable `BracketTable` component with range/rate/tax-amount columns. `TaxExplainerContent` now renders both federal and provincial/state bracket tables with subtotals. Zero-income mode shows "—" for tax amounts.
+  - `src/lib/financial-state.ts`: `buildTaxExplainerDetails` now computes provincial/state bracket segments using `getCanadianBrackets`/`getUSBrackets` and returns them alongside federal brackets. Both zero-income and income paths include provincial data.
+  - `src/lib/changelog.ts`: Added version 97 entry for dual bracket tables.
+  - `tests/unit/tax-explainer.test.tsx`: Added 12 new tests for dual bracket table rendering, subtotals, provincial brackets integration, and zero-income provincial brackets.
+  - `tests/e2e/tax-explainer.spec.ts`: Updated test ID references from old `tax-bracket-reference` to new `tax-federal-brackets-table`.
+  - `tests/e2e/milestone-10-e2e.spec.ts`: Updated test ID references.
+  - `tests/unit/milestone-10-e2e-infra.test.ts`: Updated test ID references.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/tax-explainer.test.tsx`: 45 tests passed (12 new for dual bracket tables)
+  - All 71 unit test files: 1184 passed, 0 failed
+  - `tests/e2e/tax-explainer.spec.ts`: 9 passed, 0 failed
+- **Screenshots**:
+  ![Tax explainer with dual bracket tables](screenshots/task-84-tax-explainer.png)
+  ![Zero income bracket reference](screenshots/task-89-tax-explainer-zero-income.png)
+- **Notes**: The bracket reference table for zero-income was replaced with the same BracketTable component used for income > 0, showing "—" in the tax amount column. Test IDs updated from `tax-bracket-reference`/`tax-bracket-ref-*` to `tax-federal-brackets-table`/`tax-federal-brackets-row-*`.

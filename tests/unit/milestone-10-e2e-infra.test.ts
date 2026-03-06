@@ -38,7 +38,7 @@ describe("Milestone 10 E2E test infrastructure — Explainer & Tax Treatment Enh
   it("covers $0 income tax explainer", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
     expect(content).toContain("tax-zero-income-message");
-    expect(content).toContain("tax-bracket-reference");
+    expect(content).toContain("tax-federal-brackets-table");
     expect(content).toContain("CA$0");
     expect(content).toContain("No income entered");
   });
