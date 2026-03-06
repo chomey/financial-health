@@ -103,6 +103,7 @@ interface CompactAsset {
   st?: 1; // surplusTarget
   cu?: string; // currency override (omitted when home currency)
   cb?: number; // costBasisPercent (0-100, omitted when 100/default)
+  tt?: string; // taxTreatment override ("tax-free" | "tax-deferred" | "taxable", omitted when auto-detected)
 }
 interface CompactDebt {
   c: string;
@@ -168,6 +169,7 @@ function toCompact(state: FinancialState): CompactState {
       if (x.surplusTarget) ca.st = 1;
       if (x.currency && x.currency !== homeCurrency) ca.cu = x.currency;
       if (x.costBasisPercent !== undefined && x.costBasisPercent < 100) ca.cb = x.costBasisPercent;
+      if (x.taxTreatment) ca.tt = x.taxTreatment;
       return ca;
     }),
     d: state.debts.map((x) => {
@@ -224,13 +226,14 @@ function fromCompact(compact: CompactState): FinancialState {
   return {
     assets: (() => {
       const assets = compact.a.map((x, i) => {
-        const asset: { id: string; category: string; amount: number; roi?: number; roiTaxTreatment?: import("@/components/AssetEntry").RoiTaxTreatment; monthlyContribution?: number; surplusTarget?: boolean; currency?: SupportedCurrency; costBasisPercent?: number } = { id: `a${i + 1}`, category: x.c, amount: x.a };
+        const asset: { id: string; category: string; amount: number; roi?: number; roiTaxTreatment?: import("@/components/AssetEntry").RoiTaxTreatment; monthlyContribution?: number; surplusTarget?: boolean; currency?: SupportedCurrency; costBasisPercent?: number; taxTreatment?: import("@/lib/withdrawal-tax").TaxTreatment } = { id: `a${i + 1}`, category: x.c, amount: x.a };
         if (x.r !== undefined) asset.roi = x.r;
         if (x.rt) asset.roiTaxTreatment = x.rt as import("@/components/AssetEntry").RoiTaxTreatment;
         if (x.m !== undefined) asset.monthlyContribution = x.m;
         if (x.st) asset.surplusTarget = true;
         if (x.cu) asset.currency = x.cu as SupportedCurrency;
         if (x.cb !== undefined) asset.costBasisPercent = x.cb;
+        if (x.tt) asset.taxTreatment = x.tt as import("@/lib/withdrawal-tax").TaxTreatment;
         return asset;
       });
       // Ensure exactly one asset is the surplus target — but not if a computed asset owns it (sr field)

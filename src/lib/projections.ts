@@ -70,7 +70,7 @@ export function projectFinances(
     balance: toHome(a.amount, a.currency),
     monthlyROI: ((a.roi ?? getDefaultRoi(a.category) ?? 0) * multiplier) / 100 / 12,
     monthlyContribution: toHome(a.monthlyContribution ?? 0, a.currency) * multiplier,
-    taxTreatment: getTaxTreatment(a.category),
+    taxTreatment: getTaxTreatment(a.category, a.taxTreatment),
     category: a.category,
     costBasisPercent: a.costBasisPercent ?? 100,
   }));

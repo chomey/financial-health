@@ -638,7 +638,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
           balance: asset.amount,
           ror: asset.roi ?? getDefaultRoi(asset.category) ?? 0,
           category: asset.category,
-          taxTreatment: getTaxTreatment(asset.category),
+          taxTreatment: getTaxTreatment(asset.category, asset.taxTreatment),
           costBasisPercent: asset.costBasisPercent ?? 100,
           roiTaxTreatment: asset.roiTaxTreatment,
         });
@@ -651,7 +651,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
           balance: asset.amount,
           ror: asset.roi ?? 0,
           category: asset.category,
-          taxTreatment: getTaxTreatment(asset.category),
+          taxTreatment: getTaxTreatment(asset.category, asset.taxTreatment),
           costBasisPercent: asset.costBasisPercent ?? 100,
           roiTaxTreatment: asset.roiTaxTreatment,
         });
@@ -848,7 +848,7 @@ export function computeWithdrawalTaxSummary(
 
   for (const asset of allAssets) {
     if (asset.amount <= 0) continue;
-    const treatment = getTaxTreatment(asset.category);
+    const treatment = getTaxTreatment(asset.category, asset.taxTreatment);
     const bucket = treatment === "tax-free" ? taxFree : treatment === "tax-deferred" ? taxDeferred : taxable;
     bucket.total += asset.amount;
     if (!bucket.categories.includes(asset.category)) {
@@ -879,7 +879,7 @@ export function computeWithdrawalTaxSummary(
       .map((a) => ({
         balance: a.amount,
         monthlyRate: (a.roi ?? getDefaultRoi(a.category) ?? 0) / 100 / 12,
-        taxTreatment: getTaxTreatment(a.category),
+        taxTreatment: getTaxTreatment(a.category, a.taxTreatment),
         category: a.category,
         costBasisPercent: a.costBasisPercent ?? 100,
         roiTaxTreatment: a.roiTaxTreatment,

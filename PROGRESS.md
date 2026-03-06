@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 93
-- **Completed**: 93
-- **Remaining**: 1
+- **Total Tasks**: 96
+- **Completed**: 94
+- **Remaining**: 2
 - **Last Updated**: 2026-03-06
 
 ---
@@ -1999,3 +1999,26 @@
   ![Roth 401k added](screenshots/task-93-roth-401k-added.png)
   ![Roth 401k ROI no tax toggle](screenshots/task-93-roth-401k-roi-no-tax-toggle.png)
 - **Notes**: Simple lookup table additions. "Roth 401k" is classified as tax-free (like Roth IRA) since qualified withdrawals are not taxed. ROI tax treatment toggle is hidden for tax-sheltered accounts. Pre-existing test failure in changelog.test.ts was fixed in a separate commit.
+
+## Task 94: Smart tax treatment classification with keyword matching and user override
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/lib/withdrawal-tax.ts`: Replaced exact-match `TAX_TREATMENT_MAP` with keyword-based `classifyTaxTreatment()`. Tax-free keywords (tfsa, roth, hsa, fhsa, tax-free, tax free) checked first so "Roth 401k" → tax-free. Tax-deferred keywords (rrsp, 401k, ira, lira, resp, 529, pension, retirement). Unknown defaults to taxable. Added optional `override` parameter to `getTaxTreatment()`.
+  - `src/components/AssetEntry.tsx`: Added `taxTreatment` optional field to `Asset` interface. Added colored pill UI (green=tax-free, rose=tax-deferred, amber=taxable) on each asset row — auto-detected by keyword match, clickable to cycle through treatments. Override shown with "*" indicator. Updated `shouldShowRoiTaxToggle()` to accept optional override. Updated all inline `getTaxTreatment()` calls to pass override.
+  - `src/lib/financial-state.ts`: Updated all `getTaxTreatment(asset.category)` calls to pass `asset.taxTreatment` override in computeMetrics, computeWithdrawalTaxSummary.
+  - `src/lib/projections.ts`: Updated `getTaxTreatment()` call to pass `asset.taxTreatment` override.
+  - `src/lib/url-state.ts`: Added `tt` field to `CompactAsset` for persisting taxTreatment override. Updated `toCompact`/`fromCompact` to serialize/deserialize.
+  - `src/lib/changelog.ts`: Added entry for task 94.
+  - `tests/unit/withdrawal-tax.test.ts`: Updated FHSA from tax-deferred to tax-free (correct per keyword matching — FHSA withdrawals for qualifying purchases are tax-free).
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/tax-treatment-keywords.test.ts`: 52 tests — keyword matching (tax-free, tax-deferred, taxable, roth priority, case insensitivity), override parameter, URL state roundtrip. All 52 passed, 0 failed.
+  - `tests/e2e/tax-treatment-pills.spec.ts`: 4 tests — auto-detected pills on default assets, click-to-cycle with override indicator, keyword-matched custom accounts, URL persistence. All 4 passed, 0 failed.
+  - All T1 unit tests: 1154 passed, 0 failed
+  - All E2E tests: 270 passed, 0 failed
+- **Screenshots**:
+  ![Tax treatment pills default](screenshots/task-94-tax-treatment-pills-default.png)
+  ![Tax treatment pill cycled](screenshots/task-94-tax-treatment-pill-cycled.png)
+  ![Keyword matched custom account](screenshots/task-94-keyword-matched-custom-account.png)
+- **Notes**: FHSA was reclassified from tax-deferred to tax-free. The keyword-based approach correctly identifies it via the "fhsa" keyword in the tax-free list, matching its treatment in `TAX_SHELTERED_CATEGORIES`. Custom account names like "BP 401k", "Company RRSP", "Fidelity Roth" are now correctly classified without exact name matches.
