@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 82
-- **Completed**: 81
-- **Remaining**: 1
+- **Completed**: 82
+- **Remaining**: 0
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1759,3 +1759,28 @@
   ![Whiteboard result with count-up](screenshots/task-81-whiteboard-result.png)
   ![Monthly Surplus whiteboard layout](screenshots/task-81-whiteboard-surplus.png)
 - **Notes**: The sequenced animation creates a satisfying reveal effect: source cards slide in first, then ovals draw on, then connector lines draw down with arrowheads, operators pop in, the sum bar draws across, and finally the result value counts up from zero. ConnectorLine uses vertical hand-drawn paths with SVG marker arrowheads. CountUpValue parses the formatted dollar string, counts up using requestAnimationFrame with ease-out quad easing, and snaps to the exact formatted value at the end. Oval opacity tuned from 0.6 to 0.7 per task spec.
+
+## Task 82: [MILESTONE] E2E test for whiteboard explainer modal
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `tests/e2e/milestone-9-e2e.spec.ts`: **New** — Comprehensive milestone E2E test suite with 19 tests covering all five metric explainer modals (Net Worth, Monthly Surplus, Estimated Tax, Financial Runway, Debt-to-Asset Ratio), source summary card verification with items and totals, insight card interaction, three close mechanisms (Escape, X button, backdrop click), entrance animation classes, hand-drawn SVG annotations (ovals with opacity 0.7, connector lines with arrowhead markers, sum bar with round stroke linecap/linejoin), arithmetic layout with operators and result, mobile behavior at 375px (scrollable, full-width), keyboard navigation (Tab within modal, Enter to open, Escape to close), cursor pointer hint on metric cards, and a full multi-step journey test across all metrics.
+  - `tests/unit/milestone-9-e2e-infra.test.ts`: **New** — 17 T1 unit tests verifying the milestone E2E test file structure: existence, imports, coverage of all five metrics, source summary card verification, SVG annotation testing, arithmetic layout, close mechanisms, insight cards, mobile behavior, keyboard navigation, animations, test count, screenshot capture, feature test file existence, DataFlowArrows module exports, and multi-step journey test.
+  - `src/lib/changelog.ts`: Added v82 changelog entry.
+  - `tests/unit/changelog.test.ts`: Updated expectations to 82 entries (fixed pre-existing failure from 80→81 in separate commit, then 81→82 for this task).
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/milestone-9-e2e-infra.test.ts`: 17 passed, 0 failed
+  - `tests/e2e/milestone-9-e2e.spec.ts`: 19 passed, 0 failed
+  - All T1 unit tests: 1012 passed, 0 failed (63 test files)
+  - All T2/T3 E2E tests: 247 passed, 0 failed
+- **Screenshots**:
+  ![Net Worth explainer](screenshots/task-82-net-worth-explainer.png)
+  ![Monthly Surplus explainer](screenshots/task-82-monthly-surplus-explainer.png)
+  ![Estimated Tax explainer](screenshots/task-82-estimated-tax-explainer.png)
+  ![Financial Runway explainer](screenshots/task-82-financial-runway-explainer.png)
+  ![Debt-to-Asset Ratio explainer](screenshots/task-82-debt-to-asset-explainer.png)
+  ![Insight card explainer](screenshots/task-82-insight-card-explainer.png)
+  ![Mobile explainer at 375px](screenshots/task-82-mobile-explainer.png)
+  ![Full journey complete](screenshots/task-82-full-journey-complete.png)
+- **Notes**: Fixed pre-existing changelog test failure (task 81 added v81 entry but tests expected 80 entries; committed fix separately). All 82 tasks are now complete. The whiteboard explainer modal milestone (tasks 79-82) is fully covered with unit tests, E2E tests, and screenshots. The full E2E suite (247 tests) passes across all milestone test files.
