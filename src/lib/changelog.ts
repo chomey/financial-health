@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // UI Polish (Milestone 12)
   {
+    version: 90,
+    title: "Runway burndown chart moved to main page",
+    description: "The runway burndown chart (stacked area chart showing account drawdown over time) has been moved from the Financial Runway explainer modal to the main page as a full-width section below the Projection Chart. The chart is wrapped in ZoomableCard for fullscreen viewing. The explainer modal now shows a condensed summary with monthly obligations, withdrawal order, and a note pointing to the main page chart.",
+    date: "2026-03-06",
+  },
+  {
     version: 89,
     title: "Estimated Tax card click-to-explain when tax is $0",
     description: "Clicking the Estimated Tax metric card now opens the explainer even when income is $0. Shows the jurisdiction's federal tax bracket structure for reference with a friendly message prompting users to add income. Bracket rates and ranges are displayed as a reference table, with 0% effective and marginal rates.",

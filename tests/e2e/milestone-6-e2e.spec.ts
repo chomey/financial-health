@@ -14,13 +14,13 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     // ========================================
 
     // TFSA should NOT show cost basis badge (tax-free)
-    const tfsaItem = page.getByRole("listitem").filter({ hasText: "TFSA" });
+    const tfsaItem = page.locator('#assets').getByRole("listitem").filter({ hasText: "TFSA" });
     await expect(tfsaItem).toBeVisible();
     const tfsaCostBasis = tfsaItem.locator('[data-testid^="cost-basis-badge-"]');
     await expect(tfsaCostBasis).toHaveCount(0);
 
     // Savings Account IS taxable but small amount — cost basis badge should be visible
-    const savingsItem = page.getByRole("listitem").filter({ hasText: "Savings Account" });
+    const savingsItem = page.locator('#assets').getByRole("listitem").filter({ hasText: "Savings Account" });
     await expect(savingsItem).toBeVisible();
 
     await captureScreenshot(page, "task-68-default-tax-classification");
@@ -62,18 +62,11 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await rrspInput.press("Enter");
     await page.waitForTimeout(1500);
 
-    // Tax drag is now shown in the runway explainer modal (not as a sub-line)
-    const runwayCard = page.locator('[aria-label="Financial Runway"]');
-    await runwayCard.click();
-    const modal = page.locator('[data-testid="explainer-modal"]');
-    await expect(modal).toBeVisible();
-    const taxDrag = page.locator('[data-testid="runway-tax-drag"]');
+    // Tax drag annotation is now on the main page burndown chart
+    const taxDrag = page.locator('[data-testid="burndown-tax-drag"]');
     await expect(taxDrag).toBeVisible({ timeout: 5000 });
     const taxDragText = await taxDrag.textContent();
-    expect(taxDragText).toContain("Tax drag:");
-    // Close modal
-    await page.keyboard.press("Escape");
-    await expect(modal).not.toBeVisible({ timeout: 1000 });
+    expect(taxDragText).toContain("months tax drag");
 
     await captureScreenshot(page, "task-68-runway-after-tax-rrsp-heavy");
 
@@ -149,7 +142,7 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await page.waitForTimeout(1500);
 
     // RRSP should still be $200,000
-    const rrspAfterReload = page.getByRole("listitem").filter({ hasText: "RRSP" });
+    const rrspAfterReload = page.locator('#assets').getByRole("listitem").filter({ hasText: "RRSP" });
     await expect(rrspAfterReload).toContainText("$200,000");
 
     // Brokerage should still show 60% cost basis
@@ -179,24 +172,19 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await page.waitForLoadState("networkidle");
 
     // Delete RRSP (tax-deferred) and Savings Account (taxable)
-    const rrspRow = page.getByRole("listitem").filter({ hasText: "RRSP" });
+    const rrspRow = page.locator('#assets').getByRole("listitem").filter({ hasText: "RRSP" });
     await rrspRow.hover();
     await page.getByLabel("Delete RRSP").click();
     await page.waitForTimeout(300);
 
-    const savingsRow = page.getByRole("listitem").filter({ hasText: "Savings Account" });
+    const savingsRow = page.locator('#assets').getByRole("listitem").filter({ hasText: "Savings Account" });
     await savingsRow.hover();
     await page.getByLabel("Delete Savings Account").click();
     await page.waitForTimeout(1500);
 
-    // Only TFSA (tax-free) remains — open explainer and verify no tax drag
-    const runwayCardTaxFree = page.locator('[aria-label="Financial Runway"]');
-    await runwayCardTaxFree.click();
-    const modalTaxFree = page.locator('[data-testid="explainer-modal"]');
-    await expect(modalTaxFree).toBeVisible();
-    const taxDragTaxFree = page.locator('[data-testid="runway-tax-drag"]');
+    // Only TFSA (tax-free) remains — no tax drag annotation on main page
+    const taxDragTaxFree = page.locator('[data-testid="burndown-tax-drag"]');
     await expect(taxDragTaxFree).not.toBeVisible();
-    await page.keyboard.press("Escape");
 
     await captureScreenshot(page, "task-68-tax-free-only-no-drag");
   });
@@ -223,13 +211,13 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
 
     // Delete default CA assets and add US-specific ones
     // Delete TFSA
-    const tfsaRow = page.getByRole("listitem").filter({ hasText: "TFSA" });
+    const tfsaRow = page.locator('#assets').getByRole("listitem").filter({ hasText: "TFSA" });
     await tfsaRow.hover();
     await page.getByLabel("Delete TFSA").click();
     await page.waitForTimeout(300);
 
     // Delete RRSP
-    const rrspRow = page.getByRole("listitem").filter({ hasText: "RRSP" });
+    const rrspRow = page.locator('#assets').getByRole("listitem").filter({ hasText: "RRSP" });
     await rrspRow.hover();
     await page.getByLabel("Delete RRSP").click();
     await page.waitForTimeout(300);
@@ -249,26 +237,20 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await page.waitForTimeout(1500);
 
     // Roth IRA should NOT have cost basis badge (tax-free like TFSA)
-    const rothRow = page.getByRole("listitem").filter({ hasText: "Roth IRA" });
+    const rothRow = page.locator('#assets').getByRole("listitem").filter({ hasText: "Roth IRA" });
     await expect(rothRow).toBeVisible();
     const rothCostBasis = rothRow.locator('[data-testid^="cost-basis-badge-"]');
     await expect(rothCostBasis).toHaveCount(0);
 
     // 401k should NOT have cost basis badge (tax-deferred, full withdrawal taxed)
-    const k401Row = page.getByRole("listitem").filter({ hasText: "401k" });
+    const k401Row = page.locator('#assets').getByRole("listitem").filter({ hasText: "401k" });
     await expect(k401Row).toBeVisible();
     const k401CostBasis = k401Row.locator('[data-testid^="cost-basis-badge-"]');
     await expect(k401CostBasis).toHaveCount(0);
 
-    // Tax drag is now shown in the runway explainer modal
-    const runwayCardUS = page.locator('[aria-label="Financial Runway"]');
-    await runwayCardUS.click();
-    const modalUS = page.locator('[data-testid="explainer-modal"]');
-    await expect(modalUS).toBeVisible();
-    const taxDragUS = page.locator('[data-testid="runway-tax-drag"]');
+    // Tax drag annotation is now on the main page burndown chart
+    const taxDragUS = page.locator('[data-testid="burndown-tax-drag"]');
     await expect(taxDragUS).toBeVisible({ timeout: 5000 });
-    await page.keyboard.press("Escape");
-    await expect(modalUS).not.toBeVisible({ timeout: 1000 });
 
     // Withdrawal tax summary should show US tax treatments
     const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
@@ -297,8 +279,8 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await expect(reloadedJurisdiction).toHaveValue("NY");
 
     // Verify 401k and Roth IRA persisted
-    await expect(page.getByRole("listitem").filter({ hasText: "401k" })).toBeVisible();
-    await expect(page.getByRole("listitem").filter({ hasText: "Roth IRA" })).toBeVisible();
+    await expect(page.locator('#assets').getByRole("listitem").filter({ hasText: "401k" })).toBeVisible();
+    await expect(page.locator('#assets').getByRole("listitem").filter({ hasText: "Roth IRA" })).toBeVisible();
 
     await captureScreenshot(page, "task-68-us-url-persistence");
   });
@@ -310,7 +292,7 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await page.waitForLoadState("networkidle");
 
     // Create a drawdown scenario: remove income, increase RRSP
-    const salaryRow = page.getByRole("listitem").filter({ hasText: "Salary" });
+    const salaryRow = page.locator('#income').getByRole("listitem").filter({ hasText: "Salary" });
     await salaryRow.hover();
     await page.getByLabel("Delete Salary").click();
     await page.waitForTimeout(300);

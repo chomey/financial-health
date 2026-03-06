@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Withdrawal Tax Runway", () => {
-  test("shows tax drag in runway explainer with large RRSP balance", async ({ page }) => {
+  test("shows tax drag on main page burndown chart with large RRSP balance", async ({ page }) => {
     await page.goto("/");
 
     // Default state has Savings ($5k), TFSA ($22k), RRSP ($28k)
@@ -16,46 +16,35 @@ test.describe("Withdrawal Tax Runway", () => {
     // Wait for dashboard metrics to recalculate with animation
     await page.waitForTimeout(1500);
 
-    // Click Financial Runway card to open explainer
-    const runwayCard = page.locator('[aria-label="Financial Runway"]');
-    await expect(runwayCard).toBeVisible();
-    await runwayCard.click();
-
-    // Tax drag is now shown in the explainer modal, not as a sub-line
-    const modal = page.locator('[data-testid="explainer-modal"]');
-    await expect(modal).toBeVisible();
-
-    const taxDrag = page.locator('[data-testid="runway-tax-drag"]');
+    // Tax drag annotation should be visible on the main page burndown chart
+    const taxDrag = page.locator('[data-testid="burndown-tax-drag"]');
     await expect(taxDrag).toBeVisible({ timeout: 5000 });
     const taxDragText = await taxDrag.textContent();
-    expect(taxDragText).toContain("Tax drag:");
+    expect(taxDragText).toContain("months tax drag");
 
     await captureScreenshot(page, "task-64-withdrawal-tax-runway");
   });
 
-  test("no tax drag in runway explainer when only tax-free accounts", async ({ page }) => {
+  test("no tax drag on main page when only tax-free accounts", async ({ page }) => {
     await page.goto("/");
 
     // Delete RRSP (tax-deferred) and Savings Account (taxable)
-    const rrspRow = page.getByRole("listitem").filter({ hasText: "RRSP" });
+    // Scope to the assets section to avoid matching chart legend items
+    const assetsSection = page.locator('#assets');
+    const rrspRow = assetsSection.getByRole("listitem").filter({ hasText: "RRSP" });
+    await rrspRow.scrollIntoViewIfNeeded();
     await rrspRow.hover();
     await page.getByLabel("Delete RRSP").click();
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
 
-    const savingsRow = page.getByRole("listitem").filter({ hasText: "Savings Account" });
+    const savingsRow = assetsSection.getByRole("listitem").filter({ hasText: "Savings Account" });
+    await savingsRow.scrollIntoViewIfNeeded();
     await savingsRow.hover();
     await page.getByLabel("Delete Savings Account").click();
     await page.waitForTimeout(1500);
 
-    // Open runway explainer
-    const runwayCard = page.locator('[aria-label="Financial Runway"]');
-    await runwayCard.click();
-
-    const modal = page.locator('[data-testid="explainer-modal"]');
-    await expect(modal).toBeVisible();
-
-    // Only TFSA (tax-free) remains — no tax drag annotation
-    const taxDrag = page.locator('[data-testid="runway-tax-drag"]');
+    // Only TFSA (tax-free) remains — no tax drag annotation on main page
+    const taxDrag = page.locator('[data-testid="burndown-tax-drag"]');
     await expect(taxDrag).not.toBeVisible();
   });
 });
