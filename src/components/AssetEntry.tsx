@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import CurrencyBadge from "@/components/CurrencyBadge";
+import { getTaxTreatment } from "@/lib/withdrawal-tax";
 
 export interface Asset {
   id: string;
@@ -12,6 +13,7 @@ export interface Asset {
   surplusTarget?: boolean; // monthly surplus is deposited here
   computed?: boolean; // auto-computed from stocks/properties — amount is read-only
   currency?: import("@/lib/currency").SupportedCurrency; // per-item currency override
+  costBasisPercent?: number; // 0-100: % of balance that is original contributions (only for taxable accounts)
 }
 
 const CATEGORY_SUGGESTIONS = {
@@ -141,7 +143,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
   }, [assets, onChange]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
-    "category" | "amount" | "roi" | "monthlyContribution" | null
+    "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent" | null
   >(null);
   const [editValue, setEditValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -169,7 +171,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
 
   const startEdit = (
     id: string,
-    field: "category" | "amount" | "roi" | "monthlyContribution",
+    field: "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent",
     currentValue: string
   ) => {
     setEditingId(id);
@@ -196,6 +198,12 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
           if (editingField === "monthlyContribution") {
             const val = parseCurrencyInput(value);
             return { ...a, monthlyContribution: val || undefined };
+          }
+          if (editingField === "costBasisPercent") {
+            const val = parseFloat(value);
+            if (isNaN(val)) return { ...a, costBasisPercent: undefined };
+            const clamped = Math.max(0, Math.min(100, val));
+            return { ...a, costBasisPercent: clamped };
           }
           return { ...a, amount: parseCurrencyInput(value) };
         })
@@ -528,6 +536,50 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       ? `+${formatCurrency(asset.monthlyContribution!)}/mo`
                       : "Monthly contribution"}
                   </button>
+                )}
+
+                {/* Cost basis % — only for taxable accounts */}
+                {getTaxTreatment(asset.category) === "taxable" && asset.amount > 0 && (
+                  editingId === asset.id && editingField === "costBasisPercent" ? (
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={() => commitEdit()}
+                      onKeyDown={handleEditKeyDown}
+                      className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                      aria-label={`Edit cost basis percent for ${asset.category}`}
+                      placeholder="e.g. 80"
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => startEdit(asset.id, "costBasisPercent", String(asset.costBasisPercent ?? ""))}
+                      className={`group/cb relative rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                        asset.costBasisPercent !== undefined && asset.costBasisPercent < 100
+                          ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                          : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                      }`}
+                      aria-label={`Edit cost basis percent for ${asset.category}${asset.costBasisPercent !== undefined ? `, currently ${asset.costBasisPercent}%` : ""}`}
+                      data-testid={`cost-basis-badge-${asset.id}`}
+                    >
+                      {asset.costBasisPercent !== undefined && asset.costBasisPercent < 100
+                        ? `${asset.costBasisPercent}% cost basis`
+                        : "Cost basis %"}
+                      <span className="pointer-events-none absolute left-1/2 bottom-full z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded bg-stone-800 px-2 py-1 text-[10px] text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover/cb:opacity-100">
+                        % of balance that is original contributions (not gains).
+                        <br />Gains above cost basis are subject to capital gains tax on withdrawal.
+                      </span>
+                    </button>
+                  )
+                )}
+
+                {/* Unrealized gains badge */}
+                {getTaxTreatment(asset.category) === "taxable" && asset.costBasisPercent !== undefined && asset.costBasisPercent < 100 && asset.amount > 0 && (
+                  <span className="rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-600" data-testid={`unrealized-gains-${asset.id}`}>
+                    ~{formatCurrency(Math.round(asset.amount * (100 - asset.costBasisPercent) / 100))} unrealized gains
+                  </span>
                 )}
 
                 {/* Surplus target — radio behavior, one must always be selected */}
