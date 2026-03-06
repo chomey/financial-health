@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for all 66 completed tasks", () => {
-    expect(CHANGELOG.length).toBe(66);
+  it("contains entries for all 68 completed tasks", () => {
+    expect(CHANGELOG.length).toBe(68);
   });
 
   it("has unique version numbers", () => {
@@ -11,11 +11,11 @@ describe("changelog data", () => {
     expect(new Set(versions).size).toBe(versions.length);
   });
 
-  it("covers versions 1 through 66", () => {
+  it("covers versions 1 through 68", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(66);
-    for (let i = 1; i <= 66; i++) {
+    expect(versions[versions.length - 1]).toBe(68);
+    for (let i = 1; i <= 68; i++) {
       expect(versions).toContain(i);
     }
   });
@@ -54,14 +54,14 @@ describe("getChangelogByMilestone", () => {
   it("contains all 66 entries across all groups", () => {
     const milestones = getChangelogByMilestone();
     const totalEntries = milestones.reduce((sum, m) => sum + m.entries.length, 0);
-    expect(totalEntries).toBe(66);
+    expect(totalEntries).toBe(68);
   });
 
   it("groups entries correctly by milestone range", () => {
     const milestones = getChangelogByMilestone();
     // Withdrawal Tax Modeling: 62-68
     expect(milestones[0].milestone).toBe("Withdrawal Tax Modeling");
-    expect(milestones[0].entries.length).toBe(5);
+    expect(milestones[0].entries.length).toBe(7);
     expect(milestones[0].entries.every((e) => e.version >= 62 && e.version <= 68)).toBe(true);
     // Multi-Currency: 56-61
     expect(milestones[1].milestone).toBe("Multi-Currency Support");

@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Withdrawal Tax Modeling (Milestone 7)
   {
+    version: 68,
+    title: "Full E2E test for withdrawal tax features",
+    description: "Comprehensive end-to-end test covering account tax treatment classification (TFSA tax-free, RRSP tax-deferred, Brokerage taxable), runway with vs without withdrawal tax, projection chart tax drag, withdrawal order recommendation, capital gains cost basis on brokerage accounts, tax-free withdrawal insights, and URL persistence of costBasisPercent. Tests both CA and US jurisdictions.",
+    date: "2026-03-05",
+  },
+  {
     version: 67,
     title: "Capital gains tracking for brokerage accounts",
     description: "Taxable accounts (Brokerage, Savings, etc.) now support a cost basis % field indicating what portion of the balance is original contributions vs unrealized gains. Shows an unrealized gains badge when cost basis is below 100%. Wired into withdrawal tax calculations — gains are taxed at capital gains rates (Canada 50% inclusion, US 0%/15%/20% brackets). Persisted in URL state.",
