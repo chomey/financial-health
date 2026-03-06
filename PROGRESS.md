@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 99
-- **Completed**: 98
-- **Remaining**: 1
+- **Total Tasks**: 101
+- **Completed**: 99
+- **Remaining**: 2
 - **Last Updated**: 2026-03-06
 
 ---
@@ -2150,3 +2150,26 @@
   ![Income Stops burndown view](screenshots/task-98-burndown-income-stops.png)
   ![Withdrawal order in Income Stops](screenshots/task-98-withdrawal-order.png)
 - **Notes**: The `RunwayBurndownChart` component file still exists and exports `buildSummary` which is imported by the unified `ProjectionChart`. The component itself is no longer rendered standalone. Mode tabs use `stopPropagation` on click to prevent the parent `ZoomableCard` overlay from opening when switching modes. Pre-existing test failures were fixed in a separate commit (runway-explainer tests had incorrect testids and stale assertions).
+
+## Task 99: Unified chart — always 50 years, X-axis in years, add 40/50yr columns
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/ProjectionChart.tsx`: Removed `TIMELINE_OPTIONS` constant, `years` state, and timeline selector buttons. Set `years = 50` as a constant. Changed `TABLE_MILESTONES` from `[10, 20, 30]` to `[10, 20, 30, 40, 50]`. Converted burndown mode X-axis from months to years (dataKey changed from `month` to `year`, removed "Months" axis label, added `tickFormatter` with "y" suffix). Added `fmtYears()` helper for year-based zero-crossing reference line labels. Updated burndown data to pad to 50 years (600 months) so both modes share 0–50 year X-axis range. Lines stay at $0 after savings run out. Updated `BurndownTooltip` to show year-based labels.
+  - `src/lib/projections.ts`: Changed `projectAssets` default `milestoneYears` from `[10, 20, 30]` to `[10, 20, 30, 40, 50]`.
+  - `src/lib/changelog.ts`: Added v99 changelog entry.
+  - `tests/e2e/projection-chart.spec.ts`: Removed timeline slider test, updated scenario button tests to close ZoomableCard overlay between clicks, used `.first()` for legend selectors.
+  - `tests/e2e/milestone-2-e2e.spec.ts`: Removed timeline slider interaction steps, added Escape key presses between scenario button clicks.
+  - `tests/unit/changelog.test.ts`: Updated counts to 99 entries, 12 entries in UI Polish milestone group.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/unified-50yr-chart.test.tsx`: 6 tests — no timeline buttons rendered, summary table shows 40yr/50yr columns, asset projections table shows 40yr/50yr, burndown chart visible, projectAssets defaults to 5 milestones, projectFinances generates 601 points. 6 passed, 0 failed.
+  - `tests/e2e/unified-50yr-chart.spec.ts`: 4 tests — no timeline buttons, summary table 40yr/50yr columns, burndown year-based axis, asset projections 40yr/50yr columns. 4 passed, 0 failed.
+  - All T1 unit tests: 1210 passed, 0 failed (74 test files)
+  - All related T2 E2E tests: 12 passed, 0 failed
+- **Screenshots**:
+  ![50-year chart](screenshots/task-99-50yr-chart.png)
+  ![Summary table with 40yr/50yr](screenshots/task-99-summary-table-50yr.png)
+  ![Burndown with year-based axis](screenshots/task-99-burndown-years-axis.png)
+  ![Asset projections with 40yr/50yr](screenshots/task-99-asset-projections-50yr.png)
+- **Notes**: The timeline selector was removed entirely — the chart always projects 50 years in both modes. Both "Keep Earning" and "Income Stops" share the same 0–50 year X-axis range so switching modes doesn't jump the axis. The `simulateRunwayTimeSeries` cap was already at 600 months (50 years) so no change needed there. Pre-existing E2E test failures (timeline-slider testid, ZoomableCard overlay blocking scenario button clicks) were fixed in a separate commit.

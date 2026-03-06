@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Always 50 years, X-axis in years, 40/50yr columns
+  {
+    version: 99,
+    title: "50-year unified chart with consistent year axis",
+    description: "Removed the 10/20/30 year timeline selector — the chart now always projects 50 years. Both 'Keep Earning' and 'Income Stops' modes share the same X-axis in years (0–50). Summary and per-asset tables now show 40yr and 50yr columns. If savings run out before 50 years in Income Stops mode, the line stays at $0 for the remainder.",
+    date: "2026-03-06",
+  },
   // Unified multi-mode chart
   {
     version: 98,

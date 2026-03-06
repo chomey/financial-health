@@ -95,8 +95,7 @@ function CustomTooltip({ active, payload, label, currencyCode }: CustomTooltipPr
   );
 }
 
-const TIMELINE_OPTIONS = [10, 20, 30] as const;
-const TABLE_MILESTONES = [10, 20, 30];
+const TABLE_MILESTONES = [10, 20, 30, 40, 50];
 
 /** Compute X-axis tick values: every year */
 function computeXTicks(years: number): number[] {
@@ -113,11 +112,18 @@ function fmtDuration(months: number): string {
   return years % 1 === 0 ? `${years} yr` : `${years.toFixed(1)} yr`;
 }
 
+function fmtYears(years: number): string {
+  if (years < 1) return `${Math.round(years * 12)} mo`;
+  return years % 1 === 0 ? `${years} yr` : `${years.toFixed(1)} yr`;
+}
+
 function BurndownTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
+  const yearVal = label ?? 0;
+  const yearLabel = yearVal < 1 ? `${Math.round(yearVal * 12)} months` : yearVal === 1 ? "1 year" : `${Number(yearVal.toFixed(1))} years`;
   return (
     <div className="rounded-lg border border-stone-200 bg-white p-3 shadow-lg">
-      <p className="mb-1 text-xs font-medium text-stone-500">Month {label}</p>
+      <p className="mb-1 text-xs font-medium text-stone-500">{yearLabel}</p>
       {payload.map((entry, i) => {
         const n = String(entry.name ?? "");
         const displayName = n === "withGrowth" ? "With growth" : n === "withoutGrowth" ? "Without growth" : n === "withTax" ? "After taxes" : n;
@@ -132,21 +138,16 @@ function BurndownTooltip({ active, payload, label }: CustomTooltipProps) {
 }
 
 export default function ProjectionChart({ state, runwayDetails }: ProjectionChartProps) {
-  const [years, setYears] = useState<number>(10);
   const [scenario, setScenario] = useState<Scenario>("moderate");
   const [legendOpen, setLegendOpen] = useState(false);
   const [mode, setMode] = useState<ChartMode>("keep-earning");
   const currencyCode = getHomeCurrency(state.country ?? "CA");
 
-  // Always project 30 years for the summary table; chart uses selected timeline
-  const fullProjection = useMemo(
-    () => projectFinances(state, 30, scenario),
-    [state, scenario]
-  );
+  const years = 50;
 
   const projection = useMemo(
-    () => years === 30 ? fullProjection : projectFinances(state, years, scenario),
-    [state, years, scenario, fullProjection]
+    () => projectFinances(state, 50, scenario),
+    [state, scenario]
   );
 
   const chartData = useMemo(() => {
@@ -183,9 +184,9 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
 
   const milestoneYears = TABLE_MILESTONES;
 
-  // Summary table: always 10/20/30 year points from full 30-year projection
+  // Summary table: milestone year points from 50-year projection
   const summaryPoints = useMemo(() => {
-    const allPoints = fullProjection.points;
+    const allPoints = projection.points;
     const getAtYear = (y: number) => {
       const month = y * 12;
       const p = allPoints.find((pt) => pt.month === month);
@@ -195,7 +196,7 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
       current: allPoints[0],
       milestones: milestoneYears.map((y) => getAtYear(y)),
     };
-  }, [fullProjection, milestoneYears]);
+  }, [projection, milestoneYears]);
 
   // Per-asset projections always at 10/20/30 years (includes surplus allocation)
   const assetProjections = useMemo(() => {
@@ -216,33 +217,40 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
     return { income, expenses, contributions, surplus };
   }, [state]);
 
-  // Burndown chart data (only if runwayDetails is provided)
+  // Burndown chart data (only if runwayDetails is provided) — X-axis in years
   const burndownData = useMemo(() => {
     if (!runwayDetails) return null;
     const hasTaxDrag = (runwayDetails.taxDragMonths ?? 0) > 0;
     const maxLen = Math.max(runwayDetails.withGrowth.length, runwayDetails.withoutGrowth.length, runwayDetails.withTax.length);
-    const step = maxLen > 300 ? Math.ceil(maxLen / 300) : 1;
-    const data: { month: number; withGrowth: number; withoutGrowth: number; withTax: number }[] = [];
-    for (let i = 0; i < maxLen; i += step) {
+    // Pad burndown to 50 years (600 months) if shorter, so both modes share the same X-axis range
+    const targetLen = Math.max(maxLen, 600);
+    const step = targetLen > 300 ? Math.ceil(targetLen / 300) : 1;
+    const data: { year: number; withGrowth: number; withoutGrowth: number; withTax: number }[] = [];
+    for (let i = 0; i < targetLen; i += step) {
       const gPt = runwayDetails.withGrowth[Math.min(i, runwayDetails.withGrowth.length - 1)];
       const nPt = runwayDetails.withoutGrowth[Math.min(i, runwayDetails.withoutGrowth.length - 1)];
       const tPt = runwayDetails.withTax[Math.min(i, runwayDetails.withTax.length - 1)];
+      const month = gPt?.month ?? i;
+      // If past the end of data, balance stays at $0
+      const gBal = i < runwayDetails.withGrowth.length ? Math.round(gPt?.totalBalance ?? 0) : 0;
+      const nBal = i < runwayDetails.withoutGrowth.length ? Math.round(nPt?.totalBalance ?? 0) : 0;
+      const tBal = i < runwayDetails.withTax.length ? Math.round(tPt?.totalBalance ?? 0) : 0;
       data.push({
-        month: gPt?.month ?? i,
-        withGrowth: Math.round(gPt?.totalBalance ?? 0),
-        withoutGrowth: Math.round(nPt?.totalBalance ?? 0),
-        withTax: Math.round(tPt?.totalBalance ?? 0),
+        year: parseFloat((month / 12).toFixed(2)),
+        withGrowth: gBal,
+        withoutGrowth: nBal,
+        withTax: tBal,
       });
     }
 
-    // Zero-crossing months
+    // Zero-crossing years
     let growthZero: number | null = null;
     let noGrowthZero: number | null = null;
     let taxZero: number | null = null;
     for (const pt of data) {
-      if (growthZero === null && pt.withGrowth <= 0) growthZero = pt.month;
-      if (noGrowthZero === null && pt.withoutGrowth <= 0) noGrowthZero = pt.month;
-      if (taxZero === null && pt.withTax <= 0) taxZero = pt.month;
+      if (growthZero === null && pt.withGrowth <= 0) growthZero = pt.year;
+      if (noGrowthZero === null && pt.withoutGrowth <= 0) noGrowthZero = pt.year;
+      if (taxZero === null && pt.withTax <= 0) taxZero = pt.year;
     }
 
     const emergencyFund = runwayDetails.monthlyTotal * 6;
@@ -387,25 +395,6 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
             </tbody>
           </table>
         </div>
-      </div>
-
-      <div className="mb-4 flex items-center gap-2">
-        <span className="text-xs text-stone-500">Timeline</span>
-        {TIMELINE_OPTIONS.map((y) => (
-          <button
-            key={y}
-            onClick={() => setYears(y)}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
-              years === y
-                ? "bg-stone-800 text-white shadow-sm"
-                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-            }`}
-            data-testid={`timeline-${y}yr`}
-            aria-label={`${y} year timeline`}
-          >
-            {y}yr
-          </button>
-        ))}
       </div>
 
       <div className="h-64 sm:h-80" data-testid="projection-chart-container">
@@ -681,9 +670,9 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
               <LineChart data={burndownData.data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
                 <XAxis
-                  dataKey="month"
+                  dataKey="year"
                   tick={{ fontSize: 11, fill: "#78716c" }}
-                  label={{ value: "Months", position: "insideBottom", offset: -2, fontSize: 11, fill: "#78716c" }}
+                  tickFormatter={(v) => `${v}y`}
                 />
                 <YAxis
                   tick={{ fontSize: 11, fill: "#78716c" }}
@@ -705,15 +694,15 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
                 {/* Zero-crossing markers */}
                 {burndownData.noGrowthZero !== null && (
                   <ReferenceLine x={burndownData.noGrowthZero} stroke="#9ca3af" strokeDasharray="3 3" strokeWidth={1}
-                    label={{ value: fmtDuration(burndownData.noGrowthZero), position: "top", fontSize: 10, fill: "#78716c" }} />
+                    label={{ value: fmtYears(burndownData.noGrowthZero), position: "top", fontSize: 10, fill: "#78716c" }} />
                 )}
                 {burndownData.growthZero !== null && burndownData.growthZero !== burndownData.noGrowthZero && (
                   <ReferenceLine x={burndownData.growthZero} stroke="#10b981" strokeDasharray="3 3" strokeWidth={1}
-                    label={{ value: fmtDuration(burndownData.growthZero), position: "top", fontSize: 10, fill: "#059669" }} />
+                    label={{ value: fmtYears(burndownData.growthZero), position: "top", fontSize: 10, fill: "#059669" }} />
                 )}
                 {burndownData.taxZero !== null && burndownData.taxZero !== burndownData.growthZero && burndownData.taxZero !== burndownData.noGrowthZero && (
                   <ReferenceLine x={burndownData.taxZero} stroke="#f59e0b" strokeDasharray="3 3" strokeWidth={1}
-                    label={{ value: fmtDuration(burndownData.taxZero), position: "top", fontSize: 10, fill: "#d97706" }} />
+                    label={{ value: fmtYears(burndownData.taxZero), position: "top", fontSize: 10, fill: "#d97706" }} />
                 )}
 
                 <Line type="monotone" dataKey="withGrowth" stroke="#10b981" strokeWidth={2.5} dot={false} name="withGrowth" />
