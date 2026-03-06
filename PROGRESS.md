@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 92
-- **Completed**: 87
-- **Remaining**: 5
+- **Completed**: 88
+- **Remaining**: 4
 - **Last Updated**: 2026-03-06
 
 ---
@@ -1881,3 +1881,21 @@
 - **Screenshots**:
   ![Scrollable source summary cards with frozen total](screenshots/task-87-scrollable-summary-cards.png)
 - **Notes**: The scrollbar-thin class uses both standard scrollbar-width/scrollbar-color properties and WebKit-specific pseudo-elements for cross-browser support. The sticky total row uses a subtle upward box-shadow to visually separate from scrolling content.
+
+## Task 88: Withdrawal Tax Impact card — auto-expand details and add suggested disclaimer
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/WithdrawalTaxSummary.tsx`: Removed useState import and toggle button. Details (account breakdown and withdrawal order) now render always visible. Renamed "Optimal withdrawal order" to "Suggested withdrawal order". Added italic disclaimer text below withdrawal order.
+  - `tests/e2e/withdrawal-tax-summary.spec.ts`: Updated test to verify details visible by default, "Suggested" label, and disclaimer text. Removed toggle/collapse assertions.
+  - `tests/e2e/milestone-6-e2e.spec.ts`: Updated 3 spots to remove toggle clicks and expect details visible by default, "Suggested" instead of "Optimal".
+  - `src/lib/changelog.ts`: Added changelog entry for task 88. Added "UI Polish" milestone range [88, 92].
+  - `tests/unit/changelog.test.ts`: Updated counts to 88 entries, 12 milestones.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/changelog.test.ts`: 11 passed, 0 failed
+  - `tests/e2e/withdrawal-tax-summary.spec.ts`: 4 passed, 0 failed
+  - All T1 unit tests: 1057 passed, 0 failed
+- **Screenshots**:
+  ![Withdrawal tax details auto-expanded](screenshots/task-66-withdrawal-tax-details.png)
+- **Notes**: Component no longer uses useState — it's now a pure render component (still marked "use client" for consistency with parent tree). Pre-existing changelog test failure from task 87 was fixed in a separate commit.

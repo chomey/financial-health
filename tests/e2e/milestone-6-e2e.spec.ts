@@ -40,23 +40,16 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await captureScreenshot(page, "task-68-withdrawal-tax-summary-default");
 
     // ========================================
-    // Step 3: Expand withdrawal tax details — see account breakdown and withdrawal order
+    // Step 3: Verify withdrawal tax details are visible by default
     // ========================================
-
-    const toggle = page.locator('[data-testid="withdrawal-tax-toggle"]');
-    await toggle.click();
 
     const details = page.locator('[data-testid="withdrawal-tax-details"]');
     await expect(details).toBeVisible();
-    await expect(details.locator("text=Optimal withdrawal order")).toBeVisible();
+    await expect(details.locator("text=Suggested withdrawal order")).toBeVisible();
     await expect(details.locator("text=Tax-free")).toBeVisible();
     await expect(details.locator("text=Tax-deferred")).toBeVisible();
 
     await captureScreenshot(page, "task-68-withdrawal-tax-details-expanded");
-
-    // Collapse it
-    await toggle.click();
-    await expect(details).not.toBeVisible();
 
     // ========================================
     // Step 4: Increase RRSP to make tax drag significant on runway
@@ -282,10 +275,7 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await summary.scrollIntoViewIfNeeded();
     await expect(summary).toBeVisible();
 
-    // Expand to see breakdown
-    const expandToggle = page.locator('[data-testid="withdrawal-tax-toggle"]');
-    await expandToggle.click();
-
+    // Details should be visible by default (no toggle)
     const taxDetails = page.locator('[data-testid="withdrawal-tax-details"]');
     await expect(taxDetails).toBeVisible();
     await expect(taxDetails.locator("text=Tax-free")).toBeVisible();
@@ -368,24 +358,21 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await page.click('[aria-label="Confirm add asset"]');
     await page.waitForTimeout(1500);
 
-    // Expand withdrawal tax details
+    // Withdrawal tax details should be visible by default
     const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
     await summary.scrollIntoViewIfNeeded();
     await expect(summary).toBeVisible();
 
-    const expandToggle = page.locator('[data-testid="withdrawal-tax-toggle"]');
-    await expandToggle.click();
+    const taxDetails2 = page.locator('[data-testid="withdrawal-tax-details"]');
+    await expect(taxDetails2).toBeVisible();
 
-    const taxDetails = page.locator('[data-testid="withdrawal-tax-details"]');
-    await expect(taxDetails).toBeVisible();
-
-    // Should show optimal withdrawal order
-    await expect(taxDetails.locator("text=Optimal withdrawal order")).toBeVisible();
+    // Should show suggested withdrawal order
+    await expect(taxDetails2.locator("text=Suggested withdrawal order")).toBeVisible();
 
     // All three treatments should be listed
-    await expect(taxDetails.locator("text=Tax-free")).toBeVisible();
-    await expect(taxDetails.locator("text=Taxable")).toBeVisible();
-    await expect(taxDetails.locator("text=Tax-deferred")).toBeVisible();
+    await expect(taxDetails2.locator("text=Tax-free")).toBeVisible();
+    await expect(taxDetails2.locator("text=Taxable")).toBeVisible();
+    await expect(taxDetails2.locator("text=Tax-deferred")).toBeVisible();
 
     await captureScreenshot(page, "task-68-withdrawal-order-all-three-types");
   });

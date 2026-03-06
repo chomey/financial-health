@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 interface AccountsByTreatment {
   taxFree: { categories: string[]; total: number };
   taxDeferred: { categories: string[]; total: number };
@@ -29,7 +27,6 @@ export default function WithdrawalTaxSummary({
   accountsByTreatment,
   homeCurrency = "USD",
 }: WithdrawalTaxSummaryProps) {
-  const [expanded, setExpanded] = useState(false);
   const totalLiquid =
     accountsByTreatment.taxFree.total +
     accountsByTreatment.taxDeferred.total +
@@ -105,18 +102,8 @@ export default function WithdrawalTaxSummary({
         </div>
       </div>
 
-      {/* Expand/collapse details */}
-      <button
-        type="button"
-        onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
-        className="mt-2 text-xs font-medium text-blue-500 transition-colors hover:text-blue-700"
-        data-testid="withdrawal-tax-toggle"
-      >
-        {expanded ? "Hide details" : "Show details"}
-      </button>
-
-      {expanded && (
-        <div className="mt-3 space-y-3" data-testid="withdrawal-tax-details">
+      {/* Account breakdown and withdrawal order details */}
+      <div className="mt-3 space-y-3" data-testid="withdrawal-tax-details">
           {/* Account breakdown by treatment */}
           <div className="space-y-2">
             {treatments.map((t) => {
@@ -142,11 +129,11 @@ export default function WithdrawalTaxSummary({
             })}
           </div>
 
-          {/* Optimal withdrawal order */}
+          {/* Suggested withdrawal order */}
           {withdrawalOrder.length > 0 && (
             <div>
               <p className="text-xs font-medium text-stone-500 mb-1">
-                Optimal withdrawal order:
+                Suggested withdrawal order:
               </p>
               <div className="flex items-center gap-1 text-xs text-stone-600">
                 {withdrawalOrder.map((cat, i) => (
@@ -162,10 +149,12 @@ export default function WithdrawalTaxSummary({
                   </span>
                 ))}
               </div>
+              <p className="mt-1.5 text-xs text-stone-400 italic" data-testid="withdrawal-order-disclaimer">
+                We don&apos;t have full visibility into each account&apos;s tax implications — this is a rough suggestion. Consult a tax professional for personalized advice.
+              </p>
             </div>
           )}
         </div>
-      )}
 
       <p className="mt-2 text-xs text-stone-400 leading-relaxed">
         How withdrawal taxes affect your savings. Tax-free accounts are withdrawn first to minimize tax impact.
