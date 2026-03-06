@@ -25,6 +25,7 @@ const TAX_TREATMENT_MAP: Record<string, TaxTreatment> = {
   // Tax-free accounts — withdrawals are never taxed
   "TFSA": "tax-free",
   "Roth IRA": "tax-free",
+  "Roth 401k": "tax-free",
   "HSA": "tax-free",
 
   // Tax-deferred accounts — full withdrawal taxed as income

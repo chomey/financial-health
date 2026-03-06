@@ -9,8 +9,8 @@
 -->
 
 ## Summary
-- **Total Tasks**: 92
-- **Completed**: 92
+- **Total Tasks**: 93
+- **Completed**: 93
 - **Remaining**: 1
 - **Last Updated**: 2026-03-06
 
@@ -1978,3 +1978,24 @@
   ![Simplified burndown chart](screenshots/task-92-runway-burndown-simplified.png)
   ![Withdrawal order](screenshots/task-92-withdrawal-order.png)
 - **Notes**: Replaced recharts AreaChart+Area with LineChart+Line for clarity. The amber "After withdrawal taxes" line only appears when taxDragMonths > 0 to avoid clutter. The buildSummary function uses fmtDuration to intelligently format months vs years (e.g., "6 mo", "2 yr", "1.5 yr"). Starting balances row shows per-account detail without cluttering the chart itself.
+
+## Task 93: Support Roth 401k as a distinct account category
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/components/AssetEntry.tsx`: Added "Roth 401k" to US category suggestions (after "401k"), DEFAULT_ROI (7%), and TAX_SHELTERED_CATEGORIES
+  - `src/lib/withdrawal-tax.ts`: Added "Roth 401k" as "tax-free" in TAX_TREATMENT_MAP
+  - `src/components/AssetAllocationChart.tsx`: Added "Roth 401k" to RETIREMENT_CATEGORIES
+  - `src/lib/changelog.ts`: Added v93 changelog entry, extended UI Polish milestone range to [88, 94]
+  - `tests/unit/changelog.test.ts`: Updated counts for 93 entries (also fixed pre-existing failure from task 92)
+  - `tests/unit/asset-entry.test.tsx`: Updated suggestion count from 15 to 16
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/roth-401k.test.ts`: 9 passed, 0 failed (category suggestions, default ROI, tax treatment, ROI toggle hidden, allocation grouping)
+  - All T1 unit tests: 1102 passed, 0 failed
+  - `tests/e2e/roth-401k.spec.ts`: 3 passed, 0 failed (suggestion appears, can add asset, ROI shown + no tax toggle)
+- **Screenshots**:
+  ![Roth 401k suggestion](screenshots/task-93-roth-401k-suggestion.png)
+  ![Roth 401k added](screenshots/task-93-roth-401k-added.png)
+  ![Roth 401k ROI no tax toggle](screenshots/task-93-roth-401k-roi-no-tax-toggle.png)
+- **Notes**: Simple lookup table additions. "Roth 401k" is classified as tax-free (like Roth IRA) since qualified withdrawals are not taxed. ROI tax treatment toggle is hidden for tax-sheltered accounts. Pre-existing test failure in changelog.test.ts was fixed in a separate commit.

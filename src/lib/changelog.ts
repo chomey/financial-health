@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // New Account Category
+  {
+    version: 93,
+    title: "Roth 401k support",
+    description: "Added Roth 401k as a distinct US asset category. It appears in the category suggestions after 401k, defaults to 7% ROI, is classified as tax-free for withdrawal modeling, and the ROI tax treatment toggle is hidden since growth is tax-free.",
+    date: "2026-03-06",
+  },
   // Chart Clarity
   {
     version: 92,
@@ -583,7 +590,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 92] as const },
+    { milestone: "UI Polish", range: [88, 94] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },
