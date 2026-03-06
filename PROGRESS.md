@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 76
-- **Completed**: 72
-- **Remaining**: 4
+- **Completed**: 73
+- **Remaining**: 3
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1529,3 +1529,24 @@
   ![Source section highlights](screenshots/task-72-surplus-source-highlights.png)
   ![Keyboard focus arrows](screenshots/task-72-keyboard-focus-arrows.png)
 - **Notes**: Same hover/highlight/fade behavior as Task 71 (Net Worth). The surplus formula is visually obvious: income flows in green (the one positive source), while expenses, contributions, and mortgage all flow in red. Contributions and mortgage connections are conditional (only appear when > 0), matching the spread operator pattern used by Net Worth's property equity connection.
+
+---
+
+## Task 73: Wire Estimated Tax, Financial Runway, and Debt-to-Asset Ratio cards
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/app/page.tsx`: Added three new connection arrays — `estimatedTaxConnections` (green arrow from income with effective rate label), `financialRunwayConnections` (green from assets/stocks, red from expenses/mortgage), `debtToAssetConnections` (green from assets/stocks/property value, red from debts/mortgage). Added all three to `dataFlowConnections` object.
+  - `src/lib/changelog.ts`: Added v73 entry.
+  - `tests/unit/remaining-metric-data-flow.test.tsx`: New T1 unit tests for all three metric cards.
+  - `tests/e2e/remaining-metric-data-flow.spec.ts`: New T2 browser tests for hover/arrow/highlight behavior.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/remaining-metric-data-flow.test.tsx`: 14 tests — Estimated Tax (card render, income as positive source, label includes rate, hover breakdown), Financial Runway (card render, assets+stocks positive, expenses+mortgage negative, hover breakdown), Debt-to-Asset Ratio (card render, assets+stocks+property positive, debts+mortgage negative, property in both, hover breakdown), all five wired together (14 passed, 0 failed)
+  - `tests/e2e/remaining-metric-data-flow.spec.ts`: 6 tests — Estimated Tax hover shows overlay + income highlighted, arrows disappear on leave; Financial Runway hover shows overlay + assets highlighted positive + expenses highlighted negative, arrows disappear on leave; Debt-to-Asset Ratio hover shows overlay + assets positive + debts negative, arrows disappear on leave (6 passed, 0 failed)
+  - All unit tests: 909 passed, 0 failed (56 test files)
+- **Screenshots**:
+  ![Estimated Tax arrows](screenshots/task-73-estimated-tax-arrows.png)
+  ![Financial Runway arrows](screenshots/task-73-financial-runway-arrows.png)
+  ![Debt-to-Asset Ratio arrows](screenshots/task-73-debt-to-asset-ratio-arrows.png)
+- **Notes**: All five metric cards are now fully wired with data-flow arrows. Estimated Tax has a single green arrow from income showing the effective tax rate and gross annual income. Financial Runway mirrors the formula: liquid assets (numerator) flow in green, monthly obligations (denominator) flow in red. Debt-to-Asset Ratio shows property in both positive (value) and negative (mortgage) connections since the formula uses property value on the asset side and mortgage on the debt side. Mortgage and property connections are conditional (only appear when > 0).

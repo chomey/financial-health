@@ -408,9 +408,34 @@ export default function Home() {
     ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const }] : []),
   ];
 
+  // Estimated Tax: green arrow from income showing gross income, label with effective rate + annual tax
+  const estimatedTaxConnections: DataFlowConnectionDef[] = [
+    { sourceId: "section-income", label: totals.effectiveTaxRate > 0 ? `${(totals.effectiveTaxRate * 100).toFixed(1)}% of ${fmtLabel(totals.monthlyIncome * 12).replace(/^[+-]/, "")}` : fmtLabel(totals.monthlyIncome * 12), value: totals.monthlyIncome, sign: "positive" },
+  ];
+
+  // Financial Runway: liquid assets (green) / monthly obligations (red)
+  const financialRunwayConnections: DataFlowConnectionDef[] = [
+    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" },
+    { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" },
+    { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
+    ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const }] : []),
+  ];
+
+  // Debt-to-Asset Ratio: all assets (green) vs all debts (red)
+  const debtToAssetConnections: DataFlowConnectionDef[] = [
+    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" },
+    { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" },
+    ...(totals.totalPropertyValue > 0 ? [{ sourceId: "section-property", label: `value ${fmtLabel(totals.totalPropertyValue)}`, value: totals.totalPropertyValue, sign: "positive" as const }] : []),
+    { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
+    ...(totals.totalPropertyMortgage > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totals.totalPropertyMortgage)}`, value: totals.totalPropertyMortgage, sign: "negative" as const }] : []),
+  ];
+
   const dataFlowConnections: Record<string, DataFlowConnectionDef[]> = {
     "Net Worth": netWorthConnections,
     "Monthly Surplus": monthlySurplusConnections,
+    "Estimated Tax": estimatedTaxConnections,
+    "Financial Runway": financialRunwayConnections,
+    "Debt-to-Asset Ratio": debtToAssetConnections,
   };
 
   // Benchmark comparison values
