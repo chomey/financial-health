@@ -393,7 +393,10 @@ export default function Home() {
   // Build item-level data for source summary cards in explainer modal
   const assetItems: SourceMetadataItem[] = assets.filter((a) => !a.computed).map((a) => ({ label: a.category, value: a.amount }));
   const debtItems: SourceMetadataItem[] = debts.map((d) => ({ label: d.category, value: d.amount }));
-  const incomeItems: SourceMetadataItem[] = income.map((i) => ({ label: i.category, value: i.amount }));
+  const incomeItems: SourceMetadataItem[] = [
+    ...income.map((i) => ({ label: i.category, value: i.amount })),
+    ...monthlyInvestmentReturns.map((r) => ({ label: `${r.label} returns`, value: Math.round(r.amount) })),
+  ];
   const expenseItems: SourceMetadataItem[] = expenses.map((e) => ({ label: e.category, value: e.amount }));
   const propertyItems: SourceMetadataItem[] = properties.map((p) => ({ label: p.name, value: Math.max(0, p.value - p.mortgage) }));
   const stockItems: SourceMetadataItem[] = stocks.map((s) => ({ label: s.ticker, value: getStockValue(s) }));
@@ -415,9 +418,9 @@ export default function Home() {
     { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
   ];
 
+  const incomeAndReturnsTotal = totals.monthlyAfterTaxIncome + totalMonthlyInvestmentReturns;
   const monthlySurplusConnections: DataFlowConnectionDef[] = [
-    { sourceId: "section-income", label: fmtLabel(totals.monthlyAfterTaxIncome), value: totals.monthlyAfterTaxIncome, sign: "positive" },
-    ...(totalMonthlyInvestmentReturns > 0 ? [{ sourceId: "section-assets", label: `returns ${fmtLabel(totalMonthlyInvestmentReturns)}`, value: totalMonthlyInvestmentReturns, sign: "positive" as const }] : []),
+    { sourceId: "section-income", label: fmtLabel(incomeAndReturnsTotal), value: incomeAndReturnsTotal, sign: "positive" },
     { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
     ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "section-assets", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const }] : []),
     ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const }] : []),
@@ -585,7 +588,7 @@ export default function Home() {
                 <DebtEntry items={debts} onChange={setDebts} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)} dataFlowId="section-income" dataFlowValue={incomeTotal} dataFlowLabel="Income" dataFlowItems={incomeItems}>
+              <CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)} dataFlowId="section-income" dataFlowValue={incomeTotal + totalMonthlyInvestmentReturns} dataFlowLabel="Income & Returns" dataFlowItems={incomeItems}>
                 <IncomeEntry items={income} onChange={setIncome} />
               </CollapsibleSection>
 

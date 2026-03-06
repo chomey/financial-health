@@ -1033,11 +1033,6 @@ function ExplainerModal({
               })}
             </div>
 
-            {/* Investment returns sub-section (Monthly Surplus only) */}
-            {targetMeta.metricType === "monthly-surplus" && targetMeta.investmentReturns && targetMeta.investmentReturns.length > 0 && (
-              <InvestmentReturnsSummary returns={targetMeta.investmentReturns} />
-            )}
-
             {/* Sum bar and result */}
             <div className="mt-2" data-testid="explainer-result-section">
               {/* Hand-drawn horizontal sum bar */}
