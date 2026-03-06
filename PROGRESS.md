@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 101
-- **Completed**: 99
-- **Remaining**: 2
+- **Completed**: 100
+- **Remaining**: 1
 - **Last Updated**: 2026-03-06
 
 ---
@@ -2173,3 +2173,21 @@
   ![Burndown with year-based axis](screenshots/task-99-burndown-years-axis.png)
   ![Asset projections with 40yr/50yr](screenshots/task-99-asset-projections-50yr.png)
 - **Notes**: The timeline selector was removed entirely — the chart always projects 50 years in both modes. Both "Keep Earning" and "Income Stops" share the same 0–50 year X-axis range so switching modes doesn't jump the axis. The `simulateRunwayTimeSeries` cap was already at 600 months (50 years) so no change needed there. Pre-existing E2E test failures (timeline-slider testid, ZoomableCard overlay blocking scenario button clicks) were fixed in a separate commit.
+
+## Task 100: Include investment return taxes in Estimated Tax with correct CA/US rules
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/lib/financial-state.ts`: Added `getDefaultRoiTaxTreatment` import. In `computeTotals`, iterate over assets to find taxable accounts with income-type ROI, compute annual interest (`balance × roi%`), and add to the employment income bucket for tax calculation. Returns `investmentIncomeAccounts` and `totalInvestmentInterest` for the explainer. Updated effective tax rate denominator to include investment interest. Updated tax breakdown string to show investment interest. Updated `buildTaxExplainerDetails` to accept and include `investmentIncomeTax` data.
+  - `src/components/DataFlowArrows.tsx`: Added `investmentIncomeTax` field to `TaxExplainerDetails` interface. Added investment income section to `TaxExplainerContent` with per-account breakdown (balance, ROI%, annual interest), total line for multiple accounts, and explanatory note about annual vs realized taxation.
+  - `src/lib/changelog.ts`: Added version 100 entry.
+  - `tests/unit/financial-state.test.ts`: Added 8 new tests and updated 3 existing tests. New tests cover: CA interest taxed at marginal rate, US interest taxed at ordinary income rate, capital-gains accounts excluded, TFSA excluded, RRSP excluded, Roth IRA excluded, investment income in tax explainer details, mixed account types. Updated 3 existing tests to account for Savings Account investment interest now being included in tax base.
+  - `tests/e2e/investment-income-tax.spec.ts`: New E2E test with 3 tests verifying investment income section visibility in tax explainer, per-account ROI display, and tax estimate including interest.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/financial-state.test.ts`: 50 tests passed (8 new + 3 updated), 0 failed
+  - `tests/e2e/investment-income-tax.spec.ts`: 3 tests passed, 0 failed
+  - All 1218 unit tests passed, all 22 tax-related E2E tests passed
+- **Screenshots**:
+  ![Investment income in tax explainer](screenshots/task-100-investment-income-tax-explainer.png)
+- **Notes**: Pre-existing E2E test failures in `snapshot-dashboard.spec.ts` (6 tests referencing `role="tooltip"` and hardcoded metric values that had drifted) were fixed in a separate commit. Investment interest is added to the "employment" income type bucket so progressive brackets apply correctly across salary + interest income combined. Only taxable accounts with `roiTaxTreatment === "income"` are included — capital-gains ROI, tax-free, and tax-deferred accounts are all excluded per the task requirements.

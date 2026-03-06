@@ -7,7 +7,7 @@ import type { Property } from "@/components/PropertyEntry";
 import { getEffectivePayment } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
-import { getDefaultRoi } from "@/components/AssetEntry";
+import { getDefaultRoi, getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
 import { getHomeCurrency, getEffectiveFxRates, convertToHome, formatCurrencyCompact } from "@/lib/currency";
 import type { SupportedCurrency, FxRates } from "@/lib/currency";
 import { getTaxTreatment, getWithdrawalTaxRate, type TaxTreatment } from "@/lib/withdrawal-tax";
@@ -320,7 +320,7 @@ function computeBracketSegments(taxableIncome: number, table: BracketTable): Tax
 /**
  * Build TaxExplainerDetails from the current financial state.
  */
-function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: number, federalTax: number, provincialStateTax: number, effectiveTaxRate: number, totalTax: number): TaxExplainerDetails | undefined {
+function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: number, federalTax: number, provincialStateTax: number, effectiveTaxRate: number, totalTax: number, investmentIncomeAccounts?: InvestmentIncomeAccount[]): TaxExplainerDetails | undefined {
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
@@ -432,6 +432,10 @@ function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: numb
       country,
       totalCapitalGains: capGainsTotal,
     } : undefined,
+    investmentIncomeTax: investmentIncomeAccounts && investmentIncomeAccounts.length > 0 ? {
+      totalAnnualInterest: investmentIncomeAccounts.reduce((s, a) => s + a.annualInterest, 0),
+      accounts: investmentIncomeAccounts,
+    } : undefined,
   };
 }
 
@@ -517,6 +521,13 @@ function buildRunwayExplainerDetails(
   };
 }
 
+export interface InvestmentIncomeAccount {
+  label: string;
+  balance: number;
+  roi: number;
+  annualInterest: number;
+}
+
 export interface MonthlyInvestmentReturn {
   label: string;
   amount: number;
@@ -587,6 +598,31 @@ export function computeTotals(state: FinancialState) {
     incomeByType[type] = (incomeByType[type] ?? 0) + annualAmt;
   }
 
+  // Add investment interest income from taxable accounts with income-type ROI.
+  // Interest from savings/GIC/HISA in taxable accounts is taxed annually as ordinary income.
+  // Capital-gains ROI and tax-free/tax-deferred accounts are excluded.
+  const investmentIncomeAccounts: InvestmentIncomeAccount[] = [];
+  for (const asset of state.assets) {
+    if (asset.amount <= 0) continue;
+    const roi = asset.roi ?? getDefaultRoi(asset.category) ?? 0;
+    if (roi <= 0) continue;
+    const taxTreatment = getTaxTreatment(asset.category, asset.taxTreatment);
+    if (taxTreatment === "tax-free" || taxTreatment === "tax-deferred") continue;
+    const roiTaxTreatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
+    if (roiTaxTreatment !== "income") continue;
+    const annualInterest = asset.amount * (roi / 100);
+    investmentIncomeAccounts.push({
+      label: asset.category,
+      balance: asset.amount,
+      roi,
+      annualInterest,
+    });
+  }
+  const totalInvestmentInterest = investmentIncomeAccounts.reduce((sum, a) => sum + a.annualInterest, 0);
+  if (totalInvestmentInterest > 0) {
+    incomeByType["employment"] = (incomeByType["employment"] ?? 0) + totalInvestmentInterest;
+  }
+
   let totalAnnualTax = 0;
   let totalFederalTax = 0;
   let totalProvincialStateTax = 0;
@@ -607,13 +643,15 @@ export function computeTotals(state: FinancialState) {
   const finalProvincialStateTax = state.provincialTaxOverride ?? totalProvincialStateTax;
   const finalAnnualTax = finalFederalTax + finalProvincialStateTax;
   const totalAnnualIncome = monthlyIncome * 12;
+  // Effective tax rate uses total taxable income base (earned income + investment interest)
+  const totalTaxableBase = totalAnnualIncome + totalInvestmentInterest;
   const finalAfterTaxAnnual = totalAnnualIncome - finalAnnualTax;
-  const effectiveTaxRate = totalAnnualIncome > 0 ? finalAnnualTax / totalAnnualIncome : 0;
+  const effectiveTaxRate = totalTaxableBase > 0 ? finalAnnualTax / totalTaxableBase : 0;
   const monthlyAfterTaxIncome = finalAfterTaxAnnual / 12;
   const totalTaxEstimate = finalAnnualTax;
 
   // Also export the computed (non-overridden) values so the UI can show defaults
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency };
+  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency, investmentIncomeAccounts, totalInvestmentInterest };
 }
 
 function fmtShort(n: number, currency?: SupportedCurrency): string {
@@ -625,7 +663,7 @@ function fmtShort(n: number, currency?: SupportedCurrency): string {
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest } = computeTotals(state);
 
   // Net worth: show without property equity as primary, with equity as secondary
   const netWorthWithoutEquity = totalAssets + totalStocks - totalDebts;
@@ -756,7 +794,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
     : undefined;
 
   const taxBreakdown = totalTaxEstimate > 0
-    ? `${fmtShort(monthlyIncome)} gross - ${fmtShort(monthlyIncome - monthlyAfterTaxIncome)} tax = ${fmtShort(monthlyAfterTaxIncome)}/mo`
+    ? `${fmtShort(monthlyIncome)} gross${totalInvestmentInterest > 0 ? ` + ${fmtShort(totalInvestmentInterest / 12)} inv. interest` : ""} - ${fmtShort(monthlyIncome - monthlyAfterTaxIncome)} tax = ${fmtShort(monthlyAfterTaxIncome)}/mo`
     : undefined;
 
   return [
@@ -792,7 +830,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       positive: true,
       breakdown: taxBreakdown,
       effectiveRate: effectiveTaxRate,
-      taxDetails: buildTaxExplainerDetails(state, monthlyIncome * 12, totalFederalTax, totalProvincialStateTax, effectiveTaxRate, totalTaxEstimate),
+      taxDetails: buildTaxExplainerDetails(state, monthlyIncome * 12, totalFederalTax, totalProvincialStateTax, effectiveTaxRate, totalTaxEstimate, investmentIncomeAccounts),
     },
     {
       title: "Financial Runway",

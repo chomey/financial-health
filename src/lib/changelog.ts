@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Investment return taxes in Estimated Tax
+  {
+    version: 100,
+    title: "Investment interest income included in tax estimate",
+    description: "Interest income from taxable savings accounts (Savings, GIC, HISA, etc.) is now included in the Estimated Tax calculation. Tax-free (TFSA, Roth IRA) and tax-deferred (RRSP, 401k) accounts are excluded. Capital gains ROI is not taxed annually. The tax explainer modal now shows a per-account breakdown of investment interest income with a note explaining the rules.",
+    date: "2026-03-06",
+  },
   // Always 50 years, X-axis in years, 40/50yr columns
   {
     version: 99,
