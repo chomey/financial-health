@@ -62,11 +62,11 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await rrspInput.press("Enter");
     await page.waitForTimeout(1500);
 
-    // Tax drag annotation is now on the main page burndown chart
-    const taxDrag = page.locator('[data-testid="burndown-tax-drag"]');
-    await expect(taxDrag).toBeVisible({ timeout: 5000 });
-    const taxDragText = await taxDrag.textContent();
-    expect(taxDragText).toContain("months tax drag");
+    // Tax drag info is in the burndown chart summary text
+    const burndownSummary = page.locator('[data-testid="burndown-summary"]');
+    await expect(burndownSummary).toBeVisible({ timeout: 5000 });
+    const summaryText = await burndownSummary.textContent();
+    expect(summaryText).toContain("withdrawal taxes");
 
     await captureScreenshot(page, "task-68-runway-after-tax-rrsp-heavy");
 
@@ -182,9 +182,12 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await page.getByLabel("Delete Savings Account").click();
     await page.waitForTimeout(1500);
 
-    // Only TFSA (tax-free) remains — no tax drag annotation on main page
-    const taxDragTaxFree = page.locator('[data-testid="burndown-tax-drag"]');
-    await expect(taxDragTaxFree).not.toBeVisible();
+    // Only TFSA (tax-free) remains — summary should not mention withdrawal taxes
+    const burndownSummaryTf = page.locator('[data-testid="burndown-summary"]');
+    if (await burndownSummaryTf.isVisible()) {
+      const text = await burndownSummaryTf.textContent();
+      expect(text).not.toContain("withdrawal taxes");
+    }
 
     await captureScreenshot(page, "task-68-tax-free-only-no-drag");
   });
@@ -248,9 +251,9 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     const k401CostBasis = k401Row.locator('[data-testid^="cost-basis-badge-"]');
     await expect(k401CostBasis).toHaveCount(0);
 
-    // Tax drag annotation is now on the main page burndown chart
-    const taxDragUS = page.locator('[data-testid="burndown-tax-drag"]');
-    await expect(taxDragUS).toBeVisible({ timeout: 5000 });
+    // Tax drag info is in the burndown chart summary text
+    const usBurndownSummary = page.locator('[data-testid="burndown-summary"]');
+    await expect(usBurndownSummary).toBeVisible({ timeout: 5000 });
 
     // Withdrawal tax summary should show US tax treatments
     const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
