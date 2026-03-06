@@ -652,7 +652,7 @@ export function computeTotals(state: FinancialState) {
   const totalTaxEstimate = finalAnnualTax;
 
   // Also export the computed (non-overridden) values so the UI can show defaults
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency, investmentIncomeAccounts, totalInvestmentInterest };
+  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase };
 }
 
 function fmtShort(n: number, currency?: SupportedCurrency): string {
@@ -664,7 +664,7 @@ function fmtShort(n: number, currency?: SupportedCurrency): string {
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest } = computeTotals(state);
+  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase } = computeTotals(state);
 
   // Net worth: show without property equity as primary, with equity as secondary
   const netWorthWithoutEquity = totalAssets + totalStocks - totalDebts;
@@ -831,7 +831,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       positive: true,
       breakdown: taxBreakdown,
       effectiveRate: effectiveTaxRate,
-      taxDetails: buildTaxExplainerDetails(state, monthlyIncome * 12, totalFederalTax, totalProvincialStateTax, effectiveTaxRate, totalTaxEstimate, investmentIncomeAccounts),
+      taxDetails: buildTaxExplainerDetails(state, totalTaxableBase, totalFederalTax, totalProvincialStateTax, effectiveTaxRate, totalTaxEstimate, investmentIncomeAccounts),
     },
     {
       title: "Financial Runway",

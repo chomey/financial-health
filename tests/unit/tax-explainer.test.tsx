@@ -179,6 +179,7 @@ describe("computeMetrics taxDetails integration", () => {
     const noIncome: FinancialState = {
       ...INITIAL_STATE,
       income: [],
+      assets: [],
     };
     const metrics = computeMetrics(noIncome);
     const taxMetric = metrics.find((m) => m.title === "Estimated Tax")!;
@@ -402,7 +403,7 @@ describe("computeMetrics provincialBrackets integration", () => {
   });
 
   it("zero-income taxDetails has provincial reference brackets with zero amounts", () => {
-    const noIncome: FinancialState = { ...INITIAL_STATE, income: [] };
+    const noIncome: FinancialState = { ...INITIAL_STATE, income: [], assets: [] };
     const metrics = computeMetrics(noIncome);
     const taxMetric = metrics.find((m) => m.title === "Estimated Tax")!;
     expect(taxMetric.taxDetails!.provincialBrackets).toBeDefined();
