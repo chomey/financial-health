@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for all 84 completed tasks", () => {
-    expect(CHANGELOG.length).toBe(84);
+  it("contains entries for all 85 completed tasks", () => {
+    expect(CHANGELOG.length).toBe(85);
   });
 
   it("has unique version numbers", () => {
@@ -14,8 +14,8 @@ describe("changelog data", () => {
   it("covers versions 1 through 82", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(84);
-    for (let i = 1; i <= 84; i++) {
+    expect(versions[versions.length - 1]).toBe(85);
+    for (let i = 1; i <= 85; i++) {
       expect(versions).toContain(i);
     }
   });
@@ -54,14 +54,14 @@ describe("getChangelogByMilestone", () => {
   it("contains all entries across all groups", () => {
     const milestones = getChangelogByMilestone();
     const totalEntries = milestones.reduce((sum, m) => sum + m.entries.length, 0);
-    expect(totalEntries).toBe(84);
+    expect(totalEntries).toBe(85);
   });
 
   it("groups entries correctly by milestone range", () => {
     const milestones = getChangelogByMilestone();
     // Metric-Specific Explainers: 83-87
     expect(milestones[0].milestone).toBe("Metric-Specific Explainers");
-    expect(milestones[0].entries.length).toBe(2); // 83, 84
+    expect(milestones[0].entries.length).toBe(3); // 83, 84, 85
     expect(milestones[0].entries.every((e) => e.version >= 83 && e.version <= 87)).toBe(true);
     // Whiteboard Explainer Mode: 79-82
     expect(milestones[1].milestone).toBe("Whiteboard Explainer Mode");
