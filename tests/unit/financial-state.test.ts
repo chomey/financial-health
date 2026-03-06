@@ -77,11 +77,13 @@ describe("financial-state", () => {
 
     it("computes after-tax income matching individual tax computations", () => {
       const totals = computeTotals(INITIAL_STATE);
-      // Manually compute: Salary $54k, employment, CA/ON
-      const salaryTax = computeTax(54000, "employment", "CA", "ON");
-      const expectedAfterTaxAnnual = salaryTax.afterTaxIncome;
+      // Salary $54k + investment interest ($5000 Savings @ 2% = $100/yr) = $54100 employment income
+      const salaryPlusInterestTax = computeTax(54100, "employment", "CA", "ON");
+      // monthlyAfterTaxIncome is based on salary only (before investment interest)
+      // but tax includes investment interest, so after-tax = salary - total tax
+      const expectedAfterTaxAnnual = 54000 - salaryPlusInterestTax.totalTax;
       expect(totals.monthlyAfterTaxIncome).toBeCloseTo(expectedAfterTaxAnnual / 12, 2);
-      expect(totals.totalTaxEstimate).toBeCloseTo(salaryTax.totalTax, 2);
+      expect(totals.totalTaxEstimate).toBeCloseTo(salaryPlusInterestTax.totalTax, 2);
     });
 
     it("handles capital gains income type for after-tax computation", () => {
@@ -94,9 +96,11 @@ describe("financial-state", () => {
         jurisdiction: "ON",
       };
       const totals = computeTotals(state);
-      // Capital gains should be taxed at a lower effective rate than employment income
+      // Capital gains taxed separately + investment interest ($100/yr) as employment
       const capGainsTax = computeTax(60000, "capital-gains", "CA", "ON");
-      expect(totals.monthlyAfterTaxIncome).toBeCloseTo(capGainsTax.afterTaxIncome / 12, 2);
+      const interestTax = computeTax(totals.totalInvestmentInterest, "employment", "CA", "ON");
+      const expectedAfterTax = 60000 - capGainsTax.totalTax - interestTax.totalTax;
+      expect(totals.monthlyAfterTaxIncome).toBeCloseTo(expectedAfterTax / 12, 2);
     });
 
     it("handles US income tax computation", () => {
@@ -109,8 +113,11 @@ describe("financial-state", () => {
         jurisdiction: "CA",
       };
       const totals = computeTotals(state);
-      const usTax = computeTax(60000, "employment", "US", "CA");
-      expect(totals.monthlyAfterTaxIncome).toBeCloseTo(usTax.afterTaxIncome / 12, 2);
+      // Salary $60k + investment interest from Savings Account ($5000 @ 2% = $100/yr)
+      const totalEmployment = 60000 + totals.totalInvestmentInterest;
+      const usTax = computeTax(totalEmployment, "employment", "US", "CA");
+      const expectedAfterTaxAnnual = 60000 - usTax.totalTax;
+      expect(totals.monthlyAfterTaxIncome).toBeCloseTo(expectedAfterTaxAnnual / 12, 2);
       expect(totals.totalTaxEstimate).toBeCloseTo(usTax.totalTax, 2);
     });
   });
@@ -537,6 +544,205 @@ describe("financial-state", () => {
       expect(data.monthlyIncome).toBeCloseTo(totals.monthlyAfterTaxIncome, 2);
       expect(data.monthlyIncome).toBeLessThan(4500); // less than gross
       expect(data.monthlyExpenses).toBe(2350);
+    });
+  });
+
+  describe("investment income tax", () => {
+    it("includes interest from CA taxable savings account in tax calculation", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "Savings Account", amount: 100000, roi: 4 },
+        ],
+        debts: [],
+        income: [
+          { id: "i1", category: "Salary", amount: 5000 },
+        ],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+
+      const totals = computeTotals(state);
+      // Investment interest: 100000 * 4% = $4000/year
+      expect(totals.investmentIncomeAccounts).toHaveLength(1);
+      expect(totals.investmentIncomeAccounts[0].annualInterest).toBe(4000);
+      expect(totals.totalInvestmentInterest).toBe(4000);
+
+      // Tax should be higher than without investment income
+      const stateNoRoi: FinancialState = {
+        ...state,
+        assets: [{ id: "a1", category: "Savings Account", amount: 100000, roi: 0 }],
+      };
+      const totalsNoRoi = computeTotals(stateNoRoi);
+      expect(totals.totalTaxEstimate).toBeGreaterThan(totalsNoRoi.totalTaxEstimate);
+    });
+
+    it("includes interest from US taxable savings account in tax calculation", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "Savings", amount: 50000, roi: 5 },
+        ],
+        debts: [],
+        income: [
+          { id: "i1", category: "Salary", amount: 4000 },
+        ],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "US",
+        jurisdiction: "CA",
+      };
+
+      const totals = computeTotals(state);
+      // Investment interest: 50000 * 5% = $2500/year
+      expect(totals.investmentIncomeAccounts).toHaveLength(1);
+      expect(totals.investmentIncomeAccounts[0].annualInterest).toBe(2500);
+      expect(totals.totalInvestmentInterest).toBe(2500);
+
+      // Tax should include investment income
+      const stateNoRoi: FinancialState = {
+        ...state,
+        assets: [{ id: "a1", category: "Savings", amount: 50000, roi: 0 }],
+      };
+      const totalsNoRoi = computeTotals(stateNoRoi);
+      expect(totals.totalTaxEstimate).toBeGreaterThan(totalsNoRoi.totalTaxEstimate);
+    });
+
+    it("excludes capital-gains ROI accounts from investment income tax", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "Brokerage", amount: 100000, roi: 8, roiTaxTreatment: "capital-gains" },
+        ],
+        debts: [],
+        income: [
+          { id: "i1", category: "Salary", amount: 5000 },
+        ],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+
+      const totals = computeTotals(state);
+      expect(totals.investmentIncomeAccounts).toHaveLength(0);
+      expect(totals.totalInvestmentInterest).toBe(0);
+    });
+
+    it("excludes tax-free accounts (TFSA) from investment income tax", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "TFSA", amount: 50000, roi: 4 },
+        ],
+        debts: [],
+        income: [
+          { id: "i1", category: "Salary", amount: 5000 },
+        ],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+
+      const totals = computeTotals(state);
+      expect(totals.investmentIncomeAccounts).toHaveLength(0);
+      expect(totals.totalInvestmentInterest).toBe(0);
+    });
+
+    it("excludes tax-deferred accounts (RRSP) from investment income tax", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "RRSP", amount: 50000, roi: 6 },
+        ],
+        debts: [],
+        income: [
+          { id: "i1", category: "Salary", amount: 5000 },
+        ],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+
+      const totals = computeTotals(state);
+      expect(totals.investmentIncomeAccounts).toHaveLength(0);
+      expect(totals.totalInvestmentInterest).toBe(0);
+    });
+
+    it("excludes US Roth IRA (tax-free) from investment income tax", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "Roth IRA", amount: 30000, roi: 7 },
+        ],
+        debts: [],
+        income: [],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "US",
+        jurisdiction: "NY",
+      };
+
+      const totals = computeTotals(state);
+      expect(totals.investmentIncomeAccounts).toHaveLength(0);
+      expect(totals.totalInvestmentInterest).toBe(0);
+    });
+
+    it("includes investment income in tax explainer details", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "Savings Account", amount: 100000, roi: 4 },
+          { id: "a2", category: "GIC", amount: 50000, roi: 5 },
+          { id: "a3", category: "TFSA", amount: 40000, roi: 6 },
+        ],
+        debts: [],
+        income: [
+          { id: "i1", category: "Salary", amount: 5000 },
+        ],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+
+      const metrics = computeMetrics(state);
+      const taxMetric = metrics.find((m) => m.title === "Estimated Tax");
+      expect(taxMetric?.taxDetails?.investmentIncomeTax).toBeDefined();
+      expect(taxMetric?.taxDetails?.investmentIncomeTax?.accounts).toHaveLength(2);
+      // Savings: 100k * 4% = 4000, GIC: 50k * 5% = 2500
+      expect(taxMetric?.taxDetails?.investmentIncomeTax?.totalAnnualInterest).toBe(6500);
+    });
+
+    it("handles mixed taxable and non-taxable accounts correctly", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "Savings Account", amount: 100000, roi: 4 }, // taxable, income
+          { id: "a2", category: "Brokerage", amount: 200000, roi: 8, roiTaxTreatment: "capital-gains" }, // taxable, capital gains - excluded
+          { id: "a3", category: "TFSA", amount: 50000, roi: 6 }, // tax-free - excluded
+          { id: "a4", category: "RRSP", amount: 100000, roi: 5 }, // tax-deferred - excluded
+        ],
+        debts: [],
+        income: [
+          { id: "i1", category: "Salary", amount: 5000 },
+        ],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+
+      const totals = computeTotals(state);
+      // Only savings account with income ROI treatment should be included
+      expect(totals.investmentIncomeAccounts).toHaveLength(1);
+      expect(totals.investmentIncomeAccounts[0].label).toBe("Savings Account");
+      expect(totals.investmentIncomeAccounts[0].annualInterest).toBe(4000);
+      expect(totals.totalInvestmentInterest).toBe(4000);
     });
   });
 });

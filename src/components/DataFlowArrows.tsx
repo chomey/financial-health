@@ -67,6 +67,10 @@ export interface TaxExplainerDetails {
     country: "CA" | "US";
     totalCapitalGains: number;
   };
+  investmentIncomeTax?: {
+    totalAnnualInterest: number;
+    accounts: { label: string; balance: number; roi: number; annualInterest: number }[];
+  };
 }
 
 export interface RunwayTimeSeriesPoint {
@@ -670,6 +674,30 @@ function TaxExplainerContent({ details }: { details: TaxExplainerDetails }) {
               <p className="font-medium">0% up to $48,350 · 15% up to $533,400 · 20% above</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Investment income tax section */}
+      {details.investmentIncomeTax && details.investmentIncomeTax.accounts.length > 0 && (
+        <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-4" data-testid="tax-investment-income">
+          <p className="text-sm font-semibold text-stone-700 mb-2">Investment Interest Income</p>
+          <div className="space-y-1 mb-3">
+            {details.investmentIncomeTax.accounts.map((acct, i) => (
+              <div key={i} className="flex items-center justify-between text-xs text-stone-600" data-testid={`tax-investment-account-${i}`}>
+                <span>{acct.label} ({fmt(acct.balance)} × {acct.roi.toFixed(1)}%)</span>
+                <span className="font-semibold">{fmt(acct.annualInterest)}/yr</span>
+              </div>
+            ))}
+            {details.investmentIncomeTax.accounts.length > 1 && (
+              <div className="flex items-center justify-between text-xs font-semibold text-stone-700 border-t border-amber-200 pt-1 mt-1">
+                <span>Total investment interest</span>
+                <span>{fmt(details.investmentIncomeTax.totalAnnualInterest)}/yr</span>
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-stone-500">
+            Interest income is taxed annually as ordinary income. Capital gains and tax-deferred withdrawals are taxed only when realized.
+          </p>
         </div>
       )}
 
