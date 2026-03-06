@@ -46,7 +46,6 @@ const INSIGHT_CONNECTIONS: Record<string, DataFlowConnectionDef[]> = {
 function renderWithProvider(connections?: Record<string, DataFlowConnectionDef[]>) {
   return render(
     <DataFlowProvider>
-      {/* Register source elements so highlight attributes can be set */}
       <DataFlowSourceItem id="section-assets" label="Assets" value={65000}>
         <div>Assets Section</div>
       </DataFlowSourceItem>
@@ -64,13 +63,11 @@ function renderWithProvider(connections?: Record<string, DataFlowConnectionDef[]
   );
 }
 
-describe("Insight card data-flow arrows", () => {
+describe("Insight card data-flow (click-to-explain)", () => {
   it("renders insight cards with data-testid attributes", () => {
     renderWithProvider(INSIGHT_CONNECTIONS);
-    // Should have insight cards with specific test ids
     const cards = screen.getAllByRole("article");
     expect(cards.length).toBeGreaterThanOrEqual(3);
-    // Each card should have a data-testid
     for (const card of cards) {
       expect(card.getAttribute("data-testid")).toMatch(/^insight-card-/);
     }
@@ -92,83 +89,31 @@ describe("Insight card data-flow arrows", () => {
     }
   });
 
-  it("highlights source sections on hover of runway insight", () => {
+  it("opens explainer modal on click of insight card with connections", () => {
     renderWithProvider(INSIGHT_CONNECTIONS);
-    // Find the runway insight card
-    const runwayCard = screen.getByTestId("insight-card-runway-strong") ??
-      screen.getByTestId("insight-card-runway-solid") ??
-      screen.getByTestId("insight-card-runway-building");
-
-    fireEvent.mouseEnter(runwayCard);
-
-    // Check that assets source element got highlighted
-    const assetsSource = document.querySelector('[data-dataflow-source="section-assets"]');
-    expect(assetsSource?.getAttribute("data-dataflow-highlighted")).toBe("positive");
-
-    // Check that expenses source element got highlighted
-    const expensesSource = document.querySelector('[data-dataflow-source="section-expenses"]');
-    expect(expensesSource?.getAttribute("data-dataflow-highlighted")).toBe("negative");
+    const surplusCard = screen.getByTestId("insight-card-surplus-positive");
+    fireEvent.click(surplusCard);
+    expect(screen.getByTestId("explainer-modal")).toBeInTheDocument();
   });
 
-  it("clears highlights on mouse leave", () => {
-    renderWithProvider(INSIGHT_CONNECTIONS);
-    const runwayCard = screen.getByTestId("insight-card-runway-strong") ??
-      screen.getByTestId("insight-card-runway-solid");
-
-    fireEvent.mouseEnter(runwayCard);
-    fireEvent.mouseLeave(runwayCard);
-
-    const assetsSource = document.querySelector('[data-dataflow-source="section-assets"]');
-    expect(assetsSource?.getAttribute("data-dataflow-highlighted")).toBeNull();
-  });
-
-  it("highlights debts on hover of net-worth insight", () => {
-    renderWithProvider(INSIGHT_CONNECTIONS);
-    // Net worth insight should exist (since net worth is negative: -229500)
-    const netWorthCard = screen.getByTestId("insight-card-networth-growing");
-
-    fireEvent.mouseEnter(netWorthCard);
-
-    const debtsSource = document.querySelector('[data-dataflow-source="section-debts"]');
-    expect(debtsSource?.getAttribute("data-dataflow-highlighted")).toBe("negative");
-  });
-
-  it("renders without connections (no errors on hover)", () => {
+  it("renders without connections (no errors on click)", () => {
     renderWithProvider();
     const cards = screen.getAllByRole("article");
-    // Hovering should not throw
-    fireEvent.mouseEnter(cards[0]);
-    fireEvent.mouseLeave(cards[0]);
+    fireEvent.click(cards[0]);
+    // Should not throw and should not show modal (no connections)
+    expect(screen.queryByTestId("explainer-modal")).toBeNull();
   });
 
-  it("highlights income on hover of surplus insight", () => {
+  it("opens explainer modal on keyboard Enter", () => {
     renderWithProvider(INSIGHT_CONNECTIONS);
     const surplusCard = screen.getByTestId("insight-card-surplus-positive");
-
-    fireEvent.mouseEnter(surplusCard);
-
-    const incomeSource = document.querySelector('[data-dataflow-source="section-income"]');
-    expect(incomeSource?.getAttribute("data-dataflow-highlighted")).toBe("positive");
+    fireEvent.keyDown(surplusCard, { key: "Enter" });
+    expect(screen.getByTestId("explainer-modal")).toBeInTheDocument();
   });
 
-  it("activates arrows on focus (keyboard navigation)", () => {
+  it("insight cards with connections have pointer cursor", () => {
     renderWithProvider(INSIGHT_CONNECTIONS);
     const surplusCard = screen.getByTestId("insight-card-surplus-positive");
-
-    fireEvent.focus(surplusCard);
-
-    const incomeSource = document.querySelector('[data-dataflow-source="section-income"]');
-    expect(incomeSource?.getAttribute("data-dataflow-highlighted")).toBe("positive");
-  });
-
-  it("clears arrows on blur", () => {
-    renderWithProvider(INSIGHT_CONNECTIONS);
-    const surplusCard = screen.getByTestId("insight-card-surplus-positive");
-
-    fireEvent.focus(surplusCard);
-    fireEvent.blur(surplusCard);
-
-    const incomeSource = document.querySelector('[data-dataflow-source="section-income"]');
-    expect(incomeSource?.getAttribute("data-dataflow-highlighted")).toBeNull();
+    expect(surplusCard.style.cursor).toBe("pointer");
   });
 });

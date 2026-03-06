@@ -1,103 +1,87 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-test.describe("Insight card data-flow arrows", () => {
-  test("hovering insight card shows spotlight overlay", async ({ page }) => {
+test.describe("Insight card — click-to-explain", () => {
+  test("clicking insight card opens explainer modal", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
-    // Spotlight overlay inactive initially
-    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCSS("opacity", "0");
+    // No explainer modal initially
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible();
 
     // Find a surplus insight card (always present with mock data)
     const insightCard = page.locator('[data-insight-type="surplus"]').first();
     await expect(insightCard).toBeVisible();
 
-    await insightCard.hover();
+    await insightCard.click();
 
-    // Wait for spotlight to activate
-    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
-    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCSS("opacity", "1");
+    // Explainer modal should appear
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-    await captureScreenshot(page, "task-74-insight-surplus-arrows");
+    await captureScreenshot(page, "task-74-insight-surplus-explainer");
   });
 
-  test("source sections get highlighted when insight card is hovered", async ({ page }) => {
+  test("explainer modal shows source sections for surplus insight", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
-    // Hover a surplus insight (references income + expenses)
     const surplusInsight = page.locator('[data-insight-type="surplus"]').first();
-    await surplusInsight.hover();
+    await surplusInsight.click();
 
-    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-    const incomeEl = page.locator('[data-dataflow-source="section-income"]');
-    await expect(incomeEl).toHaveAttribute("data-dataflow-highlighted", "positive");
-
-    const expensesEl = page.locator('[data-dataflow-source="section-expenses"]');
-    await expect(expensesEl).toHaveAttribute("data-dataflow-highlighted", "negative");
+    await expect(page.locator('[data-testid="explainer-source-section-income"]')).toBeVisible();
+    await expect(page.locator('[data-testid="explainer-source-section-expenses"]')).toBeVisible();
   });
 
-  test("spotlight clears when mouse leaves insight card", async ({ page }) => {
+  test("explainer modal closes on Escape from insight", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
     const insightCard = page.locator('[data-insight-type="surplus"]').first();
-    await insightCard.hover();
-    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
+    await insightCard.click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-    await page.mouse.move(0, 0);
-
-    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCSS("opacity", "0", { timeout: 3000 });
-
-    await expect(page.locator('[data-dataflow-highlighted]')).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
   });
 
-  test("keyboard focus activates spotlight on insight card", async ({ page }) => {
+  test("keyboard Enter activates explainer on insight card", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
     const insightCard = page.locator('[data-insight-type="surplus"]').first();
     await insightCard.focus();
+    await page.keyboard.press("Enter");
 
-    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
-    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCSS("opacity", "1");
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
   });
 
-  test("runway insight highlights assets and expenses", async ({ page }) => {
+  test("runway insight click shows explainer with assets and expenses", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
     const runwayInsight = page.locator('[data-insight-type="runway"]').first();
-    await runwayInsight.hover();
+    await runwayInsight.click();
 
-    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-source-section-assets"]')).toBeVisible();
+    await expect(page.locator('[data-testid="explainer-source-section-expenses"]')).toBeVisible();
 
-    const assetsEl = page.locator('[data-dataflow-source="section-assets"]');
-    await expect(assetsEl).toHaveAttribute("data-dataflow-highlighted", "positive");
-
-    const expensesEl = page.locator('[data-dataflow-source="section-expenses"]');
-    await expect(expensesEl).toHaveAttribute("data-dataflow-highlighted", "negative");
-
-    await captureScreenshot(page, "task-74-insight-runway-arrows");
+    await captureScreenshot(page, "task-74-insight-runway-explainer");
   });
 
-  test("net-worth insight highlights assets and debts", async ({ page }) => {
+  test("net-worth insight click shows explainer with assets and debts", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
     const netWorthInsight = page.locator('[data-insight-type="net-worth"]').first();
-    await netWorthInsight.hover();
+    await netWorthInsight.click();
 
-    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-source-section-assets"]')).toBeVisible();
+    await expect(page.locator('[data-testid="explainer-source-section-debts"]')).toBeVisible();
 
-    const assetsEl = page.locator('[data-dataflow-source="section-assets"]');
-    await expect(assetsEl).toHaveAttribute("data-dataflow-highlighted", "positive");
-
-    const debtsEl = page.locator('[data-dataflow-source="section-debts"]');
-    await expect(debtsEl).toHaveAttribute("data-dataflow-highlighted", "negative");
-
-    await captureScreenshot(page, "task-74-insight-net-worth-arrows");
+    await captureScreenshot(page, "task-74-insight-net-worth-explainer");
   });
 });

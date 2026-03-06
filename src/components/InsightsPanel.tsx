@@ -52,7 +52,7 @@ function InsightCard({
     return () => ctx.unregisterTarget(targetId);
   }, [ctx, targetId]);
 
-  const activateArrows = useCallback(() => {
+  const handleClick = useCallback(() => {
     if (!ctx || !connections || connections.length === 0) return;
     const filtered = connections.filter((c) => c.value === undefined || c.value > 0);
     const activeConns = prioritizeConnections(
@@ -71,27 +71,7 @@ function InsightCard({
       label: insight.type,
       formattedValue: insight.message,
     });
-
-    // Highlight source elements
-    for (const conn of activeConns) {
-      const el = document.querySelector(`[data-dataflow-source="${conn.sourceId}"]`);
-      if (el instanceof HTMLElement) {
-        el.setAttribute("data-dataflow-highlighted", conn.sign === "negative" ? "negative" : "positive");
-      }
-    }
   }, [ctx, connections, targetId, insight.type, insight.message]);
-
-  const deactivateArrows = useCallback(() => {
-    if (!ctx) return;
-    ctx.setActiveConnections([]);
-    ctx.setActiveTarget(null);
-    ctx.setActiveTargetMeta(null);
-
-    // Remove all highlights
-    document.querySelectorAll("[data-dataflow-highlighted]").forEach((el) => {
-      el.removeAttribute("data-dataflow-highlighted");
-    });
-  }, [ctx]);
 
   return (
     <div
@@ -103,11 +83,9 @@ function InsightCard({
       aria-label={insight.message}
       data-testid={`insight-card-${insight.id}`}
       data-insight-type={insight.type}
-      data-dataflow-active-target={ctx?.activeTarget === targetId ? "true" : undefined}
-      onMouseEnter={activateArrows}
-      onMouseLeave={deactivateArrows}
-      onFocus={activateArrows}
-      onBlur={deactivateArrows}
+      onClick={handleClick}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
+      style={{ cursor: connections && connections.length > 0 ? "pointer" : undefined }}
       tabIndex={0}
     >
       <span className="mt-0.5 text-lg flex-shrink-0" aria-hidden="true">

@@ -13,88 +13,8 @@ beforeAll(() => {
 import {
   DataFlowProvider,
   useDataFlow,
-  SpotlightOverlay,
-  FormulaBar,
   type ActiveConnection,
-  type ActiveTargetMeta,
 } from "@/components/DataFlowArrows";
-
-// --- SpotlightOverlay tests ---
-
-describe("SpotlightOverlay", () => {
-  it("renders with opacity 0 when inactive", () => {
-    render(<SpotlightOverlay active={false} />);
-    const overlay = screen.getByTestId("spotlight-overlay");
-    expect(overlay).toBeInTheDocument();
-    expect(overlay.style.opacity).toBe("0");
-  });
-
-  it("renders with opacity 1 when active", () => {
-    render(<SpotlightOverlay active={true} />);
-    const overlay = screen.getByTestId("spotlight-overlay");
-    expect(overlay.style.opacity).toBe("1");
-  });
-
-  it("has correct styling properties", () => {
-    render(<SpotlightOverlay active={true} />);
-    const overlay = screen.getByTestId("spotlight-overlay");
-    expect(overlay.style.position).toBe("fixed");
-    expect(overlay.style.zIndex).toBe("40");
-    expect(overlay.style.pointerEvents).toBe("none");
-    expect(overlay).toHaveAttribute("aria-hidden", "true");
-  });
-});
-
-// --- FormulaBar tests ---
-
-describe("FormulaBar", () => {
-  const connections: ActiveConnection[] = [
-    { sourceId: "section-assets", targetId: "net-worth", label: "+$65k", value: 65000, sign: "positive" },
-    { sourceId: "section-debts", targetId: "net-worth", label: "-$295k", value: 295000, sign: "negative" },
-  ];
-  const targetMeta: ActiveTargetMeta = { label: "Net Worth", formattedValue: "-$230,000" };
-
-  it("renders nothing when targetMeta is null", () => {
-    const { container } = render(
-      <FormulaBar connections={connections} targetMeta={null} />
-    );
-    expect(container.innerHTML).toBe("");
-  });
-
-  it("renders nothing when connections are empty", () => {
-    const { container } = render(
-      <FormulaBar connections={[]} targetMeta={targetMeta} />
-    );
-    expect(container.innerHTML).toBe("");
-  });
-
-  it("renders formula terms and result", () => {
-    render(<FormulaBar connections={connections} targetMeta={targetMeta} />);
-    const bar = screen.getByTestId("formula-bar");
-    expect(bar).toBeInTheDocument();
-
-    // Check terms
-    expect(screen.getByTestId("formula-term-section-assets")).toHaveTextContent("+$65k");
-    expect(screen.getByTestId("formula-term-section-debts")).toHaveTextContent("-$295k");
-
-    // Check result
-    expect(screen.getByTestId("formula-result")).toHaveTextContent("-$230,000");
-  });
-
-  it("applies green styling for positive terms and red for negative", () => {
-    render(<FormulaBar connections={connections} targetMeta={targetMeta} />);
-    const posTerm = screen.getByTestId("formula-term-section-assets");
-    const negTerm = screen.getByTestId("formula-term-section-debts");
-    expect(posTerm.className).toContain("bg-green-50");
-    expect(negTerm.className).toContain("bg-rose-50");
-  });
-
-  it("has aria-label describing the formula", () => {
-    render(<FormulaBar connections={connections} targetMeta={targetMeta} />);
-    const bar = screen.getByTestId("formula-bar");
-    expect(bar).toHaveAttribute("aria-label", "Formula: Net Worth = -$230,000");
-  });
-});
 
 // --- Context tests ---
 
@@ -119,6 +39,7 @@ describe("DataFlowProvider and useDataFlow", () => {
     expect(typeof contextValue!.setActiveTarget).toBe("function");
     expect(typeof contextValue!.setActiveConnections).toBe("function");
     expect(typeof contextValue!.setActiveTargetMeta).toBe("function");
+    expect(typeof contextValue!.getSourceMetadata).toBe("function");
     expect(contextValue!.activeTarget).toBeNull();
     expect(contextValue!.activeConnections).toEqual([]);
     expect(contextValue!.activeTargetMeta).toBeNull();
@@ -209,25 +130,39 @@ describe("DataFlowProvider and useDataFlow", () => {
     expect(ctx!.activeTargetMeta).toEqual({ label: "Net Worth", formattedValue: "$40,000" });
   });
 
-  it("renders spotlight overlay (inactive by default)", () => {
+  it("renders explainer modal when target is active with connections and meta", () => {
+    let ctx: ReturnType<typeof useDataFlow> | null = null;
+
+    function TestComponent() {
+      ctx = useDataFlow();
+      return <div>test</div>;
+    }
+
     render(
       <DataFlowProvider>
-        <div>content</div>
+        <TestComponent />
       </DataFlowProvider>
     );
 
-    const overlay = screen.getByTestId("spotlight-overlay");
-    expect(overlay).toBeInTheDocument();
-    expect(overlay.style.opacity).toBe("0");
+    act(() => {
+      ctx!.setActiveTarget("net-worth");
+      ctx!.setActiveConnections([
+        { sourceId: "section-assets", targetId: "net-worth", label: "+$65k", value: 65000, sign: "positive" },
+      ]);
+      ctx!.setActiveTargetMeta({ label: "Net Worth", formattedValue: "-$230,000" });
+    });
+
+    expect(screen.getByTestId("explainer-modal")).toBeInTheDocument();
   });
 
-  it("does not render SVG overlay (removed)", () => {
+  it("does not render spotlight overlay or SVG overlay (removed)", () => {
     render(
       <DataFlowProvider>
         <div>content</div>
       </DataFlowProvider>
     );
 
+    expect(screen.queryByTestId("spotlight-overlay")).toBeNull();
     expect(screen.queryByTestId("data-flow-overlay")).toBeNull();
   });
 });

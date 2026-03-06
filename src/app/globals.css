@@ -157,29 +157,53 @@ body {
   animation: fade-in 0.15s ease-out;
 }
 
-/* Spotlight dimming — highlighted source sections rise above overlay */
-[data-dataflow-highlighted] {
-  position: relative;
-  z-index: 45;
-  background: white;
-  transform: scale(1.005);
-  transition: all 250ms ease-out;
-  border-radius: 0.75rem;
+/* Explainer modal animations */
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-[data-dataflow-highlighted="positive"] {
-  border-color: rgb(16 185 129 / 0.6) !important;
-  box-shadow: 0 0 12px 2px rgba(16, 185, 129, 0.3);
+@keyframes modal-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
-[data-dataflow-highlighted="negative"] {
-  border-color: rgb(244 63 94 / 0.6) !important;
-  box-shadow: 0 0 12px 2px rgba(244, 63, 94, 0.3);
+@keyframes modal-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes modal-scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+.animate-modal-in {
+  animation: modal-fade-in 200ms ease-out;
+}
+.animate-modal-out {
+  animation: modal-fade-out 200ms ease-out forwards;
+}
+.animate-modal-content-in {
+  animation: modal-scale-in 200ms ease-out;
+}
+.animate-modal-content-out {
+  animation: modal-scale-out 200ms ease-out forwards;
 }
 
-/* Active target (hovered metric/insight card) — elevated above spotlight overlay */
-[data-dataflow-active-target] {
-  position: relative;
-  z-index: 45;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 250ms ease-out;
+/* Hand-drawn oval draw-on animation */
+@keyframes draw-oval {
+  from { stroke-dashoffset: 500; }
+  to { stroke-dashoffset: 0; }
+}
+.animate-draw-oval {
+  stroke-dasharray: 500;
+  animation: draw-oval 400ms ease-out 200ms both;
+}
+
+/* Hand-drawn line draw-on animation */
+@keyframes draw-line {
+  from { stroke-dashoffset: 500; }
+  to { stroke-dashoffset: 0; }
+}
+.animate-draw-line {
+  stroke-dasharray: 500;
+  animation: draw-line 300ms ease-out 600ms both;
 }
 
