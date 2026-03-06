@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 76
-- **Completed**: 73
-- **Remaining**: 3
+- **Completed**: 74
+- **Remaining**: 2
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1550,3 +1550,24 @@
   ![Financial Runway arrows](screenshots/task-73-financial-runway-arrows.png)
   ![Debt-to-Asset Ratio arrows](screenshots/task-73-debt-to-asset-ratio-arrows.png)
 - **Notes**: All five metric cards are now fully wired with data-flow arrows. Estimated Tax has a single green arrow from income showing the effective tax rate and gross annual income. Financial Runway mirrors the formula: liquid assets (numerator) flow in green, monthly obligations (denominator) flow in red. Debt-to-Asset Ratio shows property in both positive (value) and negative (mortgage) connections since the formula uses property value on the asset side and mortgage on the debt side. Mortgage and property connections are conditional (only appear when > 0).
+
+## Task 74: Wire insights panel items to show data-flow arrows on hover
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/InsightsPanel.tsx`: Added data-flow arrow support to InsightCard — registers as target, activates/deactivates arrows on hover/focus/blur. Each card uses its insight type to look up connections. Added `data-testid`, `data-insight-type`, and `tabIndex=0` attributes. Accepts `insightConnections` prop mapping insight types to connections.
+  - `src/components/DataFlowArrows.tsx`: Added `style?: "default" | "light"` to `ActiveConnection` and `light?: boolean` to `ArrowData`. Light-style arrows render thinner (1.5px vs 2.5px stroke) and more transparent (0.15 vs 0.3 glow opacity).
+  - `src/app/page.tsx`: Built `insightConnections` record mapping each InsightType to its data-flow connections (runway→assets+expenses, surplus→income+expenses, net-worth→assets+debts, savings-rate→income+expenses, debt-interest→debts, tax→income, withdrawal-tax→assets). Passed to InsightsPanel.
+  - `src/lib/changelog.ts`: Added v74 entry.
+  - `tests/unit/insight-data-flow.test.tsx`: New T1 unit tests (10 tests).
+  - `tests/e2e/insight-data-flow.spec.ts`: New T2 browser tests (6 tests).
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/insight-data-flow.test.tsx`: 10 tests — card rendering with data-testid/insight-type/tabIndex, hover highlights on runway/surplus/net-worth insights, mouse leave clears highlights, focus/blur keyboard navigation, renders without connections without errors (10 passed, 0 failed)
+  - `tests/e2e/insight-data-flow.spec.ts`: 6 tests — hovering surplus insight shows overlay, source sections highlighted (income positive, expenses negative), arrows disappear on leave, keyboard focus activates arrows, runway insight highlights assets+expenses, net-worth insight highlights assets+debts (6 passed, 0 failed)
+  - All unit tests: 919 passed, 0 failed (57 test files)
+- **Screenshots**:
+  ![Insight surplus arrows](screenshots/task-74-insight-surplus-arrows.png)
+  ![Insight runway arrows](screenshots/task-74-insight-runway-arrows.png)
+  ![Insight net-worth arrows](screenshots/task-74-insight-net-worth-arrows.png)
+- **Notes**: Pre-existing changelog test failure fixed in separate commit. Insight arrows use a lighter style (thinner strokes, lower glow opacity) than metric card arrows to avoid visual overload since insights are more numerous. Each insight type maps to the same source sections it conceptually references. The `INSIGHT_TYPE_SOURCES` constant in InsightsPanel documents the mapping but the actual connections (with labels and values) come from page.tsx for consistency with the metric card connection definitions.
