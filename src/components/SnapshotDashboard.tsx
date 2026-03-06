@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { generateInsights, type FinancialData, type InsightType } from "@/lib/insights";
-import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type ActiveTargetMeta, type TaxExplainerDetails } from "@/components/DataFlowArrows";
+import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type ActiveTargetMeta, type TaxExplainerDetails, type RunwayExplainerDetails } from "@/components/DataFlowArrows";
 
 interface MetricData {
   title: string;
@@ -18,6 +18,7 @@ interface MetricData {
   runwayWithGrowth?: number; // runway in months factoring in asset ROR
   runwayAfterTax?: number; // runway in months after withdrawal taxes
   taxDetails?: TaxExplainerDetails; // detailed tax breakdown for explainer
+  runwayDetails?: RunwayExplainerDetails; // detailed runway breakdown for explainer
 }
 
 // Mock values based on existing entry component mock data
@@ -169,6 +170,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       formattedValue: formatMetricValue(metric.value, metric.format, homeCurrency),
       metricType,
       taxDetails: metricType === "estimated-tax" ? metric.taxDetails : undefined,
+      runwayDetails: metricType === "financial-runway" ? metric.runwayDetails : undefined,
     });
 
     // Build aria-live announcement
@@ -243,11 +245,6 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       {metric.runwayWithGrowth !== undefined && (
         <p className="mt-0.5 text-sm text-stone-500" data-testid="runway-with-growth">
           ({metric.runwayWithGrowth === Infinity ? "∞" : formatMetricValue(metric.runwayWithGrowth, "months", homeCurrency)} with investment growth)
-        </p>
-      )}
-      {metric.runwayAfterTax !== undefined && (
-        <p className="mt-0.5 text-sm text-amber-600" data-testid="runway-after-tax">
-          ({formatMetricValue(metric.runwayAfterTax, "months", homeCurrency)} after withdrawal tax)
         </p>
       )}
       {/* Effective tax rate sub-line */}

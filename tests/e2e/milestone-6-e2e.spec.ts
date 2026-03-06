@@ -69,12 +69,18 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await rrspInput.press("Enter");
     await page.waitForTimeout(1500);
 
-    // Runway should now show tax-adjusted value
-    const afterTaxElement = page.locator('[data-testid="runway-after-tax"]');
-    await expect(afterTaxElement).toBeVisible({ timeout: 5000 });
-    const afterTaxText = await afterTaxElement.textContent();
-    expect(afterTaxText).toContain("after withdrawal tax");
-    expect(afterTaxText).toContain("mo");
+    // Tax drag is now shown in the runway explainer modal (not as a sub-line)
+    const runwayCard = page.locator('[aria-label="Financial Runway"]');
+    await runwayCard.click();
+    const modal = page.locator('[data-testid="explainer-modal"]');
+    await expect(modal).toBeVisible();
+    const taxDrag = page.locator('[data-testid="runway-tax-drag"]');
+    await expect(taxDrag).toBeVisible({ timeout: 5000 });
+    const taxDragText = await taxDrag.textContent();
+    expect(taxDragText).toContain("Tax drag:");
+    // Close modal
+    await page.keyboard.press("Escape");
+    await expect(modal).not.toBeVisible({ timeout: 1000 });
 
     await captureScreenshot(page, "task-68-runway-after-tax-rrsp-heavy");
 
@@ -166,9 +172,9 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await summaryReloaded.scrollIntoViewIfNeeded();
     await expect(summaryReloaded).toBeVisible();
 
-    // Runway after tax should still display
-    const afterTaxReloaded = page.locator('[data-testid="runway-after-tax"]');
-    await expect(afterTaxReloaded).toBeVisible({ timeout: 5000 });
+    // Tax drag is now in the explainer modal — verify the runway card still exists
+    const runwayCardReloaded = page.locator('[aria-label="Financial Runway"]');
+    await expect(runwayCardReloaded).toBeVisible();
 
     await captureScreenshot(page, "task-68-url-persistence-after-reload");
   });
@@ -190,9 +196,14 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     await page.getByLabel("Delete Savings Account").click();
     await page.waitForTimeout(1500);
 
-    // Only TFSA (tax-free) remains — no tax drag annotation
-    const afterTaxElement = page.locator('[data-testid="runway-after-tax"]');
-    await expect(afterTaxElement).not.toBeVisible();
+    // Only TFSA (tax-free) remains — open explainer and verify no tax drag
+    const runwayCardTaxFree = page.locator('[aria-label="Financial Runway"]');
+    await runwayCardTaxFree.click();
+    const modalTaxFree = page.locator('[data-testid="explainer-modal"]');
+    await expect(modalTaxFree).toBeVisible();
+    const taxDragTaxFree = page.locator('[data-testid="runway-tax-drag"]');
+    await expect(taxDragTaxFree).not.toBeVisible();
+    await page.keyboard.press("Escape");
 
     await captureScreenshot(page, "task-68-tax-free-only-no-drag");
   });
@@ -256,9 +267,15 @@ test.describe("Milestone 6: Withdrawal Tax Features (Tasks 63-67)", () => {
     const k401CostBasis = k401Row.locator('[data-testid^="cost-basis-badge-"]');
     await expect(k401CostBasis).toHaveCount(0);
 
-    // Tax-adjusted runway should show with 401k heavy portfolio
-    const afterTaxElement = page.locator('[data-testid="runway-after-tax"]');
-    await expect(afterTaxElement).toBeVisible({ timeout: 5000 });
+    // Tax drag is now shown in the runway explainer modal
+    const runwayCardUS = page.locator('[aria-label="Financial Runway"]');
+    await runwayCardUS.click();
+    const modalUS = page.locator('[data-testid="explainer-modal"]');
+    await expect(modalUS).toBeVisible();
+    const taxDragUS = page.locator('[data-testid="runway-tax-drag"]');
+    await expect(taxDragUS).toBeVisible({ timeout: 5000 });
+    await page.keyboard.press("Escape");
+    await expect(modalUS).not.toBeVisible({ timeout: 1000 });
 
     // Withdrawal tax summary should show US tax treatments
     const summary = page.locator('[data-testid="withdrawal-tax-summary"]');
