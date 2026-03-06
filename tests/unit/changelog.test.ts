@@ -3,7 +3,7 @@ import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
   it("contains entries for all 82 completed tasks", () => {
-    expect(CHANGELOG.length).toBe(82);
+    expect(CHANGELOG.length).toBe(83);
   });
 
   it("has unique version numbers", () => {
@@ -14,8 +14,8 @@ describe("changelog data", () => {
   it("covers versions 1 through 82", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(82);
-    for (let i = 1; i <= 82; i++) {
+    expect(versions[versions.length - 1]).toBe(83);
+    for (let i = 1; i <= 83; i++) {
       expect(versions).toContain(i);
     }
   });
