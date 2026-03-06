@@ -20,6 +20,7 @@ import FxRateDisplay from "@/components/FxRateDisplay";
 import WithdrawalTaxSummary from "@/components/WithdrawalTaxSummary";
 import InsightsPanel from "@/components/InsightsPanel";
 import ZoomableCard from "@/components/ZoomableCard";
+import { DataFlowProvider } from "@/components/DataFlowArrows";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -371,6 +372,7 @@ export default function Home() {
   const benchmarkDebtToIncome = annualIncome > 0 ? (debtTotal + totals.totalPropertyMortgage) / annualIncome : 0;
 
   return (
+    <DataFlowProvider>
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white px-4 py-3 shadow-sm sm:px-6 sm:py-4">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
@@ -585,5 +587,6 @@ export default function Home() {
         </section>
       </main>
     </div>
+    </DataFlowProvider>
   );
 }
