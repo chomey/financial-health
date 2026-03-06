@@ -83,8 +83,8 @@ Complete exactly ONE task from TASKS.md, then stop.
    Tests should cover the happy path and key edge cases. Follow the loaded agent's required test tiers.
 
 8. **Verify & Capture Screenshots** — Run all T1 tests (`npm test`) plus `npm run build`. For Playwright:
-   - **T2 (per-task)**: Run ONLY the new/changed test file(s), not the full suite: `CAPTURE_SCREENSHOTS=1 npx playwright test tests/e2e/<your-new-test>.spec.ts`. This takes ~10-30s instead of ~5 minutes.
-   - **T3 (full E2E)**: Run the full suite: `CAPTURE_SCREENSHOTS=1 npx playwright test`. Only triggered for `[@qa]` tasks, `[E2E]`/`[MILESTONE]` tags, or every 5th task.
+   - **T2 (per-task)**: Run ONLY the new/changed test file(s): `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=<N> npx playwright test tests/e2e/<your-new-test>.spec.ts` where `<N>` is the task number. The `CAPTURE_TASK` env var ensures only this task's screenshots get written, protecting previously committed screenshots. This takes ~10-30s instead of ~5 minutes. **DO NOT run the full Playwright suite for T2 — only run your new test file.**
+   - **T3 (full E2E)**: Run the full suite with task filter: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=<N> npx playwright test`. Only triggered for `[@qa]` tasks, `[E2E]`/`[MILESTONE]` tags, or every 5th task.
    - This single Playwright run both verifies tests AND captures screenshots — do NOT run Playwright twice.
    - **If tests you did NOT write are now failing**, `git stash` your changes, fix the pre-existing failure, commit the fix with `ralph: fix pre-existing test failure during task [N]`, then `git stash pop` and continue.
    - **Exception**: During T3/regression QA tasks, omit `CAPTURE_SCREENSHOTS=1` to avoid overwriting existing screenshots.
