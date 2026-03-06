@@ -95,7 +95,7 @@ describe("SourceSummaryCard", () => {
     expect(card.className).toContain("border-l-rose-500");
   });
 
-  it("shows top 5 items and +N more when >6 items", () => {
+  it("shows all items when >5 items (no truncation)", () => {
     const items = [
       { label: "Item 1", value: 10000 },
       { label: "Item 2", value: 9000 },
@@ -115,37 +115,51 @@ describe("SourceSummaryCard", () => {
         ovalSeed={1}
       />
     );
-    // Should show first 5 items
+    // All 7 items should be visible
     expect(screen.getByText("Item 1")).toBeInTheDocument();
     expect(screen.getByText("Item 5")).toBeInTheDocument();
-    // Items 6 and 7 should be hidden
-    expect(screen.queryByText("Item 6")).not.toBeInTheDocument();
-    expect(screen.queryByText("Item 7")).not.toBeInTheDocument();
-    // Should show "+2 more"
-    expect(screen.getByTestId("source-summary-more-section-assets")).toHaveTextContent("+2 more");
+    expect(screen.getByText("Item 6")).toBeInTheDocument();
+    expect(screen.getByText("Item 7")).toBeInTheDocument();
+    // No "+N more" label
+    expect(screen.queryByText(/\+\d+ more/)).not.toBeInTheDocument();
   });
 
-  it("shows exactly 5 items without +N more", () => {
+  it("renders scrollable container for items", () => {
     const items = [
-      { label: "A", value: 100 },
-      { label: "B", value: 200 },
-      { label: "C", value: 300 },
-      { label: "D", value: 400 },
-      { label: "E", value: 500 },
+      { label: "Item 1", value: 10000 },
+      { label: "Item 2", value: 9000 },
+      { label: "Item 3", value: 8000 },
     ];
     render(
       <SourceSummaryCard
-        sourceId="section-income"
-        sectionName="Income"
+        sourceId="section-assets"
+        sectionName="Assets"
         items={items}
-        total="$1,500"
+        total="$27,000"
         isPositive={true}
-        ovalSeed={3}
+        ovalSeed={1}
       />
     );
-    expect(screen.getByText("A")).toBeInTheDocument();
-    expect(screen.getByText("E")).toBeInTheDocument();
-    expect(screen.queryByTestId("source-summary-more-section-income")).not.toBeInTheDocument();
+    const itemsContainer = screen.getByTestId("source-summary-items-section-assets");
+    expect(itemsContainer.className).toContain("overflow-y-auto");
+    expect(itemsContainer.className).toContain("max-h-[200px]");
+  });
+
+  it("has sticky total row with shadow", () => {
+    render(
+      <SourceSummaryCard
+        sourceId="section-assets"
+        sectionName="Assets"
+        items={[{ label: "Savings", value: 5000 }]}
+        total="$5,000"
+        isPositive={true}
+        ovalSeed={1}
+      />
+    );
+    const totalRow = screen.getByTestId("source-summary-total-row-section-assets");
+    expect(totalRow.className).toContain("sticky");
+    expect(totalRow.className).toContain("bottom-0");
+    expect(totalRow.className).toContain("bg-white");
   });
 
   it("renders without items when items is undefined", () => {

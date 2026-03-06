@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // UI Polish (Milestone 12)
+  {
+    version: 87,
+    title: "Scrollable source summary cards with frozen total pane",
+    description: "Source summary cards in explainer modals now show all items instead of truncating at 5 with '+N more'. Long item lists scroll vertically within a 200px container with a thin stone-colored scrollbar. The total row is sticky at the bottom with a subtle shadow separator so it stays visible while scrolling. Cards have increased padding and larger total font, and the explainer modal is wider (max-w-xl) for more breathing room.",
+    date: "2026-03-06",
+  },
   // Metric-Specific Explainers (Milestone 11)
   {
     version: 86,
