@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import CurrencyBadge from "@/components/CurrencyBadge";
+import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { getTaxTreatment } from "@/lib/withdrawal-tax";
 
 export interface Asset {
@@ -320,7 +321,8 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
             // Show separator before first computed asset
             const isFirstComputed = isComputed && (idx === 0 || !sortedAssets[idx - 1].computed);
             return (
-            <div key={asset.id} role="listitem">
+            <DataFlowSourceItem key={asset.id} id={`asset:${asset.id}`} label={asset.category} value={asset.amount}>
+            <div role="listitem">
               {isFirstComputed && (
                 <div className="mt-2 mb-1 border-t border-dashed border-stone-200 pt-2 px-3">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Auto-computed</span>
@@ -629,6 +631,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 ) : null;
               })()}
             </div>
+          </DataFlowSourceItem>
           );})}
         </div>
       )}

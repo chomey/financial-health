@@ -20,7 +20,7 @@ import FxRateDisplay from "@/components/FxRateDisplay";
 import WithdrawalTaxSummary from "@/components/WithdrawalTaxSummary";
 import InsightsPanel from "@/components/InsightsPanel";
 import ZoomableCard from "@/components/ZoomableCard";
-import { DataFlowProvider } from "@/components/DataFlowArrows";
+import { DataFlowProvider, useOptionalDataFlow } from "@/components/DataFlowArrows";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -145,6 +145,9 @@ function CollapsibleSection({
   summary,
   children,
   defaultOpen = true,
+  dataFlowId,
+  dataFlowValue,
+  dataFlowLabel,
 }: {
   id?: string;
   title: string;
@@ -152,17 +155,36 @@ function CollapsibleSection({
   summary?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  dataFlowId?: string;
+  dataFlowValue?: number;
+  dataFlowLabel?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const collapsedRef = useRef<HTMLButtonElement>(null);
+  const expandedRef = useRef<HTMLDivElement>(null);
+  const ctx = useOptionalDataFlow();
+
+  // Register the appropriate element as a data-flow source based on open/collapsed state
+  useEffect(() => {
+    if (!dataFlowId || !ctx) return;
+    const ref = open ? expandedRef : collapsedRef;
+    ctx.registerSource(dataFlowId, ref, {
+      label: dataFlowLabel ?? title,
+      value: dataFlowValue ?? 0,
+    });
+    return () => ctx.unregisterSource(dataFlowId);
+  }, [dataFlowId, dataFlowLabel, dataFlowValue, title, open, ctx]);
 
   if (!open) {
     return (
       <button
         type="button"
+        ref={collapsedRef}
         id={id}
         onClick={() => setOpen(true)}
         className="flex w-full items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm text-left transition-all duration-200 hover:shadow-md hover:bg-stone-50 scroll-mt-16"
         aria-expanded={false}
+        data-dataflow-source={dataFlowId}
       >
         <div className="flex items-center gap-2 min-w-0">
           <span aria-hidden="true">{icon}</span>
@@ -185,7 +207,7 @@ function CollapsibleSection({
   }
 
   return (
-    <div id={id} className="relative scroll-mt-16">
+    <div ref={expandedRef} id={id} className="relative scroll-mt-16" data-dataflow-source={dataFlowId}>
       <button
         type="button"
         onClick={() => setOpen(false)}
@@ -457,27 +479,27 @@ export default function Home() {
             aria-label="Financial data entry"
           >
             <div className="space-y-3">
-              <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)}>
+              <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)} dataFlowId="section-assets" dataFlowValue={assetTotal} dataFlowLabel="Assets">
                 <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="debts" title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"}>
+              <CollapsibleSection id="debts" title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"} dataFlowId="section-debts" dataFlowValue={debtTotal} dataFlowLabel="Debts">
                 <DebtEntry items={debts} onChange={setDebts} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
-<CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)}>
+              <CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)} dataFlowId="section-income" dataFlowValue={incomeTotal} dataFlowLabel="Income">
                 <IncomeEntry items={income} onChange={setIncome} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="expenses" title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)}>
+              <CollapsibleSection id="expenses" title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)} dataFlowId="section-expenses" dataFlowValue={expenseTotal} dataFlowLabel="Expenses">
                 <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} surplusTargetName={surplusTargetName} federalTax={totals.totalFederalTax / 12} provincialStateTax={totals.totalProvincialStateTax / 12} computedFederalTax={totals.computedFederalTax / 12} computedProvincialStateTax={totals.computedProvincialStateTax / 12} federalTaxOverride={federalTaxOverride !== undefined ? federalTaxOverride / 12 : undefined} provincialTaxOverride={provincialTaxOverride !== undefined ? provincialTaxOverride / 12 : undefined} onFederalTaxOverride={(monthly) => setFederalTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} onProvincialTaxOverride={(monthly) => setProvincialTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} country={country} isUnderwater={monthlySurplus < 0} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="property" title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"}>
+              <CollapsibleSection id="property" title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"} dataFlowId="section-property" dataFlowValue={totals.totalPropertyEquity} dataFlowLabel="Property">
                 <PropertyEntry items={properties} onChange={setProperties} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
               </CollapsibleSection>
 
-              <CollapsibleSection id="stocks" title="Stocks" icon="📊" summary={stockCount > 0 ? `${stockCount} holding${stockCount !== 1 ? "s" : ""}` : "None"}>
+              <CollapsibleSection id="stocks" title="Stocks" icon="📊" summary={stockCount > 0 ? `${stockCount} holding${stockCount !== 1 ? "s" : ""}` : "None"} dataFlowId="section-stocks" dataFlowValue={totals.totalStocks} dataFlowLabel="Stocks">
                 <StockEntry items={stocks} onChange={setStocks} />
               </CollapsibleSection>
             </div>

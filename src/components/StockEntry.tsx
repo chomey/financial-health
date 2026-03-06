@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 
 export interface StockHolding {
   id: string;
@@ -468,7 +469,8 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
             const annualizedReturn = getAnnualizedReturn(stock);
             const isFetching = fetchingPrices.has(stock.id);
             return (
-              <div key={stock.id} role="listitem">
+              <DataFlowSourceItem key={stock.id} id={`stock:${stock.id}`} label={stock.ticker} value={value}>
+              <div role="listitem">
                 <div className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50">
                   <div className="flex flex-1 items-center gap-3 min-w-0">
                     {/* Ticker */}
@@ -661,6 +663,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                   )}
                 </div>
               </div>
+            </DataFlowSourceItem>
             );
           })}
         </div>

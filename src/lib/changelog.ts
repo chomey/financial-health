@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Data Flow Visualization (Milestone 8)
   {
+    version: 70,
+    title: "Data-flow source registration for all entry sections",
+    description: "All 6 entry sections (Assets, Debts, Income, Expenses, Property, Stocks) now register as data-flow sources via DataFlowContext. Individual entry rows also register as sub-sources for granular arrow targeting. CollapsibleSection switches registration between collapsed header and expanded container. DataFlowSourceItem component handles row-level registration with graceful no-op outside provider.",
+    date: "2026-03-05",
+  },
+  {
     version: 69,
     title: "SVG arrow overlay system and data-flow context",
     description: "New DataFlowArrows component with a full-viewport SVG overlay that renders animated flowing arrows between source and target elements. Includes DataFlowContext for registering sources and targets, cubic bezier path calculation, CSS stroke-dasharray animations, green/red color coding for positive/negative contributions, and scroll/resize recalculation.",

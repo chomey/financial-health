@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 
 export type IncomeFrequency = "monthly" | "weekly" | "biweekly" | "quarterly" | "semi-annually" | "annually";
 
@@ -326,8 +327,8 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
       ) : (
         <div className="space-y-1" role="list" aria-label="Income items">
           {items.map((item) => (
+            <DataFlowSourceItem key={item.id} id={`income:${item.id}`} label={item.category} value={item.amount}>
             <div
-              key={item.id}
               role="listitem"
               className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 ${
                 item.incomeType === "capital-gains"
@@ -472,6 +473,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
                 </svg>
               </button>
             </div>
+            </DataFlowSourceItem>
           ))}
         </div>
       )}

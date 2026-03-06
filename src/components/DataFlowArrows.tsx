@@ -59,6 +59,11 @@ export function useDataFlow(): DataFlowContextValue {
   return ctx;
 }
 
+/** Returns the data flow context or null if outside a provider. Safe for optional usage. */
+export function useOptionalDataFlow(): DataFlowContextValue | null {
+  return useContext(DataFlowContext);
+}
+
 // --- Path calculation (exported for testing) ---
 
 export interface Point {
@@ -146,6 +151,31 @@ export function approximatePathLength(from: Point, to: Point): number {
   const dy = to.y - from.y;
   // Rough approximation: slightly longer than straight-line distance due to curve
   return Math.sqrt(dx * dx + dy * dy) * 1.2;
+}
+
+// --- DataFlowSourceItem (wrapper for sub-source registration) ---
+
+export function DataFlowSourceItem({
+  id,
+  label,
+  value,
+  children,
+}: {
+  id: string;
+  label: string;
+  value: number;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const ctx = useOptionalDataFlow();
+
+  useEffect(() => {
+    if (!ctx) return;
+    ctx.registerSource(id, ref, { label, value });
+    return () => ctx.unregisterSource(id);
+  }, [id, label, value, ctx]);
+
+  return <div ref={ref} data-dataflow-source={id}>{children}</div>;
 }
 
 // --- Provider ---

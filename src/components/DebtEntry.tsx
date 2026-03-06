@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { calculateDebtPayoff, formatPayoffCurrency } from "@/lib/debt-payoff";
 import CurrencyBadge from "@/components/CurrencyBadge";
+import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 
 export interface Debt {
   id: string;
@@ -302,7 +303,8 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
             const hasInterest = debt.interestRate !== undefined;
             const hasPayment = debt.monthlyPayment !== undefined && debt.monthlyPayment > 0;
             return (
-            <div key={debt.id} role="listitem">
+            <DataFlowSourceItem key={debt.id} id={`debt:${debt.id}`} label={debt.category} value={debt.amount}>
+            <div role="listitem">
               <div
                 className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50"
               >
@@ -529,6 +531,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                 return null;
               })()}
             </div>
+          </DataFlowSourceItem>
           );})}
         </div>
       )}
