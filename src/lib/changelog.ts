@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Data Flow Visualization (Milestone 8)
   {
+    version: 72,
+    title: "Monthly Surplus metric card data-flow arrows on hover",
+    description: "Hovering the Monthly Surplus metric card now shows animated SVG arrows: green arrow from Income (after-tax amount), red arrows from Expenses, asset Contributions (if any), and Mortgage payments (if any). The surplus formula is immediately obvious — income flows in green, everything else flows in red. Same staggered entrance, source highlights, and fade-out behavior as Net Worth.",
+    date: "2026-03-05",
+  },
+  {
     version: 71,
     title: "Net Worth metric card data-flow arrows on hover",
     description: "Hovering the Net Worth metric card now shows animated SVG arrows connecting it to the Assets, Stocks, Property (if present), and Debts source sections. Green arrows for positive contributions, red for debts. Source sections get a color-matched highlight glow. Arrows fade in with staggered animation and disappear on mouse leave. Works with keyboard focus too.",

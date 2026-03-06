@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 76
-- **Completed**: 71
-- **Remaining**: 5
+- **Completed**: 72
+- **Remaining**: 4
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1511,3 +1511,21 @@
   ![Source section highlights](screenshots/task-71-source-highlights.png)
   ![Keyboard focus arrows](screenshots/task-71-keyboard-focus-arrows.png)
 - **Notes**: The `DataFlowConnectionDef` type is exported from SnapshotDashboard for use by page.tsx. MetricCard uses `useOptionalDataFlow` to gracefully handle rendering outside a DataFlowProvider (unit tests). Source highlighting uses CSS attribute selectors on `[data-dataflow-highlighted]` with keyframe glow animations. Connections with value=0 are filtered out to avoid drawing arrows to empty sections. The fmtLabel helper formats values as compact +$Xk/-$Xk labels for arrow midpoint pills.
+
+## Task 72: Wire Monthly Surplus metric card data-flow arrows on hover
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/app/page.tsx`: Added `monthlySurplusConnections` array defining 4 data-flow connections: green arrow from `section-income` (after-tax income), red arrow from `section-expenses` (total expenses), conditional red arrow from `section-assets` labeled "contributions" (when monthly contributions > 0), conditional red arrow from `section-property` labeled "mortgage" (when mortgage payments > 0). Added "Monthly Surplus" to `dataFlowConnections` record passed to SnapshotDashboard.
+  - `src/lib/changelog.ts`: Added v72 entry.
+  - `tests/unit/changelog.test.ts`: Updated expectations for 72 entries and 4 milestone-8 entries.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/monthly-surplus-data-flow.test.tsx`: 14 tests — connection structure validation (income=positive, expenses/contributions/mortgage=negative), zero-value filtering, optional contributions/mortgage connections, hover/leave/focus interactions, formula clarity (exactly 1 positive source, 3 negative outflows) (14 passed, 0 failed)
+  - `tests/e2e/monthly-surplus-data-flow.spec.ts`: 5 tests — hover shows overlay with arrow paths, income highlighted positive / expenses highlighted negative, arrows disappear on leave, breakdown visible on hover, keyboard focus activates arrows (5 passed, 0 failed)
+  - All unit tests: 895 passed, 0 failed (55 test files)
+- **Screenshots**:
+  ![Monthly Surplus arrows on hover](screenshots/task-72-monthly-surplus-arrows.png)
+  ![Source section highlights](screenshots/task-72-surplus-source-highlights.png)
+  ![Keyboard focus arrows](screenshots/task-72-keyboard-focus-arrows.png)
+- **Notes**: Same hover/highlight/fade behavior as Task 71 (Net Worth). The surplus formula is visually obvious: income flows in green (the one positive source), while expenses, contributions, and mortgage all flow in red. Contributions and mortgage connections are conditional (only appear when > 0), matching the spread operator pattern used by Net Worth's property equity connection.
