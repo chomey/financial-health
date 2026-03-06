@@ -59,8 +59,8 @@ if [[ -f "$CLAUDE_FILE" ]]; then
   stack_lines=$(sed -n '/^## Tech Stack/,/^## /{/^## /d;/^$/d;p;}' "$CLAUDE_FILE" | head -n 3)
   if [[ -n "$stack_lines" ]]; then
     print "${BOLD}Stack:${NC}"
-    print "$stack_lines" | while IFS= read -r line; do
-      print "  ${line}"
+    print -r -- "$stack_lines" | while IFS= read -r line; do
+      print -r -- "  ${line}"
     done
   fi
 fi
