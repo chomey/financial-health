@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 78
-- **Completed**: 77
-- **Remaining**: 1
+- **Completed**: 78
+- **Remaining**: 0
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1653,3 +1653,28 @@
   ![Source highlights](screenshots/task-71-source-highlights.png)
   ![Mobile highlight-only](screenshots/task-75-mobile-highlight-only.png)
 - **Notes**: Major refactoring from SVG arrows to spotlight dimming system. The SpotlightOverlay is always in the DOM (opacity 0/1 transition) unlike the old SVG overlay which was conditionally rendered, which required updating all E2E tests from `toBeAttached/not.toBeAttached` to `toHaveCSS("opacity", "0/1")`. FormulaBar shows color-coded computation pills positioned below the metric card on desktop and fixed at bottom on mobile. All existing highlighting behavior preserved — source sections still get `data-dataflow-highlighted` attributes with positive/negative values.
+
+## Task 78: [MILESTONE] E2E test for spotlight dimming system
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `tests/e2e/spotlight-dimming-e2e.spec.ts`: New comprehensive T3 E2E test with 8 test cases validating the spotlight dimming system: (1) Net Worth card shows dim overlay, spotlighted assets/debts sections with opaque backgrounds above overlay, and formula bar with color-coded green positive / rose negative term pills and result; (2) Monthly Surplus formula bar shows after-tax income (green) minus expenses (red) with aria-label; (3) formula bar displays correct terms for Estimated Tax (income with effective rate), Financial Runway (assets positive, expenses negative), and Debt-to-Asset Ratio (assets positive, debts negative); (4) spotlight clears on mouse leave with no residual highlights, no formula bar, no active-target attributes; (5) mobile viewport (375px) shows formula bar with position:fixed and bottom:0px; (6) keyboard focus triggers spotlight with aria-live announcements; (7) no CLS during spotlight activation/deactivation (< 0.1 threshold via PerformanceObserver); (8) insight card hover shows spotlight with data-dataflow-active-target attribute and correct source highlighting.
+  - `tests/unit/spotlight-dimming-e2e-infra.test.ts`: 16 T1 unit tests verifying E2E test infrastructure — file existence, Playwright imports, 5 metric card coverage, formula bar/result/term assertions, color-coded term classes, spotlight overlay assertions, mouse leave clear, mobile viewport (375px) with fixed positioning, keyboard focus + aria-live, CLS testing, insight hover, screenshot capture points (≥7), active-target attribute, existing E2E files exist and use spotlight-overlay, DataFlowArrows module exports.
+  - `src/lib/changelog.ts`: Added v78 entry for spotlight dimming system E2E milestone.
+  - `tests/unit/changelog.test.ts`: Updated expectations for 78 entries and 2 entries in Spotlight Dimming System milestone group.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/spotlight-dimming-e2e-infra.test.ts`: 16 tests — file existence, imports, metric card coverage, formula bar, color coding, overlay, mouse leave, mobile, keyboard, CLS, insight, screenshots, active-target, existing files, no data-flow-overlay, module exports (16 passed, 0 failed)
+  - `tests/e2e/spotlight-dimming-e2e.spec.ts`: 8 tests — Net Worth spotlight+formula, Monthly Surplus formula, Tax/Runway/DebtRatio formulas, clear on leave, mobile fixed formula bar, keyboard focus, CLS detection, insight spotlight (8 passed, 0 failed)
+  - All unit tests: 960 passed, 0 failed (60 test files)
+  - All E2E tests: 218 passed, 0 failed
+- **Screenshots**:
+  ![Net Worth spotlight](screenshots/task-78-net-worth-spotlight.png)
+  ![Monthly Surplus spotlight](screenshots/task-78-monthly-surplus-spotlight.png)
+  ![Estimated Tax spotlight](screenshots/task-78-estimated-tax-spotlight.png)
+  ![Financial Runway spotlight](screenshots/task-78-financial-runway-spotlight.png)
+  ![Debt-to-Asset Ratio spotlight](screenshots/task-78-debt-to-asset-ratio-spotlight.png)
+  ![Mobile formula bar](screenshots/task-78-mobile-formula-bar-bottom.png)
+  ![Keyboard focus spotlight](screenshots/task-78-keyboard-focus-spotlight.png)
+  ![Insight spotlight](screenshots/task-78-insight-spotlight.png)
+- **Notes**: All 78 tasks are now complete — the entire TASKS.md backlog is done. This milestone E2E test validates the full spotlight dimming system including formula bar content, color-coded term pills, mobile fixed positioning, CLS measurement, and insight card integration. The CLS test uses the PerformanceObserver API to measure layout shifts during spotlight activation/deactivation and asserts they remain below the 0.1 "good" threshold per Web Vitals.
