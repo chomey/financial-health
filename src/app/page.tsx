@@ -401,8 +401,16 @@ export default function Home() {
     { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
   ];
 
+  const monthlySurplusConnections: DataFlowConnectionDef[] = [
+    { sourceId: "section-income", label: fmtLabel(totals.monthlyAfterTaxIncome), value: totals.monthlyAfterTaxIncome, sign: "positive" },
+    { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
+    ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "section-assets", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const }] : []),
+    ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const }] : []),
+  ];
+
   const dataFlowConnections: Record<string, DataFlowConnectionDef[]> = {
     "Net Worth": netWorthConnections,
+    "Monthly Surplus": monthlySurplusConnections,
   };
 
   // Benchmark comparison values
