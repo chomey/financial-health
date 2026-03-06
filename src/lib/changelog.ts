@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Metric-Specific Explainers (Milestone 11)
   {
+    version: 86,
+    title: "Asset ROI included in Monthly Surplus calculation and explainer",
+    description: "Investment returns are now factored into the Monthly Surplus metric. For each asset with a non-zero ROI, the estimated monthly return (balance * ROI / 12) is added to the income side of the surplus formula. The Monthly Surplus explainer modal now shows an 'Investment Returns' sub-section with green dashed border, listing each asset's estimated monthly return (e.g., 'RRSP ($28k @ 5%) → +$117/mo') with a total row. A new data flow connection for investment returns also appears in the surplus source cards.",
+    date: "2026-03-06",
+  },
+  {
     version: 85,
     title: "Interactive burndown chart in Financial Runway explainer",
     description: "Clicking the Financial Runway metric card now opens a burndown chart showing account balances depleting over time as stacked areas per account category (using recharts AreaChart). Includes a dashed 'without growth' comparison line, a tax drag overlay showing the impact of withdrawal taxes, a numbered withdrawal order list with tax treatment labels and estimated tax costs, and a monthly obligations breakdown. The runwayAfterTax sub-line was removed from the metric card since tax drag is now visualized directly in the chart.",

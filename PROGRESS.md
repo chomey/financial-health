@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 88
-- **Completed**: 85
-- **Remaining**: 3
+- **Completed**: 86
+- **Remaining**: 2
 - **Last Updated**: 2026-03-06
 
 ---
@@ -1841,3 +1841,25 @@
   ![Withdrawal order](screenshots/task-85-withdrawal-order.png)
   ![Tax drag annotation](screenshots/task-85-runway-tax-drag.png)
 - **Notes**: The `simulateRunwayTimeSeries` function runs three parallel simulations: (1) with growth + proportional withdrawal, (2) without growth + proportional withdrawal, (3) with growth + tax-aware priority withdrawal. The tax scenario uses the same ordering as `simulateRunwayWithTax` (tax-free → taxable → tax-deferred) and the same gross-up logic. The `runwayAfterTax` sub-line was removed from the MetricCard as the task requires — tax drag is now visualized directly on the burndown chart with a shaded amber area. The `runwayAfterTax` field still exists in MetricData for backward compatibility with any code that reads it.
+
+## Task 86: Include asset ROI in Monthly Surplus calculation and explainer
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/lib/financial-state.ts`: Added `computeMonthlyInvestmentReturns()` helper that computes per-asset monthly returns (balance * roi / 12). Updated surplus formula to include investment returns: `monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments`. Added `investmentReturns` field to Monthly Surplus metric data. Updated surplus breakdown string to include investment returns.
+  - `src/components/DataFlowArrows.tsx`: Added `SurplusInvestmentReturn` type to `ActiveTargetMeta`. Created `InvestmentReturnsSummary` component with green dashed border showing per-asset returns (e.g., "RRSP ($28k @ 5%) → +$117/mo") and total row. Inserted in ExplainerModal for `monthly-surplus` metricType.
+  - `src/components/SnapshotDashboard.tsx`: Added `investmentReturns` field to `MetricData` interface. Pass `investmentReturns` through to `ActiveTargetMeta` for monthly-surplus metric.
+  - `src/app/page.tsx`: Added investment returns connection to `monthlySurplusConnections`. Updated local surplus computation to include investment returns.
+  - `tests/unit/financial-state.test.ts`: Updated surplus tests to account for ROI. Added 5 new tests for `computeMonthlyInvestmentReturns`.
+  - `tests/unit/investment-contributions.test.ts`: Updated surplus test to include TFSA investment returns in expected value.
+  - `tests/e2e/surplus-investment-returns.spec.ts`: New T2 browser tests (3 tests) verifying investment returns section appears in explainer modal.
+  - `src/lib/changelog.ts`: Added task 86 changelog entry.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/financial-state.test.ts`: 42 passed, 0 failed (including 5 new computeMonthlyInvestmentReturns tests)
+  - `tests/unit/investment-contributions.test.ts`: Updated surplus test passes
+  - `tests/e2e/surplus-investment-returns.spec.ts`: 3 passed, 0 failed
+  - All T1 unit tests: 1056 passed, 0 failed
+- **Screenshots**:
+  ![Monthly Surplus explainer with investment returns](screenshots/task-86-surplus-investment-returns.png)
+- **Notes**: Investment returns are computed from both real and computed assets (stocks, property equity entries). The default ROIs from `AssetEntry.DEFAULT_ROI` apply when no explicit ROI is set (e.g., TFSA 5%, RRSP 5%, Savings Account 2%, 401k 7%). This is especially important for retirees with no employment income — without ROI, their surplus would just be negative expenses. Fixed pre-existing changelog test failure (task 85 added entry 85 but tests expected 84).

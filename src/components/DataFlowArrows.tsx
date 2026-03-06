@@ -106,12 +106,20 @@ export interface RunwayExplainerDetails {
   categories: string[];
 }
 
+export interface SurplusInvestmentReturn {
+  label: string;
+  amount: number;
+  balance: number;
+  roi: number;
+}
+
 export interface ActiveTargetMeta {
   label: string;
   formattedValue: string;
   metricType?: string;
   taxDetails?: TaxExplainerDetails;
   runwayDetails?: RunwayExplainerDetails;
+  investmentReturns?: SurplusInvestmentReturn[];
 }
 
 interface DataFlowContextValue {
@@ -785,6 +793,50 @@ function RunwayExplainerContent({ details }: { details: RunwayExplainerDetails }
   );
 }
 
+// --- InvestmentReturnsSummary ---
+
+function InvestmentReturnsSummary({ returns }: { returns: SurplusInvestmentReturn[] }) {
+  const fmt = (n: number) => `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  const fmtBalance = (n: number) => {
+    if (n >= 1000) return `$${(n / 1000).toFixed(0)}k`;
+    return `$${n.toFixed(0)}`;
+  };
+  const totalReturns = returns.reduce((sum, r) => sum + r.amount, 0);
+
+  return (
+    <div
+      className="my-3 rounded-xl border-2 border-dashed border-green-300 bg-green-50/50 p-4"
+      data-testid="investment-returns-section"
+    >
+      <div className="mb-2 flex items-center gap-2">
+        <span aria-hidden="true" className="text-base">📊</span>
+        <span className="text-sm font-semibold text-stone-700">Investment Returns</span>
+        <span className="text-xs text-stone-400 italic">(estimated)</span>
+      </div>
+      <ul className="space-y-1.5" data-testid="investment-returns-list">
+        {returns.map((r, i) => (
+          <li key={i} className="flex items-center justify-between text-sm">
+            <span className="text-stone-500 truncate mr-2">
+              {r.label} ({fmtBalance(r.balance)} @ {r.roi}%)
+            </span>
+            <span className="font-medium text-green-600 whitespace-nowrap">
+              +{fmt(r.amount)}/mo
+            </span>
+          </li>
+        ))}
+      </ul>
+      {returns.length > 1 && (
+        <div className="mt-2 flex items-center justify-between border-t border-green-200 pt-2">
+          <span className="text-xs font-medium text-stone-500 uppercase tracking-wide">Total Returns</span>
+          <span className="text-sm font-bold text-green-600" data-testid="investment-returns-total">
+            +{fmt(totalReturns)}/mo
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // --- ExplainerModal ---
 
 function ExplainerModal({
@@ -916,6 +968,11 @@ function ExplainerModal({
               })}
             </div>
 
+            {/* Investment returns sub-section (Monthly Surplus only) */}
+            {targetMeta.metricType === "monthly-surplus" && targetMeta.investmentReturns && targetMeta.investmentReturns.length > 0 && (
+              <InvestmentReturnsSummary returns={targetMeta.investmentReturns} />
+            )}
+
             {/* Sum bar and result */}
             <div className="mt-2" data-testid="explainer-result-section">
               {/* Hand-drawn horizontal sum bar */}
@@ -953,7 +1010,7 @@ function ExplainerModal({
   );
 }
 
-export { ExplainerModal, ConnectorLine, CountUpValue, TaxExplainerContent, RunwayExplainerContent };
+export { ExplainerModal, ConnectorLine, CountUpValue, TaxExplainerContent, RunwayExplainerContent, InvestmentReturnsSummary };
 
 // --- Provider ---
 

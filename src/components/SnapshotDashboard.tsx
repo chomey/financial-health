@@ -19,6 +19,7 @@ interface MetricData {
   runwayAfterTax?: number; // runway in months after withdrawal taxes
   taxDetails?: TaxExplainerDetails; // detailed tax breakdown for explainer
   runwayDetails?: RunwayExplainerDetails; // detailed runway breakdown for explainer
+  investmentReturns?: import("@/lib/financial-state").MonthlyInvestmentReturn[]; // per-asset monthly ROI for surplus explainer
 }
 
 // Mock values based on existing entry component mock data
@@ -171,6 +172,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       metricType,
       taxDetails: metricType === "estimated-tax" ? metric.taxDetails : undefined,
       runwayDetails: metricType === "financial-runway" ? metric.runwayDetails : undefined,
+      investmentReturns: metricType === "monthly-surplus" ? metric.investmentReturns : undefined,
     });
 
     // Build aria-live announcement
