@@ -3,6 +3,7 @@ import {
   INITIAL_STATE,
   computeTotals,
   computeMetrics,
+  computeMonthlyInvestmentReturns,
   toFinancialData,
 } from "@/lib/financial-state";
 import type { FinancialState } from "@/lib/financial-state";
@@ -130,23 +131,26 @@ describe("financial-state", () => {
       expect(netWorth!.format).toBe("currency");
     });
 
-    it("computes monthly surplus using after-tax income minus expenses", () => {
+    it("computes monthly surplus using after-tax income plus investment returns minus expenses", () => {
       const metrics = computeMetrics(INITIAL_STATE);
       const surplus = metrics.find((m) => m.title === "Monthly Surplus");
       expect(surplus).toBeDefined();
-      // After-tax surplus should be less than pre-tax surplus (4500 - 2350 = 2150)
-      const preTaxSurplus = 4500 - 2350;
-      expect(surplus!.value).toBeLessThan(preTaxSurplus);
+      // Surplus includes investment returns from assets with ROI defaults
       expect(surplus!.value).toBeGreaterThan(0);
       expect(surplus!.positive).toBe(true);
+      // Investment returns should be attached
+      expect(surplus!.investmentReturns).toBeDefined();
+      expect(surplus!.investmentReturns!.length).toBeGreaterThan(0);
     });
 
-    it("surplus uses after-tax income consistently with computeTotals", () => {
+    it("surplus uses after-tax income plus investment returns consistently with computeTotals", () => {
       const metrics = computeMetrics(INITIAL_STATE);
       const totals = computeTotals(INITIAL_STATE);
+      const investmentReturns = computeMonthlyInvestmentReturns(INITIAL_STATE.assets);
+      const totalReturns = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
       const surplus = metrics.find((m) => m.title === "Monthly Surplus");
       expect(surplus!.value).toBeCloseTo(
-        totals.monthlyAfterTaxIncome - totals.monthlyExpenses - totals.totalMonthlyContributions,
+        totals.monthlyAfterTaxIncome + totalReturns - totals.monthlyExpenses - totals.totalMonthlyContributions,
         2
       );
     });
@@ -237,11 +241,9 @@ describe("financial-state", () => {
   });
 
   describe("after-tax vs pre-tax comparison", () => {
-    it("after-tax surplus is always less than or equal to pre-tax surplus", () => {
+    it("after-tax income is always less than or equal to pre-tax income", () => {
       const totals = computeTotals(INITIAL_STATE);
-      const preTaxSurplus = totals.monthlyIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
-      const afterTaxSurplus = totals.monthlyAfterTaxIncome - totals.monthlyExpenses - totals.totalMonthlyContributions;
-      expect(afterTaxSurplus).toBeLessThan(preTaxSurplus);
+      expect(totals.monthlyAfterTaxIncome).toBeLessThan(totals.monthlyIncome);
     });
 
     it("no-income state has zero tax", () => {
@@ -453,6 +455,69 @@ describe("financial-state", () => {
       expect(deferredRunway.value).toBeCloseTo(mixedRunway.value, 1);
       // Mixed should have better tax-adjusted runway because TFSA is withdrawn first
       expect(mixedRunway.runwayAfterTax!).toBeGreaterThan(deferredRunway.runwayAfterTax!);
+    });
+  });
+
+  describe("computeMonthlyInvestmentReturns", () => {
+    it("computes monthly returns for assets with ROI", () => {
+      const assets = [
+        { id: "a1", category: "TFSA", amount: 22000 },   // 5% default
+        { id: "a2", category: "RRSP", amount: 28000 },   // 5% default
+        { id: "a3", category: "Savings Account", amount: 5000 }, // 2% default
+      ];
+      const returns = computeMonthlyInvestmentReturns(assets);
+      expect(returns).toHaveLength(3);
+      // TFSA: 22000 * 0.05 / 12 ≈ 91.67
+      expect(returns[0].amount).toBeCloseTo(22000 * 0.05 / 12, 2);
+      expect(returns[0].label).toBe("TFSA");
+      expect(returns[0].balance).toBe(22000);
+      expect(returns[0].roi).toBe(5);
+    });
+
+    it("skips assets with zero or no ROI", () => {
+      const assets = [
+        { id: "a1", category: "Unknown Category", amount: 10000 }, // no default ROI
+      ];
+      const returns = computeMonthlyInvestmentReturns(assets);
+      expect(returns).toHaveLength(0);
+    });
+
+    it("uses explicit ROI over default", () => {
+      const assets = [
+        { id: "a1", category: "TFSA", amount: 10000, roi: 10 }, // override 5% default
+      ];
+      const returns = computeMonthlyInvestmentReturns(assets);
+      expect(returns).toHaveLength(1);
+      expect(returns[0].amount).toBeCloseTo(10000 * 0.10 / 12, 2);
+      expect(returns[0].roi).toBe(10);
+    });
+
+    it("skips assets with zero balance", () => {
+      const assets = [
+        { id: "a1", category: "TFSA", amount: 0 },
+      ];
+      const returns = computeMonthlyInvestmentReturns(assets);
+      expect(returns).toHaveLength(0);
+    });
+
+    it("surplus includes investment returns for assets with ROI", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "TFSA", amount: 120000, roi: 6 }, // 6% → $600/mo
+        ],
+        debts: [],
+        income: [],
+        expenses: [{ id: "e1", category: "Living", amount: 500 }],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+      const metrics = computeMetrics(state);
+      const surplus = metrics.find((m) => m.title === "Monthly Surplus");
+      // No income, but investment returns of $600/mo - $500 expenses = $100 surplus
+      expect(surplus!.value).toBeCloseTo(120000 * 0.06 / 12 - 500, 2);
+      expect(surplus!.positive).toBe(true);
     });
   });
 

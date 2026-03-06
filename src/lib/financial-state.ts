@@ -461,6 +461,34 @@ function buildRunwayExplainerDetails(
   };
 }
 
+export interface MonthlyInvestmentReturn {
+  label: string;
+  amount: number;
+  balance: number;
+  roi: number;
+}
+
+/**
+ * Compute estimated monthly investment returns for each asset with a non-zero ROI.
+ * Returns per-asset breakdown: balance * (roi/100) / 12.
+ */
+export function computeMonthlyInvestmentReturns(assets: Asset[]): MonthlyInvestmentReturn[] {
+  const results: MonthlyInvestmentReturn[] = [];
+  for (const asset of assets) {
+    if (asset.amount <= 0) continue;
+    const roi = asset.roi ?? getDefaultRoi(asset.category) ?? 0;
+    if (roi <= 0) continue;
+    const monthlyReturn = asset.amount * (roi / 100) / 12;
+    results.push({
+      label: asset.category,
+      amount: monthlyReturn,
+      balance: asset.amount,
+      roi,
+    });
+  }
+  return results;
+}
+
 export function computeTotals(state: FinancialState) {
   const homeCurrency = getHomeCurrency(state.country ?? "CA");
   const fxRates = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
@@ -547,8 +575,11 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const netWorthWithoutEquity = totalAssets + totalStocks - totalDebts;
   const netWorth = netWorthWithoutEquity;
   const netWorthWithEquity = totalAssets + totalStocks + totalPropertyEquity - totalDebts;
-  // Surplus uses after-tax income, subtracts expenses, investment contributions, and mortgage payments
-  const surplus = monthlyAfterTaxIncome - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments;
+  // Compute estimated monthly investment returns from all assets (real + computed)
+  const investmentReturns = computeMonthlyInvestmentReturns(state.assets);
+  const totalMonthlyInvestmentReturns = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
+  // Surplus uses after-tax income + investment returns, subtracts expenses, contributions, and mortgage payments
+  const surplus = monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments;
   // Runway uses liquid assets + stocks (NOT property), divided by total monthly obligations
   const liquidTotal = totalAssets + totalStocks;
   const monthlyObligations = monthlyExpenses + totalMortgagePayments;
@@ -649,6 +680,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const surplusTargetName = state.assets.find((a) => a.surplusTarget)?.category ?? state.assets[0]?.category;
 
   const surplusParts = [`${fmtShort(monthlyAfterTaxIncome)} after-tax income`];
+  if (totalMonthlyInvestmentReturns > 0) surplusParts.push(`${fmtShort(totalMonthlyInvestmentReturns)} investment returns`);
   if (monthlyExpenses > 0) surplusParts.push(`${fmtShort(monthlyExpenses)} expenses`);
   if (totalMonthlyContributions > 0) surplusParts.push(`${fmtShort(totalMonthlyContributions)} contributions`);
   if (totalMortgagePayments > 0) surplusParts.push(`${fmtShort(totalMortgagePayments)} mortgage`);
@@ -686,9 +718,10 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       format: "currency",
       icon: "📈",
       tooltip:
-        "How much more you earn than you spend each month, after estimated taxes. A positive surplus means you're building wealth.",
+        "How much more you earn than you spend each month, after estimated taxes and estimated investment returns. A positive surplus means you're building wealth.",
       positive: surplus > 0,
       breakdown: surplusBreakdown,
+      investmentReturns: investmentReturns.length > 0 ? investmentReturns : undefined,
     },
     {
       title: "Estimated Tax",

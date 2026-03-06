@@ -53,7 +53,7 @@ describe("investment contributions in surplus", () => {
   });
 
   describe("computeMetrics", () => {
-    it("subtracts contributions from after-tax surplus", () => {
+    it("subtracts contributions from after-tax surplus and adds investment returns", () => {
       const state = makeState({
         assets: [{ id: "a1", category: "TFSA", amount: 10000, monthlyContribution: 500 }],
         income: [{ id: "i1", category: "Salary", amount: 5000 }],
@@ -62,8 +62,10 @@ describe("investment contributions in surplus", () => {
       const metrics = computeMetrics(state);
       const totals = computeTotals(state);
       const surplus = metrics.find((m) => m.title === "Monthly Surplus");
-      // surplus = afterTaxIncome - 2000 - 500 (less than pre-tax 2500)
-      expect(surplus!.value).toBeCloseTo(totals.monthlyAfterTaxIncome - 2000 - 500, 2);
+      // TFSA $10k @ 5% default = $41.67/mo investment return
+      const monthlyReturn = 10000 * 0.05 / 12;
+      // surplus = afterTaxIncome + investmentReturns - 2000 - 500
+      expect(surplus!.value).toBeCloseTo(totals.monthlyAfterTaxIncome + monthlyReturn - 2000 - 500, 2);
       expect(surplus!.value).toBeLessThan(2500); // less than pre-tax
     });
 

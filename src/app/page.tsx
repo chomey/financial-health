@@ -25,6 +25,7 @@ import {
   INITIAL_STATE,
   computeMetrics,
   computeTotals,
+  computeMonthlyInvestmentReturns,
   toFinancialData,
 } from "@/lib/financial-state";
 import { getStateFromURL, updateURL } from "@/lib/url-state";
@@ -375,7 +376,9 @@ export default function Home() {
   const totals = computeTotals(state);
   const totalInvestmentContributions = assets.filter((a) => !a.computed).reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   const totalMortgagePayments = totals.totalMortgagePayments;
-  const monthlySurplus = totals.monthlyAfterTaxIncome - totals.monthlyExpenses - totals.totalMonthlyContributions - totalMortgagePayments;
+  const monthlyInvestmentReturns = computeMonthlyInvestmentReturns(assets);
+  const totalMonthlyInvestmentReturns = monthlyInvestmentReturns.reduce((sum, r) => sum + r.amount, 0);
+  const monthlySurplus = totals.monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - totals.monthlyExpenses - totals.totalMonthlyContributions - totalMortgagePayments;
   const realAssets = assets.filter((a) => !a.computed);
   const surplusTargetName = realAssets.find((a) => a.surplusTarget)?.category ?? realAssets[0]?.category;
 
@@ -414,6 +417,7 @@ export default function Home() {
 
   const monthlySurplusConnections: DataFlowConnectionDef[] = [
     { sourceId: "section-income", label: fmtLabel(totals.monthlyAfterTaxIncome), value: totals.monthlyAfterTaxIncome, sign: "positive" },
+    ...(totalMonthlyInvestmentReturns > 0 ? [{ sourceId: "section-assets", label: `returns ${fmtLabel(totalMonthlyInvestmentReturns)}`, value: totalMonthlyInvestmentReturns, sign: "positive" as const }] : []),
     { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
     ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "section-assets", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const }] : []),
     ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const }] : []),
