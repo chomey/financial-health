@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // UI Polish (Milestone 12)
   {
+    version: 89,
+    title: "Estimated Tax card click-to-explain when tax is $0",
+    description: "Clicking the Estimated Tax metric card now opens the explainer even when income is $0. Shows the jurisdiction's federal tax bracket structure for reference with a friendly message prompting users to add income. Bracket rates and ranges are displayed as a reference table, with 0% effective and marginal rates.",
+    date: "2026-03-06",
+  },
+  {
     version: 88,
     title: "Withdrawal Tax Impact card auto-expanded with disclaimer",
     description: "The Withdrawal Tax Impact card now shows account breakdowns and withdrawal order expanded by default instead of hiding them behind a 'Show details' toggle. The withdrawal order is renamed from 'Optimal' to 'Suggested' with a subtle disclaimer noting that it's a rough suggestion and users should consult a tax professional for personalized advice.",

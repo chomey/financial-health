@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 92
-- **Completed**: 88
-- **Remaining**: 4
+- **Completed**: 89
+- **Remaining**: 3
 - **Last Updated**: 2026-03-06
 
 ---
@@ -1899,3 +1899,20 @@
 - **Screenshots**:
   ![Withdrawal tax details auto-expanded](screenshots/task-66-withdrawal-tax-details.png)
 - **Notes**: Component no longer uses useState — it's now a pure render component (still marked "use client" for consistency with parent tree). Pre-existing changelog test failure from task 87 was fixed in a separate commit.
+
+## Task 89: Estimated Tax card click-to-explain when tax is $0
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `src/lib/financial-state.ts`: `buildTaxExplainerDetails` now returns details with reference brackets when grossAnnualIncome is 0, instead of returning undefined
+  - `src/components/SnapshotDashboard.tsx`: `handleClick` filter allows Estimated Tax connections through even when value is 0
+  - `src/components/DataFlowArrows.tsx`: `TaxExplainerContent` handles zero-income case with friendly message, bracket reference table, and hides irrelevant sections (bracket bar, after-tax flow)
+  - `src/lib/changelog.ts`: Added changelog entry for task 89
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/tax-explainer.test.tsx`: Updated existing test for zero-income taxDetails (now defined with reference brackets). Added 7 new tests for TaxExplainerContent zero income rendering. 32 passed, 0 failed.
+  - `tests/e2e/tax-explainer.spec.ts`: Added 2 new E2E tests for zero-income explainer (opens with bracket reference, closes on Escape). 9 passed, 0 failed.
+  - All T1 unit tests: 1064 passed, 0 failed
+- **Screenshots**:
+  ![Tax explainer with zero income](screenshots/task-89-tax-explainer-zero-income.png)
+- **Notes**: The explainer now shows the jurisdiction's federal tax bracket structure for reference even when no income is entered. Bracket reference table shows rate ranges without amounts. The after-tax flow bar and bracket bar visualization are hidden for zero income since they'd be empty.
