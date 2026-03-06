@@ -2,12 +2,12 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Insight card data-flow arrows", () => {
-  test("hovering insight card shows data-flow overlay with lighter arrows", async ({ page }) => {
+  test("hovering insight card shows spotlight overlay", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
-    // No overlay initially
-    await expect(page.locator('[data-testid="data-flow-overlay"]')).not.toBeAttached();
+    // Spotlight overlay inactive initially
+    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCSS("opacity", "0");
 
     // Find a surplus insight card (always present with mock data)
     const insightCard = page.locator('[data-insight-type="surplus"]').first();
@@ -15,15 +15,9 @@ test.describe("Insight card data-flow arrows", () => {
 
     await insightCard.hover();
 
-    // Wait for arrows to appear
-    await page.waitForSelector('[data-testid="data-flow-overlay"]', { timeout: 3000 });
-    const overlay = page.locator('[data-testid="data-flow-overlay"]');
-    await expect(overlay).toBeAttached();
-
-    // Verify SVG paths are drawn
-    const paths = overlay.locator("path");
-    const pathCount = await paths.count();
-    expect(pathCount).toBeGreaterThanOrEqual(2); // At least 1 arrow (glow + main)
+    // Wait for spotlight to activate
+    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
+    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCSS("opacity", "1");
 
     await captureScreenshot(page, "task-74-insight-surplus-arrows");
   });
@@ -36,49 +30,42 @@ test.describe("Insight card data-flow arrows", () => {
     const surplusInsight = page.locator('[data-insight-type="surplus"]').first();
     await surplusInsight.hover();
 
-    // Wait for highlight attributes
     await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
 
-    // Income section should be highlighted positive
     const incomeEl = page.locator('[data-dataflow-source="section-income"]');
     await expect(incomeEl).toHaveAttribute("data-dataflow-highlighted", "positive");
 
-    // Expenses section should be highlighted negative
     const expensesEl = page.locator('[data-dataflow-source="section-expenses"]');
     await expect(expensesEl).toHaveAttribute("data-dataflow-highlighted", "negative");
   });
 
-  test("arrows disappear when mouse leaves insight card", async ({ page }) => {
+  test("spotlight clears when mouse leaves insight card", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
     const insightCard = page.locator('[data-insight-type="surplus"]').first();
     await insightCard.hover();
-    await page.waitForSelector('[data-testid="data-flow-overlay"]', { timeout: 3000 });
+    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
 
-    // Move mouse away
     await page.mouse.move(0, 0);
 
-    // Overlay should disappear
-    await expect(page.locator('[data-testid="data-flow-overlay"]')).not.toBeAttached({ timeout: 3000 });
+    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCSS("opacity", "0", { timeout: 3000 });
 
-    // Highlights should be removed
     await expect(page.locator('[data-dataflow-highlighted]')).toHaveCount(0);
   });
 
-  test("keyboard focus activates arrows on insight card", async ({ page }) => {
+  test("keyboard focus activates spotlight on insight card", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
     const insightCard = page.locator('[data-insight-type="surplus"]').first();
     await insightCard.focus();
 
-    // Arrows should appear
-    await page.waitForSelector('[data-testid="data-flow-overlay"]', { timeout: 3000 });
-    await expect(page.locator('[data-testid="data-flow-overlay"]')).toBeAttached();
+    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
+    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCSS("opacity", "1");
   });
 
-  test("runway insight shows arrows to assets and expenses", async ({ page }) => {
+  test("runway insight highlights assets and expenses", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
@@ -87,18 +74,16 @@ test.describe("Insight card data-flow arrows", () => {
 
     await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
 
-    // Assets should be highlighted positive
     const assetsEl = page.locator('[data-dataflow-source="section-assets"]');
     await expect(assetsEl).toHaveAttribute("data-dataflow-highlighted", "positive");
 
-    // Expenses should be highlighted negative
     const expensesEl = page.locator('[data-dataflow-source="section-expenses"]');
     await expect(expensesEl).toHaveAttribute("data-dataflow-highlighted", "negative");
 
     await captureScreenshot(page, "task-74-insight-runway-arrows");
   });
 
-  test("net-worth insight shows arrows to assets and debts", async ({ page }) => {
+  test("net-worth insight highlights assets and debts", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
@@ -107,11 +92,9 @@ test.describe("Insight card data-flow arrows", () => {
 
     await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
 
-    // Assets should be highlighted
     const assetsEl = page.locator('[data-dataflow-source="section-assets"]');
     await expect(assetsEl).toHaveAttribute("data-dataflow-highlighted", "positive");
 
-    // Debts should be highlighted
     const debtsEl = page.locator('[data-dataflow-source="section-debts"]');
     await expect(debtsEl).toHaveAttribute("data-dataflow-highlighted", "negative");
 

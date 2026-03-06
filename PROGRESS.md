@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 76
-- **Completed**: 76
-- **Remaining**: 0
+- **Total Tasks**: 78
+- **Completed**: 77
+- **Remaining**: 1
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1619,3 +1619,37 @@
   ![Arrows after data change](screenshots/task-76-arrows-after-data-change.png)
   ![Keyboard focus arrows](screenshots/task-76-keyboard-focus-arrows.png)
 - **Notes**: This milestone E2E test validates all data-flow arrow visualization features from tasks 69-75 in integrated journeys. All 76 tasks are now complete — the entire TASKS.md backlog is done.
+
+## Task 77: Replace SVG arrow overlay with spotlight dimming system
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Removed `DataFlowArrowOverlay` component (SVG arrows, particles, label pills) and path geometry functions (`getCenterPoint`, `getEdgePoint`, `calculateArrowPath`, `approximatePathLength`, `Point`, `Rect`, `ArrowData`, `PARTICLES_PER_ARROW`). Added `SpotlightOverlay` component (fixed div with rgba(0,0,0,0.7) backdrop, z-index 40, pointer-events none, 250ms opacity transition). Added `FormulaBar` component (color-coded computation term pills — green positive, rose negative — with bold result, responsive mobile fixed positioning). Added `activeTargetMeta: { label: string; formattedValue: string }` and `setActiveTargetMeta` to `DataFlowContext`. Exported `SpotlightOverlay` and `FormulaBar` for testing.
+  - `src/app/globals.css`: Removed arrow keyframe animations (`arrow-draw`, `arrow-flow`, `arrow-fade-in`, `source-highlight-green`, `source-highlight-red`, `mobile-border-pulse-green`, `mobile-border-pulse-red`). Replaced `[data-dataflow-highlighted]` CSS with spotlight styles (position relative, z-index 45, white background, scale(1.005), 250ms transition, colored borders/shadows). Added `[data-dataflow-active-target]` CSS for hovered metric/insight cards (z-index 45, elevated shadow).
+  - `src/components/SnapshotDashboard.tsx`: MetricCard sets `data-dataflow-active-target` attribute and `activeTargetMeta` on hover/focus. Removed scroll-into-view behavior. Added `setActiveTargetMeta(null)` on deactivate.
+  - `src/components/InsightsPanel.tsx`: InsightCard sets `data-dataflow-active-target` attribute and `activeTargetMeta` on hover/focus. Added `setActiveTargetMeta(null)` on deactivate.
+  - `tests/unit/data-flow-arrows.test.tsx`: Removed SVG geometry tests (getCenterPoint, getEdgePoint, calculateArrowPath, approximatePathLength). Added SpotlightOverlay rendering tests (opacity 0/1, fixed positioning, aria-hidden). Added FormulaBar rendering tests (term pills, result, color coding, aria-label, null cases). Updated context tests for `activeTargetMeta` and `setActiveTargetMeta`.
+  - `tests/unit/arrow-polish.test.tsx`: Removed SVG-specific tests (particles, will-change, label pills). Added SpotlightOverlay behavior tests (visible when active, no SVG overlay). Added FormulaBar in DataFlowProvider test. Kept prioritizeConnections and aria-live tests.
+  - `tests/unit/milestone-8-e2e-infra.test.ts`: Updated module export assertions from SVG functions to SpotlightOverlay/FormulaBar/prioritizeConnections. Updated E2E content assertion from `not.toBeAttached` to `toHaveCSS("opacity", "0"`.
+  - `tests/e2e/data-flow-arrows.spec.ts`: Updated to check spotlight-overlay instead of data-flow-overlay.
+  - `tests/e2e/net-worth-data-flow.spec.ts`: Replaced SVG overlay assertions with spotlight opacity assertions.
+  - `tests/e2e/monthly-surplus-data-flow.spec.ts`: Replaced SVG overlay assertions with spotlight opacity assertions.
+  - `tests/e2e/remaining-metric-data-flow.spec.ts`: Replaced SVG overlay assertions with spotlight opacity assertions.
+  - `tests/e2e/insight-data-flow.spec.ts`: Replaced SVG overlay assertions with spotlight opacity assertions.
+  - `tests/e2e/arrow-polish.spec.ts`: Rewrote for spotlight system — formula bar test, aria-hidden, aria-live, data-dataflow-active-target, mobile, clear on leave.
+  - `tests/e2e/data-flow-sources.spec.ts`: Updated to check spotlight-overlay instead of data-flow-overlay.
+  - `tests/e2e/milestone-8-e2e.spec.ts`: Replaced all SVG overlay assertions with spotlight opacity assertions.
+  - `src/lib/changelog.ts`: Added v77 entry and "Spotlight Dimming System" milestone group.
+  - `tests/unit/changelog.test.ts`: Updated for 77 entries and 9 milestone groups.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/data-flow-arrows.test.tsx`: 12 tests — SpotlightOverlay (opacity 0/1, fixed/z-index/pointer-events/aria-hidden), FormulaBar (null meta, empty connections, terms+result, color styling, aria-label), context (activeTargetMeta, throws outside provider, registration, no SVG overlay) (12 passed, 0 failed)
+  - `tests/unit/arrow-polish.test.tsx`: 10 tests — prioritizeConnections (5), aria-live (1), SpotlightOverlay behavior (2), FormulaBar in provider (1), no SVG overlay (1) (10 passed, 0 failed)
+  - All unit tests: 944 passed, 0 failed (59 test files)
+  - All E2E tests: 209 passed, 0 failed
+- **Screenshots**:
+  ![Formula bar](screenshots/task-75-formula-bar.png)
+  ![Net Worth spotlight](screenshots/task-71-net-worth-arrows.png)
+  ![Source highlights](screenshots/task-71-source-highlights.png)
+  ![Mobile highlight-only](screenshots/task-75-mobile-highlight-only.png)
+- **Notes**: Major refactoring from SVG arrows to spotlight dimming system. The SpotlightOverlay is always in the DOM (opacity 0/1 transition) unlike the old SVG overlay which was conditionally rendered, which required updating all E2E tests from `toBeAttached/not.toBeAttached` to `toHaveCSS("opacity", "0/1")`. FormulaBar shows color-coded computation pills positioned below the metric card on desktop and fixed at bottom on mobile. All existing highlighting behavior preserved — source sections still get `data-dataflow-highlighted` attributes with positive/negative values.
