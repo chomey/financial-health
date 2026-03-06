@@ -32,7 +32,7 @@ PROGRESS_ARCHIVE="$SCRIPT_DIR/PROGRESS-ARCHIVE.md"
 
 # Rolling archive thresholds
 PROGRESS_MAX_ENTRIES=10   # Keep last N task entries in PROGRESS.md
-TASKS_MAX_COMPLETED=20    # Keep last N completed tasks in TASKS.md
+TASKS_MAX_COMPLETED=3     # Keep last N completed tasks in TASKS.md
 
 # archive_progress — moves older entries from PROGRESS.md to PROGRESS-ARCHIVE.md
 # Keeps header (everything before first ## Task) + last N task entries.
