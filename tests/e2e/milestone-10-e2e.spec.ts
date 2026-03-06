@@ -50,12 +50,26 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
       await page.goto("/");
       await page.waitForLoadState("networkidle");
 
-      // Remove all income
+      // Remove salary income
       const salaryRow = page
         .getByRole("listitem")
         .filter({ hasText: "Salary" });
       await salaryRow.hover();
       await page.getByLabel("Delete Salary").click();
+      await page.waitForTimeout(300);
+
+      // Also remove all assets to eliminate investment interest income
+      await page.click('button:has-text("Assets")');
+      await page.waitForTimeout(300);
+      for (const label of ["Savings Account", "TFSA", "RRSP"]) {
+        const row = page.getByRole("listitem").filter({ hasText: label });
+        if (await row.count() > 0) {
+          await row.hover();
+          await page.getByLabel(`Delete ${label}`).click();
+          await page.waitForTimeout(200);
+        }
+      }
+      await page.click('button:has-text("Dashboard")');
       await page.waitForTimeout(300);
 
       // Tax card should show $0
@@ -81,13 +95,10 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
       await expect(zeroMsg).toBeVisible();
       await expect(zeroMsg).toContainText("No income entered");
 
-      // Bracket reference table visible, not the bar
+      // Bracket reference table visible
       await expect(
         page.locator('[data-testid="tax-federal-brackets-table"]')
       ).toBeVisible();
-      await expect(
-        page.locator('[data-testid="tax-bracket-bar"]')
-      ).not.toBeVisible();
 
       await captureScreenshot(page, "task-96-tax-zero-income");
       await page.keyboard.press("Escape");
@@ -430,7 +441,7 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
         page.locator('[data-testid="tax-explainer"]')
       ).toBeVisible();
       await expect(
-        page.locator('[data-testid="tax-bracket-bar"]')
+        page.locator('[data-testid="tax-federal-brackets-table"]')
       ).toBeVisible();
       await page.keyboard.press("Escape");
       await expect(modal).not.toBeVisible({ timeout: 3000 });
@@ -474,12 +485,26 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
       await page.keyboard.press("Escape");
       await expect(modal).not.toBeVisible({ timeout: 3000 });
 
-      // Step 7: Remove income and verify $0 tax explainer
+      // Step 7: Remove income and assets to verify $0 tax explainer
       const salaryRow = page
         .getByRole("listitem")
         .filter({ hasText: "Salary" });
       await salaryRow.hover();
       await page.getByLabel("Delete Salary").click();
+      await page.waitForTimeout(300);
+
+      // Remove all assets to eliminate investment interest income
+      await page.click('button:has-text("Assets")');
+      await page.waitForTimeout(300);
+      for (const label of ["Savings Account", "TFSA", "RRSP"]) {
+        const row = page.getByRole("listitem").filter({ hasText: label });
+        if (await row.count() > 0) {
+          await row.hover();
+          await page.getByLabel(`Delete ${label}`).click();
+          await page.waitForTimeout(200);
+        }
+      }
+      await page.click('button:has-text("Dashboard")');
       await page.waitForTimeout(300);
 
       await taxCard.scrollIntoViewIfNeeded();

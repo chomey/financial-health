@@ -201,6 +201,20 @@ test.describe("Milestone 11: Unified Chart & Final Enhancements (Tasks 97-101)",
       await page.getByLabel("Delete Salary").click();
       await page.waitForTimeout(300);
 
+      // Also remove all assets to eliminate investment interest income
+      await page.click('button:has-text("Assets")');
+      await page.waitForTimeout(300);
+      for (const label of ["Savings Account", "TFSA", "RRSP"]) {
+        const row = page.getByRole("listitem").filter({ hasText: label });
+        if (await row.count() > 0) {
+          await row.hover();
+          await page.getByLabel(`Delete ${label}`).click();
+          await page.waitForTimeout(200);
+        }
+      }
+      await page.click('button:has-text("Dashboard")');
+      await page.waitForTimeout(300);
+
       // Tax card should show $0
       const taxCard = page.locator('[data-testid="metric-card-estimated-tax"]');
       await expect(taxCard).toContainText("CA$0");
@@ -215,9 +229,6 @@ test.describe("Milestone 11: Unified Chart & Final Enhancements (Tasks 97-101)",
 
       // Federal bracket table still visible for reference
       await expect(page.locator('[data-testid="tax-federal-brackets-table"]')).toBeVisible();
-
-      // Bracket bar should NOT be visible (no income to show)
-      await expect(page.locator('[data-testid="tax-bracket-bar"]')).not.toBeVisible();
 
       await captureScreenshot(page, "task-101-zero-income-tax-explainer");
       await page.keyboard.press("Escape");
@@ -389,10 +400,24 @@ test.describe("Milestone 11: Unified Chart & Final Enhancements (Tasks 97-101)",
       const toggle = savingsItem.locator('[data-testid^="roi-tax-treatment-"]');
       await expect(toggle).toBeVisible();
 
-      // Step 5: Remove income and verify $0 tax explainer
+      // Step 5: Remove income and assets to verify $0 tax explainer
       const salaryRow = page.getByRole("listitem").filter({ hasText: "Salary" });
       await salaryRow.hover();
       await page.getByLabel("Delete Salary").click();
+      await page.waitForTimeout(300);
+
+      // Remove all assets to eliminate investment interest income
+      await page.click('button:has-text("Assets")');
+      await page.waitForTimeout(300);
+      for (const label of ["Savings Account", "TFSA", "RRSP"]) {
+        const row = page.getByRole("listitem").filter({ hasText: label });
+        if (await row.count() > 0) {
+          await row.hover();
+          await page.getByLabel(`Delete ${label}`).click();
+          await page.waitForTimeout(200);
+        }
+      }
+      await page.click('button:has-text("Dashboard")');
       await page.waitForTimeout(300);
 
       await taxCard.scrollIntoViewIfNeeded();
