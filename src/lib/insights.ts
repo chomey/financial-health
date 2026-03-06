@@ -26,9 +26,22 @@ export interface FinancialData {
   hasCapitalGains?: boolean;
   /** Home currency code (e.g., "CAD", "USD") for formatting */
   homeCurrency?: string;
+  /** Withdrawal tax impact data */
+  withdrawalTax?: {
+    /** How many months shorter the runway is due to withdrawal taxes */
+    taxDragMonths: number;
+    /** Optimal withdrawal order for this account mix */
+    withdrawalOrder: string[];
+    /** Account balances grouped by tax treatment */
+    accountsByTreatment: {
+      taxFree: { categories: string[]; total: number };
+      taxDeferred: { categories: string[]; total: number };
+      taxable: { categories: string[]; total: number };
+    };
+  };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax";
 
 export interface Insight {
   id: string;
@@ -214,6 +227,53 @@ export function generateInsights(data: FinancialData): Insight[] {
         type: "tax",
         message: `Your effective tax rate is ${ratePercent}% — that's ${formatCurrency(data.annualTax)} annually in estimated taxes.`,
         icon: "🏛️",
+      });
+    }
+  }
+
+  // Withdrawal tax insights
+  if (data.withdrawalTax) {
+    const wt = data.withdrawalTax;
+    const totalLiquid = wt.accountsByTreatment.taxFree.total + wt.accountsByTreatment.taxDeferred.total + wt.accountsByTreatment.taxable.total;
+
+    // Tax-free holdings insight
+    if (wt.accountsByTreatment.taxFree.total > 0 && totalLiquid > 0) {
+      const pct = Math.round((wt.accountsByTreatment.taxFree.total / totalLiquid) * 100);
+      insights.push({
+        id: "withdrawal-tax-free",
+        type: "withdrawal-tax",
+        message: `Your ${wt.accountsByTreatment.taxFree.categories.join(" & ")} hold${wt.accountsByTreatment.taxFree.categories.length === 1 ? "s" : ""} ${pct}% of your savings — that's ${formatCurrency(wt.accountsByTreatment.taxFree.total)} you can withdraw tax-free.`,
+        icon: "🛡️",
+      });
+    }
+
+    // Tax-deferred warning / suggestion
+    if (wt.accountsByTreatment.taxDeferred.total > 0 && totalLiquid > 0) {
+      const pct = Math.round((wt.accountsByTreatment.taxDeferred.total / totalLiquid) * 100);
+      if (pct >= 50 && wt.accountsByTreatment.taxFree.total > 0) {
+        insights.push({
+          id: "withdrawal-tax-deferred-heavy",
+          type: "withdrawal-tax",
+          message: `Consider maximizing your ${wt.accountsByTreatment.taxFree.categories.join("/")} contributions — withdrawals from your ${wt.accountsByTreatment.taxDeferred.categories.join("/")} will be taxed as income.`,
+          icon: "💡",
+        });
+      } else if (wt.accountsByTreatment.taxFree.total === 0) {
+        insights.push({
+          id: "withdrawal-tax-no-free",
+          type: "withdrawal-tax",
+          message: `Consider opening a tax-free account (TFSA or Roth IRA) — all your current savings will be taxed on withdrawal.`,
+          icon: "💡",
+        });
+      }
+    }
+
+    // Tax drag on runway
+    if (wt.taxDragMonths > 0.5) {
+      insights.push({
+        id: "withdrawal-tax-drag",
+        type: "withdrawal-tax",
+        message: `Withdrawal taxes reduce your financial runway by about ${wt.taxDragMonths.toFixed(1)} months — tax-free accounts can help reduce this impact.`,
+        icon: "📉",
       });
     }
   }

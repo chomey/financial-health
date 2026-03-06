@@ -441,5 +441,95 @@ export function toFinancialData(state: FinancialState): FinancialData {
     annualTax: totalTaxEstimate,
     hasCapitalGains,
     homeCurrency,
+    withdrawalTax: computeWithdrawalTaxSummary(state, totalAssets, totalStocks),
+  };
+}
+
+/**
+ * Compute withdrawal tax summary data for insights and dashboard.
+ * Groups assets by tax treatment and computes tax drag on runway.
+ */
+export function computeWithdrawalTaxSummary(
+  state: FinancialState,
+  totalAssets: number,
+  totalStocks: number,
+): FinancialData["withdrawalTax"] {
+  const realAssets = state.assets.filter((a) => !a.computed);
+  const computedAssets = state.assets.filter((a) => a.computed);
+  const hasComputedStocks = computedAssets.some((a) => a.id === "_computed_stocks");
+
+  // Group accounts by tax treatment
+  const taxFree: { categories: string[]; total: number } = { categories: [], total: 0 };
+  const taxDeferred: { categories: string[]; total: number } = { categories: [], total: 0 };
+  const taxable: { categories: string[]; total: number } = { categories: [], total: 0 };
+
+  const allAssets = [...realAssets, ...computedAssets];
+  // Add standalone stock bucket if no computed stocks entry
+  if (!hasComputedStocks && totalStocks > 0) {
+    allAssets.push({ id: "_stocks_fallback", category: "Brokerage", amount: totalStocks, computed: false } as Asset);
+  }
+
+  for (const asset of allAssets) {
+    if (asset.amount <= 0) continue;
+    const treatment = getTaxTreatment(asset.category);
+    const bucket = treatment === "tax-free" ? taxFree : treatment === "tax-deferred" ? taxDeferred : taxable;
+    bucket.total += asset.amount;
+    if (!bucket.categories.includes(asset.category)) {
+      bucket.categories.push(asset.category);
+    }
+  }
+
+  const totalLiquid = taxFree.total + taxDeferred.total + taxable.total;
+  if (totalLiquid <= 0) return undefined;
+
+  // Build withdrawal order (tax-free first, taxable second, tax-deferred last)
+  const withdrawalOrder: string[] = [];
+  if (taxFree.categories.length > 0) withdrawalOrder.push(...taxFree.categories);
+  if (taxable.categories.length > 0) withdrawalOrder.push(...taxable.categories);
+  if (taxDeferred.categories.length > 0) withdrawalOrder.push(...taxDeferred.categories);
+
+  // Compute tax drag: difference between base runway and tax-adjusted runway
+  const monthlyObligations = state.expenses.reduce((sum, e) => sum + e.amount, 0) +
+    (state.properties ?? []).reduce((sum, p) => sum + getEffectivePayment(p), 0);
+
+  let taxDragMonths = 0;
+  if (monthlyObligations > 0 && totalLiquid > 0) {
+    const baseRunway = totalLiquid / monthlyObligations;
+
+    // Build tax-aware buckets for simulation
+    const taxBuckets = allAssets
+      .filter((a) => a.amount > 0)
+      .map((a) => ({
+        balance: a.amount,
+        monthlyRate: (a.roi ?? getDefaultRoi(a.category) ?? 0) / 100 / 12,
+        taxTreatment: getTaxTreatment(a.category),
+        category: a.category,
+        costBasisPercent: (a as { costBasisPercent?: number }).costBasisPercent ?? 100,
+      }));
+
+    const hasTaxedAccounts = taxBuckets.some((b) => b.taxTreatment !== "tax-free");
+    if (hasTaxedAccounts) {
+      const country = state.country ?? "CA";
+      const jurisdiction = state.jurisdiction ?? "ON";
+
+      // Simple runway with growth for baseline
+      const growthBuckets = taxBuckets.map((b) => ({ balance: b.balance, monthlyRate: b.monthlyRate }));
+      const hasGrowth = growthBuckets.some((b) => b.monthlyRate > 0);
+      const growthRunway = hasGrowth
+        ? simulateRunwayWithGrowth(growthBuckets, monthlyObligations)
+        : baseRunway;
+      const baseline = growthRunway >= 1200 ? 1200 : growthRunway;
+
+      const taxRunway = simulateRunwayWithTax(taxBuckets, monthlyObligations, country, jurisdiction);
+      const taxAdjusted = taxRunway >= 1200 ? 1200 : taxRunway;
+
+      taxDragMonths = Math.max(0, baseline - taxAdjusted);
+    }
+  }
+
+  return {
+    taxDragMonths,
+    withdrawalOrder,
+    accountsByTreatment: { taxFree, taxDeferred, taxable },
   };
 }
