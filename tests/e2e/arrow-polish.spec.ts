@@ -1,31 +1,33 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-test.describe("Spotlight visual polish — formula bar, responsive, accessibility", () => {
-  test("hovering metric card shows formula bar with computation terms", async ({ page }) => {
+test.describe("Explainer modal — click-to-explain polish, responsive, accessibility", () => {
+  test("clicking metric card shows explainer modal with source cards and result", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="metric-card-net-worth"]');
 
     const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
-    await netWorthCard.hover();
+    await netWorthCard.click();
 
-    await page.waitForSelector('[data-testid="formula-bar"]', { timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-title"]')).toBeVisible();
+    await expect(page.locator('[data-testid="explainer-result-value"]')).toBeVisible();
 
-    // Formula bar should have terms and a result
-    const formulaBar = page.locator('[data-testid="formula-bar"]');
-    await expect(formulaBar).toBeVisible();
-
-    const result = page.locator('[data-testid="formula-result"]');
-    await expect(result).toBeVisible();
-
-    await captureScreenshot(page, "task-75-formula-bar");
+    await captureScreenshot(page, "task-75-explainer-modal");
   });
 
-  test("spotlight overlay has aria-hidden for accessibility", async ({ page }) => {
+  test("explainer modal has correct aria attributes for accessibility", async ({ page }) => {
     await page.goto("/");
+    await page.waitForSelector('[data-testid="metric-card-net-worth"]');
 
-    const overlay = page.locator('[data-testid="spotlight-overlay"]');
-    await expect(overlay).toHaveAttribute("aria-hidden", "true");
+    const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
+    await netWorthCard.click();
+
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+
+    const backdrop = page.locator('[data-testid="explainer-backdrop"]');
+    await expect(backdrop).toHaveAttribute("aria-modal", "true");
+    await expect(backdrop).toHaveAttribute("role", "dialog");
   });
 
   test("metric card has aria-live region for screen reader announcements", async ({ page }) => {
@@ -35,60 +37,47 @@ test.describe("Spotlight visual polish — formula bar, responsive, accessibilit
     const ariaLive = page.locator('[data-testid="metric-card-net-worth"] [data-testid="dataflow-aria-live"]');
     await expect(ariaLive).toBeAttached();
     await expect(ariaLive).toHaveAttribute("aria-live", "polite");
-
     await expect(ariaLive).toHaveText("");
-
-    const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
-    await netWorthCard.hover();
-    await page.waitForTimeout(500);
-
-    const text = await ariaLive.textContent();
-    expect(text).toContain("Net Worth is calculated from:");
   });
 
-  test("mobile viewport shows highlight-only mode with formula bar", async ({ page }) => {
+  test("mobile viewport shows explainer modal fullscreen-like", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
     await page.waitForSelector('[data-testid="metric-card-net-worth"]');
 
     const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
-    await netWorthCard.focus();
+    await netWorthCard.click();
 
-    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-    // Source sections should be highlighted
-    const highlighted = page.locator('[data-dataflow-highlighted]');
-    const count = await highlighted.count();
-    expect(count).toBeGreaterThanOrEqual(1);
-
-    await captureScreenshot(page, "task-75-mobile-highlight-only");
+    await captureScreenshot(page, "task-75-mobile-explainer");
   });
 
-  test("spotlight and highlights clear on mouse leave", async ({ page }) => {
+  test("explainer modal closes when close button is clicked", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="metric-card-net-worth"]');
 
     const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
-    await netWorthCard.hover();
-    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
+    await netWorthCard.click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-    await page.mouse.move(0, 0);
+    await page.locator('[data-testid="explainer-close"]').click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
 
-    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCSS("opacity", "0", { timeout: 3000 });
-    await expect(page.locator('[data-dataflow-highlighted]')).toHaveCount(0);
-
+    // Aria-live should be clear
     const ariaLive = page.locator('[data-testid="metric-card-net-worth"] [data-testid="dataflow-aria-live"]');
     await expect(ariaLive).toHaveText("");
   });
 
-  test("data-dataflow-active-target attribute set on hovered metric card", async ({ page }) => {
+  test("click-to-explain hint visible on hover", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="metric-card-net-worth"]');
 
     const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
     await netWorthCard.hover();
 
-    await page.waitForSelector('[data-dataflow-highlighted]', { timeout: 3000 });
-    await expect(netWorthCard).toHaveAttribute("data-dataflow-active-target", "true");
+    const hint = netWorthCard.locator('[data-testid="click-to-explain-hint"]');
+    await expect(hint).toBeVisible();
+    await expect(hint).toContainText("Click to explain");
   });
 });

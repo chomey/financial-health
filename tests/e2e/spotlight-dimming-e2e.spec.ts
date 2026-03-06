@@ -1,175 +1,82 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-test.describe("Spotlight Dimming System — Milestone E2E", () => {
-  test("Net Worth card shows dim overlay, spotlighted sections, and formula bar with color-coded terms", async ({
+test.describe("Explainer Modal System — Milestone E2E (replaces spotlight dimming)", () => {
+  test("Net Worth card click opens explainer modal with source cards and hand-drawn ovals", async ({
     page,
   }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const netWorthCard = page.locator(
-      '[data-testid="metric-card-net-worth"]'
-    );
+    const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
     await netWorthCard.scrollIntoViewIfNeeded();
 
-    // Verify overlay is dormant
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "0");
+    // No modal initially
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible();
 
-    // Hover Net Worth card
-    await netWorthCard.hover();
-    await page.waitForSelector("[data-dataflow-highlighted]", {
-      timeout: 5000,
-    });
+    // Click Net Worth card
+    await netWorthCard.click();
 
-    // 1. Dim overlay visible
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "1");
+    // Explainer modal should appear
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-    // 2. Assets and debts spotlighted with correct signs
-    const assetsEl = page.locator(
-      '[data-dataflow-source="section-assets"]'
-    );
-    await expect(assetsEl).toHaveAttribute(
-      "data-dataflow-highlighted",
-      "positive"
-    );
+    // Title and value displayed
+    await expect(page.locator('[data-testid="explainer-title"]')).toContainText("Net Worth");
+    await expect(page.locator('[data-testid="explainer-value"]')).toBeVisible();
 
-    const debtsEl = page.locator(
-      '[data-dataflow-source="section-debts"]'
-    );
-    await expect(debtsEl).toHaveAttribute(
-      "data-dataflow-highlighted",
-      "negative"
-    );
+    // Assets (positive) and debts (negative) source cards
+    await expect(page.locator('[data-testid="explainer-source-section-assets"]')).toBeVisible();
+    await expect(page.locator('[data-testid="explainer-source-section-debts"]')).toBeVisible();
 
-    // Stocks section spotlighted positive only if stocks have value
-    const stocksEl = page.locator(
-      '[data-dataflow-source="section-stocks"]'
-    );
-    const stocksHighlighted = await stocksEl
-      .getAttribute("data-dataflow-highlighted")
-      .catch(() => null);
-    // If stocks have value, they should be positive; if 0, they're filtered out
-    if (stocksHighlighted) {
-      expect(stocksHighlighted).toBe("positive");
-    }
+    // Positive source card has green left border
+    const assetsCard = page.locator('[data-testid="explainer-source-section-assets"]');
+    const assetsClasses = await assetsCard.getAttribute("class");
+    expect(assetsClasses).toContain("border-l-green-500");
 
-    // 3. Spotlighted sections have opaque backgrounds above overlay (z-index >= 45)
-    const assetsZIndex = await assetsEl.evaluate(
-      (el) => getComputedStyle(el).zIndex
-    );
-    expect(Number(assetsZIndex)).toBeGreaterThanOrEqual(45);
+    // Negative source card has red left border
+    const debtsCard = page.locator('[data-testid="explainer-source-section-debts"]');
+    const debtsClasses = await debtsCard.getAttribute("class");
+    expect(debtsClasses).toContain("border-l-rose-500");
 
-    const assetsBg = await assetsEl.evaluate(
-      (el) => getComputedStyle(el).background
-    );
-    expect(assetsBg).toContain("rgb"); // has a non-transparent background
+    // Hand-drawn oval SVG paths exist
+    await expect(page.locator('[data-testid="explainer-oval-section-assets"]')).toBeVisible();
+    await expect(page.locator('[data-testid="explainer-oval-section-debts"]')).toBeVisible();
 
-    // 4. Formula bar visible with color-coded terms
-    const formulaBar = page.locator('[data-testid="formula-bar"]');
-    await expect(formulaBar).toBeVisible();
+    // Result section with equals sign
+    await expect(page.locator('[data-testid="explainer-result-value"]')).toBeVisible();
 
-    // Formula bar has positive (green) and negative (red) term pills
-    const positiveTerm = formulaBar.locator(
-      '[data-testid="formula-term-section-assets"]'
-    );
-    await expect(positiveTerm).toBeVisible();
-    const positiveClasses = await positiveTerm.getAttribute("class");
-    expect(positiveClasses).toContain("bg-green-50");
-    expect(positiveClasses).toContain("text-green-700");
-
-    const negativeTerm = formulaBar.locator(
-      '[data-testid="formula-term-section-debts"]'
-    );
-    await expect(negativeTerm).toBeVisible();
-    const negativeClasses = await negativeTerm.getAttribute("class");
-    expect(negativeClasses).toContain("bg-rose-50");
-    expect(negativeClasses).toContain("text-rose-700");
-
-    // Formula result visible
-    const result = formulaBar.locator('[data-testid="formula-result"]');
-    await expect(result).toBeVisible();
-
-    await captureScreenshot(page, "task-78-net-worth-spotlight");
+    await captureScreenshot(page, "task-78-net-worth-explainer");
   });
 
-  test("Monthly Surplus formula bar shows after-tax income minus expenses minus contributions minus mortgage", async ({
+  test("Monthly Surplus explainer shows income and expenses with operators", async ({
     page,
   }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const surplusCard = page.locator(
-      '[data-testid="metric-card-monthly-surplus"]'
-    );
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
     await surplusCard.scrollIntoViewIfNeeded();
-    await surplusCard.hover();
+    await surplusCard.click();
 
-    await page.waitForSelector("[data-dataflow-highlighted]", {
-      timeout: 5000,
-    });
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-    // Spotlight overlay active
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "1");
+    // Income and expenses sources
+    await expect(page.locator('[data-testid="explainer-source-section-income"]')).toBeVisible();
+    await expect(page.locator('[data-testid="explainer-source-section-expenses"]')).toBeVisible();
 
-    // Income spotlighted green, expenses spotlighted red
-    const incomeEl = page.locator(
-      '[data-dataflow-source="section-income"]'
-    );
-    await expect(incomeEl).toHaveAttribute(
-      "data-dataflow-highlighted",
-      "positive"
-    );
+    // Operator between sources
+    const operator = page.locator('[data-testid^="explainer-operator-"]').first();
+    await expect(operator).toBeVisible();
 
-    const expensesEl = page.locator(
-      '[data-dataflow-source="section-expenses"]'
-    );
-    await expect(expensesEl).toHaveAttribute(
-      "data-dataflow-highlighted",
-      "negative"
-    );
+    // Result value
+    await expect(page.locator('[data-testid="explainer-result-value"]')).toBeVisible();
 
-    // Formula bar visible with income (positive) and expenses (negative) terms
-    const formulaBar = page.locator('[data-testid="formula-bar"]');
-    await expect(formulaBar).toBeVisible();
-
-    // Income term is green
-    const incomeTerm = formulaBar.locator(
-      '[data-testid="formula-term-section-income"]'
-    );
-    await expect(incomeTerm).toBeVisible();
-    const incomeClasses = await incomeTerm.getAttribute("class");
-    expect(incomeClasses).toContain("bg-green-50");
-
-    // Expenses term is red/rose
-    const expensesTerm = formulaBar.locator(
-      '[data-testid="formula-term-section-expenses"]'
-    );
-    await expect(expensesTerm).toBeVisible();
-    const expensesClasses = await expensesTerm.getAttribute("class");
-    expect(expensesClasses).toContain("bg-rose-50");
-
-    // Formula bar has an aria-label describing the formula
-    const ariaLabel = await formulaBar.getAttribute("aria-label");
-    expect(ariaLabel).toContain("Formula:");
-    expect(ariaLabel).toContain("Monthly Surplus");
-
-    // Result displayed
-    const result = formulaBar.locator('[data-testid="formula-result"]');
-    await expect(result).toBeVisible();
-
-    await captureScreenshot(page, "task-78-monthly-surplus-spotlight");
+    await captureScreenshot(page, "task-78-monthly-surplus-explainer");
   });
 
-  test("formula bar displays correct terms for Estimated Tax, Financial Runway, and Debt-to-Asset Ratio", async ({
+  test("explainer modals work for Estimated Tax, Financial Runway, and Debt-to-Asset Ratio", async ({
     page,
   }) => {
     test.setTimeout(90000);
@@ -177,163 +84,65 @@ test.describe("Spotlight Dimming System — Milestone E2E", () => {
     await page.waitForLoadState("networkidle");
 
     // --- Estimated Tax ---
-    const taxCard = page.locator(
-      '[data-testid="metric-card-estimated-tax"]'
-    );
+    const taxCard = page.locator('[data-testid="metric-card-estimated-tax"]');
     await taxCard.scrollIntoViewIfNeeded();
-    await taxCard.hover();
-
-    await page.waitForSelector("[data-dataflow-highlighted]", {
-      timeout: 5000,
-    });
-
-    let formulaBar = page.locator('[data-testid="formula-bar"]');
-    await expect(formulaBar).toBeVisible();
-
-    // Estimated Tax: single income term showing effective rate
-    const taxIncomeTerm = formulaBar.locator(
-      '[data-testid="formula-term-section-income"]'
-    );
-    await expect(taxIncomeTerm).toBeVisible();
-    const taxTermText = await taxIncomeTerm.textContent();
-    // Should contain the percentage and gross income (e.g. "23.5% of $78k")
-    expect(taxTermText).toMatch(/\d+\.\d+%.*\$|^\$/);
-
-    let ariaLabel = await formulaBar.getAttribute("aria-label");
-    expect(ariaLabel).toContain("Estimated Tax");
-
-    await captureScreenshot(page, "task-78-estimated-tax-spotlight");
-
-    // Clear
-    await page.mouse.move(0, 0);
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "0", { timeout: 3000 });
+    await taxCard.click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-title"]')).toContainText("Estimated Tax");
+    await captureScreenshot(page, "task-78-estimated-tax-explainer");
+    await page.keyboard.press("Escape");
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
 
     // --- Financial Runway ---
-    const runwayCard = page.locator(
-      '[data-testid="metric-card-financial-runway"]'
-    );
+    const runwayCard = page.locator('[data-testid="metric-card-financial-runway"]');
     await runwayCard.scrollIntoViewIfNeeded();
-    await runwayCard.hover();
-
-    await page.waitForSelector("[data-dataflow-highlighted]", {
-      timeout: 5000,
-    });
-
-    formulaBar = page.locator('[data-testid="formula-bar"]');
-    await expect(formulaBar).toBeVisible();
-
-    // Financial Runway: assets (positive), stocks (positive), expenses (negative)
-    const runwayAssetsTerm = formulaBar.locator(
-      '[data-testid="formula-term-section-assets"]'
-    );
-    await expect(runwayAssetsTerm).toBeVisible();
-    const runwayAssetsClasses = await runwayAssetsTerm.getAttribute("class");
-    expect(runwayAssetsClasses).toContain("bg-green-50");
-
-    const runwayExpensesTerm = formulaBar.locator(
-      '[data-testid="formula-term-section-expenses"]'
-    );
-    await expect(runwayExpensesTerm).toBeVisible();
-    const runwayExpensesClasses =
-      await runwayExpensesTerm.getAttribute("class");
-    expect(runwayExpensesClasses).toContain("bg-rose-50");
-
-    ariaLabel = await formulaBar.getAttribute("aria-label");
-    expect(ariaLabel).toContain("Financial Runway");
-
-    await captureScreenshot(page, "task-78-financial-runway-spotlight");
-
-    // Clear
-    await page.mouse.move(0, 0);
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "0", { timeout: 3000 });
+    await runwayCard.click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-title"]')).toContainText("Financial Runway");
+    await captureScreenshot(page, "task-78-financial-runway-explainer");
+    await page.keyboard.press("Escape");
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
 
     // --- Debt-to-Asset Ratio ---
-    const debtRatioCard = page.locator(
-      '[data-testid="metric-card-debt-to-asset-ratio"]'
-    );
+    const debtRatioCard = page.locator('[data-testid="metric-card-debt-to-asset-ratio"]');
     await debtRatioCard.scrollIntoViewIfNeeded();
-    await debtRatioCard.hover();
-
-    await page.waitForSelector("[data-dataflow-highlighted]", {
-      timeout: 5000,
-    });
-
-    formulaBar = page.locator('[data-testid="formula-bar"]');
-    await expect(formulaBar).toBeVisible();
-
-    // Debt-to-Asset: assets (positive), debts (negative)
-    const ratioAssetsTerm = formulaBar.locator(
-      '[data-testid="formula-term-section-assets"]'
-    );
-    await expect(ratioAssetsTerm).toBeVisible();
-
-    const ratioDebtsTerm = formulaBar.locator(
-      '[data-testid="formula-term-section-debts"]'
-    );
-    await expect(ratioDebtsTerm).toBeVisible();
-    const ratioDebtsClasses = await ratioDebtsTerm.getAttribute("class");
-    expect(ratioDebtsClasses).toContain("bg-rose-50");
-
-    ariaLabel = await formulaBar.getAttribute("aria-label");
-    expect(ariaLabel).toContain("Debt-to-Asset Ratio");
-
-    await captureScreenshot(page, "task-78-debt-to-asset-ratio-spotlight");
+    await debtRatioCard.click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-testid="explainer-title"]')).toContainText("Debt-to-Asset Ratio");
+    await captureScreenshot(page, "task-78-debt-to-asset-ratio-explainer");
+    await page.keyboard.press("Escape");
   });
 
-  test("spotlight clears on mouse leave with no residual highlights", async ({
+  test("explainer modal closes via close button, Escape key, and backdrop click", async ({
     page,
   }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const netWorthCard = page.locator(
-      '[data-testid="metric-card-net-worth"]'
-    );
+    const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
     await netWorthCard.scrollIntoViewIfNeeded();
-    await netWorthCard.hover();
 
-    await page.waitForSelector("[data-dataflow-highlighted]", {
-      timeout: 5000,
-    });
+    // Close via X button
+    await netWorthCard.click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+    await page.locator('[data-testid="explainer-close"]').click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
 
-    // Confirm active state
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "1");
-    const activeCount = await page
-      .locator("[data-dataflow-highlighted]")
-      .count();
-    expect(activeCount).toBeGreaterThanOrEqual(1);
+    // Close via Escape
+    await netWorthCard.click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+    await page.keyboard.press("Escape");
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
 
-    // Move away
-    await page.mouse.move(0, 0);
-
-    // Overlay should fade out
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "0", { timeout: 3000 });
-
-    // No residual highlights
-    await expect(
-      page.locator("[data-dataflow-highlighted]")
-    ).toHaveCount(0);
-
-    // No formula bar
-    const formulaBar = page.locator('[data-testid="formula-bar"]');
-    await expect(formulaBar).not.toBeVisible();
-
-    // Active target attribute cleared
-    await expect(
-      page.locator("[data-dataflow-active-target]")
-    ).toHaveCount(0);
+    // Close via backdrop click
+    await netWorthCard.click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+    await page.locator('[data-testid="explainer-backdrop"]').click({ position: { x: 10, y: 10 } });
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
   });
 
-  test("mobile viewport (375px) shows formula bar fixed at bottom of viewport", async ({
+  test("mobile viewport (375px) shows explainer modal with scrollable content", async ({
     page,
   }) => {
     test.setTimeout(60000);
@@ -341,86 +150,43 @@ test.describe("Spotlight Dimming System — Milestone E2E", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const netWorthCard = page.locator(
-      '[data-testid="metric-card-net-worth"]'
-    );
+    const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
     await netWorthCard.scrollIntoViewIfNeeded();
-    await netWorthCard.focus();
+    await netWorthCard.click();
 
-    await page.waitForSelector("[data-dataflow-highlighted]", {
-      timeout: 5000,
-    });
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-    // Spotlight overlay active
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "1");
+    // Modal should be visible and scrollable
+    const modal = page.locator('[data-testid="explainer-modal"]');
+    const overflowY = await modal.evaluate((el) => getComputedStyle(el).overflowY);
+    expect(overflowY).toBe("auto");
 
-    // Formula bar should be visible and fixed at bottom
-    const formulaBar = page.locator('[data-testid="formula-bar"]');
-    await expect(formulaBar).toBeVisible();
-
-    const position = await formulaBar.evaluate(
-      (el) => getComputedStyle(el).position
-    );
-    expect(position).toBe("fixed");
-
-    const bottom = await formulaBar.evaluate(
-      (el) => getComputedStyle(el).bottom
-    );
-    expect(bottom).toBe("0px");
-
-    // Source sections highlighted
-    const highlighted = page.locator("[data-dataflow-highlighted]");
-    expect(await highlighted.count()).toBeGreaterThanOrEqual(1);
-
-    await captureScreenshot(page, "task-78-mobile-formula-bar-bottom");
+    await captureScreenshot(page, "task-78-mobile-explainer-modal");
   });
 
-  test("keyboard Tab to metric card triggers spotlight on focus", async ({
+  test("keyboard Enter opens explainer and aria-live announces sources", async ({
     page,
   }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Focus the Net Worth card via keyboard focus
-    const netWorthCard = page.locator(
-      '[data-testid="metric-card-net-worth"]'
-    );
+    const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
     await netWorthCard.focus();
+    await page.keyboard.press("Enter");
 
-    await page.waitForSelector("[data-dataflow-highlighted]", {
-      timeout: 5000,
-    });
-
-    // Spotlight overlay active
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "1");
-
-    // Formula bar visible
-    const formulaBar = page.locator('[data-testid="formula-bar"]');
-    await expect(formulaBar).toBeVisible();
-
-    // Active target attribute set
-    await expect(netWorthCard).toHaveAttribute(
-      "data-dataflow-active-target",
-      "true"
-    );
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
     // Aria-live region announces data sources
-    const ariaLive = netWorthCard.locator(
-      '[data-testid="dataflow-aria-live"]'
-    );
+    const ariaLive = netWorthCard.locator('[data-testid="dataflow-aria-live"]');
     await page.waitForTimeout(500);
     const text = await ariaLive.textContent();
     expect(text).toContain("Net Worth is calculated from:");
 
-    await captureScreenshot(page, "task-78-keyboard-focus-spotlight");
+    await captureScreenshot(page, "task-78-keyboard-explainer");
   });
 
-  test("no Cumulative Layout Shift during spotlight activation/deactivation", async ({
+  test("no CLS during explainer modal open/close", async ({
     page,
   }) => {
     test.setTimeout(60000);
@@ -440,31 +206,23 @@ test.describe("Spotlight Dimming System — Milestone E2E", () => {
       observer.observe({ type: "layout-shift", buffered: true });
     });
 
-    // Reset CLS entries before interaction
     await page.evaluate(() => {
       (window as unknown as { clsEntries: { value: number }[] }).clsEntries = [];
     });
 
-    const netWorthCard = page.locator(
-      '[data-testid="metric-card-net-worth"]'
-    );
+    const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
     await netWorthCard.scrollIntoViewIfNeeded();
 
-    // Activate spotlight
-    await netWorthCard.hover();
-    await page.waitForSelector("[data-dataflow-highlighted]", {
-      timeout: 5000,
-    });
+    // Open modal
+    await netWorthCard.click();
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
     await page.waitForTimeout(500);
 
-    // Deactivate spotlight
-    await page.mouse.move(0, 0);
-    await expect(
-      page.locator('[data-testid="spotlight-overlay"]')
-    ).toHaveCSS("opacity", "0", { timeout: 3000 });
+    // Close modal
+    await page.keyboard.press("Escape");
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
     await page.waitForTimeout(500);
 
-    // Check CLS
     const clsTotal = await page.evaluate(() => {
       return (window as unknown as { clsEntries: { value: number }[] }).clsEntries.reduce(
         (sum: number, e: { value: number }) => sum + e.value,
@@ -472,11 +230,10 @@ test.describe("Spotlight Dimming System — Milestone E2E", () => {
       );
     });
 
-    // CLS should be minimal (< 0.1 is "good" per Web Vitals)
     expect(clsTotal).toBeLessThan(0.1);
   });
 
-  test("insight card hover shows spotlight with lighter styling", async ({
+  test("insight card click opens explainer modal", async ({
     page,
   }) => {
     test.setTimeout(60000);
@@ -486,71 +243,24 @@ test.describe("Spotlight Dimming System — Milestone E2E", () => {
     const insightsPanel = page.locator('[data-testid="insights-panel"]');
     await insightsPanel.scrollIntoViewIfNeeded();
 
-    const surplusInsight = page
-      .locator('[data-insight-type="surplus"]')
-      .first();
+    const surplusInsight = page.locator('[data-insight-type="surplus"]').first();
 
-    if (
-      await surplusInsight.isVisible({ timeout: 2000 }).catch(() => false)
-    ) {
-      await surplusInsight.hover();
-      await page.waitForSelector("[data-dataflow-highlighted]", {
-        timeout: 5000,
-      });
+    if (await surplusInsight.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await surplusInsight.click();
+      await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-      // Spotlight overlay active
-      await expect(
-        page.locator('[data-testid="spotlight-overlay"]')
-      ).toHaveCSS("opacity", "1");
+      await captureScreenshot(page, "task-78-insight-explainer");
 
-      // Insight card gets active-target attribute
-      await expect(surplusInsight).toHaveAttribute(
-        "data-dataflow-active-target",
-        "true"
-      );
-
-      // Source sections highlighted
-      const incomeEl = page.locator(
-        '[data-dataflow-source="section-income"]'
-      );
-      await expect(incomeEl).toHaveAttribute(
-        "data-dataflow-highlighted",
-        "positive"
-      );
-
-      const expensesEl = page.locator(
-        '[data-dataflow-source="section-expenses"]'
-      );
-      await expect(expensesEl).toHaveAttribute(
-        "data-dataflow-highlighted",
-        "negative"
-      );
-
-      await captureScreenshot(page, "task-78-insight-spotlight");
-
-      // Clear
-      await page.mouse.move(0, 0);
-      await expect(
-        page.locator('[data-testid="spotlight-overlay"]')
-      ).toHaveCSS("opacity", "0", { timeout: 3000 });
-      await expect(
-        page.locator("[data-dataflow-highlighted]")
-      ).toHaveCount(0);
+      await page.keyboard.press("Escape");
     } else {
-      // Fallback: test with any available insight
       const anyInsight = page.locator("[data-insight-type]").first();
       await expect(anyInsight).toBeVisible({ timeout: 3000 });
-      await anyInsight.hover();
-      await page.waitForSelector("[data-dataflow-highlighted]", {
-        timeout: 5000,
-      });
-      await expect(
-        page.locator('[data-testid="spotlight-overlay"]')
-      ).toHaveCSS("opacity", "1");
+      await anyInsight.click();
+      await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-      await captureScreenshot(page, "task-78-insight-spotlight");
+      await captureScreenshot(page, "task-78-insight-explainer");
 
-      await page.mouse.move(0, 0);
+      await page.keyboard.press("Escape");
     }
   });
 });

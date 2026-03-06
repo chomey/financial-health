@@ -148,7 +148,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     return () => ctx.unregisterTarget(targetId);
   }, [ctx, targetId]);
 
-  const activateArrows = useCallback(() => {
+  const handleClick = useCallback(() => {
     if (!ctx || !connections || connections.length === 0) return;
     const filtered = connections.filter((c) => c.value === undefined || c.value > 0);
     const prioritized = prioritizeConnections(
@@ -170,28 +170,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     // Build aria-live announcement
     const parts = prioritized.map((c) => c.label || c.sourceId.replace("section-", ""));
     setAriaAnnouncement(`${metric.title} is calculated from: ${parts.join(", ")}`);
-
-    // Highlight source elements
-    for (const conn of prioritized) {
-      const el = document.querySelector(`[data-dataflow-source="${conn.sourceId}"]`);
-      if (el instanceof HTMLElement) {
-        el.setAttribute("data-dataflow-highlighted", conn.sign === "negative" ? "negative" : "positive");
-      }
-    }
   }, [ctx, connections, targetId, metric.title, metric.value, metric.format, homeCurrency]);
-
-  const deactivateArrows = useCallback(() => {
-    if (!ctx) return;
-    ctx.setActiveConnections([]);
-    ctx.setActiveTarget(null);
-    ctx.setActiveTargetMeta(null);
-    setAriaAnnouncement("");
-
-    // Remove all highlights
-    document.querySelectorAll("[data-dataflow-highlighted]").forEach((el) => {
-      el.removeAttribute("data-dataflow-highlighted");
-    });
-  }, [ctx]);
 
   const valueColor = metric.positive
     ? "text-green-600"
@@ -214,7 +193,9 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
   return (
     <div
       ref={cardRef}
-      className={`relative rounded-xl border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default ${
+      className={`relative rounded-xl border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+        hasConnections ? "cursor-pointer" : "cursor-default"
+      } ${
         isRunwayCelebration
           ? "border-green-300 ring-1 ring-green-200 animate-glow-pulse"
           : isUnderwaterWarning
@@ -225,11 +206,12 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       aria-label={metric.title}
       data-testid={`metric-card-${metric.title.toLowerCase().replace(/\s+/g, "-")}`}
       data-runway-celebration={isRunwayCelebration || undefined}
-      data-dataflow-active-target={ctx?.activeTarget === targetId ? "true" : undefined}
-      onMouseEnter={() => { setShowTooltip(true); activateArrows(); }}
-      onMouseLeave={() => { setShowTooltip(false); deactivateArrows(); }}
-      onFocus={() => { setShowTooltip(true); activateArrows(); }}
-      onBlur={() => { setShowTooltip(false); deactivateArrows(); }}
+      onClick={handleClick}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      onFocus={() => setShowTooltip(true)}
+      onBlur={() => setShowTooltip(false)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
       tabIndex={0}
     >
       <div className="flex items-center justify-between">
@@ -292,6 +274,15 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       <p className="mt-1.5 text-xs text-stone-400 leading-relaxed">
         {metric.tooltip}
       </p>
+      {/* Click to explain hint */}
+      {hasConnections && (
+        <p className={`mt-1.5 flex items-center gap-1 text-xs text-stone-300 transition-opacity duration-200 ${showTooltip ? "opacity-100" : "opacity-0"}`} data-testid="click-to-explain-hint">
+          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Click to explain
+        </p>
+      )}
       {/* Accessibility: announce data sources to screen readers */}
       <span className="sr-only" aria-live="polite" data-testid="dataflow-aria-live">
         {ariaAnnouncement}

@@ -25,22 +25,18 @@ test.describe("Data flow source registration", () => {
     await page.goto("/");
     await page.waitForSelector('[data-dataflow-source]');
 
-    // Default state has assets — check sub-sources exist with asset: prefix
     const assetSources = page.locator('[data-dataflow-source^="asset:"]');
     const assetCount = await assetSources.count();
     expect(assetCount).toBeGreaterThan(0);
 
-    // Default state has debts
     const debtSources = page.locator('[data-dataflow-source^="debt:"]');
     const debtCount = await debtSources.count();
     expect(debtCount).toBeGreaterThan(0);
 
-    // Default state has income
     const incomeSources = page.locator('[data-dataflow-source^="income:"]');
     const incomeCount = await incomeSources.count();
     expect(incomeCount).toBeGreaterThan(0);
 
-    // Default state has expenses
     const expenseSources = page.locator('[data-dataflow-source^="expense:"]');
     const expenseCount = await expenseSources.count();
     expect(expenseCount).toBeGreaterThan(0);
@@ -50,15 +46,11 @@ test.describe("Data flow source registration", () => {
     await page.goto("/");
     await page.waitForSelector('[data-dataflow-source="section-assets"]');
 
-    // Collapse the assets section
     const collapseBtn = page.locator('#assets button[aria-label="Collapse Assets"]');
     await collapseBtn.click();
 
-    // The collapsed header should still have the data-dataflow-source attribute
     const source = page.locator('[data-dataflow-source="section-assets"]');
     await expect(source).toBeAttached();
-
-    // Verify it's the collapsed button (aria-expanded=false)
     await expect(source).toHaveAttribute("aria-expanded", "false");
 
     await captureScreenshot(page, "task-70-collapsed-section-source");
@@ -68,33 +60,26 @@ test.describe("Data flow source registration", () => {
     await page.goto("/");
     await page.waitForSelector('[data-dataflow-source="section-debts"]');
 
-    // Collapse debts section
     const collapseBtn = page.locator('#debts button[aria-label="Collapse Debts"]');
     await collapseBtn.click();
 
-    // Verify collapsed source
     const collapsedSource = page.locator('[data-dataflow-source="section-debts"]');
     await expect(collapsedSource).toHaveAttribute("aria-expanded", "false");
 
-    // Expand it again
     await collapsedSource.click();
 
-    // Source should be re-registered on expanded div
     const expandedSource = page.locator('[data-dataflow-source="section-debts"]');
     await expect(expandedSource).toBeAttached();
-    // Expanded sections use a div, not a button with aria-expanded
     await expect(expandedSource).not.toHaveAttribute("aria-expanded", "false");
   });
 
-  test("Spotlight overlay present and dormant without active targets", async ({ page }) => {
+  test("no spotlight overlay (replaced by explainer modal)", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-dataflow-source]');
 
-    // Spotlight overlay should be present but invisible since no target is active
-    const overlay = page.locator('[data-testid="spotlight-overlay"]');
-    await expect(overlay).toBeAttached();
-    await expect(overlay).toHaveCSS("opacity", "0");
+    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible();
 
-    await captureScreenshot(page, "task-70-sources-registered-no-arrows");
+    await captureScreenshot(page, "task-70-sources-registered-no-modal");
   });
 });

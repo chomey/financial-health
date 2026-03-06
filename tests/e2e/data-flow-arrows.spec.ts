@@ -1,19 +1,18 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-test.describe("Data Flow Arrows", () => {
+test.describe("Data Flow — Explainer Modal", () => {
   test("DataFlowProvider renders without errors on homepage", async ({
     page,
   }) => {
     await page.goto("/");
     await expect(page.locator("h1")).toContainText("Financial Health Snapshot");
 
-    // The spotlight overlay should be present but invisible when no target is hovered
-    const overlay = page.locator('[data-testid="spotlight-overlay"]');
-    await expect(overlay).toHaveCSS("opacity", "0");
+    // No explainer modal should be visible initially
+    await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible();
   });
 
-  test("Spotlight overlay system is available in the DOM when activated", async ({
+  test("Explainer modal system is available (no old spotlight overlay)", async ({
     page,
   }) => {
     await page.goto("/");
@@ -25,17 +24,18 @@ test.describe("Data Flow Arrows", () => {
     });
     expect(hasProvider).toBe(true);
 
-    // Verify spotlight overlay exists
-    const overlay = page.locator('[data-testid="spotlight-overlay"]');
-    await expect(overlay).toBeAttached();
+    // No spotlight overlay should exist (removed)
+    await expect(page.locator('[data-testid="spotlight-overlay"]')).toHaveCount(0);
 
     await captureScreenshot(page, "task-69-data-flow-arrows-base");
   });
 
-  test("spotlight-overlay has pointer-events none", async ({ page }) => {
+  test("metric cards are clickable with cursor pointer", async ({ page }) => {
     await page.goto("/");
 
-    const overlay = page.locator('[data-testid="spotlight-overlay"]');
-    await expect(overlay).toHaveCSS("pointer-events", "none");
+    const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
+    await netWorthCard.scrollIntoViewIfNeeded();
+    const cursor = await netWorthCard.evaluate((el) => getComputedStyle(el).cursor);
+    expect(cursor).toBe("pointer");
   });
 });

@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 78
-- **Completed**: 78
-- **Remaining**: 0
+- **Total Tasks**: 82
+- **Completed**: 79
+- **Remaining**: 3
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1678,3 +1678,40 @@
   ![Keyboard focus spotlight](screenshots/task-78-keyboard-focus-spotlight.png)
   ![Insight spotlight](screenshots/task-78-insight-spotlight.png)
 - **Notes**: All 78 tasks are now complete — the entire TASKS.md backlog is done. This milestone E2E test validates the full spotlight dimming system including formula bar content, color-coded term pills, mobile fixed positioning, CLS measurement, and insight card integration. The CLS test uses the PerformanceObserver API to measure layout shifts during spotlight activation/deactivation and asserts they remain below the 0.1 "good" threshold per Web Vitals.
+
+---
+
+## Task 79: Replace spotlight dimming with click-to-explain whiteboard mode
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/components/DataFlowArrows.tsx`: Removed SpotlightOverlay and FormulaBar components. Added ExplainerModal component with click-triggered whiteboard explainer. Added `handDrawnOval()` and `handDrawnLine()` SVG utility functions for organic marker-style annotations. Added `getSourceMetadata()` to DataFlowContextValue. Provider now renders ExplainerModal instead of SpotlightOverlay/FormulaBar when activeTarget is set.
+  - `src/components/SnapshotDashboard.tsx`: Changed MetricCard from `onMouseEnter`/`onMouseLeave` hover activation to `onClick` handler. Added keyboard Enter/Space support. Added cursor-pointer styling when connections exist. Added "click to explain" hint with info icon that appears on hover. Removed `data-dataflow-highlighted` attribute setting and `data-dataflow-active-target` attribute.
+  - `src/components/InsightsPanel.tsx`: Changed InsightCard from `onMouseEnter`/`onMouseLeave` to `onClick` handler. Added keyboard Enter/Space support. Added pointer cursor when connections exist. Removed `data-dataflow-highlighted` and `data-dataflow-active-target` attribute setting.
+  - `src/app/globals.css`: Removed spotlight dimming CSS (`[data-dataflow-highlighted]`, `[data-dataflow-active-target]` rules). Added modal animation CSS (fade-in/out, scale-in/out for backdrop and content). Added hand-drawn SVG animation CSS (draw-oval, draw-line with stroke-dasharray animation).
+  - `src/lib/changelog.ts`: Added task 79 changelog entry.
+  - `tests/unit/explainer-modal.test.tsx`: New — 26 tests for handDrawnOval, handDrawnLine, ExplainerModal rendering, close handlers, aria attributes, and DataFlowProvider integration.
+  - `tests/unit/data-flow-arrows.test.tsx`: Updated — removed SpotlightOverlay/FormulaBar tests, added ExplainerModal context tests.
+  - `tests/unit/arrow-polish.test.tsx`: Updated — replaced spotlight tests with ExplainerModal tests.
+  - `tests/unit/insight-data-flow.test.tsx`: Updated — changed hover-based highlight tests to click-based explainer modal tests.
+  - `tests/unit/spotlight-dimming-e2e-infra.test.ts`: Updated — replaced SpotlightOverlay/FormulaBar export checks with ExplainerModal/handDrawnOval/handDrawnLine export checks.
+  - `tests/unit/milestone-8-e2e-infra.test.ts`: Updated — replaced spotlight export checks with ExplainerModal export checks.
+  - `tests/e2e/spotlight-dimming-e2e.spec.ts`: Rewritten — tests explainer modal instead of spotlight dimming.
+  - `tests/e2e/data-flow-arrows.spec.ts`: Updated — tests explainer modal system instead of spotlight overlay.
+  - `tests/e2e/net-worth-data-flow.spec.ts`: Updated — click-to-explain instead of hover spotlight.
+  - `tests/e2e/monthly-surplus-data-flow.spec.ts`: Updated — click-to-explain.
+  - `tests/e2e/remaining-metric-data-flow.spec.ts`: Updated — click-to-explain for Tax, Runway, Debt Ratio.
+  - `tests/e2e/insight-data-flow.spec.ts`: Updated — click-to-explain for insight cards.
+  - `tests/e2e/arrow-polish.spec.ts`: Updated — tests explainer modal polish, accessibility, responsive.
+  - `tests/e2e/data-flow-sources.spec.ts`: Updated — removed spotlight overlay assertions.
+  - `tests/e2e/milestone-8-e2e.spec.ts`: Rewritten — all data-flow tests use click-to-explain modal.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/explainer-modal.test.tsx`: 26 tests — handDrawnOval paths, handDrawnLine paths, ExplainerModal rendering/close/aria/colors, DataFlowProvider integration
+  - All T1 unit tests: 958 passed, 0 failed (61 test files)
+  - All T2 E2E tests: 215 passed, 0 failed
+- **Screenshots**:
+  ![Explainer modal — Net Worth](screenshots/task-79-explainer-modal-net-worth.png)
+  ![Explainer modal — mobile](screenshots/task-79-explainer-modal-mobile.png)
+  ![Explainer modal — insight card](screenshots/task-79-explainer-modal-insight.png)
+- **Notes**: Complete replacement of the hover-triggered spotlight/dimming system with a click-triggered whiteboard-style explainer modal. The modal uses hand-drawn SVG annotations (wobbly ovals around values, wobbly sum bar line) with sequenced draw-on animations. Source cards use colored left borders (green for positive contributions, red for negative). All 19 affected test files (unit + E2E) were updated to reflect the new interaction model. No spotlight overlay, formula bar, or data-dataflow-highlighted attributes remain in the codebase.
