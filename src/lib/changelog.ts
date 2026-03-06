@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Spotlight Dimming System (Milestone 9)
+  {
+    version: 77,
+    title: "Replace SVG arrow overlay with spotlight dimming system",
+    description: "Replaced SVG arrow overlay with a spotlight dimming system: a dark backdrop dims the page while source sections and the active metric card rise above it with colored borders and shadows. Added FormulaBar component showing color-coded computation terms as pills (green positive, red negative, bold result). Added activeTargetMeta to DataFlowContext for formula display. Mobile formula bar fixed at bottom of viewport. Removed all SVG geometry functions, arrow animations, and particle effects.",
+    date: "2026-03-05",
+  },
   // Data Flow Visualization (Milestone 8)
   {
     version: 76,
@@ -480,6 +487,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
+    { milestone: "Spotlight Dimming System", range: [77, 78] as const },
     { milestone: "Data Flow Visualization", range: [69, 76] as const },
     { milestone: "Withdrawal Tax Modeling", range: [62, 68] as const },
     { milestone: "Multi-Currency Support", range: [56, 61] as const },

@@ -67,6 +67,10 @@ function InsightCard({
     );
     ctx.setActiveConnections(activeConns);
     ctx.setActiveTarget(targetId);
+    ctx.setActiveTargetMeta({
+      label: insight.type,
+      formattedValue: insight.message,
+    });
 
     // Highlight source elements
     for (const conn of activeConns) {
@@ -75,12 +79,13 @@ function InsightCard({
         el.setAttribute("data-dataflow-highlighted", conn.sign === "negative" ? "negative" : "positive");
       }
     }
-  }, [ctx, connections, targetId]);
+  }, [ctx, connections, targetId, insight.type, insight.message]);
 
   const deactivateArrows = useCallback(() => {
     if (!ctx) return;
     ctx.setActiveConnections([]);
     ctx.setActiveTarget(null);
+    ctx.setActiveTargetMeta(null);
 
     // Remove all highlights
     document.querySelectorAll("[data-dataflow-highlighted]").forEach((el) => {
@@ -98,6 +103,7 @@ function InsightCard({
       aria-label={insight.message}
       data-testid={`insight-card-${insight.id}`}
       data-insight-type={insight.type}
+      data-dataflow-active-target={ctx?.activeTarget === targetId ? "true" : undefined}
       onMouseEnter={activateArrows}
       onMouseLeave={deactivateArrows}
       onFocus={activateArrows}

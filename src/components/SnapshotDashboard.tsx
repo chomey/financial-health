@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { generateInsights, type FinancialData, type InsightType } from "@/lib/insights";
-import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections } from "@/components/DataFlowArrows";
+import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type ActiveTargetMeta } from "@/components/DataFlowArrows";
 
 interface MetricData {
   title: string;
@@ -162,6 +162,10 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     );
     ctx.setActiveConnections(prioritized);
     ctx.setActiveTarget(targetId);
+    ctx.setActiveTargetMeta({
+      label: metric.title,
+      formattedValue: formatMetricValue(metric.value, metric.format, homeCurrency),
+    });
 
     // Build aria-live announcement
     const parts = prioritized.map((c) => c.label || c.sourceId.replace("section-", ""));
@@ -172,19 +176,15 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       const el = document.querySelector(`[data-dataflow-source="${conn.sourceId}"]`);
       if (el instanceof HTMLElement) {
         el.setAttribute("data-dataflow-highlighted", conn.sign === "negative" ? "negative" : "positive");
-        // Scroll into view if off-screen
-        const rect = el.getBoundingClientRect();
-        if (rect.bottom < 0 || rect.top > window.innerHeight) {
-          el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }
       }
     }
-  }, [ctx, connections, targetId, metric.title]);
+  }, [ctx, connections, targetId, metric.title, metric.value, metric.format, homeCurrency]);
 
   const deactivateArrows = useCallback(() => {
     if (!ctx) return;
     ctx.setActiveConnections([]);
     ctx.setActiveTarget(null);
+    ctx.setActiveTargetMeta(null);
     setAriaAnnouncement("");
 
     // Remove all highlights
@@ -225,6 +225,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       aria-label={metric.title}
       data-testid={`metric-card-${metric.title.toLowerCase().replace(/\s+/g, "-")}`}
       data-runway-celebration={isRunwayCelebration || undefined}
+      data-dataflow-active-target={ctx?.activeTarget === targetId ? "true" : undefined}
       onMouseEnter={() => { setShowTooltip(true); activateArrows(); }}
       onMouseLeave={() => { setShowTooltip(false); deactivateArrows(); }}
       onFocus={() => { setShowTooltip(true); activateArrows(); }}

@@ -157,74 +157,29 @@ body {
   animation: fade-in 0.15s ease-out;
 }
 
-/* Data flow arrow animations */
-@keyframes arrow-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes arrow-flow {
-  0% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: -40;
-  }
-}
-
-@keyframes arrow-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Data flow source highlighting — applied via JS when a metric card is hovered */
-@keyframes source-highlight-green {
-  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-  30% { box-shadow: 0 0 12px 2px rgba(16, 185, 129, 0.4); }
-  100% { box-shadow: 0 0 6px 1px rgba(16, 185, 129, 0.2); }
-}
-@keyframes source-highlight-red {
-  0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
-  30% { box-shadow: 0 0 12px 2px rgba(244, 63, 94, 0.4); }
-  100% { box-shadow: 0 0 6px 1px rgba(244, 63, 94, 0.2); }
-}
-
-[data-dataflow-highlighted="positive"] {
-  animation: source-highlight-green 0.6s ease-out forwards;
-  border-color: rgb(16 185 129 / 0.5) !important;
+/* Spotlight dimming — highlighted source sections rise above overlay */
+[data-dataflow-highlighted] {
+  position: relative;
+  z-index: 45;
+  background: white;
+  transform: scale(1.005);
+  transition: all 250ms ease-out;
   border-radius: 0.75rem;
+}
+[data-dataflow-highlighted="positive"] {
+  border-color: rgb(16 185 129 / 0.6) !important;
+  box-shadow: 0 0 12px 2px rgba(16, 185, 129, 0.3);
 }
 [data-dataflow-highlighted="negative"] {
-  animation: source-highlight-red 0.6s ease-out forwards;
-  border-color: rgb(244 63 94 / 0.5) !important;
-  border-radius: 0.75rem;
+  border-color: rgb(244 63 94 / 0.6) !important;
+  box-shadow: 0 0 12px 2px rgba(244, 63, 94, 0.3);
 }
 
-/* Mobile: pulsing border instead of SVG arrows */
-@media (max-width: 767px) {
-  [data-dataflow-highlighted="positive"] {
-    animation: mobile-border-pulse-green 1.5s ease-in-out infinite;
-    border-width: 2px;
-    border-style: solid;
-  }
-  [data-dataflow-highlighted="negative"] {
-    animation: mobile-border-pulse-red 1.5s ease-in-out infinite;
-    border-width: 2px;
-    border-style: solid;
-  }
-}
-
-@keyframes mobile-border-pulse-green {
-  0%, 100% { border-color: rgb(16 185 129 / 0.3); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-  50% { border-color: rgb(16 185 129 / 0.8); box-shadow: 0 0 8px 2px rgba(16, 185, 129, 0.3); }
-}
-@keyframes mobile-border-pulse-red {
-  0%, 100% { border-color: rgb(244 63 94 / 0.3); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
-  50% { border-color: rgb(244 63 94 / 0.8); box-shadow: 0 0 8px 2px rgba(244, 63, 94, 0.3); }
+/* Active target (hovered metric/insight card) — elevated above spotlight overlay */
+[data-dataflow-active-target] {
+  position: relative;
+  z-index: 45;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 250ms ease-out;
 }
 

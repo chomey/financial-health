@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeAll } from "vitest";
-import { render, screen, act, fireEvent } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import React, { useRef, useEffect } from "react";
 
 // Mock ResizeObserver for jsdom
@@ -48,7 +48,6 @@ describe("prioritizeConnections", () => {
       { sourceId: "large", targetId: "t", value: 100000, sign: "negative" },
       { sourceId: "medium", targetId: "t", value: 5000, sign: "positive" },
     ];
-    // With max 2, should keep the two largest by absolute value
     const result = prioritizeConnections(connections, 2);
     expect(result).toHaveLength(2);
     expect(result[0].sourceId).toBe("large");
@@ -58,7 +57,7 @@ describe("prioritizeConnections", () => {
   it("handles connections without value (treats as 0)", () => {
     const connections: ActiveConnection[] = [
       { sourceId: "a", targetId: "t", value: 1000, sign: "positive" },
-      { sourceId: "b", targetId: "t", sign: "negative" }, // no value
+      { sourceId: "b", targetId: "t", sign: "negative" },
     ];
     const result = prioritizeConnections(connections, 1);
     expect(result[0].sourceId).toBe("a");
@@ -72,9 +71,7 @@ describe("prioritizeConnections", () => {
 // --- Accessibility: aria-live announcement tests ---
 
 describe("MetricCard aria-live announcements", () => {
-  // We test via SnapshotDashboard since MetricCard is not exported
   it("renders sr-only aria-live region in metric card", async () => {
-    // Import dynamically to get the full component
     const { default: SnapshotDashboard } = await import("@/components/SnapshotDashboard");
 
     render(
@@ -83,30 +80,58 @@ describe("MetricCard aria-live announcements", () => {
       </DataFlowProvider>
     );
 
-    // Each metric card should have an aria-live region
     const ariaLiveRegions = screen.getAllByTestId("dataflow-aria-live");
     expect(ariaLiveRegions.length).toBeGreaterThan(0);
 
-    // All should have aria-live="polite"
     for (const region of ariaLiveRegions) {
       expect(region).toHaveAttribute("aria-live", "polite");
     }
 
-    // Initially empty (no arrows active)
     for (const region of ariaLiveRegions) {
       expect(region.textContent).toBe("");
     }
   });
 });
 
-// --- Mobile responsive: SVG overlay hidden on small viewports ---
+// --- SpotlightOverlay replaces SVG overlay ---
 
-describe("DataFlowArrowOverlay mobile behavior", () => {
-  it("does not render SVG overlay when viewport is narrow (< 768px)", () => {
-    // Set viewport to mobile width
-    Object.defineProperty(window, "innerWidth", { value: 375, writable: true });
-    window.dispatchEvent(new Event("resize"));
+describe("SpotlightOverlay behavior", () => {
+  it("spotlight overlay is always present but invisible when no active target", () => {
+    render(
+      <DataFlowProvider>
+        <div>content</div>
+      </DataFlowProvider>
+    );
 
+    const overlay = screen.getByTestId("spotlight-overlay");
+    expect(overlay).toBeInTheDocument();
+    expect(overlay.style.opacity).toBe("0");
+    expect(overlay).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("spotlight overlay becomes visible when active target is set", () => {
+    let ctx: ReturnType<typeof useDataFlow> | null = null;
+
+    function TestComponent() {
+      ctx = useDataFlow();
+      return <div>test</div>;
+    }
+
+    render(
+      <DataFlowProvider>
+        <TestComponent />
+      </DataFlowProvider>
+    );
+
+    act(() => {
+      ctx!.setActiveTarget("some-target");
+    });
+
+    const overlay = screen.getByTestId("spotlight-overlay");
+    expect(overlay.style.opacity).toBe("1");
+  });
+
+  it("no SVG overlay is rendered (removed in favor of spotlight)", () => {
     let ctx: ReturnType<typeof useDataFlow> | null = null;
 
     function TestComponent() {
@@ -134,41 +159,19 @@ describe("DataFlowArrowOverlay mobile behavior", () => {
       ]);
     });
 
-    // On mobile, SVG overlay should not be rendered
     expect(screen.queryByTestId("data-flow-overlay")).toBeNull();
-
-    // Reset viewport
-    Object.defineProperty(window, "innerWidth", { value: 1024, writable: true });
-    window.dispatchEvent(new Event("resize"));
   });
 });
 
-// --- Label pill styling ---
+// --- FormulaBar rendering in provider ---
 
-describe("Arrow label pills", () => {
-  it("arrow overlay has aria-hidden attribute", () => {
-    // Set viewport to desktop
-    Object.defineProperty(window, "innerWidth", { value: 1200, writable: true });
-    window.dispatchEvent(new Event("resize"));
-
+describe("FormulaBar in DataFlowProvider", () => {
+  it("renders formula bar when activeTargetMeta and connections are set", () => {
     let ctx: ReturnType<typeof useDataFlow> | null = null;
 
     function TestComponent() {
       ctx = useDataFlow();
-      const sourceRef = useRef<HTMLDivElement>(null);
-      const targetRef = useRef<HTMLDivElement>(null);
-
-      useEffect(() => {
-        ctx!.registerSource("src", sourceRef, { label: "Test", value: 100 });
-        ctx!.registerTarget("tgt", targetRef);
-      }, []);
-
-      return (
-        <>
-          <div ref={sourceRef}>source</div>
-          <div ref={targetRef}>target</div>
-        </>
-      );
+      return <div>test</div>;
     }
 
     render(
@@ -178,58 +181,16 @@ describe("Arrow label pills", () => {
     );
 
     act(() => {
-      ctx!.setActiveTarget("tgt");
+      ctx!.setActiveTarget("net-worth");
       ctx!.setActiveConnections([
-        { sourceId: "src", targetId: "tgt", label: "+$50k", value: 50000, sign: "positive" },
+        { sourceId: "section-assets", targetId: "net-worth", label: "+$65k", value: 65000, sign: "positive" },
+        { sourceId: "section-debts", targetId: "net-worth", label: "-$295k", value: 295000, sign: "negative" },
       ]);
+      ctx!.setActiveTargetMeta({ label: "Net Worth", formattedValue: "-$230,000" });
     });
 
-    const overlay = screen.queryByTestId("data-flow-overlay");
-    // Overlay may or may not render (depends on getBoundingClientRect in jsdom)
-    // If rendered, it should have aria-hidden
-    if (overlay) {
-      expect(overlay).toHaveAttribute("aria-hidden", "true");
-    }
-  });
-});
-
-// --- will-change performance optimization ---
-
-describe("Performance optimizations", () => {
-  it("SVG overlay uses will-change: transform", () => {
-    Object.defineProperty(window, "innerWidth", { value: 1200, writable: true });
-    window.dispatchEvent(new Event("resize"));
-
-    let ctx: ReturnType<typeof useDataFlow> | null = null;
-
-    function TestComponent() {
-      ctx = useDataFlow();
-      const ref = useRef<HTMLDivElement>(null);
-
-      useEffect(() => {
-        ctx!.registerSource("s1", ref, { label: "A", value: 100 });
-        ctx!.registerTarget("t1", ref);
-      }, []);
-
-      return <div ref={ref}>test</div>;
-    }
-
-    render(
-      <DataFlowProvider>
-        <TestComponent />
-      </DataFlowProvider>
-    );
-
-    act(() => {
-      ctx!.setActiveTarget("t1");
-      ctx!.setActiveConnections([
-        { sourceId: "s1", targetId: "t1", value: 100, sign: "positive" },
-      ]);
-    });
-
-    const overlay = screen.queryByTestId("data-flow-overlay");
-    if (overlay) {
-      expect(overlay.style.willChange).toBe("transform");
-    }
+    const bar = screen.getByTestId("formula-bar");
+    expect(bar).toBeInTheDocument();
+    expect(screen.getByTestId("formula-result")).toHaveTextContent("-$230,000");
   });
 });

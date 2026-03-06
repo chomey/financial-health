@@ -34,6 +34,11 @@ interface RegisteredElement {
   metadata?: SourceMetadata;
 }
 
+export interface ActiveTargetMeta {
+  label: string;
+  formattedValue: string;
+}
+
 interface DataFlowContextValue {
   registerSource: (
     id: string,
@@ -47,6 +52,8 @@ interface DataFlowContextValue {
   activeTarget: string | null;
   activeConnections: ActiveConnection[];
   setActiveConnections: (connections: ActiveConnection[]) => void;
+  activeTargetMeta: ActiveTargetMeta | null;
+  setActiveTargetMeta: (meta: ActiveTargetMeta | null) => void;
 }
 
 // --- Constants ---
@@ -69,95 +76,6 @@ export function useDataFlow(): DataFlowContextValue {
 /** Returns the data flow context or null if outside a provider. Safe for optional usage. */
 export function useOptionalDataFlow(): DataFlowContextValue | null {
   return useContext(DataFlowContext);
-}
-
-// --- Path calculation (exported for testing) ---
-
-export interface Point {
-  x: number;
-  y: number;
-}
-
-export interface Rect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-/**
- * Get the center point of an element's bounding rect.
- */
-export function getCenterPoint(rect: Rect): Point {
-  return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
-}
-
-/**
- * Get the best edge point on a rect to connect from/to another point.
- * Returns the midpoint of the edge closest to the other point.
- */
-export function getEdgePoint(rect: Rect, toward: Point): Point {
-  const cx = rect.x + rect.width / 2;
-  const cy = rect.y + rect.height / 2;
-
-  // Determine which edge to use based on direction
-  const dx = toward.x - cx;
-  const dy = toward.y - cy;
-  const absDx = Math.abs(dx);
-  const absDy = Math.abs(dy);
-
-  if (absDx > absDy) {
-    // Horizontal edge
-    return dx > 0
-      ? { x: rect.x + rect.width, y: cy }
-      : { x: rect.x, y: cy };
-  } else {
-    // Vertical edge
-    return dy > 0
-      ? { x: cx, y: rect.y + rect.height }
-      : { x: cx, y: rect.y };
-  }
-}
-
-/**
- * Calculate a cubic bezier SVG path between two points.
- * Creates a natural arcing curve that avoids overlapping page content.
- */
-export function calculateArrowPath(from: Point, to: Point): string {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-
-  // Control point offset — larger distance = more pronounced arc
-  const curvature = Math.min(dist * 0.3, 120);
-
-  // Arc direction: perpendicular to the line between points
-  // Choose the direction that arcs away from content (leftward bias for right-to-left)
-  const midX = (from.x + to.x) / 2;
-  const midY = (from.y + to.y) / 2;
-
-  // Perpendicular unit vector
-  const len = dist || 1;
-  const perpX = -dy / len;
-  const perpY = dx / len;
-
-  // Single control point for quadratic-like feel, but using cubic for smoother result
-  const cp1x = midX + perpX * curvature * 0.5;
-  const cp1y = midY + perpY * curvature * 0.5;
-  const cp2x = midX + perpX * curvature * 0.3;
-  const cp2y = midY + perpY * curvature * 0.3;
-
-  return `M ${from.x} ${from.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${to.x} ${to.y}`;
-}
-
-/**
- * Calculate the approximate length of a cubic bezier path (for dash animation).
- */
-export function approximatePathLength(from: Point, to: Point): number {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  // Rough approximation: slightly longer than straight-line distance due to curve
-  return Math.sqrt(dx * dx + dy * dy) * 1.2;
 }
 
 /**
@@ -198,6 +116,101 @@ export function DataFlowSourceItem({
   return <div ref={ref} data-dataflow-source={id}>{children}</div>;
 }
 
+// --- SpotlightOverlay ---
+
+function SpotlightOverlay({ active }: { active: boolean }) {
+  return (
+    <div
+      data-testid="spotlight-overlay"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "rgba(0,0,0,0.7)",
+        zIndex: 40,
+        pointerEvents: "none",
+        opacity: active ? 1 : 0,
+        transition: "opacity 250ms ease-out",
+      }}
+      aria-hidden="true"
+    />
+  );
+}
+
+// --- FormulaBar ---
+
+function FormulaBar({
+  connections,
+  targetMeta,
+}: {
+  connections: ActiveConnection[];
+  targetMeta: ActiveTargetMeta | null;
+}) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  if (!targetMeta || connections.length === 0) return null;
+
+  return (
+    <div
+      data-testid="formula-bar"
+      style={{
+        position: isMobile ? "fixed" : "relative",
+        bottom: isMobile ? 0 : undefined,
+        left: isMobile ? 0 : undefined,
+        right: isMobile ? 0 : undefined,
+        zIndex: 50,
+      }}
+      className={`flex flex-wrap items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-md ${
+        isMobile ? "rounded-b-none" : "mt-2"
+      }`}
+      aria-label={`Formula: ${targetMeta.label} = ${targetMeta.formattedValue}`}
+    >
+      {connections.map((conn, i) => {
+        const isPositive = conn.sign !== "negative";
+        const showOperator = i > 0;
+        return (
+          <React.Fragment key={conn.sourceId}>
+            {showOperator && (
+              <span className="text-xs font-bold text-stone-400">
+                {isPositive ? "+" : "\u2212"}
+              </span>
+            )}
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                isPositive
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-rose-50 text-rose-700 border border-rose-200"
+              }`}
+              data-testid={`formula-term-${conn.sourceId}`}
+            >
+              {conn.label || conn.sourceId.replace("section-", "")}
+            </span>
+          </React.Fragment>
+        );
+      })}
+      <span className="text-xs font-bold text-stone-400">=</span>
+      <span
+        className="inline-flex items-center rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-bold text-stone-800 border border-stone-300"
+        data-testid="formula-result"
+      >
+        {targetMeta.formattedValue}
+      </span>
+    </div>
+  );
+}
+
+// Export FormulaBar and SpotlightOverlay for testing
+export { FormulaBar, SpotlightOverlay };
+
 // --- Provider ---
 
 export function DataFlowProvider({ children }: { children: ReactNode }) {
@@ -207,6 +220,8 @@ export function DataFlowProvider({ children }: { children: ReactNode }) {
   const [activeConnections, setActiveConnections] = useState<
     ActiveConnection[]
   >([]);
+  const [activeTargetMeta, setActiveTargetMeta] =
+    useState<ActiveTargetMeta | null>(null);
 
   const registerSource = useCallback(
     (
@@ -243,306 +258,15 @@ export function DataFlowProvider({ children }: { children: ReactNode }) {
     activeTarget,
     activeConnections,
     setActiveConnections,
+    activeTargetMeta,
+    setActiveTargetMeta,
   };
 
   return (
     <DataFlowContext.Provider value={value}>
       {children}
-      <DataFlowArrowOverlay
-        sources={sourcesRef}
-        targets={targetsRef}
-        activeTarget={activeTarget}
-        connections={activeConnections}
-      />
+      <SpotlightOverlay active={activeTarget !== null} />
+      <FormulaBar connections={activeConnections} targetMeta={activeTargetMeta} />
     </DataFlowContext.Provider>
-  );
-}
-
-// --- Arrow Overlay ---
-
-interface ArrowOverlayProps {
-  sources: React.RefObject<Map<string, RegisteredElement>>;
-  targets: React.RefObject<Map<string, RegisteredElement>>;
-  activeTarget: string | null;
-  connections: ActiveConnection[];
-}
-
-interface ArrowData {
-  path: string;
-  length: number;
-  color: string;
-  label?: string;
-  labelPos: Point;
-  delay: number;
-  light?: boolean;
-}
-
-/** Number of flowing particles per arrow path */
-const PARTICLES_PER_ARROW = 3;
-
-function DataFlowArrowOverlay({
-  sources,
-  targets,
-  activeTarget,
-  connections,
-}: ArrowOverlayProps) {
-  const [arrows, setArrows] = useState<ArrowData[]>([]);
-  const [visible, setVisible] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const recalcRef = useRef<number>(0);
-
-  // Detect mobile viewport
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  const calculateArrows = useCallback(() => {
-    if (!activeTarget || connections.length === 0) {
-      setArrows([]);
-      setVisible(false);
-      return;
-    }
-
-    const targetEntry = targets.current.get(activeTarget);
-    if (!targetEntry?.ref.current) {
-      setArrows([]);
-      return;
-    }
-
-    const targetRect = targetEntry.ref.current.getBoundingClientRect();
-    const targetCenter = getCenterPoint(targetRect);
-
-    const newArrows: ArrowData[] = [];
-
-    // Prioritize by value magnitude, cap at MAX_ARROWS
-    const prioritized = prioritizeConnections(connections);
-
-    prioritized.forEach((conn, index) => {
-      const sourceEntry = sources.current.get(conn.sourceId);
-      if (!sourceEntry?.ref.current) return;
-
-      const sourceRect = sourceEntry.ref.current.getBoundingClientRect();
-      const sourcePoint = getEdgePoint(sourceRect, targetCenter);
-      const targetPoint = getEdgePoint(targetRect, getCenterPoint(sourceRect));
-
-      const path = calculateArrowPath(sourcePoint, targetPoint);
-      const length = approximatePathLength(sourcePoint, targetPoint);
-      const isPositive = conn.sign !== "negative";
-      const color = isPositive
-        ? "rgba(16, 185, 129, 0.7)"
-        : "rgba(244, 63, 94, 0.7)";
-
-      const labelPos: Point = {
-        x: (sourcePoint.x + targetPoint.x) / 2,
-        y: (sourcePoint.y + targetPoint.y) / 2 - 12,
-      };
-
-      newArrows.push({
-        path,
-        length,
-        color,
-        label: conn.label,
-        labelPos,
-        delay: index * 50,
-        light: conn.style === "light",
-      });
-    });
-
-    setArrows(newArrows);
-    setVisible(true);
-  }, [activeTarget, connections, sources, targets]);
-
-  // Recalculate on scroll/resize — throttled to 1 frame per event
-  useEffect(() => {
-    if (!activeTarget) {
-      setArrows([]);
-      setVisible(false);
-      return;
-    }
-
-    calculateArrows();
-
-    const handleUpdate = () => {
-      cancelAnimationFrame(recalcRef.current);
-      recalcRef.current = requestAnimationFrame(calculateArrows);
-    };
-
-    window.addEventListener("scroll", handleUpdate, { passive: true });
-    window.addEventListener("resize", handleUpdate, { passive: true });
-
-    // ResizeObserver for element size changes
-    const resizeObserver = new ResizeObserver(handleUpdate);
-    const targetEntry = targets.current.get(activeTarget);
-    if (targetEntry?.ref.current) {
-      resizeObserver.observe(targetEntry.ref.current);
-    }
-    connections.forEach((conn) => {
-      const sourceEntry = sources.current.get(conn.sourceId);
-      if (sourceEntry?.ref.current) {
-        resizeObserver.observe(sourceEntry.ref.current);
-      }
-    });
-
-    return () => {
-      window.removeEventListener("scroll", handleUpdate);
-      window.removeEventListener("resize", handleUpdate);
-      resizeObserver.disconnect();
-      cancelAnimationFrame(recalcRef.current);
-    };
-  }, [activeTarget, connections, calculateArrows, sources, targets]);
-
-  // On mobile, don't render SVG arrows — highlight-only mode is handled via CSS
-  if (isMobile || !visible || arrows.length === 0) return null;
-
-  return (
-    <svg
-      data-testid="data-flow-overlay"
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        pointerEvents: "none",
-        zIndex: 50,
-        willChange: "transform",
-      }}
-      aria-hidden="true"
-    >
-      <defs>
-        <filter id="arrow-glow">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <marker
-          id="arrowhead-positive"
-          markerWidth="8"
-          markerHeight="6"
-          refX="7"
-          refY="3"
-          orient="auto"
-        >
-          <polygon
-            points="0 0, 8 3, 0 6"
-            fill="rgba(16, 185, 129, 0.8)"
-          />
-        </marker>
-        <marker
-          id="arrowhead-negative"
-          markerWidth="8"
-          markerHeight="6"
-          refX="7"
-          refY="3"
-          orient="auto"
-        >
-          <polygon
-            points="0 0, 8 3, 0 6"
-            fill="rgba(244, 63, 94, 0.8)"
-          />
-        </marker>
-      </defs>
-
-      {arrows.map((arrow, i) => {
-        const isPositive = arrow.color.includes("129");
-        const glowWidth = arrow.light ? 2 : 4;
-        const strokeWidth = arrow.light ? 1.5 : 2.5;
-        const glowOpacity = arrow.light ? 0.15 : 0.3;
-        const particleRadius = arrow.light ? 2.5 : 3.5;
-        const particleDuration = arrow.light ? "2.5s" : "2s";
-        return (
-          <g key={i}>
-            {/* Background glow path */}
-            <path
-              d={arrow.path}
-              fill="none"
-              stroke={arrow.color}
-              strokeWidth={glowWidth}
-              opacity={glowOpacity}
-              filter="url(#arrow-glow)"
-              style={{
-                animation: `arrow-fade-in 0.3s ease-out ${arrow.delay}ms both`,
-              }}
-            />
-            {/* Hidden path for particle motion reference */}
-            <path
-              id={`arrow-path-${i}`}
-              d={arrow.path}
-              fill="none"
-              stroke="none"
-            />
-            {/* Main animated path */}
-            <path
-              d={arrow.path}
-              fill="none"
-              stroke={arrow.color}
-              strokeWidth={strokeWidth}
-              strokeLinecap="round"
-              markerEnd={`url(#arrowhead-${isPositive ? "positive" : "negative"})`}
-              style={{
-                strokeDasharray: `${arrow.length}`,
-                strokeDashoffset: `${arrow.length}`,
-                animation: `arrow-draw 1.2s ease-out ${arrow.delay}ms forwards`,
-              }}
-            />
-            {/* Flowing particles along the path */}
-            {Array.from({ length: PARTICLES_PER_ARROW }).map((_, pi) => (
-              <circle
-                key={pi}
-                r={particleRadius}
-                fill={arrow.color}
-                opacity={0}
-                style={{
-                  animation: `arrow-fade-in 0.3s ease-out ${arrow.delay + 1000}ms both`,
-                }}
-              >
-                <animateMotion
-                  dur={particleDuration}
-                  repeatCount="indefinite"
-                  begin={`${arrow.delay / 1000 + 1 + (pi * (parseFloat(particleDuration) / PARTICLES_PER_ARROW))}s`}
-                  path={arrow.path}
-                />
-              </circle>
-            ))}
-            {/* Label pill at midpoint */}
-            {arrow.label && (
-              <g
-                style={{
-                  animation: `arrow-fade-in 0.3s ease-out ${arrow.delay + 300}ms both`,
-                }}
-              >
-                <rect
-                  x={arrow.labelPos.x - 40}
-                  y={arrow.labelPos.y - 10}
-                  width={80}
-                  height={20}
-                  rx={10}
-                  fill="white"
-                  fillOpacity={0.95}
-                  stroke={arrow.color}
-                  strokeWidth={1.5}
-                />
-                <text
-                  x={arrow.labelPos.x}
-                  y={arrow.labelPos.y + 4}
-                  textAnchor="middle"
-                  fontSize={11}
-                  fontWeight={600}
-                  fill={isPositive ? "#059669" : "#e11d48"}
-                  fontFamily="system-ui, sans-serif"
-                >
-                  {arrow.label}
-                </text>
-              </g>
-            )}
-          </g>
-        );
-      })}
-    </svg>
   );
 }

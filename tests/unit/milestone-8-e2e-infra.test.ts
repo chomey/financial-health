@@ -57,7 +57,7 @@ describe("Milestone 8 E2E test infrastructure — Data-Flow Arrow Visualization"
   it("verifies arrows disappear on mouse leave", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
     expect(content).toContain("mouse.move(0, 0)");
-    expect(content).toContain("not.toBeAttached");
+    expect(content).toContain('toHaveCSS("opacity", "0"');
     expect(content).toContain("toHaveCount(0");
   });
 
@@ -131,9 +131,9 @@ describe("Milestone 8 E2E test infrastructure — Data-Flow Arrow Visualization"
   // Verify DataFlowArrows module exports
   it("DataFlowArrows module exports required functions", async () => {
     const mod = await import("@/components/DataFlowArrows");
-    expect(mod.getCenterPoint).toBeDefined();
-    expect(mod.getEdgePoint).toBeDefined();
-    expect(mod.calculateArrowPath).toBeDefined();
     expect(mod.DataFlowProvider).toBeDefined();
+    expect(mod.SpotlightOverlay).toBeDefined();
+    expect(mod.FormulaBar).toBeDefined();
+    expect(mod.prioritizeConnections).toBeDefined();
   });
 });

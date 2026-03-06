@@ -86,13 +86,14 @@ test.describe("Data flow source registration", () => {
     await expect(expandedSource).not.toHaveAttribute("aria-expanded", "false");
   });
 
-  test("SVG overlay still present and dormant without active targets", async ({ page }) => {
+  test("Spotlight overlay present and dormant without active targets", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-dataflow-source]');
 
-    // Overlay should NOT be visible since no target is active
-    const overlay = page.locator('[data-testid="data-flow-overlay"]');
-    await expect(overlay).not.toBeAttached();
+    // Spotlight overlay should be present but invisible since no target is active
+    const overlay = page.locator('[data-testid="spotlight-overlay"]');
+    await expect(overlay).toBeAttached();
+    await expect(overlay).toHaveCSS("opacity", "0");
 
     await captureScreenshot(page, "task-70-sources-registered-no-arrows");
   });
