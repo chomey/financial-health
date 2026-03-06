@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 96
-- **Completed**: 95
-- **Remaining**: 1
+- **Completed**: 96
+- **Remaining**: 0
 - **Last Updated**: 2026-03-06
 
 ---
@@ -2041,3 +2041,28 @@
   ![Withdrawal pills wrap](screenshots/task-95-withdrawal-pills-wrap.png)
   ![Burndown pills wrap](screenshots/task-95-burndown-pills-wrap.png)
 - **Notes**: Pre-existing changelog test failure (expected 93 entries but had 94) was fixed in a separate commit before applying task changes.
+
+## Task 96: [MILESTONE] E2E test for explainer and tax treatment enhancements
+- **Status**: Complete
+- **Date**: 2026-03-06
+- **Changes**:
+  - `tests/e2e/milestone-10-e2e.spec.ts`: **New** — Comprehensive milestone E2E test suite with 11 tests covering: (1) Withdrawal Tax Impact auto-expanded details with "Suggested" label and disclaimer, (2) $0 income tax explainer with bracket reference table, (3) Runway burndown chart on main page with summary/legend/balances/withdrawal order, (4) Runway explainer modal condensed with chart note, (5) Tax bracket visualization with colored segments, federal/provincial breakdown, effective/marginal rates, after-tax flow, (6) ROI tax treatment toggle visible on savings, hidden on TFSA, correct cycling, (7) Scrollable source summary cards with sticky total and wider modal, (8-10) Three modal close mechanisms (Escape, X button, backdrop), (11) Full multi-step journey across all features.
+  - `tests/unit/milestone-10-e2e-infra.test.ts`: **New** — 14 T1 unit tests verifying the milestone E2E test file structure: existence, imports, coverage of withdrawal tax, $0 tax, runway burndown, tax brackets, ROI toggle, scrollable cards, close mechanisms, journey test, test count, screenshots, and related feature test files.
+  - `src/lib/changelog.ts`: Added v96 changelog entry. Extended UI Polish milestone range to [88, 96].
+  - `tests/unit/changelog.test.ts`: Updated expectations to 96 entries, 9 entries in UI Polish milestone group.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/milestone-10-e2e-infra.test.ts`: 14 passed, 0 failed
+  - `tests/unit/changelog.test.ts`: 11 passed, 0 failed
+  - All T1 unit tests: 1171 passed, 0 failed (71 test files)
+  - `tests/e2e/milestone-10-e2e.spec.ts`: 11 passed, 0 failed
+  - All T2/T3 E2E tests: 283 passed, 0 failed
+- **Screenshots**:
+  ![Withdrawal tax auto-expanded](screenshots/task-96-withdrawal-tax-auto-expanded.png)
+  ![Tax zero income](screenshots/task-96-tax-zero-income.png)
+  ![Runway burndown main](screenshots/task-96-runway-burndown-main.png)
+  ![Tax bracket visualization](screenshots/task-96-tax-bracket-visualization.png)
+  ![ROI tax toggle](screenshots/task-96-roi-tax-toggle.png)
+  ![Scrollable source cards](screenshots/task-96-scrollable-source-cards.png)
+  ![Full journey complete](screenshots/task-96-full-journey-complete.png)
+- **Notes**: All 96 tasks are now complete. This milestone covers the explainer and tax treatment enhancements from tasks 83-96, validating withdrawal tax auto-expand, $0 income tax explainer, runway burndown on main page, tax bracket visualization, ROI tax treatment toggle, scrollable source cards, and modal close mechanisms. The full E2E suite (283 tests) passes across all milestone test files.
