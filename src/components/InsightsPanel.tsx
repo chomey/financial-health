@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { generateInsights, type FinancialData, type Insight, type InsightType } from "@/lib/insights";
-import { useOptionalDataFlow, type ActiveConnection } from "@/components/DataFlowArrows";
+import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections } from "@/components/DataFlowArrows";
 import type { DataFlowConnectionDef } from "@/components/SnapshotDashboard";
 
 // Mock financial data matching the existing entry component mock values
@@ -54,16 +54,17 @@ function InsightCard({
 
   const activateArrows = useCallback(() => {
     if (!ctx || !connections || connections.length === 0) return;
-    const activeConns: ActiveConnection[] = connections
-      .filter((c) => c.value === undefined || c.value > 0)
-      .map((c) => ({
+    const filtered = connections.filter((c) => c.value === undefined || c.value > 0);
+    const activeConns = prioritizeConnections(
+      filtered.map((c) => ({
         sourceId: c.sourceId,
         targetId,
         label: c.label,
         value: c.value,
         sign: c.sign,
         style: "light" as const,
-      }));
+      }))
+    );
     ctx.setActiveConnections(activeConns);
     ctx.setActiveTarget(targetId);
 
