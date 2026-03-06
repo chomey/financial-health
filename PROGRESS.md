@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 68
-- **Completed**: 67
-- **Remaining**: 1
+- **Completed**: 68
+- **Remaining**: 0
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1419,3 +1419,34 @@
   ![Cost basis set on Brokerage](screenshots/task-67-cost-basis-set.png)
   ![Cost basis persisted after reload](screenshots/task-67-cost-basis-persisted.png)
 - **Notes**: The cost basis % field only appears for accounts classified as "taxable" by `getTaxTreatment()` (Brokerage, Savings, Checking, etc.). Tax-free (TFSA, Roth IRA) and tax-deferred (RRSP, 401k) accounts don't show it since their withdrawal tax treatment doesn't depend on cost basis. Capital gains tax rates respect jurisdiction: Canada's 50% inclusion rate for first $250k, US long-term capital gains brackets (0%/15%/20%).
+
+## Task 68: [MILESTONE] Full E2E test for withdrawal tax features
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `tests/e2e/milestone-6-e2e.spec.ts`: New comprehensive T3 E2E test with 5 test cases covering all withdrawal tax features from tasks 63-67: full journey (tax treatment classification, runway with/without withdrawal tax, projection chart tax drag, cost basis on brokerage, insights, URL persistence), tax-free-only portfolio showing no drag, US jurisdiction with 401k/Roth IRA, projection drawdown with tax drag, and withdrawal order recommendation with all three treatment types.
+  - `tests/unit/milestone-6-e2e-infra.test.ts`: 13 T1 unit tests verifying E2E test infrastructure — file existence, Playwright imports, screenshot helper, feature coverage (tax-free/tax-deferred/taxable, withdrawal-tax-summary, cost-basis, runway-after-tax, CA/US jurisdictions), screenshot capture points, test count, timeout, feature test files, and withdrawal-tax module exports.
+  - `src/lib/changelog.ts`: Added v68 entry for withdrawal tax E2E milestone.
+  - `tests/unit/changelog.test.ts`: Updated expectations for 68 entries, 7 milestones with updated entry counts.
+- **Test tiers run**: T1, T2, T3
+- **Tests**:
+  - `tests/unit/milestone-6-e2e-infra.test.ts`: 13 tests — file existence, imports, feature coverage, screenshots, module exports (13 passed, 0 failed)
+  - `tests/e2e/milestone-6-e2e.spec.ts`: 5 tests — full journey, tax-free-only no drag, US jurisdiction, projection drawdown, withdrawal order (5 passed, 0 failed)
+  - All unit tests: 836 passed, 0 failed (51 test files)
+- **Screenshots**:
+  ![Default tax classification](screenshots/task-68-default-tax-classification.png)
+  ![Withdrawal tax summary](screenshots/task-68-withdrawal-tax-summary-default.png)
+  ![Withdrawal tax details expanded](screenshots/task-68-withdrawal-tax-details-expanded.png)
+  ![Runway after tax with heavy RRSP](screenshots/task-68-runway-after-tax-rrsp-heavy.png)
+  ![Brokerage cost basis set](screenshots/task-68-brokerage-cost-basis-set.png)
+  ![Withdrawal tax insights](screenshots/task-68-withdrawal-tax-insights.png)
+  ![Projection chart with tax](screenshots/task-68-projection-chart-with-tax.png)
+  ![URL persistence after reload](screenshots/task-68-url-persistence-after-reload.png)
+  ![Tax-free only no drag](screenshots/task-68-tax-free-only-no-drag.png)
+  ![US NY jurisdiction](screenshots/task-68-us-ny-jurisdiction.png)
+  ![US withdrawal tax details](screenshots/task-68-us-withdrawal-tax-details.png)
+  ![US URL persistence](screenshots/task-68-us-url-persistence.png)
+  ![Projection drawdown tax drag](screenshots/task-68-projection-drawdown-tax-drag.png)
+  ![Drawdown withdrawal tax summary](screenshots/task-68-drawdown-withdrawal-tax-summary.png)
+  ![Withdrawal order all three types](screenshots/task-68-withdrawal-order-all-three-types.png)
+- **Notes**: This milestone E2E test validates all withdrawal tax features from tasks 63-67 in integrated journeys. Tests cover both CA (TFSA/RRSP) and US (Roth IRA/401k) jurisdictions, verifying tax treatment classification, runway tax drag, projection drawdown behavior, cost basis tracking with unrealized gains, and URL persistence. All 68 tasks are now complete.
