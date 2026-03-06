@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Whiteboard Explainer Mode (Milestone 10)
   {
+    version: 82,
+    title: "E2E test for whiteboard explainer modal",
+    description: "Comprehensive milestone E2E test suite (19 tests) covering all five metric explainer modals (Net Worth, Monthly Surplus, Estimated Tax, Financial Runway, Debt-to-Asset Ratio) with source summary card verification, insight card interaction, three close mechanisms (Escape, X button, backdrop click), entrance animations, hand-drawn SVG annotations (ovals, connectors, sum bar with round stroke caps), arithmetic layout with operators and result, mobile behavior at 375px, keyboard navigation (Tab, Enter, Escape), cursor hints, and a full multi-step journey test across all metrics.",
+    date: "2026-03-05",
+  },
+  {
     version: 81,
     title: "Whiteboard-style SVG annotations and arithmetic layout",
     description: "Enhanced ExplainerModal with full whiteboard aesthetic: hand-drawn connector lines with arrowheads (green for positive, red for negative) flowing from source cards to the result area, sequenced animations (source cards fade in, ovals draw on, connectors draw, operators pop in, sum bar draws, result counts up), count-up animation for the result value using requestAnimationFrame, and tuned hand-drawn style with opacity 0.7, round stroke caps/joins, and sinusoidal jitter for organic whiteboard feel.",
