@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   // Withdrawal Tax Modeling (Milestone 7)
   {
+    version: 66,
+    title: "Withdrawal tax summary and insights",
+    description: "New Withdrawal Tax Impact dashboard card showing tax drag on runway, account breakdown by tax treatment (tax-free, taxable, tax-deferred), and optimal withdrawal order. Insights engine now generates withdrawal-tax-aware messages about TFSA/Roth IRA benefits and tax-deferred account implications.",
+    date: "2026-03-05",
+  },
+  {
     version: 65,
     title: "Tax-aware projection drawdown",
     description: "Projection engine now models withdrawal taxes during drawdown. When expenses exceed income (retirement scenario), assets are drawn in tax-optimal order with gross-up for taxes. Chart tooltip shows cumulative withdrawal tax paid.",

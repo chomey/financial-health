@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 68
-- **Completed**: 65
-- **Remaining**: 3
+- **Completed**: 66
+- **Remaining**: 2
 - **Last Updated**: 2026-03-05
 
 ---
@@ -1378,3 +1378,25 @@
   ![Projection drawdown with tax drag](screenshots/task-65-projection-drawdown-tax.png)
   ![Mixed drawdown scenario](screenshots/task-65-projection-mixed-drawdown.png)
 - **Notes**: Two pre-existing test failures were fixed in separate commits — tests assumed gross income = expenses was breakeven, but after the tax feature (Task 44), after-tax income falls below expenses creating unintended drawdown scenarios. The drawdown threshold of $50/month prevents triggering on small tax rounding when gross income ≈ expenses.
+
+## Task 66: Add withdrawal tax summary to dashboard and insights
+- **Status**: Complete
+- **Date**: 2026-03-05
+- **Changes**:
+  - `src/lib/insights.ts`: Extended `FinancialData` with `withdrawalTax` field containing tax drag, withdrawal order, and account breakdown by treatment. Added `"withdrawal-tax"` to `InsightType`. Added 3 new insight generators: tax-free holdings percentage, tax-deferred heavy suggestion, and tax drag on runway.
+  - `src/lib/financial-state.ts`: Added `computeWithdrawalTaxSummary()` function that groups assets by tax treatment, builds optimal withdrawal order, and computes tax drag on runway. Wired into `toFinancialData()`.
+  - `src/components/WithdrawalTaxSummary.tsx`: New dashboard component showing Withdrawal Tax Impact card with: tax drag summary, color-coded treatment breakdown bar, expandable details (account breakdown by treatment with balances/percentages, optimal withdrawal order with arrow flow).
+  - `src/components/SnapshotDashboard.tsx`: Added `"withdrawal-tax"` to Financial Runway insight type mapping.
+  - `src/app/page.tsx`: Integrated WithdrawalTaxSummary component into dashboard after SnapshotDashboard, passing withdrawal tax data from financialData.
+  - `src/lib/changelog.ts`: Added v66 entry.
+- **Test tiers run**: T1, T2
+- **Tests**:
+  - `tests/unit/withdrawal-tax-summary.test.ts`: 14 tests — computeWithdrawalTaxSummary (empty assets, TFSA tax-free, RRSP tax-deferred, Brokerage taxable, withdrawal order, tax drag for RRSP-heavy, zero drag for tax-free-only, computed asset handling), withdrawal-tax insights (tax-free insight, tax-deferred heavy, no-free suggestion, tax drag insight, minimal drag skip, type consistency). 14 passed, 0 failed.
+  - `tests/e2e/withdrawal-tax-summary.spec.ts`: 4 tests — summary card visibility, expand/collapse details with account breakdown and withdrawal order, insights panel tax-free insight, runway card with withdrawal-tax insights. 4 passed, 0 failed.
+  - All unit tests: 808 passed, 0 failed (49 test files)
+- **Screenshots**:
+  ![Withdrawal tax summary card](screenshots/task-66-withdrawal-tax-summary.png)
+  ![Withdrawal tax details expanded](screenshots/task-66-withdrawal-tax-details.png)
+  ![Withdrawal tax insights](screenshots/task-66-withdrawal-tax-insights.png)
+  ![Runway with withdrawal tax](screenshots/task-66-runway-with-withdrawal-tax.png)
+- **Notes**: Pre-existing changelog test failure (expected 64 entries but task 65 added 65th) was fixed in a separate commit. The WithdrawalTaxSummary component uses `stopPropagation` on the toggle button click to prevent the ZoomableCard wrapper from intercepting the event. Withdrawal-tax insights are mapped to the Financial Runway metric card via `METRIC_TO_INSIGHT_TYPES`.
