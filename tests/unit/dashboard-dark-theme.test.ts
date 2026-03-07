@@ -25,13 +25,13 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
     expect(dashboardSrc).toContain("border-white/10");
   });
 
-  it("positive metric value uses cyan-400 instead of green-600", () => {
-    expect(dashboardSrc).toContain("text-cyan-400");
+  it("positive metric value uses emerald-400 instead of green-600", () => {
+    expect(dashboardSrc).toContain("text-emerald-400");
     expect(dashboardSrc).not.toContain("text-green-600");
   });
 
-  it("negative metric value uses rose-400 instead of rose-600", () => {
-    expect(dashboardSrc).toContain("text-rose-400");
+  it("negative metric value uses red-400", () => {
+    expect(dashboardSrc).toContain("text-red-400");
   });
 
   it("neutral metric value uses slate-200 instead of stone-700", () => {
@@ -48,25 +48,25 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
     expect(dashboardSrc).toContain("bg-slate-700");
   });
 
-  it("income replacement progress bar uses cyan gradient", () => {
-    expect(dashboardSrc).toContain("via-cyan-500");
+  it("income replacement progress bar uses emerald gradient", () => {
+    expect(dashboardSrc).toContain("via-emerald-500");
     expect(dashboardSrc).not.toContain("via-green-400");
   });
 
-  it("runway celebration uses cyan glow border", () => {
-    expect(dashboardSrc).toContain("border-cyan-500/40");
+  it("runway celebration uses emerald glow border", () => {
+    expect(dashboardSrc).toContain("border-emerald-500/40");
     expect(dashboardSrc).not.toContain("border-green-300");
   });
 
-  it("underwater warning uses rose glow border", () => {
-    expect(dashboardSrc).toContain("border-rose-500/40");
+  it("underwater warning uses red glow border", () => {
+    expect(dashboardSrc).toContain("border-red-500/40");
     expect(dashboardSrc).not.toContain("border-rose-300");
   });
 
-  it("insight text uses cyan-400 instead of green-600", () => {
+  it("insight text uses emerald-400 instead of green-600", () => {
     // Insights below the metric value
     const insightLine = dashboardSrc.match(/text-xs font-medium text-(\w+-\d+)/g) ?? [];
-    expect(insightLine.some((cls) => cls.includes("cyan-400"))).toBe(true);
+    expect(insightLine.some((cls) => cls.includes("emerald-400"))).toBe(true);
   });
 
   it("does not use any stone color classes (migrated to slate)", () => {
