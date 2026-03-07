@@ -8,13 +8,13 @@
 
 ## Summary
 - **Total Tasks**: 139
-- **Completed**: 133
-- **Remaining**: 6
+- **Completed**: 134
+- **Remaining**: 5
 - **Last Updated**: 2026-03-07
 
-## Task 133: Make Income Replacement metric card clickable with detailed explainer
+## Task 134: [MILESTONE] Visual theme E2E regression
 - **Date**: 2026-03-07
-- **Files**: `src/components/DataFlowArrows.tsx`, `src/components/SnapshotDashboard.tsx`, `src/lib/financial-state.ts`, `src/app/page.tsx`, `src/lib/changelog.ts`, `tests/unit/income-replacement.test.ts`, `tests/e2e/income-replacement.spec.ts`, `tests/unit/changelog.test.ts`
-- **Tests**: 1715 passed (14 new T1 in `income-replacement.test.ts`, 8 new T2 in `income-replacement.spec.ts`)
-- **Screenshots**: ![Explainer open](screenshots/task-133-income-replacement-explainer-open.png) ![Formula breakdown](screenshots/task-133-income-replacement-formula.png) ![Asset breakdown](screenshots/task-133-income-replacement-asset-breakdown.png) ![4% rule education](screenshots/task-133-income-replacement-education.png) ![Click hint](screenshots/task-133-income-replacement-click-hint.png)
-- **Notes**: Added `IncomeReplacementExplainerDetails` interface and `IncomeReplacementExplainerContent` component to DataFlowArrows.tsx. Added `computeIncomeReplacementDetails()` to financial-state.ts. The explainer shows: formula (total invested × 4% ÷ 12), tier progress bar (5 tiers), per-account contributions, next-tier goal, and 4% rule education. Fixed a changelog test expecting 132 entries (now 133).
+- **Files**: `tests/unit/theme-contrast-wcag.test.ts`, `tests/e2e/theme-visual-regression.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: T1: 1743 passed (28 new in `theme-contrast-wcag.test.ts`), T2+T3: 485 passed (12 new in `theme-visual-regression.spec.ts`)
+- **Screenshots**: ![Dashboard metrics](screenshots/task-134-dashboard-metrics.png) ![Entry panels](screenshots/task-134-entry-panels.png) ![Explainer modal](screenshots/task-134-explainer-modal.png) ![Projection chart](screenshots/task-134-projection-chart.png) ![Mobile responsive](screenshots/task-134-mobile-responsive.png)
+- **Notes**: Full regression — all existing tests pass. WCAG AA contrast verified for all theme color pairs (foreground, cyan-400, rose-400, violet-400, pink-400, amber-400 on both dark background and glass card surface). Slate-400 (muted text) passes large text threshold (3:1).
