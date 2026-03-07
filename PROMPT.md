@@ -57,6 +57,7 @@ Complete exactly ONE task from TASKS.md, then stop.
    - **UI-first**: If this task involves both backend and frontend work, implement the visible UI first (even with mock/hardcoded data) so progress is verifiable by human eyes. Wire in real data as a follow-up.
 
 6. **Implement** — Write the code. Follow project conventions from CLAUDE.md and the loaded agent's quality checklist.
+   - **Read files efficiently**: Do NOT read entire large files. Use Grep to find the specific function/section you need, then Read with offset+limit to read only that section. For files >200 lines, always search first, read targeted sections. Parallelize independent reads. This saves significant time on files like `DataFlowArrows.tsx` (1100+ lines) and `financial-state.ts` (900+ lines).
 
 7. **Write Tests (tiered by domain)** — Every task MUST include automated tests at the tiers required by its agent tag. Do NOT skip this step.
 
@@ -117,5 +118,6 @@ Complete exactly ONE task from TASKS.md, then stop.
 - **NEVER modify completed or in-progress tasks in TASKS.md.** Tasks marked `- [x]` are immutable records. The only change allowed to the current task is marking it `- [x]` when done. You may only edit, reorder, or remove tasks that are still unchecked (`- [ ]`) and not yet started.
 - Keep changes minimal and focused on the task at hand.
 - Do not refactor or "improve" code outside the scope of your current task.
+- **Be efficient with file reads.** Never read a 500+ line file top to bottom. Grep for the function/type/component name first, then read just that section (offset+limit). Parallelize independent tool calls. Every unnecessary full-file read wastes ~30 seconds.
 - **Do NOT generate new tasks, design features, or make product/architecture decisions.** If you notice something missing, note it in PROGRESS.md for the planning agents to address. Your job is to implement what's already in TASKS.md.
 - **Never leave a failing test suite.** If tests you did not write break during your work, stash your changes, fix the pre-existing failure, commit the fix, unstash, and continue.
