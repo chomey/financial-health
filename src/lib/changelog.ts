@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Charts dark theme
+  {
+    version: 130,
+    title: "Charts and projection panel — dark cyberpunk theme",
+    description: "Applied dark cyberpunk palette to all chart components: NetWorthDonutChart, ExpenseBreakdownChart, ProjectionChart, NetWorthWaterfallChart. Dark glass-effect cards (bg-white/5 backdrop-blur border-white/10). Recharts color arrays updated to vivid saturated colors: cyan-400, violet-400, emerald-400, amber-400, blue-400, pink-400. Grid lines now use rgba(255,255,255,0.05) for subtle contrast. Axis labels in slate-400. Projection chart net worth line glows with a CSS drop-shadow filter. Positive values emerald-400, negative red-400. Summary tables use white/5 row dividers with slate text. FIRE callout uses amber-400 accent.",
+    date: "2026-03-07",
+  },
   // Entry panels dark theme
   {
     version: 129,

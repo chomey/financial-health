@@ -26,10 +26,10 @@ export interface WaterfallSegment {
   type: "asset" | "debt" | "total";
 }
 
-const ASSET_COLOR = "#059669"; // emerald-600
-const DEBT_COLOR = "#dc2626"; // red-600
-const TOTAL_COLOR = "#2563eb"; // blue-600
-const TOTAL_NEGATIVE_COLOR = "#dc2626"; // red-600 for negative net worth
+const ASSET_COLOR = "#34d399"; // emerald-400
+const DEBT_COLOR = "#f87171"; // red-400
+const TOTAL_COLOR = "#22d3ee"; // cyan-400
+const TOTAL_NEGATIVE_COLOR = "#f87171"; // red-400 for negative net worth
 
 export function computeWaterfallData(
   assets: Asset[],
@@ -146,24 +146,24 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   const segment = payload[0].payload;
 
   return (
-    <div className="rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-md">
-      <p className="text-sm font-medium text-stone-800">{segment.name}</p>
+    <div className="rounded-lg border border-white/10 bg-slate-900/90 px-3 py-2 shadow-md backdrop-blur-sm">
+      <p className="text-sm font-medium text-slate-200">{segment.name}</p>
       <p
         className={`text-sm font-medium ${
           segment.type === "debt"
-            ? "text-red-600"
+            ? "text-red-400"
             : segment.type === "total"
             ? segment.value >= 0
-              ? "text-blue-600"
-              : "text-red-600"
-            : "text-emerald-600"
+              ? "text-cyan-400"
+              : "text-red-400"
+            : "text-emerald-400"
         }`}
       >
         {segment.type === "debt" ? "-" : ""}
         {formatCurrency(Math.abs(segment.value))}
       </p>
       {segment.type !== "total" && (
-        <p className="text-xs text-stone-400">
+        <p className="text-xs text-slate-500">
           Running total: {formatCurrency(segment.cumulative)}
         </p>
       )}
@@ -192,10 +192,10 @@ export default function NetWorthWaterfallChart({
   if (data.length <= 1) {
     return (
       <div
-        className="rounded-xl border border-stone-200 bg-white p-5 text-center"
+        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 text-center"
         data-testid="waterfall-chart"
       >
-        <p className="text-sm text-stone-400">
+        <p className="text-sm text-slate-400">
           Add assets and debts to see your net worth breakdown
         </p>
       </div>
@@ -207,10 +207,10 @@ export default function NetWorthWaterfallChart({
 
   return (
     <div
-      className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm"
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5"
       data-testid="waterfall-chart"
     >
-      <h3 className="mb-3 text-sm font-medium text-stone-500">
+      <h3 className="mb-3 text-sm font-medium text-slate-400">
         Net Worth Breakdown
       </h3>
 
@@ -227,7 +227,7 @@ export default function NetWorthWaterfallChart({
               tickFormatter={(v: number) => formatCurrency(v)}
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: "#78716c" }}
+              tick={{ fontSize: 11, fill: "#94a3b8" }}
             />
             <YAxis
               type="category"
@@ -235,10 +235,10 @@ export default function NetWorthWaterfallChart({
               width={100}
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: "#57534e" }}
+              tick={{ fontSize: 11, fill: "#94a3b8" }}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
-            <ReferenceLine x={0} stroke="#d6d3d1" strokeWidth={1} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+            <ReferenceLine x={0} stroke="rgba(255,255,255,0.15)" strokeWidth={1} />
             {/* Invisible base bar */}
             <Bar dataKey="base" stackId="waterfall" fill="transparent" isAnimationActive={false} />
             {/* Visible value bar */}
@@ -262,7 +262,7 @@ export default function NetWorthWaterfallChart({
       </div>
 
       {/* Compact legend */}
-      <div className="mt-3 flex items-center justify-center gap-4 text-xs text-stone-500">
+      <div className="mt-3 flex items-center justify-center gap-4 text-xs text-slate-400">
         <div className="flex items-center gap-1.5">
           <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: ASSET_COLOR }} />
           <span>Assets</span>

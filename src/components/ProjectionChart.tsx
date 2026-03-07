@@ -44,9 +44,9 @@ const SCENARIO_LABELS: Record<Scenario, string> = {
 };
 
 const SCENARIO_COLORS: Record<Scenario, string> = {
-  conservative: "#f59e0b",
-  moderate: "#10b981",
-  optimistic: "#3b82f6",
+  conservative: "#f59e0b", // amber-400
+  moderate: "#34d399",    // emerald-400
+  optimistic: "#60a5fa",  // blue-400
 };
 
 const SCENARIO_DESCRIPTIONS: Record<Scenario, string> = {
@@ -73,15 +73,15 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const withdrawalTaxDrag = typeof dataPoint?.withdrawalTaxDrag === "number" ? dataPoint.withdrawalTaxDrag : 0;
 
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-3 shadow-lg">
-      <p className="mb-1 text-xs font-medium text-stone-500">{yearLabel} from now</p>
+    <div className="rounded-lg border border-white/10 bg-slate-900/90 p-3 shadow-lg backdrop-blur-sm">
+      <p className="mb-1 text-xs font-medium text-slate-400">{yearLabel} from now</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-sm font-semibold" style={{ color: entry.color }}>
           {entry.name}: {fmt.full(entry.value)}
         </p>
       ))}
       {withdrawalTaxDrag > 0 && (
-        <p className="mt-1 text-xs text-amber-600" data-testid="tooltip-tax-drag">
+        <p className="mt-1 text-xs text-amber-400" data-testid="tooltip-tax-drag">
           Withdrawal tax paid: {fmt.full(withdrawalTaxDrag)}
         </p>
       )}
@@ -116,8 +116,8 @@ function BurndownTooltip({ active, payload, label }: CustomTooltipProps) {
   const yearVal = label ?? 0;
   const yearLabel = yearVal < 1 ? `${Math.round(yearVal * 12)} months` : yearVal === 1 ? "1 year" : `${Number(yearVal.toFixed(1))} years`;
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-3 shadow-lg">
-      <p className="mb-1 text-xs font-medium text-stone-500">{yearLabel}</p>
+    <div className="rounded-lg border border-white/10 bg-slate-900/90 p-3 shadow-lg backdrop-blur-sm">
+      <p className="mb-1 text-xs font-medium text-slate-400">{yearLabel}</p>
       {payload.map((entry, i) => {
         const n = String(entry.name ?? "");
         const displayName = n === "withGrowth" ? "With growth" : n === "withoutGrowth" ? "Without growth" : n === "withTax" ? "After taxes" : n;
@@ -152,11 +152,11 @@ function MilestoneLabelContent({
         width={textWidth}
         height={15}
         rx={3}
-        fill="white"
+        fill="#0f172a"
         fillOpacity={0.9}
         stroke={fill}
         strokeWidth={0.5}
-        strokeOpacity={0.5}
+        strokeOpacity={0.7}
       />
       <text x={x + 7} y={y + 17} fontSize={10} fill={fill} fontWeight={600}>
         {value}
@@ -326,12 +326,12 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
   return (
     <section
-      className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-6"
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 sm:p-6"
       data-testid="projection-chart"
       aria-label="Financial projection"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-stone-800">
+        <h3 className="text-lg font-semibold text-slate-200">
           Financial Projection
         </h3>
         {mode === "keep-earning" && (
@@ -343,8 +343,8 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 title={SCENARIO_DESCRIPTIONS[s]}
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
                   scenario === s
-                    ? "text-white shadow-sm"
-                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                    ? "text-slate-900 shadow-sm"
+                    : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
                 }`}
                 style={scenario === s ? { backgroundColor: SCENARIO_COLORS[s] } : undefined}
                 data-testid={`scenario-${s}`}
@@ -363,8 +363,8 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             onClick={(e) => { e.stopPropagation(); setMode("keep-earning"); }}
             className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
               mode === "keep-earning"
-                ? "bg-stone-800 text-white shadow-sm"
-                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                ? "bg-slate-200 text-slate-900 shadow-sm"
+                : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
             }`}
             data-testid="mode-keep-earning"
           >
@@ -374,8 +374,8 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             onClick={(e) => { e.stopPropagation(); setMode("income-stops"); }}
             className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
               mode === "income-stops"
-                ? "bg-stone-800 text-white shadow-sm"
-                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                ? "bg-slate-200 text-slate-900 shadow-sm"
+                : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
             }`}
             data-testid="mode-income-stops"
           >
@@ -386,19 +386,19 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
       {/* Inflation adjustment toggle — stopPropagation prevents ZoomableCard from opening */}
       <div className="mb-3 flex flex-wrap items-center gap-3" data-testid="inflation-controls" onClick={(e) => e.stopPropagation()}>
-        <label className="flex cursor-pointer items-center gap-2 text-xs text-stone-600">
+        <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-400">
           <input
             type="checkbox"
             checked={inflationAdjusted}
             onChange={(e) => handleInflationToggle(e.target.checked)}
-            className="h-3.5 w-3.5 cursor-pointer accent-emerald-600"
+            className="h-3.5 w-3.5 cursor-pointer accent-cyan-400"
             data-testid="inflation-toggle"
             aria-label="Adjust for inflation"
           />
           Adjust for inflation
         </label>
         {inflationAdjusted && (
-          <div className="flex items-center gap-1.5 text-xs text-stone-600">
+          <div className="flex items-center gap-1.5 text-xs text-slate-400">
             <input
               type="number"
               min="0"
@@ -406,20 +406,20 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               step="0.1"
               value={inflationRateInput}
               onChange={(e) => handleInflationRateChange(e.target.value)}
-              className="w-14 rounded border border-stone-200 bg-white px-1.5 py-0.5 text-right text-xs transition-colors focus:border-emerald-400 focus:outline-none"
+              className="w-14 rounded border border-white/10 bg-slate-800 px-1.5 py-0.5 text-right text-xs text-slate-200 transition-colors focus:border-cyan-500/50 focus:outline-none"
               data-testid="inflation-rate-input"
               aria-label="Annual inflation rate"
             />
             <span>% / yr</span>
             <span
-              className="ml-1 cursor-help text-stone-400"
+              className="ml-1 cursor-help text-slate-500"
               title={`Values shown in today's dollars, deflated by ${inflationRate}% per year`}
               data-testid="inflation-tooltip"
               aria-label={`In today's dollars, adjusted for ${inflationRate}% annual inflation`}
             >
               ⓘ
             </span>
-            <span className="text-xs text-stone-400">
+            <span className="text-xs text-slate-500">
               (today&apos;s dollars)
             </span>
           </div>
@@ -428,8 +428,8 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
       {/* Surplus subtitle for Keep Earning mode */}
       {mode === "keep-earning" && surplusInfo.income > 0 && (
-        <p className="mb-3 text-xs text-stone-500" data-testid="projection-surplus-subtitle">
-          Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)}{surplusInfo.contributions > 0 ? ` − Contributions ${formatCurrency(surplusInfo.contributions)}` : ""} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-emerald-600" : "font-medium text-rose-600"}>{formatCurrency(surplusInfo.surplus)}</span> surplus/mo
+        <p className="mb-3 text-xs text-slate-500" data-testid="projection-surplus-subtitle">
+          Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)}{surplusInfo.contributions > 0 ? ` − Contributions ${formatCurrency(surplusInfo.contributions)}` : ""} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-emerald-400" : "font-medium text-rose-400"}>{formatCurrency(surplusInfo.surplus)}</span> surplus/mo
         </p>
       )}
 
@@ -439,31 +439,31 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-stone-200">
-                <th className="pb-1.5 pr-4 text-left font-medium text-stone-500">Metric</th>
-                <th className="pb-1.5 px-2 text-right font-medium text-stone-500">Now</th>
+              <tr className="border-b border-white/10">
+                <th className="pb-1.5 pr-4 text-left font-medium text-slate-500">Metric</th>
+                <th className="pb-1.5 px-2 text-right font-medium text-slate-500">Now</th>
                 {milestoneYears.map((y, i) => (
-                  <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-stone-500`}>
+                  <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-slate-500`}>
                     {y}yr
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100">
+            <tbody className="divide-y divide-white/5">
               <tr>
-                <td className="py-1.5 pr-4 font-medium text-stone-700">Net Worth</td>
-                <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.netWorth)}</td>
+                <td className="py-1.5 pr-4 font-medium text-slate-300">Net Worth</td>
+                <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.netWorth)}</td>
                 {summaryPoints.milestones.map((p, i) => (
-                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-green-600 font-medium`}>
+                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-emerald-400 font-medium`}>
                     {formatTableCurrency(p.netWorth)}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="py-1.5 pr-4 font-medium text-stone-700">Total Assets</td>
-                <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.totalAssets)}</td>
+                <td className="py-1.5 pr-4 font-medium text-slate-300">Total Assets</td>
+                <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.totalAssets)}</td>
                 {summaryPoints.milestones.map((p, i) => (
-                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-indigo-600`}>
+                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-cyan-400`}>
                     {formatTableCurrency(p.totalAssets)}
                   </td>
                 ))}
@@ -471,19 +471,19 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               {hasBothDebtTypes ? (
                 <>
                   <tr>
-                    <td className="py-1.5 pr-4 font-medium text-stone-700">Consumer Debt</td>
-                    <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.consumerDebts)}</td>
+                    <td className="py-1.5 pr-4 font-medium text-slate-300">Consumer Debt</td>
+                    <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.consumerDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-400`}>
                         {formatTableCurrency(p.consumerDebts)}
                       </td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="py-1.5 pr-4 font-medium text-stone-700">Mortgage</td>
-                    <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.mortgageDebts)}</td>
+                    <td className="py-1.5 pr-4 font-medium text-slate-300">Mortgage</td>
+                    <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.mortgageDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-400`}>
                         {formatTableCurrency(p.mortgageDebts)}
                       </td>
                     ))}
@@ -491,10 +491,10 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 </>
               ) : (
                 <tr>
-                  <td className="py-1.5 pr-4 font-medium text-stone-700">Total Debts</td>
-                  <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.totalDebts)}</td>
+                  <td className="py-1.5 pr-4 font-medium text-slate-300">Total Debts</td>
+                  <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.totalDebts)}</td>
                   {summaryPoints.milestones.map((p, i) => (
-                    <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
+                    <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-400`}>
                       {formatTableCurrency(p.totalDebts)}
                     </td>
                   ))}
@@ -508,23 +508,23 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       <div className="h-64 sm:h-80" data-testid="projection-chart-container">
         <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
           <LineChart data={chartData} margin={{ top: 10, right: 10, bottom: 5, left: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis
               dataKey="year"
               type="number"
               domain={[0, 50]}
-              tick={{ fontSize: 11, fill: "#78716c" }}
+              tick={{ fontSize: 11, fill: "#94a3b8" }}
               tickFormatter={(v) => `${v}y`}
               ticks={xTicks}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: "#78716c" }}
+              tick={{ fontSize: 11, fill: "#94a3b8" }}
               tickFormatter={formatCurrency}
               width={75}
             />
             <Tooltip content={<CustomTooltip />} />
 
-            {/* Net Worth line */}
+            {/* Net Worth line — glowing */}
             <Line
               type="monotone"
               dataKey="netWorth"
@@ -533,6 +533,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               strokeWidth={2.5}
               dot={false}
               animationDuration={500}
+              style={{ filter: `drop-shadow(0 0 6px ${SCENARIO_COLORS[scenario]})` }}
             />
 
             {/* Assets line */}
@@ -540,7 +541,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               type="monotone"
               dataKey="assets"
               name="Assets"
-              stroke="#6366f1"
+              stroke="#818cf8"
               strokeWidth={1.5}
               strokeDasharray="4 4"
               dot={false}
@@ -552,7 +553,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               type="monotone"
               dataKey="debts"
               name="Debts"
-              stroke="#ef4444"
+              stroke="#f87171"
               strokeWidth={1.5}
               strokeDasharray="4 4"
               dot={false}
@@ -565,7 +566,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 type="monotone"
                 dataKey="mortgage"
                 name="Mortgage"
-                stroke="#f97316"
+                stroke="#fb923c"
                 strokeWidth={1.5}
                 strokeDasharray="6 3"
                 dot={false}
@@ -614,7 +615,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 label={{
                   value: `🔥 FIRE: ${formatCurrency(fireNumber)}`,
                   position: "right",
-                  fill: "#d97706",
+                  fill: "#f59e0b",
                   fontSize: 10,
                 }}
               />
@@ -625,12 +626,12 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               <ReferenceLine
                 key={m.label}
                 y={m.value}
-                stroke="#d4d4d4"
+                stroke="rgba(255,255,255,0.15)"
                 strokeDasharray="3 3"
                 label={{
                   value: m.label,
                   position: "right",
-                  fill: "#a8a29e",
+                  fill: "#64748b",
                   fontSize: 10,
                 }}
               />
@@ -640,7 +641,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       </div>
 
       {/* Legend & milestones summary */}
-      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
+      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
         <span className="flex items-center gap-1">
           <span
             className="inline-block h-0.5 w-4 rounded"
@@ -649,26 +650,26 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           Net Worth
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-indigo-500" />
+          <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-indigo-400" />
           Assets
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-red-500" />
+          <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-red-400" />
           Debts
         </span>
         {hasMortgage && (
           <span className="flex items-center gap-1" data-testid="mortgage-burndown-legend">
-            <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-orange-500" />
+            <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-orange-400" />
             Mortgage
           </span>
         )}
       </div>
 
       {/* Scenario legend */}
-      <div className="mt-3 border-t border-stone-100 pt-3" data-testid="scenario-legend">
+      <div className="mt-3 border-t border-white/10 pt-3" data-testid="scenario-legend">
         <button
           onClick={() => setLegendOpen(!legendOpen)}
-          className="flex w-full items-center gap-1.5 text-xs font-medium text-stone-500 transition-colors duration-200 hover:text-stone-700"
+          className="flex w-full items-center gap-1.5 text-xs font-medium text-slate-500 transition-colors duration-200 hover:text-slate-300"
           data-testid="scenario-legend-toggle"
           aria-expanded={legendOpen}
         >
@@ -691,8 +692,8 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                   className="mt-1.5 inline-block h-2 w-2 flex-shrink-0 rounded-full"
                   style={{ backgroundColor: SCENARIO_COLORS[s] }}
                 />
-                <p className="text-xs text-stone-600">
-                  <span className="font-semibold">{SCENARIO_LABELS[s]}</span>
+                <p className="text-xs text-slate-400">
+                  <span className="font-semibold text-slate-300">{SCENARIO_LABELS[s]}</span>
                   {" — "}
                   {SCENARIO_DESCRIPTIONS[s]}
                 </p>
@@ -704,17 +705,17 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
       {/* FIRE milestone callout */}
       {fireNumber > 0 && (
-        <div className="mt-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2" data-testid="fire-milestone">
+        <div className="mt-3 rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-2" data-testid="fire-milestone">
           {fireAlreadyReached ? (
-            <p className="text-xs font-medium text-amber-700">
+            <p className="text-xs font-medium text-amber-400">
               🎉 You&apos;ve already reached your FIRE number of {fmt.compact(fireNumber)}! Financial independence achieved.
             </p>
           ) : fireYear !== null ? (
-            <p className="text-xs font-medium text-amber-700" data-testid="fire-year">
+            <p className="text-xs font-medium text-amber-400" data-testid="fire-year">
               🔥 FIRE number: {fmt.compact(fireNumber)} ({safeWithdrawalRate}% rule) — projected in ~{fmtYears(fireYear)}
             </p>
           ) : (
-            <p className="text-xs font-medium text-amber-700">
+            <p className="text-xs font-medium text-amber-400">
               🔥 FIRE number: {fmt.compact(fireNumber)} ({safeWithdrawalRate}% rule) — not reached within 50 years at current rate
             </p>
           )}
@@ -723,29 +724,29 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
       {/* Milestone details */}
       {(milestoneMarkers.length > 0 || debtFreeYear !== null) && (
-        <div className="mt-3 space-y-1 border-t border-stone-100 pt-3">
+        <div className="mt-3 space-y-1 border-t border-white/10 pt-3">
           {hasBothDebtTypes ? (
             <>
               {consumerDebtFreeYear !== null && consumerDebtFreeYear > 0 && (
-                <p className="text-xs text-emerald-600" data-testid="consumer-debt-free-label">
+                <p className="text-xs text-emerald-400" data-testid="consumer-debt-free-label">
                   🎉 Consumer debt free in ~{consumerDebtFreeYear.toFixed(1)} years
                 </p>
               )}
               {mortgageFreeYear !== null && mortgageFreeYear > 0 && (
-                <p className="text-xs text-emerald-700" data-testid="mortgage-free-label">
+                <p className="text-xs text-emerald-400" data-testid="mortgage-free-label">
                   🏠 Mortgage free in ~{mortgageFreeYear.toFixed(1)} years
                 </p>
               )}
             </>
           ) : (
             debtFreeYear !== null && debtFreeYear > 0 && (
-              <p className="text-xs text-emerald-600" data-testid="debt-free-label">
+              <p className="text-xs text-emerald-400" data-testid="debt-free-label">
                 🎉 Debt free in ~{debtFreeYear.toFixed(1)} years
               </p>
             )
           )}
           {milestoneMarkers.map((m: Milestone) => (
-            <p key={m.label} className="text-xs text-stone-500" data-testid="milestone-label">
+            <p key={m.label} className="text-xs text-slate-500" data-testid="milestone-label">
               ⭐ {m.label} net worth in ~{(m.month / 12).toFixed(1)} years
             </p>
           ))}
@@ -754,28 +755,28 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
       {/* Per-asset projections with dynamic milestones */}
       {assetProjections.length > 0 && (
-        <div className="mt-4 border-t border-stone-100 pt-4" data-testid="asset-projections-table">
-          <h4 className="mb-2 text-sm font-semibold text-stone-700">Asset Growth Projections</h4>
+        <div className="mt-4 border-t border-white/10 pt-4" data-testid="asset-projections-table">
+          <h4 className="mb-2 text-sm font-semibold text-slate-300">Asset Growth Projections</h4>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-stone-200">
-                  <th className="pb-1.5 pr-4 text-left font-medium text-stone-500">Account</th>
-                  <th className="pb-1.5 px-2 text-right font-medium text-stone-500">Now</th>
+                <tr className="border-b border-white/10">
+                  <th className="pb-1.5 pr-4 text-left font-medium text-slate-500">Account</th>
+                  <th className="pb-1.5 px-2 text-right font-medium text-slate-500">Now</th>
                   {milestoneYears.map((y, i) => (
-                    <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-stone-500`}>
+                    <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-slate-500`}>
                       {y}yr
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-white/5">
                 {assetProjections.map((ap) => (
                   <tr key={ap.category}>
-                    <td className="py-1.5 pr-4 font-medium text-stone-700 truncate max-w-[120px]">{ap.category}</td>
-                    <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(ap.currentValue)}</td>
+                    <td className="py-1.5 pr-4 font-medium text-slate-300 truncate max-w-[120px]">{ap.category}</td>
+                    <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(ap.currentValue)}</td>
                     {ap.milestoneValues.map((val, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-green-600`}>
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-emerald-400`}>
                         {formatTableCurrency(val)}
                       </td>
                     ))}
@@ -797,17 +798,17 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           {/* Legend */}
           <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" data-testid="burndown-legend">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-4 rounded bg-emerald-500" style={{ height: 2 }} />
-              <span className="text-stone-600">With investment growth</span>
+              <span className="inline-block w-4 rounded bg-emerald-400" style={{ height: 2 }} />
+              <span className="text-slate-400">With investment growth</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-4 rounded" style={{ height: 2, borderTop: "2px dashed #9ca3af", background: "none" }} />
-              <span className="text-stone-600">Without growth</span>
+              <span className="inline-block w-4 rounded" style={{ height: 2, borderTop: "2px dashed #64748b", background: "none" }} />
+              <span className="text-slate-400">Without growth</span>
             </span>
             {burndownData.hasTaxDrag && (
               <span className="flex items-center gap-1.5">
-                <span className="inline-block w-4 rounded bg-amber-500" style={{ height: 2 }} />
-                <span className="text-stone-600">After withdrawal taxes</span>
+                <span className="inline-block w-4 rounded bg-amber-400" style={{ height: 2 }} />
+                <span className="text-slate-400">After withdrawal taxes</span>
               </span>
             )}
           </div>
@@ -815,17 +816,17 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           <div className="h-72 sm:h-80 w-full" data-testid="burndown-chart-container">
             <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
               <LineChart data={burndownData.data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                 <XAxis
                   dataKey="year"
                   type="number"
                   domain={[0, 50]}
-                  tick={{ fontSize: 11, fill: "#78716c" }}
+                  tick={{ fontSize: 11, fill: "#94a3b8" }}
                   tickFormatter={(v) => `${v}y`}
                   ticks={xTicks}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: "#78716c" }}
+                  tick={{ fontSize: 11, fill: "#94a3b8" }}
                   tickFormatter={(v: number) => v >= 1000 ? `$${(v/1000).toFixed(0)}k` : `$${v}`}
                 />
                 <Tooltip content={<BurndownTooltip />} />
@@ -834,29 +835,30 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 {burndownData.emergencyFund > 0 && (
                   <ReferenceLine
                     y={burndownData.emergencyFund}
-                    stroke="#d6d3d1"
+                    stroke="rgba(255,255,255,0.15)"
                     strokeDasharray="4 4"
                     strokeWidth={1}
-                    label={{ value: "6-mo emergency fund", position: "right", fontSize: 10, fill: "#a8a29e" }}
+                    label={{ value: "6-mo emergency fund", position: "right", fontSize: 10, fill: "#64748b" }}
                   />
                 )}
 
                 {/* Zero-crossing markers */}
                 {burndownData.noGrowthZero !== null && (
-                  <ReferenceLine x={burndownData.noGrowthZero} stroke="#9ca3af" strokeDasharray="3 3" strokeWidth={1}
-                    label={{ value: fmtYears(burndownData.noGrowthZero), position: "top", fontSize: 10, fill: "#78716c" }} />
+                  <ReferenceLine x={burndownData.noGrowthZero} stroke="#64748b" strokeDasharray="3 3" strokeWidth={1}
+                    label={{ value: fmtYears(burndownData.noGrowthZero), position: "top", fontSize: 10, fill: "#94a3b8" }} />
                 )}
                 {burndownData.growthZero !== null && burndownData.growthZero !== burndownData.noGrowthZero && (
-                  <ReferenceLine x={burndownData.growthZero} stroke="#10b981" strokeDasharray="3 3" strokeWidth={1}
-                    label={{ value: fmtYears(burndownData.growthZero), position: "top", fontSize: 10, fill: "#059669" }} />
+                  <ReferenceLine x={burndownData.growthZero} stroke="#34d399" strokeDasharray="3 3" strokeWidth={1}
+                    label={{ value: fmtYears(burndownData.growthZero), position: "top", fontSize: 10, fill: "#34d399" }} />
                 )}
                 {burndownData.taxZero !== null && burndownData.taxZero !== burndownData.growthZero && burndownData.taxZero !== burndownData.noGrowthZero && (
                   <ReferenceLine x={burndownData.taxZero} stroke="#f59e0b" strokeDasharray="3 3" strokeWidth={1}
-                    label={{ value: fmtYears(burndownData.taxZero), position: "top", fontSize: 10, fill: "#d97706" }} />
+                    label={{ value: fmtYears(burndownData.taxZero), position: "top", fontSize: 10, fill: "#f59e0b" }} />
                 )}
 
-                <Line type="monotone" dataKey="withGrowth" stroke="#10b981" strokeWidth={2.5} dot={false} name="withGrowth" />
-                <Line type="monotone" dataKey="withoutGrowth" stroke="#9ca3af" strokeWidth={2} strokeDasharray="6 3" dot={false} name="withoutGrowth" />
+                <Line type="monotone" dataKey="withGrowth" stroke="#34d399" strokeWidth={2.5} dot={false} name="withGrowth"
+                  style={{ filter: "drop-shadow(0 0 5px #34d399)" }} />
+                <Line type="monotone" dataKey="withoutGrowth" stroke="#64748b" strokeWidth={2} strokeDasharray="6 3" dot={false} name="withoutGrowth" />
                 {burndownData.hasTaxDrag && (
                   <Line type="monotone" dataKey="withTax" stroke="#f59e0b" strokeWidth={2} dot={false} name="withTax" />
                 )}
@@ -866,8 +868,8 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
           {/* Starting balances */}
           {runwayDetails.withGrowth[0] && (
-            <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs text-stone-500" data-testid="burndown-starting-balances">
-              <span className="font-medium text-stone-600">Starting:</span>
+            <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs text-slate-500" data-testid="burndown-starting-balances">
+              <span className="font-medium text-slate-400">Starting:</span>
               {runwayDetails.categories
                 .map(cat => ({ category: cat, balance: runwayDetails.withGrowth[0]?.balances[cat] ?? 0 }))
                 .filter(b => b.balance > 0)
@@ -882,17 +884,17 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           {/* Withdrawal order */}
           {runwayDetails.withdrawalOrder.length > 0 && (
             <div className="mt-4" data-testid="burndown-withdrawal-order">
-              <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Suggested Withdrawal Order</p>
+              <p className="mb-2 text-xs font-medium text-slate-500 uppercase tracking-wide">Suggested Withdrawal Order</p>
               <div className="flex flex-wrap gap-2">
                 {runwayDetails.withdrawalOrder.map((entry, i) => {
                   const treatmentLabel = entry.taxTreatment === "tax-free" ? "tax-free"
                     : entry.taxTreatment === "tax-deferred" ? "taxed as income"
                     : "capital gains";
                   return (
-                    <span key={i} className="inline-flex items-center gap-1.5 rounded-lg bg-stone-50 px-2.5 py-1.5 text-xs" data-testid={`burndown-withdrawal-${i}`}>
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-stone-200 text-[10px] font-bold text-stone-600">{i + 1}</span>
-                      <span className="max-w-[150px] truncate text-stone-700 font-medium">{entry.category}</span>
-                      <span className="text-stone-400">({treatmentLabel})</span>
+                    <span key={i} className="inline-flex items-center gap-1.5 rounded-lg bg-slate-700/40 border border-white/5 px-2.5 py-1.5 text-xs" data-testid={`burndown-withdrawal-${i}`}>
+                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-600 text-[10px] font-bold text-slate-200">{i + 1}</span>
+                      <span className="max-w-[150px] truncate text-slate-200 font-medium">{entry.category}</span>
+                      <span className="text-slate-500">({treatmentLabel})</span>
                     </span>
                   );
                 })}
