@@ -25,6 +25,7 @@ const INSIGHT_TYPE_SOURCES: Record<InsightType, string[]> = {
   "tax": ["section-income"],
   "withdrawal-tax": ["section-assets"],
   "employer-match": ["section-assets", "section-income"],
+  "debt-strategy": ["section-debts"],
 };
 
 function InsightCard({

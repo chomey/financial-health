@@ -44,13 +44,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 105: Include investment interest income in Cash Flow Sankey
-- **Date**: 2026-03-06
-- **Files**: `src/lib/sankey-data.ts` (added `InvestmentReturnItem` interface, `investmentReturns` field on `CashFlowInput`, investment-income nodes in `buildSankeyData`, teal color in `SANKEY_COLORS`), `src/components/CashFlowSankey.tsx` (added `investmentReturns` prop, legend entry for Interest Income, updated `isLeft` for investment-income nodes), `src/app/page.tsx` (filter `computeMonthlyInvestmentReturns` for income-type accounts and pass to Sankey), `src/lib/changelog.ts`, `tests/unit/sankey-investment-returns.test.ts` (new), `tests/e2e/sankey-investment-returns.spec.ts` (new), `tests/unit/sankey-data.test.ts` (updated SANKEY_COLORS types), `tests/unit/changelog.test.ts`
-- **Tests**: T1: 1276 passed, 0 failed (79 files). T2: 3 passed (sankey-investment-returns). T3: 330 passed, 0 failed (full suite).
-- **Screenshots**:
-  ![Sankey with investment returns](screenshots/task-105-sankey-investment-returns.png)
-  ![Sankey legend with interest income](screenshots/task-105-sankey-legend-interest.png)
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 106: Enhance Fast Forward what-if scenarios
 - **Date**: 2026-03-06
@@ -160,6 +154,13 @@
   ![Wizard completed](screenshots/task-115-wizard-completed.png)
   ![Wizard skipped](screenshots/task-115-wizard-skipped.png)
 - **Notes**: localStorage access wrapped in try/catch since JSDOM test environment doesn't support it. Wizard only triggers for mobile (< 768px) new users with no URL state and no localStorage flag set.
+
+## Task 116: Debt payoff strategy comparison
+- **Date**: 2026-03-06
+- **Files**: `src/lib/debt-payoff.ts` (added `DebtForStrategy`, `StrategyResult`, `DebtStrategyComparison` interfaces + `compareDebtStrategies`, `simulateCurrent`, `simulateWithRedistribution`), `src/lib/insights.ts` (added `"debt-strategy"` InsightType, imported `compareDebtStrategies`/`formatDuration`, added strategy insight generation), `src/components/InsightsPanel.tsx` (added `"debt-strategy"` source mapping), `src/lib/changelog.ts` (v116 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/debt-strategy.test.ts` (new — 19 tests)
+- **Tests**: T1: 1464 passed, 0 failed (90 files). Build: passes.
+- **Screenshots**: N/A ([@backend] task — T2 not required)
+- **Notes**: Avalanche = highest-rate-first with payment redistribution; snowball = smallest-balance-first with redistribution; current = no redistribution. Insight only appears when ≥2 debts have both `interestRate` and `monthlyPayment` set and all payments cover their respective interest.
 
 ## Task 108: Consistent currency formatting and composition tables on charts
 - **Date**: 2026-03-06

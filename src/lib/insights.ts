@@ -1,3 +1,5 @@
+import { compareDebtStrategies, formatDuration } from "@/lib/debt-payoff";
+
 export interface DebtDetail {
   category: string;
   amount: number;
@@ -43,7 +45,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy";
 
 export interface Insight {
   id: string;
@@ -325,6 +327,52 @@ export function generateInsights(data: FinancialData): Insight[] {
       message: `Your employer match adds ${formatCurrency(data.employerMatchAnnual)}/year in free money — make sure you're contributing enough to get the full match.`,
       icon: "🎁",
     });
+  }
+
+  // Debt payoff strategy comparison — shown when user has 2+ debts with interest & payments
+  if (data.debts && data.debts.length >= 2) {
+    const debtsForStrategy = data.debts
+      .filter((d) => d.amount > 0 && d.monthlyPayment !== undefined && d.interestRate !== undefined)
+      .map((d) => ({
+        category: d.category,
+        balance: d.amount,
+        annualRate: d.interestRate!,
+        monthlyPayment: d.monthlyPayment!,
+      }));
+
+    const comparison = compareDebtStrategies(debtsForStrategy);
+    if (comparison) {
+      // Determine the best strategy
+      const avalancheBetter = comparison.avalancheInterestSavings >= comparison.snowballInterestSavings;
+      const bestSavings = avalancheBetter ? comparison.avalancheInterestSavings : comparison.snowballInterestSavings;
+      const bestMonths = avalancheBetter ? comparison.avalancheMonthsSaved : comparison.snowballMonthsSaved;
+      const bestName = avalancheBetter ? "avalanche" : "snowball";
+      const bestDescription = avalancheBetter ? "highest-rate debt first" : "smallest balance first";
+
+      if (bestSavings > 0 || bestMonths > 0) {
+        const savingsPart = bestSavings > 0 ? `saves ${formatCurrency(bestSavings)} in interest` : "";
+        const monthsPart = bestMonths > 0 ? `pays off ${bestMonths} month${bestMonths !== 1 ? "s" : ""} sooner` : "";
+        const combined = [savingsPart, monthsPart].filter(Boolean).join(" and ");
+
+        insights.push({
+          id: "debt-strategy-best",
+          type: "debt-strategy",
+          message: `Switching to the ${bestName} method (${bestDescription}) ${combined} compared to your current plan.`,
+          icon: "📊",
+        });
+      }
+
+      // Show the current payoff duration as encouragement
+      if (isFinite(comparison.current.totalMonths) && comparison.current.totalMonths > 0) {
+        const currentDuration = formatDuration(comparison.current.totalMonths);
+        insights.push({
+          id: "debt-strategy-timeline",
+          type: "debt-strategy",
+          message: `At current payments, you'll be debt-free in ${currentDuration}. Paying off high-interest debts first can accelerate that timeline.`,
+          icon: "🗓️",
+        });
+      }
+    }
   }
 
   return insights;
