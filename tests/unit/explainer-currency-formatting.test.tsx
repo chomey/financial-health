@@ -35,20 +35,20 @@ describe("SourceSummaryCard currency formatting", () => {
     expect(items).toHaveTextContent("$50,000");
   });
 
-  it("formats item amounts with CA$ symbol when homeCurrency is CAD", () => {
+  it("formats item amounts with plain $ when homeCurrency is CAD", () => {
     render(
       <SourceSummaryCard
         sourceId="section-assets"
         sectionName="Assets"
         items={[{ label: "TFSA", value: 50000 }]}
-        total="CA$50,000"
+        total="$50,000"
         isPositive={true}
         ovalSeed={1}
         homeCurrency="CAD"
       />
     );
     const items = screen.getByTestId("source-summary-items-section-assets");
-    expect(items).toHaveTextContent("CA$50,000");
+    expect(items).toHaveTextContent("$50,000");
   });
 
   it("shows currency code when item currency differs from homeCurrency", () => {
@@ -57,7 +57,7 @@ describe("SourceSummaryCard currency formatting", () => {
         sourceId="section-assets"
         sectionName="Assets"
         items={[{ label: "Fidelity Brokerage", value: 100000, currency: "USD" }]}
-        total="CA$137,000"
+        total="$137,000"
         isPositive={true}
         ovalSeed={1}
         homeCurrency="CAD"
@@ -74,14 +74,14 @@ describe("SourceSummaryCard currency formatting", () => {
         sourceId="section-assets"
         sectionName="Assets"
         items={[{ label: "TD GIC", value: 50000, currency: "CAD" }]}
-        total="CA$50,000"
+        total="$50,000"
         isPositive={true}
         ovalSeed={1}
         homeCurrency="CAD"
       />
     );
     const items = screen.getByTestId("source-summary-items-section-assets");
-    expect(items).toHaveTextContent("CA$50,000");
+    expect(items).toHaveTextContent("$50,000");
     // No currency code badge should appear
     expect(screen.queryByText("CAD")).not.toBeInTheDocument();
   });
@@ -109,7 +109,7 @@ describe("SourceSummaryCard currency formatting", () => {
         sourceId="section-assets"
         sectionName="Assets"
         items={[{ label: "RRSP", value: 12476711 }]}
-        total="CA$12,476,711"
+        total="$12,476,711"
         isPositive={true}
         ovalSeed={1}
         homeCurrency="CAD"
@@ -117,19 +117,19 @@ describe("SourceSummaryCard currency formatting", () => {
     );
     // Item list should have the full number
     const items = screen.getByTestId("source-summary-items-section-assets");
-    expect(items).toHaveTextContent("CA$12,476,711");
+    expect(items).toHaveTextContent("$12,476,711");
   });
 });
 
 describe("ExplainerModal full currency totals", () => {
   const mockConnections: ActiveConnection[] = [
-    { sourceId: "section-assets", targetId: "metric-net-worth", label: "+CA$55k", value: 55000, sign: "positive" },
-    { sourceId: "section-debts", targetId: "metric-net-worth", label: "-CA$12k", value: 12000, sign: "negative" },
+    { sourceId: "section-assets", targetId: "metric-net-worth", label: "+$55k", value: 55000, sign: "positive" },
+    { sourceId: "section-debts", targetId: "metric-net-worth", label: "-$12k", value: 12000, sign: "negative" },
   ];
 
   const mockTargetMeta: ActiveTargetMeta = {
     label: "Net Worth",
-    formattedValue: "CA$43,000",
+    formattedValue: "$43,000",
   };
 
   const mockGetSourceMetadata = (id: string) => {
@@ -158,12 +158,12 @@ describe("ExplainerModal full currency totals", () => {
         homeCurrency="CAD"
       />
     );
-    // Should show full format "CA$55,000" not compact "+CA$55k"
-    expect(screen.getByTestId("source-summary-total-section-assets")).toHaveTextContent("CA$55,000");
-    expect(screen.getByTestId("source-summary-total-section-debts")).toHaveTextContent("CA$12,000");
+    // Should show full format "$55,000" not compact "+$55k"
+    expect(screen.getByTestId("source-summary-total-section-assets")).toHaveTextContent("$55,000");
+    expect(screen.getByTestId("source-summary-total-section-debts")).toHaveTextContent("$12,000");
   });
 
-  it("renders item amounts with proper CAD currency formatting", () => {
+  it("renders item amounts with plain $ for home currency", () => {
     render(
       <ExplainerModal
         connections={mockConnections}
@@ -173,10 +173,10 @@ describe("ExplainerModal full currency totals", () => {
         homeCurrency="CAD"
       />
     );
-    // Items within the assets section should show CA$ formatted values
+    // Items within the assets section should show $ formatted values (home currency)
     const assetsItems = screen.getByTestId("source-summary-items-section-assets");
-    expect(assetsItems).toHaveTextContent("CA$33,000");
-    expect(assetsItems).toHaveTextContent("CA$22,000");
+    expect(assetsItems).toHaveTextContent("$33,000");
+    expect(assetsItems).toHaveTextContent("$22,000");
   });
 
   it("defaults to USD when homeCurrency is not provided", () => {
