@@ -26,26 +26,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 96: Show both federal and provincial/state bracket tables in tax explainer
-- **Status**: Complete
-- **Date**: 2026-03-06
-- **Changes**:
-  - `src/components/DataFlowArrows.tsx`: Added `provincialBrackets`, `federalBasicPersonalAmount`, `provincialBasicPersonalAmount` to `TaxExplainerDetails` interface. Created reusable `BracketTable` component with range/rate/tax-amount columns. `TaxExplainerContent` now renders both federal and provincial/state bracket tables with subtotals. Zero-income mode shows "—" for tax amounts.
-  - `src/lib/financial-state.ts`: `buildTaxExplainerDetails` now computes provincial/state bracket segments using `getCanadianBrackets`/`getUSBrackets` and returns them alongside federal brackets. Both zero-income and income paths include provincial data.
-  - `src/lib/changelog.ts`: Added version 97 entry for dual bracket tables.
-  - `tests/unit/tax-explainer.test.tsx`: Added 12 new tests for dual bracket table rendering, subtotals, provincial brackets integration, and zero-income provincial brackets.
-  - `tests/e2e/tax-explainer.spec.ts`: Updated test ID references from old `tax-bracket-reference` to new `tax-federal-brackets-table`.
-  - `tests/e2e/milestone-10-e2e.spec.ts`: Updated test ID references.
-  - `tests/unit/milestone-10-e2e-infra.test.ts`: Updated test ID references.
-- **Test tiers run**: T1, T2
-- **Tests**:
-  - `tests/unit/tax-explainer.test.tsx`: 45 tests passed (12 new for dual bracket tables)
-  - All 71 unit test files: 1184 passed, 0 failed
-  - `tests/e2e/tax-explainer.spec.ts`: 9 passed, 0 failed
-- **Screenshots**:
-  ![Tax explainer with dual bracket tables](screenshots/task-84-tax-explainer.png)
-  ![Zero income bracket reference](screenshots/task-89-tax-explainer-zero-income.png)
-- **Notes**: The bracket reference table for zero-income was replaced with the same BracketTable component used for income > 0, showing "—" in the tax amount column. Test IDs updated from `tax-bracket-reference`/`tax-bracket-ref-*` to `tax-federal-brackets-table`/`tax-federal-brackets-row-*`.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 97: Show after-tax runway on metric card and merge Withdrawal Tax Impact into Financial Runway
 - **Status**: Complete
@@ -227,3 +208,14 @@
   ![Retire today](screenshots/task-106-retire-today.png)
   ![ROI adjustment](screenshots/task-106-roi-adjustment.png)
 - **Notes**: No changes needed in page.tsx — FastForwardPanel already receives the full `state` prop. Added 5 new scenario types: retire today (zeros income, shows runway), max tax-sheltered (auto-calculates TFSA/RRSP/401k/IRA limits), housing downsize (slider with equity release), ROI adjustment (global ±5% slider), and 3 quick presets (Conservative, Aggressive Saver, Early Retirement).
+
+## Task 107: Validate all formulas and fix contextual inconsistencies
+- **Date**: 2026-03-06
+- **Files**: `src/lib/projections.ts` (fixed baseSurplus to subtract mortgage payments, fixed drawdown threshold to include mortgage), `src/lib/changelog.ts` (added v107 entry), `tests/unit/formula-validation.test.ts` (new — 26 tests), `tests/e2e/formula-validation.spec.ts` (new — 4 tests), `tests/unit/changelog.test.ts` (updated counts)
+- **Tests**: T1: 1333 passed, 0 failed (81 files). T2: 4 passed (formula-validation).
+- **Screenshots**:
+  ![Net worth explainer](screenshots/task-107-net-worth-explainer.png)
+  ![Tax explainer](screenshots/task-107-tax-explainer.png)
+  ![Runway explainer](screenshots/task-107-runway-explainer.png)
+  ![All metric cards](screenshots/task-107-all-metric-cards.png)
+- **Notes**: **Bug fixed**: Projection chart `baseSurplus` was not subtracting `totalMortgagePayments`, causing projected asset growth to be overstated for users with mortgages. The surplus was being added to savings while mortgage payments were also being paid from nowhere. Drawdown threshold also updated to include mortgage in the income shortfall calculation. All other formulas (Net Worth, Monthly Surplus, Estimated Tax, Financial Runway, Debt-to-Asset Ratio, Sankey flows) were verified correct.
