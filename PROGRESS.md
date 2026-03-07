@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 120
-- **Completed**: 111
-- **Remaining**: 9
+- **Completed**: 112
+- **Remaining**: 8
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -38,15 +38,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 102: Redesign tax bracket visualization with tiered fill bars
-- **Date**: 2026-03-06
-- **Files**: `src/components/DataFlowArrows.tsx` (replaced `BracketTable` with `TieredBracketBars`, removed stacked bracket bar), `src/lib/financial-state.ts` (updated `computeBracketSegments` to return ALL brackets including unfilled ones above income), `src/lib/changelog.ts`, `tests/unit/tiered-bracket-bars.test.tsx` (new), `tests/e2e/tiered-bracket-bars.spec.ts` (new), `tests/unit/tax-explainer.test.tsx` (updated test IDs), `tests/unit/milestone-10-e2e-infra.test.ts` (updated test IDs), `tests/unit/changelog.test.ts`
-- **Tests**: T1: 1245 passed, 0 failed (76 files). T2: 36 passed, 0 failed (tiered-bracket-bars + tax-explainer + milestone-10 + milestone-11)
-- **Screenshots**:
-  ![Tiered bracket bars](screenshots/task-102-tiered-bracket-bars.png)
-  ![Provincial bracket bars](screenshots/task-102-provincial-bracket-bars.png)
-  ![Unfilled bracket tiers](screenshots/task-102-unfilled-bracket-tiers.png)
-- **Notes**: Pre-existing test failures in zero-income E2E tests were fixed in a separate commit — they assumed deleting salary alone produced zero income, but Task 100's investment interest from assets kept income non-zero. Fix: also delete assets before checking zero-income behavior.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 103: Fix currency formatting in explainer modals
 - **Date**: 2026-03-06
@@ -149,6 +141,18 @@
   ![Employer match amount](screenshots/task-112-employer-match-amount.png)
   ![Employer match insight](screenshots/task-112-employer-match-insight.png)
   ![Employer match capped](screenshots/task-112-employer-match-capped.png)
+
+## Task 113: Preset sample profiles for new users
+- **Date**: 2026-03-06
+- **Files**: `src/lib/sample-profiles.ts` (new — 3 CA profiles + 3 US profiles + `getProfilesForCountry`), `src/app/page.tsx` (`showSampleProfiles` state, `loadProfile`/`clearAll` callbacks, sample profiles banner inline in main, `SampleProfile` import), `src/lib/changelog.ts` (v113 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/sample-profiles.test.ts` (new — 16 tests), `tests/e2e/sample-profiles.spec.ts` (new — 8 tests)
+- **Tests**: T1: 1427 passed, 0 failed (87 files). T2: 8 passed (sample-profiles). Build: passes.
+- **Screenshots**:
+  ![Sample profiles banner](screenshots/task-113-sample-profiles-banner.png)
+  ![Banner dismissed](screenshots/task-113-banner-dismissed.png)
+  ![Fresh grad loaded](screenshots/task-113-fresh-grad-loaded.png)
+  ![Mid-career loaded](screenshots/task-113-mid-career-loaded.png)
+  ![Pre-retirement loaded](screenshots/task-113-pre-retirement-loaded.png)
+  ![Clear all](screenshots/task-113-clear-all.png)
 
 ## Task 108: Consistent currency formatting and composition tables on charts
 - **Date**: 2026-03-06
