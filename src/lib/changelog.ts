@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Net worth milestones and age-based percentile insight
+  {
+    version: 138,
+    title: "Net worth milestones and age-based percentile insight",
+    description: "Two new insights: (1) Net worth milestones celebrate crossing key thresholds from $0 to $10M+, with motivating messages at each level — including the famous Charlie Munger quote at $100k. (2) Age-based percentile compares your net worth to Federal Reserve SCF 2022 medians by age group (Under 35: $39k, 35–44: $135k, 45–54: $247k, 55–64: $364k, 65–74: $410k, 75+: $335k). Tone is encouraging regardless of where you stand. Requires entering your age for the percentile insight.",
+    date: "2026-03-07",
+  },
   // Coast FIRE age calculation and insight
   {
     version: 137,
