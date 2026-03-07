@@ -46,6 +46,8 @@ export interface FinancialData {
   monthlyDebtPayments?: number;
   /** Gross monthly income before tax. Used for DTI ratio calculation. */
   monthlyGrossIncome?: number;
+  /** Monthly housing cost (mortgage payment or rent). Used for housing cost ratio. */
+  monthlyHousingCost?: number;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** How many months shorter the runway is due to withdrawal taxes */
@@ -61,7 +63,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost";
 
 export interface Insight {
   id: string;
@@ -486,6 +488,28 @@ export function generateInsights(data: FinancialData): Insight[] {
       type: "debt-to-income",
       message,
       icon: "📊",
+    });
+  }
+
+  // Housing cost ratio insight (30% rule)
+  if (data.monthlyHousingCost !== undefined && data.monthlyHousingCost > 0 && data.monthlyGrossIncome && data.monthlyGrossIncome > 0) {
+    const housingPct = (data.monthlyHousingCost / data.monthlyGrossIncome) * 100;
+    const housingFormatted = housingPct.toFixed(1);
+    let message: string;
+    if (housingPct < 25) {
+      message = `Your housing costs are ${housingFormatted}% of gross income — well within budget. The classic guideline is 30%, so you have plenty of room left over for savings, investments, and unexpected expenses.`;
+    } else if (housingPct < 31) {
+      message = `Your housing costs are ${housingFormatted}% of gross income — right at the sweet spot. Financial planners recommend keeping housing at or below 30% of gross income so there's room for savings, retirement contributions, and life's surprises.`;
+    } else if (housingPct < 41) {
+      message = `Your housing costs are ${housingFormatted}% of gross income — above the 30% guideline. This is common in expensive cities, but it does compress room for savings and emergencies. Look for ways to increase income or reduce housing costs when the opportunity arises.`;
+    } else {
+      message = `Your housing costs are ${housingFormatted}% of gross income — HUD defines 40%+ as cost-burdened. At this level, saving for retirement or emergencies is difficult. Reducing housing costs or boosting income should be a priority when possible.`;
+    }
+    insights.push({
+      id: "housing-cost",
+      type: "housing-cost",
+      message,
+      icon: "🏠",
     });
   }
 

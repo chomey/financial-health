@@ -981,6 +981,14 @@ export function toFinancialData(state: FinancialState): FinancialData {
   // Monthly debt payments: sum of minimum debt payments + mortgage payments
   const monthlyDebtPayments = state.debts.reduce((sum, d) => sum + (d.monthlyPayment ?? 0), 0) + totalMortgagePayments;
 
+  // Monthly housing cost: mortgage payment (from PropertyEntry) OR rent expense (from expenses)
+  // Prefer mortgage payments from PropertyEntry; fall back to expenses with rent-like category
+  const fxRatesForHousing = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
+  const rentExpense = state.expenses
+    .filter((e) => e.category.toLowerCase().includes("rent"))
+    .reduce((sum, e) => sum + convertToHome(e.amount, e.currency ?? homeCurrency, homeCurrency, fxRatesForHousing), 0);
+  const monthlyHousingCost = totalMortgagePayments > 0 ? totalMortgagePayments : rentExpense;
+
   // Income replacement ratio: % of monthly after-tax income sustainable by portfolio via 4% rule
   const liquidInvestedAssets = totalAssets + totalStocks;
   const incomeReplacementRatio = monthlyAfterTaxIncome > 0
@@ -1020,6 +1028,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     incomeReplacementRatio,
     monthlyDebtPayments: monthlyDebtPayments > 0 ? monthlyDebtPayments : 0,
     monthlyGrossIncome: monthlyIncome > 0 ? monthlyIncome : undefined,
+    monthlyHousingCost: monthlyHousingCost > 0 ? monthlyHousingCost : undefined,
   };
 }
 

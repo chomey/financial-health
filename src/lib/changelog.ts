@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Housing cost ratio insight
+  {
+    version: 136,
+    title: "Housing cost ratio insight with 30% rule explanation",
+    description: "New insight type showing your housing cost ratio — monthly rent or mortgage payment divided by gross monthly income. Four tiers: Well within budget (<25%), Right at the sweet spot (25–30%), Above the 30% rule (31–40%), and Cost-burdened (40%+). Each tier explains why the 30% guideline matters: financial planners and HUD use it as the benchmark — spending more limits savings capacity and emergency preparedness. Mortgage payments from PropertyEntry take priority; falls back to rent expense category.",
+    date: "2026-03-07",
+  },
   // Debt-to-income ratio insight
   {
     version: 135,
@@ -884,7 +891,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 135] as const },
+    { milestone: "UI Polish", range: [88, 136] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

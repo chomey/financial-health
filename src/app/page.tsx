@@ -719,6 +719,12 @@ export default function Home() {
       { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
       { sourceId: "section-income", label: fmtLabel(totals.monthlyIncome), value: totals.monthlyIncome, sign: "positive" },
     ],
+    "housing-cost": [
+      { sourceId: "section-income", label: fmtLabel(totals.monthlyIncome), value: totals.monthlyIncome, sign: "positive" },
+      ...(totalMortgagePayments > 0
+        ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const }]
+        : [{ sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" as const }]),
+    ],
     "tax": [
       { sourceId: "section-income", label: fmtLabel(totals.monthlyIncome * 12), value: totals.monthlyIncome, sign: "positive" },
     ],
