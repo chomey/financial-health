@@ -129,7 +129,7 @@ archive_tasks() {
     if [[ -z "$next_content" ]]; then
       sed_cmd="${sed_cmd}${next}d;"
     fi
-  done <<< "$lines_to_remove"
+  done <<< "$lines_to_remove" 2>/dev/null
 
   if [[ -n "$sed_cmd" ]]; then
     sed -i '' "$sed_cmd" "$file"
