@@ -719,21 +719,27 @@ export default function Home() {
     )}
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white px-4 py-3 shadow-sm sm:px-6 sm:py-4">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
-          <div className="min-w-0">
-            <h1 className="text-xl font-bold text-stone-900 sm:text-2xl">
-              Financial Health Snapshot
-            </h1>
-            <p className="text-xs text-stone-500 sm:text-sm">
-              Your finances at a glance — no judgment, just clarity
-              <span className="mx-1.5 text-stone-300">·</span>
-              <a
-                href="/changelog"
-                className="text-blue-500 transition-colors duration-200 hover:text-blue-700 hover:underline"
-              >
-                Changelog
-              </a>
-            </p>
+        <div className="mx-auto max-w-7xl space-y-2">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold text-stone-900 sm:text-2xl">
+                Financial Health Snapshot
+              </h1>
+              <p className="text-xs text-stone-500 sm:text-sm">
+                Your finances at a glance — no judgment, just clarity
+                <span className="mx-1.5 text-stone-300">·</span>
+                <a
+                  href="/changelog"
+                  className="text-blue-500 transition-colors duration-200 hover:text-blue-700 hover:underline"
+                >
+                  Changelog
+                </a>
+              </p>
+            </div>
+            <div className="flex-shrink-0 flex items-center gap-2 print:hidden">
+              <CopyLinkButton />
+              <PrintSnapshotButton />
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 print:hidden">
             <CountryJurisdictionSelector
@@ -750,8 +756,6 @@ export default function Home() {
               fxManualOverride={fxManualOverride}
               onManualOverrideChange={setFxManualOverride}
             />
-            <CopyLinkButton />
-            <PrintSnapshotButton />
           </div>
         </div>
       </header>
