@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 122
-- **Completed**: 122
-- **Remaining**: 0
+- **Total Tasks**: 124
+- **Completed**: 123
+- **Remaining**: 1
 - **Last Updated**: 2026-03-07
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -58,17 +58,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 113: Preset sample profiles for new users
-- **Date**: 2026-03-06
-- **Files**: `src/lib/sample-profiles.ts` (new — 3 CA profiles + 3 US profiles + `getProfilesForCountry`), `src/app/page.tsx` (`showSampleProfiles` state, `loadProfile`/`clearAll` callbacks, sample profiles banner inline in main, `SampleProfile` import), `src/lib/changelog.ts` (v113 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/sample-profiles.test.ts` (new — 16 tests), `tests/e2e/sample-profiles.spec.ts` (new — 8 tests)
-- **Tests**: T1: 1427 passed, 0 failed (87 files). T2: 8 passed (sample-profiles). Build: passes.
-- **Screenshots**:
-  ![Sample profiles banner](screenshots/task-113-sample-profiles-banner.png)
-  ![Banner dismissed](screenshots/task-113-banner-dismissed.png)
-  ![Fresh grad loaded](screenshots/task-113-fresh-grad-loaded.png)
-  ![Mid-career loaded](screenshots/task-113-mid-career-loaded.png)
-  ![Pre-retirement loaded](screenshots/task-113-pre-retirement-loaded.png)
-  ![Clear all](screenshots/task-113-clear-all.png)
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 114: Print/PDF snapshot export
 - **Date**: 2026-03-06
@@ -167,6 +157,17 @@
   ![Chart dimensions](screenshots/task-122-chart-dimensions.png)
   ![Milestone labels](screenshots/task-122-milestone-labels.png)
   ![Full chart](screenshots/task-122-full-chart.png)
+
+## Task 123: Add mortgage burndown line to projection chart
+- **Date**: 2026-03-07
+- **Files**: `src/lib/projections.ts` (added `computeMortgageAmortization` export), `src/components/ProjectionChart.tsx` (added `mortgage` field to chartData, orange dashed Line for mortgage, Mortgage legend entry), `src/lib/changelog.ts` (v123 entry), `tests/unit/changelog.test.ts` (updated counts to 123), `tests/unit/mortgage-amortization.test.ts` (new — 9 tests), `tests/e2e/mortgage-burndown.spec.ts` (new — 5 tests)
+- **Tests**: T1: 1559 passed, 0 failed (96 files). T2: 5 passed (mortgage-burndown). Build: passes.
+- **Screenshots**:
+  ![Mortgage legend visible](screenshots/task-123-mortgage-legend-visible.png)
+  ![No mortgage no legend](screenshots/task-123-no-mortgage-no-legend.png)
+  ![Chart with mortgage line](screenshots/task-123-chart-with-mortgage-line.png)
+  ![Summary table mortgage](screenshots/task-123-summary-table-mortgage.png)
+  ![Mortgage free milestone](screenshots/task-123-mortgage-free-milestone.png)
 
 ## Task 121: Auto-display investment returns in Income section
 - **Date**: 2026-03-07

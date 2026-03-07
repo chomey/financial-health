@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Mortgage burndown line on projection chart
+  {
+    version: 123,
+    title: "Mortgage burndown line on projection chart",
+    description: "The Financial Projection chart now includes a dedicated mortgage burndown line (dashed orange) that shows how your mortgage balance declines over time alongside Net Worth, Assets, and Debts. The line coincides with the Mortgage Free milestone marker when the balance reaches $0. A Mortgage legend entry appears in the chart legend when a mortgage is present.",
+    date: "2026-03-07",
+  },
   // Fix projection chart label clipping
   {
     version: 122,
