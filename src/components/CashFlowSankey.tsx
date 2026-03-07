@@ -89,6 +89,8 @@ export default function CashFlowSankey({
     if (rawData.nodes.length === 0) return null;
 
     const nodeMap = new Map(rawData.nodes.map((n, i) => [n.id, i]));
+    // Preserve original values — d3-sankey mutates node.value to flow totals
+    const originalValues = new Map(rawData.nodes.map((n) => [n.id, n.value]));
     const nodes = rawData.nodes.map((n) => ({ ...n }));
     const links = rawData.links
       .filter((l) => nodeMap.has(l.source) && nodeMap.has(l.target) && l.value > 0)
@@ -111,6 +113,11 @@ export default function CashFlowSankey({
       ]);
 
     const result = generator({ nodes, links } as Parameters<typeof generator>[0]);
+    // Restore original values that d3-sankey overwrote with flow totals
+    for (const node of result.nodes as D3SankeyNode[]) {
+      const orig = originalValues.get(node.id);
+      if (orig !== undefined) node.value = orig;
+    }
     return {
       nodes: result.nodes as D3SankeyNode[],
       links: result.links as D3SankeyLink[],

@@ -8,20 +8,24 @@ import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 
 describe("computeAllocationByCategory", () => {
-  it("groups assets by category type", () => {
+  it("groups assets by individual category", () => {
     const assets: Asset[] = [
       { id: "1", category: "TFSA", amount: 20000 },
       { id: "2", category: "RRSP", amount: 30000 },
       { id: "3", category: "Savings", amount: 10000 },
     ];
     const result = computeAllocationByCategory(assets, [], []);
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(3);
 
-    const retirement = result.find((s) => s.name === "Retirement Accounts");
-    expect(retirement).toBeDefined();
-    expect(retirement!.value).toBe(50000);
+    const tfsa = result.find((s) => s.name === "TFSA");
+    expect(tfsa).toBeDefined();
+    expect(tfsa!.value).toBe(20000);
 
-    const savings = result.find((s) => s.name === "Savings & Checking");
+    const rrsp = result.find((s) => s.name === "RRSP");
+    expect(rrsp).toBeDefined();
+    expect(rrsp!.value).toBe(30000);
+
+    const savings = result.find((s) => s.name === "Savings");
     expect(savings).toBeDefined();
     expect(savings!.value).toBe(10000);
   });
@@ -69,7 +73,7 @@ describe("computeAllocationByCategory", () => {
     ];
     const result = computeAllocationByCategory(assets, [], []);
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("Retirement Accounts");
+    expect(result[0].name).toBe("TFSA");
   });
 
   it("sorts by value descending", () => {
@@ -83,25 +87,26 @@ describe("computeAllocationByCategory", () => {
     expect(result[1].value).toBeGreaterThanOrEqual(result[2].value);
   });
 
-  it("groups US retirement accounts correctly", () => {
+  it("shows US retirement accounts individually", () => {
     const assets: Asset[] = [
       { id: "1", category: "401k", amount: 100000 },
       { id: "2", category: "Roth IRA", amount: 30000 },
       { id: "3", category: "HSA", amount: 5000 },
     ];
     const result = computeAllocationByCategory(assets, [], []);
-    expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("Retirement Accounts");
-    expect(result[0].value).toBe(135000);
+    expect(result).toHaveLength(3);
+    expect(result.find((s) => s.name === "401k")!.value).toBe(100000);
+    expect(result.find((s) => s.name === "Roth IRA")!.value).toBe(30000);
+    expect(result.find((s) => s.name === "HSA")!.value).toBe(5000);
   });
 
-  it("groups 'Savings Account' into Savings & Checking", () => {
+  it("groups 'Savings Account' into Savings", () => {
     const assets: Asset[] = [
       { id: "1", category: "Savings Account", amount: 5000 },
     ];
     const result = computeAllocationByCategory(assets, [], []);
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("Savings & Checking");
+    expect(result[0].name).toBe("Savings");
   });
 
   it("handles property with zero equity", () => {
