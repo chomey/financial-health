@@ -9,10 +9,10 @@
 -->
 
 ## Summary
-- **Total Tasks**: 120
-- **Completed**: 118
-- **Remaining**: 2
-- **Last Updated**: 2026-03-06
+- **Total Tasks**: 121
+- **Completed**: 121
+- **Remaining**: 0
+- **Last Updated**: 2026-03-07
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
 
@@ -54,17 +54,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 111: Age input and personalized benchmarks
-- **Date**: 2026-03-06
-- **Files**: `src/lib/benchmarks.ts` (added `estimatePercentile` with lognormal model, added `percentile`/`ageGroupLabel` to `BenchmarkComparison`, updated messages to include specific dollar amounts), `src/app/page.tsx` (added `AgeInputHeader` component in header next to `CountryJurisdictionSelector`), `src/components/BenchmarkComparisons.tsx` (show percentile badge per metric), `src/lib/changelog.ts` (v111 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/benchmarks.test.ts` (updated pre-existing message assertions), `tests/unit/age-benchmarks.test.ts` (new — 17 tests), `tests/e2e/age-benchmarks.spec.ts` (new — 8 tests)
-- **Tests**: T1: 1392 passed, 0 failed (85 files). T2: 8 passed (age-benchmarks). Build: passes.
-- **Screenshots**:
-  ![Age header display](screenshots/task-111-age-header-display.png)
-  ![Personalized benchmarks](screenshots/task-111-personalized-benchmarks.png)
-  ![Benchmark percentile](screenshots/task-111-benchmark-percentile.png)
-  ![Age persists](screenshots/task-111-age-persists.png)
-  ![Card age syncs header](screenshots/task-111-card-age-syncs-header.png)
-- **Notes**: Age was already stored in URL state (`ag` field in CompactState) — no url-state changes needed. Pre-existing `benchmarks.test.ts` message assertions updated to match new format (specific dollar amounts in messages). Percentile uses lognormal model (σ=1.0) which is a standard approximation for wealth/income distributions.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 112: Employer match modeling for registered accounts
 - **Date**: 2026-03-06
@@ -174,3 +164,13 @@
   ![Income replacement](screenshots/task-120-income-replacement.png)
   ![Full dashboard](screenshots/task-120-full-dashboard.png)
 - **Notes**: All 10 feature areas from tasks 110-119 verified end-to-end. Full regression suite (407 tests) passes. No pre-existing test failures.
+
+## Task 121: Auto-display investment returns in Income section
+- **Date**: 2026-03-07
+- **Files**: `src/components/IncomeEntry.tsx` (import `MonthlyInvestmentReturn`, add `investmentReturns` prop, auto-computed section with "auto" badge rows, include in monthly total), `src/app/page.tsx` (pass `investmentReturns={monthlyInvestmentReturns}` to IncomeEntry), `src/lib/changelog.ts` (v121 entry, UI Polish range extended to 121), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/investment-returns-income.test.tsx` (new — 14 tests), `tests/e2e/investment-returns-income.spec.ts` (new — 8 tests)
+- **Tests**: T1: 1545 passed, 0 failed (95 files). T2: 8 passed (investment-returns-income). Build: passes.
+- **Screenshots**:
+  ![Auto returns section](screenshots/task-121-auto-returns-section.png)
+  ![Auto return labels](screenshots/task-121-auto-return-labels.png)
+  ![Monthly total with returns](screenshots/task-121-monthly-total-with-returns.png)
+  ![Manual plus auto income](screenshots/task-121-manual-plus-auto-income.png)
