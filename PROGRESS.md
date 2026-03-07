@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 120
-- **Completed**: 113
-- **Remaining**: 7
+- **Completed**: 114
+- **Remaining**: 6
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -42,15 +42,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 104: Replace Net Worth waterfall chart with donut/pie chart
-- **Date**: 2026-03-06
-- **Files**: `src/components/NetWorthDonutChart.tsx` (new), `src/app/page.tsx` (swap component), `src/lib/changelog.ts`, `tests/unit/donut-chart.test.ts` (new), `tests/e2e/donut-chart.spec.ts` (new), `tests/e2e/waterfall-chart.spec.ts` (updated testids), `tests/unit/milestone-5-e2e-infra.test.ts` (updated testid), `tests/unit/changelog.test.ts`
-- **Tests**: T1: 1266 passed, 0 failed (78 files). T2: 9 passed, 0 failed.
-- **Screenshots**:
-  ![Donut chart default](screenshots/task-104-donut-chart-default.png)
-  ![Donut center label](screenshots/task-104-donut-center-label.png)
-  ![Donut legend](screenshots/task-104-donut-legend.png)
-- **Notes**: Old `NetWorthWaterfallChart.tsx` still exists (not deleted) — old unit tests still pass against it. Pre-existing milestone-5 E2E failures (ZoomableCard strict mode violations on allocation-chart, benchmark, sankey testids) fixed in separate commit.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 105: Include investment interest income in Cash Flow Sankey
 - **Date**: 2026-03-06
@@ -156,6 +148,18 @@
   ![Print footer visible](screenshots/task-114-print-footer-visible.png)
   ![Print dashboard visible](screenshots/task-114-print-dashboard-visible.png)
   ![Print layout with data](screenshots/task-114-print-layout-with-data.png)
+
+## Task 115: Mobile guided wizard entry mode
+- **Date**: 2026-03-06
+- **Files**: `src/components/MobileWizard.tsx` (new), `src/app/page.tsx` (showWizard state, wizard trigger in useEffect, callbacks), `src/lib/changelog.ts` (v115 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/mobile-wizard.test.ts` (new — 10 tests), `tests/e2e/mobile-wizard.spec.ts` (new — 13 tests)
+- **Tests**: T1: 1445 passed, 0 failed (89 files). T2: 13 passed (mobile-wizard). Build: passes.
+- **Screenshots**:
+  ![Wizard step 1](screenshots/task-115-wizard-step1.png)
+  ![Wizard step 4](screenshots/task-115-wizard-step4.png)
+  ![Wizard presets](screenshots/task-115-wizard-presets.png)
+  ![Wizard completed](screenshots/task-115-wizard-completed.png)
+  ![Wizard skipped](screenshots/task-115-wizard-skipped.png)
+- **Notes**: localStorage access wrapped in try/catch since JSDOM test environment doesn't support it. Wizard only triggers for mobile (< 768px) new users with no URL state and no localStorage flag set.
 
 ## Task 108: Consistent currency formatting and composition tables on charts
 - **Date**: 2026-03-06

@@ -29,6 +29,7 @@ import {
   toFinancialData,
 } from "@/lib/financial-state";
 import { getProfilesForCountry, type SampleProfile } from "@/lib/sample-profiles";
+import MobileWizard, { type WizardResult } from "@/components/MobileWizard";
 import { getStateFromURL, updateURL } from "@/lib/url-state";
 import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey, formatCurrencyCompact } from "@/lib/currency";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
@@ -401,6 +402,7 @@ export default function Home() {
   const [fxManualOverride, setFxManualOverride] = useState<number | undefined>(undefined);
   const [fxRates, setFxRates] = useState<FxRates | undefined>(undefined);
   const [showSampleProfiles, setShowSampleProfiles] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
   const isFirstRender = useRef(true);
 
   // Restore state from URL after hydration; show sample profiles if no URL state
@@ -424,6 +426,15 @@ export default function Home() {
     } else {
       // No saved state — show sample profile picker for new visitors
       setShowSampleProfiles(true);
+      // Show mobile wizard for new users on mobile viewports (< 768px)
+      try {
+        const wizardDone = localStorage.getItem("fhs-wizard-done");
+        if (!wizardDone && window.innerWidth < 768) {
+          setShowWizard(true);
+        }
+      } catch {
+        // localStorage unavailable (private browsing, test environment, etc.)
+      }
     }
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -546,6 +557,19 @@ export default function Home() {
     setSurplusTargetComputedId(undefined);
     setFxManualOverride(undefined);
     setShowSampleProfiles(false);
+  }, []);
+
+  const handleWizardComplete = useCallback((result: WizardResult) => {
+    setAssets(result.assets);
+    setDebts(result.debts);
+    setIncome(result.income);
+    setExpenses(result.expenses);
+    setShowWizard(false);
+    setShowSampleProfiles(false);
+  }, []);
+
+  const handleWizardSkip = useCallback(() => {
+    setShowWizard(false);
   }, []);
 
   const homeCurrency = getHomeCurrency(country);
@@ -679,6 +703,14 @@ export default function Home() {
   return (
     <CurrencyProvider currency={homeCurrency}>
     <DataFlowProvider homeCurrency={homeCurrency}>
+    {/* Mobile guided wizard — full-screen for new mobile users */}
+    {showWizard && (
+      <MobileWizard
+        country={country}
+        onComplete={handleWizardComplete}
+        onSkip={handleWizardSkip}
+      />
+    )}
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white px-4 py-3 shadow-sm sm:px-6 sm:py-4">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
