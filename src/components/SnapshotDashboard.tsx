@@ -184,10 +184,10 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
   }, [ctx, connections, targetId, metric.title, metric.value, metric.format, homeCurrency]);
 
   const valueColor = metric.positive
-    ? "text-green-600"
+    ? "text-cyan-400"
     : metric.value < 0
-      ? "text-rose-600"
-      : "text-stone-700";
+      ? "text-rose-400"
+      : "text-slate-200";
 
   // Celebratory glow for Financial Runway > 12 months
   const isRunwayCelebration =
@@ -204,14 +204,14 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
   return (
     <div
       ref={cardRef}
-      className={`relative rounded-xl border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+      className={`relative rounded-xl border bg-white/5 backdrop-blur-sm p-5 shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 ${
         hasConnections ? "cursor-pointer" : "cursor-default"
       } ${
         isRunwayCelebration
-          ? "border-green-300 ring-1 ring-green-200 animate-glow-pulse"
+          ? "border-cyan-500/40 ring-1 ring-cyan-500/20 animate-glow-pulse"
           : isUnderwaterWarning
-            ? "border-rose-300 ring-1 ring-rose-200 animate-warning-pulse"
-            : "border-stone-200"
+            ? "border-rose-500/40 ring-1 ring-rose-500/20 animate-warning-pulse"
+            : "border-white/10"
       }`}
       role="group"
       aria-label={metric.title}
@@ -226,7 +226,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       tabIndex={0}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-stone-500">{metric.title}</h3>
+        <h3 className="text-sm font-medium text-slate-400">{metric.title}</h3>
         <span className="text-lg" aria-hidden="true">
           {metric.icon}
         </span>
@@ -238,44 +238,44 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
         {formatMetricValue(animatedValue, metric.format, homeCurrency)}
       </p>
       {metric.valueWithEquity !== undefined && metric.valueWithEquity !== metric.value && (
-        <p className="mt-0.5 text-sm text-stone-500" data-testid="net-worth-with-equity">
+        <p className="mt-0.5 text-sm text-slate-400" data-testid="net-worth-with-equity">
           ({formatMetricValue(metric.valueWithEquity, metric.format, homeCurrency)} with home equity)
         </p>
       )}
       {metric.ratioWithoutMortgage !== undefined && metric.ratioWithoutMortgage !== metric.value && (
-        <p className="mt-0.5 text-sm text-stone-500" data-testid="ratio-without-mortgage">
+        <p className="mt-0.5 text-sm text-slate-400" data-testid="ratio-without-mortgage">
           ({formatMetricValue(metric.ratioWithoutMortgage, metric.format, homeCurrency)} without mortgage)
         </p>
       )}
       {metric.format === "percent" && (
         <div className="mt-2" data-testid="income-replacement-progress">
-          <div className="h-2 w-full rounded-full bg-stone-100 overflow-hidden">
+          <div className="h-2 w-full rounded-full bg-slate-700 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-green-400 to-green-600 transition-all duration-700"
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-cyan-500 to-cyan-400 transition-all duration-700"
               style={{ width: `${Math.min(100, animatedValue)}%` }}
               aria-hidden="true"
             />
           </div>
           {metric.breakdown && (
-            <p className="mt-1 text-xs font-medium text-stone-500" data-testid="income-replacement-tier">
+            <p className="mt-1 text-xs font-medium text-slate-400" data-testid="income-replacement-tier">
               {metric.breakdown}
             </p>
           )}
         </div>
       )}
       {metric.runwayWithGrowth !== undefined && (
-        <p className="mt-0.5 text-sm text-stone-500" data-testid="runway-with-growth">
+        <p className="mt-0.5 text-sm text-slate-400" data-testid="runway-with-growth">
           ({metric.runwayWithGrowth === Infinity ? "∞" : formatMetricValue(metric.runwayWithGrowth, "months", homeCurrency)} with investment growth)
         </p>
       )}
       {metric.runwayAfterTax !== undefined && metric.runwayAfterTax !== metric.runwayWithGrowth && metric.runwayAfterTax !== metric.value && (
-        <p className="mt-0.5 text-sm text-amber-600" data-testid="runway-after-tax">
+        <p className="mt-0.5 text-sm text-amber-400" data-testid="runway-after-tax">
           ({formatMetricValue(metric.runwayAfterTax, "months", homeCurrency)} after withdrawal taxes)
         </p>
       )}
       {/* Effective tax rate sub-line */}
       {metric.effectiveRate !== undefined && metric.effectiveRate > 0 && (
-        <p className="mt-0.5 text-sm text-stone-500" data-testid="effective-tax-rate">
+        <p className="mt-0.5 text-sm text-slate-400" data-testid="effective-tax-rate">
           {(metric.effectiveRate * 100).toFixed(1)}% effective rate
         </p>
       )}
@@ -283,27 +283,27 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       {insights.length > 0 && (
         <div className="mt-1.5 space-y-0.5">
           {insights.map((msg, i) => (
-            <p key={i} className="text-xs font-medium text-green-600">{msg}</p>
+            <p key={i} className="text-xs font-medium text-cyan-400">{msg}</p>
           ))}
         </div>
       )}
       {isRunwayCelebration && insights.length === 0 && (
-        <p className="mt-1 text-xs font-medium text-green-600" data-testid="runway-celebration-text">
+        <p className="mt-1 text-xs font-medium text-cyan-400" data-testid="runway-celebration-text">
           Excellent safety net!
         </p>
       )}
       {/* Breakdown on hover — highlighted when data-flow arrows are active. Hidden for percent format (shown in progress bar section). */}
       {metric.breakdown && metric.format !== "percent" && (
-        <p className={`mt-1.5 text-xs leading-relaxed transition-all duration-200 ${showTooltip ? `opacity-100 ${hasConnections ? "text-stone-600 font-medium" : "text-stone-400"}` : "opacity-0 h-0 overflow-hidden"}`} data-testid="metric-breakdown">
+        <p className={`mt-1.5 text-xs leading-relaxed transition-all duration-200 ${showTooltip ? `opacity-100 ${hasConnections ? "text-slate-300 font-medium" : "text-slate-500"}` : "opacity-0 h-0 overflow-hidden"}`} data-testid="metric-breakdown">
           {metric.breakdown}
         </p>
       )}
-      <p className="mt-1.5 text-xs text-stone-400 leading-relaxed">
+      <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
         {metric.tooltip}
       </p>
       {/* Click to explain hint */}
       {hasConnections && (
-        <p className={`mt-1.5 flex items-center gap-1 text-xs text-stone-300 transition-opacity duration-200 ${showTooltip ? "opacity-100" : "opacity-0"}`} data-testid="click-to-explain-hint">
+        <p className={`mt-1.5 flex items-center gap-1 text-xs text-slate-500 transition-opacity duration-200 ${showTooltip ? "opacity-100" : "opacity-0"}`} data-testid="click-to-explain-hint">
           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>

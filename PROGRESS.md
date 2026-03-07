@@ -8,13 +8,13 @@
 
 ## Summary
 - **Total Tasks**: 134
-- **Completed**: 127
-- **Remaining**: 7
+- **Completed**: 128
+- **Remaining**: 6
 - **Last Updated**: 2026-03-07
 
-## Task 127: Visual theme overhaul — soft cyberpunk palette
+## Task 128: Update metric cards and dashboard for new theme
 - **Date**: 2026-03-07
-- **Files**: `src/app/globals.css`, `tests/unit/cyberpunk-theme.test.ts`, `tests/e2e/cyberpunk-theme.spec.ts`, `src/lib/changelog.ts`
-- **Tests**: 1614 passed (18 new T1 in `cyberpunk-theme.test.ts`, 4 new T2 in `cyberpunk-theme.spec.ts`)
-- **Screenshots**: ![Dark theme body](screenshots/task-127-dark-theme-body.png) ![Full page cyberpunk](screenshots/task-127-full-page-cyberpunk.png)
-- **Notes**: This task only updates theme tokens and globals.css. Components still have explicit light backgrounds — tasks 128-130 will update components to use the dark theme. Legacy green/stone/blue tokens remapped to cyan/slate/violet for gradual migration.
+- **Files**: `src/components/SnapshotDashboard.tsx`, `src/components/DataFlowArrows.tsx`, `src/lib/changelog.ts`, `tests/unit/dashboard-dark-theme.test.ts`, `tests/e2e/dashboard-dark-theme.spec.ts`
+- **Tests**: 1646 passed (37 new T1 in `dashboard-dark-theme.test.ts`, 5 new T2 in `dashboard-dark-theme.spec.ts`)
+- **Screenshots**: ![Dashboard dark cards](screenshots/task-128-metric-cards-dark.png) ![Full dashboard](screenshots/task-128-dashboard-full.png)
+- **Notes**: Updated existing color-assertion tests in snapshot-dashboard.test.tsx, explainer-modal.test.tsx, source-summary-card.test.tsx, micro-interactions.test.tsx to match new cyan/slate theme. Tax bracket bars now use dark containers with muted neon fills (cyan→violet→rose progression) so text is always readable. Also fixed pre-existing changelog test failure (task 127 count mismatch).
