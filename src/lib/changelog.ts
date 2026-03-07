@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Visual theme overhaul — soft cyberpunk palette
+  {
+    version: 127,
+    title: "Soft cyberpunk theme tokens",
+    description: "Replaced the green/stone Tailwind theme with a soft cyberpunk palette: dark slate-900 background, muted cyan for positive metrics, violet for info/links, rose for warnings. Added semantic accent CSS custom properties (--accent-positive, --accent-negative, --accent-info, --accent-highlight, --accent-muted, --accent-surface, --accent-border). Legacy green/stone/blue tokens remapped to new palette for gradual migration. Glow animations updated to use cyan/rose accents.",
+    date: "2026-03-07",
+  },
   // Show both monthly and yearly totals on Income and Expenses
   {
     version: 126,
