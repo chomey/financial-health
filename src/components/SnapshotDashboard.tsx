@@ -206,14 +206,12 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
   return (
     <div
       ref={cardRef}
-      className={`relative rounded-xl border bg-white/5 backdrop-blur-sm p-5 shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 ${
+      className={`relative rounded-xl border bg-white/5 backdrop-blur-sm p-5 shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:border-emerald-500/40 hover:ring-1 hover:ring-emerald-500/20 hover:shadow-emerald-500/10 ${
         hasConnections ? "cursor-pointer" : "cursor-default"
       } ${
-        isRunwayCelebration
-          ? "border-emerald-500/40 ring-1 ring-emerald-500/20 animate-glow-pulse"
-          : isUnderwaterWarning
-            ? "border-red-500/40 ring-1 ring-red-500/20 animate-warning-pulse"
-            : "border-white/10"
+        isUnderwaterWarning
+          ? "border-red-500/40 ring-1 ring-red-500/20 animate-warning-pulse"
+          : "border-white/10"
       }`}
       role="group"
       aria-label={metric.title}
