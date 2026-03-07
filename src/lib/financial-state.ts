@@ -656,7 +656,7 @@ export function computeTotals(state: FinancialState) {
 }
 
 function fmtShort(n: number, currency: SupportedCurrency): string {
-  return formatCurrencyCompact(n, currency);
+  return formatCurrencyCompact(n, currency, currency);
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {

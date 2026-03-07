@@ -50,36 +50,37 @@ export function convertToHome(
 
 /**
  * Format a currency amount for display.
- * Uses Intl.NumberFormat with the correct currency code.
+ * Uses plain "$" for the home currency; only shows "CA$" or "US$" for foreign amounts.
  */
 export function formatCurrency(
   amount: number,
   currency: SupportedCurrency,
-  opts?: { maximumFractionDigits?: number; showSign?: boolean },
+  opts?: { maximumFractionDigits?: number; showSign?: boolean; homeCurrency?: SupportedCurrency },
 ): string {
   const maxFrac = opts?.maximumFractionDigits ?? 0;
   const abs = Math.abs(amount);
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: maxFrac,
-  }).format(abs);
+  const isForeign = opts?.homeCurrency !== undefined && currency !== opts.homeCurrency;
+  // Use plain "$" for home currency, full prefix for foreign
+  const formatted = isForeign
+    ? new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: maxFrac }).format(abs)
+    : "$" + new Intl.NumberFormat("en-US", { maximumFractionDigits: maxFrac }).format(abs);
   const sign = amount < 0 ? "-" : opts?.showSign && amount > 0 ? "+" : "";
   return `${sign}${formatted}`;
 }
 
 /**
  * Format a currency amount in compact form (e.g., "$55k", "$1.2M").
- * Includes the currency symbol from Intl but uses compact notation.
+ * Uses plain "$" for home currency; shows "CA$"/"US$" only for foreign amounts.
  */
 export function formatCurrencyCompact(
   amount: number,
   currency: SupportedCurrency,
+  homeCurrency?: SupportedCurrency,
 ): string {
   const abs = Math.abs(amount);
   const sign = amount < 0 ? "-" : "";
-  // Get the currency symbol
-  const symbol = currency === "CAD" ? "CA$" : "$";
+  const isForeign = homeCurrency !== undefined && currency !== homeCurrency;
+  const symbol = isForeign ? (currency === "CAD" ? "CA$" : "US$") : "$";
   if (abs >= 1_000_000) return `${sign}${symbol}${(abs / 1_000_000).toFixed(1)}M`;
   if (abs >= 1_000) return `${sign}${symbol}${(abs / 1_000).toFixed(0)}k`;
   return `${sign}${symbol}${abs.toFixed(0)}`;
@@ -92,17 +93,23 @@ export function formatCurrencyCompact(
 export class CurrencyFormatter {
   constructor(public readonly currency: SupportedCurrency) {}
 
-  /** Compact display for chart axes / tight spaces: CA$1.2M, $55k, CA$123 */
+  /** Compact display for chart axes / tight spaces: $1.2M, $55k, $123 */
   compact(amount: number): string {
-    return formatCurrencyCompact(amount, this.currency);
+    return formatCurrencyCompact(amount, this.currency, this.currency);
   }
 
-  /** Full formatted display for tooltips / tables: CA$1,234,567 */
+  /** Full formatted display for tooltips / tables: $1,234,567 */
   full(amount: number, opts?: { showSign?: boolean; decimals?: number }): string {
     return formatCurrency(amount, this.currency, {
       showSign: opts?.showSign,
       maximumFractionDigits: opts?.decimals,
+      homeCurrency: this.currency,
     });
+  }
+
+  /** Format an amount in a specific (possibly foreign) currency: US$5,000 or $5,000 */
+  foreign(amount: number, itemCurrency: SupportedCurrency): string {
+    return formatCurrency(amount, itemCurrency, { homeCurrency: this.currency });
   }
 }
 

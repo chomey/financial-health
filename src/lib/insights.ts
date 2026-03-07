@@ -495,16 +495,13 @@ export function generateInsights(data: FinancialData): Insight[] {
 let _insightCurrency = "USD";
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: _insightCurrency,
-    maximumFractionDigits: 0,
-  }).format(Math.abs(amount));
+  const abs = Math.abs(amount);
+  return "$" + new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(abs);
 }
 
 function formatCompact(amount: number): string {
   const abs = Math.abs(amount);
-  if (abs >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(amount / 1_000).toFixed(0)}k`;
+  if (abs >= 1_000_000) return `$${(abs / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `$${(abs / 1_000).toFixed(0)}k`;
   return formatCurrency(amount);
 }

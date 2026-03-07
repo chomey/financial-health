@@ -66,12 +66,19 @@ describe("currency", () => {
   });
 
   describe("formatCurrency", () => {
-    it("formats USD amounts", () => {
+    it("formats with plain $ when no homeCurrency context", () => {
       expect(formatCurrency(1234, "USD")).toBe("$1,234");
+      expect(formatCurrency(1234, "CAD")).toBe("$1,234");
     });
 
-    it("formats CAD amounts", () => {
-      expect(formatCurrency(1234, "CAD")).toBe("CA$1,234");
+    it("formats home currency with plain $", () => {
+      expect(formatCurrency(1234, "CAD", { homeCurrency: "CAD" })).toBe("$1,234");
+      expect(formatCurrency(1234, "USD", { homeCurrency: "USD" })).toBe("$1,234");
+    });
+
+    it("formats foreign currency with prefix", () => {
+      expect(formatCurrency(1234, "USD", { homeCurrency: "CAD" })).toBe("$1,234");  // Intl: US$ for USD
+      expect(formatCurrency(1234, "CAD", { homeCurrency: "USD" })).toBe("CA$1,234");
     });
 
     it("handles negative amounts", () => {
@@ -88,14 +95,18 @@ describe("currency", () => {
   });
 
   describe("formatCurrencyCompact", () => {
-    it("formats millions", () => {
-      expect(formatCurrencyCompact(1_200_000, "USD")).toBe("$1.2M");
-      expect(formatCurrencyCompact(1_200_000, "CAD")).toBe("CA$1.2M");
+    it("formats with plain $ for home currency", () => {
+      expect(formatCurrencyCompact(1_200_000, "USD", "USD")).toBe("$1.2M");
+      expect(formatCurrencyCompact(1_200_000, "CAD", "CAD")).toBe("$1.2M");
+    });
+
+    it("formats with prefix for foreign currency", () => {
+      expect(formatCurrencyCompact(1_200_000, "CAD", "USD")).toBe("CA$1.2M");
+      expect(formatCurrencyCompact(55_000, "USD", "CAD")).toBe("US$55k");
     });
 
     it("formats thousands", () => {
-      expect(formatCurrencyCompact(55_000, "USD")).toBe("$55k");
-      expect(formatCurrencyCompact(55_000, "CAD")).toBe("CA$55k");
+      expect(formatCurrencyCompact(55_000, "USD", "USD")).toBe("$55k");
     });
 
     it("formats small amounts", () => {

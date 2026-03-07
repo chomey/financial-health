@@ -620,7 +620,7 @@ export default function Home() {
   // Data-flow connections for metric cards
   const fmtLabel = (v: number) => {
     const sign = v >= 0 ? "+" : "-";
-    return `${sign}${formatCurrencyCompact(Math.abs(v), homeCurrency)}`;
+    return `${sign}${formatCurrencyCompact(Math.abs(v), homeCurrency, homeCurrency)}`;
   };
 
   const netWorthConnections: DataFlowConnectionDef[] = [
