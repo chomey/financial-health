@@ -252,7 +252,7 @@ export function simulateRunwayTimeSeries(
 
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
-import { computeTax } from "@/lib/tax-engine";
+import { computeTax, getMarginalRateForIncome } from "@/lib/tax-engine";
 import type { TaxExplainerDetails, TaxBracketSegment, RunwayExplainerDetails, RunwayTimeSeriesPoint, RunwayWithdrawalOrderEntry } from "@/components/DataFlowArrows";
 import { getCanadianBrackets, getUSBrackets, calculateCanadianCapitalGainsInclusion, US_CAPITAL_GAINS_2025, type BracketTable } from "@/lib/tax-tables";
 import { CA_PROVINCES, US_STATES } from "@/components/CountryJurisdictionSelector";
@@ -861,6 +861,8 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 export function toFinancialData(state: FinancialState): FinancialData {
   const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, homeCurrency } = computeTotals(state);
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
+  const country = state.country ?? "CA";
+  const jurisdiction = state.jurisdiction ?? "ON";
 
   // Compute annual employer match across all eligible assets
   const annualEmploymentSalary = state.income.reduce((sum, item) => {
@@ -876,6 +878,11 @@ export function toFinancialData(state: FinancialState): FinancialData {
 
   // FIRE number: annual living expenses / 4% SWR — use raw monthly expenses (excludes contributions/mortgage)
   const fireNumber = monthlyExpenses > 0 ? (monthlyExpenses * 12) / 0.04 : undefined;
+
+  // Marginal rate for tax optimization suggestions — use employment income
+  const marginalRate = annualEmploymentSalary > 0
+    ? getMarginalRateForIncome(annualEmploymentSalary, country, jurisdiction)
+    : undefined;
 
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
   return {
@@ -899,6 +906,9 @@ export function toFinancialData(state: FinancialState): FinancialData {
     withdrawalTax: computeWithdrawalTaxSummary(state, totalAssets, totalStocks),
     employerMatchAnnual: employerMatchAnnual > 0 ? employerMatchAnnual : undefined,
     fireNumber,
+    marginalRate,
+    country,
+    annualEmploymentIncome: annualEmploymentSalary > 0 ? annualEmploymentSalary : undefined,
   };
 }
 

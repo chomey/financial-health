@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 120
-- **Completed**: 115
-- **Remaining**: 5
+- **Completed**: 116
+- **Remaining**: 4
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -48,16 +48,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 107: Validate all formulas and fix contextual inconsistencies
-- **Date**: 2026-03-06
-- **Files**: `src/lib/projections.ts` (fixed baseSurplus to subtract mortgage payments, fixed drawdown threshold to include mortgage), `src/lib/changelog.ts` (added v107 entry), `tests/unit/formula-validation.test.ts` (new — 26 tests), `tests/e2e/formula-validation.spec.ts` (new — 4 tests), `tests/unit/changelog.test.ts` (updated counts)
-- **Tests**: T1: 1333 passed, 0 failed (81 files). T2: 4 passed (formula-validation).
-- **Screenshots**:
-  ![Net worth explainer](screenshots/task-107-net-worth-explainer.png)
-  ![Tax explainer](screenshots/task-107-tax-explainer.png)
-  ![Runway explainer](screenshots/task-107-runway-explainer.png)
-  ![All metric cards](screenshots/task-107-all-metric-cards.png)
-- **Notes**: **Bug fixed**: Projection chart `baseSurplus` was not subtracting `totalMortgagePayments`, causing projected asset growth to be overstated for users with mortgages. The surplus was being added to savings while mortgage payments were also being paid from nowhere. Drawdown threshold also updated to include mortgage in the income shortfall calculation. All other formulas (Net Worth, Monthly Surplus, Estimated Tax, Financial Runway, Debt-to-Asset Ratio, Sankey flows) were verified correct.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 109: [MILESTONE] E2E test for UI polish and formula validation
 - **Date**: 2026-03-06
@@ -162,6 +153,13 @@
   ![SWR changed 3%](screenshots/task-117-swr-changed-3pct.png)
   ![FIRE insight](screenshots/task-117-fire-insight.png)
   ![FIRE achieved](screenshots/task-117-fire-achieved.png)
+
+## Task 118: Tax optimization suggestions
+- **Date**: 2026-03-06
+- **Files**: `src/lib/tax-engine.ts` (export `getMarginalRateForIncome`), `src/lib/insights.ts` (add `"tax-optimization"` InsightType, add `marginalRate`/`country`/`annualEmploymentIncome` to FinancialData, add 3 tax optimization insights), `src/lib/financial-state.ts` (import `getMarginalRateForIncome`, compute marginalRate in `toFinancialData`), `src/components/InsightsPanel.tsx` (add `"tax-optimization"` source mapping), `src/lib/changelog.ts` (v118 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/tax-optimization.test.ts` (new — 18 tests)
+- **Tests**: T1: 1501 passed, 0 failed (92 files). Build: passes.
+- **Screenshots**: N/A ([@backend] task — T2 not required)
+- **Notes**: Three insights: (1) taxable→TFSA/Roth IRA savings when taxable×5%×marginalRate > $100/yr; (2) RRSP/401k deduction suggestion when marginalRate ≥ 25% and employment income present; (3) tax-free room nudge when taxable > tax-free and suggestion 1 threshold not met.
 
 ## Task 108: Consistent currency formatting and composition tables on charts
 - **Date**: 2026-03-06
