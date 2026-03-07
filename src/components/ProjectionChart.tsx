@@ -221,6 +221,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
         netWorth: p.netWorth,
         assets: p.totalAssets,
         debts: -p.totalDebts, // show as negative for visual clarity
+        mortgage: -p.mortgageDebts, // show as negative like debts
         withdrawalTaxDrag: p.withdrawalTaxDrag ?? 0,
       }));
   }, [displayPoints]);
@@ -558,6 +559,20 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               animationDuration={500}
             />
 
+            {/* Mortgage burndown line (negative, dashed orange) */}
+            {hasMortgage && (
+              <Line
+                type="monotone"
+                dataKey="mortgage"
+                name="Mortgage"
+                stroke="#f97316"
+                strokeWidth={1.5}
+                strokeDasharray="6 3"
+                dot={false}
+                animationDuration={500}
+              />
+            )}
+
             {/* Debt-free reference lines — split consumer vs mortgage when both exist */}
             {hasBothDebtTypes ? (
               <>
@@ -641,6 +656,12 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-red-500" />
           Debts
         </span>
+        {hasMortgage && (
+          <span className="flex items-center gap-1" data-testid="mortgage-burndown-legend">
+            <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-orange-500" />
+            Mortgage
+          </span>
+        )}
       </div>
 
       {/* Scenario legend */}

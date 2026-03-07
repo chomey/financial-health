@@ -355,6 +355,31 @@ export function deflateProjectionPoints(
   });
 }
 
+/**
+ * Compute the monthly remaining balance for a single mortgage over time.
+ * Returns an array of length (months + 1) where index 0 is the initial balance.
+ */
+export function computeMortgageAmortization(
+  principal: number,
+  annualRate: number,
+  monthlyPayment: number,
+  months: number
+): number[] {
+  const monthlyRate = annualRate / 100 / 12;
+  const balances: number[] = [];
+  let balance = principal;
+  for (let m = 0; m <= months; m++) {
+    balances.push(Math.max(0, Math.round(balance)));
+    if (m < months) {
+      if (balance > 0) {
+        balance = balance * (1 + monthlyRate) - monthlyPayment;
+        if (balance < 0) balance = 0;
+      }
+    }
+  }
+  return balances;
+}
+
 /** Downsample projection points for chart rendering — keep start, end, and evenly-spaced points */
 export function downsamplePoints(points: ProjectionPoint[], maxPoints: number = 120): ProjectionPoint[] {
   if (points.length <= maxPoints) return points;
