@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { calculateDebtPayoff, formatPayoffCurrency } from "@/lib/debt-payoff";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import { useCurrency } from "@/lib/CurrencyContext";
+import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 
 export interface Debt {
@@ -269,7 +270,9 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
       .filter((group) => group.items.length > 0);
   };
 
-  const total = debts.reduce((sum, d) => sum + d.amount, 0);
+  const hc = homeCurrency ?? "CAD";
+  const rates = fxRates ?? FALLBACK_RATES;
+  const total = debts.reduce((sum, d) => sum + convertToHome(d.amount, d.currency ?? hc, hc, rates), 0);
 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">

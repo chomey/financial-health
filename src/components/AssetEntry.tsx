@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
+import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { getTaxTreatment, type TaxTreatment } from "@/lib/withdrawal-tax";
 
 export type RoiTaxTreatment = "capital-gains" | "income";
@@ -337,7 +338,9 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
       .filter((group) => group.items.length > 0);
   };
 
-  const total = assets.filter((a) => !a.computed).reduce((sum, a) => sum + a.amount, 0);
+  const hc = homeCurrency ?? "CAD";
+  const rates = fxRates ?? FALLBACK_RATES;
+  const total = assets.filter((a) => !a.computed).reduce((sum, a) => sum + convertToHome(a.amount, a.currency ?? hc, hc, rates), 0);
 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
