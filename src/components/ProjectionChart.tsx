@@ -19,6 +19,8 @@ import {
   downsamplePoints,
   projectAssets,
   deflateProjectionPoints,
+  computeFireNumber,
+  findMonthAtTarget,
 } from "@/lib/projections";
 import type { Scenario, Milestone } from "@/lib/projections";
 import { getInflationFromURL, updateInflationURL } from "@/lib/url-state";
@@ -30,6 +32,7 @@ type ChartMode = "keep-earning" | "income-stops";
 interface ProjectionChartProps {
   state: FinancialState;
   runwayDetails?: RunwayExplainerDetails;
+  safeWithdrawalRate?: number;
 }
 
 // formatCurrency and formatFullCurrency defined inside components via useCurrency()
@@ -128,7 +131,7 @@ function BurndownTooltip({ active, payload, label }: CustomTooltipProps) {
   );
 }
 
-export default function ProjectionChart({ state, runwayDetails }: ProjectionChartProps) {
+export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRate = 4 }: ProjectionChartProps) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.compact(v);
   const formatTableCurrency = (v: number) => fmt.full(v);
@@ -208,6 +211,14 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
   const hasBothDebtTypes = hasConsumerDebt && hasMortgage;
 
   const milestoneMarkers = projection.milestones.filter((m) => m.month > 0);
+
+  // FIRE (Financial Independence, Retire Early) milestone
+  const { monthlyExpenses: rawExpenses } = computeTotals(state);
+  const fireNumber = computeFireNumber(rawExpenses, safeWithdrawalRate);
+  const fireMonth = fireNumber > 0 ? findMonthAtTarget(projection.points, fireNumber) : null;
+  const fireYear = fireMonth !== null ? parseFloat((fireMonth / 12).toFixed(1)) : null;
+  const currentNetWorth = projection.points[0]?.netWorth ?? 0;
+  const fireAlreadyReached = fireNumber > 0 && currentNetWorth >= fireNumber;
 
   const milestoneYears = TABLE_MILESTONES;
 
@@ -562,6 +573,22 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
               )
             )}
 
+            {/* FIRE number reference line */}
+            {fireNumber > 0 && (
+              <ReferenceLine
+                y={fireNumber}
+                stroke="#f59e0b"
+                strokeDasharray="4 3"
+                strokeWidth={1.5}
+                label={{
+                  value: `🔥 FIRE: ${formatCurrency(fireNumber)}`,
+                  position: "right",
+                  fill: "#d97706",
+                  fontSize: 10,
+                }}
+              />
+            )}
+
             {/* Milestone markers */}
             {milestoneMarkers.map((m: Milestone) => (
               <ReferenceLine
@@ -637,6 +664,25 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
           </div>
         )}
       </div>
+
+      {/* FIRE milestone callout */}
+      {fireNumber > 0 && (
+        <div className="mt-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2" data-testid="fire-milestone">
+          {fireAlreadyReached ? (
+            <p className="text-xs font-medium text-amber-700">
+              🎉 You&apos;ve already reached your FIRE number of {fmt.compact(fireNumber)}! Financial independence achieved.
+            </p>
+          ) : fireYear !== null ? (
+            <p className="text-xs font-medium text-amber-700" data-testid="fire-year">
+              🔥 FIRE number: {fmt.compact(fireNumber)} ({safeWithdrawalRate}% rule) — projected in ~{fmtYears(fireYear)}
+            </p>
+          ) : (
+            <p className="text-xs font-medium text-amber-700">
+              🔥 FIRE number: {fmt.compact(fireNumber)} ({safeWithdrawalRate}% rule) — not reached within 50 years at current rate
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Milestone details */}
       {(milestoneMarkers.length > 0 || debtFreeYear !== null) && (

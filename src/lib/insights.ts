@@ -30,6 +30,10 @@ export interface FinancialData {
   homeCurrency?: string;
   /** Total annual employer match across all eligible accounts */
   employerMatchAnnual?: number;
+  /** FIRE number: portfolio size needed for financial independence (annual expenses / 4% SWR) */
+  fireNumber?: number;
+  /** Years until net worth reaches FIRE number (null = already reached, undefined = not enough data) */
+  yearsToFire?: number | null;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** How many months shorter the runway is due to withdrawal taxes */
@@ -45,7 +49,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire";
 
 export interface Insight {
   id: string;
@@ -372,6 +376,31 @@ export function generateInsights(data: FinancialData): Insight[] {
           icon: "🗓️",
         });
       }
+    }
+  }
+
+  // FIRE (Financial Independence, Retire Early) insight
+  if (data.fireNumber && data.fireNumber > 0) {
+    const currentNetWorth = data.totalAssets - data.totalDebts;
+    const fireNumber = data.fireNumber;
+    if (currentNetWorth >= fireNumber) {
+      insights.push({
+        id: "fire-achieved",
+        type: "fire",
+        message: `🎉 You've reached financial independence! Your net worth of ${formatCurrency(currentNetWorth)} covers your annual expenses using the 4% rule. FIRE number: ${formatCurrency(fireNumber)}.`,
+        icon: "🔥",
+      });
+    } else {
+      const progressPct = currentNetWorth > 0 ? Math.min(99, Math.round((currentNetWorth / fireNumber) * 100)) : 0;
+      const yearsText = data.yearsToFire != null
+        ? ` At your current savings rate, you'll reach it in ~${data.yearsToFire.toFixed(1)} years.`
+        : "";
+      insights.push({
+        id: "fire-progress",
+        type: "fire",
+        message: `You need ${formatCurrency(fireNumber)} to be financially independent (4% rule). You're ${progressPct}% there.${yearsText}`,
+        icon: "🔥",
+      });
     }
   }
 

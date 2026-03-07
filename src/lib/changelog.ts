@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // FIRE number milestone
+  {
+    version: 117,
+    title: "FIRE number milestone",
+    description: "Added Financial Independence, Retire Early (FIRE) number to the projection chart. The FIRE number is calculated as annual living expenses divided by your safe withdrawal rate (default 4%). A golden reference line on the chart marks this target, and a callout shows how many years until you reach financial independence at your current savings rate. The Fast Forward panel now includes a withdrawal rate slider (3–5%) so you can model conservative or aggressive scenarios. A new insight celebrates when you've already hit your FIRE number, or shows your current progress toward it.",
+    date: "2026-03-06",
+  },
   // Debt payoff strategy comparison
   {
     version: 116,

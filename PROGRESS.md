@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 120
-- **Completed**: 114
-- **Remaining**: 6
+- **Completed**: 115
+- **Remaining**: 5
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -46,17 +46,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 106: Enhance Fast Forward what-if scenarios
-- **Date**: 2026-03-06
-- **Files**: `src/lib/scenario.ts` (added retireToday, maxTaxSheltered, housingDownsizePercent, roiAdjustment fields, TAX_SHELTERED_LIMITS constants, isTaxSheltered/getMonthlyLimit/applyPreset helpers, scenarioRunwayMonths in comparison), `src/components/FastForwardPanel.tsx` (added preset buttons, retire-today toggle, max-tax-sheltered toggle with account limit details, housing downsize slider, ROI adjustment slider, runway estimate display), `src/lib/changelog.ts` (added v106 entry), `tests/unit/scenario-enhanced.test.ts` (new — 31 tests), `tests/e2e/fast-forward-enhanced.spec.ts` (new — 7 tests), `tests/unit/changelog.test.ts` (updated counts)
-- **Tests**: T1: 1307 passed, 0 failed (80 files). T2: 7 passed (fast-forward-enhanced).
-- **Screenshots**:
-  ![Scenario presets](screenshots/task-106-presets.png)
-  ![Conservative preset](screenshots/task-106-conservative-preset.png)
-  ![Early retirement](screenshots/task-106-early-retirement.png)
-  ![Retire today](screenshots/task-106-retire-today.png)
-  ![ROI adjustment](screenshots/task-106-roi-adjustment.png)
-- **Notes**: No changes needed in page.tsx — FastForwardPanel already receives the full `state` prop. Added 5 new scenario types: retire today (zeros income, shows runway), max tax-sheltered (auto-calculates TFSA/RRSP/401k/IRA limits), housing downsize (slider with equity release), ROI adjustment (global ±5% slider), and 3 quick presets (Conservative, Aggressive Saver, Early Retirement).
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 107: Validate all formulas and fix contextual inconsistencies
 - **Date**: 2026-03-06
@@ -161,6 +151,17 @@
 - **Tests**: T1: 1464 passed, 0 failed (90 files). Build: passes.
 - **Screenshots**: N/A ([@backend] task — T2 not required)
 - **Notes**: Avalanche = highest-rate-first with payment redistribution; snowball = smallest-balance-first with redistribution; current = no redistribution. Insight only appears when ≥2 debts have both `interestRate` and `monthlyPayment` set and all payments cover their respective interest.
+
+## Task 117: FIRE number milestone
+- **Date**: 2026-03-06
+- **Files**: `src/lib/projections.ts` (added `computeFireNumber`, `findMonthAtTarget`), `src/lib/url-state.ts` (added `getSwrFromURL`, `updateSwrURL`), `src/lib/insights.ts` (added `"fire"` InsightType, `fireNumber`/`yearsToFire` to FinancialData, FIRE insight generation), `src/lib/financial-state.ts` (compute `fireNumber` in `toFinancialData`), `src/components/InsightsPanel.tsx` (added `"fire"` source mapping), `src/components/FastForwardPanel.tsx` (added SWR slider props and UI), `src/components/ProjectionChart.tsx` (FIRE reference line + callout using `safeWithdrawalRate` prop), `src/app/page.tsx` (added `safeWithdrawalRate` state, `handleSwrChange`, wired to components), `src/lib/changelog.ts` (v117 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/fire-number.test.ts` (new — 18 tests), `tests/e2e/fire-number.spec.ts` (new — 6 tests)
+- **Tests**: T1: 1482 passed, 0 failed (91 files). T2: 6 passed (fire-number). Build: passes.
+- **Screenshots**:
+  ![FIRE milestone default](screenshots/task-117-fire-milestone-default.png)
+  ![SWR slider](screenshots/task-117-swr-slider.png)
+  ![SWR changed 3%](screenshots/task-117-swr-changed-3pct.png)
+  ![FIRE insight](screenshots/task-117-fire-insight.png)
+  ![FIRE achieved](screenshots/task-117-fire-achieved.png)
 
 ## Task 108: Consistent currency formatting and composition tables on charts
 - **Date**: 2026-03-06
