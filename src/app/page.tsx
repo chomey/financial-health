@@ -35,6 +35,7 @@ import type { FxRates, SupportedCurrency } from "@/lib/currency";
 import type { Asset } from "@/components/AssetEntry";
 import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
+import { computeMortgageBreakdown, DEFAULT_INTEREST_RATE } from "@/components/PropertyEntry";
 import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getPortfolioSummary, getAnnualizedReturn } from "@/components/StockEntry";
@@ -631,11 +632,29 @@ export default function Home() {
   ];
 
   const incomeAndReturnsTotal = totals.monthlyAfterTaxIncome + totalMonthlyInvestmentReturns;
+
+  // Compute mortgage principal/interest breakdown for explainer
+  const mortgageItems: { label: string; value: number }[] = [];
+  if (totalMortgagePayments > 0) {
+    let totalInterest = 0;
+    let totalPrincipal = 0;
+    for (const prop of properties) {
+      if (prop.mortgage > 0 && prop.monthlyPayment && prop.monthlyPayment > 0) {
+        const rate = prop.interestRate ?? DEFAULT_INTEREST_RATE;
+        const { interestPortion, principalPortion } = computeMortgageBreakdown(prop.mortgage, rate, prop.monthlyPayment);
+        totalInterest += interestPortion;
+        totalPrincipal += principalPortion;
+      }
+    }
+    if (totalInterest > 0) mortgageItems.push({ label: "Interest", value: Math.round(totalInterest) });
+    if (totalPrincipal > 0) mortgageItems.push({ label: "Principal", value: Math.round(totalPrincipal) });
+  }
+
   const monthlySurplusConnections: DataFlowConnectionDef[] = [
     { sourceId: "section-income", label: fmtLabel(incomeAndReturnsTotal), value: incomeAndReturnsTotal, sign: "positive" },
     { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
     ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "section-assets", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const }] : []),
-    ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const }] : []),
+    ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const, items: mortgageItems.length > 0 ? mortgageItems : undefined }] : []),
   ];
 
   // Estimated Tax: green arrow from income showing gross income, label with effective rate + annual tax

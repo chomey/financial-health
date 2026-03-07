@@ -35,6 +35,8 @@ export interface ActiveConnection {
   sign?: "positive" | "negative";
   /** "light" renders thinner, more transparent arrows (used by insight cards) */
   style?: "default" | "light";
+  /** Override items for the explainer card (e.g. mortgage principal/interest breakdown) */
+  items?: { label: string; value: number }[];
 }
 
 interface RegisteredElement {
@@ -1018,7 +1020,8 @@ function ExplainerModal({
                 const meta = getSourceMetadata(conn.sourceId);
                 const isPositive = conn.sign !== "negative";
                 const showOperator = i > 0;
-                const sectionName = meta?.label || conn.label || conn.sourceId.replace("section-", "");
+                const labelOverride = conn.label?.startsWith("mortgage") ? "Mortgage" : conn.label?.startsWith("contributions") ? "Contributions" : undefined;
+                const sectionName = labelOverride || meta?.label || conn.label || conn.sourceId.replace("section-", "");
                 const displayValue = formatCurrency(conn.value ?? 0, homeCurrencyProp);
                 const cardDelay = i * 50; // Stagger card fade-ins
 
@@ -1042,7 +1045,7 @@ function ExplainerModal({
                       <SourceSummaryCard
                         sourceId={conn.sourceId}
                         sectionName={sectionName}
-                        items={meta && Math.abs(meta.value - (conn.value ?? 0)) < 1 ? meta.items : undefined}
+                        items={conn.items ?? (meta?.items && !conn.label?.match(/^(mortgage|contributions)\s/) ? meta.items : undefined)}
                         total={displayValue}
                         isPositive={isPositive}
                         ovalSeed={i + 1}

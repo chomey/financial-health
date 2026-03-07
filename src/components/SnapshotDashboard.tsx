@@ -84,6 +84,7 @@ export interface DataFlowConnectionDef {
   label?: string;
   value?: number;
   sign: "positive" | "negative";
+  items?: { label: string; value: number }[];
 }
 
 export { formatMetricValue, MOCK_METRICS };
@@ -162,6 +163,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
         label: c.label,
         value: c.value,
         sign: c.sign,
+        items: c.items,
       }))
     );
     ctx.setActiveConnections(prioritized);
