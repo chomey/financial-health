@@ -653,8 +653,8 @@ export default function Home() {
   const monthlySurplusConnections: DataFlowConnectionDef[] = [
     { sourceId: "section-income", label: fmtLabel(incomeAndReturnsTotal), value: incomeAndReturnsTotal, sign: "positive" },
     { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
-    ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "section-assets", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const }] : []),
-    ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const, items: mortgageItems.length > 0 ? mortgageItems : undefined }] : []),
+    ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "virtual-contributions", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const }] : []),
+    ...(totalMortgagePayments > 0 ? [{ sourceId: "virtual-mortgage", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const, items: mortgageItems.length > 0 ? mortgageItems : undefined }] : []),
   ];
 
   // Estimated Tax: green arrow from income showing gross income, label with effective rate + annual tax
