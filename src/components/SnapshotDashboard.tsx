@@ -226,7 +226,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       tabIndex={0}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-slate-400">{metric.title}</h3>
+        <h3 className="text-base font-medium text-slate-400">{metric.title}</h3>
         <span className="text-lg" aria-hidden="true">
           {metric.icon}
         </span>
@@ -257,7 +257,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
             />
           </div>
           {metric.breakdown && (
-            <p className="mt-1 text-xs font-medium text-slate-400" data-testid="income-replacement-tier">
+            <p className="mt-1 text-sm font-medium text-slate-400" data-testid="income-replacement-tier">
               {metric.breakdown}
             </p>
           )}
@@ -281,29 +281,29 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       )}
       {/* Contextual insights below value */}
       {insights.length > 0 && (
-        <div className="mt-1.5 space-y-0.5">
+        <div className="mt-2 space-y-1">
           {insights.map((msg, i) => (
-            <p key={i} className="text-xs font-medium text-emerald-400">{msg}</p>
+            <p key={i} className="text-sm font-medium text-emerald-400">{msg}</p>
           ))}
         </div>
       )}
       {isRunwayCelebration && insights.length === 0 && (
-        <p className="mt-1 text-xs font-medium text-emerald-400" data-testid="runway-celebration-text">
+        <p className="mt-2 text-sm font-medium text-emerald-400" data-testid="runway-celebration-text">
           Excellent safety net!
         </p>
       )}
       {/* Breakdown on hover — highlighted when data-flow arrows are active. Hidden for percent format (shown in progress bar section). */}
       {metric.breakdown && metric.format !== "percent" && (
-        <p className={`mt-1.5 text-xs leading-relaxed transition-all duration-200 ${showTooltip ? `opacity-100 ${hasConnections ? "text-slate-300 font-medium" : "text-slate-500"}` : "opacity-0 h-0 overflow-hidden"}`} data-testid="metric-breakdown">
+        <p className={`mt-2 text-sm leading-relaxed transition-all duration-200 ${showTooltip ? `opacity-100 ${hasConnections ? "text-slate-300 font-medium" : "text-slate-500"}` : "opacity-0 h-0 overflow-hidden"}`} data-testid="metric-breakdown">
           {metric.breakdown}
         </p>
       )}
-      <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
+      <p className="mt-2 text-sm text-slate-500 leading-relaxed">
         {metric.tooltip}
       </p>
       {/* Click to explain hint */}
       {hasConnections && (
-        <p className={`mt-1.5 flex items-center gap-1 text-xs text-slate-500 transition-opacity duration-200 ${showTooltip ? "opacity-100" : "opacity-0"}`} data-testid="click-to-explain-hint">
+        <p className={`mt-2 flex items-center gap-1 text-sm text-slate-500 transition-opacity duration-200 ${showTooltip ? "opacity-100" : "opacity-0"}`} data-testid="click-to-explain-hint">
           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>

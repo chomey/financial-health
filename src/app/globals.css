@@ -192,12 +192,11 @@ body {
 /* Global card hover glow — targets all rounded card elements with border */
 /* This covers all dark glass cards site-wide with a single rule */
 :is(.rounded-xl, .rounded-lg)[class*="border"][class*="bg-white"] {
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 :is(.rounded-xl, .rounded-lg)[class*="border"][class*="bg-white"]:hover {
   border-color: rgba(16, 185, 129, 0.4) !important; /* emerald-500/40 */
   box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2), 0 10px 15px -3px rgba(16, 185, 129, 0.1) !important;
-  transform: translateY(-2px);
 }
 
 /* Tooltip fade transition */
