@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Fix projection chart label clipping
+  {
+    version: 122,
+    title: "Projection chart label clipping fixed",
+    description: "Y-axis currency labels no longer show unnecessary decimal zeros (e.g. '$105M' instead of '$105.0M'), reducing label width and preventing clipping. The left chart margin and Y-axis width have been increased to comfortably accommodate currency labels with CA$/US$ prefixes. Milestone annotation labels (Consumer Debt Free, Mortgage Free) are now rendered as SVG pills just inside the chart boundary instead of being clipped at the top edge.",
+    date: "2026-03-07",
+  },
   // Auto-display investment returns in Income section
   {
     version: 121,
@@ -786,7 +793,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 121] as const },
+    { milestone: "UI Polish", range: [88, 130] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

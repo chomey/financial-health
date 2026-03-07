@@ -116,6 +116,22 @@ describe("currency", () => {
     it("handles negative amounts", () => {
       expect(formatCurrencyCompact(-25_000, "USD")).toBe("-$25k");
     });
+
+    it("omits trailing .0 for round millions", () => {
+      expect(formatCurrencyCompact(1_000_000, "USD", "USD")).toBe("$1M");
+      expect(formatCurrencyCompact(2_000_000, "CAD", "CAD")).toBe("$2M");
+      expect(formatCurrencyCompact(105_000_000, "USD", "USD")).toBe("$105M");
+    });
+
+    it("omits trailing .0 for round millions with foreign prefix", () => {
+      expect(formatCurrencyCompact(105_000_000, "CAD", "USD")).toBe("CA$105M");
+      expect(formatCurrencyCompact(2_000_000, "USD", "CAD")).toBe("US$2M");
+    });
+
+    it("retains decimal for non-round millions", () => {
+      expect(formatCurrencyCompact(1_200_000, "USD", "USD")).toBe("$1.2M");
+      expect(formatCurrencyCompact(1_500_000, "CAD", "CAD")).toBe("$1.5M");
+    });
   });
 
   describe("getEffectiveFxRates", () => {
