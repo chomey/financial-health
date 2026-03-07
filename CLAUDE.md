@@ -85,7 +85,14 @@ Each task is tagged with a specialized implementation agent (e.g., `[@frontend]`
 ```
 - [ ] Task N: Short title — Description [@agent-tag]
 - [ ] Task N: [ARCH] Short title — Description [@devops]
+- [ ] Task N: [OPUS] Complex title — Description [@fullstack]
 ```
+
+### Model Tags
+Tasks are run with Sonnet by default for speed. Add these tags to force Opus for complex tasks:
+- `[MILESTONE]` — Major integration milestones (auto-detected by ralph.zsh)
+- `[E2E]` — End-to-end test tasks (auto-detected)
+- `[OPUS]` — Manually tagged complex tasks requiring deeper reasoning (cross-file audits, multi-system changes, architectural work)
 
 ### The Rule
 **Prefer tasks for all meaningful work.** New features, multi-file changes, and anything that needs integration tests should be a task in TASKS.md and implemented by Ralph. Small bug fixes, config tweaks, and quick adjustments can be done inline when the user drives an interactive session.
