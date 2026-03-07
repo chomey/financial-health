@@ -119,10 +119,12 @@ interface CompactIncome {
   a: number;
   f?: string; // frequency (omitted when "monthly" / default)
   it?: string; // incomeType (omitted when "employment" / default)
+  cu?: string; // currency (omitted when home currency)
 }
 interface CompactExpense {
   c: string;
   a: number;
+  cu?: string; // currency (omitted when home currency)
 }
 interface CompactProperty {
   n: string; // name
@@ -187,9 +189,14 @@ function toCompact(state: FinancialState): CompactState {
       const ci: CompactIncome = { c: x.category, a: x.amount };
       if (x.frequency && x.frequency !== "monthly") ci.f = x.frequency;
       if (x.incomeType && x.incomeType !== "employment") ci.it = x.incomeType;
+      if (x.currency && x.currency !== homeCurrency) ci.cu = x.currency;
       return ci;
     }),
-    e: state.expenses.map((x) => ({ c: x.category, a: x.amount })),
+    e: state.expenses.map((x) => {
+      const ce: CompactExpense = { c: x.category, a: x.amount };
+      if (x.currency && x.currency !== homeCurrency) ce.cu = x.currency;
+      return ce;
+    }),
   };
   const properties = state.properties ?? [];
   if (properties.length > 0) {
@@ -256,12 +263,17 @@ function fromCompact(compact: CompactState): FinancialState {
       return debt;
     }),
     income: compact.i.map((x, i) => {
-      const item: { id: string; category: string; amount: number; frequency?: import("@/components/IncomeEntry").IncomeFrequency; incomeType?: import("@/components/IncomeEntry").IncomeType } = { id: `i${i + 1}`, category: x.c, amount: x.a };
+      const item: { id: string; category: string; amount: number; frequency?: import("@/components/IncomeEntry").IncomeFrequency; incomeType?: import("@/components/IncomeEntry").IncomeType; currency?: SupportedCurrency } = { id: `i${i + 1}`, category: x.c, amount: x.a };
       if (x.f) item.frequency = x.f as import("@/components/IncomeEntry").IncomeFrequency;
       if (x.it) item.incomeType = x.it as import("@/components/IncomeEntry").IncomeType;
+      if (x.cu) item.currency = x.cu as SupportedCurrency;
       return item;
     }),
-    expenses: compact.e.map((x, i) => ({ id: `e${i + 1}`, category: x.c, amount: x.a })),
+    expenses: compact.e.map((x, i) => {
+      const item: { id: string; category: string; amount: number; currency?: SupportedCurrency } = { id: `e${i + 1}`, category: x.c, amount: x.a };
+      if (x.cu) item.currency = x.cu as SupportedCurrency;
+      return item;
+    }),
     properties: (compact.p ?? []).map((x, i) => {
       const prop: { id: string; name: string; value: number; mortgage: number; interestRate?: number; monthlyPayment?: number; amortizationYears?: number; yearPurchased?: number; appreciation?: number; currency?: SupportedCurrency } = {
         id: `p${i + 1}`,

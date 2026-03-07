@@ -4,6 +4,9 @@ import { useState, useRef, useEffect } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
 import type { MonthlyInvestmentReturn } from "@/lib/financial-state";
+import CurrencyBadge from "@/components/CurrencyBadge";
+import type { SupportedCurrency, FxRates } from "@/lib/currency";
+import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 
 export type IncomeFrequency = "monthly" | "weekly" | "biweekly" | "quarterly" | "semi-annually" | "annually";
 
@@ -15,6 +18,7 @@ export interface IncomeItem {
   amount: number;
   frequency?: IncomeFrequency;
   incomeType?: IncomeType;
+  currency?: SupportedCurrency;
 }
 
 const FREQUENCY_LABELS: Record<IncomeFrequency, string> = {
@@ -112,9 +116,11 @@ interface IncomeEntryProps {
   items?: IncomeItem[];
   onChange?: (items: IncomeItem[]) => void;
   investmentReturns?: MonthlyInvestmentReturn[];
+  homeCurrency?: SupportedCurrency;
+  fxRates?: FxRates;
 }
 
-export default function IncomeEntry({ items: controlledItems, onChange, investmentReturns = [] }: IncomeEntryProps = {}) {
+export default function IncomeEntry({ items: controlledItems, onChange, investmentReturns = [], homeCurrency, fxRates }: IncomeEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
   const [items, setItems] = useState<IncomeItem[]>(controlledItems ?? MOCK_INCOME);
@@ -171,8 +177,10 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const hc = homeCurrency ?? "CAD";
+  const rates = fxRates ?? FALLBACK_RATES;
   const investmentReturnsTotal = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
-  const total = items.reduce((sum, item) => sum + normalizeToMonthly(item.amount, item.frequency), 0) + investmentReturnsTotal;
+  const total = items.reduce((sum, item) => sum + convertToHome(normalizeToMonthly(item.amount, item.frequency), item.currency ?? hc, hc, rates), 0) + investmentReturnsTotal;
 
   const triggerTotalAnimation = () => {
     if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
@@ -327,6 +335,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
         <div className="space-y-1" role="list" aria-label="Income items">
           {items.map((item) => (
             <DataFlowSourceItem key={item.id} id={`income:${item.id}`} label={item.category} value={item.amount}>
+            <div>
             <div
               role="listitem"
               className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 ${
@@ -471,6 +480,21 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                   />
                 </svg>
               </button>
+            </div>
+            {/* Secondary detail row: currency badge */}
+            {homeCurrency && fxRates && (
+              <div className="flex items-center gap-2 px-5 pb-1" data-testid={`income-details-${item.id}`}>
+                <CurrencyBadge
+                  currency={item.currency}
+                  homeCurrency={homeCurrency}
+                  amount={normalizeToMonthly(item.amount, item.frequency)}
+                  fxRates={fxRates}
+                  onCurrencyChange={(cu) => {
+                    setItems((prev) => prev.map((i) => i.id === item.id ? { ...i, currency: cu } : i));
+                  }}
+                />
+              </div>
+            )}
             </div>
             </DataFlowSourceItem>
           ))}

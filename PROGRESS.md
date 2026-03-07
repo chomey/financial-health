@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 124
-- **Completed**: 123
-- **Remaining**: 1
+- **Completed**: 124
+- **Remaining**: 0
 - **Last Updated**: 2026-03-07
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -60,15 +60,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 114: Print/PDF snapshot export
-- **Date**: 2026-03-06
-- **Files**: `src/app/page.tsx` (added `PrintSnapshotButton`, `PrintFooter` components; `print:hidden` on nav, header controls, entry panel, sample profiles banner, FastForward section; `data-testid` on entry/dashboard panels; `PrintFooter` in main), `src/app/globals.css` (`@media print` rules for page setup, chart heights, full-width dashboard, suppress animations), `src/lib/changelog.ts` (v114 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/print-snapshot.test.ts` (new — 9 tests), `tests/e2e/print-snapshot.spec.ts` (new — 11 tests), `tests/unit/setup.test.tsx` (updated to use `getAllByText` for duplicated title text)
-- **Tests**: T1: 1434 passed, 0 failed (88 files). T2: 11 passed (print-snapshot). Build: passes.
-- **Screenshots**:
-  ![Print button visible](screenshots/task-114-print-button-visible.png)
-  ![Print footer visible](screenshots/task-114-print-footer-visible.png)
-  ![Print dashboard visible](screenshots/task-114-print-dashboard-visible.png)
-  ![Print layout with data](screenshots/task-114-print-layout-with-data.png)
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 115: Mobile guided wizard entry mode
 - **Date**: 2026-03-06
@@ -168,6 +160,17 @@
   ![Chart with mortgage line](screenshots/task-123-chart-with-mortgage-line.png)
   ![Summary table mortgage](screenshots/task-123-summary-table-mortgage.png)
   ![Mortgage free milestone](screenshots/task-123-mortgage-free-milestone.png)
+
+## Task 124: Add foreign currency support to income and expense entries
+- **Date**: 2026-03-07
+- **Files**: `src/components/IncomeEntry.tsx` (add `currency?` to IncomeItem, CurrencyBadge import, homeCurrency/fxRates props, secondary detail row, FX-aware total), `src/components/ExpenseEntry.tsx` (same pattern), `src/lib/financial-state.ts` (FX-aware monthlyIncome/monthlyExpenses via toHome()), `src/lib/url-state.ts` (cu? field on CompactIncome/CompactExpense, toCompact/fromCompact updated), `src/app/page.tsx` (pass homeCurrency/fxRates to IncomeEntry and ExpenseEntry), `src/lib/changelog.ts` (v124 entry), `tests/unit/changelog.test.ts` (updated counts to 124), `tests/unit/income-expense-currency.test.tsx` (new — 16 tests), `tests/e2e/income-expense-currency.spec.ts` (new — 6 tests)
+- **Tests**: T1: 1577 passed, 0 failed (97 files). T2: 6 passed (income-expense-currency). Build: passes.
+- **Screenshots**:
+  ![Income currency badge](screenshots/task-124-income-currency-badge.png)
+  ![Income currency toggled to USD](screenshots/task-124-income-currency-toggled.png)
+  ![Income currency converted amount](screenshots/task-124-income-currency-converted.png)
+  ![Expense currency badge](screenshots/task-124-expense-currency-badge.png)
+  ![Expense currency toggled](screenshots/task-124-expense-currency-toggled.png)
 
 ## Task 121: Auto-display investment returns in Income section
 - **Date**: 2026-03-07
