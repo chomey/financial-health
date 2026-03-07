@@ -354,5 +354,29 @@ export function updateURL(state: FinancialState): void {
   window.history.replaceState(null, "", url.toString());
 }
 
+/** Read inflation toggle state from URL params (ia=1 and ir=<rate>). */
+export function getInflationFromURL(): { adjusted: boolean; rate: number } {
+  if (typeof window === "undefined") return { adjusted: false, rate: 2.5 };
+  const params = new URLSearchParams(window.location.search);
+  const adjusted = params.get("ia") === "1";
+  const parsed = parseFloat(params.get("ir") ?? "2.5");
+  const rate = isNaN(parsed) ? 2.5 : parsed;
+  return { adjusted, rate };
+}
+
+/** Persist inflation toggle state to URL params without affecting the main state param. */
+export function updateInflationURL(adjusted: boolean, rate: number): void {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (adjusted) {
+    url.searchParams.set("ia", "1");
+    url.searchParams.set("ir", String(rate));
+  } else {
+    url.searchParams.delete("ia");
+    url.searchParams.delete("ir");
+  }
+  window.history.replaceState(null, "", url.toString());
+}
+
 // Export for testing
 export { encode85, decode85, toCompact, fromCompact };

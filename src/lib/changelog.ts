@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Inflation-adjusted projection toggle
+  {
+    version: 110,
+    title: "Inflation-adjusted projection (real vs nominal)",
+    description: "Added an 'Adjust for inflation' toggle to the Financial Projection chart. When enabled, all future values — chart data, 50-year summary table, and milestones — are deflated to today's purchasing power using a configurable annual inflation rate (default 2.5%). An info tooltip explains what 'today's dollars' means. Toggle state and rate are stored in URL params (ia=1&ir=2.5) so shared links preserve the setting.",
+    date: "2026-03-06",
+  },
   // Milestone E2E: UI polish and formula validation
   {
     version: 109,
@@ -702,7 +709,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 109] as const },
+    { milestone: "UI Polish", range: [88, 120] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },
