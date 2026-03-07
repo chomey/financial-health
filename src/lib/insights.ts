@@ -1,4 +1,5 @@
 import { compareDebtStrategies, formatDuration } from "@/lib/debt-payoff";
+import { computeCoastFireAge } from "@/lib/financial-state";
 
 export interface DebtDetail {
   category: string;
@@ -48,6 +49,10 @@ export interface FinancialData {
   monthlyGrossIncome?: number;
   /** Monthly housing cost (mortgage payment or rent). Used for housing cost ratio. */
   monthlyHousingCost?: number;
+  /** User's current age. Used for Coast FIRE and age-based insights. */
+  currentAge?: number;
+  /** Total monthly investment contributions. Used for Coast FIRE projection. */
+  monthlySavings?: number;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** How many months shorter the runway is due to withdrawal taxes */
@@ -63,7 +68,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost" | "coast-fire";
 
 export interface Insight {
   id: string;
@@ -511,6 +516,30 @@ export function generateInsights(data: FinancialData): Insight[] {
       message,
       icon: "🏠",
     });
+  }
+
+  // Coast FIRE insight
+  if (data.currentAge && data.liquidAssets && data.rawMonthlyExpenses && data.rawMonthlyExpenses > 0) {
+    const annualExpenses = data.rawMonthlyExpenses * 12;
+    const coastAge = computeCoastFireAge(data.currentAge, data.liquidAssets, annualExpenses, 65, 0.05, data.monthlySavings ?? 0);
+    if (coastAge !== null) {
+      if (coastAge <= data.currentAge) {
+        insights.push({
+          id: "coast-fire-achieved",
+          type: "coast-fire",
+          message: `You've hit Coast FIRE! Even if you stopped saving today, your investments would grow to cover retirement by age 65. Coast FIRE means your existing portfolio, compounding at ~5% real return, will reach your FIRE number without additional contributions — a powerful milestone for peace of mind.`,
+          icon: "🏖️",
+        });
+      } else {
+        const yearsAway = coastAge - data.currentAge;
+        insights.push({
+          id: "coast-fire-progress",
+          type: "coast-fire",
+          message: `If you keep saving until age ${coastAge}, you could stop contributing and still retire at 65 — that's ${yearsAway} year${yearsAway !== 1 ? "s" : ""} away. Coast FIRE is the point where your current investments, growing at ~5% real return, will compound to cover your retirement expenses without any more contributions.`,
+          icon: "🏖️",
+        });
+      }
+    }
   }
 
   // FIRE (Financial Independence, Retire Early) insight

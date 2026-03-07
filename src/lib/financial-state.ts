@@ -1029,6 +1029,8 @@ export function toFinancialData(state: FinancialState): FinancialData {
     monthlyDebtPayments: monthlyDebtPayments > 0 ? monthlyDebtPayments : 0,
     monthlyGrossIncome: monthlyIncome > 0 ? monthlyIncome : undefined,
     monthlyHousingCost: monthlyHousingCost > 0 ? monthlyHousingCost : undefined,
+    currentAge: state.age,
+    monthlySavings: totalMonthlyContributions > 0 ? totalMonthlyContributions : undefined,
   };
 }
 
@@ -1036,6 +1038,45 @@ export function toFinancialData(state: FinancialState): FinancialData {
  * Compute withdrawal tax summary data for insights and dashboard.
  * Groups assets by tax treatment and computes tax drag on runway.
  */
+/**
+ * Compute the Coast FIRE age — the age at which your portfolio, growing at
+ * an assumed real return rate, will compound to cover retirement expenses by
+ * targetAge without any additional contributions from that point on.
+ *
+ * If monthlySavings > 0, projects continued contributions until the coast age.
+ * Returns the coast age (integer), or null if unreachable before targetAge.
+ */
+export function computeCoastFireAge(
+  currentAge: number,
+  currentInvested: number,
+  annualExpenses: number,
+  targetAge: number = 65,
+  realReturn: number = 0.05,
+  monthlySavings: number = 0,
+): number | null {
+  if (currentAge >= targetAge || annualExpenses <= 0 || currentInvested <= 0) return null;
+
+  // FIRE number: annual expenses / 4% SWR
+  const fireNumber = annualExpenses / 0.04;
+  const monthlyReturn = Math.pow(1 + realReturn, 1 / 12) - 1;
+
+  // Simulate year by year: grow portfolio with contributions, check if coasting
+  let portfolio = currentInvested;
+  for (let age = currentAge; age < targetAge; age++) {
+    // Check: from this age, does portfolio grow to fireNumber by targetAge with no more contributions?
+    const yearsLeft = targetAge - age;
+    const futureValue = portfolio * Math.pow(1 + realReturn, yearsLeft);
+    if (futureValue >= fireNumber) return age;
+
+    // Grow portfolio for one year with monthly contributions
+    for (let m = 0; m < 12; m++) {
+      portfolio = portfolio * (1 + monthlyReturn) + monthlySavings;
+    }
+  }
+
+  return null;
+}
+
 export function computeWithdrawalTaxSummary(
   state: FinancialState,
   totalAssets: number,

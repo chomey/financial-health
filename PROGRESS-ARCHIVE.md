@@ -2444,3 +2444,10 @@
 - **Tests**: T1: 1755 passed (12 new in `debt-to-income.test.ts`), T2: 6 passed (new `debt-to-income.spec.ts`)
 - **Screenshots**: ![DTI insight default](screenshots/task-135-dti-insight-default.png) ![DTI explainer modal](screenshots/task-135-dti-explainer-modal.png) ![DTI metric card](screenshots/task-135-dti-metric-card.png)
 - **Notes**: DTI = monthly debt payments (minimums + mortgage) / gross monthly income. Four tiers: Excellent <20%, Good 20-35%, Moderate 36-43%, High 44%+. Added `monthlyDebtPayments` and `monthlyGrossIncome` to FinancialData. InsightsPanel.tsx needed `"debt-to-income"` added to `INSIGHT_TYPE_SOURCES` exhaustive Record type.
+
+## Task 136: Add housing cost ratio insight with 30% rule explanation
+- **Date**: 2026-03-07
+- **Files**: `src/lib/insights.ts`, `src/lib/financial-state.ts`, `src/components/InsightsPanel.tsx`, `src/app/page.tsx`, `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`, `tests/unit/housing-cost.test.ts`, `tests/e2e/housing-cost.spec.ts`
+- **Tests**: T1: 1768 passed (13 new in `housing-cost.test.ts`), T2: 5 passed (new `housing-cost.spec.ts`)
+- **Screenshots**: ![Housing cost insight default](screenshots/task-136-housing-cost-insight-default.png) ![Housing cost explainer modal](screenshots/task-136-housing-cost-explainer-modal.png)
+- **Notes**: Housing cost = mortgage payments (from PropertyEntry) OR rent expense (category containing "rent"). Four tiers: <25% well within budget, 25-30% sweet spot, 31-40% above 30% rule, 41%+ cost-burdened. Fixed pre-existing changelog test failure (task 135 added version 135 but test expected 134).
