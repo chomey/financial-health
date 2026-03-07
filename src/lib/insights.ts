@@ -40,6 +40,8 @@ export interface FinancialData {
   country?: "CA" | "US";
   /** Annual employment income for RRSP/401k contribution suggestions */
   annualEmploymentIncome?: number;
+  /** Income replacement ratio: % of monthly income sustainable by portfolio via 4% rule */
+  incomeReplacementRatio?: number;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** How many months shorter the runway is due to withdrawal taxes */
@@ -55,7 +57,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement";
 
 export interface Insight {
   id: string;
@@ -434,6 +436,31 @@ export function generateInsights(data: FinancialData): Insight[] {
         icon: "💡",
       });
     }
+  }
+
+  // Income replacement ratio insight
+  if (data.incomeReplacementRatio !== undefined && data.monthlyIncome > 0) {
+    const pct = data.incomeReplacementRatio;
+    let message: string;
+    if (pct >= 100) {
+      message = `Your investments could sustain ${Math.round(pct)}% of your income using the 4% rule — you've reached financial independence!`;
+    } else if (pct >= 75) {
+      message = `Your portfolio covers ${Math.round(pct)}% of your income using the 4% rule — you're nearly financially independent!`;
+    } else if (pct >= 50) {
+      message = `Your investments replace ${Math.round(pct)}% of your income using the 4% rule — you're in a strong financial position.`;
+    } else if (pct >= 25) {
+      message = `Your portfolio replaces ${Math.round(pct)}% of your income using the 4% rule — you're building real momentum toward financial independence.`;
+    } else if (pct > 0) {
+      message = `Your investments currently replace ${Math.round(pct)}% of your income using the 4% rule — every contribution brings you closer to financial independence.`;
+    } else {
+      message = `Start investing to build your income replacement ratio — the goal is for your portfolio to sustainably cover your living expenses.`;
+    }
+    insights.push({
+      id: "income-replacement",
+      type: "income-replacement",
+      message,
+      icon: "🎯",
+    });
   }
 
   // FIRE (Financial Independence, Retire Early) insight

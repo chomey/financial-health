@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 120
-- **Completed**: 116
-- **Remaining**: 4
+- **Completed**: 117
+- **Remaining**: 3
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -50,23 +50,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 109: [MILESTONE] E2E test for UI polish and formula validation
-- **Date**: 2026-03-06
-- **Files**: `tests/e2e/milestone-e2e-109.spec.ts` (new — 11 tests), `tests/unit/milestone-12-e2e-infra.test.ts` (new — 12 tests), `src/lib/changelog.ts` (added v109 entry, updated milestone range), `tests/unit/changelog.test.ts` (updated counts)
-- **Tests**: T1: 1345 passed, 0 failed (82 files). T2: 11 passed (milestone-e2e-109). T3: 345 passed, 0 failed (full suite).
-- **Screenshots**:
-  ![Tax bracket bars](screenshots/task-109-tax-bracket-bars.png)
-  ![Explainer full currency](screenshots/task-109-explainer-full-currency.png)
-  ![Tax explainer full currency](screenshots/task-109-tax-explainer-full-currency.png)
-  ![Donut chart](screenshots/task-109-donut-chart.png)
-  ![Sankey investment income](screenshots/task-109-sankey-investment-income.png)
-  ![Fast forward options](screenshots/task-109-fast-forward-options.png)
-  ![Fast forward early retirement](screenshots/task-109-fast-forward-early-retirement.png)
-  ![Net worth match](screenshots/task-109-net-worth-match.png)
-  ![Tax breakdown rates](screenshots/task-109-tax-breakdown-rates.png)
-  ![Runway breakdown](screenshots/task-109-runway-breakdown.png)
-  ![Full dashboard](screenshots/task-109-full-dashboard.png)
-- **Notes**: TASKS.md was renumbered during this iteration — original task 108 (E2E milestone) became task 109, and a new task 108 (currency formatting) was inserted ahead of it. Implemented the E2E milestone test as task 109. Changelog has version gap at 108 (pending task).
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 110: Inflation-adjusted projection toggle
 - **Date**: 2026-03-06
@@ -160,6 +144,16 @@
 - **Tests**: T1: 1501 passed, 0 failed (92 files). Build: passes.
 - **Screenshots**: N/A ([@backend] task — T2 not required)
 - **Notes**: Three insights: (1) taxable→TFSA/Roth IRA savings when taxable×5%×marginalRate > $100/yr; (2) RRSP/401k deduction suggestion when marginalRate ≥ 25% and employment income present; (3) tax-free room nudge when taxable > tax-free and suggestion 1 threshold not met.
+
+## Task 119: Income replacement ratio metric
+- **Date**: 2026-03-06
+- **Files**: `src/lib/insights.ts` (added `incomeReplacementRatio` to FinancialData, `"income-replacement"` InsightType, tier-based insight generation), `src/lib/financial-state.ts` (Income Replacement metric in `computeMetrics`, `incomeReplacementRatio` in `toFinancialData`), `src/components/SnapshotDashboard.tsx` (added `"percent"` format type, `formatMetricValue` case, progress bar rendering, tier label, METRIC_TO_INSIGHT_TYPES entry), `src/components/InsightsPanel.tsx` (added `"income-replacement"` source mapping), `src/lib/changelog.ts` (v119 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/financial-state.test.ts` (updated 5→6 metric count), `tests/unit/income-replacement.test.ts` (new — 14 tests), `tests/e2e/income-replacement.spec.ts` (new — 6 tests)
+- **Tests**: T1: 1515 passed, 0 failed (93 files). T2: 6 passed (income-replacement). Build: passes.
+- **Screenshots**:
+  ![Income replacement card](screenshots/task-119-income-replacement-card.png)
+  ![Income replacement progress bar](screenshots/task-119-income-replacement-progress.png)
+  ![Income replacement insight](screenshots/task-119-income-replacement-insight.png)
+  ![Income replacement high](screenshots/task-119-income-replacement-high.png)
 
 ## Task 108: Consistent currency formatting and composition tables on charts
 - **Date**: 2026-03-06

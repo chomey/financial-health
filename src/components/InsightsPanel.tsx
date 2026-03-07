@@ -28,6 +28,7 @@ const INSIGHT_TYPE_SOURCES: Record<InsightType, string[]> = {
   "debt-strategy": ["section-debts"],
   "fire": ["section-expenses", "section-assets"],
   "tax-optimization": ["section-assets", "section-income"],
+  "income-replacement": ["section-assets", "section-income"],
 };
 
 function InsightCard({

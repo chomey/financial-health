@@ -855,6 +855,23 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       breakdown: ratioBreakdown,
       ratioWithoutMortgage: totalPropertyMortgage > 0 ? parseFloat(debtToAssetWithoutMortgage.toFixed(2)) : undefined,
     },
+    ...(monthlyAfterTaxIncome > 0 ? [{
+      title: "Income Replacement",
+      value: parseFloat(((totalAssets + totalStocks) * 0.04 / 12 / monthlyAfterTaxIncome * 100).toFixed(1)),
+      format: "percent" as const,
+      icon: "🎯",
+      tooltip:
+        "What percentage of your monthly income your investment portfolio could sustainably replace using the 4% rule. 100% means financial independence.",
+      positive: ((totalAssets + totalStocks) * 0.04 / 12 / monthlyAfterTaxIncome) >= 1,
+      breakdown: (() => {
+        const pct = (totalAssets + totalStocks) * 0.04 / 12 / monthlyAfterTaxIncome * 100;
+        if (pct >= 100) return "Financially independent";
+        if (pct >= 75) return "Nearly independent";
+        if (pct >= 50) return "Strong position";
+        if (pct >= 25) return "Building momentum";
+        return "Early stage";
+      })(),
+    }] : []),
   ];
 }
 
@@ -878,6 +895,12 @@ export function toFinancialData(state: FinancialState): FinancialData {
 
   // FIRE number: annual living expenses / 4% SWR — use raw monthly expenses (excludes contributions/mortgage)
   const fireNumber = monthlyExpenses > 0 ? (monthlyExpenses * 12) / 0.04 : undefined;
+
+  // Income replacement ratio: % of monthly after-tax income sustainable by portfolio via 4% rule
+  const liquidInvestedAssets = totalAssets + totalStocks;
+  const incomeReplacementRatio = monthlyAfterTaxIncome > 0
+    ? parseFloat((liquidInvestedAssets * 0.04 / 12 / monthlyAfterTaxIncome * 100).toFixed(1))
+    : undefined;
 
   // Marginal rate for tax optimization suggestions — use employment income
   const marginalRate = annualEmploymentSalary > 0
@@ -909,6 +932,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     marginalRate,
     country,
     annualEmploymentIncome: annualEmploymentSalary > 0 ? annualEmploymentSalary : undefined,
+    incomeReplacementRatio,
   };
 }
 

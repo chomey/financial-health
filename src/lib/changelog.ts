@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Income replacement ratio metric
+  {
+    version: 119,
+    title: "Income replacement ratio",
+    description: "Added an Income Replacement metric card showing what percentage of your monthly income your investment portfolio could sustainably replace using the 4% withdrawal rule. The formula is (total invested assets × 4% / 12) ÷ monthly after-tax income. A progress bar visualizes your journey from Early stage (< 25%) through Building momentum (25–50%), Strong position (50–75%), Nearly independent (75–100%), to Financially independent (100%+). An insight card in the insights panel provides an encouraging, tier-specific message about your progress toward financial independence.",
+    date: "2026-03-06",
+  },
   // Tax optimization suggestions
   {
     version: 118,

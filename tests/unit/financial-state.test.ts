@@ -123,10 +123,11 @@ describe("financial-state", () => {
   });
 
   describe("computeMetrics", () => {
-    it("returns five metrics including Estimated Tax", () => {
+    it("returns six metrics including Estimated Tax and Income Replacement", () => {
       const metrics = computeMetrics(INITIAL_STATE);
-      expect(metrics).toHaveLength(5);
+      expect(metrics).toHaveLength(6);
       expect(metrics.map(m => m.title)).toContain("Estimated Tax");
+      expect(metrics.map(m => m.title)).toContain("Income Replacement");
     });
 
     it("computes net worth as liquid assets + property equity minus debts", () => {
