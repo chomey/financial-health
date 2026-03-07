@@ -7,7 +7,7 @@ import type { Property } from "@/components/PropertyEntry";
 import { getEffectivePayment } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
-import { getDefaultRoi, getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
+import { getDefaultRoi, getDefaultRoiTaxTreatment, computeEmployerMatchMonthly } from "@/components/AssetEntry";
 import { getHomeCurrency, getEffectiveFxRates, convertToHome, formatCurrencyCompact } from "@/lib/currency";
 import type { SupportedCurrency, FxRates } from "@/lib/currency";
 import { getTaxTreatment, getWithdrawalTaxRate, type TaxTreatment } from "@/lib/withdrawal-tax";
@@ -861,6 +861,19 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 export function toFinancialData(state: FinancialState): FinancialData {
   const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, homeCurrency } = computeTotals(state);
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
+
+  // Compute annual employer match across all eligible assets
+  const annualEmploymentSalary = state.income.reduce((sum, item) => {
+    if ((item.incomeType ?? "employment") !== "employment") return sum;
+    return sum + normalizeToMonthly(item.amount, item.frequency) * 12;
+  }, 0);
+  const employerMatchAnnual = state.assets
+    .filter((a) => !a.computed)
+    .reduce((sum, a) => {
+      if (!a.employerMatchPct || !a.employerMatchCap || !a.monthlyContribution) return sum;
+      return sum + computeEmployerMatchMonthly(a.monthlyContribution, a.employerMatchPct, a.employerMatchCap, annualEmploymentSalary) * 12;
+    }, 0);
+
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
   return {
     totalAssets: totalAssets + totalStocks + totalPropertyValue,
@@ -881,6 +894,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     hasCapitalGains,
     homeCurrency,
     withdrawalTax: computeWithdrawalTaxSummary(state, totalAssets, totalStocks),
+    employerMatchAnnual: employerMatchAnnual > 0 ? employerMatchAnnual : undefined,
   };
 }
 
