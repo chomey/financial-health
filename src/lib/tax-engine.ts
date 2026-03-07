@@ -221,3 +221,16 @@ function computeUSCapitalGainsTax(
     marginalRate,
   };
 }
+
+/**
+ * Get the marginal tax rate for a given annual employment income, country, and jurisdiction.
+ * Convenience wrapper around computeTax that returns only the marginal rate.
+ */
+export function getMarginalRateForIncome(
+  annualIncome: number,
+  country: "CA" | "US",
+  jurisdiction: string
+): number {
+  if (annualIncome <= 0) return 0;
+  return computeTax(annualIncome, "employment", country, jurisdiction).marginalRate;
+}

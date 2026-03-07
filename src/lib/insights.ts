@@ -34,6 +34,12 @@ export interface FinancialData {
   fireNumber?: number;
   /** Years until net worth reaches FIRE number (null = already reached, undefined = not enough data) */
   yearsToFire?: number | null;
+  /** Marginal tax rate (0-1) for tax optimization suggestions */
+  marginalRate?: number;
+  /** Country code for country-specific account name suggestions */
+  country?: "CA" | "US";
+  /** Annual employment income for RRSP/401k contribution suggestions */
+  annualEmploymentIncome?: number;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** How many months shorter the runway is due to withdrawal taxes */
@@ -49,7 +55,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization";
 
 export interface Insight {
   id: string;
@@ -376,6 +382,57 @@ export function generateInsights(data: FinancialData): Insight[] {
           icon: "🗓️",
         });
       }
+    }
+  }
+
+  // Tax optimization insights — show when there's a meaningful tax saving opportunity (> $100/year)
+  if (data.marginalRate && data.marginalRate > 0 && data.withdrawalTax) {
+    const wt = data.withdrawalTax;
+    const taxableTotal = wt.accountsByTreatment.taxable.total;
+    const taxFreeTotal = wt.accountsByTreatment.taxFree.total;
+    const taxDeferredTotal = wt.accountsByTreatment.taxDeferred.total;
+    const marginalRate = data.marginalRate;
+    const country = data.country ?? "CA";
+    const taxFreeAccountName = country === "CA" ? "TFSA" : "Roth IRA";
+    const taxDeferredAccountName = country === "CA" ? "RRSP" : "401(k)";
+
+    // Suggestion 1: Taxable brokerage → tax-free account
+    // Annual tax cost on growth = taxable balance × assumed 5% growth × marginalRate
+    if (taxableTotal > 0) {
+      const annualTaxCost = taxableTotal * 0.05 * marginalRate;
+      if (annualTaxCost >= 100) {
+        const marginalPct = Math.round(marginalRate * 100);
+        insights.push({
+          id: "tax-opt-taxable-to-free",
+          type: "tax-optimization",
+          message: `You have ${formatCurrency(taxableTotal)} in taxable accounts with gains taxed at your ${marginalPct}% marginal rate. Shifting contributions to your ${taxFreeAccountName} would shelter ~${formatCurrency(Math.round(annualTaxCost))}/year in gains from tax.`,
+          icon: "💡",
+        });
+      }
+    }
+
+    // Suggestion 2: RRSP/401(k) contribution deduction
+    // Reference: each $10,000 contributed saves marginalRate × $10,000 in tax
+    if (data.annualEmploymentIncome && data.annualEmploymentIncome > 0 && marginalRate >= 0.25) {
+      const referenceContribution = 10_000;
+      const taxSavings = referenceContribution * marginalRate;
+      insights.push({
+        id: "tax-opt-deferred-contribution",
+        type: "tax-optimization",
+        message: `Based on your income of ${formatCurrency(data.annualEmploymentIncome)}/year, each $10,000 contributed to your ${taxDeferredAccountName} reduces your tax bill by ~${formatCurrency(Math.round(taxSavings))}. Check your available contribution room.`,
+        icon: "💡",
+      });
+    }
+
+    // Suggestion 3: Tax-free room — redirect savings from taxable to tax-free
+    // Show when taxable savings exceed tax-free savings and there's meaningful taxable exposure
+    if (taxableTotal > taxFreeTotal && taxableTotal > 1000 && taxDeferredTotal === 0 && !insights.find((i) => i.id === "tax-opt-taxable-to-free")) {
+      insights.push({
+        id: "tax-opt-use-tax-free-room",
+        type: "tax-optimization",
+        message: `Your ${taxFreeAccountName} has room — contributing there instead of a taxable savings account shelters future growth from tax at no extra cost.`,
+        icon: "💡",
+      });
     }
   }
 

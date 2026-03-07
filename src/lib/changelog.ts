@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Tax optimization suggestions
+  {
+    version: 118,
+    title: "Tax optimization suggestions",
+    description: "Added smart tax optimization insights that analyze your account mix and suggest actionable improvements. Three suggestions appear when relevant: (1) If you hold taxable brokerage assets, the insight shows how much you'd save annually by shifting contributions to a TFSA or Roth IRA instead. (2) For higher-income earners, it shows the approximate tax savings from maximizing RRSP or 401(k) contributions using your marginal rate. (3) When taxable savings exceed tax-free savings, it nudges you to redirect contributions into your TFSA or Roth IRA. All suggestions only appear when the annual savings exceed $100 — no noise for minor optimizations.",
+    date: "2026-03-06",
+  },
   // FIRE number milestone
   {
     version: 117,
