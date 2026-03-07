@@ -5,9 +5,10 @@ import Home from "@/app/page";
 describe("App shell layout", () => {
   it("renders the app title", () => {
     render(<Home />);
+    // Use getAllByText since PrintFooter also contains this text (hidden in print mode)
     expect(
-      screen.getByText("Financial Health Snapshot")
-    ).toBeInTheDocument();
+      screen.getAllByText("Financial Health Snapshot").length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("renders the tagline", () => {

@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Print/PDF export
+  {
+    version: 114,
+    title: "Print/PDF snapshot export",
+    description: "Added a 'Print' button in the header that triggers the browser's print dialog, enabling one-click Save as PDF. In print mode, CSS @media print rules hide all entry panels, navigation, and interactive elements, leaving a clean layout of metric cards, the projection chart, and the insights panel. A print-only footer shows the snapshot URL and generation date, so the exported PDF is self-contained and shareable. Charts render at fixed heights to avoid collapsing in print.",
+    date: "2026-03-06",
+  },
   // Preset sample profiles for new users
   {
     version: 113,

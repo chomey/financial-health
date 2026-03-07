@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 120
-- **Completed**: 112
-- **Remaining**: 8
+- **Completed**: 113
+- **Remaining**: 7
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -40,14 +40,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 103: Fix currency formatting in explainer modals
-- **Date**: 2026-03-06
-- **Files**: `src/components/DataFlowArrows.tsx` (added `formatCurrency` import, `homeCurrency` to context/provider/ExplainerModal/SourceSummaryCard/TaxExplainerContent/RunwayExplainerContent/InvestmentReturnsSummary, `currency` field on SourceMetadataItem, replaced hardcoded "$" formatting with Intl.NumberFormat), `src/app/page.tsx` (pass `homeCurrency` to DataFlowProvider, `currency` to asset/debt/property items, updated `fmtLabel` to use `formatCurrencyCompact`), `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`, `tests/unit/explainer-currency-formatting.test.tsx` (new), `tests/e2e/explainer-currency-formatting.spec.ts` (new)
-- **Tests**: T1: 1256 passed, 0 failed (77 files). T2: 4 passed, 0 failed.
-- **Screenshots**:
-  ![Explainer full currency](screenshots/task-103-explainer-full-currency.png)
-  ![Explainer CAD currency](screenshots/task-103-explainer-cad-currency.png)
-  ![Tax explainer full currency](screenshots/task-103-tax-explainer-full-currency.png)
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 104: Replace Net Worth waterfall chart with donut/pie chart
 - **Date**: 2026-03-06
@@ -153,6 +146,16 @@
   ![Mid-career loaded](screenshots/task-113-mid-career-loaded.png)
   ![Pre-retirement loaded](screenshots/task-113-pre-retirement-loaded.png)
   ![Clear all](screenshots/task-113-clear-all.png)
+
+## Task 114: Print/PDF snapshot export
+- **Date**: 2026-03-06
+- **Files**: `src/app/page.tsx` (added `PrintSnapshotButton`, `PrintFooter` components; `print:hidden` on nav, header controls, entry panel, sample profiles banner, FastForward section; `data-testid` on entry/dashboard panels; `PrintFooter` in main), `src/app/globals.css` (`@media print` rules for page setup, chart heights, full-width dashboard, suppress animations), `src/lib/changelog.ts` (v114 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/print-snapshot.test.ts` (new — 9 tests), `tests/e2e/print-snapshot.spec.ts` (new — 11 tests), `tests/unit/setup.test.tsx` (updated to use `getAllByText` for duplicated title text)
+- **Tests**: T1: 1434 passed, 0 failed (88 files). T2: 11 passed (print-snapshot). Build: passes.
+- **Screenshots**:
+  ![Print button visible](screenshots/task-114-print-button-visible.png)
+  ![Print footer visible](screenshots/task-114-print-footer-visible.png)
+  ![Print dashboard visible](screenshots/task-114-print-dashboard-visible.png)
+  ![Print layout with data](screenshots/task-114-print-layout-with-data.png)
 
 ## Task 108: Consistent currency formatting and composition tables on charts
 - **Date**: 2026-03-06

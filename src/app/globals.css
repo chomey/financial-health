@@ -260,6 +260,57 @@ body {
   animation: result-in 200ms ease-out 1000ms both;
 }
 
+/* ============================================================
+   Print / PDF export styles
+   @media print hides interactive chrome and shows print-only
+   footer with snapshot URL and generation date.
+   ============================================================ */
+@media print {
+  /* Page setup */
+  @page {
+    margin: 1.5cm;
+    size: A4 portrait;
+  }
+
+  /* White background */
+  body {
+    background: white !important;
+  }
+
+  /* Fix recharts responsive containers — they collapse to 0 height
+     in print because the parent has no explicit height. Give them
+     a sensible fixed height so charts render in the PDF. */
+  .recharts-responsive-container {
+    height: 260px !important;
+    min-height: 260px !important;
+  }
+
+  /* Prevent page breaks inside metric cards and chart wrappers */
+  [data-testid="snapshot-dashboard"],
+  [data-testid="print-footer"] {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Full-width dashboard column in print (entry panel is hidden) */
+  [data-testid="dashboard-panel"] {
+    grid-column: span 12 !important;
+    width: 100% !important;
+  }
+
+  /* Remove sticky positioning on the dashboard sticky wrapper */
+  [data-testid="dashboard-panel"] > div {
+    position: static !important;
+  }
+
+  /* Remove hover shadows and animations in print */
+  * {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+  }
+}
+
 /* Thin scrollbar for source summary cards */
 .scrollbar-thin {
   scrollbar-width: thin;
