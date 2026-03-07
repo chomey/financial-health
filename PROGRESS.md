@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 108
-- **Completed**: 103
-- **Remaining**: 5
+- **Completed**: 104
+- **Remaining**: 4
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -20,28 +20,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 94: Smart tax treatment classification with keyword matching and user override
-- **Status**: Complete
-- **Date**: 2026-03-06
-- **Changes**:
-  - `src/lib/withdrawal-tax.ts`: Replaced exact-match `TAX_TREATMENT_MAP` with keyword-based `classifyTaxTreatment()`. Tax-free keywords (tfsa, roth, hsa, fhsa, tax-free, tax free) checked first so "Roth 401k" → tax-free. Tax-deferred keywords (rrsp, 401k, ira, lira, resp, 529, pension, retirement). Unknown defaults to taxable. Added optional `override` parameter to `getTaxTreatment()`.
-  - `src/components/AssetEntry.tsx`: Added `taxTreatment` optional field to `Asset` interface. Added colored pill UI (green=tax-free, rose=tax-deferred, amber=taxable) on each asset row — auto-detected by keyword match, clickable to cycle through treatments. Override shown with "*" indicator. Updated `shouldShowRoiTaxToggle()` to accept optional override. Updated all inline `getTaxTreatment()` calls to pass override.
-  - `src/lib/financial-state.ts`: Updated all `getTaxTreatment(asset.category)` calls to pass `asset.taxTreatment` override in computeMetrics, computeWithdrawalTaxSummary.
-  - `src/lib/projections.ts`: Updated `getTaxTreatment()` call to pass `asset.taxTreatment` override.
-  - `src/lib/url-state.ts`: Added `tt` field to `CompactAsset` for persisting taxTreatment override. Updated `toCompact`/`fromCompact` to serialize/deserialize.
-  - `src/lib/changelog.ts`: Added entry for task 94.
-  - `tests/unit/withdrawal-tax.test.ts`: Updated FHSA from tax-deferred to tax-free (correct per keyword matching — FHSA withdrawals for qualifying purchases are tax-free).
-- **Test tiers run**: T1, T2
-- **Tests**:
-  - `tests/unit/tax-treatment-keywords.test.ts`: 52 tests — keyword matching (tax-free, tax-deferred, taxable, roth priority, case insensitivity), override parameter, URL state roundtrip. All 52 passed, 0 failed.
-  - `tests/e2e/tax-treatment-pills.spec.ts`: 4 tests — auto-detected pills on default assets, click-to-cycle with override indicator, keyword-matched custom accounts, URL persistence. All 4 passed, 0 failed.
-  - All T1 unit tests: 1154 passed, 0 failed
-  - All E2E tests: 270 passed, 0 failed
-- **Screenshots**:
-  ![Tax treatment pills default](screenshots/task-94-tax-treatment-pills-default.png)
-  ![Tax treatment pill cycled](screenshots/task-94-tax-treatment-pill-cycled.png)
-  ![Keyword matched custom account](screenshots/task-94-keyword-matched-custom-account.png)
-- **Notes**: FHSA was reclassified from tax-deferred to tax-free. The keyword-based approach correctly identifies it via the "fhsa" keyword in the tax-free list, matching its treatment in `TAX_SHELTERED_CATEGORIES`. Custom account names like "BP 401k", "Company RRSP", "Fidelity Roth" are now correctly classified without exact name matches.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 95: Fix withdrawal order pills overflowing container
 - **Status**: Complete
@@ -258,3 +237,13 @@
   ![Explainer full currency](screenshots/task-103-explainer-full-currency.png)
   ![Explainer CAD currency](screenshots/task-103-explainer-cad-currency.png)
   ![Tax explainer full currency](screenshots/task-103-tax-explainer-full-currency.png)
+
+## Task 104: Replace Net Worth waterfall chart with donut/pie chart
+- **Date**: 2026-03-06
+- **Files**: `src/components/NetWorthDonutChart.tsx` (new), `src/app/page.tsx` (swap component), `src/lib/changelog.ts`, `tests/unit/donut-chart.test.ts` (new), `tests/e2e/donut-chart.spec.ts` (new), `tests/e2e/waterfall-chart.spec.ts` (updated testids), `tests/unit/milestone-5-e2e-infra.test.ts` (updated testid), `tests/unit/changelog.test.ts`
+- **Tests**: T1: 1266 passed, 0 failed (78 files). T2: 9 passed, 0 failed.
+- **Screenshots**:
+  ![Donut chart default](screenshots/task-104-donut-chart-default.png)
+  ![Donut center label](screenshots/task-104-donut-center-label.png)
+  ![Donut legend](screenshots/task-104-donut-legend.png)
+- **Notes**: Old `NetWorthWaterfallChart.tsx` still exists (not deleted) — old unit tests still pass against it. Pre-existing milestone-5 E2E failures (ZoomableCard strict mode violations on allocation-chart, benchmark, sankey testids) fixed in separate commit.

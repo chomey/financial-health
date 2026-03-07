@@ -12,7 +12,7 @@ import ProjectionChart from "@/components/ProjectionChart";
 import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
 import AssetAllocationChart from "@/components/AssetAllocationChart";
 import ExpenseBreakdownChart from "@/components/ExpenseBreakdownChart";
-import NetWorthWaterfallChart from "@/components/NetWorthWaterfallChart";
+import NetWorthDonutChart from "@/components/NetWorthDonutChart";
 import FastForwardPanel from "@/components/FastForwardPanel";
 import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import CashFlowSankey from "@/components/CashFlowSankey";
@@ -661,7 +661,7 @@ export default function Home() {
                 properties={properties}
                 stocks={stocks}
               /></ZoomableCard>
-              <ZoomableCard><NetWorthWaterfallChart
+              <ZoomableCard><NetWorthDonutChart
                 assets={assets}
                 debts={debts}
                 properties={properties}

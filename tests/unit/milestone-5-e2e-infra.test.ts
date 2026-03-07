@@ -31,8 +31,8 @@ describe("Milestone 5 E2E test infrastructure", () => {
     expect(content).toContain("allocation-chart");
     // Task 49: Expense breakdown
     expect(content).toContain("expense-breakdown-chart");
-    // Task 50: Waterfall chart
-    expect(content).toContain("waterfall-chart");
+    // Task 50: Net worth chart (donut, replaced waterfall in task 104)
+    expect(content).toContain("donut-chart");
     // Task 51: Fast forward panel
     expect(content).toContain("fast-forward-panel");
     // Task 52: Benchmark comparisons

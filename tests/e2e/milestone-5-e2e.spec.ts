@@ -60,20 +60,20 @@ test.describe("T3: Milestone 5 — Comprehensive E2E for Kubera-inspired visuali
     await captureScreenshot(page, "task-55-expense-breakdown");
 
     // ========================================
-    // Step 3: Net Worth Waterfall Chart (Task 50)
+    // Step 3: Net Worth Donut Chart (Task 50, replaced by donut in Task 104)
     // ========================================
-    const waterfallChart = page.getByTestId("waterfall-chart");
-    await expect(waterfallChart).toBeVisible();
+    const donutChart = page.getByTestId("donut-chart");
+    await expect(donutChart).toBeVisible();
 
-    // Waterfall should have SVG chart rendered
-    const waterfallSvg = waterfallChart.locator("svg.recharts-surface");
-    await expect(waterfallSvg.first()).toBeVisible();
+    // Donut should have SVG chart rendered
+    const donutSvg = donutChart.locator("svg.recharts-surface");
+    await expect(donutSvg.first()).toBeVisible();
 
-    // Legend should show Assets, Debts, Net Worth labels
-    const waterfallText = await waterfallChart.textContent();
-    expect(waterfallText).toContain("Assets");
-    expect(waterfallText).toContain("Debts");
-    expect(waterfallText).toContain("Net Worth");
+    // Center label should show Net Worth
+    const centerLabel = donutChart.locator('[data-testid="donut-center-label"]');
+    await expect(centerLabel).toBeVisible();
+    const centerText = await centerLabel.textContent();
+    expect(centerText).toContain("Net Worth");
 
     await captureScreenshot(page, "task-55-waterfall-chart");
 
