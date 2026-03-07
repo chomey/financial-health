@@ -13,6 +13,13 @@ export const CHANGELOG: ChangelogEntry[] = [
     description: "Comprehensive end-to-end test covering tax bracket tiered fill bars, full-format currency in explainer modals, net worth donut chart segments, Cash Flow Sankey investment income nodes, Fast Forward scenario options, and metric card consistency with explainer breakdowns.",
     date: "2026-03-06",
   },
+  // Consistent currency formatting and composition tables on charts
+  {
+    version: 108,
+    title: "Full currency in charts and composition tables",
+    description: "Fixed currency formatting inconsistencies across all charts. Net worth donut chart center label now shows full formatted currency (e.g., CA$1,234,567) instead of compact notation. Removed duplicate recharts legend from Asset Allocation chart — the composition table below is the single source of truth. Projection chart milestone tables now show full currency values for precise reading.",
+    date: "2026-03-06",
+  },
   // Formula validation and projection bug fix
   {
     version: 107,

@@ -129,6 +129,7 @@ function BurndownTooltip({ active, payload, label }: CustomTooltipProps) {
 export default function ProjectionChart({ state, runwayDetails }: ProjectionChartProps) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.compact(v);
+  const formatTableCurrency = (v: number) => fmt.full(v);
   const [scenario, setScenario] = useState<Scenario>("moderate");
   const [legendOpen, setLegendOpen] = useState(false);
   const [mode, setMode] = useState<ChartMode>("keep-earning");
@@ -330,19 +331,19 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
             <tbody className="divide-y divide-stone-100">
               <tr>
                 <td className="py-1.5 pr-4 font-medium text-stone-700">Net Worth</td>
-                <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.netWorth)}</td>
+                <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.netWorth)}</td>
                 {summaryPoints.milestones.map((p, i) => (
                   <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-green-600 font-medium`}>
-                    {formatCurrency(p.netWorth)}
+                    {formatTableCurrency(p.netWorth)}
                   </td>
                 ))}
               </tr>
               <tr>
                 <td className="py-1.5 pr-4 font-medium text-stone-700">Total Assets</td>
-                <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.totalAssets)}</td>
+                <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.totalAssets)}</td>
                 {summaryPoints.milestones.map((p, i) => (
                   <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-indigo-600`}>
-                    {formatCurrency(p.totalAssets)}
+                    {formatTableCurrency(p.totalAssets)}
                   </td>
                 ))}
               </tr>
@@ -350,19 +351,19 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
                 <>
                   <tr>
                     <td className="py-1.5 pr-4 font-medium text-stone-700">Consumer Debt</td>
-                    <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.consumerDebts)}</td>
+                    <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.consumerDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
                       <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
-                        {formatCurrency(p.consumerDebts)}
+                        {formatTableCurrency(p.consumerDebts)}
                       </td>
                     ))}
                   </tr>
                   <tr>
                     <td className="py-1.5 pr-4 font-medium text-stone-700">Mortgage</td>
-                    <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.mortgageDebts)}</td>
+                    <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.mortgageDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
                       <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
-                        {formatCurrency(p.mortgageDebts)}
+                        {formatTableCurrency(p.mortgageDebts)}
                       </td>
                     ))}
                   </tr>
@@ -370,10 +371,10 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
               ) : (
                 <tr>
                   <td className="py-1.5 pr-4 font-medium text-stone-700">Total Debts</td>
-                  <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(summaryPoints.current.totalDebts)}</td>
+                  <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(summaryPoints.current.totalDebts)}</td>
                   {summaryPoints.milestones.map((p, i) => (
                     <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-500`}>
-                      {formatCurrency(p.totalDebts)}
+                      {formatTableCurrency(p.totalDebts)}
                     </td>
                   ))}
                 </tr>
@@ -614,10 +615,10 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
                 {assetProjections.map((ap) => (
                   <tr key={ap.category}>
                     <td className="py-1.5 pr-4 font-medium text-stone-700 truncate max-w-[120px]">{ap.category}</td>
-                    <td className="py-1.5 px-2 text-right text-stone-600">{formatCurrency(ap.currentValue)}</td>
+                    <td className="py-1.5 px-2 text-right text-stone-600">{formatTableCurrency(ap.currentValue)}</td>
                     {ap.milestoneValues.map((val, i) => (
                       <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-green-600`}>
-                        {formatCurrency(val)}
+                        {formatTableCurrency(val)}
                       </td>
                     ))}
                   </tr>
