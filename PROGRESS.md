@@ -9,9 +9,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 109
-- **Completed**: 109
-- **Remaining**: 0
+- **Total Tasks**: 120
+- **Completed**: 110
+- **Remaining**: 10
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -32,28 +32,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 99: Unified chart — always 50 years, X-axis in years, add 40/50yr columns
-- **Status**: Complete
-- **Date**: 2026-03-06
-- **Changes**:
-  - `src/components/ProjectionChart.tsx`: Removed `TIMELINE_OPTIONS` constant, `years` state, and timeline selector buttons. Set `years = 50` as a constant. Changed `TABLE_MILESTONES` from `[10, 20, 30]` to `[10, 20, 30, 40, 50]`. Converted burndown mode X-axis from months to years (dataKey changed from `month` to `year`, removed "Months" axis label, added `tickFormatter` with "y" suffix). Added `fmtYears()` helper for year-based zero-crossing reference line labels. Updated burndown data to pad to 50 years (600 months) so both modes share 0–50 year X-axis range. Lines stay at $0 after savings run out. Updated `BurndownTooltip` to show year-based labels.
-  - `src/lib/projections.ts`: Changed `projectAssets` default `milestoneYears` from `[10, 20, 30]` to `[10, 20, 30, 40, 50]`.
-  - `src/lib/changelog.ts`: Added v99 changelog entry.
-  - `tests/e2e/projection-chart.spec.ts`: Removed timeline slider test, updated scenario button tests to close ZoomableCard overlay between clicks, used `.first()` for legend selectors.
-  - `tests/e2e/milestone-2-e2e.spec.ts`: Removed timeline slider interaction steps, added Escape key presses between scenario button clicks.
-  - `tests/unit/changelog.test.ts`: Updated counts to 99 entries, 12 entries in UI Polish milestone group.
-- **Test tiers run**: T1, T2
-- **Tests**:
-  - `tests/unit/unified-50yr-chart.test.tsx`: 6 tests — no timeline buttons rendered, summary table shows 40yr/50yr columns, asset projections table shows 40yr/50yr, burndown chart visible, projectAssets defaults to 5 milestones, projectFinances generates 601 points. 6 passed, 0 failed.
-  - `tests/e2e/unified-50yr-chart.spec.ts`: 4 tests — no timeline buttons, summary table 40yr/50yr columns, burndown year-based axis, asset projections 40yr/50yr columns. 4 passed, 0 failed.
-  - All T1 unit tests: 1210 passed, 0 failed (74 test files)
-  - All related T2 E2E tests: 12 passed, 0 failed
-- **Screenshots**:
-  ![50-year chart](screenshots/task-99-50yr-chart.png)
-  ![Summary table with 40yr/50yr](screenshots/task-99-summary-table-50yr.png)
-  ![Burndown with year-based axis](screenshots/task-99-burndown-years-axis.png)
-  ![Asset projections with 40yr/50yr](screenshots/task-99-asset-projections-50yr.png)
-- **Notes**: The timeline selector was removed entirely — the chart always projects 50 years in both modes. Both "Keep Earning" and "Income Stops" share the same 0–50 year X-axis range so switching modes doesn't jump the axis. The `simulateRunwayTimeSeries` cap was already at 600 months (50 years) so no change needed there. Pre-existing E2E test failures (timeline-slider testid, ZoomableCard overlay blocking scenario button clicks) were fixed in a separate commit.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 100: Include investment return taxes in Estimated Tax with correct CA/US rules
 - **Status**: Complete
@@ -178,6 +157,18 @@
   ![Runway breakdown](screenshots/task-109-runway-breakdown.png)
   ![Full dashboard](screenshots/task-109-full-dashboard.png)
 - **Notes**: TASKS.md was renumbered during this iteration — original task 108 (E2E milestone) became task 109, and a new task 108 (currency formatting) was inserted ahead of it. Implemented the E2E milestone test as task 109. Changelog has version gap at 108 (pending task).
+
+## Task 110: Inflation-adjusted projection toggle
+- **Date**: 2026-03-06
+- **Files**: `src/lib/projections.ts` (added `deflateProjectionPoints`), `src/lib/url-state.ts` (added `getInflationFromURL`, `updateInflationURL`), `src/components/ProjectionChart.tsx` (added inflation toggle UI, `displayPoints` memo with deflation, stopped click propagation so ZoomableCard doesn't open), `src/lib/changelog.ts` (v110 entry, expanded UI Polish range to 88-120), `tests/unit/inflation-deflation.test.ts` (new — 13 tests), `tests/e2e/inflation-toggle.spec.ts` (new — 6 tests), `tests/unit/changelog.test.ts` (updated counts)
+- **Tests**: T1: 1370 passed, 0 failed (84 files). T2: 6 passed (inflation-toggle). T3: 357 passed, 0 failed (full suite). Build: passes.
+- **Screenshots**:
+  ![Inflation toggle off](screenshots/task-110-inflation-toggle-off.png)
+  ![Inflation toggle on](screenshots/task-110-inflation-toggle-on.png)
+  ![Inflation values lower](screenshots/task-110-inflation-values-lower.png)
+  ![Inflation rate changed](screenshots/task-110-inflation-rate-changed.png)
+  ![Now column unchanged](screenshots/task-110-inflation-now-unchanged.png)
+- **Notes**: Inflation toggle uses `onClick={(e) => e.stopPropagation()}` on the controls container to prevent ZoomableCard from opening when interacting with the toggle. URL params `ia=1` and `ir=<rate>` persist the toggle state separately from the main `s=` state param. T3 was triggered (task 110 is the 110th completed task, divisible by 5) — all 357 E2E tests pass.
 
 ## Task 108: Consistent currency formatting and composition tables on charts
 - **Date**: 2026-03-06

@@ -18,8 +18,10 @@ import {
   projectFinances,
   downsamplePoints,
   projectAssets,
+  deflateProjectionPoints,
 } from "@/lib/projections";
 import type { Scenario, Milestone } from "@/lib/projections";
+import { getInflationFromURL, updateInflationURL } from "@/lib/url-state";
 import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
 import { buildSummary } from "@/components/RunwayBurndownChart";
 
@@ -135,6 +137,32 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
   const [mode, setMode] = useState<ChartMode>("keep-earning");
   const currencyCode = getHomeCurrency(state.country ?? "CA");
 
+  // Inflation adjustment state — read from URL on mount
+  const [inflationAdjusted, setInflationAdjusted] = useState(false);
+  const [inflationRate, setInflationRate] = useState(2.5);
+  const [inflationRateInput, setInflationRateInput] = useState("2.5");
+  // Read URL params once on mount
+  useState(() => {
+    const { adjusted, rate } = getInflationFromURL();
+    setInflationAdjusted(adjusted);
+    setInflationRate(rate);
+    setInflationRateInput(String(rate));
+  });
+
+  function handleInflationToggle(enabled: boolean) {
+    setInflationAdjusted(enabled);
+    updateInflationURL(enabled, inflationRate);
+  }
+
+  function handleInflationRateChange(val: string) {
+    setInflationRateInput(val);
+    const parsed = parseFloat(val);
+    if (!isNaN(parsed) && parsed >= 0 && parsed <= 20) {
+      setInflationRate(parsed);
+      updateInflationURL(inflationAdjusted, parsed);
+    }
+  }
+
   const years = 50;
 
   const projection = useMemo(
@@ -142,9 +170,14 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
     [state, scenario]
   );
 
+  const displayPoints = useMemo(() => {
+    if (!inflationAdjusted) return projection.points;
+    return deflateProjectionPoints(projection.points, inflationRate / 100);
+  }, [projection, inflationAdjusted, inflationRate]);
+
   const chartData = useMemo(() => {
     // Sample at whole-year intervals so tooltip snaps to integer years
-    return projection.points
+    return displayPoints
       .filter((p) => p.month % 12 === 0)
       .map((p) => ({
         year: Math.round(p.month / 12),
@@ -153,7 +186,7 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
         debts: -p.totalDebts, // show as negative for visual clarity
         withdrawalTaxDrag: p.withdrawalTaxDrag ?? 0,
       }));
-  }, [projection]);
+  }, [displayPoints]);
 
   const xTicks = useMemo(() => computeXTicks(years), [years]);
 
@@ -178,9 +211,9 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
 
   const milestoneYears = TABLE_MILESTONES;
 
-  // Summary table: milestone year points from 50-year projection
+  // Summary table: milestone year points from 50-year projection (deflated if inflation enabled)
   const summaryPoints = useMemo(() => {
-    const allPoints = projection.points;
+    const allPoints = displayPoints;
     const getAtYear = (y: number) => {
       const month = y * 12;
       const p = allPoints.find((pt) => pt.month === month);
@@ -190,7 +223,7 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
       current: allPoints[0],
       milestones: milestoneYears.map((y) => getAtYear(y)),
     };
-  }, [projection, milestoneYears]);
+  }, [displayPoints, milestoneYears]);
 
   // Per-asset projections always at 10/20/30 years (includes surplus allocation)
   const assetProjections = useMemo(() => {
@@ -304,6 +337,48 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
           </button>
         </div>
       )}
+
+      {/* Inflation adjustment toggle — stopPropagation prevents ZoomableCard from opening */}
+      <div className="mb-3 flex flex-wrap items-center gap-3" data-testid="inflation-controls" onClick={(e) => e.stopPropagation()}>
+        <label className="flex cursor-pointer items-center gap-2 text-xs text-stone-600">
+          <input
+            type="checkbox"
+            checked={inflationAdjusted}
+            onChange={(e) => handleInflationToggle(e.target.checked)}
+            className="h-3.5 w-3.5 cursor-pointer accent-emerald-600"
+            data-testid="inflation-toggle"
+            aria-label="Adjust for inflation"
+          />
+          Adjust for inflation
+        </label>
+        {inflationAdjusted && (
+          <div className="flex items-center gap-1.5 text-xs text-stone-600">
+            <input
+              type="number"
+              min="0"
+              max="20"
+              step="0.1"
+              value={inflationRateInput}
+              onChange={(e) => handleInflationRateChange(e.target.value)}
+              className="w-14 rounded border border-stone-200 bg-white px-1.5 py-0.5 text-right text-xs transition-colors focus:border-emerald-400 focus:outline-none"
+              data-testid="inflation-rate-input"
+              aria-label="Annual inflation rate"
+            />
+            <span>% / yr</span>
+            <span
+              className="ml-1 cursor-help text-stone-400"
+              title={`Values shown in today's dollars, deflated by ${inflationRate}% per year`}
+              data-testid="inflation-tooltip"
+              aria-label={`In today's dollars, adjusted for ${inflationRate}% annual inflation`}
+            >
+              ⓘ
+            </span>
+            <span className="text-xs text-stone-400">
+              (today&apos;s dollars)
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* Surplus subtitle for Keep Earning mode */}
       {mode === "keep-earning" && surplusInfo.income > 0 && (

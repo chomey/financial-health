@@ -290,6 +290,35 @@ export function projectAssets(
   });
 }
 
+/**
+ * Deflate projection points from nominal to real (today's dollars).
+ * Each point at year Y is divided by (1 + inflationRate)^Y.
+ * @param points - Array of ProjectionPoint (nominal values)
+ * @param inflationRate - Annual inflation rate as a decimal (e.g., 0.025 for 2.5%)
+ */
+export function deflateProjectionPoints(
+  points: ProjectionPoint[],
+  inflationRate: number
+): ProjectionPoint[] {
+  return points.map((p) => {
+    const years = p.month / 12;
+    const deflator = Math.pow(1 + inflationRate, years);
+    return {
+      ...p,
+      netWorth: Math.round(p.netWorth / deflator),
+      totalAssets: Math.round(p.totalAssets / deflator),
+      totalDebts: Math.round(p.totalDebts / deflator),
+      consumerDebts: Math.round(p.consumerDebts / deflator),
+      mortgageDebts: Math.round(p.mortgageDebts / deflator),
+      totalPropertyEquity: Math.round(p.totalPropertyEquity / deflator),
+      withdrawalTaxDrag:
+        p.withdrawalTaxDrag !== undefined
+          ? Math.round(p.withdrawalTaxDrag / deflator)
+          : undefined,
+    };
+  });
+}
+
 /** Downsample projection points for chart rendering — keep start, end, and evenly-spaced points */
 export function downsamplePoints(points: ProjectionPoint[], maxPoints: number = 120): ProjectionPoint[] {
   if (points.length <= maxPoints) return points;
