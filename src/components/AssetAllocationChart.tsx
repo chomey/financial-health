@@ -7,7 +7,6 @@ import {
   Cell,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 import type { Asset } from "@/components/AssetEntry";
 import type { Property } from "@/components/PropertyEntry";
@@ -208,7 +207,7 @@ export default function AssetAllocationChart({
         </div>
       </div>
 
-      <div className="h-52 sm:h-64">
+      <div className="h-44 sm:h-52">
         <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
           <PieChart>
             <Pie
@@ -234,13 +233,6 @@ export default function AssetAllocationChart({
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
-            <Legend
-              verticalAlign="bottom"
-              height={36}
-              formatter={(value: string) => (
-                <span className="text-xs text-stone-600">{value}</span>
-              )}
-            />
           </PieChart>
         </ResponsiveContainer>
       </div>

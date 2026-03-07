@@ -286,11 +286,11 @@ export default function NetWorthDonutChart({
             Net Worth
           </span>
           <span
-            className={`text-lg font-bold ${
+            className={`text-sm font-bold ${
               netWorth >= 0 ? "text-blue-600" : "text-red-600"
             }`}
           >
-            {formatCurrency(netWorth)}
+            {formatFullCurrency(netWorth)}
           </span>
         </div>
       </div>
