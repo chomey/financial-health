@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Visual theme E2E regression
+  {
+    version: 134,
+    title: "Visual theme E2E regression — WCAG AA contrast verification",
+    description: "Full Playwright regression test verifying the cyberpunk theme renders correctly across all major views: dashboard metric cards, entry panels with inputs, explainer modal, projection chart, and mobile responsive layout. Includes WCAG AA contrast ratio verification ensuring all text/background color pairs meet 4.5:1 for normal text and 3:1 for large text. All 485 E2E tests pass.",
+    date: "2026-03-07",
+  },
   // Income Replacement explainer modal
   {
     version: 133,
@@ -870,7 +877,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 133] as const },
+    { milestone: "UI Polish", range: [88, 134] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },
