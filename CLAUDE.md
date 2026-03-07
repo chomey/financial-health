@@ -82,10 +82,9 @@ Each task is tagged with a specialized implementation agent (e.g., `[@frontend]`
 | `[@reviewer]` | `agents/CODE-REVIEWER.md` | Post-implementation review and audit |
 
 ### Task Format
+TASKS.md holds the full backlog of upcoming tasks. Ralph treats it as a **mutex**: pick up the first unchecked task, complete it, then stop. Only one task is in-progress at a time. Ralph stops when there are no unchecked tasks.
 ```
 - [ ] Task N: Short title — Description [@agent-tag]
-- [ ] Task N: [ARCH] Short title — Description [@devops]
-- [ ] Task N: [OPUS] Complex title — Description [@fullstack]
 ```
 
 ### Model Tags
@@ -116,12 +115,12 @@ Tasks are run with Sonnet by default for speed. Add these tags to force Opus for
 When operating in Ralph Loop mode (invoked via `ralph.zsh`), follow these rules:
 
 1. **Read TASKS.md** to find the next unchecked task (`- [ ]`)
-2. **Skim the last ~5 entries in PROGRESS.md** for recent context (older tasks archived in PROGRESS-ARCHIVE.md)
+2. **Read PROGRESS.md** for context on the current/last task (PROGRESS.md is a mutex — only one task entry at a time; completed entries are archived to PROGRESS-ARCHIVE.md)
 3. **Complete exactly ONE task** per iteration
 4. **Write tests (tiered by domain)** — Every task MUST include automated tests at the tiers required by its agent tag. **T1 (Unit + API)** is always required. **T2 (Browser integration)** is required for `[@frontend]`, `[@fullstack]`, and `[@qa]` tasks. **T3 (Full E2E)** runs on `[@qa]` tasks, tasks tagged `[E2E]` or `[MILESTONE]`, and automatically every 5 completed tasks. Do not mark a task complete without passing all required-tier tests.
 5. **Run tests/build & capture screenshots in one pass** — Run T1 tests (`npm test`) and `npm run build`. For T2 Playwright, run ONLY your new test file: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=<N> npx playwright test tests/e2e/<your-test>.spec.ts`. For T3 (full suite): `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=<N> npx playwright test`. The `CAPTURE_TASK` env var ensures only the current task's screenshots are written — other tasks' screenshots are protected. Do NOT run Playwright twice. **If tests you did NOT write are now failing**, `git stash` your changes, fix the pre-existing failure, commit the fix with `ralph: fix pre-existing test failure during task [N]`, then `git stash pop` and continue.
 6. **Mark the task as done** in TASKS.md (`- [x]`)
-7. **Log your work** in PROGRESS.md with a brief entry: task number, status, date, files changed, test results. Keep it concise — a few lines, not paragraphs. Embed screenshots using `![description](screenshots/filename.png)`.
+7. **Log your work** in PROGRESS.md — first archive any existing entry to PROGRESS-ARCHIVE.md, then write a single entry for the current task: task number, status, date, files changed, test results. Keep it concise — a few lines, not paragraphs. Embed screenshots using `![description](screenshots/filename.png)`. PROGRESS.md should only ever contain ONE task entry (the current/most recent).
 8. **Update the changelog** — After completing a task, add an entry to `src/lib/changelog.ts` with the task number as the version, title, short description, and today's date. This keeps the `/changelog` page up to date automatically.
 9. **Commit your changes** with a descriptive message referencing the task
 11. Do NOT skip ahead or do multiple tasks at once
