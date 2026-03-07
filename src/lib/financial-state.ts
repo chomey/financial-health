@@ -655,16 +655,14 @@ export function computeTotals(state: FinancialState) {
   return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase };
 }
 
-function fmtShort(n: number, currency?: SupportedCurrency): string {
-  if (currency) return formatCurrencyCompact(n, currency);
-  const abs = Math.abs(n);
-  if (abs >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(n / 1_000).toFixed(0)}k`;
-  return `$${n.toFixed(0)}`;
+function fmtShort(n: number, currency: SupportedCurrency): string {
+  return formatCurrencyCompact(n, currency);
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
   const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase } = computeTotals(state);
+  const hc = getHomeCurrency(state.country ?? "CA");
+  const $ = (n: number) => fmtShort(n, hc);
 
   // Net worth: show without property equity as primary, with equity as secondary
   const netWorthWithoutEquity = totalAssets + totalStocks - totalDebts;
@@ -769,33 +767,33 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 
   // Build breakdown strings
   const nwParts: string[] = [];
-  if (totalAssets > 0) nwParts.push(`${fmtShort(totalAssets)} savings`);
-  if (totalStocks > 0) nwParts.push(`${fmtShort(totalStocks)} stocks`);
-  if (totalPropertyEquity > 0) nwParts.push(`${fmtShort(totalPropertyEquity)} equity`);
-  if (totalDebts > 0) nwParts.push(`- ${fmtShort(totalDebts)} debts`);
+  if (totalAssets > 0) nwParts.push(`${$(totalAssets)} savings`);
+  if (totalStocks > 0) nwParts.push(`${$(totalStocks)} stocks`);
+  if (totalPropertyEquity > 0) nwParts.push(`${$(totalPropertyEquity)} equity`);
+  if (totalDebts > 0) nwParts.push(`- ${$(totalDebts)} debts`);
   const netWorthBreakdown = nwParts.length > 0 ? nwParts.join(" + ").replace("+ -", "- ") : undefined;
 
   const surplusTargetName = state.assets.find((a) => a.surplusTarget)?.category ?? state.assets[0]?.category;
 
-  const surplusParts = [`${fmtShort(monthlyAfterTaxIncome)} after-tax income`];
-  if (totalMonthlyInvestmentReturns > 0) surplusParts.push(`${fmtShort(totalMonthlyInvestmentReturns)} investment returns`);
-  if (monthlyExpenses > 0) surplusParts.push(`${fmtShort(monthlyExpenses)} expenses`);
-  if (totalMonthlyContributions > 0) surplusParts.push(`${fmtShort(totalMonthlyContributions)} contributions`);
-  if (totalMortgagePayments > 0) surplusParts.push(`${fmtShort(totalMortgagePayments)} mortgage`);
+  const surplusParts = [`${$(monthlyAfterTaxIncome)} after-tax income`];
+  if (totalMonthlyInvestmentReturns > 0) surplusParts.push(`${$(totalMonthlyInvestmentReturns)} investment returns`);
+  if (monthlyExpenses > 0) surplusParts.push(`${$(monthlyExpenses)} expenses`);
+  if (totalMonthlyContributions > 0) surplusParts.push(`${$(totalMonthlyContributions)} contributions`);
+  if (totalMortgagePayments > 0) surplusParts.push(`${$(totalMortgagePayments)} mortgage`);
   const surplusBreakdown = surplus > 0 && surplusTargetName
-    ? `${surplusParts.join(" - ")} → ${fmtShort(surplus)}/mo to ${surplusTargetName}`
+    ? `${surplusParts.join(" - ")} → ${$(surplus)}/mo to ${surplusTargetName}`
     : surplusParts.join(" - ");
 
   const runwayBreakdown = monthlyObligations > 0
-    ? `${fmtShort(liquidTotal)} liquid / ${fmtShort(monthlyObligations)}/mo obligations${totalMortgagePayments > 0 ? ` (${fmtShort(monthlyExpenses)} expenses + ${fmtShort(totalMortgagePayments)} mortgage)` : ""}`
+    ? `${$(liquidTotal)} liquid / ${$(monthlyObligations)}/mo obligations${totalMortgagePayments > 0 ? ` (${$(monthlyExpenses)} expenses + ${$(totalMortgagePayments)} mortgage)` : ""}`
     : undefined;
 
   const ratioBreakdown = totalAllAssets > 0
-    ? `${fmtShort(totalAllDebts)} debts / ${fmtShort(totalAllAssets)} assets`
+    ? `${$(totalAllDebts)} debts / ${$(totalAllAssets)} assets`
     : undefined;
 
   const taxBreakdown = totalTaxEstimate > 0
-    ? `${fmtShort(monthlyIncome)} gross${totalInvestmentInterest > 0 ? ` + ${fmtShort(totalInvestmentInterest / 12)} inv. interest` : ""} - ${fmtShort(monthlyIncome - monthlyAfterTaxIncome)} tax = ${fmtShort(monthlyAfterTaxIncome)}/mo`
+    ? `${$(monthlyIncome)} gross${totalInvestmentInterest > 0 ? ` + ${$(totalInvestmentInterest / 12)} inv. interest` : ""} - ${$(monthlyIncome - monthlyAfterTaxIncome)} tax = ${$(monthlyAfterTaxIncome)}/mo`
     : undefined;
 
   return [

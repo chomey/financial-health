@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { render } from "../test-utils";
 import userEvent from "@testing-library/user-event";
 import PropertyEntry from "@/components/PropertyEntry";
 import type { Property } from "@/components/PropertyEntry";

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 export interface Property {
   id: string;
@@ -163,14 +164,7 @@ function generateId(): string {
   return `p${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+// formatCurrency defined inside component via useCurrency()
 
 function parseCurrencyInput(value: string): number {
   const cleaned = value.replace(/[^0-9.-]/g, "");
@@ -186,6 +180,8 @@ interface PropertyEntryProps {
 }
 
 export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }: PropertyEntryProps = {}) {
+  const fmt = useCurrency();
+  const formatCurrency = (v: number) => fmt.full(v);
   const [properties, setProperties] = useState<Property[]>(items ?? MOCK_PROPERTIES);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);

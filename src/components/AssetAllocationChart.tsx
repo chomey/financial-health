@@ -13,6 +13,7 @@ import type { Asset } from "@/components/AssetEntry";
 import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 // High-contrast color palette — each color is visually distinct
 const COLORS = [
@@ -122,25 +123,19 @@ export function computeAllocationByLiquidity(
   return slices;
 }
 
-function formatCurrency(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(value / 1_000).toFixed(1)}k`;
-  return `$${value.toFixed(0)}`;
-}
-
 interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{ name: string; value: number; payload: AllocationSlice }>;
 }
 
 function CustomTooltip({ active, payload }: CustomTooltipProps) {
+  const fmt = useCurrency();
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
   return (
     <div className="rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-md">
       <p className="text-sm font-medium text-stone-800">{item.name}</p>
-      <p className="text-sm text-stone-600">{formatCurrency(item.value)}</p>
+      <p className="text-sm text-stone-600">{fmt.full(item.value)}</p>
       <p className="text-xs text-stone-400">{item.percentage.toFixed(1)}%</p>
     </div>
   );
@@ -157,6 +152,7 @@ export default function AssetAllocationChart({
   properties,
   stocks,
 }: AssetAllocationChartProps) {
+  const fmt = useCurrency();
   const [view, setView] = useState<AllocationView>("category");
 
   const data = useMemo(() => {
@@ -265,7 +261,7 @@ export default function AssetAllocationChart({
             </div>
             <div className="flex items-center gap-2">
               <span className="text-stone-800 font-medium">
-                {formatCurrency(slice.value)}
+                {fmt.full(slice.value)}
               </span>
               <span className="text-stone-400 w-10 text-right">
                 {slice.percentage.toFixed(1)}%

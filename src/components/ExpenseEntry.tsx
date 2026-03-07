@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 export interface ExpenseItem {
   id: string;
@@ -35,15 +36,6 @@ function generateId(): string {
   return `e${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 function parseCurrencyInput(value: string): number {
   const cleaned = value.replace(/[^0-9.-]/g, "");
   const parsed = parseFloat(cleaned);
@@ -70,6 +62,8 @@ interface ExpenseEntryProps {
 }
 
 export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0, surplus = 0, surplusTargetName, federalTax = 0, provincialStateTax = 0, computedFederalTax, computedProvincialStateTax, federalTaxOverride, provincialTaxOverride, onFederalTaxOverride, onProvincialTaxOverride, country = "CA", isUnderwater = false }: ExpenseEntryProps = {}) {
+  const fmt = useCurrency();
+  const formatCurrency = (v: number) => fmt.full(v);
   const [items, setItems] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);

@@ -12,23 +12,12 @@ import {
   getMonthlyLimit,
 } from "@/lib/scenario";
 import type { Scenario } from "@/lib/projections";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 interface FastForwardPanelProps {
   state: FinancialState;
   scenario?: Scenario;
   years?: number;
-}
-
-function formatCurrency(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(value / 1_000).toFixed(0)}k`;
-  return `$${value.toFixed(0)}`;
-}
-
-function formatDelta(value: number): string {
-  const prefix = value > 0 ? "+" : "";
-  return prefix + formatCurrency(value);
 }
 
 function formatMonthsDelta(months: number): string {
@@ -64,6 +53,9 @@ export default function FastForwardPanel({
   scenario = "moderate",
   years = 10,
 }: FastForwardPanelProps) {
+  const fmt = useCurrency();
+  const formatCurrency = (v: number) => fmt.compact(v);
+  const formatDelta = (v: number) => (v > 0 ? "+" : "") + fmt.compact(v);
   const [mod, setMod] = useState<ScenarioModification>({ ...EMPTY_MODIFICATION });
   const [isOpen, setIsOpen] = useState(false);
   const [activePreset, setActivePreset] = useState<ScenarioPreset | null>(null);

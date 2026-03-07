@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 export interface StockHolding {
   id: string;
@@ -77,24 +78,6 @@ function generateId(): string {
   return `s${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(price);
-}
-
 function parseCurrencyInput(value: string): number {
   const cleaned = value.replace(/[^0-9.-]/g, "");
   const parsed = parseFloat(cleaned);
@@ -123,6 +106,9 @@ async function fetchStockPrice(ticker: string): Promise<{ price: number; timesta
 const MOCK_STOCKS: StockHolding[] = [];
 
 export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
+  const fmt = useCurrency();
+  const formatCurrency = (v: number) => fmt.full(v);
+  const formatPrice = (v: number) => fmt.full(v, { decimals: 2 });
   const [stocks, setStocks] = useState<StockHolding[]>(items ?? MOCK_STOCKS);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);

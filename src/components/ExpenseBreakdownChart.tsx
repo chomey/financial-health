@@ -12,6 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 // Warm, distinguishable colors for expense categories
 const COLORS = [
@@ -95,27 +96,13 @@ export function computeExpenseBreakdown(
   return slices;
 }
 
-function formatCurrency(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(value / 1_000).toFixed(1)}k`;
-  return `$${value.toFixed(0)}`;
-}
-
-function formatCurrencyFull(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
 interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{ value: number; payload: ExpenseSlice & { fill: string } }>;
 }
 
 function CustomTooltip({ active, payload }: CustomTooltipProps) {
+  const fmt = useCurrency();
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
   return (
@@ -128,7 +115,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
           </span>
         )}
       </div>
-      <p className="text-sm text-stone-600">{formatCurrencyFull(item.value)}/mo</p>
+      <p className="text-sm text-stone-600">{fmt.full(item.value)}/mo</p>
       <p className="text-xs text-stone-400">{item.percentage.toFixed(1)}% of total</p>
     </div>
   );
@@ -153,6 +140,7 @@ export default function ExpenseBreakdownChart({
   monthlyAfterTaxIncome = 0,
   monthlyGrossIncome,
 }: ExpenseBreakdownChartProps) {
+  const fmt = useCurrency();
   // If taxes are shown as an expense slice, compare against gross income
   // to avoid double-counting (taxes subtracted from income AND shown as expense)
   const hasTaxSlice = federalTax + provincialStateTax > 0;
@@ -213,8 +201,8 @@ export default function ExpenseBreakdownChart({
       {incomeForComparison > 0 && (
         <div className="mb-4" data-testid="income-vs-expenses">
           <div className="mb-1 flex items-center justify-between text-xs text-stone-500">
-            <span>Expenses: {formatCurrency(totalExpenses)}/mo</span>
-            <span>{hasTaxSlice ? "Gross Income" : "Income"}: {formatCurrency(incomeForComparison)}/mo</span>
+            <span>Expenses: {fmt.compact(totalExpenses)}/mo</span>
+            <span>{hasTaxSlice ? "Gross Income" : "Income"}: {fmt.compact(incomeForComparison)}/mo</span>
           </div>
           <div className="relative h-4 w-full overflow-hidden rounded-full bg-stone-100">
             {/* Expense fill */}
@@ -239,11 +227,11 @@ export default function ExpenseBreakdownChart({
           </div>
           {incomeForComparison > totalExpenses ? (
             <p className="mt-1 text-xs text-emerald-600">
-              {formatCurrency(incomeForComparison - totalExpenses)}/mo surplus
+              {fmt.compact(incomeForComparison - totalExpenses)}/mo surplus
             </p>
           ) : incomeForComparison < totalExpenses ? (
             <p className="mt-1 text-xs text-rose-600">
-              {formatCurrency(totalExpenses - incomeForComparison)}/mo over budget
+              {fmt.compact(totalExpenses - incomeForComparison)}/mo over budget
             </p>
           ) : null}
         </div>
@@ -254,12 +242,12 @@ export default function ExpenseBreakdownChart({
         <div className="mb-4 rounded-lg bg-stone-50 px-3 py-2.5 space-y-1.5" data-testid="spending-power">
           <div className="flex items-center justify-between">
             <span className="text-xs text-stone-500">Spending Power</span>
-            <span className="text-xs font-medium text-stone-800">{formatCurrency(spendingPower)}/mo</span>
+            <span className="text-xs font-medium text-stone-800">{fmt.compact(spendingPower)}/mo</span>
           </div>
           {manualExpenses > 0 && manualExpenses < spendingPower && (
             <div className="flex items-center justify-between">
               <span className="text-xs text-stone-400">Discretionary remaining</span>
-              <span className="text-xs font-medium text-emerald-600">{formatCurrency(spendingPower - manualExpenses)}/mo</span>
+              <span className="text-xs font-medium text-emerald-600">{fmt.compact(spendingPower - manualExpenses)}/mo</span>
             </div>
           )}
           <div className="flex items-center justify-between border-t border-stone-200 pt-1.5">
@@ -269,7 +257,7 @@ export default function ExpenseBreakdownChart({
               </svg>
               After inflation ({(INFLATION_RATE * 100).toFixed(0)}%/yr)
             </span>
-            <span className="text-xs text-amber-600">{formatCurrency(spendingPower * (1 - INFLATION_RATE))}/mo in 1yr</span>
+            <span className="text-xs text-amber-600">{fmt.compact(spendingPower * (1 - INFLATION_RATE))}/mo in 1yr</span>
           </div>
         </div>
       )}
@@ -349,7 +337,7 @@ export default function ExpenseBreakdownChart({
             </div>
             <div className="flex items-center gap-2">
               <span className="text-stone-800 font-medium">
-                {formatCurrency(slice.value)}
+                {fmt.compact(slice.value)}
               </span>
               <span className="text-stone-400 w-10 text-right">
                 {slice.percentage.toFixed(1)}%

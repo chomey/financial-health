@@ -91,11 +91,10 @@ export interface BenchmarkComparison {
   aboveBenchmark: boolean;
 }
 
-function fmtCurrency(n: number): string {
-  const abs = Math.abs(n);
-  if (abs >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(n / 1_000).toFixed(0)}k`;
-  return `$${n.toFixed(0)}`;
+import { CurrencyFormatter, getHomeCurrency } from "@/lib/currency";
+
+function fmtCurrency(n: number, country: "CA" | "US" = "US"): string {
+  return new CurrencyFormatter(getHomeCurrency(country)).compact(n);
 }
 
 function fmtPercent(n: number): string {
@@ -121,7 +120,7 @@ export function computeBenchmarkComparisons(
   const nwAbove = netWorth >= benchmark.medianNetWorth;
   const nwMessage = nwAbove
     ? `Your net worth is above the median for your age group (${benchmark.label}) — great progress!`
-    : `The median net worth for the ${benchmark.label} age group is ${fmtCurrency(benchmark.medianNetWorth)} — you're building toward it`;
+    : `The median net worth for the ${benchmark.label} age group is ${fmtCurrency(benchmark.medianNetWorth, country)} — you're building toward it`;
   comparisons.push({
     metric: "Net Worth",
     userValue: netWorth,
@@ -137,7 +136,7 @@ export function computeBenchmarkComparisons(
     const incAbove = annualIncome >= benchmark.medianIncome;
     const incMessage = incAbove
       ? `Your income is above the median for your age group (${benchmark.label}) — nice work!`
-      : `The median income for the ${benchmark.label} age group is ${fmtCurrency(benchmark.medianIncome)} — you're on your way`;
+      : `The median income for the ${benchmark.label} age group is ${fmtCurrency(benchmark.medianIncome, country)} — you're on your way`;
     comparisons.push({
       metric: "Income",
       userValue: annualIncome,
