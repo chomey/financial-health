@@ -599,11 +599,11 @@ export default function Home() {
   const realAssets = assets.filter((a) => !a.computed);
   const surplusTargetName = realAssets.find((a) => a.surplusTarget)?.category ?? realAssets[0]?.category;
 
-  // Summaries for collapsed sections
-  const assetTotal = assets.filter((a) => !a.computed).reduce((sum, a) => sum + a.amount, 0);
-  const debtTotal = debts.reduce((sum, d) => sum + d.amount, 0);
-  const incomeTotal = income.reduce((sum, i) => sum + i.amount, 0);
-  const expenseTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
+  // Summaries for collapsed sections — use converted totals from computeTotals
+  const assetTotal = totals.totalAssets;
+  const debtTotal = totals.totalDebts;
+  const incomeTotal = totals.monthlyIncome;
+  const expenseTotal = totals.monthlyExpenses;
   const propertyCount = properties.length;
   const stockCount = stocks.length;
 
