@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Milestone E2E: Financial Intelligence
+  {
+    version: 120,
+    title: "Milestone E2E: Financial Intelligence",
+    description: "Comprehensive end-to-end test suite covering all financial intelligence features from tasks 110-119: inflation-adjusted projections, age-based benchmarks, employer match modeling, sample profiles, print layout, mobile wizard, debt payoff strategies, FIRE milestone, tax optimization suggestions, and income replacement ratio. Full regression test across the entire application.",
+    date: "2026-03-06",
+  },
   // Income replacement ratio metric
   {
     version: 119,
