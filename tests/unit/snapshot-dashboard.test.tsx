@@ -58,16 +58,16 @@ describe("SnapshotDashboard", () => {
     expect(screen.getByText(/Your total debts divided by/)).toBeInTheDocument();
   });
 
-  it("uses cyan color class for positive metrics (dark theme)", () => {
+  it("uses emerald color class for positive metrics (dark theme)", () => {
     render(<SnapshotDashboard />);
     const surplusValue = screen.getByLabelText("Monthly Surplus: $3,350");
-    expect(surplusValue.className).toContain("text-cyan-400");
+    expect(surplusValue.className).toContain("text-emerald-400");
   });
 
-  it("uses rose color class for negative currency values", () => {
+  it("uses red color class for negative currency values", () => {
     render(<SnapshotDashboard />);
     const netWorthValue = screen.getByLabelText("Net Worth: -$229,500");
-    expect(netWorthValue.className).toContain("text-rose-400");
+    expect(netWorthValue.className).toContain("text-red-400");
   });
 
   it("renders the dashboard container with test id", () => {
