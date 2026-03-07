@@ -166,7 +166,7 @@ export default function CashFlowSankey({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-sm transition-all duration-200 hover:shadow-md"
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-sm"
       data-testid="cash-flow-sankey"
     >
       <button

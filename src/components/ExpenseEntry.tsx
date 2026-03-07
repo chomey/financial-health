@@ -245,7 +245,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   };
 
   return (
-    <div className={`rounded-xl border bg-white/5 backdrop-blur-sm p-3 shadow-lg shadow-black/20 transition-all duration-200 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 sm:p-4 ${isUnderwater ? "border-rose-500/30 ring-1 ring-rose-500/10" : "border-white/10 hover:border-white/15"}`}>
+    <div className={`rounded-xl border bg-white/5 backdrop-blur-sm p-3 shadow-sm sm:p-4 ${isUnderwater ? "border-red-500/30 ring-1 ring-red-500/10" : "border-white/10"}`}>
       <div className="mb-2 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-base font-semibold text-slate-200">
           <span aria-hidden="true">🧾</span>

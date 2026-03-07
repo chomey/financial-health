@@ -312,7 +312,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
   };
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-lg shadow-black/20 transition-all duration-200 hover:shadow-xl hover:shadow-black/30 hover:border-white/15 hover:-translate-y-0.5 sm:p-4">
+    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-sm sm:p-4">
       <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-200">
         <span aria-hidden="true">💰</span>
         Income
