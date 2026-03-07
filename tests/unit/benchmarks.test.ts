@@ -98,14 +98,14 @@ describe("benchmarks", () => {
       const comparisons = computeBenchmarkComparisons(30, "CA", 100000, 0.15, 6, 1.0);
       const nw = comparisons.find((c) => c.metric === "Net Worth")!;
       expect(nw.aboveBenchmark).toBe(true);
-      expect(nw.message).toContain("above the median");
+      expect(nw.message).toContain("above the");
     });
 
     it("marks net worth below median correctly", () => {
       const comparisons = computeBenchmarkComparisons(30, "CA", 10000, 0.15, 6, 1.0);
       const nw = comparisons.find((c) => c.metric === "Net Worth")!;
       expect(nw.aboveBenchmark).toBe(false);
-      expect(nw.message).toContain("building toward it");
+      expect(nw.message).toContain("building toward");
     });
 
     it("marks savings rate above median correctly", () => {
@@ -113,7 +113,7 @@ describe("benchmarks", () => {
       const comparisons = computeBenchmarkComparisons(30, "CA", 100000, 0.15, 6, 1.0);
       const sr = comparisons.find((c) => c.metric === "Savings Rate")!;
       expect(sr.aboveBenchmark).toBe(true);
-      expect(sr.message).toContain("above the median");
+      expect(sr.message).toContain("beats the");
     });
 
     it("marks emergency fund above recommended correctly", () => {
@@ -129,14 +129,14 @@ describe("benchmarks", () => {
       const comparisons = computeBenchmarkComparisons(30, "CA", 100000, 0.15, 6, 0.5);
       const di = comparisons.find((c) => c.metric === "Debt-to-Income")!;
       expect(di.aboveBenchmark).toBe(true);
-      expect(di.message).toContain("better than the median");
+      expect(di.message).toContain("better than the");
     });
 
     it("debt-to-income above median shows encouraging message", () => {
       const comparisons = computeBenchmarkComparisons(30, "CA", 100000, 0.15, 6, 3.0);
       const di = comparisons.find((c) => c.metric === "Debt-to-Income")!;
       expect(di.aboveBenchmark).toBe(false);
-      expect(di.message).toContain("typical for your age group");
+      expect(di.message).toContain("typical for ages");
     });
 
     it("uses correct US benchmarks", () => {

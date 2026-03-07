@@ -34,23 +34,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 100: Include investment return taxes in Estimated Tax with correct CA/US rules
-- **Status**: Complete
-- **Date**: 2026-03-06
-- **Changes**:
-  - `src/lib/financial-state.ts`: Added `getDefaultRoiTaxTreatment` import. In `computeTotals`, iterate over assets to find taxable accounts with income-type ROI, compute annual interest (`balance × roi%`), and add to the employment income bucket for tax calculation. Returns `investmentIncomeAccounts` and `totalInvestmentInterest` for the explainer. Updated effective tax rate denominator to include investment interest. Updated tax breakdown string to show investment interest. Updated `buildTaxExplainerDetails` to accept and include `investmentIncomeTax` data.
-  - `src/components/DataFlowArrows.tsx`: Added `investmentIncomeTax` field to `TaxExplainerDetails` interface. Added investment income section to `TaxExplainerContent` with per-account breakdown (balance, ROI%, annual interest), total line for multiple accounts, and explanatory note about annual vs realized taxation.
-  - `src/lib/changelog.ts`: Added version 100 entry.
-  - `tests/unit/financial-state.test.ts`: Added 8 new tests and updated 3 existing tests. New tests cover: CA interest taxed at marginal rate, US interest taxed at ordinary income rate, capital-gains accounts excluded, TFSA excluded, RRSP excluded, Roth IRA excluded, investment income in tax explainer details, mixed account types. Updated 3 existing tests to account for Savings Account investment interest now being included in tax base.
-  - `tests/e2e/investment-income-tax.spec.ts`: New E2E test with 3 tests verifying investment income section visibility in tax explainer, per-account ROI display, and tax estimate including interest.
-- **Test tiers run**: T1, T2
-- **Tests**:
-  - `tests/unit/financial-state.test.ts`: 50 tests passed (8 new + 3 updated), 0 failed
-  - `tests/e2e/investment-income-tax.spec.ts`: 3 tests passed, 0 failed
-  - All 1218 unit tests passed, all 22 tax-related E2E tests passed
-- **Screenshots**:
-  ![Investment income in tax explainer](screenshots/task-100-investment-income-tax-explainer.png)
-- **Notes**: Pre-existing E2E test failures in `snapshot-dashboard.spec.ts` (6 tests referencing `role="tooltip"` and hardcoded metric values that had drifted) were fixed in a separate commit. Investment interest is added to the "employment" income type bucket so progressive brackets apply correctly across salary + interest income combined. Only taxable accounts with `roiTaxTreatment === "income"` are included — capital-gains ROI, tax-free, and tax-deferred accounts are all excluded per the task requirements.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 101: [MILESTONE] E2E test for unified chart and enhancements
 - **Status**: Complete
@@ -169,6 +153,18 @@
   ![Inflation rate changed](screenshots/task-110-inflation-rate-changed.png)
   ![Now column unchanged](screenshots/task-110-inflation-now-unchanged.png)
 - **Notes**: Inflation toggle uses `onClick={(e) => e.stopPropagation()}` on the controls container to prevent ZoomableCard from opening when interacting with the toggle. URL params `ia=1` and `ir=<rate>` persist the toggle state separately from the main `s=` state param. T3 was triggered (task 110 is the 110th completed task, divisible by 5) — all 357 E2E tests pass.
+
+## Task 111: Age input and personalized benchmarks
+- **Date**: 2026-03-06
+- **Files**: `src/lib/benchmarks.ts` (added `estimatePercentile` with lognormal model, added `percentile`/`ageGroupLabel` to `BenchmarkComparison`, updated messages to include specific dollar amounts), `src/app/page.tsx` (added `AgeInputHeader` component in header next to `CountryJurisdictionSelector`), `src/components/BenchmarkComparisons.tsx` (show percentile badge per metric), `src/lib/changelog.ts` (v111 entry), `tests/unit/changelog.test.ts` (updated counts), `tests/unit/benchmarks.test.ts` (updated pre-existing message assertions), `tests/unit/age-benchmarks.test.ts` (new — 17 tests), `tests/e2e/age-benchmarks.spec.ts` (new — 8 tests)
+- **Tests**: T1: 1392 passed, 0 failed (85 files). T2: 8 passed (age-benchmarks). Build: passes.
+- **Screenshots**:
+  ![Age header display](screenshots/task-111-age-header-display.png)
+  ![Personalized benchmarks](screenshots/task-111-personalized-benchmarks.png)
+  ![Benchmark percentile](screenshots/task-111-benchmark-percentile.png)
+  ![Age persists](screenshots/task-111-age-persists.png)
+  ![Card age syncs header](screenshots/task-111-card-age-syncs-header.png)
+- **Notes**: Age was already stored in URL state (`ag` field in CompactState) — no url-state changes needed. Pre-existing `benchmarks.test.ts` message assertions updated to match new format (specific dollar amounts in messages). Percentile uses lognormal model (σ=1.0) which is a standard approximation for wealth/income distributions.
 
 ## Task 108: Consistent currency formatting and composition tables on charts
 - **Date**: 2026-03-06

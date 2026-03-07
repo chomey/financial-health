@@ -34,7 +34,7 @@ function formatBarValue(value: number, format: BenchmarkComparison["format"], co
 
 function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
   const fmt = useCurrency();
-  const { metric, userValue, benchmarkValue, nationalAverage, format, message, aboveBenchmark } = comparison;
+  const { metric, userValue, benchmarkValue, nationalAverage, format, message, aboveBenchmark, percentile, ageGroupLabel } = comparison;
 
   // For debt-to-income, lower is better, so we invert the visual logic
   const isDebtMetric = metric === "Debt-to-Income";
@@ -53,11 +53,22 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
     <div className="space-y-2" data-testid={`benchmark-${metric.toLowerCase().replace(/\s+/g, "-")}`}>
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium text-stone-700">{metric}</h4>
-        {aboveBenchmark && (
-          <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-            {isDebtMetric ? "Below median" : "Above median"}
-          </span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {percentile !== undefined && ageGroupLabel && (
+            <span
+              className="text-xs text-stone-400"
+              title={`Estimated percentile within the ${ageGroupLabel} age group`}
+              data-testid={`benchmark-${metric.toLowerCase().replace(/\s+/g, "-")}-percentile`}
+            >
+              ~{percentile}th pctile
+            </span>
+          )}
+          {aboveBenchmark && (
+            <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+              {isDebtMetric ? "Below median" : "Above median"}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* User bar */}
