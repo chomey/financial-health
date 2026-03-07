@@ -19,7 +19,7 @@ test.describe("Expense entry section", () => {
     await expect(expenseSection.getByText("$600")).toBeVisible();
     await expect(expenseSection.getByText("$150")).toBeVisible();
 
-    await expect(page.getByText("Monthly Total: $2,950")).toBeVisible();
+    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$2,950");
 
     await captureScreenshot(page, "task-6-expenses-with-mock-data");
   });
@@ -51,7 +51,7 @@ test.describe("Expense entry section", () => {
 
     await expect(page.getByText("Transportation")).toBeVisible();
     await expect(page.getByText("$200")).toBeVisible();
-    await expect(page.getByText("Monthly Total: $3,150")).toBeVisible();
+    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$3,150");
 
     await captureScreenshot(page, "task-6-expense-added");
   });
@@ -67,7 +67,7 @@ test.describe("Expense entry section", () => {
     await page.getByLabel("Delete Subscriptions").click();
 
     await expect(page.getByText("Subscriptions")).not.toBeVisible();
-    await expect(page.getByText("Monthly Total: $2,800")).toBeVisible();
+    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$2,800");
 
     await captureScreenshot(page, "task-6-expense-deleted");
   });
@@ -84,7 +84,7 @@ test.describe("Expense entry section", () => {
     await editInput.press("Enter");
 
     await expect(page.getByText("$700")).toBeVisible();
-    await expect(page.getByText("Monthly Total: $3,050")).toBeVisible();
+    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$3,050");
 
     await captureScreenshot(page, "task-6-expense-amount-edited");
   });

@@ -19,16 +19,16 @@ describe("ExpenseEntry component", () => {
     expect(screen.getByText("Subscriptions")).toBeInTheDocument();
   });
 
-  it("displays formatted dollar amounts", () => {
+  it("displays formatted dollar amounts with /mo suffix", () => {
     render(<ExpenseEntry />);
-    expect(screen.getByText("$2,200")).toBeInTheDocument();
-    expect(screen.getByText("$600")).toBeInTheDocument();
-    expect(screen.getByText("$150")).toBeInTheDocument();
+    expect(screen.getByText("$2,200/mo")).toBeInTheDocument();
+    expect(screen.getByText("$600/mo")).toBeInTheDocument();
+    expect(screen.getByText("$150/mo")).toBeInTheDocument();
   });
 
   it("shows monthly total of all expenses", () => {
     render(<ExpenseEntry />);
-    expect(screen.getByText("Monthly Total: $2,950")).toBeInTheDocument();
+    expect(screen.getByTestId("expense-monthly-total")).toHaveTextContent("$2,950");
   });
 
   it("renders the Add Expense button", () => {
@@ -49,7 +49,7 @@ describe("ExpenseEntry component", () => {
     render(<ExpenseEntry />);
     await user.click(screen.getByLabelText("Delete Subscriptions"));
     expect(screen.queryByText("Subscriptions")).not.toBeInTheDocument();
-    expect(screen.getByText("Monthly Total: $2,800")).toBeInTheDocument();
+    expect(screen.getByTestId("expense-monthly-total")).toHaveTextContent("$2,800");
   });
 
   it("shows click-to-edit input when category is clicked", async () => {
@@ -97,7 +97,7 @@ describe("ExpenseEntry component", () => {
     const amountBtn = screen.getByLabelText(
       /Edit amount for Groceries, currently/
     );
-    expect(amountBtn.className).toContain("text-amber-700");
+    expect(amountBtn.querySelector('[class*="text-amber-700"]')).toBeInTheDocument();
   });
 
   it("adds a new expense item via the add form", async () => {
@@ -111,8 +111,8 @@ describe("ExpenseEntry component", () => {
     await user.type(screen.getByLabelText("New expense amount"), "200");
     await user.click(screen.getByLabelText("Confirm add expense"));
     expect(screen.getByText("Transportation")).toBeInTheDocument();
-    expect(screen.getByText("$200")).toBeInTheDocument();
-    expect(screen.getByText("Monthly Total: $3,150")).toBeInTheDocument();
+    expect(screen.getByText("$200/mo")).toBeInTheDocument();
+    expect(screen.getByTestId("expense-monthly-total")).toHaveTextContent("$3,150");
   });
 });
 

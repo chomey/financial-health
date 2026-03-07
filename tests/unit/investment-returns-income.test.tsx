@@ -46,8 +46,8 @@ describe("IncomeEntry - investment returns auto-computed section", () => {
   it("displays formatted monthly return amounts", () => {
     render(<IncomeEntry items={[]} investmentReturns={sampleReturns} />);
     // TFSA: $250/mo, RRSP: $125/mo
-    expect(screen.getByText("$250")).toBeInTheDocument();
-    expect(screen.getByText("$125")).toBeInTheDocument();
+    expect(screen.getByText("$250/mo")).toBeInTheDocument();
+    expect(screen.getByText("$125/mo")).toBeInTheDocument();
   });
 
   it("includes investment returns in monthly total", () => {

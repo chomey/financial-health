@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Show both monthly and yearly totals on Income and Expenses
+  {
+    version: 126,
+    title: "Dual monthly/yearly totals on Income & Expenses",
+    description: "Income and Expense sections now always show both monthly and yearly amounts. Each item displays its primary amount with frequency suffix (e.g. $5,500/mo) and a secondary converted amount ($66,000/yr). Section footers show 'Monthly: $X | Yearly: $Y'. The monthly/yearly toggle in Expenses has been removed.",
+    date: "2026-03-07",
+  },
   // Fix surplus explainer showing Assets instead of Contributions
   {
     version: 125,
