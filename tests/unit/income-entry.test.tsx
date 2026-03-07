@@ -90,7 +90,7 @@ describe("IncomeEntry component", () => {
   it("displays income amounts in green", () => {
     render(<IncomeEntry />);
     const amountBtn = screen.getByLabelText(/Edit amount for Salary, currently/);
-    expect(amountBtn.querySelector('[class*="text-green-700"]')).toBeInTheDocument();
+    expect(amountBtn.querySelector('[class*="text-emerald-400"]')).toBeInTheDocument();
   });
 
   it("adds a new income item via the add form", async () => {
@@ -166,8 +166,8 @@ describe("IncomeEntry income type selector", () => {
     ];
     render(<IncomeEntry items={items} />);
     const listItem = screen.getByRole("listitem");
-    expect(listItem.className).toContain("bg-amber-50");
-    expect(listItem.className).toContain("border-amber-400");
+    expect(listItem.className).toContain("bg-amber-400/5");
+    expect(listItem.className).toContain("border-amber-400/60");
   });
 
   it("does not apply capital-gains styling to employment rows", () => {
@@ -216,7 +216,7 @@ describe("IncomeEntry income type selector", () => {
     ];
     render(<IncomeEntry items={items} />);
     const selector = screen.getByTestId("income-type-i1");
-    expect(selector.className).toContain("border-amber-300");
-    expect(selector.className).toContain("text-amber-700");
+    expect(selector.className).toContain("border-amber-500/30");
+    expect(selector.className).toContain("text-amber-400");
   });
 });

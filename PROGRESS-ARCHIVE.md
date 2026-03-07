@@ -3,6 +3,13 @@
 <!--
   This file is automatically updated by Ralph after each task iteration.
   It serves as a running log of what was done and provides context for
+
+## Task 128: Update metric cards and dashboard for new theme
+- **Date**: 2026-03-07
+- **Files**: `src/components/SnapshotDashboard.tsx`, `src/components/DataFlowArrows.tsx`, `src/lib/changelog.ts`, `tests/unit/dashboard-dark-theme.test.ts`, `tests/e2e/dashboard-dark-theme.spec.ts`
+- **Tests**: 1646 passed (37 new T1 in `dashboard-dark-theme.test.ts`, 5 new T2 in `dashboard-dark-theme.spec.ts`)
+- **Screenshots**: ![Dashboard dark cards](screenshots/task-128-metric-cards-dark.png) ![Full dashboard](screenshots/task-128-dashboard-full.png)
+- **Notes**: Updated existing color-assertion tests in snapshot-dashboard.test.tsx, explainer-modal.test.tsx, source-summary-card.test.tsx, micro-interactions.test.tsx to match new cyan/slate theme. Tax bracket bars now use dark containers with muted neon fills (cyan→violet→rose progression) so text is always readable. Also fixed pre-existing changelog test failure (task 127 count mismatch).
   future iterations to pick up where the last one left off.
 
   Do not manually edit entries below unless correcting errors.

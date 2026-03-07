@@ -92,12 +92,12 @@ describe("ExpenseEntry component", () => {
     ).toBeInTheDocument();
   });
 
-  it("displays expense amounts in amber", () => {
+  it("displays expense amounts in rose/red color", () => {
     render(<ExpenseEntry />);
     const amountBtn = screen.getByLabelText(
       /Edit amount for Groceries, currently/
     );
-    expect(amountBtn.querySelector('[class*="text-amber-700"]')).toBeInTheDocument();
+    expect(amountBtn.querySelector('[class*="text-rose-400"]')).toBeInTheDocument();
   });
 
   it("adds a new expense item via the add form", async () => {

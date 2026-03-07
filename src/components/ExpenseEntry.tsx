@@ -245,9 +245,9 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   };
 
   return (
-    <div className={`rounded-xl border bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4 ${isUnderwater ? "border-rose-200 ring-1 ring-rose-100" : "border-stone-200"}`}>
+    <div className={`rounded-xl border bg-white/5 backdrop-blur-sm p-3 shadow-lg shadow-black/20 transition-all duration-200 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 sm:p-4 ${isUnderwater ? "border-rose-500/30 ring-1 ring-rose-500/10" : "border-white/10 hover:border-white/15"}`}>
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-stone-800">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-slate-200">
           <span aria-hidden="true">🧾</span>
           Expenses
         </h2>
@@ -255,12 +255,12 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
 
       {items.length === 0 && !addingNew ? (
         <div className="flex flex-col items-center py-4 text-center" data-testid="expense-empty-state">
-          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-400">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-amber-400/10 text-amber-400">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
             </svg>
           </div>
-          <p className="text-sm text-stone-400">
+          <p className="text-sm text-slate-500">
             Add your regular expenses — be as detailed or broad as you like.
           </p>
         </div>
@@ -270,7 +270,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
             <DataFlowSourceItem key={item.id} id={`expense:${item.id}`} label={item.category} value={item.amount}>
             <div role="listitem">
             <div
-              className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-stone-50"
+              className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-white/5"
             >
               <div className="flex flex-1 items-center gap-3 min-w-0">
                 {/* Category */}
@@ -290,14 +290,14 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                         }, 150);
                       }}
                       onKeyDown={handleEditKeyDown}
-                      className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                      className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                       aria-label="Edit category name"
                     />
                     {showSuggestions &&
                       filteredSuggestions(editValue).length > 0 && (
                         <div
                           ref={suggestionsRef}
-                          className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
+                          className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
                         >
                           {filteredSuggestions(editValue).map((suggestion) => (
                             <button
@@ -307,7 +307,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                                 e.preventDefault();
                                 commitEdit(suggestion);
                               }}
-                              className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                              className="w-full px-3 py-1.5 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300"
                             >
                               {suggestion}
                             </button>
@@ -321,7 +321,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                     onClick={() =>
                       startEdit(item.id, "category", item.category)
                     }
-                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-stone-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                     aria-label={`Edit category for ${item.category}`}
                   >
                     {item.category}
@@ -337,7 +337,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                    className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                     aria-label={`Edit amount for ${item.category}`}
                   />
                 ) : (
@@ -346,11 +346,11 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                     onClick={() =>
                       startEdit(item.id, "amount", String(item.amount))
                     }
-                    className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                    className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-rose-400/10 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
                     aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
                   >
-                    <div className="text-sm font-medium text-amber-700">{formatCurrency(item.amount)}/mo</div>
-                    <div className="text-xs text-stone-400">{formatCurrency(item.amount * 12)}/yr</div>
+                    <div className="text-sm font-medium text-rose-400">{formatCurrency(item.amount)}/mo</div>
+                    <div className="text-xs text-slate-500">{formatCurrency(item.amount * 12)}/yr</div>
                   </button>
                 )}
               </div>
@@ -359,7 +359,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               <button
                 type="button"
                 onClick={() => deleteItem(item.id)}
-                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-stone-300 sm:opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 sm:group-hover:opacity-100"
+                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 sm:group-hover:opacity-100"
                 aria-label={`Delete ${item.category}`}
               >
                 <svg
@@ -398,8 +398,8 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
 
       {/* Auto-computed section */}
       {(totalTax > 0 || investmentContributions > 0 || mortgagePayments > 0 || surplus > 0) && (
-        <div className="mt-2 mb-1 border-t border-dashed border-stone-200 pt-2 px-3">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Auto-computed</span>
+        <div className="mt-2 mb-1 border-t border-dashed border-white/10 pt-2 px-3">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Auto-computed</span>
         </div>
       )}
 
@@ -408,17 +408,17 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
         <div className="space-y-1" data-testid="tax-breakdown">
           {/* Federal Tax */}
           <div
-            className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1"
+            className="flex items-center justify-between rounded-lg px-3 py-2 bg-slate-800/60 border border-dashed border-white/10 mx-1"
             data-testid="federal-tax-row"
           >
             <div className="flex flex-1 items-center gap-2 min-w-0">
-              <span className="text-sm text-stone-500">Federal Tax</span>
+              <span className="text-sm text-slate-400">Federal Tax</span>
               {federalTaxOverride !== undefined ? (
-                <span className="inline-flex items-center rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-medium text-blue-500 uppercase tracking-wide" title="You've overridden this value. Clear to reset.">
+                <span className="inline-flex items-center rounded-full bg-cyan-500/15 px-1.5 py-0.5 text-[9px] font-medium text-cyan-400 uppercase tracking-wide" title="You've overridden this value. Clear to reset.">
                   override
                 </span>
               ) : (
-                <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-estimated from your income and tax brackets">
+                <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 uppercase tracking-wide" title="Auto-estimated from your income and tax brackets">
                   auto
                 </span>
               )}
@@ -443,7 +443,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   if (e.key === "Escape") setEditingTax(null);
                 }}
-                className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                 aria-label="Override federal tax amount"
               />
             ) : (
@@ -453,28 +453,28 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   setEditingTax("federal");
                   setEditTaxValue(String(Math.round(federalTax)));
                 }}
-                className="text-right rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="text-right rounded px-2 py-1 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                 aria-label={`Edit federal tax, currently ${formatCurrency(federalTax)}/mo`}
               >
-                <div className="text-sm font-medium text-stone-400">{formatCurrency(federalTax)}/mo</div>
-                <div className="text-xs text-stone-300">{formatCurrency(federalTax * 12)}/yr</div>
+                <div className="text-sm font-medium text-slate-500">{formatCurrency(federalTax)}/mo</div>
+                <div className="text-xs text-slate-600">{formatCurrency(federalTax * 12)}/yr</div>
               </button>
             )}
           </div>
 
           {/* Provincial/State Tax */}
           <div
-            className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1"
+            className="flex items-center justify-between rounded-lg px-3 py-2 bg-slate-800/60 border border-dashed border-white/10 mx-1"
             data-testid="provincial-state-tax-row"
           >
             <div className="flex flex-1 items-center gap-2 min-w-0">
-              <span className="text-sm text-stone-500">{provStateLabel} Tax</span>
+              <span className="text-sm text-slate-400">{provStateLabel} Tax</span>
               {provincialTaxOverride !== undefined ? (
-                <span className="inline-flex items-center rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-medium text-blue-500 uppercase tracking-wide" title="You've overridden this value. Clear to reset.">
+                <span className="inline-flex items-center rounded-full bg-cyan-500/15 px-1.5 py-0.5 text-[9px] font-medium text-cyan-400 uppercase tracking-wide" title="You've overridden this value. Clear to reset.">
                   override
                 </span>
               ) : (
-                <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-estimated from your income and tax brackets">
+                <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 uppercase tracking-wide" title="Auto-estimated from your income and tax brackets">
                   auto
                 </span>
               )}
@@ -498,7 +498,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   if (e.key === "Escape") setEditingTax(null);
                 }}
-                className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                 aria-label={`Override ${provStateLabel.toLowerCase()} tax amount`}
               />
             ) : (
@@ -508,11 +508,11 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   setEditingTax("provincial");
                   setEditTaxValue(String(Math.round(provincialStateTax)));
                 }}
-                className="text-right rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="text-right rounded px-2 py-1 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                 aria-label={`Edit ${provStateLabel.toLowerCase()} tax, currently ${formatCurrency(provincialStateTax)}/mo`}
               >
-                <div className="text-sm font-medium text-stone-400">{formatCurrency(provincialStateTax)}/mo</div>
-                <div className="text-xs text-stone-300">{formatCurrency(provincialStateTax * 12)}/yr</div>
+                <div className="text-sm font-medium text-slate-500">{formatCurrency(provincialStateTax)}/mo</div>
+                <div className="text-xs text-slate-600">{formatCurrency(provincialStateTax * 12)}/yr</div>
               </button>
             )}
           </div>
@@ -522,20 +522,20 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       {/* Auto-generated investment contributions row */}
       {investmentContributions > 0 && (
         <div
-          className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1 mt-1"
+          className="flex items-center justify-between rounded-lg px-3 py-2 bg-slate-800/60 border border-dashed border-white/10 mx-1 mt-1"
           data-testid="investment-contributions-row"
         >
           <div className="flex flex-1 items-center gap-2 min-w-0">
-            <span className="text-sm text-stone-500">
+            <span className="text-sm text-slate-400">
               Investment Contributions
             </span>
-            <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-calculated from your asset monthly contributions">
+            <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 uppercase tracking-wide" title="Auto-calculated from your asset monthly contributions">
               auto
             </span>
           </div>
           <div className="text-right">
-            <div className="text-sm font-medium text-stone-400">{formatCurrency(investmentContributions)}/mo</div>
-            <div className="text-xs text-stone-300">{formatCurrency(investmentContributions * 12)}/yr</div>
+            <div className="text-sm font-medium text-slate-500">{formatCurrency(investmentContributions)}/mo</div>
+            <div className="text-xs text-slate-600">{formatCurrency(investmentContributions * 12)}/yr</div>
           </div>
         </div>
       )}
@@ -543,20 +543,20 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       {/* Auto-generated mortgage payments row */}
       {mortgagePayments > 0 && (
         <div
-          className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1 mt-1"
+          className="flex items-center justify-between rounded-lg px-3 py-2 bg-slate-800/60 border border-dashed border-white/10 mx-1 mt-1"
           data-testid="mortgage-payments-row"
         >
           <div className="flex flex-1 items-center gap-2 min-w-0">
-            <span className="text-sm text-stone-500">
+            <span className="text-sm text-slate-400">
               Mortgage Payments
             </span>
-            <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-calculated from your property mortgage payments">
+            <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 uppercase tracking-wide" title="Auto-calculated from your property mortgage payments">
               auto
             </span>
           </div>
           <div className="text-right">
-            <div className="text-sm font-medium text-stone-400">{formatCurrency(mortgagePayments)}/mo</div>
-            <div className="text-xs text-stone-300">{formatCurrency(mortgagePayments * 12)}/yr</div>
+            <div className="text-sm font-medium text-slate-500">{formatCurrency(mortgagePayments)}/mo</div>
+            <div className="text-xs text-slate-600">{formatCurrency(mortgagePayments * 12)}/yr</div>
           </div>
         </div>
       )}
@@ -564,32 +564,32 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       {/* Auto-generated surplus row */}
       {surplus > 0 && (
         <div
-          className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1 mt-1"
+          className="flex items-center justify-between rounded-lg px-3 py-2 bg-slate-800/60 border border-dashed border-white/10 mx-1 mt-1"
           data-testid="surplus-row"
         >
           <div className="flex flex-1 items-center gap-2 min-w-0">
-            <span className="text-sm text-stone-500">
+            <span className="text-sm text-slate-400">
               Surplus
             </span>
             {surplus > 0 && surplusTargetName && (
-              <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600" title={`Monthly surplus allocated to ${surplusTargetName}`}>
+              <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400" title={`Monthly surplus allocated to ${surplusTargetName}`}>
                 → {surplusTargetName}
               </span>
             )}
-            <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-calculated from income minus expenses and contributions">
+            <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 uppercase tracking-wide" title="Auto-calculated from income minus expenses and contributions">
               auto
             </span>
           </div>
           <div className="text-right">
-            <div className={`text-sm font-medium ${surplus >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus))}/mo</div>
-            <div className="text-xs text-stone-300">{surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus) * 12)}/yr</div>
+            <div className={`text-sm font-medium ${surplus >= 0 ? "text-emerald-400" : "text-rose-400"}`}>{surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus))}/mo</div>
+            <div className="text-xs text-slate-600">{surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus) * 12)}/yr</div>
           </div>
         </div>
       )}
 
       {/* Add new expense row */}
       {addingNew && (
-        <div className="mt-2 rounded-lg border border-dashed border-blue-200 bg-blue-50/50 px-3 py-2 animate-in">
+        <div className="mt-2 rounded-lg border border-dashed border-cyan-500/20 bg-cyan-500/5 px-3 py-2 animate-in">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <div className="relative flex-1 min-w-0">
               <input
@@ -606,12 +606,12 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
                 onKeyDown={(e) => handleNewKeyDown(e, "category")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New expense category"
               />
               {showNewSuggestions &&
                 filteredSuggestions(newCategory).length > 0 && (
-                  <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                  <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
                     {filteredSuggestions(newCategory).map((suggestion) => (
                       <button
                         key={suggestion}
@@ -622,7 +622,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                           setShowNewSuggestions(false);
                           newAmountRef.current?.focus();
                         }}
-                        className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
+                        className="w-full px-3 py-2 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300 sm:py-1.5"
                       >
                         {suggestion}
                       </button>
@@ -638,13 +638,13 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                 value={newAmount}
                 onChange={(e) => setNewAmount(e.target.value)}
                 onKeyDown={(e) => handleNewKeyDown(e, "amount")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-right text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New expense amount"
               />
               <button
                 type="button"
                 onClick={addItem}
-                className="min-h-[44px] rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
                 aria-label="Confirm add expense"
               >
                 Add
@@ -657,7 +657,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   setNewAmount("");
                   setShowNewSuggestions(false);
                 }}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/10"
                 aria-label="Cancel adding expense"
               >
                 <svg
@@ -679,10 +679,10 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       )}
 
       {/* Total breakdown and Add button */}
-      <div className="mt-4 border-t border-stone-100 pt-3 space-y-1.5">
+      <div className="mt-4 border-t border-white/10 pt-3 space-y-1.5">
         {/* Sub-totals breakdown */}
         {(totalTax > 0 || investmentContributions > 0 || mortgagePayments > 0) && (
-          <div className="space-y-0.5 text-xs text-stone-400" data-testid="expense-subtotals">
+          <div className="space-y-0.5 text-xs text-slate-500" data-testid="expense-subtotals">
             <div className="flex justify-between">
               <span>Expenses</span>
               <span>{formatCurrency(itemsTotal)}/mo</span>
@@ -711,8 +711,8 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
         {/* Grand total + Add button */}
         <div className="flex items-center justify-between">
           <span
-            className={`text-sm font-medium text-stone-500 transition-all duration-300 ${
-              animatingTotal ? "scale-110 text-amber-600" : ""
+            className={`text-sm font-medium text-slate-400 transition-all duration-300 ${
+              animatingTotal ? "scale-110 text-rose-400" : ""
             }`}
           >
             Monthly: <span data-testid="expense-monthly-total">{formatCurrency(total)}</span>
@@ -723,7 +723,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
             <button
               type="button"
               onClick={() => setAddingNew(true)}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition-all duration-150 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 active:bg-blue-100"
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 active:bg-cyan-500/20"
             >
               + Add Expense
             </button>

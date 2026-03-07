@@ -87,7 +87,7 @@ describe("DebtEntry component", () => {
     const amountButton = screen.getByLabelText(
       /Edit amount for Car Loan, currently/
     );
-    expect(amountButton.className).toContain("text-rose-600");
+    expect(amountButton.className).toContain("text-rose-400");
   });
 });
 

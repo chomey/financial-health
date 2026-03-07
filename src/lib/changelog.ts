@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Entry panels dark theme
+  {
+    version: 129,
+    title: "Entry panels — dark cyberpunk theme",
+    description: "Applied the soft cyberpunk palette to all entry panel components: AssetEntry, DebtEntry, IncomeEntry, ExpenseEntry, PropertyEntry. Dark glass-effect cards (bg-white/5 backdrop-blur), border-white/10 card borders, cyan-500/50 inputs with slate-900 backgrounds, emerald-400 for positive/asset/income amounts, rose-400 for debt/expense amounts. Vivid accent glows on hover/focus. 'Add' buttons use bright cyan accent. Auto-computed rows have a distinct dark badge style. Section footers use white/10 dividers and cyan 'Add' buttons.",
+    date: "2026-03-07",
+  },
   // Dashboard and explainer modal dark theme
   {
     version: 128,
