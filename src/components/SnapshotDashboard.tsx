@@ -66,11 +66,8 @@ function formatMetricValue(value: number, format: MetricData["format"], currency
   switch (format) {
     case "currency": {
       const absValue = Math.abs(value);
-      const formatted = absValue.toLocaleString("en-US", {
-        style: "currency",
-        currency: currencyCode ?? "USD",
-        maximumFractionDigits: 0,
-      });
+      const num = absValue.toLocaleString("en-US", { maximumFractionDigits: 0 });
+      const formatted = `$${num}`;
       return value < 0 ? `-${formatted}` : formatted;
     }
     case "months":

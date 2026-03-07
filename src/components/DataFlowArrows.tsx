@@ -1019,7 +1019,7 @@ function ExplainerModal({
                 const isPositive = conn.sign !== "negative";
                 const showOperator = i > 0;
                 const sectionName = meta?.label || conn.label || conn.sourceId.replace("section-", "");
-                const displayValue = meta ? formatCurrency(Math.abs(meta.value), homeCurrencyProp) : (conn.label || "");
+                const displayValue = formatCurrency(conn.value ?? 0, homeCurrencyProp);
                 const cardDelay = i * 50; // Stagger card fade-ins
 
                 return (
@@ -1042,7 +1042,7 @@ function ExplainerModal({
                       <SourceSummaryCard
                         sourceId={conn.sourceId}
                         sectionName={sectionName}
-                        items={meta?.items}
+                        items={meta && Math.abs(meta.value - (conn.value ?? 0)) < 1 ? meta.items : undefined}
                         total={displayValue}
                         isPositive={isPositive}
                         ovalSeed={i + 1}

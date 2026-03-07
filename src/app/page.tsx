@@ -911,7 +911,7 @@ export default function Home() {
                       <span className="text-lg" aria-hidden="true">📊</span>
                     </div>
                     <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-green-600" : "text-rose-600"}`}>
-                      {portfolio.totalGainLoss >= 0 ? "+" : ""}{new Intl.NumberFormat("en-US", { style: "currency", currency: homeCurrency, maximumFractionDigits: 0 }).format(portfolio.totalGainLoss)}
+                      {portfolio.totalGainLoss >= 0 ? "+" : "-"}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.abs(portfolio.totalGainLoss))}
                     </p>
                     {portfolio.totalCostBasis > 0 && (
                       <p className="mt-0.5 text-sm text-stone-500" data-testid="portfolio-return-pct">
