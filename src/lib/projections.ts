@@ -1,6 +1,7 @@
 import type { FinancialState } from "@/lib/financial-state";
 import { computeTotals } from "@/lib/financial-state";
-import { getDefaultRoi } from "@/components/AssetEntry";
+import { getDefaultRoi, computeEmployerMatchMonthly } from "@/components/AssetEntry";
+import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { getEffectivePayment, getDefaultAppreciation } from "@/components/PropertyEntry";
 import { getHomeCurrency, getEffectiveFxRates, convertToHome, type SupportedCurrency } from "@/lib/currency";
 import { getTaxTreatment, getWithdrawalTaxRate, type TaxTreatment } from "@/lib/withdrawal-tax";
@@ -65,15 +66,27 @@ export function projectFinances(
   const isDrawdown = expenseShortfall > DRAWDOWN_THRESHOLD;
   const monthlyDrawdown = isDrawdown ? expenseShortfall : 0;
 
+  // Compute annual employment salary for employer match calculations
+  const annualEmploymentSalary = state.income.reduce((sum, item) => {
+    if ((item.incomeType ?? "employment") !== "employment") return sum;
+    return sum + normalizeToMonthly(item.amount, item.frequency) * 12;
+  }, 0);
+
   // Track each asset individually for ROI/contribution (converted to home currency)
-  const assetBalances = state.assets.map((a) => ({
-    balance: toHome(a.amount, a.currency),
-    monthlyROI: ((a.roi ?? getDefaultRoi(a.category) ?? 0) * multiplier) / 100 / 12,
-    monthlyContribution: toHome(a.monthlyContribution ?? 0, a.currency) * multiplier,
-    taxTreatment: getTaxTreatment(a.category, a.taxTreatment),
-    category: a.category,
-    costBasisPercent: a.costBasisPercent ?? 100,
-  }));
+  const assetBalances = state.assets.map((a) => {
+    const baseMonthlyContrib = toHome(a.monthlyContribution ?? 0, a.currency);
+    const employerMatch = (a.employerMatchPct && a.employerMatchCap && a.monthlyContribution)
+      ? computeEmployerMatchMonthly(a.monthlyContribution, a.employerMatchPct, a.employerMatchCap, annualEmploymentSalary)
+      : 0;
+    return {
+      balance: toHome(a.amount, a.currency),
+      monthlyROI: ((a.roi ?? getDefaultRoi(a.category) ?? 0) * multiplier) / 100 / 12,
+      monthlyContribution: (baseMonthlyContrib + employerMatch) * multiplier,
+      taxTreatment: getTaxTreatment(a.category, a.taxTreatment),
+      category: a.category,
+      costBasisPercent: a.costBasisPercent ?? 100,
+    };
+  });
 
   // Withdrawal order priority: tax-free first, taxable second, tax-deferred last
   const withdrawalPriority: Record<TaxTreatment, number> = { "tax-free": 0, "taxable": 1, "tax-deferred": 2 };

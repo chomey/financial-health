@@ -26,6 +26,8 @@ export interface FinancialData {
   hasCapitalGains?: boolean;
   /** Home currency code (e.g., "CAD", "USD") for formatting */
   homeCurrency?: string;
+  /** Total annual employer match across all eligible accounts */
+  employerMatchAnnual?: number;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** How many months shorter the runway is due to withdrawal taxes */
@@ -41,7 +43,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match";
 
 export interface Insight {
   id: string;
@@ -313,6 +315,16 @@ export function generateInsights(data: FinancialData): Insight[] {
         icon: "💪",
       });
     }
+  }
+
+  // Employer match insight
+  if (data.employerMatchAnnual && data.employerMatchAnnual > 0) {
+    insights.push({
+      id: "employer-match",
+      type: "employer-match",
+      message: `Your employer match adds ${formatCurrency(data.employerMatchAnnual)}/year in free money — make sure you're contributing enough to get the full match.`,
+      icon: "🎁",
+    });
   }
 
   return insights;

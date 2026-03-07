@@ -20,6 +20,8 @@ export interface Asset {
   currency?: import("@/lib/currency").SupportedCurrency; // per-item currency override
   costBasisPercent?: number; // 0-100: % of balance that is original contributions (only for taxable accounts)
   taxTreatment?: TaxTreatment; // user override for tax treatment (auto-detected if not set)
+  employerMatchPct?: number; // employer match percentage (e.g., 50 = 50% match on contributions)
+  employerMatchCap?: number; // employer match salary cap (e.g., 6 = 6% of annual salary)
 }
 
 const CATEGORY_SUGGESTIONS = {
@@ -84,6 +86,28 @@ export function getDefaultRoi(category: string): number | undefined {
   return DEFAULT_ROI[category];
 }
 
+/** Employer-sponsored registered accounts eligible for employer match */
+export const EMPLOYER_MATCH_ELIGIBLE = new Set([
+  "RRSP", "401k", "Roth 401k",
+]);
+
+/**
+ * Compute monthly employer match contribution.
+ * Employer matches `matchPct`% of the user's monthly contribution, capped at
+ * `matchCap`% of annual salary (divided by 12 for monthly).
+ */
+export function computeEmployerMatchMonthly(
+  monthlyContribution: number,
+  matchPct: number,
+  matchCap: number,
+  annualSalary: number,
+): number {
+  if (matchPct <= 0 || matchCap <= 0 || monthlyContribution <= 0 || annualSalary <= 0) return 0;
+  const matchOnContrib = monthlyContribution * (matchPct / 100);
+  const monthlyCap = (annualSalary * (matchCap / 100)) / 12;
+  return Math.min(matchOnContrib, monthlyCap);
+}
+
 /** Categories whose ROI is taxed as interest income (not capital gains) by default */
 const INCOME_TAX_ROI_CATEGORIES = new Set([
   "Savings", "Savings Account", "Checking", "GIC", "Money Market", "HISA",
@@ -145,9 +169,10 @@ interface AssetEntryProps {
   monthlySurplus?: number;
   homeCurrency?: import("@/lib/currency").SupportedCurrency;
   fxRates?: import("@/lib/currency").FxRates;
+  annualEmploymentSalary?: number;
 }
 
-export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCurrency, fxRates }: AssetEntryProps = {}) {
+export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCurrency, fxRates, annualEmploymentSalary = 0 }: AssetEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
   const formatCompact = (v: number) => fmt.compact(v);
@@ -159,7 +184,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
   }, [assets, onChange]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<
-    "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent" | null
+    "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent" | "employerMatchPct" | "employerMatchCap" | null
   >(null);
   const [editValue, setEditValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -187,7 +212,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
 
   const startEdit = (
     id: string,
-    field: "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent",
+    field: "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent" | "employerMatchPct" | "employerMatchCap",
     currentValue: string
   ) => {
     setEditingId(id);
@@ -220,6 +245,14 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
             if (isNaN(val)) return { ...a, costBasisPercent: undefined };
             const clamped = Math.max(0, Math.min(100, val));
             return { ...a, costBasisPercent: clamped };
+          }
+          if (editingField === "employerMatchPct") {
+            const val = parseFloat(value);
+            return { ...a, employerMatchPct: isNaN(val) || val <= 0 ? undefined : val };
+          }
+          if (editingField === "employerMatchCap") {
+            const val = parseFloat(value);
+            return { ...a, employerMatchCap: isNaN(val) || val <= 0 ? undefined : val };
           }
           return { ...a, amount: parseCurrencyInput(value) };
         })
@@ -618,6 +651,89 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   </button>
                 )}
 
+                {/* Employer match — only for eligible registered accounts */}
+                {EMPLOYER_MATCH_ELIGIBLE.has(asset.category) && !isComputed && (() => {
+                  const hasPct = asset.employerMatchPct !== undefined && asset.employerMatchPct > 0;
+                  const hasCap = asset.employerMatchCap !== undefined && asset.employerMatchCap > 0;
+                  const monthlyMatch = (hasPct && hasCap && asset.monthlyContribution)
+                    ? computeEmployerMatchMonthly(
+                        asset.monthlyContribution,
+                        asset.employerMatchPct!,
+                        asset.employerMatchCap!,
+                        annualEmploymentSalary,
+                      )
+                    : 0;
+                  return (
+                    <div className="flex flex-wrap items-center gap-1" data-testid={`employer-match-section-${asset.id}`}>
+                      {/* Match % badge */}
+                      {editingId === asset.id && editingField === "employerMatchPct" ? (
+                        <input
+                          ref={inputRef}
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onBlur={() => commitEdit()}
+                          onKeyDown={handleEditKeyDown}
+                          className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                          aria-label={`Edit employer match percent for ${asset.category}`}
+                          placeholder="e.g. 50"
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => startEdit(asset.id, "employerMatchPct", String(asset.employerMatchPct ?? ""))}
+                          className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                            hasPct
+                              ? "bg-violet-50 text-violet-600 hover:bg-violet-100"
+                              : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                          }`}
+                          aria-label={`Edit employer match percent for ${asset.category}${hasPct ? `, currently ${asset.employerMatchPct}%` : ""}`}
+                          data-testid={`employer-match-pct-${asset.id}`}
+                        >
+                          {hasPct ? `${asset.employerMatchPct}% match` : "Employer match %"}
+                        </button>
+                      )}
+                      {/* Cap % badge */}
+                      {editingId === asset.id && editingField === "employerMatchCap" ? (
+                        <input
+                          ref={inputRef}
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onBlur={() => commitEdit()}
+                          onKeyDown={handleEditKeyDown}
+                          className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                          aria-label={`Edit employer match cap for ${asset.category}`}
+                          placeholder="e.g. 6"
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => startEdit(asset.id, "employerMatchCap", String(asset.employerMatchCap ?? ""))}
+                          className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                            hasCap
+                              ? "bg-violet-50 text-violet-600 hover:bg-violet-100"
+                              : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                          }`}
+                          aria-label={`Edit employer match cap for ${asset.category}${hasCap ? `, currently ${asset.employerMatchCap}% of salary` : ""}`}
+                          data-testid={`employer-match-cap-${asset.id}`}
+                        >
+                          {hasCap ? `up to ${asset.employerMatchCap}% salary` : "salary cap %"}
+                        </button>
+                      )}
+                      {/* Computed match amount */}
+                      {monthlyMatch > 0 && (
+                        <span
+                          className="rounded bg-violet-50 px-1.5 py-0.5 text-xs text-violet-700"
+                          data-testid={`employer-match-amount-${asset.id}`}
+                        >
+                          +{formatCurrency(monthlyMatch)}/mo employer match
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
+
                 {/* Cost basis % — only for taxable accounts */}
                 {getTaxTreatment(asset.category, asset.taxTreatment) === "taxable" && asset.amount > 0 && (
                   editingId === asset.id && editingField === "costBasisPercent" ? (
@@ -697,7 +813,10 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
 
               {/* Per-asset 10/20/30 year projections */}
               {(() => {
-                const totalContrib = (asset.monthlyContribution ?? 0) + (asset.surplusTarget ? monthlySurplus : 0);
+                const matchContrib = (asset.employerMatchPct && asset.employerMatchCap && asset.monthlyContribution)
+                  ? computeEmployerMatchMonthly(asset.monthlyContribution, asset.employerMatchPct, asset.employerMatchCap, annualEmploymentSalary)
+                  : 0;
+                const totalContrib = (asset.monthlyContribution ?? 0) + matchContrib + (asset.surplusTarget ? monthlySurplus : 0);
                 const showProjection = (displayRoi !== undefined && displayRoi > 0) || totalContrib > 0;
                 return showProjection ? (
                   <div className={`flex items-center gap-3 pb-1.5 text-[10px] text-stone-400 ${isComputed ? "px-6" : "px-5"}`} data-testid={`asset-projection-${asset.id}`}>

@@ -38,6 +38,7 @@ import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getPortfolioSummary, getAnnualizedReturn } from "@/components/StockEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
+import { normalizeToMonthly } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 
 function CopyLinkButton() {
@@ -450,6 +451,10 @@ export default function Home() {
   const monthlyInvestmentReturns = computeMonthlyInvestmentReturns(assets);
   const totalMonthlyInvestmentReturns = monthlyInvestmentReturns.reduce((sum, r) => sum + r.amount, 0);
   const monthlySurplus = totals.monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - totals.monthlyExpenses - totals.totalMonthlyContributions - totalMortgagePayments;
+  const annualEmploymentSalary = income.reduce((sum, i) => {
+    if ((i.incomeType ?? "employment") !== "employment") return sum;
+    return sum + normalizeToMonthly(i.amount, i.frequency) * 12;
+  }, 0);
   const realAssets = assets.filter((a) => !a.computed);
   const surplusTargetName = realAssets.find((a) => a.surplusTarget)?.category ?? realAssets[0]?.category;
 
@@ -650,7 +655,7 @@ export default function Home() {
           >
             <div className="space-y-3">
               <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)} dataFlowId="section-assets" dataFlowValue={assetTotal} dataFlowLabel="Assets" dataFlowItems={assetItems}>
-                <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
+                <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={effectiveFxRates} annualEmploymentSalary={annualEmploymentSalary} />
               </CollapsibleSection>
 
               <CollapsibleSection id="debts" title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"} dataFlowId="section-debts" dataFlowValue={debtTotal} dataFlowLabel="Debts" dataFlowItems={debtItems}>

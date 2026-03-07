@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Employer match modeling for registered accounts
+  {
+    version: 112,
+    title: "Employer match modeling for registered accounts",
+    description: "Added optional employer match fields to RRSP, 401k, and Roth 401k asset entries: match percentage (e.g., 50% = employer matches half your contributions) and salary cap percentage (e.g., 6% = match is capped at 6% of annual salary). The projection engine adds employer match as additional monthly contributions. A new insight celebrates the employer match: 'Your employer match adds $X/year in free money — make sure you're contributing enough to get the full match.' All settings persist in URL state.",
+    date: "2026-03-06",
+  },
   // Age input and personalized benchmarks
   {
     version: 111,
