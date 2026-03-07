@@ -48,7 +48,7 @@ function PrintSnapshotButton() {
     <button
       type="button"
       onClick={() => window.print()}
-      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-600 shadow-sm transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 active:scale-95 print:hidden"
+      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-400 shadow-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95 print:hidden"
       aria-label="Print snapshot"
       data-testid="print-snapshot-button"
     >
@@ -94,18 +94,18 @@ function PrintFooter() {
 
   return (
     <footer
-      className="mt-8 hidden border-t border-stone-200 pt-4 print:block"
+      className="mt-8 hidden border-t border-slate-700 pt-4 print:block"
       data-testid="print-footer"
     >
-      <div className="flex items-start justify-between gap-4 text-xs text-stone-500">
+      <div className="flex items-start justify-between gap-4 text-xs text-slate-500">
         <div>
-          <p className="font-semibold text-stone-700">Financial Health Snapshot</p>
+          <p className="font-semibold text-slate-300">Financial Health Snapshot</p>
           <p className="mt-0.5">Your finances at a glance — no accounts, no data stored</p>
         </div>
         <div className="space-y-0.5 text-right">
           <p data-testid="print-footer-date">{date}</p>
           <p
-            className="break-all font-mono text-xs text-stone-400"
+            className="break-all font-mono text-xs text-slate-500"
             data-testid="print-footer-url"
           >
             {url}
@@ -143,7 +143,7 @@ function CopyLinkButton() {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-600 shadow-sm transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 active:scale-95"
+      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-400 shadow-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95"
       aria-label="Copy link to clipboard"
     >
       {copied ? (
@@ -157,7 +157,7 @@ function CopyLinkButton() {
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
-          <span className="text-emerald-600">Copied!</span>
+          <span className="text-cyan-400">Copied!</span>
         </>
       ) : (
         <>
@@ -198,7 +198,7 @@ function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange: (age:
   if (editing) {
     return (
       <div className="flex items-center gap-1.5" data-testid="age-input-header-form">
-        <label className="text-sm font-medium text-stone-600">Age:</label>
+        <label className="text-sm font-medium text-slate-400">Age:</label>
         <input
           type="number"
           min={18}
@@ -208,7 +208,7 @@ function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange: (age:
           onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") setEditing(false); }}
           onBlur={submit}
           autoFocus
-          className="w-16 rounded-lg border border-stone-300 px-2 py-1 text-sm text-stone-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150"
+          className="w-16 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm text-slate-200 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20 transition-all duration-150"
           placeholder="e.g. 35"
           data-testid="age-input-header"
         />
@@ -219,17 +219,17 @@ function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange: (age:
   if (age) {
     return (
       <div className="flex items-center gap-1" data-testid="age-display-header">
-        <span className="text-sm font-medium text-stone-600">Age:</span>
+        <span className="text-sm font-medium text-slate-400">Age:</span>
         <button
           onClick={() => { setInput(age.toString()); setEditing(true); }}
-          className="min-h-[36px] rounded-lg border border-stone-200 bg-white px-2.5 py-1 text-sm font-medium text-stone-700 shadow-sm transition-all duration-200 hover:border-stone-300 hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
+          className="min-h-[36px] rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
           data-testid="age-value-header"
         >
           {age}
         </button>
         <button
           onClick={() => { onAgeChange(undefined); setInput(""); }}
-          className="p-1 text-stone-400 hover:text-stone-600 transition-colors duration-150 rounded"
+          className="p-1 text-slate-500 hover:text-slate-300 transition-colors duration-150 rounded"
           aria-label="Clear age"
           data-testid="age-clear-header"
         >
@@ -242,7 +242,7 @@ function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange: (age:
   return (
     <button
       onClick={() => { setInput(""); setEditing(true); }}
-      className="min-h-[36px] rounded-lg border border-dashed border-stone-200 bg-white px-3 py-1 text-sm text-stone-400 transition-all duration-200 hover:border-stone-300 hover:text-stone-600 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
+      className="min-h-[36px] rounded-lg border border-dashed border-white/10 bg-transparent px-3 py-1 text-sm text-slate-500 transition-all duration-200 hover:border-white/20 hover:text-slate-300 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
       data-testid="age-add-header"
     >
       Add age
@@ -256,29 +256,29 @@ function WelcomeBanner() {
   if (dismissed) return null;
 
   return (
-    <div className="relative mb-6 rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-sky-50 px-4 py-4 shadow-sm sm:px-6 sm:py-5">
+    <div className="relative mb-6 rounded-xl border border-violet-400/20 bg-gradient-to-br from-violet-400/10 to-cyan-400/5 px-4 py-4 shadow-sm sm:px-6 sm:py-5 backdrop-blur-sm">
       <button
         type="button"
         onClick={() => setDismissed(true)}
-        className="absolute right-3 top-3 rounded-md p-1 text-stone-400 transition-colors hover:bg-white/60 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        className="absolute right-3 top-3 rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
         aria-label="Dismiss welcome message"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
         </svg>
       </button>
-      <h2 className="mb-2 text-base font-semibold text-stone-800 sm:text-lg">
+      <h2 className="mb-2 text-base font-semibold text-slate-200 sm:text-lg">
         Welcome! Here&apos;s how this works
       </h2>
-      <div className="space-y-2 text-sm leading-relaxed text-stone-600">
+      <div className="space-y-2 text-sm leading-relaxed text-slate-400">
         <p>
           This is a simple tool to help you see your <strong>full financial picture in one place</strong>. Just fill in some rough numbers for your savings, debts, income, and expenses — it doesn&apos;t need to be exact.
         </p>
         <p>
           You&apos;ll get a snapshot of where you stand, plus a projection of how things could look in 10, 20, or 30 years.
         </p>
-        <div className="mt-3 rounded-lg bg-white/60 px-3 py-2.5 text-xs text-stone-500 sm:text-sm">
-          <strong className="text-stone-700">Your privacy is fully protected.</strong> Nothing you enter is stored on any server or sent anywhere. All your data stays right here in your browser. The numbers are saved in the page link itself — so you can bookmark it or share it, but nobody can see your information unless you give them that link.
+        <div className="mt-3 rounded-lg bg-white/5 px-3 py-2.5 text-xs text-slate-400 sm:text-sm">
+          <strong className="text-slate-300">Your privacy is fully protected.</strong> Nothing you enter is stored on any server or sent anywhere. All your data stays right here in your browser. The numbers are saved in the page link itself — so you can bookmark it or share it, but nobody can see your information unless you give them that link.
         </div>
       </div>
     </div>
@@ -332,19 +332,19 @@ function CollapsibleSection({
         ref={collapsedRef}
         id={id}
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm text-left transition-all duration-200 hover:shadow-md hover:bg-stone-50 scroll-mt-16"
+        className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 shadow-sm text-left transition-all duration-200 hover:shadow-md hover:bg-white/10 scroll-mt-16"
         aria-expanded={false}
         data-dataflow-source={dataFlowId}
       >
         <div className="flex items-center gap-2 min-w-0">
           <span aria-hidden="true">{icon}</span>
-          <h2 className="text-base font-semibold text-stone-800">{title}</h2>
+          <h2 className="text-base font-semibold text-slate-200">{title}</h2>
           {summary && (
-            <span className="ml-2 text-sm text-stone-400 truncate">{summary}</span>
+            <span className="ml-2 text-sm text-slate-500 truncate">{summary}</span>
           )}
         </div>
         <svg
-          className="h-4 w-4 flex-shrink-0 text-stone-400"
+          className="h-4 w-4 flex-shrink-0 text-slate-500"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -361,7 +361,7 @@ function CollapsibleSection({
       <button
         type="button"
         onClick={() => setOpen(false)}
-        className="absolute right-3 top-3 z-10 rounded-md p-1 text-stone-400 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600"
+        className="absolute right-3 top-3 z-10 rounded-md p-1 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300"
         aria-expanded={true}
         aria-label={`Collapse ${title}`}
       >
@@ -736,20 +736,20 @@ export default function Home() {
         onSkip={handleWizardSkip}
       />
     )}
-    <div className="min-h-screen bg-stone-50">
-      <header className="border-b border-stone-200 bg-white px-4 py-3 shadow-sm sm:px-6 sm:py-4">
+    <div className="min-h-screen bg-slate-950">
+      <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-sm px-4 py-3 shadow-sm sm:px-6 sm:py-4">
         <div className="mx-auto max-w-7xl space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="text-xl font-bold text-stone-900 sm:text-2xl">
+              <h1 className="text-xl font-bold text-white sm:text-2xl">
                 Financial Health Snapshot
               </h1>
-              <p className="text-xs text-stone-500 sm:text-sm">
+              <p className="text-xs text-slate-400 sm:text-sm">
                 Your finances at a glance — no judgment, just clarity
-                <span className="mx-1.5 text-stone-300">·</span>
+                <span className="mx-1.5 text-slate-600">·</span>
                 <a
                   href="/changelog"
-                  className="text-blue-500 transition-colors duration-200 hover:text-blue-700 hover:underline"
+                  className="text-violet-400 transition-colors duration-200 hover:text-violet-300 hover:underline"
                 >
                   Changelog
                 </a>
@@ -779,7 +779,7 @@ export default function Home() {
         </div>
       </header>
 
-      <nav className="sticky top-0 z-30 border-b border-stone-200 bg-white/95 backdrop-blur-sm shadow-sm print:hidden">
+      <nav className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/90 backdrop-blur-sm shadow-sm print:hidden">
         <div className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6">
           <div className="flex items-center gap-1 py-1.5 text-sm">
             {[
@@ -799,7 +799,7 @@ export default function Home() {
                 onClick={() => {
                   document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
                 }}
-                className="flex-shrink-0 rounded-md px-2.5 py-1.5 font-medium text-stone-500 transition-all duration-150 hover:bg-stone-100 hover:text-stone-800 focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95"
+                className="flex-shrink-0 rounded-md px-2.5 py-1.5 font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
               >
                 <span aria-hidden="true" className="mr-1">{item.icon}</span>
                 {item.label}
@@ -815,16 +815,16 @@ export default function Home() {
 
         {/* Sample profile picker for new visitors (no URL state) */}
         {showSampleProfiles && (
-          <div className="mb-6 rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-5 shadow-sm sm:px-6 print:hidden" data-testid="sample-profiles-banner">
+          <div className="mb-6 rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/10 to-emerald-400/5 px-4 py-5 shadow-sm sm:px-6 print:hidden backdrop-blur-sm" data-testid="sample-profiles-banner">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-base font-semibold text-stone-800 sm:text-lg">Start with a sample profile</h2>
-                <p className="mt-0.5 text-sm text-stone-500">See how the tool works with realistic numbers, then edit to match your own.</p>
+                <h2 className="text-base font-semibold text-slate-200 sm:text-lg">Start with a sample profile</h2>
+                <p className="mt-0.5 text-sm text-slate-400">See how the tool works with realistic numbers, then edit to match your own.</p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowSampleProfiles(false)}
-                className="shrink-0 rounded-md p-1 text-stone-400 transition-colors hover:bg-white/60 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                className="shrink-0 rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
                 aria-label="Dismiss sample profiles"
                 data-testid="sample-profiles-dismiss"
               >
@@ -839,28 +839,28 @@ export default function Home() {
                   key={profile.id}
                   type="button"
                   onClick={() => loadProfile(profile)}
-                  className="group flex flex-col gap-2 rounded-lg border border-emerald-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:border-emerald-400 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 active:scale-95"
+                  className="group flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-4 text-left shadow-sm transition-all duration-200 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95"
                   data-testid={`sample-profile-${profile.id}`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-2xl" aria-hidden="true">{profile.emoji}</span>
-                    <span className="font-semibold text-stone-800 text-sm leading-tight group-hover:text-emerald-700 transition-colors duration-150">{profile.name}</span>
+                    <span className="font-semibold text-slate-200 text-sm leading-tight group-hover:text-cyan-400 transition-colors duration-150">{profile.name}</span>
                   </div>
-                  <p className="text-xs text-stone-500 leading-relaxed">{profile.description}</p>
+                  <p className="text-xs text-slate-400 leading-relaxed">{profile.description}</p>
                   <div className="flex flex-wrap gap-1.5 mt-auto">
                     {profile.highlights.map((h) => (
-                      <span key={h} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 border border-emerald-100">{h}</span>
+                      <span key={h} className="rounded-full bg-cyan-400/10 px-2 py-0.5 text-xs font-medium text-cyan-300 border border-cyan-400/20">{h}</span>
                     ))}
                   </div>
                 </button>
               ))}
             </div>
             <div className="mt-4 flex items-center justify-between gap-3">
-              <p className="text-xs text-stone-400">Or enter your own numbers directly in the sections below.</p>
+              <p className="text-xs text-slate-500">Or enter your own numbers directly in the sections below.</p>
               <button
                 type="button"
                 onClick={clearAll}
-                className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-500 shadow-sm transition-all duration-150 hover:border-stone-300 hover:text-stone-700 hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 active:scale-95"
+                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-400 shadow-sm transition-all duration-150 hover:border-white/20 hover:text-slate-200 hover:shadow focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 active:scale-95"
                 data-testid="clear-all-button"
               >
                 Clear all
@@ -924,32 +924,32 @@ export default function Home() {
                   .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
                   .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
                 return (
-                  <ZoomableCard><div className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5" data-testid="portfolio-performance">
+                  <ZoomableCard><div className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:border-white/20 hover:-translate-y-0.5" data-testid="portfolio-performance">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium text-stone-500">Portfolio Performance</h3>
+                      <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
                       <span className="text-lg" aria-hidden="true">📊</span>
                     </div>
-                    <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-green-600" : "text-rose-600"}`}>
+                    <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                       {portfolio.totalGainLoss >= 0 ? "+" : "-"}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.abs(portfolio.totalGainLoss))}
                     </p>
                     {portfolio.totalCostBasis > 0 && (
-                      <p className="mt-0.5 text-sm text-stone-500" data-testid="portfolio-return-pct">
+                      <p className="mt-0.5 text-sm text-slate-400" data-testid="portfolio-return-pct">
                         {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% overall return
                       </p>
                     )}
                     {stocksWithReturns.length > 0 && (
                       <div className="mt-2 space-y-0.5">
                         {stocksWithReturns.map((s) => (
-                          <p key={s.ticker} className="text-xs text-stone-400">
-                            <span className="font-mono font-medium text-stone-500">{s.ticker}</span>{" "}
-                            <span className={s.annualized >= 0 ? "text-green-500" : "text-rose-500"}>
+                          <p key={s.ticker} className="text-xs text-slate-500">
+                            <span className="font-mono font-medium text-slate-400">{s.ticker}</span>{" "}
+                            <span className={s.annualized >= 0 ? "text-emerald-400" : "text-rose-400"}>
                               {s.annualized >= 0 ? "+" : ""}{s.annualized.toFixed(1)}%/yr
                             </span>
                           </p>
                         ))}
                       </div>
                     )}
-                    <p className="mt-1.5 text-xs text-stone-400 leading-relaxed">
+                    <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
                       Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
                     </p>
                   </div></ZoomableCard>

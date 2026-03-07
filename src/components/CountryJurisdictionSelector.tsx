@@ -105,14 +105,14 @@ export default function CountryJurisdictionSelector({
   return (
     <div className="flex items-center gap-1.5" data-testid="country-jurisdiction-selector">
       {/* Country segmented control */}
-      <div className="inline-flex rounded-lg border border-stone-200 bg-stone-100 p-0.5">
+      <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
         <button
           type="button"
           onClick={() => handleCountryChange("CA")}
-          className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 ${
+          className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
             country === "CA"
-              ? "bg-white text-stone-800 shadow-sm"
-              : "text-stone-500 hover:text-stone-700"
+              ? "bg-white/15 text-slate-100 shadow-sm"
+              : "text-slate-500 hover:text-slate-300"
           }`}
           aria-pressed={country === "CA"}
           aria-label="Select Canada"
@@ -124,10 +124,10 @@ export default function CountryJurisdictionSelector({
         <button
           type="button"
           onClick={() => handleCountryChange("US")}
-          className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 ${
+          className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
             country === "US"
-              ? "bg-white text-stone-800 shadow-sm"
-              : "text-stone-500 hover:text-stone-700"
+              ? "bg-white/15 text-slate-100 shadow-sm"
+              : "text-slate-500 hover:text-slate-300"
           }`}
           aria-pressed={country === "US"}
           aria-label="Select United States"
@@ -142,7 +142,7 @@ export default function CountryJurisdictionSelector({
       <select
         value={jurisdiction}
         onChange={(e) => onJurisdictionChange(e.target.value)}
-        className="min-h-[36px] rounded-lg border border-stone-200 bg-white px-2 py-1 text-sm font-medium text-stone-700 shadow-sm transition-all duration-200 hover:border-stone-300 hover:shadow focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
+        className="min-h-[36px] rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
         aria-label={country === "CA" ? "Select province or territory" : "Select state"}
         data-testid="jurisdiction-select"
       >
