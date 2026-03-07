@@ -363,7 +363,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             onClick={(e) => { e.stopPropagation(); setMode("keep-earning"); }}
             className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
               mode === "keep-earning"
-                ? "bg-slate-200 text-slate-900 shadow-sm"
+                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
                 : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
             }`}
             data-testid="mode-keep-earning"
@@ -374,7 +374,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             onClick={(e) => { e.stopPropagation(); setMode("income-stops"); }}
             className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
               mode === "income-stops"
-                ? "bg-slate-200 text-slate-900 shadow-sm"
+                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
                 : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
             }`}
             data-testid="mode-income-stops"
@@ -391,7 +391,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             type="checkbox"
             checked={inflationAdjusted}
             onChange={(e) => handleInflationToggle(e.target.checked)}
-            className="h-3.5 w-3.5 cursor-pointer accent-cyan-400"
+            className="h-3.5 w-3.5 cursor-pointer accent-emerald-400"
             data-testid="inflation-toggle"
             aria-label="Adjust for inflation"
           />
@@ -406,7 +406,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               step="0.1"
               value={inflationRateInput}
               onChange={(e) => handleInflationRateChange(e.target.value)}
-              className="w-14 rounded border border-white/10 bg-slate-800 px-1.5 py-0.5 text-right text-xs text-slate-200 transition-colors focus:border-cyan-500/50 focus:outline-none"
+              className="w-14 rounded border border-white/10 bg-slate-800 px-1.5 py-0.5 text-right text-xs text-slate-200 transition-colors focus:border-emerald-500/50 focus:outline-none"
               data-testid="inflation-rate-input"
               aria-label="Annual inflation rate"
             />
@@ -429,7 +429,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       {/* Surplus subtitle for Keep Earning mode */}
       {mode === "keep-earning" && surplusInfo.income > 0 && (
         <p className="mb-3 text-xs text-slate-500" data-testid="projection-surplus-subtitle">
-          Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)}{surplusInfo.contributions > 0 ? ` − Contributions ${formatCurrency(surplusInfo.contributions)}` : ""} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-emerald-400" : "font-medium text-rose-400"}>{formatCurrency(surplusInfo.surplus)}</span> surplus/mo
+          Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)}{surplusInfo.contributions > 0 ? ` − Contributions ${formatCurrency(surplusInfo.contributions)}` : ""} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-emerald-400" : "font-medium text-red-400"}>{formatCurrency(surplusInfo.surplus)}</span> surplus/mo
         </p>
       )}
 
@@ -463,7 +463,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 <td className="py-1.5 pr-4 font-medium text-slate-300">Total Assets</td>
                 <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.totalAssets)}</td>
                 {summaryPoints.milestones.map((p, i) => (
-                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-cyan-400`}>
+                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-blue-400`}>
                     {formatTableCurrency(p.totalAssets)}
                   </td>
                 ))}
@@ -793,7 +793,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       {mode === "income-stops" && runwayDetails && burndownData && burndownData.data.length > 1 && (
         <>
           {/* Plain-English summary */}
-          <p className="mb-4 text-sm text-stone-600" data-testid="burndown-summary">{buildSummary(runwayDetails)}</p>
+          <p className="mb-4 text-sm text-slate-400" data-testid="burndown-summary">{buildSummary(runwayDetails)}</p>
 
           {/* Legend */}
           <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" data-testid="burndown-legend">
@@ -827,7 +827,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 />
                 <YAxis
                   tick={{ fontSize: 11, fill: "#94a3b8" }}
-                  tickFormatter={(v: number) => v >= 1000 ? `$${(v/1000).toFixed(0)}k` : `$${v}`}
+                  tickFormatter={formatCurrency}
                 />
                 <Tooltip content={<BurndownTooltip />} />
 
