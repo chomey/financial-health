@@ -15,7 +15,7 @@ test.describe("Income entry section", () => {
     await expect(page.getByText("$5,500")).toBeVisible();
     await expect(page.getByText("$800")).toBeVisible();
 
-    await expect(page.getByText("Monthly Total: $6,300")).toBeVisible();
+    await expect(page.getByTestId("income-monthly-total")).toHaveText("$6,300");
 
     await captureScreenshot(page, "task-6-income-with-mock-data");
   });
@@ -49,7 +49,7 @@ test.describe("Income entry section", () => {
     const incomeSection = page.locator("section", { has: page.getByRole("heading", { name: "Income" }) }).first();
     await expect(incomeSection.getByText("Side Hustle")).toBeVisible();
     await expect(incomeSection.getByText("$500")).toBeVisible();
-    await expect(incomeSection.getByText("Monthly Total: $6,800")).toBeVisible();
+    await expect(page.getByTestId("income-monthly-total")).toHaveText("$6,800");
 
     await captureScreenshot(page, "task-6-income-added");
   });
@@ -65,7 +65,7 @@ test.describe("Income entry section", () => {
     await page.getByLabel("Delete Freelance").click();
 
     await expect(page.getByText("Freelance")).not.toBeVisible();
-    await expect(page.getByText("Monthly Total: $5,500")).toBeVisible();
+    await expect(page.getByTestId("income-monthly-total")).toHaveText("$5,500");
 
     await captureScreenshot(page, "task-6-income-deleted");
   });
@@ -82,7 +82,7 @@ test.describe("Income entry section", () => {
     await editInput.press("Enter");
 
     await expect(page.getByText("$6,000")).toBeVisible();
-    await expect(page.getByText("Monthly Total: $6,800")).toBeVisible();
+    await expect(page.getByTestId("income-monthly-total")).toHaveText("$6,800");
 
     await captureScreenshot(page, "task-6-income-amount-edited");
   });

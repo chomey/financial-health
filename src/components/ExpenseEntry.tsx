@@ -116,7 +116,6 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   const [newAmount, setNewAmount] = useState("");
   const [showNewSuggestions, setShowNewSuggestions] = useState(false);
   const [animatingTotal, setAnimatingTotal] = useState(false);
-  const [viewMode, setViewMode] = useState<"monthly" | "yearly">("monthly");
   const [editingTax, setEditingTax] = useState<"federal" | "provincial" | null>(null);
   const [editTaxValue, setEditTaxValue] = useState("");
   const taxInputRef = useRef<HTMLInputElement>(null);
@@ -128,7 +127,6 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
 
   const hc = homeCurrency ?? "CAD";
   const rates = fxRates ?? FALLBACK_RATES;
-  const mult = viewMode === "yearly" ? 12 : 1;
   const itemsTotal = items.reduce((sum, item) => sum + convertToHome(item.amount, item.currency ?? hc, hc, rates), 0);
   const totalTax = federalTax + provincialStateTax;
   const total = itemsTotal + investmentContributions + mortgagePayments + totalTax;
@@ -253,22 +251,6 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
           <span aria-hidden="true">🧾</span>
           Expenses
         </h2>
-        <div className="flex items-center rounded-full bg-stone-100 p-0.5" data-testid="expense-view-toggle">
-          <button
-            type="button"
-            onClick={() => setViewMode("monthly")}
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-200 ${viewMode === "monthly" ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"}`}
-          >
-            Monthly
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("yearly")}
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-200 ${viewMode === "yearly" ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"}`}
-          >
-            Yearly
-          </button>
-        </div>
       </div>
 
       {items.length === 0 && !addingNew ? (
@@ -364,10 +346,11 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                     onClick={() =>
                       startEdit(item.id, "amount", String(item.amount))
                     }
-                    className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-amber-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-amber-50 hover:text-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                    className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-200"
                     aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
                   >
-                    {formatCurrency(item.amount * mult)}
+                    <div className="text-sm font-medium text-amber-700">{formatCurrency(item.amount)}/mo</div>
+                    <div className="text-xs text-stone-400">{formatCurrency(item.amount * 12)}/yr</div>
                   </button>
                 )}
               </div>
@@ -452,7 +435,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   if (!editTaxValue.trim() || val === 0) {
                     onFederalTaxOverride?.(undefined);
                   } else {
-                    onFederalTaxOverride?.(viewMode === "yearly" ? val / 12 : val);
+                    onFederalTaxOverride?.(val);
                   }
                   setEditingTax(null);
                 }}
@@ -468,12 +451,13 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                 type="button"
                 onClick={() => {
                   setEditingTax("federal");
-                  setEditTaxValue(String(Math.round(federalTax * mult)));
+                  setEditTaxValue(String(Math.round(federalTax)));
                 }}
-                className="text-sm font-medium text-stone-400 rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                aria-label={`Edit federal tax, currently ${formatCurrency(federalTax * mult)}`}
+                className="text-right rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                aria-label={`Edit federal tax, currently ${formatCurrency(federalTax)}/mo`}
               >
-                {formatCurrency(federalTax * mult)}
+                <div className="text-sm font-medium text-stone-400">{formatCurrency(federalTax)}/mo</div>
+                <div className="text-xs text-stone-300">{formatCurrency(federalTax * 12)}/yr</div>
               </button>
             )}
           </div>
@@ -506,7 +490,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   if (!editTaxValue.trim() || val === 0) {
                     onProvincialTaxOverride?.(undefined);
                   } else {
-                    onProvincialTaxOverride?.(viewMode === "yearly" ? val / 12 : val);
+                    onProvincialTaxOverride?.(val);
                   }
                   setEditingTax(null);
                 }}
@@ -522,12 +506,13 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                 type="button"
                 onClick={() => {
                   setEditingTax("provincial");
-                  setEditTaxValue(String(Math.round(provincialStateTax * mult)));
+                  setEditTaxValue(String(Math.round(provincialStateTax)));
                 }}
-                className="text-sm font-medium text-stone-400 rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                aria-label={`Edit ${provStateLabel.toLowerCase()} tax, currently ${formatCurrency(provincialStateTax * mult)}`}
+                className="text-right rounded px-2 py-1 transition-colors duration-150 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                aria-label={`Edit ${provStateLabel.toLowerCase()} tax, currently ${formatCurrency(provincialStateTax)}/mo`}
               >
-                {formatCurrency(provincialStateTax * mult)}
+                <div className="text-sm font-medium text-stone-400">{formatCurrency(provincialStateTax)}/mo</div>
+                <div className="text-xs text-stone-300">{formatCurrency(provincialStateTax * 12)}/yr</div>
               </button>
             )}
           </div>
@@ -548,9 +533,10 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               auto
             </span>
           </div>
-          <span className="text-sm font-medium text-stone-400">
-            {formatCurrency(investmentContributions * mult)}
-          </span>
+          <div className="text-right">
+            <div className="text-sm font-medium text-stone-400">{formatCurrency(investmentContributions)}/mo</div>
+            <div className="text-xs text-stone-300">{formatCurrency(investmentContributions * 12)}/yr</div>
+          </div>
         </div>
       )}
 
@@ -568,9 +554,10 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               auto
             </span>
           </div>
-          <span className="text-sm font-medium text-stone-400">
-            {formatCurrency(mortgagePayments * mult)}
-          </span>
+          <div className="text-right">
+            <div className="text-sm font-medium text-stone-400">{formatCurrency(mortgagePayments)}/mo</div>
+            <div className="text-xs text-stone-300">{formatCurrency(mortgagePayments * 12)}/yr</div>
+          </div>
         </div>
       )}
 
@@ -593,9 +580,10 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               auto
             </span>
           </div>
-          <span className={`text-sm font-medium ${surplus >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
-            {surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus) * mult)}
-          </span>
+          <div className="text-right">
+            <div className={`text-sm font-medium ${surplus >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus))}/mo</div>
+            <div className="text-xs text-stone-300">{surplus >= 0 ? "" : "-"}{formatCurrency(Math.abs(surplus) * 12)}/yr</div>
+          </div>
         </div>
       )}
 
@@ -697,24 +685,24 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
           <div className="space-y-0.5 text-xs text-stone-400" data-testid="expense-subtotals">
             <div className="flex justify-between">
               <span>Expenses</span>
-              <span>{formatCurrency(itemsTotal * mult)}</span>
+              <span>{formatCurrency(itemsTotal)}/mo</span>
             </div>
             {totalTax > 0 && (
               <div className="flex justify-between">
                 <span>Taxes (est.)</span>
-                <span>{formatCurrency(totalTax * mult)}</span>
+                <span>{formatCurrency(totalTax)}/mo</span>
               </div>
             )}
             {investmentContributions > 0 && (
               <div className="flex justify-between">
                 <span>Contributions</span>
-                <span>{formatCurrency(investmentContributions * mult)}</span>
+                <span>{formatCurrency(investmentContributions)}/mo</span>
               </div>
             )}
             {mortgagePayments > 0 && (
               <div className="flex justify-between">
                 <span>Mortgage</span>
-                <span>{formatCurrency(mortgagePayments * mult)}</span>
+                <span>{formatCurrency(mortgagePayments)}/mo</span>
               </div>
             )}
           </div>
@@ -727,7 +715,9 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               animatingTotal ? "scale-110 text-amber-600" : ""
             }`}
           >
-            {viewMode === "yearly" ? "Yearly" : "Monthly"} Total: {formatCurrency(total * mult)}
+            Monthly: <span data-testid="expense-monthly-total">{formatCurrency(total)}</span>
+            {" | "}
+            Yearly: <span data-testid="expense-yearly-total">{formatCurrency(total * 12)}</span>
           </span>
           {!addingNew && (
             <button

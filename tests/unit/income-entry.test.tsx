@@ -18,10 +18,10 @@ describe("IncomeEntry component", () => {
     expect(screen.getByText("Freelance")).toBeInTheDocument();
   });
 
-  it("displays formatted dollar amounts", () => {
+  it("displays formatted dollar amounts with frequency suffix", () => {
     render(<IncomeEntry />);
-    expect(screen.getByText("$5,500")).toBeInTheDocument();
-    expect(screen.getByText("$800")).toBeInTheDocument();
+    expect(screen.getByText("$5,500/mo")).toBeInTheDocument();
+    expect(screen.getByText("$800/mo")).toBeInTheDocument();
   });
 
   it("shows monthly total of all income", () => {
@@ -90,7 +90,7 @@ describe("IncomeEntry component", () => {
   it("displays income amounts in green", () => {
     render(<IncomeEntry />);
     const amountBtn = screen.getByLabelText(/Edit amount for Salary, currently/);
-    expect(amountBtn.className).toContain("text-green-700");
+    expect(amountBtn.querySelector('[class*="text-green-700"]')).toBeInTheDocument();
   });
 
   it("adds a new income item via the add form", async () => {
@@ -101,7 +101,7 @@ describe("IncomeEntry component", () => {
     await user.type(screen.getByLabelText("New income amount"), "500");
     await user.click(screen.getByLabelText("Confirm add income"));
     expect(screen.getByText("Side Hustle")).toBeInTheDocument();
-    expect(screen.getByText("$500")).toBeInTheDocument();
+    expect(screen.getByText("$500/mo")).toBeInTheDocument();
     expect(screen.getByTestId("income-monthly-total")).toHaveTextContent("$6,800");
   });
 });

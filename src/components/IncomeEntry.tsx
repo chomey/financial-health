@@ -418,10 +418,15 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                     onClick={() =>
                       startEdit(item.id, "amount", String(item.amount))
                     }
-                    className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-green-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-green-50 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-200"
+                    className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-200"
                     aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
                   >
-                    {formatCurrency(item.amount)}
+                    <div className="text-sm font-medium text-green-700">{formatCurrency(item.amount)}{FREQUENCY_SHORT_LABELS[item.frequency ?? "monthly"]}</div>
+                    {(item.frequency ?? "monthly") === "monthly" ? (
+                      <div className="text-xs text-stone-400">{formatCurrency(item.amount * 12)}/yr</div>
+                    ) : (
+                      <div className="text-xs text-stone-400">{formatCurrency(normalizeToMonthly(item.amount, item.frequency))}/mo</div>
+                    )}
                   </button>
                 )}
 
@@ -519,7 +524,10 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                   auto
                 </span>
               </div>
-              <span className="text-sm font-medium text-green-600">{formatCurrency(r.amount)}</span>
+              <div className="text-right">
+                <div className="text-sm font-medium text-green-600">{formatCurrency(r.amount)}/mo</div>
+                <div className="text-xs text-stone-400">{formatCurrency(r.amount * 12)}/yr</div>
+              </div>
             </div>
           ))}
         </div>
@@ -650,7 +658,9 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
             animatingTotal ? "scale-110 text-green-600" : ""
           }`}
         >
-          Monthly Total: <span data-testid="income-monthly-total">{formatCurrency(total)}</span>
+          Monthly: <span data-testid="income-monthly-total">{formatCurrency(total)}</span>
+          {" | "}
+          Yearly: <span data-testid="income-yearly-total">{formatCurrency(total * 12)}</span>
         </span>
         {!addingNew && (
           <button
