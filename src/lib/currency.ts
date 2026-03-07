@@ -81,7 +81,7 @@ export function formatCurrencyCompact(
   const sign = amount < 0 ? "-" : "";
   const isForeign = homeCurrency !== undefined && currency !== homeCurrency;
   const symbol = isForeign ? (currency === "CAD" ? "CA$" : "US$") : "$";
-  if (abs >= 1_000_000) return `${sign}${symbol}${(abs / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000_000) return `${sign}${symbol}${parseFloat((abs / 1_000_000).toFixed(1))}M`;
   if (abs >= 1_000) return `${sign}${symbol}${(abs / 1_000).toFixed(0)}k`;
   return `${sign}${symbol}${abs.toFixed(0)}`;
 }

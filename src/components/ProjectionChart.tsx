@@ -131,6 +131,40 @@ function BurndownTooltip({ active, payload, label }: CustomTooltipProps) {
   );
 }
 
+/** Custom SVG label for vertical ReferenceLine — renders a pill below the top edge to prevent clipping */
+function MilestoneLabelContent({
+  viewBox,
+  value,
+  fill = "#10b981",
+}: {
+  viewBox?: { x: number; y: number; width: number; height: number };
+  value?: string;
+  fill?: string;
+}) {
+  if (!viewBox || !value) return null;
+  const { x, y } = viewBox;
+  const textWidth = value.length * 5.8 + 10;
+  return (
+    <g>
+      <rect
+        x={x + 3}
+        y={y + 6}
+        width={textWidth}
+        height={15}
+        rx={3}
+        fill="white"
+        fillOpacity={0.9}
+        stroke={fill}
+        strokeWidth={0.5}
+        strokeOpacity={0.5}
+      />
+      <text x={x + 7} y={y + 17} fontSize={10} fill={fill} fontWeight={600}>
+        {value}
+      </text>
+    </g>
+  );
+}
+
 export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRate = 4 }: ProjectionChartProps) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.compact(v);
@@ -472,7 +506,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
       <div className="h-64 sm:h-80" data-testid="projection-chart-container">
         <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
-          <LineChart data={chartData} margin={{ top: 10, right: 10, bottom: 5, left: 0 }}>
+          <LineChart data={chartData} margin={{ top: 10, right: 10, bottom: 5, left: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
             <XAxis
               dataKey="year"
@@ -485,7 +519,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             <YAxis
               tick={{ fontSize: 11, fill: "#78716c" }}
               tickFormatter={formatCurrency}
-              width={60}
+              width={75}
             />
             <Tooltip content={<CustomTooltip />} />
 
@@ -532,13 +566,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     x={consumerDebtFreeYear}
                     stroke="#10b981"
                     strokeDasharray="6 3"
-                    label={{
-                      value: "Consumer Debt Free",
-                      position: "top",
-                      fill: "#10b981",
-                      fontSize: 11,
-                      fontWeight: 600,
-                    }}
+                    label={<MilestoneLabelContent value="Consumer Debt Free" fill="#10b981" />}
                   />
                 )}
                 {mortgageFreeYear !== null && mortgageFreeYear <= years && mortgageFreeYear > 0 && (
@@ -546,13 +574,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     x={mortgageFreeYear}
                     stroke="#059669"
                     strokeDasharray="6 3"
-                    label={{
-                      value: "Mortgage Free",
-                      position: "top",
-                      fill: "#059669",
-                      fontSize: 11,
-                      fontWeight: 600,
-                    }}
+                    label={<MilestoneLabelContent value="Mortgage Free" fill="#059669" />}
                   />
                 )}
               </>
@@ -562,13 +584,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                   x={debtFreeYear}
                   stroke="#10b981"
                   strokeDasharray="6 3"
-                  label={{
-                    value: "Debt Free",
-                    position: "top",
-                    fill: "#10b981",
-                    fontSize: 11,
-                    fontWeight: 600,
-                  }}
+                  label={<MilestoneLabelContent value="Debt Free" fill="#10b981" />}
                 />
               )
             )}

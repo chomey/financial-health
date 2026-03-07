@@ -9,8 +9,8 @@
 -->
 
 ## Summary
-- **Total Tasks**: 121
-- **Completed**: 121
+- **Total Tasks**: 122
+- **Completed**: 122
 - **Remaining**: 0
 - **Last Updated**: 2026-03-07
 
@@ -56,15 +56,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 112: Employer match modeling for registered accounts
-- **Date**: 2026-03-06
-- **Files**: `src/components/AssetEntry.tsx` (added `employerMatchPct`/`employerMatchCap` to `Asset` interface, `EMPLOYER_MATCH_ELIGIBLE` set, `computeEmployerMatchMonthly` helper, `annualEmploymentSalary` prop, employer match UI badges, projection includes match), `src/lib/url-state.ts` (`emp`/`emc` fields encode/decode), `src/lib/projections.ts` (employer match added to `monthlyContribution`), `src/lib/financial-state.ts` (`employerMatchAnnual` in `toFinancialData`), `src/lib/insights.ts` (`"employer-match"` type + insight), `src/components/InsightsPanel.tsx` (`"employer-match"` source), `src/app/page.tsx` (`annualEmploymentSalary` computed + passed), `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`, `tests/unit/employer-match.test.ts` (new), `tests/e2e/employer-match.spec.ts` (new)
-- **Tests**: T1: 1410 passed, 0 failed (86 files). T2: 8 passed (employer-match). Build: passes.
-- **Screenshots**:
-  ![Employer match empty](screenshots/task-112-employer-match-empty.png)
-  ![Employer match amount](screenshots/task-112-employer-match-amount.png)
-  ![Employer match insight](screenshots/task-112-employer-match-insight.png)
-  ![Employer match capped](screenshots/task-112-employer-match-capped.png)
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 113: Preset sample profiles for new users
 - **Date**: 2026-03-06
@@ -164,6 +156,17 @@
   ![Income replacement](screenshots/task-120-income-replacement.png)
   ![Full dashboard](screenshots/task-120-full-dashboard.png)
 - **Notes**: All 10 feature areas from tasks 110-119 verified end-to-end. Full regression suite (407 tests) passes. No pre-existing test failures.
+
+## Task 122: Fix projection chart label clipping
+- **Date**: 2026-03-07
+- **Files**: `src/lib/currency.ts` (compact format: strip trailing .0 from millions), `src/components/ProjectionChart.tsx` (added `MilestoneLabelContent` SVG component; main chart margin left 0→10, YAxis width 60→75; milestone reference line labels use custom SVG pill), `tests/unit/currency.test.ts` (3 new test cases for round-million compact format), `tests/e2e/projection-chart-labels.spec.ts` (new — 5 tests), `src/lib/changelog.ts` (v122 entry, UI Polish range extended to 130), `tests/unit/changelog.test.ts` (updated counts)
+- **Tests**: T1: 1550 passed, 0 failed (95 files). T2: 5 passed (projection-chart-labels). Build: passes.
+- **Screenshots**:
+  ![Projection chart container](screenshots/task-122-projection-chart-container.png)
+  ![Y-axis labels](screenshots/task-122-yaxis-labels.png)
+  ![Chart dimensions](screenshots/task-122-chart-dimensions.png)
+  ![Milestone labels](screenshots/task-122-milestone-labels.png)
+  ![Full chart](screenshots/task-122-full-chart.png)
 
 ## Task 121: Auto-display investment returns in Income section
 - **Date**: 2026-03-07
