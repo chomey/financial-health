@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Debt payoff strategy comparison
+  {
+    version: 116,
+    title: "Debt payoff strategy comparison",
+    description: "Added avalanche vs snowball vs current debt payoff strategy comparison. When you have 2 or more debts with interest rates and monthly payments, the insights panel now shows how much interest and time you could save by switching strategies. The avalanche method (highest-rate debt first) minimizes total interest paid; the snowball method (smallest balance first) builds momentum by eliminating debts faster. The insight shows the best strategy for your situation and how long until you're debt-free at current payments.",
+    date: "2026-03-06",
+  },
   // Mobile guided wizard
   {
     version: 115,
