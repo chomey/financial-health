@@ -20,8 +20,8 @@ test.describe("Net Worth Donut Chart", () => {
     const svg = chart.locator("svg").first();
     await expect(svg).toBeVisible();
 
-    // Should show legend
-    const legend = chart.locator('[data-testid="donut-legend"]');
+    // Should show composition table
+    const legend = chart.locator('[data-testid="donut-composition-table"]');
     await expect(legend).toBeVisible();
 
     await captureScreenshot(page, "task-104-donut-chart-default");
@@ -59,14 +59,14 @@ test.describe("Net Worth Donut Chart", () => {
     await captureScreenshot(page, "task-104-donut-center-label");
   });
 
-  test("donut legend shows segment names", async ({ page }) => {
+  test("donut composition table shows segment names", async ({ page }) => {
     await page.goto("/");
 
-    const legend = page.locator('[data-testid="donut-legend"]');
-    await expect(legend).toBeVisible();
+    const table = page.locator('[data-testid="donut-composition-table"]');
+    await expect(table).toBeVisible();
 
-    // Legend should have colored squares
-    const swatches = legend.locator("span.inline-block");
+    // Table rows should have colored swatches
+    const swatches = table.locator("span.inline-block");
     expect(await swatches.count()).toBeGreaterThan(0);
 
     await captureScreenshot(page, "task-104-donut-legend");
