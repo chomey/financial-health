@@ -28,36 +28,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 97: Show after-tax runway on metric card and merge Withdrawal Tax Impact into Financial Runway
-- **Status**: Complete
-- **Date**: 2026-03-06
-- **Changes**:
-  - `src/components/SnapshotDashboard.tsx`: Added `runwayAfterTax` sub-line to Financial Runway metric card. Shows "X.X mo after withdrawal taxes" in amber when it differs from both `runwayWithGrowth` and the base value.
-  - `src/app/page.tsx`: Removed `WithdrawalTaxSummary` component from dashboard sidebar. Removed import.
-  - `src/components/DataFlowArrows.tsx`: Expanded `RunwayExplainerContent` to include full withdrawal tax content: tax treatment breakdown bar (green/amber/rose), account groupings by treatment, suggested withdrawal order with disclaimer, and tax drag summary. Content derived from existing `withdrawalOrder` data in `RunwayExplainerDetails`.
-  - `src/lib/changelog.ts`: Added task 97 entry. Fixed pre-existing duplicate entries for task 96. Updated UI Polish milestone range to [88, 99].
-  - `tests/e2e/withdrawal-tax-summary.spec.ts`: Rewritten to test withdrawal tax in Financial Runway explainer modal instead of standalone card.
-  - `tests/e2e/withdrawal-pills-overflow.spec.ts`: Updated to test withdrawal order in explainer modal.
-  - `tests/e2e/milestone-10-e2e.spec.ts`: Updated withdrawal tax test to check explainer modal.
-  - `tests/e2e/milestone-6-e2e.spec.ts`: Updated all withdrawal tax references to explainer modal. Fixed pre-existing `burndown-tax-drag` testid references.
-  - `tests/unit/milestone-6-e2e-infra.test.ts`: Updated string checks for refactored E2E test.
-  - `tests/unit/milestone-10-e2e-infra.test.ts`: Updated string checks for refactored E2E test.
-  - `tests/unit/snapshot-dashboard.test.tsx`: Added 4 tests for `runwayAfterTax` sub-line visibility logic.
-  - `tests/unit/runway-withdrawal-tax-merge.test.ts`: New file with 4 tests verifying `RunwayExplainerDetails` contains all data needed for merged withdrawal tax view.
-  - `tests/unit/changelog.test.ts`: Updated counts for 97 entries and milestone range.
-- **Test tiers run**: T1, T2
-- **Tests**:
-  - `tests/unit/snapshot-dashboard.test.tsx`: 21 passed (4 new for runwayAfterTax)
-  - `tests/unit/runway-withdrawal-tax-merge.test.ts`: 4 passed (all new)
-  - All 72 unit test files: 1192 passed, 0 failed
-  - `tests/e2e/withdrawal-tax-summary.spec.ts`: 3 passed
-  - `tests/e2e/withdrawal-pills-overflow.spec.ts`: 2 passed
-  - `tests/e2e/milestone-10-e2e.spec.ts`: 11 passed
-  - `tests/e2e/milestone-6-e2e.spec.ts`: 5 passed
-- **Screenshots**:
-  ![Runway explainer with withdrawal tax content](screenshots/task-97-runway-explainer-with-withdrawal-tax.png)
-  ![Runway card with after-tax sub-line](screenshots/task-97-runway-card-after-tax.png)
-- **Notes**: The `WithdrawalTaxSummary` component file still exists but is no longer rendered on the page. It could be deleted in a future cleanup task. All withdrawal tax information is now consolidated in the Financial Runway explainer modal, accessible by clicking the Financial Runway metric card.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 98: Merge projection chart and runway burndown into a single multi-mode chart
 - **Status**: Complete
@@ -219,3 +190,21 @@
   ![Runway explainer](screenshots/task-107-runway-explainer.png)
   ![All metric cards](screenshots/task-107-all-metric-cards.png)
 - **Notes**: **Bug fixed**: Projection chart `baseSurplus` was not subtracting `totalMortgagePayments`, causing projected asset growth to be overstated for users with mortgages. The surplus was being added to savings while mortgage payments were also being paid from nowhere. Drawdown threshold also updated to include mortgage in the income shortfall calculation. All other formulas (Net Worth, Monthly Surplus, Estimated Tax, Financial Runway, Debt-to-Asset Ratio, Sankey flows) were verified correct.
+
+## Task 109: [MILESTONE] E2E test for UI polish and formula validation
+- **Date**: 2026-03-06
+- **Files**: `tests/e2e/milestone-e2e-109.spec.ts` (new — 11 tests), `tests/unit/milestone-12-e2e-infra.test.ts` (new — 12 tests), `src/lib/changelog.ts` (added v109 entry, updated milestone range), `tests/unit/changelog.test.ts` (updated counts)
+- **Tests**: T1: 1345 passed, 0 failed (82 files). T2: 11 passed (milestone-e2e-109). T3: 345 passed, 0 failed (full suite).
+- **Screenshots**:
+  ![Tax bracket bars](screenshots/task-109-tax-bracket-bars.png)
+  ![Explainer full currency](screenshots/task-109-explainer-full-currency.png)
+  ![Tax explainer full currency](screenshots/task-109-tax-explainer-full-currency.png)
+  ![Donut chart](screenshots/task-109-donut-chart.png)
+  ![Sankey investment income](screenshots/task-109-sankey-investment-income.png)
+  ![Fast forward options](screenshots/task-109-fast-forward-options.png)
+  ![Fast forward early retirement](screenshots/task-109-fast-forward-early-retirement.png)
+  ![Net worth match](screenshots/task-109-net-worth-match.png)
+  ![Tax breakdown rates](screenshots/task-109-tax-breakdown-rates.png)
+  ![Runway breakdown](screenshots/task-109-runway-breakdown.png)
+  ![Full dashboard](screenshots/task-109-full-dashboard.png)
+- **Notes**: TASKS.md was renumbered during this iteration — original task 108 (E2E milestone) became task 109, and a new task 108 (currency formatting) was inserted ahead of it. Implemented the E2E milestone test as task 109. Changelog has version gap at 108 (pending task).
