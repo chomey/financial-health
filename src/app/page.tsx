@@ -679,12 +679,19 @@ export default function Home() {
     ...(totals.totalPropertyMortgage > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totals.totalPropertyMortgage)}`, value: totals.totalPropertyMortgage, sign: "negative" as const }] : []),
   ];
 
+  // Income Replacement: invested assets (green) driving the 4% withdrawal
+  const incomeReplacementConnections: DataFlowConnectionDef[] = [
+    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" as const },
+    ...(totals.totalStocks > 0 ? [{ sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" as const }] : []),
+  ].filter((c) => c.value > 0);
+
   const dataFlowConnections: Record<string, DataFlowConnectionDef[]> = {
     "Net Worth": netWorthConnections,
     "Monthly Surplus": monthlySurplusConnections,
     "Estimated Tax": estimatedTaxConnections,
     "Financial Runway": financialRunwayConnections,
     "Debt-to-Asset Ratio": debtToAssetConnections,
+    "Income Replacement": incomeReplacementConnections,
   };
 
   // Insight-type data-flow connections (keyed by InsightType)

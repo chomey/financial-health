@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Income Replacement explainer modal
+  {
+    version: 133,
+    title: "Income Replacement metric — clickable explainer with 4% rule breakdown",
+    description: "The Income Replacement metric card is now clickable. Clicking opens a detailed explainer showing: formula breakdown (total invested assets × 4% ÷ 12 vs monthly income), progress through tiers (Early stage → Building momentum → Strong position → Nearly independent → Financially independent), per-account contribution to the sustainable withdrawal, how much more is needed to reach the next tier, and an educational explanation of the 4% Safe Withdrawal Rate rule.",
+    date: "2026-03-07",
+  },
   // Show company/fund names for stock tickers
   {
     version: 132,
@@ -863,7 +870,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 132] as const },
+    { milestone: "UI Polish", range: [88, 133] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

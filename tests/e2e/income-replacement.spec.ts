@@ -78,3 +78,107 @@ test.describe("Income Replacement metric", () => {
     expect(text).not.toContain("mo");
   });
 });
+
+test.describe("Income Replacement explainer modal (task 133)", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await page.waitForSelector('[data-testid="snapshot-dashboard"]');
+  });
+
+  test("clicking Income Replacement card opens explainer modal", async ({ page }) => {
+    const card = page.getByTestId("metric-card-income-replacement");
+    await expect(card).toBeVisible();
+    await card.click();
+    const modal = page.getByTestId("explainer-modal");
+    await expect(modal).toBeVisible();
+    await expect(modal).toContainText("Income Replacement");
+
+    await captureScreenshot(page, "task-133-income-replacement-explainer-open");
+  });
+
+  test("explainer shows formula breakdown with total invested assets", async ({ page }) => {
+    const card = page.getByTestId("metric-card-income-replacement");
+    await card.click();
+    const modal = page.getByTestId("explainer-modal");
+    await expect(modal).toBeVisible();
+
+    const formula = modal.getByTestId("income-replacement-formula");
+    await expect(formula).toBeVisible();
+    await expect(formula).toContainText("Total invested portfolio");
+    await expect(formula).toContainText("4%");
+    await expect(formula).toContainText("Monthly after-tax income");
+
+    await captureScreenshot(page, "task-133-income-replacement-formula");
+  });
+
+  test("explainer shows current tier in tier progress section", async ({ page }) => {
+    const card = page.getByTestId("metric-card-income-replacement");
+    await card.click();
+    const modal = page.getByTestId("explainer-modal");
+    await expect(modal).toBeVisible();
+
+    const tiers = modal.getByTestId("income-replacement-tiers");
+    await expect(tiers).toBeVisible();
+    const currentTier = modal.getByTestId("income-replacement-current-tier");
+    await expect(currentTier).toBeVisible();
+
+    const tierText = await currentTier.textContent();
+    const validTiers = ["Early stage", "Building momentum", "Strong position", "Nearly independent", "Financially independent"];
+    expect(validTiers.some((t) => tierText?.includes(t))).toBeTruthy();
+  });
+
+  test("explainer shows per-asset breakdown", async ({ page }) => {
+    const card = page.getByTestId("metric-card-income-replacement");
+    await card.click();
+    const modal = page.getByTestId("explainer-modal");
+    await expect(modal).toBeVisible();
+
+    const breakdown = modal.getByTestId("income-replacement-asset-breakdown");
+    await expect(breakdown).toBeVisible();
+    await expect(breakdown).toContainText("/mo");
+
+    await captureScreenshot(page, "task-133-income-replacement-asset-breakdown");
+  });
+
+  test("explainer shows 4% rule educational section", async ({ page }) => {
+    const card = page.getByTestId("metric-card-income-replacement");
+    await card.click();
+    const modal = page.getByTestId("explainer-modal");
+    await expect(modal).toBeVisible();
+
+    const education = modal.getByTestId("income-replacement-education");
+    await expect(education).toBeVisible();
+    await expect(education).toContainText("4% rule");
+    await expect(education).toContainText("Trinity Study");
+
+    await captureScreenshot(page, "task-133-income-replacement-education");
+  });
+
+  test("explainer closes on backdrop click", async ({ page }) => {
+    const card = page.getByTestId("metric-card-income-replacement");
+    await card.click();
+    await expect(page.getByTestId("explainer-modal")).toBeVisible();
+
+    const backdrop = page.getByTestId("explainer-backdrop");
+    await backdrop.click({ position: { x: 10, y: 10 } });
+    await expect(page.getByTestId("explainer-modal")).not.toBeVisible({ timeout: 1000 });
+  });
+
+  test("explainer closes on close button click", async ({ page }) => {
+    const card = page.getByTestId("metric-card-income-replacement");
+    await card.click();
+    await expect(page.getByTestId("explainer-modal")).toBeVisible();
+
+    await page.getByTestId("explainer-close").click();
+    await expect(page.getByTestId("explainer-modal")).not.toBeVisible({ timeout: 1000 });
+  });
+
+  test("Income Replacement card shows 'Click to explain' hint on hover", async ({ page }) => {
+    const card = page.getByTestId("metric-card-income-replacement");
+    await card.hover();
+    const hint = card.getByTestId("click-to-explain-hint");
+    await expect(hint).toBeVisible();
+
+    await captureScreenshot(page, "task-133-income-replacement-click-hint");
+  });
+});

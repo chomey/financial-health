@@ -7,14 +7,14 @@
 -->
 
 ## Summary
-- **Total Tasks**: 134
-- **Completed**: 132
-- **Remaining**: 2
+- **Total Tasks**: 139
+- **Completed**: 133
+- **Remaining**: 6
 - **Last Updated**: 2026-03-07
 
-## Task 132: Show company/fund names for stock tickers
+## Task 133: Make Income Replacement metric card clickable with detailed explainer
 - **Date**: 2026-03-07
-- **Files**: `src/lib/ticker-names.ts` (new), `src/components/StockEntry.tsx`, `src/components/DataFlowArrows.tsx`, `tests/unit/ticker-names.test.ts` (new), `tests/e2e/ticker-names.spec.ts` (new), `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`
-- **Tests**: 1701 passed (10 new T1 in `ticker-names.test.ts`, 4 new T2 in `ticker-names.spec.ts`)
-- **Screenshots**: ![Ticker name AAPL](screenshots/task-132-ticker-name-aapl.png) ![Multiple ticker names](screenshots/task-132-ticker-names-multiple.png) ![Ticker name explainer](screenshots/task-132-ticker-name-explainer.png)
-- **Notes**: Created static map with 550+ ticker-to-name entries (S&P 500, popular ETFs, Canadian stocks/ETFs, Vanguard/Fidelity funds). Async fallback via Yahoo Finance search API with module-level cache. Company names show as subtle 10px text below ticker buttons in StockEntry and as parenthetical labels in DataFlowArrows explainer source cards. Fixed pre-existing changelog test failure (task 131 count mismatch).
+- **Files**: `src/components/DataFlowArrows.tsx`, `src/components/SnapshotDashboard.tsx`, `src/lib/financial-state.ts`, `src/app/page.tsx`, `src/lib/changelog.ts`, `tests/unit/income-replacement.test.ts`, `tests/e2e/income-replacement.spec.ts`, `tests/unit/changelog.test.ts`
+- **Tests**: 1715 passed (14 new T1 in `income-replacement.test.ts`, 8 new T2 in `income-replacement.spec.ts`)
+- **Screenshots**: ![Explainer open](screenshots/task-133-income-replacement-explainer-open.png) ![Formula breakdown](screenshots/task-133-income-replacement-formula.png) ![Asset breakdown](screenshots/task-133-income-replacement-asset-breakdown.png) ![4% rule education](screenshots/task-133-income-replacement-education.png) ![Click hint](screenshots/task-133-income-replacement-click-hint.png)
+- **Notes**: Added `IncomeReplacementExplainerDetails` interface and `IncomeReplacementExplainerContent` component to DataFlowArrows.tsx. Added `computeIncomeReplacementDetails()` to financial-state.ts. The explainer shows: formula (total invested × 4% ÷ 12), tier progress bar (5 tiers), per-account contributions, next-tier goal, and 4% rule education. Fixed a changelog test expecting 132 entries (now 133).

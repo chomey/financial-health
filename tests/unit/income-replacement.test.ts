@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { generateInsights } from "@/lib/insights";
+import { computeIncomeReplacementDetails, computeMetrics } from "@/lib/financial-state";
 import type { FinancialData } from "@/lib/insights";
+import type { FinancialState } from "@/lib/financial-state";
 
 /** Base financial data with income for ratio tests */
 const baseData: FinancialData = {
@@ -137,5 +139,150 @@ describe("income replacement insight generation", () => {
     const ir = insights.find((i) => i.id === "income-replacement");
     expect(ir).toBeDefined();
     expect(ir!.message).toMatch(/financial independence/);
+  });
+});
+
+// Base state for computeIncomeReplacementDetails tests
+const baseState: FinancialState = {
+  assets: [
+    { id: "a1", category: "TFSA", amount: 100_000 },
+    { id: "a2", category: "RRSP", amount: 200_000 },
+  ],
+  debts: [],
+  income: [{ id: "i1", category: "Salary", amount: 5000 }],
+  expenses: [],
+  properties: [],
+  stocks: [],
+  country: "CA",
+  jurisdiction: "ON",
+};
+
+describe("computeIncomeReplacementDetails — breakdown computation", () => {
+  it("computes monthlyWithdrawal4pct correctly", () => {
+    const details = computeIncomeReplacementDetails(baseState, 300_000, 5000);
+    // 300,000 * 0.04 / 12 = 1,000
+    expect(details.monthlyWithdrawal4pct).toBeCloseTo(1000, 1);
+  });
+
+  it("computes incomeReplacementPct correctly", () => {
+    const details = computeIncomeReplacementDetails(baseState, 300_000, 5000);
+    // 1000 / 5000 * 100 = 20%
+    expect(details.incomeReplacementPct).toBeCloseTo(20, 1);
+  });
+
+  it("assigns 'Early stage' tier for pct < 25", () => {
+    const details = computeIncomeReplacementDetails(baseState, 100_000, 5000);
+    expect(details.currentTierLabel).toBe("Early stage");
+    expect(details.nextTierLabel).toBe("Building momentum");
+  });
+
+  it("assigns 'Building momentum' tier for 25-49%", () => {
+    // 375,000 * 0.04/12 / 5000 = 25%
+    const details = computeIncomeReplacementDetails(baseState, 375_000, 5000);
+    expect(details.currentTierLabel).toBe("Building momentum");
+    expect(details.nextTierLabel).toBe("Strong position");
+  });
+
+  it("assigns 'Strong position' tier for 50-74%", () => {
+    const details = computeIncomeReplacementDetails(baseState, 750_000, 5000);
+    expect(details.currentTierLabel).toBe("Strong position");
+    expect(details.nextTierLabel).toBe("Nearly independent");
+  });
+
+  it("assigns 'Nearly independent' tier for 75-99%", () => {
+    const details = computeIncomeReplacementDetails(baseState, 1_125_000, 5000);
+    expect(details.currentTierLabel).toBe("Nearly independent");
+    expect(details.nextTierLabel).toBe("Financially independent");
+  });
+
+  it("assigns 'Financially independent' tier for 100%+", () => {
+    const details = computeIncomeReplacementDetails(baseState, 1_500_000, 5000);
+    expect(details.currentTierLabel).toBe("Financially independent");
+    expect(details.nextTierLabel).toBeNull();
+    expect(details.amountNeededForNextTier).toBeNull();
+  });
+
+  it("computes amountNeededForNextTier correctly", () => {
+    // At 20% (300k, income 5000): need 25% → portfolio = 0.25 * 5000 * 12 / 0.04 = 375,000
+    // amountNeeded = 375,000 - 300,000 = 75,000
+    const details = computeIncomeReplacementDetails(baseState, 300_000, 5000);
+    expect(details.amountNeededForNextTier).toBeGreaterThan(0);
+    expect(details.amountNeededForNextTier!).toBeLessThanOrEqual(75_000);
+  });
+
+  it("builds per-asset breakdown from state assets", () => {
+    const details = computeIncomeReplacementDetails(baseState, 300_000, 5000);
+    expect(details.assetBreakdown).toHaveLength(2);
+    expect(details.assetBreakdown[0].label).toBe("TFSA");
+    expect(details.assetBreakdown[0].balance).toBe(100_000);
+    expect(details.assetBreakdown[0].monthlyWithdrawal).toBe(Math.round(100_000 * 0.04 / 12));
+    expect(details.assetBreakdown[1].label).toBe("RRSP");
+    expect(details.assetBreakdown[1].balance).toBe(200_000);
+  });
+
+  it("includes stock holdings in asset breakdown", () => {
+    const stateWithStocks: FinancialState = {
+      ...baseState,
+      stocks: [{ id: "s1", ticker: "AAPL", shares: 10, lastFetchedPrice: 200 }],
+    };
+    const details = computeIncomeReplacementDetails(stateWithStocks, 302_000, 5000);
+    const aapl = details.assetBreakdown.find((a) => a.label === "AAPL");
+    expect(aapl).toBeDefined();
+    expect(aapl!.balance).toBe(2000);
+  });
+
+  it("excludes computed assets from breakdown", () => {
+    const stateWithComputed: FinancialState = {
+      ...baseState,
+      assets: [
+        ...baseState.assets,
+        { id: "_computed_stocks", category: "Stocks", amount: 50_000, computed: true },
+      ],
+    };
+    const details = computeIncomeReplacementDetails(stateWithComputed, 300_000, 5000);
+    const computed = details.assetBreakdown.find((a) => a.label === "Stocks");
+    expect(computed).toBeUndefined();
+  });
+
+  it("returns 0% pct when monthlyAfterTaxIncome is 0", () => {
+    const details = computeIncomeReplacementDetails(baseState, 300_000, 0);
+    expect(details.incomeReplacementPct).toBe(0);
+  });
+});
+
+describe("computeMetrics includes incomeReplacementDetails", () => {
+  it("attaches incomeReplacementDetails to Income Replacement metric", () => {
+    const state: FinancialState = {
+      assets: [{ id: "a1", category: "TFSA", amount: 300_000 }],
+      debts: [],
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      expenses: [],
+      properties: [],
+      stocks: [],
+      country: "CA",
+      jurisdiction: "ON",
+    };
+    const metrics = computeMetrics(state);
+    const irMetric = metrics.find((m) => m.title === "Income Replacement");
+    expect(irMetric).toBeDefined();
+    expect(irMetric!.incomeReplacementDetails).toBeDefined();
+    expect(irMetric!.incomeReplacementDetails!.assetBreakdown).toHaveLength(1);
+    expect(irMetric!.incomeReplacementDetails!.assetBreakdown[0].label).toBe("TFSA");
+  });
+
+  it("does not create Income Replacement metric when income is 0", () => {
+    const state: FinancialState = {
+      assets: [{ id: "a1", category: "TFSA", amount: 300_000 }],
+      debts: [],
+      income: [],
+      expenses: [],
+      properties: [],
+      stocks: [],
+      country: "CA",
+      jurisdiction: "ON",
+    };
+    const metrics = computeMetrics(state);
+    const irMetric = metrics.find((m) => m.title === "Income Replacement");
+    expect(irMetric).toBeUndefined();
   });
 });

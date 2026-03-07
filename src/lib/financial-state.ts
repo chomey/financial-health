@@ -253,7 +253,7 @@ export function simulateRunwayTimeSeries(
 import type { FinancialData } from "@/lib/insights";
 import type { MetricData } from "@/components/SnapshotDashboard";
 import { computeTax, getMarginalRateForIncome } from "@/lib/tax-engine";
-import type { TaxExplainerDetails, TaxBracketSegment, RunwayExplainerDetails, RunwayTimeSeriesPoint, RunwayWithdrawalOrderEntry } from "@/components/DataFlowArrows";
+import type { TaxExplainerDetails, TaxBracketSegment, RunwayExplainerDetails, RunwayTimeSeriesPoint, RunwayWithdrawalOrderEntry, IncomeReplacementExplainerDetails } from "@/components/DataFlowArrows";
 import { getCanadianBrackets, getUSBrackets, calculateCanadianCapitalGainsInclusion, US_CAPITAL_GAINS_2025, type BracketTable } from "@/lib/tax-tables";
 import { CA_PROVINCES, US_STATES } from "@/components/CountryJurisdictionSelector";
 
@@ -659,6 +659,80 @@ function fmtShort(n: number, currency: SupportedCurrency): string {
   return formatCurrencyCompact(n, currency, currency);
 }
 
+const INCOME_REPLACEMENT_TIERS = [
+  { label: "Early stage", threshold: 0 },
+  { label: "Building momentum", threshold: 25 },
+  { label: "Strong position", threshold: 50 },
+  { label: "Nearly independent", threshold: 75 },
+  { label: "Financially independent", threshold: 100 },
+];
+
+export function computeIncomeReplacementDetails(
+  state: FinancialState,
+  totalInvestedAssets: number,
+  monthlyAfterTaxIncome: number,
+): IncomeReplacementExplainerDetails {
+  const homeCurrency = getHomeCurrency(state.country ?? "CA");
+  const fxRates = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
+  const toHome = (amount: number, itemCurrency?: SupportedCurrency) =>
+    convertToHome(amount, itemCurrency ?? homeCurrency, homeCurrency, fxRates);
+
+  const monthlyWithdrawal4pct = totalInvestedAssets * 0.04 / 12;
+  const incomeReplacementPct = monthlyAfterTaxIncome > 0
+    ? parseFloat((monthlyWithdrawal4pct / monthlyAfterTaxIncome * 100).toFixed(1))
+    : 0;
+
+  // Determine current tier and next tier
+  let tierIndex = 0;
+  for (let i = INCOME_REPLACEMENT_TIERS.length - 1; i >= 0; i--) {
+    if (incomeReplacementPct >= INCOME_REPLACEMENT_TIERS[i].threshold) {
+      tierIndex = i;
+      break;
+    }
+  }
+  const currentTierLabel = INCOME_REPLACEMENT_TIERS[tierIndex].label;
+  const nextTier = tierIndex < INCOME_REPLACEMENT_TIERS.length - 1 ? INCOME_REPLACEMENT_TIERS[tierIndex + 1] : null;
+  const nextTierLabel = nextTier?.label ?? null;
+  const amountNeededForNextTier = nextTier && monthlyAfterTaxIncome > 0
+    ? Math.max(0, Math.ceil((nextTier.threshold / 100 * monthlyAfterTaxIncome * 12) / 0.04) - totalInvestedAssets)
+    : null;
+
+  // Per-asset breakdown
+  const assetBreakdown: { label: string; balance: number; monthlyWithdrawal: number }[] = [];
+  for (const asset of state.assets.filter((a) => !a.computed)) {
+    if (asset.amount > 0) {
+      const balance = toHome(asset.amount, asset.currency);
+      assetBreakdown.push({
+        label: asset.category,
+        balance,
+        monthlyWithdrawal: Math.round(balance * 0.04 / 12),
+      });
+    }
+  }
+  for (const stock of (state.stocks ?? [])) {
+    const val = getStockValue(stock);
+    if (val > 0) {
+      const balance = toHome(val, stock.priceCurrency);
+      assetBreakdown.push({
+        label: stock.ticker,
+        balance,
+        monthlyWithdrawal: Math.round(balance * 0.04 / 12),
+      });
+    }
+  }
+
+  return {
+    totalInvestedAssets,
+    monthlyWithdrawal4pct,
+    monthlyAfterTaxIncome,
+    incomeReplacementPct,
+    currentTierLabel,
+    nextTierLabel,
+    amountNeededForNextTier,
+    assetBreakdown,
+  };
+}
+
 export function computeMetrics(state: FinancialState): MetricData[] {
   const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase } = computeTotals(state);
   const hc = getHomeCurrency(state.country ?? "CA");
@@ -865,23 +939,21 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       breakdown: ratioBreakdown,
       ratioWithoutMortgage: totalPropertyMortgage > 0 ? parseFloat(debtToAssetWithoutMortgage.toFixed(2)) : undefined,
     },
-    ...(monthlyAfterTaxIncome > 0 ? [{
-      title: "Income Replacement",
-      value: parseFloat(((totalAssets + totalStocks) * 0.04 / 12 / monthlyAfterTaxIncome * 100).toFixed(1)),
-      format: "percent" as const,
-      icon: "🎯",
-      tooltip:
-        "What percentage of your monthly income your investment portfolio could sustainably replace using the 4% rule. 100% means financial independence.",
-      positive: ((totalAssets + totalStocks) * 0.04 / 12 / monthlyAfterTaxIncome) >= 1,
-      breakdown: (() => {
-        const pct = (totalAssets + totalStocks) * 0.04 / 12 / monthlyAfterTaxIncome * 100;
-        if (pct >= 100) return "Financially independent";
-        if (pct >= 75) return "Nearly independent";
-        if (pct >= 50) return "Strong position";
-        if (pct >= 25) return "Building momentum";
-        return "Early stage";
-      })(),
-    }] : []),
+    ...(monthlyAfterTaxIncome > 0 ? [(() => {
+      const liquidInvested = totalAssets + totalStocks;
+      const incomeReplacementDetails = computeIncomeReplacementDetails(state, liquidInvested, monthlyAfterTaxIncome);
+      return {
+        title: "Income Replacement",
+        value: incomeReplacementDetails.incomeReplacementPct,
+        format: "percent" as const,
+        icon: "🎯",
+        tooltip:
+          "What percentage of your monthly income your investment portfolio could sustainably replace using the 4% rule. 100% means financial independence.",
+        positive: incomeReplacementDetails.incomeReplacementPct >= 100,
+        breakdown: incomeReplacementDetails.currentTierLabel,
+        incomeReplacementDetails,
+      };
+    })()] : []),
   ];
 }
 

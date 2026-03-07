@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { generateInsights, type FinancialData, type InsightType } from "@/lib/insights";
-import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type ActiveTargetMeta, type TaxExplainerDetails, type RunwayExplainerDetails } from "@/components/DataFlowArrows";
+import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type ActiveTargetMeta, type TaxExplainerDetails, type RunwayExplainerDetails, type IncomeReplacementExplainerDetails } from "@/components/DataFlowArrows";
 
 interface MetricData {
   title: string;
@@ -20,6 +20,7 @@ interface MetricData {
   taxDetails?: TaxExplainerDetails; // detailed tax breakdown for explainer
   runwayDetails?: RunwayExplainerDetails; // detailed runway breakdown for explainer
   investmentReturns?: import("@/lib/financial-state").MonthlyInvestmentReturn[]; // per-asset monthly ROI for surplus explainer
+  incomeReplacementDetails?: IncomeReplacementExplainerDetails; // detailed income replacement breakdown for explainer
 }
 
 // Mock values based on existing entry component mock data
@@ -176,6 +177,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       taxDetails: metricType === "estimated-tax" ? metric.taxDetails : undefined,
       runwayDetails: metricType === "financial-runway" ? metric.runwayDetails : undefined,
       investmentReturns: metricType === "monthly-surplus" ? metric.investmentReturns : undefined,
+      incomeReplacementDetails: metricType === "income-replacement" ? metric.incomeReplacementDetails : undefined,
     });
 
     // Build aria-live announcement
