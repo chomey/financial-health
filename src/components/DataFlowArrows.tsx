@@ -11,6 +11,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { formatCurrency, type SupportedCurrency } from "@/lib/currency";
+import { getTickerName } from "@/lib/ticker-names";
 
 // --- Types ---
 
@@ -334,7 +335,15 @@ export function SourceSummaryCard({
               const showCurrencyCode = item.currency && item.currency !== cur;
               return (
                 <li key={i} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400 truncate mr-2">{item.label}</span>
+                  <span className="text-slate-400 truncate mr-2">
+                    {item.label}
+                    {(() => {
+                      const tickerName = getTickerName(item.label);
+                      return tickerName ? (
+                        <span className="ml-1 text-[10px] text-slate-500" data-testid={`source-item-name-${i}`}>({tickerName})</span>
+                      ) : null;
+                    })()}
+                  </span>
                   <span className="font-medium text-slate-200 whitespace-nowrap">
                     {formatCurrency(Math.abs(item.value), itemCur)}
                     {showCurrencyCode && <span className="ml-1 text-xs text-slate-500">{itemCur}</span>}

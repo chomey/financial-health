@@ -2417,3 +2417,9 @@
 - **Tests**: 1665 passed (20 new T1 in `entry-panels-dark-theme.test.tsx`, 6 new T2 in `entry-panels-dark-theme.spec.ts`)
 - **Screenshots**: ![Entry panels dark theme](screenshots/task-129-entry-panels-dark-theme.png) ![Add expense dark form](screenshots/task-129-add-expense-dark-form.png) ![Full page dark](screenshots/task-129-full-page-dark-entry-panels.png)
 - **Notes**: Applied soft cyberpunk palette to all 5 entry components. Dark glass cards (bg-white/5 backdrop-blur border-white/10), emerald-400 for assets/income, rose-400 for debts/expenses, cyan accent buttons and inputs (bg-slate-900 border-cyan-500/50). PropertyEntry mortgage info boxes use dark dashed containers. Auto-computed badge style updated (bg-slate-700/40 text-slate-500). Fixed pre-existing changelog test failure (task 128 count mismatch).
+
+## Task 131: Update page layout, header, and remaining UI for new theme
+- **Date**: 2026-03-07
+- **Files**: `src/app/page.tsx`, `src/app/globals.css`, `src/components/FastForwardPanel.tsx`, `src/components/InsightsPanel.tsx`, `src/components/CountryJurisdictionSelector.tsx`, `src/components/BenchmarkComparisons.tsx`, `src/components/ZoomableCard.tsx`, `src/components/FxRateDisplay.tsx`, `src/components/CurrencyBadge.tsx`, `src/components/WithdrawalTaxSummary.tsx`, `src/components/StockEntry.tsx`, `src/components/MobileWizard.tsx`, `tests/unit/page-layout-dark-theme.test.tsx`, `tests/e2e/page-layout-dark-theme.spec.ts`
+- **Tests**: 1683 passed
+- **Screenshots**: ![Full page dark theme](screenshots/task-131-full-page-dark-theme.png)

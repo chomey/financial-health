@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
+import { getTickerName, resolveTickerName } from "@/lib/ticker-names";
 
 export interface StockHolding {
   id: string;
@@ -167,9 +168,36 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   const [newTicker, setNewTicker] = useState("");
   const [newShares, setNewShares] = useState("");
   const [fetchingPrices, setFetchingPrices] = useState<Set<string>>(new Set());
+  const [resolvedNames, setResolvedNames] = useState<Record<string, string>>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const newTickerRef = useRef<HTMLInputElement>(null);
   const newSharesRef = useRef<HTMLInputElement>(null);
+
+  // Resolve ticker names (static first, then async fallback)
+  useEffect(() => {
+    const tickers = stocks.map((s) => s.ticker.toUpperCase().trim()).filter(Boolean);
+    const toResolve: string[] = [];
+    const newNames: Record<string, string> = {};
+    for (const t of tickers) {
+      const staticName = getTickerName(t);
+      if (staticName) {
+        newNames[t] = staticName;
+      } else if (!resolvedNames[t]) {
+        toResolve.push(t);
+      }
+    }
+    if (Object.keys(newNames).length > 0) {
+      setResolvedNames((prev) => ({ ...prev, ...newNames }));
+    }
+    for (const t of toResolve) {
+      resolveTickerName(t).then((name) => {
+        if (name) {
+          setResolvedNames((prev) => ({ ...prev, [t]: name }));
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stocks.map((s) => s.ticker).join(",")]);
 
   useEffect(() => {
     if (addingNew && newTickerRef.current) {
@@ -459,29 +487,40 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
               <div role="listitem">
                 <div className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-white/5">
                   <div className="flex flex-1 items-center gap-3 min-w-0">
-                    {/* Ticker */}
-                    {editingId === stock.id && editingField === "ticker" ? (
-                      <input
-                        ref={inputRef}
-                        type="text"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value.toUpperCase())}
-                        onBlur={commitEdit}
-                        onKeyDown={handleEditKeyDown}
-                        className="w-24 rounded-md border border-violet-400/40 bg-slate-800 px-2 py-1 text-sm font-mono font-medium text-slate-200 uppercase outline-none ring-2 ring-violet-400/20 transition-all duration-200"
-                        aria-label="Edit ticker symbol"
-                      />
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => startEdit(stock.id, "ticker", stock.ticker)}
-                        className="min-h-[44px] sm:min-h-0 rounded px-2 py-2 sm:py-1 text-sm font-mono font-semibold text-slate-200 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
-                        aria-label={`Edit ticker for ${stock.ticker}`}
-                        data-testid={`ticker-${stock.id}`}
-                      >
-                        {stock.ticker || "???"}
-                      </button>
-                    )}
+                    {/* Ticker + Company Name */}
+                    <div className="flex flex-col">
+                      {editingId === stock.id && editingField === "ticker" ? (
+                        <input
+                          ref={inputRef}
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value.toUpperCase())}
+                          onBlur={commitEdit}
+                          onKeyDown={handleEditKeyDown}
+                          className="w-24 rounded-md border border-violet-400/40 bg-slate-800 px-2 py-1 text-sm font-mono font-medium text-slate-200 uppercase outline-none ring-2 ring-violet-400/20 transition-all duration-200"
+                          aria-label="Edit ticker symbol"
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => startEdit(stock.id, "ticker", stock.ticker)}
+                          className="min-h-[44px] sm:min-h-0 rounded px-2 py-2 sm:py-1 text-sm font-mono font-semibold text-slate-200 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400/30 text-left"
+                          aria-label={`Edit ticker for ${stock.ticker}`}
+                          data-testid={`ticker-${stock.id}`}
+                        >
+                          {stock.ticker || "???"}
+                        </button>
+                      )}
+                      {resolvedNames[stock.ticker.toUpperCase().trim()] && (
+                        <span
+                          className="px-2 text-[10px] leading-tight text-slate-500 truncate max-w-[120px]"
+                          data-testid={`ticker-name-${stock.id}`}
+                          title={resolvedNames[stock.ticker.toUpperCase().trim()]}
+                        >
+                          {resolvedNames[stock.ticker.toUpperCase().trim()]}
+                        </span>
+                      )}
+                    </div>
 
                     {/* Shares */}
                     {editingId === stock.id && editingField === "shares" ? (
