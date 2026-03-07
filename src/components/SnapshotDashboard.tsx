@@ -7,7 +7,7 @@ import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type
 interface MetricData {
   title: string;
   value: number;
-  format: "currency" | "months" | "ratio";
+  format: "currency" | "months" | "ratio" | "percent";
   icon: string;
   tooltip: string;
   positive: boolean;
@@ -77,6 +77,8 @@ function formatMetricValue(value: number, format: MetricData["format"], currency
       return `${value.toFixed(1)} mo`;
     case "ratio":
       return `${value.toFixed(2)}`;
+    case "percent":
+      return `${Math.round(value)}%`;
   }
 }
 
@@ -97,6 +99,7 @@ const METRIC_TO_INSIGHT_TYPES: Record<string, InsightType[]> = {
   "Estimated Tax": ["tax"],
   "Financial Runway": ["runway", "withdrawal-tax"],
   "Debt-to-Asset Ratio": ["debt-interest"],
+  "Income Replacement": ["income-replacement"],
 };
 
 function useCountUp(target: number, duration: number = 1000): number {
@@ -245,6 +248,22 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
           ({formatMetricValue(metric.ratioWithoutMortgage, metric.format, homeCurrency)} without mortgage)
         </p>
       )}
+      {metric.format === "percent" && (
+        <div className="mt-2" data-testid="income-replacement-progress">
+          <div className="h-2 w-full rounded-full bg-stone-100 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-green-400 to-green-600 transition-all duration-700"
+              style={{ width: `${Math.min(100, animatedValue)}%` }}
+              aria-hidden="true"
+            />
+          </div>
+          {metric.breakdown && (
+            <p className="mt-1 text-xs font-medium text-stone-500" data-testid="income-replacement-tier">
+              {metric.breakdown}
+            </p>
+          )}
+        </div>
+      )}
       {metric.runwayWithGrowth !== undefined && (
         <p className="mt-0.5 text-sm text-stone-500" data-testid="runway-with-growth">
           ({metric.runwayWithGrowth === Infinity ? "∞" : formatMetricValue(metric.runwayWithGrowth, "months", homeCurrency)} with investment growth)
@@ -274,8 +293,8 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
           Excellent safety net!
         </p>
       )}
-      {/* Breakdown on hover — highlighted when data-flow arrows are active */}
-      {metric.breakdown && (
+      {/* Breakdown on hover — highlighted when data-flow arrows are active. Hidden for percent format (shown in progress bar section). */}
+      {metric.breakdown && metric.format !== "percent" && (
         <p className={`mt-1.5 text-xs leading-relaxed transition-all duration-200 ${showTooltip ? `opacity-100 ${hasConnections ? "text-stone-600 font-medium" : "text-stone-400"}` : "opacity-0 h-0 overflow-hidden"}`} data-testid="metric-breakdown">
           {metric.breakdown}
         </p>
