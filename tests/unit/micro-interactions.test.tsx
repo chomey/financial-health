@@ -20,7 +20,7 @@ describe("Runway celebratory glow", () => {
     const runwayCard = screen.getByRole("group", { name: "Financial Runway" });
     expect(runwayCard.getAttribute("data-runway-celebration")).toBeTruthy();
     expect(runwayCard.className).toContain("animate-glow-pulse");
-    expect(runwayCard.className).toContain("border-cyan-500/40");
+    expect(runwayCard.className).toContain("border-emerald-500/40");
   });
 
   it("shows 'Excellent safety net!' text for runway > 12 months", () => {
