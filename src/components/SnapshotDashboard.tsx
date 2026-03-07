@@ -98,7 +98,7 @@ const METRIC_TO_INSIGHT_TYPES: Record<string, InsightType[]> = {
   "Estimated Tax": ["tax"],
   "Financial Runway": ["runway", "withdrawal-tax"],
   "Debt-to-Asset Ratio": ["debt-interest", "debt-to-income"],
-  "Income Replacement": ["income-replacement"],
+  "Income Replacement": ["income-replacement", "coast-fire"],
 };
 
 function useCountUp(target: number, duration: number = 1000): number {
@@ -186,9 +186,9 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
   }, [ctx, connections, targetId, metric.title, metric.value, metric.format, homeCurrency]);
 
   const valueColor = metric.positive
-    ? "text-cyan-400"
+    ? "text-emerald-400"
     : metric.value < 0
-      ? "text-rose-400"
+      ? "text-red-400"
       : "text-slate-200";
 
   // Celebratory glow for Financial Runway > 12 months
@@ -210,9 +210,9 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
         hasConnections ? "cursor-pointer" : "cursor-default"
       } ${
         isRunwayCelebration
-          ? "border-cyan-500/40 ring-1 ring-cyan-500/20 animate-glow-pulse"
+          ? "border-emerald-500/40 ring-1 ring-emerald-500/20 animate-glow-pulse"
           : isUnderwaterWarning
-            ? "border-rose-500/40 ring-1 ring-rose-500/20 animate-warning-pulse"
+            ? "border-red-500/40 ring-1 ring-red-500/20 animate-warning-pulse"
             : "border-white/10"
       }`}
       role="group"
@@ -253,7 +253,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
         <div className="mt-2" data-testid="income-replacement-progress">
           <div className="h-2 w-full rounded-full bg-slate-700 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-cyan-500 to-cyan-400 transition-all duration-700"
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-emerald-500 to-emerald-400 transition-all duration-700"
               style={{ width: `${Math.min(100, animatedValue)}%` }}
               aria-hidden="true"
             />
@@ -285,12 +285,12 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       {insights.length > 0 && (
         <div className="mt-1.5 space-y-0.5">
           {insights.map((msg, i) => (
-            <p key={i} className="text-xs font-medium text-cyan-400">{msg}</p>
+            <p key={i} className="text-xs font-medium text-emerald-400">{msg}</p>
           ))}
         </div>
       )}
       {isRunwayCelebration && insights.length === 0 && (
-        <p className="mt-1 text-xs font-medium text-cyan-400" data-testid="runway-celebration-text">
+        <p className="mt-1 text-xs font-medium text-emerald-400" data-testid="runway-celebration-text">
           Excellent safety net!
         </p>
       )}
