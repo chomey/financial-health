@@ -775,14 +775,24 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 
   const surplusTargetName = state.assets.find((a) => a.surplusTarget)?.category ?? state.assets[0]?.category;
 
-  const surplusParts = [`${$(monthlyAfterTaxIncome)} after-tax income`];
-  if (totalMonthlyInvestmentReturns > 0) surplusParts.push(`${$(totalMonthlyInvestmentReturns)} investment returns`);
-  if (monthlyExpenses > 0) surplusParts.push(`${$(monthlyExpenses)} expenses`);
-  if (totalMonthlyContributions > 0) surplusParts.push(`${$(totalMonthlyContributions)} contributions`);
-  if (totalMortgagePayments > 0) surplusParts.push(`${$(totalMortgagePayments)} mortgage`);
+  // Build surplus formula: income sources (added) then outflows (subtracted)
+  const surplusIncome: string[] = [];
+  const surplusOutflow: string[] = [];
+  // List income sources largest-first
+  if (totalMonthlyInvestmentReturns > monthlyAfterTaxIncome) {
+    if (totalMonthlyInvestmentReturns > 0) surplusIncome.push(`${$(totalMonthlyInvestmentReturns)} investment returns`);
+    if (monthlyAfterTaxIncome > 0) surplusIncome.push(`${$(monthlyAfterTaxIncome)} after-tax income`);
+  } else {
+    if (monthlyAfterTaxIncome > 0) surplusIncome.push(`${$(monthlyAfterTaxIncome)} after-tax income`);
+    if (totalMonthlyInvestmentReturns > 0) surplusIncome.push(`${$(totalMonthlyInvestmentReturns)} investment returns`);
+  }
+  if (monthlyExpenses > 0) surplusOutflow.push(`${$(monthlyExpenses)} expenses`);
+  if (totalMonthlyContributions > 0) surplusOutflow.push(`${$(totalMonthlyContributions)} contributions`);
+  if (totalMortgagePayments > 0) surplusOutflow.push(`${$(totalMortgagePayments)} mortgage`);
+  const surplusFormula = [...surplusIncome.length > 0 ? [surplusIncome.join(" + ")] : [], ...surplusOutflow].join(" - ");
   const surplusBreakdown = surplus > 0 && surplusTargetName
-    ? `${surplusParts.join(" - ")} → ${$(surplus)}/mo to ${surplusTargetName}`
-    : surplusParts.join(" - ");
+    ? `${surplusFormula} → ${$(surplus)}/mo to ${surplusTargetName}`
+    : surplusFormula;
 
   const runwayBreakdown = monthlyObligations > 0
     ? `${$(liquidTotal)} liquid / ${$(monthlyObligations)}/mo obligations${totalMortgagePayments > 0 ? ` (${$(monthlyExpenses)} expenses + ${$(totalMortgagePayments)} mortgage)` : ""}`
