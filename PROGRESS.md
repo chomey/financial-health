@@ -8,13 +8,13 @@
 
 ## Summary
 - **Total Tasks**: 139
-- **Completed**: 137
-- **Remaining**: 2
+- **Completed**: 138
+- **Remaining**: 1
 - **Last Updated**: 2026-03-07
 
-## Task 137: Coast FIRE age calculation and insight
+## Task 138: Net worth milestones and age-based percentile insight
 - **Date**: 2026-03-07
-- **Files**: `src/lib/financial-state.ts`, `src/lib/insights.ts`, `src/components/InsightsPanel.tsx`, `src/components/SnapshotDashboard.tsx`, `src/lib/changelog.ts`, `tests/unit/coast-fire.test.ts`, `tests/e2e/coast-fire.spec.ts`
-- **Tests**: T1: 1784 passed (16 new in `coast-fire.test.ts`), T2: 5 passed (new `coast-fire.spec.ts`)
-- **Screenshots**: ![Coast FIRE default](screenshots/task-137-coast-fire-default.png) ![Coast FIRE achieved](screenshots/task-137-coast-fire-achieved.png)
-- **Notes**: Added `computeCoastFireAge` with monthly savings projection (not just static check). Coast FIRE is binary without contributions — function accepts optional `monthlySavings` to project when portfolio becomes self-sustaining. Fixed 3 pre-existing color theme test failures (cyan/rose → emerald/red). `currentAge` and `monthlySavings` fields added to FinancialData. Age input already existed from prior tasks.
+- **Files**: `src/lib/insights.ts`, `src/components/InsightsPanel.tsx`, `tests/unit/net-worth-milestones.test.ts`, `tests/e2e/net-worth-milestones.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: T1: 1817 passed (26 new in `net-worth-milestones.test.ts`), T2: 6 passed (new `net-worth-milestones.spec.ts`)
+- **Screenshots**: ![Net worth milestone](screenshots/task-138-net-worth-milestone.png) ![Percentile above](screenshots/task-138-net-worth-percentile-above.png) ![Percentile below](screenshots/task-138-net-worth-percentile-below.png)
+- **Notes**: Milestone only fires when `netWorth > 0` (not on empty state). Age group is looked up from Federal Reserve SCF 2022 medians. Both new types added to `INSIGHT_TYPE_SOURCES` in InsightsPanel.

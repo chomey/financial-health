@@ -68,7 +68,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost" | "coast-fire";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost" | "coast-fire" | "net-worth-milestone" | "net-worth-percentile";
 
 export interface Insight {
   id: string;
@@ -567,6 +567,33 @@ export function generateInsights(data: FinancialData): Insight[] {
     }
   }
 
+  // Net worth milestone insight (only when netWorth > 0 — crossing from negative to positive is a milestone)
+  const milestone = netWorth > 0 ? getNetWorthMilestone(netWorth) : null;
+  if (milestone) {
+    insights.push({
+      id: `net-worth-milestone-${milestone.amount}`,
+      type: "net-worth-milestone",
+      message: milestone.message,
+      icon: "🏆",
+    });
+  }
+
+  // Age-based net worth percentile insight
+  if (data.currentAge !== undefined && data.currentAge > 0) {
+    const ageGroup = getAgeGroup(data.currentAge);
+    if (ageGroup) {
+      const above = netWorth >= ageGroup.median;
+      insights.push({
+        id: above ? "net-worth-percentile-above" : "net-worth-percentile-below",
+        type: "net-worth-percentile",
+        message: above
+          ? `Your net worth of ${formatCompact(netWorth)} is above the median for your age group (${ageGroup.label}: ${formatCompact(ageGroup.median)}). You're building real financial strength.`
+          : `The median net worth for your age group (${ageGroup.label}) is ${formatCompact(ageGroup.median)}. You're on your way — every dollar saved now compounds over time.`,
+        icon: "📊",
+      });
+    }
+  }
+
   return insights;
 }
 
@@ -583,4 +610,52 @@ function formatCompact(amount: number): string {
   if (abs >= 1_000_000) return `$${(abs / 1_000_000).toFixed(1)}M`;
   if (abs >= 1_000) return `$${(abs / 1_000).toFixed(0)}k`;
   return formatCurrency(amount);
+}
+
+interface MilestoneDefinition {
+  amount: number;
+  message: string;
+}
+
+const NET_WORTH_MILESTONES: MilestoneDefinition[] = [
+  { amount: 10_000_000, message: "$10M+ — you've won the financial game." },
+  { amount: 5_000_000, message: "$5M — generational wealth territory." },
+  { amount: 2_000_000, message: "$2M — financial independence is likely within reach." },
+  { amount: 1_000_000, message: "Millionaire! Your money now earns more than most people's salaries." },
+  { amount: 500_000, message: "$500k — your portfolio generates ~$20k/year at 4%, a meaningful income stream." },
+  { amount: 250_000, message: "$250k — your money is earning more than many people's side hustles." },
+  { amount: 100_000, message: "$100k is the hardest milestone — Charlie Munger said the first $100k is a bitch. Compound growth really accelerates from here." },
+  { amount: 50_000, message: "$50k — halfway to the big one." },
+  { amount: 25_000, message: "$25k — a serious financial cushion." },
+  { amount: 10_000, message: "$10k — you're ahead of most people your age." },
+  { amount: 5_000, message: "$5k saved — a real emergency fund is forming." },
+  { amount: 1_000, message: "Your first $1,000 — proof you can save." },
+  { amount: 0, message: "You've crossed from negative to positive net worth — the hardest step is behind you!" },
+];
+
+/** Returns the highest milestone the user has reached, or null if below $0. */
+export function getNetWorthMilestone(netWorth: number): MilestoneDefinition | null {
+  if (netWorth < 0) return null;
+  return NET_WORTH_MILESTONES.find((m) => netWorth >= m.amount) ?? null;
+}
+
+interface AgeGroup {
+  label: string;
+  median: number;
+}
+
+// Federal Reserve SCF 2022 median net worth by age group
+const AGE_GROUPS: Array<{ minAge: number; maxAge: number | null } & AgeGroup> = [
+  { minAge: 75, maxAge: null, label: "75+", median: 335_000 },
+  { minAge: 65, maxAge: 74, label: "65–74", median: 410_000 },
+  { minAge: 55, maxAge: 64, label: "55–64", median: 364_000 },
+  { minAge: 45, maxAge: 54, label: "45–54", median: 247_000 },
+  { minAge: 35, maxAge: 44, label: "35–44", median: 135_000 },
+  { minAge: 0, maxAge: 34, label: "Under 35", median: 39_000 },
+];
+
+/** Returns the age group and SCF median net worth for a given age. */
+export function getAgeGroup(age: number): AgeGroup | null {
+  const group = AGE_GROUPS.find((g) => age >= g.minAge && (g.maxAge === null || age <= g.maxAge));
+  return group ? { label: group.label, median: group.median } : null;
 }
