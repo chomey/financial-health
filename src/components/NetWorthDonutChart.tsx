@@ -46,18 +46,20 @@ export function computeLiquidityData(
 }
 
 const COLORS = [
-  "#059669", // emerald-600
-  "#2563eb", // blue-600
-  "#d97706", // amber-600
-  "#7c3aed", // violet-600
-  "#0891b2", // cyan-600
-  "#db2777", // pink-600
-  "#65a30d", // lime-600
-  "#ea580c", // orange-600
+  "#22d3ee", // cyan-400
+  "#a78bfa", // violet-400
+  "#34d399", // emerald-400
+  "#f59e0b", // amber-400
+  "#60a5fa", // blue-400
+  "#f472b6", // pink-400
+  "#4ade80", // green-400
+  "#fb923c", // orange-400
+  "#e879f9", // fuchsia-400
+  "#facc15", // yellow-400
 ];
 
-const DEBT_COLOR = "#dc2626"; // red-600
-const PROPERTY_PATTERN_COLOR = "#9ca3af"; // gray-400 for property equity hatching
+const DEBT_COLOR = "#f87171"; // red-400
+const PROPERTY_PATTERN_COLOR = "#94a3b8"; // slate-400 for property equity hatching
 
 export interface DonutSlice {
   name: string;
@@ -148,16 +150,16 @@ function DonutTooltip({ active, payload }: CustomTooltipProps) {
   const slice = payload[0].payload;
 
   return (
-    <div className="rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-md">
-      <p className="text-sm font-medium text-stone-800">{slice.name}</p>
+    <div className="rounded-lg border border-white/10 bg-slate-900/90 px-3 py-2 shadow-md backdrop-blur-sm">
+      <p className="text-sm font-medium text-slate-200">{slice.name}</p>
       <p
         className={`text-sm font-medium ${
-          slice.type === "debt" ? "text-red-600" : "text-emerald-600"
+          slice.type === "debt" ? "text-red-400" : "text-emerald-400"
         }`}
       >
         {fmt.full(slice.value)}
       </p>
-      <p className="text-xs text-stone-400">
+      <p className="text-xs text-slate-500">
         {slice.percentage.toFixed(1)}% of {slice.type === "debt" ? "total debts" : "total assets"}
       </p>
     </div>
@@ -210,10 +212,10 @@ export default function NetWorthDonutChart({
   if (slices.length === 0) {
     return (
       <div
-        className="rounded-xl border border-stone-200 bg-white p-5 text-center"
+        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 text-center"
         data-testid="donut-chart"
       >
-        <p className="text-sm text-stone-400">
+        <p className="text-sm text-slate-400">
           Add assets and debts to see your net worth breakdown
         </p>
       </div>
@@ -232,18 +234,18 @@ export default function NetWorthDonutChart({
 
   return (
     <div
-      className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm"
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5"
       data-testid="donut-chart"
     >
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-stone-500">Net Worth Breakdown</h3>
-        <div className="flex rounded-lg border border-stone-200 text-xs">
+        <h3 className="text-sm font-medium text-slate-400">Net Worth Breakdown</h3>
+        <div className="flex rounded-lg border border-white/10 text-xs">
           <button
             onClick={() => setView("breakdown")}
             className={`px-2.5 py-1 rounded-l-lg transition-colors duration-150 ${
               view === "breakdown"
-                ? "bg-emerald-50 text-emerald-700 font-medium"
-                : "text-stone-500 hover:bg-stone-50"
+                ? "bg-cyan-500/20 text-cyan-400 font-medium"
+                : "text-slate-400 hover:bg-white/5"
             }`}
             aria-pressed={view === "breakdown"}
           >
@@ -253,8 +255,8 @@ export default function NetWorthDonutChart({
             onClick={() => setView("liquidity")}
             className={`px-2.5 py-1 rounded-r-lg transition-colors duration-150 ${
               view === "liquidity"
-                ? "bg-emerald-50 text-emerald-700 font-medium"
-                : "text-stone-500 hover:bg-stone-50"
+                ? "bg-cyan-500/20 text-cyan-400 font-medium"
+                : "text-slate-400 hover:bg-white/5"
             }`}
             aria-pressed={view === "liquidity"}
           >
@@ -298,7 +300,7 @@ export default function NetWorthDonutChart({
                       <Cell
                         key={`asset-${index}`}
                         fill={colorMap[colorIdx]}
-                        stroke="white"
+                        stroke="#0f172a"
                         strokeWidth={2}
                         className="transition-opacity duration-150 cursor-pointer"
                         opacity={activeIndex === null || activeIndex === index ? 1 : 0.6}
@@ -324,7 +326,7 @@ export default function NetWorthDonutChart({
                       <Cell
                         key={`debt-${index}`}
                         fill={DEBT_COLOR}
-                        stroke="white"
+                        stroke="#0f172a"
                         strokeWidth={2}
                         opacity={0.8 - index * 0.1}
                         className="cursor-pointer"
@@ -342,12 +344,12 @@ export default function NetWorthDonutChart({
               className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
               data-testid="donut-center-label"
             >
-              <span className="text-[10px] font-medium uppercase tracking-wider text-stone-400">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
                 Net Worth
               </span>
               <span
                 className={`text-sm font-bold ${
-                  netWorth >= 0 ? "text-blue-600" : "text-red-600"
+                  netWorth >= 0 ? "text-cyan-400" : "text-red-400"
                 }`}
               >
                 {formatFullCurrency(netWorth)}
@@ -359,7 +361,7 @@ export default function NetWorthDonutChart({
           <div className="mt-3 overflow-x-auto" data-testid="donut-composition-table">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-stone-100 text-left text-stone-400">
+                <tr className="border-b border-white/10 text-left text-slate-500">
                   <th className="pb-1 pr-2 font-medium">Name</th>
                   <th className="pb-1 px-2 font-medium text-right">Amount</th>
                   <th className="pb-1 pl-2 font-medium text-right">%</th>
@@ -381,7 +383,7 @@ export default function NetWorthDonutChart({
                     const total = slice.type === "asset" ? totalAssets : totalDebts;
                     const pct = total > 0 ? (slice.value / total) * 100 : 0;
                     return (
-                      <tr key={i} className="border-b border-stone-50">
+                      <tr key={i} className="border-b border-white/5">
                         <td className="py-1 pr-2">
                           <div className="flex items-center gap-1.5">
                             <span
@@ -391,18 +393,18 @@ export default function NetWorthDonutChart({
                                 ...(slice.isProperty
                                   ? {
                                       backgroundImage:
-                                        "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 4px)",
+                                        "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.3) 2px, rgba(255,255,255,0.3) 4px)",
                                     }
                                   : {}),
                               }}
                             />
-                            <span className="text-stone-700">{slice.name}</span>
+                            <span className="text-slate-300">{slice.name}</span>
                           </div>
                         </td>
-                        <td className={`py-1 px-2 text-right font-medium whitespace-nowrap ${slice.type === "debt" ? "text-red-600" : "text-stone-800"}`}>
+                        <td className={`py-1 px-2 text-right font-medium whitespace-nowrap ${slice.type === "debt" ? "text-red-400" : "text-slate-100"}`}>
                           {slice.type === "debt" ? "-" : ""}{formatFullCurrency(slice.value)}
                         </td>
-                        <td className="py-1 pl-2 text-right text-stone-400 whitespace-nowrap">
+                        <td className="py-1 pl-2 text-right text-slate-500 whitespace-nowrap">
                           {pct.toFixed(1)}%
                         </td>
                       </tr>
@@ -425,7 +427,7 @@ export default function NetWorthDonutChart({
               ...(liquid > 0 ? [{ name: "Liquid", value: liquid, pct: liquidPct }] : []),
               ...(illiquid > 0 ? [{ name: "Illiquid", value: illiquid, pct: illiquidPct }] : []),
             ];
-            const liqColors = ["#2563eb", "#9ca3af"]; // blue for liquid, gray for illiquid
+            const liqColors = ["#22d3ee", "#475569"]; // cyan for liquid, slate for illiquid
             return (
               <>
                 <div className="relative" style={{ height: 240 }}>
@@ -446,7 +448,7 @@ export default function NetWorthDonutChart({
                           <Cell
                             key={index}
                             fill={liqColors[index % liqColors.length]}
-                            stroke="white"
+                            stroke="#0f172a"
                             strokeWidth={2}
                             className="cursor-pointer"
                           />
@@ -455,10 +457,10 @@ export default function NetWorthDonutChart({
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-stone-400">
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
                       Liquid
                     </span>
-                    <span className="text-sm font-bold text-blue-600">
+                    <span className="text-sm font-bold text-cyan-400">
                       {liquidPct.toFixed(0)}%
                     </span>
                   </div>
@@ -471,11 +473,11 @@ export default function NetWorthDonutChart({
                           className="inline-block h-2.5 w-2.5 rounded-full"
                           style={{ backgroundColor: liqColors[i] }}
                         />
-                        <span className="text-stone-600">{item.name}</span>
+                        <span className="text-slate-300">{item.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-stone-800 font-medium">{formatFullCurrency(item.value)}</span>
-                        <span className="text-stone-400 w-10 text-right">{item.pct.toFixed(1)}%</span>
+                        <span className="text-slate-100 font-medium">{formatFullCurrency(item.value)}</span>
+                        <span className="text-slate-500 w-10 text-right">{item.pct.toFixed(1)}%</span>
                       </div>
                     </div>
                   ))}

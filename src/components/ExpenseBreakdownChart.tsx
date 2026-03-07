@@ -14,18 +14,18 @@ import {
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
 
-// Warm, distinguishable colors for expense categories
+// Vivid, saturated cyberpunk colors for expense categories
 const COLORS = [
-  "#d97706", // amber-600
-  "#dc2626", // red-600
-  "#059669", // emerald-600
-  "#2563eb", // blue-600
-  "#7c3aed", // violet-600
-  "#0891b2", // cyan-600
-  "#0d9488", // teal-600
-  "#4f46e5", // indigo-600
-  "#be185d", // pink-700
-  "#ca8a04", // yellow-600
+  "#f59e0b", // amber-400
+  "#f87171", // red-400
+  "#34d399", // emerald-400
+  "#60a5fa", // blue-400
+  "#a78bfa", // violet-400
+  "#22d3ee", // cyan-400
+  "#2dd4bf", // teal-400
+  "#818cf8", // indigo-400
+  "#f472b6", // pink-400
+  "#facc15", // yellow-400
 ];
 
 export interface ExpenseSlice {
@@ -106,17 +106,17 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
   return (
-    <div className="rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-md">
+    <div className="rounded-lg border border-white/10 bg-slate-900/90 px-3 py-2 shadow-md backdrop-blur-sm">
       <div className="flex items-center gap-1.5">
-        <p className="text-sm font-medium text-stone-800">{item.name}</p>
+        <p className="text-sm font-medium text-slate-200">{item.name}</p>
         {item.isAuto && (
-          <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide">
+          <span className="inline-flex items-center rounded-full bg-slate-700/60 px-1.5 py-0.5 text-[9px] font-medium text-slate-400 uppercase tracking-wide">
             auto
           </span>
         )}
       </div>
-      <p className="text-sm text-stone-600">{fmt.full(item.value)}/mo</p>
-      <p className="text-xs text-stone-400">{item.percentage.toFixed(1)}% of total</p>
+      <p className="text-sm text-slate-300">{fmt.full(item.value)}/mo</p>
+      <p className="text-xs text-slate-500">{item.percentage.toFixed(1)}% of total</p>
     </div>
   );
 }
@@ -172,10 +172,10 @@ export default function ExpenseBreakdownChart({
   if (data.length === 0) {
     return (
       <div
-        className="rounded-xl border border-stone-200 bg-white p-5 text-center"
+        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 text-center"
         data-testid="expense-breakdown-chart"
       >
-        <p className="text-sm text-stone-400">
+        <p className="text-sm text-slate-400">
           Add expenses to see your spending breakdown
         </p>
       </div>
@@ -190,34 +190,34 @@ export default function ExpenseBreakdownChart({
 
   return (
     <div
-      className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm"
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5"
       data-testid="expense-breakdown-chart"
     >
-      <h3 className="mb-3 text-sm font-medium text-stone-500">
+      <h3 className="mb-3 text-sm font-medium text-slate-400">
         Spending Breakdown
       </h3>
 
       {/* Income vs Expenses comparison bar */}
       {incomeForComparison > 0 && (
         <div className="mb-4" data-testid="income-vs-expenses">
-          <div className="mb-1 flex items-center justify-between text-xs text-stone-500">
+          <div className="mb-1 flex items-center justify-between text-xs text-slate-400">
             <span>Expenses: {fmt.compact(totalExpenses)}/mo</span>
             <span>{hasTaxSlice ? "Gross Income" : "Income"}: {fmt.compact(incomeForComparison)}/mo</span>
           </div>
-          <div className="relative h-4 w-full overflow-hidden rounded-full bg-stone-100">
+          <div className="relative h-4 w-full overflow-hidden rounded-full bg-slate-700/50">
             {/* Expense fill */}
             <div
               className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
               style={{
                 width: `${Math.min((totalExpenses / incomeForComparison) * 100, 100)}%`,
                 backgroundColor:
-                  totalExpenses > incomeForComparison ? "#dc2626" : "#059669",
+                  totalExpenses > incomeForComparison ? "#f87171" : "#34d399",
               }}
             />
             {/* Show surplus gap annotation if income > expenses */}
             {incomeForComparison > totalExpenses && (
               <div
-                className="absolute inset-y-0 rounded-r-full bg-emerald-100 border-l-2 border-dashed border-emerald-400"
+                className="absolute inset-y-0 rounded-r-full bg-emerald-400/10 border-l-2 border-dashed border-emerald-400/50"
                 style={{
                   left: `${(totalExpenses / incomeForComparison) * 100}%`,
                   width: `${((incomeForComparison - totalExpenses) / incomeForComparison) * 100}%`,
@@ -226,11 +226,11 @@ export default function ExpenseBreakdownChart({
             )}
           </div>
           {incomeForComparison > totalExpenses ? (
-            <p className="mt-1 text-xs text-emerald-600">
+            <p className="mt-1 text-xs text-emerald-400">
               {fmt.compact(incomeForComparison - totalExpenses)}/mo surplus
             </p>
           ) : incomeForComparison < totalExpenses ? (
-            <p className="mt-1 text-xs text-rose-600">
+            <p className="mt-1 text-xs text-rose-400">
               {fmt.compact(totalExpenses - incomeForComparison)}/mo over budget
             </p>
           ) : null}
@@ -239,25 +239,25 @@ export default function ExpenseBreakdownChart({
 
       {/* Spending power & inflation */}
       {spendingPower > 0 && (
-        <div className="mb-4 rounded-lg bg-stone-50 px-3 py-2.5 space-y-1.5" data-testid="spending-power">
+        <div className="mb-4 rounded-lg bg-slate-800/50 border border-white/5 px-3 py-2.5 space-y-1.5" data-testid="spending-power">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-stone-500">Spending Power</span>
-            <span className="text-xs font-medium text-stone-800">{fmt.compact(spendingPower)}/mo</span>
+            <span className="text-xs text-slate-400">Spending Power</span>
+            <span className="text-xs font-medium text-slate-100">{fmt.compact(spendingPower)}/mo</span>
           </div>
           {manualExpenses > 0 && manualExpenses < spendingPower && (
             <div className="flex items-center justify-between">
-              <span className="text-xs text-stone-400">Discretionary remaining</span>
-              <span className="text-xs font-medium text-emerald-600">{fmt.compact(spendingPower - manualExpenses)}/mo</span>
+              <span className="text-xs text-slate-500">Discretionary remaining</span>
+              <span className="text-xs font-medium text-emerald-400">{fmt.compact(spendingPower - manualExpenses)}/mo</span>
             </div>
           )}
-          <div className="flex items-center justify-between border-t border-stone-200 pt-1.5">
-            <span className="text-xs text-stone-400 flex items-center gap-1">
-              <svg className="h-3 w-3 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="flex items-center justify-between border-t border-white/5 pt-1.5">
+            <span className="text-xs text-slate-500 flex items-center gap-1">
+              <svg className="h-3 w-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
               </svg>
               After inflation ({(INFLATION_RATE * 100).toFixed(0)}%/yr)
             </span>
-            <span className="text-xs text-amber-600">{fmt.compact(spendingPower * (1 - INFLATION_RATE))}/mo in 1yr</span>
+            <span className="text-xs text-amber-400">{fmt.compact(spendingPower * (1 - INFLATION_RATE))}/mo in 1yr</span>
           </div>
         </div>
       )}
@@ -282,18 +282,18 @@ export default function ExpenseBreakdownChart({
               type="category"
               dataKey="name"
               width={120}
-              tick={{ fontSize: 11, fill: "#78716c" }}
+              tick={{ fontSize: 11, fill: "#94a3b8" }}
               axisLine={false}
               tickLine={false}
             />
             <Tooltip
               content={<CustomTooltip />}
-              cursor={{ fill: "rgba(0,0,0,0.04)" }}
+              cursor={{ fill: "rgba(255,255,255,0.04)" }}
             />
             {incomeForComparison > 0 && (
               <ReferenceLine
                 x={incomeForComparison}
-                stroke="#059669"
+                stroke="#34d399"
                 strokeDasharray="4 4"
                 strokeWidth={1}
               />
@@ -328,18 +328,18 @@ export default function ExpenseBreakdownChart({
                 className="inline-block h-2.5 w-2.5 rounded-full"
                 style={{ backgroundColor: COLORS[i % COLORS.length] }}
               />
-              <span className="text-stone-600">{slice.name}</span>
+              <span className="text-slate-300">{slice.name}</span>
               {slice.isAuto && (
-                <span className="inline-flex items-center rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-600">
+                <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
                   auto
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-stone-800 font-medium">
+              <span className="text-slate-100 font-medium">
                 {fmt.compact(slice.value)}
               </span>
-              <span className="text-stone-400 w-10 text-right">
+              <span className="text-slate-500 w-10 text-right">
                 {slice.percentage.toFixed(1)}%
               </span>
             </div>
