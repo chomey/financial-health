@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for all 107 completed tasks", () => {
-    expect(CHANGELOG.length).toBe(107);
+  it("contains entries for completed tasks (108 entries, versions 1-107 + 109)", () => {
+    expect(CHANGELOG.length).toBe(108);
   });
 
   it("has unique version numbers", () => {
@@ -11,13 +11,15 @@ describe("changelog data", () => {
     expect(new Set(versions).size).toBe(versions.length);
   });
 
-  it("covers versions 1 through 97", () => {
+  it("covers versions 1 through 109 (with 108 pending)", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(107);
+    expect(versions[versions.length - 1]).toBe(109);
+    // Versions 1-107 and 109 should be present; 108 is pending (task reordered)
     for (let i = 1; i <= 107; i++) {
       expect(versions).toContain(i);
     }
+    expect(versions).toContain(109);
   });
 
   it("is sorted in reverse chronological order (newest first)", () => {
@@ -54,15 +56,15 @@ describe("getChangelogByMilestone", () => {
   it("contains all entries across all groups", () => {
     const milestones = getChangelogByMilestone();
     const totalEntries = milestones.reduce((sum, m) => sum + m.entries.length, 0);
-    expect(totalEntries).toBe(107);
+    expect(totalEntries).toBe(108);
   });
 
   it("groups entries correctly by milestone range", () => {
     const milestones = getChangelogByMilestone();
     // UI Polish: 88-101
     expect(milestones[0].milestone).toBe("UI Polish");
-    expect(milestones[0].entries.length).toBe(20); // 88-108 (currently 88-107)
-    expect(milestones[0].entries.every((e) => e.version >= 88 && e.version <= 108)).toBe(true);
+    expect(milestones[0].entries.length).toBe(21); // 88-107 + 109 (108 pending)
+    expect(milestones[0].entries.every((e) => e.version >= 88 && e.version <= 109)).toBe(true);
     // Metric-Specific Explainers: 83-87
     expect(milestones[1].milestone).toBe("Metric-Specific Explainers");
     expect(milestones[1].entries.length).toBe(5); // 83, 84, 85, 86, 87

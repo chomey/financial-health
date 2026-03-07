@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Milestone E2E: UI polish and formula validation
+  {
+    version: 109,
+    title: "Milestone E2E: UI polish and formula validation",
+    description: "Comprehensive end-to-end test covering tax bracket tiered fill bars, full-format currency in explainer modals, net worth donut chart segments, Cash Flow Sankey investment income nodes, Fast Forward scenario options, and metric card consistency with explainer breakdowns.",
+    date: "2026-03-06",
+  },
   // Formula validation and projection bug fix
   {
     version: 107,
@@ -688,7 +695,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 108] as const },
+    { milestone: "UI Polish", range: [88, 109] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },
