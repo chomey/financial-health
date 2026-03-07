@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Debt-to-income ratio insight
+  {
+    version: 135,
+    title: "Debt-to-income ratio insight with educational explainer",
+    description: "New insight type showing your debt-to-income (DTI) ratio — total monthly debt payments divided by gross monthly income. Four tiers: Excellent (<20%), Good (20–35%), Moderate (36–43%), and High (44%+). Each tier explains why DTI matters: lenders use it to decide mortgage approvals, credit card limits, and loan rates. A lower DTI means better terms and more financial flexibility. Appears on the Debt-to-Asset Ratio metric card.",
+    date: "2026-03-07",
+  },
   // Visual theme E2E regression
   {
     version: 134,
