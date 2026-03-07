@@ -42,6 +42,79 @@ import type { IncomeItem } from "@/components/IncomeEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 
+function PrintSnapshotButton() {
+  return (
+    <button
+      type="button"
+      onClick={() => window.print()}
+      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-600 shadow-sm transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 active:scale-95 print:hidden"
+      aria-label="Print snapshot"
+      data-testid="print-snapshot-button"
+    >
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+        />
+      </svg>
+      Print
+    </button>
+  );
+}
+
+function PrintFooter() {
+  const [date, setDate] = useState("");
+  const [url, setUrl] = useState("");
+
+  useEffect(() => {
+    const updateValues = () => {
+      setDate(
+        new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      );
+      setUrl(window.location.href);
+    };
+    updateValues();
+    // Also refresh right before the browser opens the print dialog
+    window.addEventListener("beforeprint", updateValues);
+    return () => window.removeEventListener("beforeprint", updateValues);
+  }, []);
+
+  return (
+    <footer
+      className="mt-8 hidden border-t border-stone-200 pt-4 print:block"
+      data-testid="print-footer"
+    >
+      <div className="flex items-start justify-between gap-4 text-xs text-stone-500">
+        <div>
+          <p className="font-semibold text-stone-700">Financial Health Snapshot</p>
+          <p className="mt-0.5">Your finances at a glance — no accounts, no data stored</p>
+        </div>
+        <div className="space-y-0.5 text-right">
+          <p data-testid="print-footer-date">{date}</p>
+          <p
+            className="break-all font-mono text-xs text-stone-400"
+            data-testid="print-footer-url"
+          >
+            {url}
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 function CopyLinkButton() {
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -624,7 +697,7 @@ export default function Home() {
               </a>
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 print:hidden">
             <CountryJurisdictionSelector
               country={country}
               jurisdiction={jurisdiction}
@@ -640,11 +713,12 @@ export default function Home() {
               onManualOverrideChange={setFxManualOverride}
             />
             <CopyLinkButton />
+            <PrintSnapshotButton />
           </div>
         </div>
       </header>
 
-      <nav className="sticky top-0 z-30 border-b border-stone-200 bg-white/95 backdrop-blur-sm shadow-sm">
+      <nav className="sticky top-0 z-30 border-b border-stone-200 bg-white/95 backdrop-blur-sm shadow-sm print:hidden">
         <div className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6">
           <div className="flex items-center gap-1 py-1.5 text-sm">
             {[
@@ -680,7 +754,7 @@ export default function Home() {
 
         {/* Sample profile picker for new visitors (no URL state) */}
         {showSampleProfiles && (
-          <div className="mb-6 rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-5 shadow-sm sm:px-6" data-testid="sample-profiles-banner">
+          <div className="mb-6 rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-5 shadow-sm sm:px-6 print:hidden" data-testid="sample-profiles-banner">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-base font-semibold text-stone-800 sm:text-lg">Start with a sample profile</h2>
@@ -743,8 +817,9 @@ export default function Home() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* Entry Panel — left side on desktop, top on mobile */}
           <section
-            className="lg:col-span-7"
+            className="lg:col-span-7 print:hidden"
             aria-label="Financial data entry"
+            data-testid="entry-panel"
           >
             <div className="space-y-3">
               <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)} dataFlowId="section-assets" dataFlowValue={assetTotal} dataFlowLabel="Assets" dataFlowItems={assetItems}>
@@ -776,7 +851,8 @@ export default function Home() {
           {/* Dashboard Panel — right side on desktop, bottom on mobile */}
           <section
             id="dashboard"
-            className="lg:col-span-5 scroll-mt-16"
+            className="lg:col-span-5 scroll-mt-16 print:col-span-full"
+            data-testid="dashboard-panel"
             aria-label="Financial dashboard"
           >
             <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
@@ -870,9 +946,11 @@ export default function Home() {
         </div>
 
         {/* What If scenario panel — full-width at the bottom */}
-        <section id="scenarios" className="mt-8 scroll-mt-16" aria-label="Scenario modeling">
+        <section id="scenarios" className="mt-8 scroll-mt-16 print:hidden" aria-label="Scenario modeling">
           <FastForwardPanel state={state} />
         </section>
+
+        <PrintFooter />
       </main>
     </div>
     </DataFlowProvider>
