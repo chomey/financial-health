@@ -869,7 +869,7 @@ export default function Home() {
               </CollapsibleSection>
 
               <CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)} dataFlowId="section-income" dataFlowValue={incomeTotal + totalMonthlyInvestmentReturns} dataFlowLabel="Income & Returns" dataFlowItems={incomeItems}>
-                <IncomeEntry items={income} onChange={setIncome} />
+                <IncomeEntry items={income} onChange={setIncome} investmentReturns={monthlyInvestmentReturns} />
               </CollapsibleSection>
 
               <CollapsibleSection id="expenses" title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)} dataFlowId="section-expenses" dataFlowValue={expenseTotal} dataFlowLabel="Expenses" dataFlowItems={expenseItems}>

@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Auto-display investment returns in Income section
+  {
+    version: 121,
+    title: "Investment returns in Income section",
+    description: "Auto-computed investment returns now appear as read-only line items in the Income section, below manually entered income sources. Each asset with a non-zero ROI contributes a '{category} returns' row with an 'auto' badge showing its monthly return amount. Investment returns are included in the Monthly Total, giving a complete picture of monthly cash flow from all sources.",
+    date: "2026-03-07",
+  },
   // Milestone E2E: Financial Intelligence
   {
     version: 120,
@@ -779,7 +786,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 120] as const },
+    { milestone: "UI Polish", range: [88, 121] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

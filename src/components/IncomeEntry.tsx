@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
+import type { MonthlyInvestmentReturn } from "@/lib/financial-state";
 
 export type IncomeFrequency = "monthly" | "weekly" | "biweekly" | "quarterly" | "semi-annually" | "annually";
 
@@ -110,9 +111,10 @@ function parseCurrencyInput(value: string): number {
 interface IncomeEntryProps {
   items?: IncomeItem[];
   onChange?: (items: IncomeItem[]) => void;
+  investmentReturns?: MonthlyInvestmentReturn[];
 }
 
-export default function IncomeEntry({ items: controlledItems, onChange }: IncomeEntryProps = {}) {
+export default function IncomeEntry({ items: controlledItems, onChange, investmentReturns = [] }: IncomeEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
   const [items, setItems] = useState<IncomeItem[]>(controlledItems ?? MOCK_INCOME);
@@ -169,7 +171,8 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const total = items.reduce((sum, item) => sum + normalizeToMonthly(item.amount, item.frequency), 0);
+  const investmentReturnsTotal = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
+  const total = items.reduce((sum, item) => sum + normalizeToMonthly(item.amount, item.frequency), 0) + investmentReturnsTotal;
 
   const triggerTotalAnimation = () => {
     if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
@@ -307,7 +310,7 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
         Income
       </h2>
 
-      {items.length === 0 && !addingNew ? (
+      {items.length === 0 && !addingNew && investmentReturns.length === 0 && (
         <div className="flex flex-col items-center py-4 text-center" data-testid="income-empty-state">
           <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-400">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -318,7 +321,9 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
             Enter your income sources to understand your monthly cash flow.
           </p>
         </div>
-      ) : (
+      )}
+
+      {items.length > 0 && (
         <div className="space-y-1" role="list" aria-label="Income items">
           {items.map((item) => (
             <DataFlowSourceItem key={item.id} id={`income:${item.id}`} label={item.category} value={item.amount}>
@@ -468,6 +473,30 @@ export default function IncomeEntry({ items: controlledItems, onChange }: Income
               </button>
             </div>
             </DataFlowSourceItem>
+          ))}
+        </div>
+      )}
+
+      {/* Auto-computed investment returns */}
+      {investmentReturns.length > 0 && (
+        <div data-testid="investment-returns-auto-section">
+          <div className="mt-2 mb-1 border-t border-dashed border-stone-200 pt-2 px-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Auto-computed</span>
+          </div>
+          {investmentReturns.map((r) => (
+            <div
+              key={r.label}
+              className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1"
+              data-testid="investment-return-row"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-stone-500">{r.label} returns</span>
+                <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-computed from your investment ROI">
+                  auto
+                </span>
+              </div>
+              <span className="text-sm font-medium text-green-600">{formatCurrency(r.amount)}</span>
+            </div>
           ))}
         </div>
       )}
