@@ -73,7 +73,7 @@ function PresetButton({ amount, active, onClick }: { amount: number; active: boo
       type="button"
       onClick={onClick}
       className={`rounded-full px-3 py-1.5 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95 ${
-        active ? "bg-blue-600 text-white shadow-sm" : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+        active ? "bg-violet-500 text-white shadow-sm" : "bg-white/10 text-slate-300 hover:bg-white/15"
       }`}
     >
       {label}
@@ -96,9 +96,9 @@ function AmountField({
 }) {
   return (
     <div className="mb-5">
-      <label className="block text-sm font-semibold text-stone-600 mb-2">{label}</label>
+      <label className="block text-sm font-semibold text-slate-400 mb-2">{label}</label>
       <div className="relative">
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold text-stone-400 pointer-events-none">$</span>
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold text-slate-500 pointer-events-none">$</span>
         <input
           type="number"
           inputMode="numeric"
@@ -108,7 +108,7 @@ function AmountField({
           onChange={(e) => onChange(e.target.value)}
           placeholder="0"
           data-testid={testId}
-          className="w-full rounded-xl border border-stone-200 pl-8 pr-4 py-3.5 text-lg font-semibold text-stone-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150"
+          className="w-full rounded-xl border border-white/10 bg-slate-800 pl-8 pr-4 py-3.5 text-lg font-semibold text-slate-200 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20 transition-all duration-150"
         />
       </div>
       {presets && (
@@ -195,7 +195,7 @@ export default function MobileWizard({ country, onComplete, onSkip }: MobileWiza
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-white"
+      className="fixed inset-0 z-50 flex flex-col bg-slate-950"
       data-testid="mobile-wizard"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -204,13 +204,13 @@ export default function MobileWizard({ country, onComplete, onSkip }: MobileWiza
       aria-modal="true"
     >
       {/* Header with progress */}
-      <div className="border-b border-stone-100 px-5 py-4">
+      <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-bold text-stone-800">Quick Setup</p>
+          <p className="text-sm font-bold text-slate-200">Quick Setup</p>
           <button
             type="button"
             onClick={handleSkip}
-            className="text-sm text-stone-400 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-1.5 py-0.5 transition-colors duration-150"
+            className="text-sm text-slate-500 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-400 rounded px-1.5 py-0.5 transition-colors duration-150"
             data-testid="wizard-skip"
           >
             Skip
@@ -229,12 +229,12 @@ export default function MobileWizard({ country, onComplete, onSkip }: MobileWiza
             <div
               key={s.id}
               className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                i <= step ? "bg-blue-500" : "bg-stone-200"
+                i <= step ? "bg-violet-500" : "bg-white/10"
               }`}
             />
           ))}
         </div>
-        <p className="mt-1.5 text-xs text-stone-400" data-testid="wizard-step-label">
+        <p className="mt-1.5 text-xs text-slate-500" data-testid="wizard-step-label">
           Step {step + 1} of {STEPS.length}
         </p>
       </div>
@@ -245,10 +245,10 @@ export default function MobileWizard({ country, onComplete, onSkip }: MobileWiza
           <span className="text-5xl" aria-hidden="true">
             {currentStep.emoji}
           </span>
-          <h2 className="mt-3 text-2xl font-bold text-stone-900" data-testid="wizard-step-title">
+          <h2 className="mt-3 text-2xl font-bold text-white" data-testid="wizard-step-title">
             {currentStep.title}
           </h2>
-          <p className="mt-1 text-sm text-stone-500">{currentStep.subtitle}</p>
+          <p className="mt-1 text-sm text-slate-400">{currentStep.subtitle}</p>
         </div>
 
         {step === 0 && (
@@ -350,12 +350,12 @@ export default function MobileWizard({ country, onComplete, onSkip }: MobileWiza
       </div>
 
       {/* Navigation buttons */}
-      <div className="border-t border-stone-100 px-5 py-4 flex items-center gap-3">
+      <div className="border-t border-white/10 px-5 py-4 flex items-center gap-3">
         {step > 0 ? (
           <button
             type="button"
             onClick={() => setStep((s) => s - 1)}
-            className="h-[52px] flex-1 rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-600 transition-all duration-150 hover:bg-stone-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="h-[52px] flex-1 rounded-xl border border-white/10 bg-white/5 text-sm font-semibold text-slate-400 transition-all duration-150 hover:bg-white/10 active:scale-95 focus:outline-none focus:ring-2 focus:ring-violet-400"
             data-testid="wizard-prev"
           >
             ← Back

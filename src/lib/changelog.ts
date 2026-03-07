@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Page layout and remaining UI dark theme
+  {
+    version: 131,
+    title: "Page layout, header, and remaining UI — dark cyberpunk theme",
+    description: "Final dark theme pass across all remaining components. Page background slate-950, header bg-slate-900/80 with backdrop-blur glass effect, nav bg-slate-950/90. Print styles in globals.css override back to white-on-light for printing. All stone-* colors replaced with slate equivalents. Positive/negative convention consistent everywhere: emerald-400 positive, rose-400 negative. FastForwardPanel sliders updated to vivid accents. MobileWizard, StockEntry, ZoomableCard, FxRateDisplay, CurrencyBadge, WithdrawalTaxSummary, InsightsPanel, BenchmarkComparisons, CountryJurisdictionSelector all updated to glass card pattern.",
+    date: "2026-03-07",
+  },
   // Charts dark theme
   {
     version: 130,

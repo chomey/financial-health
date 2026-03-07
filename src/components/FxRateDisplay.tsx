@@ -54,7 +54,7 @@ export default function FxRateDisplay({
 
   return (
     <div
-      className="flex items-center gap-1.5 text-xs text-stone-500"
+      className="flex items-center gap-1.5 text-xs text-slate-400"
       data-testid="fx-rate-display"
     >
       <span className="hidden sm:inline">1 {foreignCurrency} =</span>
@@ -72,14 +72,14 @@ export default function FxRateDisplay({
             if (e.key === "Enter") commitEdit();
             if (e.key === "Escape") setEditing(false);
           }}
-          className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs font-mono text-stone-700 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          className="w-20 rounded border border-violet-400/40 bg-slate-800 px-1.5 py-0.5 text-xs font-mono text-slate-200 focus:outline-none focus:ring-1 focus:ring-violet-400"
           data-testid="fx-rate-input"
         />
       ) : (
         <button
           type="button"
           onClick={startEditing}
-          className="rounded px-1 py-0.5 font-mono text-stone-700 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          className="rounded px-1 py-0.5 font-mono text-slate-300 transition-colors hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-violet-400"
           title="Click to set custom rate"
           data-testid="fx-rate-value"
         >
@@ -91,7 +91,7 @@ export default function FxRateDisplay({
         <button
           type="button"
           onClick={clearOverride}
-          className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 transition-colors hover:bg-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-400"
+          className="rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-300 transition-colors hover:bg-amber-400/25 focus:outline-none focus:ring-1 focus:ring-amber-400"
           title="Using custom rate — click to revert to live rate"
           data-testid="fx-badge-custom"
         >
@@ -99,7 +99,7 @@ export default function FxRateDisplay({
         </button>
       ) : (
         <span
-          className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700"
+          className="rounded-full bg-emerald-400/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-300"
           data-testid="fx-badge-live"
         >
           live

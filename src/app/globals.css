@@ -316,10 +316,36 @@ body {
     size: A4 portrait;
   }
 
-  /* White background */
+  /* White background — override dark cyberpunk theme for readability in print */
   body {
     background: white !important;
     color: #1c1917 !important;
+  }
+
+  /* Override dark card surfaces back to white for print */
+  [class*="bg-white/"],
+  [class*="bg-slate-"],
+  [class*="bg-stone-"] {
+    background-color: white !important;
+  }
+
+  /* Override dark text back to dark for print readability */
+  [class*="text-slate-"],
+  [class*="text-stone-"],
+  [class*="text-white"] {
+    color: #1c1917 !important;
+  }
+
+  /* Override dark borders */
+  [class*="border-white/"],
+  [class*="border-slate-"] {
+    border-color: #e5e7eb !important;
+  }
+
+  /* Header and nav — white for print */
+  header, nav {
+    background: white !important;
+    border-color: #e5e7eb !important;
   }
 
   /* Fix recharts responsive containers — they collapse to 0 height
