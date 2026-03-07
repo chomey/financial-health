@@ -108,6 +108,17 @@ export interface RunwayExplainerDetails {
   categories: string[];
 }
 
+export interface IncomeReplacementExplainerDetails {
+  totalInvestedAssets: number;
+  monthlyWithdrawal4pct: number;
+  monthlyAfterTaxIncome: number;
+  incomeReplacementPct: number;
+  currentTierLabel: string;
+  nextTierLabel: string | null;
+  amountNeededForNextTier: number | null;
+  assetBreakdown: { label: string; balance: number; monthlyWithdrawal: number }[];
+}
+
 export interface SurplusInvestmentReturn {
   label: string;
   amount: number;
@@ -122,6 +133,7 @@ export interface ActiveTargetMeta {
   taxDetails?: TaxExplainerDetails;
   runwayDetails?: RunwayExplainerDetails;
   investmentReturns?: SurplusInvestmentReturn[];
+  incomeReplacementDetails?: IncomeReplacementExplainerDetails;
 }
 
 interface DataFlowContextValue {
@@ -940,6 +952,136 @@ function InvestmentReturnsSummary({ returns, homeCurrency }: { returns: SurplusI
   );
 }
 
+// --- IncomeReplacementExplainerContent ---
+
+function IncomeReplacementExplainerContent({ details, homeCurrency }: { details: IncomeReplacementExplainerDetails; homeCurrency?: SupportedCurrency }) {
+  const cur = homeCurrency ?? "USD";
+  const fmt = (n: number) => formatCurrency(Math.abs(n), cur);
+
+  const TIERS = [
+    { label: "Early stage", threshold: 0 },
+    { label: "Building momentum", threshold: 25 },
+    { label: "Strong position", threshold: 50 },
+    { label: "Nearly independent", threshold: 75 },
+    { label: "Financially independent", threshold: 100 },
+  ];
+
+  const tierIndex = TIERS.findIndex((t) => t.label === details.currentTierLabel);
+
+  return (
+    <div className="space-y-5" data-testid="income-replacement-explainer">
+      {/* Formula breakdown */}
+      <div className="rounded-xl border border-slate-600 p-4" data-testid="income-replacement-formula">
+        <p className="mb-3 text-xs font-medium text-slate-400 uppercase tracking-wide">How it&apos;s calculated</p>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-400">Total invested portfolio</span>
+            <span className="font-semibold text-slate-100" data-testid="income-replacement-total-invested">{fmt(details.totalInvestedAssets)}</span>
+          </div>
+          <div className="flex items-center justify-between text-slate-500 text-xs">
+            <span>× 4% safe withdrawal rate ÷ 12</span>
+            <span className="font-medium text-cyan-400" data-testid="income-replacement-monthly-withdrawal">= {fmt(details.monthlyWithdrawal4pct)}/mo</span>
+          </div>
+          <div className="border-t border-slate-600 pt-2 flex items-center justify-between">
+            <span className="text-slate-400">Monthly after-tax income</span>
+            <span className="font-semibold text-slate-100" data-testid="income-replacement-monthly-income">{fmt(details.monthlyAfterTaxIncome)}/mo</span>
+          </div>
+          <div className="flex items-center justify-between font-semibold">
+            <span className="text-slate-300">Income replacement ratio</span>
+            <span className="text-cyan-400" data-testid="income-replacement-pct">{details.incomeReplacementPct.toFixed(1)}%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress through tiers */}
+      <div data-testid="income-replacement-tiers">
+        <p className="mb-2 text-xs font-medium text-slate-400 uppercase tracking-wide">Your progress</p>
+        <div className="relative mb-3">
+          <div className="h-2 w-full rounded-full bg-slate-700 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-cyan-500 to-cyan-400 transition-all duration-700"
+              style={{ width: `${Math.min(100, details.incomeReplacementPct)}%` }}
+              aria-hidden="true"
+            />
+          </div>
+          {TIERS.slice(1).map((t) => (
+            <div
+              key={t.threshold}
+              className="absolute top-0 h-2 w-0.5 bg-slate-500"
+              style={{ left: `${t.threshold}%` }}
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+        <div className="space-y-1.5">
+          {TIERS.map((tier, i) => {
+            const isActive = i === tierIndex;
+            const isPast = i < tierIndex;
+            return (
+              <div
+                key={tier.label}
+                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+                  isActive
+                    ? "bg-cyan-900/30 border border-cyan-700/40"
+                    : isPast
+                      ? "text-slate-500"
+                      : "text-slate-600"
+                }`}
+                data-testid={isActive ? "income-replacement-current-tier" : undefined}
+              >
+                <span className={isActive ? "text-cyan-400" : isPast ? "text-slate-500" : "text-slate-600"}>
+                  {isPast ? "✓" : isActive ? "▶" : "○"}
+                </span>
+                <span className={isActive ? "font-semibold text-slate-200" : ""}>{tier.label}</span>
+                {tier.threshold > 0 && (
+                  <span className={`ml-auto text-xs ${isActive ? "text-slate-400" : "text-slate-600"}`}>
+                    {tier.threshold}%+
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {details.nextTierLabel && details.amountNeededForNextTier !== null && (
+          <p className="mt-3 text-xs text-slate-400" data-testid="income-replacement-next-tier">
+            Invest <span className="font-semibold text-amber-400">{fmt(details.amountNeededForNextTier)}</span> more to reach <span className="font-semibold text-slate-300">&quot;{details.nextTierLabel}&quot;</span>
+          </p>
+        )}
+      </div>
+
+      {/* Per-asset breakdown */}
+      {details.assetBreakdown.length > 0 && (
+        <div data-testid="income-replacement-asset-breakdown">
+          <p className="mb-2 text-xs font-medium text-slate-400 uppercase tracking-wide">Per-account contribution (4% rule)</p>
+          <div className="space-y-1.5">
+            {details.assetBreakdown.map((item, i) => (
+              <div key={i} className="flex items-center justify-between rounded-lg bg-slate-700/40 px-3 py-2 text-sm">
+                <span className="text-slate-300 truncate mr-2">{item.label}</span>
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  <span className="text-slate-500 text-xs">{fmt(item.balance)}</span>
+                  <span className="text-slate-500">→</span>
+                  <span className="font-medium text-cyan-400">{fmt(item.monthlyWithdrawal)}/mo</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 4% rule explanation */}
+      <div className="rounded-xl border border-violet-700/40 bg-violet-900/20 p-4" data-testid="income-replacement-education">
+        <p className="text-xs font-semibold text-slate-300 mb-1">What is the 4% rule?</p>
+        <p className="text-xs text-slate-400 leading-relaxed">
+          The 4% rule (also called the Safe Withdrawal Rate) comes from the <span className="text-slate-300">Trinity Study</span> — it found that retirees could withdraw 4% of their portfolio annually and sustain it for 30+ years across most historical market conditions.
+        </p>
+        <p className="mt-2 text-xs text-slate-400 leading-relaxed">
+          When your ratio reaches <span className="font-semibold text-cyan-400">100%</span>, your portfolio&apos;s sustainable withdrawal matches your current income — that&apos;s financial independence.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // --- ExplainerModal ---
 
 function ExplainerModal({
@@ -1024,6 +1166,8 @@ function ExplainerModal({
           <TaxExplainerContent details={targetMeta.taxDetails} homeCurrency={homeCurrencyProp} />
         ) : targetMeta.metricType === "financial-runway" && targetMeta.runwayDetails ? (
           <RunwayExplainerContent details={targetMeta.runwayDetails} homeCurrency={homeCurrencyProp} />
+        ) : targetMeta.metricType === "income-replacement" && targetMeta.incomeReplacementDetails ? (
+          <IncomeReplacementExplainerContent details={targetMeta.incomeReplacementDetails} homeCurrency={homeCurrencyProp} />
         ) : (
           <>
             {/* Source summary cards with connectors */}
@@ -1112,7 +1256,7 @@ function ExplainerModal({
   );
 }
 
-export { ExplainerModal, ConnectorLine, CountUpValue, TaxExplainerContent, RunwayExplainerContent, InvestmentReturnsSummary };
+export { ExplainerModal, ConnectorLine, CountUpValue, TaxExplainerContent, RunwayExplainerContent, IncomeReplacementExplainerContent, InvestmentReturnsSummary };
 
 // --- Provider ---
 
