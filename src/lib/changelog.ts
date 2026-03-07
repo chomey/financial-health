@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Enhanced Fast Forward what-if scenarios
+  {
+    version: 106,
+    title: "Enhanced Fast Forward what-if scenarios",
+    description: "Added powerful new scenario options: 'What if I retired today?' zeros all income and shows how long savings last. 'Max tax-sheltered accounts' auto-calculates contribution limits for TFSA, RRSP, 401k, IRA, etc. 'Downsize housing' slider converts property equity to liquid savings. 'ROI adjustment' slider models different market conditions. Quick-pick preset buttons for Conservative, Aggressive Saver, and Early Retirement scenarios.",
+    date: "2026-03-06",
+  },
   // Investment interest income in Cash Flow Sankey
   {
     version: 105,

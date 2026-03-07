@@ -24,30 +24,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 96: [MILESTONE] E2E test for explainer and tax treatment enhancements
-- **Status**: Complete
-- **Date**: 2026-03-06
-- **Changes**:
-  - `tests/e2e/milestone-10-e2e.spec.ts`: **New** — Comprehensive milestone E2E test suite with 11 tests covering: (1) Withdrawal Tax Impact auto-expanded details with "Suggested" label and disclaimer, (2) $0 income tax explainer with bracket reference table, (3) Runway burndown chart on main page with summary/legend/balances/withdrawal order, (4) Runway explainer modal condensed with chart note, (5) Tax bracket visualization with colored segments, federal/provincial breakdown, effective/marginal rates, after-tax flow, (6) ROI tax treatment toggle visible on savings, hidden on TFSA, correct cycling, (7) Scrollable source summary cards with sticky total and wider modal, (8-10) Three modal close mechanisms (Escape, X button, backdrop), (11) Full multi-step journey across all features.
-  - `tests/unit/milestone-10-e2e-infra.test.ts`: **New** — 14 T1 unit tests verifying the milestone E2E test file structure: existence, imports, coverage of withdrawal tax, $0 tax, runway burndown, tax brackets, ROI toggle, scrollable cards, close mechanisms, journey test, test count, screenshots, and related feature test files.
-  - `src/lib/changelog.ts`: Added v96 changelog entry. Extended UI Polish milestone range to [88, 96].
-  - `tests/unit/changelog.test.ts`: Updated expectations to 96 entries, 9 entries in UI Polish milestone group.
-- **Test tiers run**: T1, T2, T3
-- **Tests**:
-  - `tests/unit/milestone-10-e2e-infra.test.ts`: 14 passed, 0 failed
-  - `tests/unit/changelog.test.ts`: 11 passed, 0 failed
-  - All T1 unit tests: 1171 passed, 0 failed (71 test files)
-  - `tests/e2e/milestone-10-e2e.spec.ts`: 11 passed, 0 failed
-  - All T2/T3 E2E tests: 283 passed, 0 failed
-- **Screenshots**:
-  ![Withdrawal tax auto-expanded](screenshots/task-96-withdrawal-tax-auto-expanded.png)
-  ![Tax zero income](screenshots/task-96-tax-zero-income.png)
-  ![Runway burndown main](screenshots/task-96-runway-burndown-main.png)
-  ![Tax bracket visualization](screenshots/task-96-tax-bracket-visualization.png)
-  ![ROI tax toggle](screenshots/task-96-roi-tax-toggle.png)
-  ![Scrollable source cards](screenshots/task-96-scrollable-source-cards.png)
-  ![Full journey complete](screenshots/task-96-full-journey-complete.png)
-- **Notes**: All 96 tasks are now complete. This milestone covers the explainer and tax treatment enhancements from tasks 83-96, validating withdrawal tax auto-expand, $0 income tax explainer, runway burndown on main page, tax bracket visualization, ROI tax treatment toggle, scrollable source cards, and modal close mechanisms. The full E2E suite (283 tests) passes across all milestone test files.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 96: Show both federal and provincial/state bracket tables in tax explainer
 - **Status**: Complete
@@ -238,3 +215,15 @@
 - **Screenshots**:
   ![Sankey with investment returns](screenshots/task-105-sankey-investment-returns.png)
   ![Sankey legend with interest income](screenshots/task-105-sankey-legend-interest.png)
+
+## Task 106: Enhance Fast Forward what-if scenarios
+- **Date**: 2026-03-06
+- **Files**: `src/lib/scenario.ts` (added retireToday, maxTaxSheltered, housingDownsizePercent, roiAdjustment fields, TAX_SHELTERED_LIMITS constants, isTaxSheltered/getMonthlyLimit/applyPreset helpers, scenarioRunwayMonths in comparison), `src/components/FastForwardPanel.tsx` (added preset buttons, retire-today toggle, max-tax-sheltered toggle with account limit details, housing downsize slider, ROI adjustment slider, runway estimate display), `src/lib/changelog.ts` (added v106 entry), `tests/unit/scenario-enhanced.test.ts` (new — 31 tests), `tests/e2e/fast-forward-enhanced.spec.ts` (new — 7 tests), `tests/unit/changelog.test.ts` (updated counts)
+- **Tests**: T1: 1307 passed, 0 failed (80 files). T2: 7 passed (fast-forward-enhanced).
+- **Screenshots**:
+  ![Scenario presets](screenshots/task-106-presets.png)
+  ![Conservative preset](screenshots/task-106-conservative-preset.png)
+  ![Early retirement](screenshots/task-106-early-retirement.png)
+  ![Retire today](screenshots/task-106-retire-today.png)
+  ![ROI adjustment](screenshots/task-106-roi-adjustment.png)
+- **Notes**: No changes needed in page.tsx — FastForwardPanel already receives the full `state` prop. Added 5 new scenario types: retire today (zeros income, shows runway), max tax-sheltered (auto-calculates TFSA/RRSP/401k/IRA limits), housing downsize (slider with equity release), ROI adjustment (global ±5% slider), and 3 quick presets (Conservative, Aggressive Saver, Early Retirement).
