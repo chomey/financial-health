@@ -77,7 +77,7 @@ describe("SourceSummaryCard", () => {
       />
     );
     const card = screen.getByTestId("source-summary-section-assets");
-    expect(card.className).toContain("border-l-green-500");
+    expect(card.className).toContain("border-l-cyan-500");
   });
 
   it("uses red border for negative sources", () => {
@@ -159,7 +159,7 @@ describe("SourceSummaryCard", () => {
     const totalRow = screen.getByTestId("source-summary-total-row-section-assets");
     expect(totalRow.className).toContain("sticky");
     expect(totalRow.className).toContain("bottom-0");
-    expect(totalRow.className).toContain("bg-white");
+    expect(totalRow.className).toContain("bg-slate-700/80");
   });
 
   it("renders without items when items is undefined", () => {

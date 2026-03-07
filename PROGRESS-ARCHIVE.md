@@ -9,10 +9,10 @@
 -->
 
 ## Summary
-- **Total Tasks**: 101
-- **Completed**: 101
-- **Remaining**: 0
-- **Last Updated**: 2026-03-06
+- **Total Tasks**: 134
+- **Completed**: 128
+- **Remaining**: 6
+- **Last Updated**: 2026-03-07
 
 # Progress Archive (Tasks 1-90)
 
@@ -2371,3 +2371,15 @@
 - **Files**: `src/app/page.tsx`, `src/components/DataFlowArrows.tsx`, `tests/unit/surplus-explainer.test.ts`, `tests/e2e/surplus-explainer.spec.ts`, `src/lib/changelog.ts`
 - **Tests**: 1589 passed (6 new T1 in `surplus-explainer.test.ts`, 3 new T2 in `surplus-explainer.spec.ts`)
 - **Screenshots**: ![Surplus explainer with Contributions card](screenshots/task-125-surplus-explainer-contributions.png)
+
+## Task 126: Show both monthly and yearly totals on Income and Expenses
+- **Date**: 2026-03-07
+- **Files**: `src/app/page.tsx`, `src/components/IncomeEntry.tsx`, `src/components/ExpenseEntry.tsx`, `tests/unit/income-expense-totals.test.ts`, `tests/e2e/income-expense-totals.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: 1596 passed (T1/T2)
+
+## Task 127: Visual theme overhaul — soft cyberpunk palette
+- **Date**: 2026-03-07
+- **Files**: `src/app/globals.css`, `tests/unit/cyberpunk-theme.test.ts`, `tests/e2e/cyberpunk-theme.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: 1614 passed (18 new T1, 4 new T2)
+- **Screenshots**: ![Dark theme body](screenshots/task-127-dark-theme-body.png) ![Full page cyberpunk](screenshots/task-127-full-page-cyberpunk.png)
+- **Notes**: Only updates theme tokens in globals.css. Component updates in tasks 128-130.

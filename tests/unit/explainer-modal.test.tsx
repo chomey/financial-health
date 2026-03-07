@@ -263,7 +263,7 @@ describe("ExplainerModal", () => {
     );
     const assetsCard = screen.getByTestId("source-summary-section-assets");
     const debtsCard = screen.getByTestId("source-summary-section-debts");
-    expect(assetsCard.className).toContain("border-l-green-500");
+    expect(assetsCard.className).toContain("border-l-cyan-500");
     expect(debtsCard.className).toContain("border-l-rose-500");
   });
 });
@@ -435,18 +435,18 @@ describe("ConnectorLine", () => {
     expect(marker!.querySelector("polygon")).not.toBeNull();
   });
 
-  it("uses green color for positive connections", () => {
+  it("uses cyan color for positive connections (dark theme)", () => {
     render(<ConnectorLine isPositive={true} seed={1} index={0} />);
     const svg = screen.getByTestId("explainer-connector-0");
     const path = svg.querySelector("path");
-    expect(path!.getAttribute("stroke")).toBe("#059669");
+    expect(path!.getAttribute("stroke")).toBe("#22d3ee");
   });
 
-  it("uses red color for negative connections", () => {
+  it("uses rose color for negative connections (dark theme)", () => {
     render(<ConnectorLine isPositive={false} seed={1} index={0} />);
     const svg = screen.getByTestId("explainer-connector-0");
     const path = svg.querySelector("path");
-    expect(path!.getAttribute("stroke")).toBe("#e11d48");
+    expect(path!.getAttribute("stroke")).toBe("#fb7185");
   });
 
   it("has animate-draw-connector class", () => {
@@ -635,11 +635,11 @@ describe("ExplainerModal sequenced animations", () => {
         getSourceMetadata={mockGetSourceMetadata}
       />
     );
-    // First connection is positive (Assets)
+    // First connection is positive (Assets) — cyan in dark theme
     const connector0 = screen.getByTestId("explainer-connector-0");
-    expect(connector0.querySelector("path")!.getAttribute("stroke")).toBe("#059669");
-    // Second connection is negative (Debts)
+    expect(connector0.querySelector("path")!.getAttribute("stroke")).toBe("#22d3ee");
+    // Second connection is negative (Debts) — rose in dark theme
     const connector1 = screen.getByTestId("explainer-connector-1");
-    expect(connector1.querySelector("path")!.getAttribute("stroke")).toBe("#e11d48");
+    expect(connector1.querySelector("path")!.getAttribute("stroke")).toBe("#fb7185");
   });
 });

@@ -314,15 +314,15 @@ export function SourceSummaryCard({
 
   return (
     <div
-      className={`relative flex flex-col rounded-xl border-l-4 bg-white p-5 shadow-sm ${
-        isPositive ? "border-l-green-500" : "border-l-rose-500"
+      className={`relative flex flex-col rounded-xl border-l-4 bg-slate-700/50 p-5 shadow-sm ${
+        isPositive ? "border-l-cyan-500" : "border-l-rose-500"
       }`}
       data-testid={`source-summary-${sourceId}`}
     >
       {/* Header: icon + title */}
       <div className="mb-2 flex items-center gap-2">
         {icon && <span aria-hidden="true" className="text-base">{icon}</span>}
-        <span className="text-sm font-semibold text-stone-700" data-testid={`source-summary-title-${sourceId}`}>{sectionName}</span>
+        <span className="text-sm font-semibold text-slate-200" data-testid={`source-summary-title-${sourceId}`}>{sectionName}</span>
       </div>
 
       {/* Scrollable item list */}
@@ -334,10 +334,10 @@ export function SourceSummaryCard({
               const showCurrencyCode = item.currency && item.currency !== cur;
               return (
                 <li key={i} className="flex items-center justify-between text-sm">
-                  <span className="text-stone-500 truncate mr-2">{item.label}</span>
-                  <span className="font-medium text-stone-700 whitespace-nowrap">
+                  <span className="text-slate-400 truncate mr-2">{item.label}</span>
+                  <span className="font-medium text-slate-200 whitespace-nowrap">
                     {formatCurrency(Math.abs(item.value), itemCur)}
-                    {showCurrencyCode && <span className="ml-1 text-xs text-stone-400">{itemCur}</span>}
+                    {showCurrencyCode && <span className="ml-1 text-xs text-slate-500">{itemCur}</span>}
                   </span>
                 </li>
               );
@@ -347,11 +347,11 @@ export function SourceSummaryCard({
       )}
 
       {/* Total with hand-drawn oval — sticky at bottom */}
-      <div className="sticky bottom-0 flex items-center justify-between border-t border-stone-100 pt-2 bg-white shadow-[0_-2px_4px_rgba(0,0,0,0.05)]" data-testid={`source-summary-total-row-${sourceId}`}>
-        <span className="text-xs font-medium text-stone-500 uppercase tracking-wide">Total</span>
+      <div className="sticky bottom-0 flex items-center justify-between border-t border-slate-600 pt-2 bg-slate-700/80 shadow-[0_-2px_4px_rgba(0,0,0,0.2)]" data-testid={`source-summary-total-row-${sourceId}`}>
+        <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">Total</span>
         <div className="relative">
           <span
-            className={`text-xl font-bold ${isPositive ? "text-green-600" : "text-rose-600"}`}
+            className={`text-xl font-bold ${isPositive ? "text-cyan-400" : "text-rose-400"}`}
             data-testid={`source-summary-total-${sourceId}`}
           >
             {total}
@@ -367,7 +367,7 @@ export function SourceSummaryCard({
             <path
               d={handDrawnOval(50, 20, 45, 16, ovalSeed)}
               fill="none"
-              stroke={isPositive ? "#059669" : "#e11d48"}
+              stroke={isPositive ? "#22d3ee" : "#fb7185"}
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -392,7 +392,7 @@ function ConnectorLine({
   seed: number;
   index: number;
 }) {
-  const color = isPositive ? "#059669" : "#e11d48";
+  const color = isPositive ? "#22d3ee" : "#fb7185";
   const delayMs = 400 + index * 50; // Stagger connector draws
   return (
     <svg
@@ -485,9 +485,17 @@ function CountUpValue({ formattedValue }: { formattedValue: string }) {
 
 // --- TaxExplainerContent ---
 
-// Color palette for bracket tiers: lighter green for low rates, deeper teal for higher
+// Color palette for bracket tiers: muted cyan (low rates) → violet → rose (high rates)
+// Designed for dark backgrounds — distinct and readable without being garish
 const BRACKET_COLORS = [
-  "#d1fae5", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981", "#059669", "#047857", "#065f46",
+  "#0e7490", // cyan-700 - subtle for lowest bracket
+  "#0891b2", // cyan-600
+  "#06b6d4", // cyan-500
+  "#22d3ee", // cyan-400 - more visible for mid brackets
+  "#7c3aed", // violet-600 - transition to violet
+  "#8b5cf6", // violet-500
+  "#fb7185", // rose-400 - high brackets
+  "#f43f5e", // rose-500
 ];
 
 function TieredBracketBars({
@@ -524,7 +532,7 @@ function TieredBracketBars({
 
   return (
     <div data-testid={`${testIdPrefix}-table`}>
-      <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">{title}</p>
+      <p className="mb-2 text-xs font-medium text-slate-400 uppercase tracking-wide">{title}</p>
       <div className="flex flex-col-reverse gap-1.5">
         {brackets.map((seg, i) => {
           const capacity = getBracketCapacity(seg);
@@ -538,38 +546,33 @@ function TieredBracketBars({
               className="relative"
               data-testid={`${testIdPrefix}-row-${i}`}
             >
-              {/* Bar container */}
+              {/* Bar container — dark background so text is always readable */}
               <div
                 className={`relative h-9 w-full rounded-lg overflow-hidden border transition-colors ${
-                  isFilled ? "border-stone-200" : "border-stone-200 border-dashed"
+                  isFilled ? "border-slate-600" : "border-slate-600/50 border-dashed"
                 }`}
-                style={{ backgroundColor: isFilled ? "#f5f5f4" : "#fafaf9" }}
+                style={{ backgroundColor: isFilled ? "rgb(30,41,59)" : "rgb(15,23,42)" }}
               >
                 {/* Fill bar */}
                 {isFilled && (
                   <div
-                    className="absolute inset-y-0 left-0 rounded-lg transition-all duration-300"
+                    className="absolute inset-y-0 left-0 rounded-lg transition-all duration-300 opacity-60"
                     style={{ width: `${fillPct}%`, backgroundColor: color }}
                     data-testid={`${testIdPrefix}-fill-${i}`}
                   />
                 )}
-                {/* Content overlay */}
+                {/* Content overlay — always light text since bg is dark */}
                 <div className="absolute inset-0 flex items-center justify-between px-3">
-                  <span className="text-xs text-stone-500 truncate mr-2">
+                  <span className="text-xs text-slate-300 truncate mr-2">
                     {fmtRange(seg.min, seg.max)}
                   </span>
                   <div className="flex items-center gap-3 shrink-0">
                     <span
-                      className={`text-xs font-bold ${
-                        isFilled
-                          ? i >= 4 ? "text-white" : "text-emerald-800"
-                          : "text-stone-400"
-                      }`}
-                      style={isFilled && fillPct > 40 ? { textShadow: i >= 4 ? "0 1px 2px rgba(0,0,0,0.2)" : undefined } : undefined}
+                      className={`text-xs font-bold ${isFilled ? "text-slate-100" : "text-slate-500"}`}
                     >
                       {(seg.rate * 100).toFixed(1)}%
                     </span>
-                    <span className={`text-xs ${isFilled ? "font-semibold text-stone-700" : "text-stone-400"}`}>
+                    <span className={`text-xs ${isFilled ? "font-semibold text-slate-200" : "text-slate-500"}`}>
                       {isZeroIncome ? "—" : isFilled ? fmt(seg.taxInBracket) : "—"}
                     </span>
                   </div>
@@ -581,7 +584,7 @@ function TieredBracketBars({
       </div>
       {!isZeroIncome && (
         <div className="mt-1.5 flex justify-end">
-          <span className="text-xs font-semibold text-stone-700" data-testid={`${testIdPrefix}-subtotal`}>
+          <span className="text-xs font-semibold text-slate-300" data-testid={`${testIdPrefix}-subtotal`}>
             {title.split(" ")[0]} total: {fmt(subtotal)}
           </span>
         </div>
@@ -605,12 +608,12 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
     <div className="space-y-5" data-testid="tax-explainer">
       {/* Zero income message */}
       {isZeroIncome && (
-        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4" data-testid="tax-zero-income-message">
-          <p className="text-sm text-stone-600">
+        <div className="rounded-xl border border-violet-700/40 bg-violet-900/20 p-4" data-testid="tax-zero-income-message">
+          <p className="text-sm text-slate-300">
             No income entered — add income to see your estimated tax breakdown.
           </p>
-          <p className="mt-1 text-sm text-stone-500">
-            Here are the <span className="font-semibold">{details.jurisdictionLabel}</span> tax brackets for reference:
+          <p className="mt-1 text-sm text-slate-400">
+            Here are the <span className="font-semibold text-slate-200">{details.jurisdictionLabel}</span> tax brackets for reference:
           </p>
         </div>
       )}
@@ -639,34 +642,34 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
 
       {/* Federal & Provincial/State totals */}
       <div className="space-y-1.5" data-testid="tax-breakdown">
-        <div className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2">
-          <span className="text-sm text-stone-600">Federal</span>
-          <span className="text-sm font-semibold text-stone-800" data-testid="tax-federal-amount">{fmt(details.federalTax)}</span>
+        <div className="flex items-center justify-between rounded-lg bg-slate-700/50 px-3 py-2">
+          <span className="text-sm text-slate-400">Federal</span>
+          <span className="text-sm font-semibold text-slate-100" data-testid="tax-federal-amount">{fmt(details.federalTax)}</span>
         </div>
-        <div className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2">
-          <span className="text-sm text-stone-600">{details.jurisdictionType}: {details.jurisdictionLabel}</span>
-          <span className="text-sm font-semibold text-stone-800" data-testid="tax-provincial-amount">{fmt(details.provincialStateTax)}</span>
+        <div className="flex items-center justify-between rounded-lg bg-slate-700/50 px-3 py-2">
+          <span className="text-sm text-slate-400">{details.jurisdictionType}: {details.jurisdictionLabel}</span>
+          <span className="text-sm font-semibold text-slate-100" data-testid="tax-provincial-amount">{fmt(details.provincialStateTax)}</span>
         </div>
       </div>
 
       {/* Effective vs marginal rate */}
-      <div className="rounded-xl border border-stone-200 p-4" data-testid="tax-rates">
+      <div className="rounded-xl border border-slate-600 p-4" data-testid="tax-rates">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-2xl font-bold text-stone-800" data-testid="tax-effective-rate">
+            <p className="text-2xl font-bold text-slate-100" data-testid="tax-effective-rate">
               {(details.effectiveRate * 100).toFixed(1)}%
             </p>
-            <p className="text-xs text-stone-500">Effective rate</p>
+            <p className="text-xs text-slate-400">Effective rate</p>
           </div>
           <div className="text-right">
-            <p className="text-lg font-semibold text-stone-500" data-testid="tax-marginal-rate">
+            <p className="text-lg font-semibold text-slate-400" data-testid="tax-marginal-rate">
               {(details.marginalRate * 100).toFixed(1)}%
             </p>
-            <p className="text-xs text-stone-400">Marginal rate</p>
+            <p className="text-xs text-slate-500">Marginal rate</p>
           </div>
         </div>
         {details.marginalRate > details.effectiveRate && (
-          <p className="mt-2 text-xs text-stone-400">
+          <p className="mt-2 text-xs text-slate-500">
             Your effective rate is lower because only income above each bracket threshold is taxed at the higher rate.
           </p>
         )}
@@ -674,20 +677,20 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
 
       {/* Capital gains section */}
       {details.hasCapitalGains && details.capitalGainsInfo && (
-        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4" data-testid="tax-capital-gains">
-          <p className="text-sm font-semibold text-stone-700 mb-1">Capital Gains</p>
+        <div className="rounded-xl border border-violet-700/40 bg-violet-900/20 p-4" data-testid="tax-capital-gains">
+          <p className="text-sm font-semibold text-slate-200 mb-1">Capital Gains</p>
           {details.capitalGainsInfo.country === "CA" ? (
-            <div className="text-xs text-stone-600 space-y-1">
+            <div className="text-xs text-slate-400 space-y-1">
               <p>Canada taxes capital gains at a reduced inclusion rate:</p>
-              <p className="font-medium">First $250,000: 50% included in income</p>
+              <p className="font-medium text-slate-300">First $250,000: 50% included in income</p>
               {details.capitalGainsInfo.totalCapitalGains > 250000 && (
-                <p className="font-medium">Above $250,000: 66.67% included</p>
+                <p className="font-medium text-slate-300">Above $250,000: 66.67% included</p>
               )}
             </div>
           ) : (
-            <div className="text-xs text-stone-600 space-y-1">
+            <div className="text-xs text-slate-400 space-y-1">
               <p>US long-term capital gains have their own bracket rates:</p>
-              <p className="font-medium">0% up to $48,350 · 15% up to $533,400 · 20% above</p>
+              <p className="font-medium text-slate-300">0% up to $48,350 · 15% up to $533,400 · 20% above</p>
             </div>
           )}
         </div>
@@ -695,23 +698,23 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
 
       {/* Investment income tax section */}
       {details.investmentIncomeTax && details.investmentIncomeTax.accounts.length > 0 && (
-        <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-4" data-testid="tax-investment-income">
-          <p className="text-sm font-semibold text-stone-700 mb-2">Investment Interest Income</p>
+        <div className="rounded-xl border border-amber-700/40 bg-amber-900/20 p-4" data-testid="tax-investment-income">
+          <p className="text-sm font-semibold text-slate-200 mb-2">Investment Interest Income</p>
           <div className="space-y-1 mb-3">
             {details.investmentIncomeTax.accounts.map((acct, i) => (
-              <div key={i} className="flex items-center justify-between text-xs text-stone-600" data-testid={`tax-investment-account-${i}`}>
+              <div key={i} className="flex items-center justify-between text-xs text-slate-400" data-testid={`tax-investment-account-${i}`}>
                 <span>{acct.label} ({fmt(acct.balance)} × {acct.roi.toFixed(1)}%)</span>
-                <span className="font-semibold">{fmt(acct.annualInterest)}/yr</span>
+                <span className="font-semibold text-slate-300">{fmt(acct.annualInterest)}/yr</span>
               </div>
             ))}
             {details.investmentIncomeTax.accounts.length > 1 && (
-              <div className="flex items-center justify-between text-xs font-semibold text-stone-700 border-t border-amber-200 pt-1 mt-1">
+              <div className="flex items-center justify-between text-xs font-semibold text-slate-200 border-t border-amber-700/40 pt-1 mt-1">
                 <span>Total investment interest</span>
                 <span>{fmt(details.investmentIncomeTax.totalAnnualInterest)}/yr</span>
               </div>
             )}
           </div>
-          <p className="text-xs text-stone-500">
+          <p className="text-xs text-slate-500">
             Interest income is taxed annually as ordinary income. Capital gains and tax-deferred withdrawals are taxed only when realized.
           </p>
         </div>
@@ -719,16 +722,16 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
 
       {/* After-tax income flow (only when there's income) */}
       {!isZeroIncome && (
-        <div className="flex items-center justify-between rounded-xl bg-stone-50 px-4 py-3" data-testid="tax-after-tax-flow">
+        <div className="flex items-center justify-between rounded-xl bg-slate-700/50 px-4 py-3" data-testid="tax-after-tax-flow">
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-stone-500">Gross</span>
-            <span className="font-semibold text-stone-800">{fmt(details.grossIncome)}</span>
-            <span className="text-stone-400">→</span>
-            <span className="text-stone-500">Tax</span>
-            <span className="font-semibold text-rose-600">{fmt(details.totalTax)}</span>
-            <span className="text-stone-400">→</span>
-            <span className="text-stone-500">After-tax</span>
-            <span className="font-semibold text-green-600">{fmt(details.afterTaxIncome)}</span>
+            <span className="text-slate-400">Gross</span>
+            <span className="font-semibold text-slate-100">{fmt(details.grossIncome)}</span>
+            <span className="text-slate-500">→</span>
+            <span className="text-slate-400">Tax</span>
+            <span className="font-semibold text-rose-400">{fmt(details.totalTax)}</span>
+            <span className="text-slate-500">→</span>
+            <span className="text-slate-400">After-tax</span>
+            <span className="font-semibold text-cyan-400">{fmt(details.afterTaxIncome)}</span>
           </div>
         </div>
       )}
@@ -744,23 +747,23 @@ function RunwayExplainerContent({ details, homeCurrency }: { details: RunwayExpl
   return (
     <div className="space-y-5" data-testid="runway-explainer">
       {/* Note pointing to unified chart */}
-      <p className="text-xs text-stone-500 italic" data-testid="runway-chart-note">
+      <p className="text-xs text-slate-500 italic" data-testid="runway-chart-note">
         Switch to &quot;Income Stops&quot; mode on the projection chart above for the full burndown visualization.
       </p>
 
       {/* Monthly obligation breakdown */}
-      <div className="rounded-xl border border-stone-200 p-4" data-testid="runway-monthly-obligations">
-        <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Monthly Obligations</p>
+      <div className="rounded-xl border border-slate-600 p-4" data-testid="runway-monthly-obligations">
+        <p className="mb-2 text-xs font-medium text-slate-400 uppercase tracking-wide">Monthly Obligations</p>
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-stone-600">{fmt(details.monthlyExpenses)} expenses</span>
+          <span className="text-slate-300">{fmt(details.monthlyExpenses)} expenses</span>
           {details.monthlyMortgage > 0 && (
             <>
-              <span className="text-stone-400">+</span>
-              <span className="text-stone-600">{fmt(details.monthlyMortgage)} mortgage</span>
+              <span className="text-slate-500">+</span>
+              <span className="text-slate-300">{fmt(details.monthlyMortgage)} mortgage</span>
             </>
           )}
-          <span className="text-stone-400">=</span>
-          <span className="font-semibold text-stone-800">{fmt(details.monthlyTotal)}/mo</span>
+          <span className="text-slate-500">=</span>
+          <span className="font-semibold text-slate-100">{fmt(details.monthlyTotal)}/mo</span>
         </div>
       </div>
 
@@ -788,24 +791,24 @@ function RunwayExplainerContent({ details, homeCurrency }: { details: RunwayExpl
           }
         }
         const treatments = [
-          { label: "Tax-free", sublabel: "No tax on withdrawal", color: "bg-green-100 text-green-700 border-green-200", barColor: "bg-green-400", data: grouped["tax-free"] },
-          { label: "Taxable (Interest)", sublabel: "Returns taxed annually as income", color: "bg-orange-50 text-orange-700 border-orange-200", barColor: "bg-orange-400", data: grouped["taxable-income"] },
-          { label: "Taxable (Capital Gains)", sublabel: "Gains taxed only on withdrawal", color: "bg-amber-50 text-amber-700 border-amber-200", barColor: "bg-amber-400", data: grouped["taxable-capgains"] },
-          { label: "Tax-deferred", sublabel: "Full withdrawal taxed as income", color: "bg-rose-50 text-rose-700 border-rose-200", barColor: "bg-rose-400", data: grouped["tax-deferred"] },
+          { label: "Tax-free", sublabel: "No tax on withdrawal", color: "bg-cyan-900/30 text-cyan-300 border-cyan-700/40", barColor: "bg-cyan-400", data: grouped["tax-free"] },
+          { label: "Taxable (Interest)", sublabel: "Returns taxed annually as income", color: "bg-orange-900/30 text-orange-300 border-orange-700/40", barColor: "bg-orange-400", data: grouped["taxable-income"] },
+          { label: "Taxable (Capital Gains)", sublabel: "Gains taxed only on withdrawal", color: "bg-amber-900/30 text-amber-300 border-amber-700/40", barColor: "bg-amber-400", data: grouped["taxable-capgains"] },
+          { label: "Tax-deferred", sublabel: "Full withdrawal taxed as income", color: "bg-rose-900/30 text-rose-300 border-rose-700/40", barColor: "bg-rose-400", data: grouped["tax-deferred"] },
         ];
 
         return (
           <div data-testid="runway-withdrawal-tax">
-            <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Withdrawal Tax Impact</p>
+            <p className="mb-2 text-xs font-medium text-slate-400 uppercase tracking-wide">Withdrawal Tax Impact</p>
 
             {/* Tax drag summary */}
             {details.taxDragMonths !== undefined && details.taxDragMonths > 0.5 && (
-              <p className="mb-3 text-sm text-amber-600" data-testid="runway-tax-drag-summary">
+              <p className="mb-3 text-sm text-amber-400" data-testid="runway-tax-drag-summary">
                 Withdrawal taxes reduce your runway by ~{details.taxDragMonths.toFixed(1)} months
               </p>
             )}
             {details.taxDragMonths !== undefined && details.taxDragMonths <= 0.5 && (
-              <p className="mb-3 text-sm text-green-600" data-testid="runway-tax-drag-summary">
+              <p className="mb-3 text-sm text-cyan-400" data-testid="runway-tax-drag-summary">
                 Minimal withdrawal tax impact on your runway
               </p>
             )}
@@ -813,7 +816,7 @@ function RunwayExplainerContent({ details, homeCurrency }: { details: RunwayExpl
             {/* Tax treatment breakdown bar */}
             {totalLiquid > 0 && (
               <div className="mb-3">
-                <div className="flex h-3 w-full overflow-hidden rounded-full bg-stone-100" data-testid="runway-tax-treatment-bar">
+                <div className="flex h-3 w-full overflow-hidden rounded-full bg-slate-700" data-testid="runway-tax-treatment-bar">
                   {treatments.map((t) => {
                     const pct = (t.data.total / totalLiquid) * 100;
                     if (pct <= 0) return null;
@@ -849,30 +852,30 @@ function RunwayExplainerContent({ details, homeCurrency }: { details: RunwayExpl
             </div>
 
             {/* Suggested withdrawal order */}
-            <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Suggested Withdrawal Order</p>
+            <p className="mb-2 text-xs font-medium text-slate-400 uppercase tracking-wide">Suggested Withdrawal Order</p>
             <ol className="space-y-1.5">
               {details.withdrawalOrder.map((entry, i) => {
                 const treatmentLabel = entry.taxTreatment === "tax-free" ? "tax-free"
                   : entry.taxTreatment === "tax-deferred" ? "taxed as income"
                   : "capital gains";
                 return (
-                  <li key={i} className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2" data-testid={`withdrawal-order-${i}`}>
+                  <li key={i} className="flex items-center justify-between rounded-lg bg-slate-700/50 px-3 py-2" data-testid={`withdrawal-order-${i}`}>
                     <div className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-stone-200 text-xs font-bold text-stone-600">{i + 1}</span>
-                      <span className="text-sm text-stone-700">{entry.category}</span>
-                      <span className="text-xs text-stone-400">({treatmentLabel})</span>
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-600 text-xs font-bold text-slate-200">{i + 1}</span>
+                      <span className="text-sm text-slate-200">{entry.category}</span>
+                      <span className="text-xs text-slate-500">({treatmentLabel})</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-semibold text-stone-800">{fmt(entry.startingBalance)}</span>
+                      <span className="text-sm font-semibold text-slate-100">{fmt(entry.startingBalance)}</span>
                       {entry.estimatedTaxCost > 0 && (
-                        <span className="ml-1.5 text-xs text-amber-600">~{fmt(entry.estimatedTaxCost)} tax</span>
+                        <span className="ml-1.5 text-xs text-amber-400">~{fmt(entry.estimatedTaxCost)} tax</span>
                       )}
                     </div>
                   </li>
                 );
               })}
             </ol>
-            <p className="mt-1.5 text-xs text-stone-400 italic" data-testid="withdrawal-order-disclaimer">
+            <p className="mt-1.5 text-xs text-slate-500 italic" data-testid="withdrawal-order-disclaimer">
               We don&apos;t have full visibility into each account&apos;s tax implications — this is a rough suggestion. Consult a tax professional for personalized advice.
             </p>
           </div>
@@ -896,30 +899,30 @@ function InvestmentReturnsSummary({ returns, homeCurrency }: { returns: SurplusI
 
   return (
     <div
-      className="my-3 rounded-xl border-2 border-dashed border-green-300 bg-green-50/50 p-4"
+      className="my-3 rounded-xl border-2 border-dashed border-cyan-500/40 bg-cyan-500/5 p-4"
       data-testid="investment-returns-section"
     >
       <div className="mb-2 flex items-center gap-2">
         <span aria-hidden="true" className="text-base">📊</span>
-        <span className="text-sm font-semibold text-stone-700">Investment Returns</span>
-        <span className="text-xs text-stone-400 italic">(estimated)</span>
+        <span className="text-sm font-semibold text-slate-200">Investment Returns</span>
+        <span className="text-xs text-slate-500 italic">(estimated)</span>
       </div>
       <ul className="space-y-1.5" data-testid="investment-returns-list">
         {returns.map((r, i) => (
           <li key={i} className="flex items-center justify-between text-sm">
-            <span className="text-stone-500 truncate mr-2">
+            <span className="text-slate-400 truncate mr-2">
               {r.label} ({fmtBalance(r.balance)} @ {r.roi}%)
             </span>
-            <span className="font-medium text-green-600 whitespace-nowrap">
+            <span className="font-medium text-cyan-400 whitespace-nowrap">
               +{fmt(r.amount)}/mo
             </span>
           </li>
         ))}
       </ul>
       {returns.length > 1 && (
-        <div className="mt-2 flex items-center justify-between border-t border-green-200 pt-2">
-          <span className="text-xs font-medium text-stone-500 uppercase tracking-wide">Total Returns</span>
-          <span className="text-sm font-bold text-green-600" data-testid="investment-returns-total">
+        <div className="mt-2 flex items-center justify-between border-t border-cyan-700/40 pt-2">
+          <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">Total Returns</span>
+          <span className="text-sm font-bold text-cyan-400" data-testid="investment-returns-total">
             +{fmt(totalReturns)}/mo
           </span>
         </div>
@@ -985,14 +988,14 @@ function ExplainerModal({
       <div
         ref={modalRef}
         data-testid="explainer-modal"
-        className={`relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl sm:p-8 ${closing ? "animate-modal-content-out" : "animate-modal-content-in"}`}
+        className={`relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-slate-800 border border-slate-700 p-6 shadow-2xl sm:p-8 ${closing ? "animate-modal-content-out" : "animate-modal-content-in"}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           type="button"
           onClick={handleClose}
-          className="absolute right-3 top-3 rounded-full p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="absolute right-3 top-3 rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-700 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400"
           aria-label="Close explainer"
           data-testid="explainer-close"
         >
@@ -1003,8 +1006,8 @@ function ExplainerModal({
 
         {/* Metric title & value */}
         <div className="mb-6 text-center">
-          <h2 className="text-lg font-semibold text-stone-700" data-testid="explainer-title">{targetMeta.label}</h2>
-          <p className="mt-1 text-3xl font-bold text-stone-900" data-testid="explainer-value">{targetMeta.formattedValue}</p>
+          <h2 className="text-lg font-semibold text-slate-200" data-testid="explainer-title">{targetMeta.label}</h2>
+          <p className="mt-1 text-3xl font-bold text-slate-100" data-testid="explainer-value">{targetMeta.formattedValue}</p>
         </div>
 
         {/* Metric-specific content or generic source cards */}
@@ -1030,7 +1033,7 @@ function ExplainerModal({
                     {showOperator && (
                       <div className="flex justify-center py-1">
                         <span
-                          className={`text-2xl font-bold animate-operator-in ${isPositive ? "text-green-600" : "text-rose-600"}`}
+                          className={`text-2xl font-bold animate-operator-in ${isPositive ? "text-cyan-400" : "text-rose-400"}`}
                           data-testid={`explainer-operator-${i}`}
                           style={{ animationDelay: `${600 + i * 50}ms` }}
                         >
@@ -1079,14 +1082,14 @@ function ExplainerModal({
                 />
               </svg>
               <div className="mt-3 flex items-center justify-center gap-2 animate-result-in" data-testid="explainer-result-area">
-                <span className="text-xl font-bold text-stone-500">=</span>
-                <span className="text-2xl font-bold text-stone-900" data-testid="explainer-result-value">
+                <span className="text-xl font-bold text-slate-400">=</span>
+                <span className="text-2xl font-bold text-slate-100" data-testid="explainer-result-value">
                   <CountUpValue formattedValue={targetMeta.formattedValue} />
                 </span>
               </div>
               {/* Summary: positive vs negative */}
               {positiveConns.length > 0 && negativeConns.length > 0 && (
-                <p className="mt-2 text-center text-xs text-stone-400 animate-result-in" data-testid="explainer-summary" style={{ animationDelay: "1100ms" }}>
+                <p className="mt-2 text-center text-xs text-slate-500 animate-result-in" data-testid="explainer-summary" style={{ animationDelay: "1100ms" }}>
                   {positiveConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" + ")}
                   {" \u2212 "}
                   {negativeConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" \u2212 ")}

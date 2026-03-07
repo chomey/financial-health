@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Dashboard and explainer modal dark theme
+  {
+    version: 128,
+    title: "Metric cards and explainer modal — dark theme",
+    description: "Applied the soft cyberpunk palette to SnapshotDashboard metric cards: glass-effect dark backgrounds (bg-white/5 backdrop-blur), cyan-400 for positive values, rose-400 for negative, slate text for labels. Explainer modal now uses dark slate-800 background. Tax bracket bars use a muted cyan→violet→rose color progression on dark containers, with consistently readable light text. Source summary cards, connector lines, and investment returns section all updated to the new palette.",
+    date: "2026-03-07",
+  },
   // Visual theme overhaul — soft cyberpunk palette
   {
     version: 127,
