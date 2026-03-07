@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Coast FIRE age calculation and insight
+  {
+    version: 137,
+    title: "Coast FIRE age calculation and insight",
+    description: "New Coast FIRE insight that calculates when your existing investments, compounding at ~5% real return, will grow to cover retirement expenses by age 65 without additional contributions. If you've already hit Coast FIRE, it celebrates the milestone. If not, it shows how many more years of saving are needed. Includes educational explanation of what Coast FIRE means and why it's motivating. Requires entering your age via the age input.",
+    date: "2026-03-07",
+  },
   // Housing cost ratio insight
   {
     version: 136,
@@ -891,7 +898,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 136] as const },
+    { milestone: "UI Polish", range: [88, 137] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },
