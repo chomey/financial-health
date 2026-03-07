@@ -15,7 +15,36 @@ import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
 
-// Color palette matching AssetAllocationChart
+export type DonutView = "breakdown" | "liquidity";
+
+// Liquidity classification for assets
+export function computeLiquidityData(
+  assets: Asset[],
+  properties: Property[],
+  stocks: StockHolding[]
+): { liquid: number; illiquid: number } {
+  let liquid = 0;
+  let illiquid = 0;
+
+  for (const asset of assets) {
+    if (asset.amount <= 0) continue;
+    if (asset.category === "Vehicle") {
+      illiquid += asset.amount;
+    } else {
+      liquid += asset.amount;
+    }
+  }
+
+  liquid += stocks.reduce((sum, s) => sum + getStockValue(s), 0);
+
+  for (const prop of properties) {
+    const equity = Math.max(0, prop.value - prop.mortgage);
+    illiquid += equity;
+  }
+
+  return { liquid, illiquid };
+}
+
 const COLORS = [
   "#059669", // emerald-600
   "#2563eb", // blue-600
@@ -157,6 +186,12 @@ export default function NetWorthDonutChart({
   );
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [view, setView] = useState<DonutView>("breakdown");
+
+  const liquidity = useMemo(
+    () => computeLiquidityData(assets, properties, stocks),
+    [assets, properties, stocks]
+  );
 
   // Add percentage to slices for tooltip
   const slicesWithPct = useMemo(() => {
@@ -200,158 +235,256 @@ export default function NetWorthDonutChart({
       className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm"
       data-testid="donut-chart"
     >
-      <h3 className="mb-3 text-sm font-medium text-stone-500">
-        Net Worth Breakdown
-      </h3>
-
-      <div className="relative" style={{ height: 240 }}>
-        <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
-          <PieChart>
-            {/* Outer ring: assets */}
-            <Pie
-              data={assetSlices}
-              dataKey="value"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              innerRadius={65}
-              paddingAngle={1}
-              animationDuration={600}
-              animationEasing="ease-out"
-              onMouseEnter={(_, index) => setActiveIndex(index)}
-              onMouseLeave={() => setActiveIndex(null)}
-            >
-              {assetSlices.map((slice, index) => {
-                let colorIdx = 0;
-                // Find this slice's color from the full colorMap
-                let found = 0;
-                for (let i = 0; i < slicesWithPct.length; i++) {
-                  if (slicesWithPct[i].type === "asset") {
-                    if (found === index) {
-                      colorIdx = i;
-                      break;
-                    }
-                    found++;
-                  }
-                }
-                return (
-                  <Cell
-                    key={`asset-${index}`}
-                    fill={colorMap[colorIdx]}
-                    stroke="white"
-                    strokeWidth={2}
-                    className="transition-opacity duration-150 cursor-pointer"
-                    opacity={activeIndex === null || activeIndex === index ? 1 : 0.6}
-                  />
-                );
-              })}
-            </Pie>
-
-            {/* Inner ring: debts (if any) */}
-            {debtSlices.length > 0 && (
-              <Pie
-                data={debtSlices}
-                dataKey="value"
-                cx="50%"
-                cy="50%"
-                outerRadius={60}
-                innerRadius={40}
-                paddingAngle={1}
-                animationDuration={600}
-                animationEasing="ease-out"
-              >
-                {debtSlices.map((_, index) => (
-                  <Cell
-                    key={`debt-${index}`}
-                    fill={DEBT_COLOR}
-                    stroke="white"
-                    strokeWidth={2}
-                    opacity={0.8 - index * 0.1}
-                    className="cursor-pointer"
-                  />
-                ))}
-              </Pie>
-            )}
-
-            <Tooltip content={<DonutTooltip />} wrapperStyle={{ pointerEvents: "none" }} position={{ x: 0, y: 0 }} />
-          </PieChart>
-        </ResponsiveContainer>
-
-        {/* Center label */}
-        <div
-          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
-          data-testid="donut-center-label"
-        >
-          <span className="text-[10px] font-medium uppercase tracking-wider text-stone-400">
-            Net Worth
-          </span>
-          <span
-            className={`text-sm font-bold ${
-              netWorth >= 0 ? "text-blue-600" : "text-red-600"
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-medium text-stone-500">Net Worth Breakdown</h3>
+        <div className="flex rounded-lg border border-stone-200 text-xs">
+          <button
+            onClick={() => setView("breakdown")}
+            className={`px-2.5 py-1 rounded-l-lg transition-colors duration-150 ${
+              view === "breakdown"
+                ? "bg-emerald-50 text-emerald-700 font-medium"
+                : "text-stone-500 hover:bg-stone-50"
             }`}
+            aria-pressed={view === "breakdown"}
           >
-            {formatFullCurrency(netWorth)}
-          </span>
+            By Type
+          </button>
+          <button
+            onClick={() => setView("liquidity")}
+            className={`px-2.5 py-1 rounded-r-lg transition-colors duration-150 ${
+              view === "liquidity"
+                ? "bg-emerald-50 text-emerald-700 font-medium"
+                : "text-stone-500 hover:bg-stone-50"
+            }`}
+            aria-pressed={view === "liquidity"}
+          >
+            By Liquidity
+          </button>
         </div>
       </div>
 
-      {/* Composition table */}
-      <div className="mt-3 overflow-x-auto" data-testid="donut-composition-table">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b border-stone-100 text-left text-stone-400">
-              <th className="pb-1 pr-2 font-medium">Name</th>
-              <th className="pb-1 px-2 font-medium text-right">Amount</th>
-              <th className="pb-1 pl-2 font-medium text-right">%</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(() => {
-              let tableAssetIdx = 0;
-              return slicesWithPct.map((slice, i) => {
-                let color: string;
-                if (slice.type === "debt") {
-                  color = DEBT_COLOR;
-                } else if (slice.isProperty) {
-                  color = PROPERTY_PATTERN_COLOR;
-                } else {
-                  color = COLORS[tableAssetIdx % COLORS.length];
-                  tableAssetIdx++;
-                }
-                const total = slice.type === "asset" ? totalAssets : totalDebts;
-                const pct = total > 0 ? (slice.value / total) * 100 : 0;
-                return (
-                  <tr key={i} className="border-b border-stone-50">
-                    <td className="py-1 pr-2">
+      {view === "breakdown" ? (
+        <>
+          <div className="relative" style={{ height: 240 }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
+              <PieChart>
+                {/* Outer ring: assets */}
+                <Pie
+                  data={assetSlices}
+                  dataKey="value"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  innerRadius={65}
+                  paddingAngle={1}
+                  animationDuration={600}
+                  animationEasing="ease-out"
+                  onMouseEnter={(_, index) => setActiveIndex(index)}
+                  onMouseLeave={() => setActiveIndex(null)}
+                >
+                  {assetSlices.map((slice, index) => {
+                    let colorIdx = 0;
+                    let found = 0;
+                    for (let i = 0; i < slicesWithPct.length; i++) {
+                      if (slicesWithPct[i].type === "asset") {
+                        if (found === index) {
+                          colorIdx = i;
+                          break;
+                        }
+                        found++;
+                      }
+                    }
+                    return (
+                      <Cell
+                        key={`asset-${index}`}
+                        fill={colorMap[colorIdx]}
+                        stroke="white"
+                        strokeWidth={2}
+                        className="transition-opacity duration-150 cursor-pointer"
+                        opacity={activeIndex === null || activeIndex === index ? 1 : 0.6}
+                      />
+                    );
+                  })}
+                </Pie>
+
+                {/* Inner ring: debts (if any) */}
+                {debtSlices.length > 0 && (
+                  <Pie
+                    data={debtSlices}
+                    dataKey="value"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={60}
+                    innerRadius={40}
+                    paddingAngle={1}
+                    animationDuration={600}
+                    animationEasing="ease-out"
+                  >
+                    {debtSlices.map((_, index) => (
+                      <Cell
+                        key={`debt-${index}`}
+                        fill={DEBT_COLOR}
+                        stroke="white"
+                        strokeWidth={2}
+                        opacity={0.8 - index * 0.1}
+                        className="cursor-pointer"
+                      />
+                    ))}
+                  </Pie>
+                )}
+
+                <Tooltip content={<DonutTooltip />} wrapperStyle={{ pointerEvents: "none" }} position={{ x: 0, y: 0 }} />
+              </PieChart>
+            </ResponsiveContainer>
+
+            {/* Center label */}
+            <div
+              className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
+              data-testid="donut-center-label"
+            >
+              <span className="text-[10px] font-medium uppercase tracking-wider text-stone-400">
+                Net Worth
+              </span>
+              <span
+                className={`text-sm font-bold ${
+                  netWorth >= 0 ? "text-blue-600" : "text-red-600"
+                }`}
+              >
+                {formatFullCurrency(netWorth)}
+              </span>
+            </div>
+          </div>
+
+          {/* Composition table */}
+          <div className="mt-3 overflow-x-auto" data-testid="donut-composition-table">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-stone-100 text-left text-stone-400">
+                  <th className="pb-1 pr-2 font-medium">Name</th>
+                  <th className="pb-1 px-2 font-medium text-right">Amount</th>
+                  <th className="pb-1 pl-2 font-medium text-right">%</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  let tableAssetIdx = 0;
+                  return slicesWithPct.map((slice, i) => {
+                    let color: string;
+                    if (slice.type === "debt") {
+                      color = DEBT_COLOR;
+                    } else if (slice.isProperty) {
+                      color = PROPERTY_PATTERN_COLOR;
+                    } else {
+                      color = COLORS[tableAssetIdx % COLORS.length];
+                      tableAssetIdx++;
+                    }
+                    const total = slice.type === "asset" ? totalAssets : totalDebts;
+                    const pct = total > 0 ? (slice.value / total) * 100 : 0;
+                    return (
+                      <tr key={i} className="border-b border-stone-50">
+                        <td className="py-1 pr-2">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className="inline-block h-2.5 w-2.5 rounded-sm shrink-0"
+                              style={{
+                                backgroundColor: color,
+                                ...(slice.isProperty
+                                  ? {
+                                      backgroundImage:
+                                        "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 4px)",
+                                    }
+                                  : {}),
+                              }}
+                            />
+                            <span className="text-stone-700">{slice.name}</span>
+                          </div>
+                        </td>
+                        <td className={`py-1 px-2 text-right font-medium whitespace-nowrap ${slice.type === "debt" ? "text-red-600" : "text-stone-800"}`}>
+                          {slice.type === "debt" ? "-" : ""}{formatFullCurrency(slice.value)}
+                        </td>
+                        <td className="py-1 pl-2 text-right text-stone-400 whitespace-nowrap">
+                          {pct.toFixed(1)}%
+                        </td>
+                      </tr>
+                    );
+                  });
+                })()}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Liquidity view */}
+          {(() => {
+            const { liquid, illiquid } = liquidity;
+            const total = liquid + illiquid;
+            const liquidPct = total > 0 ? (liquid / total) * 100 : 0;
+            const illiquidPct = total > 0 ? (illiquid / total) * 100 : 0;
+            const liqData = [
+              ...(liquid > 0 ? [{ name: "Liquid", value: liquid, pct: liquidPct }] : []),
+              ...(illiquid > 0 ? [{ name: "Illiquid", value: illiquid, pct: illiquidPct }] : []),
+            ];
+            const liqColors = ["#2563eb", "#9ca3af"]; // blue for liquid, gray for illiquid
+            return (
+              <>
+                <div className="relative" style={{ height: 240 }}>
+                  <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
+                    <PieChart>
+                      <Pie
+                        data={liqData}
+                        dataKey="value"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        innerRadius={65}
+                        paddingAngle={2}
+                        animationDuration={600}
+                        animationEasing="ease-out"
+                      >
+                        {liqData.map((_, index) => (
+                          <Cell
+                            key={index}
+                            fill={liqColors[index % liqColors.length]}
+                            stroke="white"
+                            strokeWidth={2}
+                            className="cursor-pointer"
+                          />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-stone-400">
+                      Liquid
+                    </span>
+                    <span className="text-sm font-bold text-blue-600">
+                      {liquidPct.toFixed(0)}%
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-2 space-y-1">
+                  {liqData.map((item, i) => (
+                    <div key={item.name} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5">
                         <span
-                          className="inline-block h-2.5 w-2.5 rounded-sm shrink-0"
-                          style={{
-                            backgroundColor: color,
-                            ...(slice.isProperty
-                              ? {
-                                  backgroundImage:
-                                    "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 4px)",
-                                }
-                              : {}),
-                          }}
+                          className="inline-block h-2.5 w-2.5 rounded-full"
+                          style={{ backgroundColor: liqColors[i] }}
                         />
-                        <span className="text-stone-700">{slice.name}</span>
+                        <span className="text-stone-600">{item.name}</span>
                       </div>
-                    </td>
-                    <td className={`py-1 px-2 text-right font-medium whitespace-nowrap ${slice.type === "debt" ? "text-red-600" : "text-stone-800"}`}>
-                      {slice.type === "debt" ? "-" : ""}{formatFullCurrency(slice.value)}
-                    </td>
-                    <td className="py-1 pl-2 text-right text-stone-400 whitespace-nowrap">
-                      {pct.toFixed(1)}%
-                    </td>
-                  </tr>
-                );
-              });
-            })()}
-          </tbody>
-        </table>
-      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-stone-800 font-medium">{formatFullCurrency(item.value)}</span>
+                        <span className="text-stone-400 w-10 text-right">{item.pct.toFixed(1)}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            );
+          })()}
+        </>
+      )}
     </div>
   );
 }

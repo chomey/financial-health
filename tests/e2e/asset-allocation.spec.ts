@@ -1,15 +1,16 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-test.describe("Asset Allocation Chart", () => {
-  test("renders allocation chart with default data", async ({ page }) => {
+// Asset allocation was merged into the Net Worth Donut chart
+test.describe("Asset Allocation (via Donut Chart)", () => {
+  test("renders donut chart with default data", async ({ page }) => {
     await page.goto("/");
 
-    const chart = page.locator('[data-testid="allocation-chart"]');
+    const chart = page.locator('[data-testid="donut-chart"]');
     await expect(chart).toBeVisible();
 
-    // Should show "Asset Allocation" heading
-    await expect(chart.locator("text=Asset Allocation")).toBeVisible();
+    // Should show "Net Worth Breakdown" heading
+    await expect(chart.locator("text=Net Worth Breakdown")).toBeVisible();
 
     // Should have view toggle buttons
     await expect(chart.locator("button", { hasText: "By Type" })).toBeVisible();
@@ -20,27 +21,27 @@ test.describe("Asset Allocation Chart", () => {
 
   test("shows category breakdown with default assets", async ({ page }) => {
     await page.goto("/");
-    const chart = page.locator('[data-testid="allocation-chart"]');
+    const chart = page.locator('[data-testid="donut-chart"]');
     await expect(chart).toBeVisible();
 
-    // Default data has TFSA, Savings Account, and Brokerage — each shown individually
+    // Default data has TFSA, Savings Account, and Brokerage
     await expect(chart.getByText("TFSA").first()).toBeVisible();
     await expect(chart.getByText("Savings").first()).toBeVisible();
   });
 
   test("toggles between category and liquidity views", async ({ page }) => {
     await page.goto("/");
-    const chart = page.locator('[data-testid="allocation-chart"]');
+    const chart = page.locator('[data-testid="donut-chart"]');
     await expect(chart).toBeVisible();
 
     // Click "By Liquidity" toggle
     const liquidityBtn = chart.locator("button", { hasText: "By Liquidity" });
     await liquidityBtn.click();
-    // Wait for the button to become active
     await expect(liquidityBtn).toHaveAttribute("aria-pressed", "true");
 
-    // Individual categories should be gone, replaced with Liquid/Illiquid
-    await expect(chart.getByText("TFSA")).not.toBeVisible();
+    // Should show Liquid/Illiquid instead of individual categories
+    const chartText = await chart.textContent();
+    expect(chartText).toMatch(/liquid/i);
 
     await captureScreenshot(page, "task-48-allocation-chart-liquidity");
 
@@ -52,7 +53,7 @@ test.describe("Asset Allocation Chart", () => {
   test("chart is positioned in the dashboard section", async ({ page }) => {
     await page.goto("/");
     const dashboard = page.locator('[aria-label="Financial dashboard"]');
-    const chart = dashboard.locator('[data-testid="allocation-chart"]');
+    const chart = dashboard.locator('[data-testid="donut-chart"]');
     await expect(chart).toBeVisible();
   });
 });

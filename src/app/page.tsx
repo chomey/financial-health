@@ -10,7 +10,6 @@ import ExpenseEntry from "@/components/ExpenseEntry";
 import SnapshotDashboard, { type DataFlowConnectionDef } from "@/components/SnapshotDashboard";
 import ProjectionChart from "@/components/ProjectionChart";
 import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
-import AssetAllocationChart from "@/components/AssetAllocationChart";
 import ExpenseBreakdownChart from "@/components/ExpenseBreakdownChart";
 import NetWorthDonutChart from "@/components/NetWorthDonutChart";
 import FastForwardPanel from "@/components/FastForwardPanel";
@@ -941,11 +940,6 @@ export default function Home() {
                 provincialStateTax={totals.totalProvincialStateTax / 12}
                 monthlyAfterTaxIncome={totals.monthlyAfterTaxIncome}
                 monthlyGrossIncome={totals.monthlyIncome}
-              /></ZoomableCard>
-              <ZoomableCard><AssetAllocationChart
-                assets={assets}
-                properties={properties}
-                stocks={stocks}
               /></ZoomableCard>
               <ZoomableCard><NetWorthDonutChart
                 assets={assets}

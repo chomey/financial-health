@@ -36,20 +36,10 @@ test.describe("Net Worth Chart (Donut)", () => {
     await expect(chartInDashboard).toBeVisible();
   });
 
-  test("chart appears after allocation chart", async ({ page }) => {
+  test("chart appears in dashboard", async ({ page }) => {
     await page.goto("/");
 
-    const allocationChart = page.locator('[data-testid="allocation-chart"]');
     const donutChart = page.locator('[data-testid="donut-chart"]');
-
-    await expect(allocationChart).toBeVisible();
     await expect(donutChart).toBeVisible();
-
-    const allocationBox = await allocationChart.boundingBox();
-    const donutBox = await donutChart.boundingBox();
-
-    expect(allocationBox).toBeTruthy();
-    expect(donutBox).toBeTruthy();
-    expect(donutBox!.y).toBeGreaterThan(allocationBox!.y);
   });
 });

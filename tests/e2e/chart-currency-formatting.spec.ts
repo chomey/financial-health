@@ -45,26 +45,23 @@ test.describe("Task 108 — Chart currency formatting", () => {
     await captureScreenshot(page, "task-108-donut-composition-table");
   });
 
-  test("asset allocation chart has composition table with full currency", async ({ page }) => {
+  test("donut chart composition table has full currency amounts", async ({ page }) => {
     await page.goto("/");
 
-    const allocationChart = page.locator('[data-testid="allocation-chart"]');
-    await expect(allocationChart).toBeVisible();
+    const table = page.locator('[data-testid="donut-composition-table"]');
+    await expect(table).toBeVisible();
 
-    // The composition table (below chart) should be visible
-    // It uses mt-2 space-y-1 layout
-    const compositionRows = allocationChart.locator(".space-y-1 > div");
-    expect(await compositionRows.count()).toBeGreaterThan(0);
+    // Table rows should show dollar amounts (not compact)
+    const rows = table.locator("tbody tr");
+    expect(await rows.count()).toBeGreaterThan(0);
 
-    // Each row should show a dollar amount (not compact)
-    const firstRow = compositionRows.first();
-    await expect(firstRow).toBeVisible();
+    const firstRow = rows.first();
     const rowText = await firstRow.textContent();
     expect(rowText).toMatch(/\$/);
-    // Verify no M/K abbreviation in the amount column
+    // Verify no M/K abbreviation
     expect(rowText).not.toMatch(/\d+\.\d+[MK]/);
 
-    await captureScreenshot(page, "task-108-allocation-composition-table");
+    await captureScreenshot(page, "task-108-donut-composition-full-currency");
   });
 
   test("projection chart milestone table shows full currency values", async ({ page }) => {
