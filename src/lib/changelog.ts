@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Formula validation and projection bug fix
+  {
+    version: 107,
+    title: "Formula validation and projection fix",
+    description: "Comprehensive audit of all financial formulas. Fixed a bug where the projection chart did not subtract mortgage payments from the surplus, causing projected asset growth to be overstated for users with mortgages. Added 26 formula validation tests covering Net Worth, Monthly Surplus, Estimated Tax, Financial Runway, Debt-to-Asset Ratio, projection accumulation, and Cash Flow Sankey flow balance.",
+    date: "2026-03-06",
+  },
   // Enhanced Fast Forward what-if scenarios
   {
     version: 106,
