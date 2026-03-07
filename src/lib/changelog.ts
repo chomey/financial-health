@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Show company/fund names for stock tickers
+  {
+    version: 132,
+    title: "Show company/fund names for stock tickers",
+    description: "Added a static map of 550+ ticker symbols to company/fund names (S&P 500, popular ETFs, Canadian stocks/ETFs, Vanguard/Fidelity mutual funds). Company names display as subtle text below ticker symbols in the stock entry view and as parenthetical labels in explainer modal source cards. Unknown tickers attempt an async Yahoo Finance lookup with session-level caching. Graceful fallback — if lookup fails, nothing is shown.",
+    date: "2026-03-07",
+  },
   // Page layout and remaining UI dark theme
   {
     version: 131,
@@ -856,7 +863,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 131] as const },
+    { milestone: "UI Polish", range: [88, 132] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

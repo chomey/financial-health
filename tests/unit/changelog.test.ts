@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for completed tasks (131 entries, versions 1-131)", () => {
-    expect(CHANGELOG.length).toBe(131);
+  it("contains entries for completed tasks (132 entries, versions 1-132)", () => {
+    expect(CHANGELOG.length).toBe(132);
   });
 
   it("has unique version numbers", () => {
@@ -11,11 +11,11 @@ describe("changelog data", () => {
     expect(new Set(versions).size).toBe(versions.length);
   });
 
-  it("covers versions 1 through 131", () => {
+  it("covers versions 1 through 132", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(131);
-    for (let i = 1; i <= 131; i++) {
+    expect(versions[versions.length - 1]).toBe(132);
+    for (let i = 1; i <= 132; i++) {
       expect(versions).toContain(i);
     }
   });
@@ -54,15 +54,15 @@ describe("getChangelogByMilestone", () => {
   it("contains all entries across all groups", () => {
     const milestones = getChangelogByMilestone();
     const totalEntries = milestones.reduce((sum, m) => sum + m.entries.length, 0);
-    expect(totalEntries).toBe(131);
+    expect(totalEntries).toBe(132);
   });
 
   it("groups entries correctly by milestone range", () => {
     const milestones = getChangelogByMilestone();
-    // UI Polish: 88-131
+    // UI Polish: 88-132
     expect(milestones[0].milestone).toBe("UI Polish");
-    expect(milestones[0].entries.length).toBe(44); // 88-131
-    expect(milestones[0].entries.every((e) => e.version >= 88 && e.version <= 131)).toBe(true);
+    expect(milestones[0].entries.length).toBe(45); // 88-132
+    expect(milestones[0].entries.every((e) => e.version >= 88 && e.version <= 132)).toBe(true);
     // Metric-Specific Explainers: 83-87
     expect(milestones[1].milestone).toBe("Metric-Specific Explainers");
     expect(milestones[1].entries.length).toBe(5); // 83, 84, 85, 86, 87

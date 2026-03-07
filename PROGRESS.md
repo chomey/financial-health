@@ -8,13 +8,13 @@
 
 ## Summary
 - **Total Tasks**: 134
-- **Completed**: 131
-- **Remaining**: 3
+- **Completed**: 132
+- **Remaining**: 2
 - **Last Updated**: 2026-03-07
 
-## Task 131: Update page layout, header, and remaining UI for new theme
+## Task 132: Show company/fund names for stock tickers
 - **Date**: 2026-03-07
-- **Files**: `src/app/page.tsx`, `src/app/globals.css`, `src/components/FastForwardPanel.tsx`, `src/components/InsightsPanel.tsx`, `src/components/CountryJurisdictionSelector.tsx`, `src/components/BenchmarkComparisons.tsx`, `src/components/ZoomableCard.tsx`, `src/components/FxRateDisplay.tsx`, `src/components/CurrencyBadge.tsx`, `src/components/WithdrawalTaxSummary.tsx`, `src/components/StockEntry.tsx`, `src/components/MobileWizard.tsx`, `tests/unit/page-layout-dark-theme.test.tsx`, `tests/e2e/page-layout-dark-theme.spec.ts`
-- **Tests**: 1683 passed (7 new T1 in `page-layout-dark-theme.test.tsx`, 9 new T2 in `page-layout-dark-theme.spec.ts`)
-- **Screenshots**: ![Full page dark theme](screenshots/task-131-full-page-dark-theme.png) ![Fast forward dark theme](screenshots/task-131-fast-forward-dark-theme.png)
-- **Notes**: Final dark theme pass across all remaining components. Page background slate-950, header bg-slate-900/80 backdrop-blur, nav bg-slate-950/90 backdrop-blur. Print styles in globals.css override back to white-on-light for printing. All stone-* colors replaced with slate equivalents throughout. Positive/negative convention consistent: emerald-400 positive, rose-400 negative. FastForwardPanel sliders use vivid accent-violet-400/pink-400/amber-400. MobileWizard fully dark. StockEntry, ZoomableCard, FxRateDisplay, CurrencyBadge, WithdrawalTaxSummary all updated to glass card pattern.
+- **Files**: `src/lib/ticker-names.ts` (new), `src/components/StockEntry.tsx`, `src/components/DataFlowArrows.tsx`, `tests/unit/ticker-names.test.ts` (new), `tests/e2e/ticker-names.spec.ts` (new), `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`
+- **Tests**: 1701 passed (10 new T1 in `ticker-names.test.ts`, 4 new T2 in `ticker-names.spec.ts`)
+- **Screenshots**: ![Ticker name AAPL](screenshots/task-132-ticker-name-aapl.png) ![Multiple ticker names](screenshots/task-132-ticker-names-multiple.png) ![Ticker name explainer](screenshots/task-132-ticker-name-explainer.png)
+- **Notes**: Created static map with 550+ ticker-to-name entries (S&P 500, popular ETFs, Canadian stocks/ETFs, Vanguard/Fidelity funds). Async fallback via Yahoo Finance search API with module-level cache. Company names show as subtle 10px text below ticker buttons in StockEntry and as parenthetical labels in DataFlowArrows explainer source cards. Fixed pre-existing changelog test failure (task 131 count mismatch).
