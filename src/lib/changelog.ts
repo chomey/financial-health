@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Net worth donut chart
+  {
+    version: 104,
+    title: "Net worth donut chart",
+    description: "Replaced the waterfall bar chart with a donut/pie chart for net worth breakdown. Assets shown as colored segments in the outer ring, debts in an inner ring. Property equity uses a hatched pattern to distinguish illiquid from liquid assets. Center label shows net worth total. Compact legend below with all segments.",
+    date: "2026-03-06",
+  },
   // Full currency formatting in explainer modals
   {
     version: 103,
