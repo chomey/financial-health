@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { calculateDebtPayoff, formatPayoffCurrency } from "@/lib/debt-payoff";
 import CurrencyBadge from "@/components/CurrencyBadge";
+import { useCurrency } from "@/lib/CurrencyContext";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 
 export interface Debt {
@@ -86,15 +87,6 @@ function generateId(): string {
   return `d${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 function parseCurrencyInput(value: string): number {
   const cleaned = value.replace(/[^0-9.-]/g, "");
   const parsed = parseFloat(cleaned);
@@ -109,6 +101,8 @@ interface DebtEntryProps {
 }
 
 export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: DebtEntryProps = {}) {
+  const fmt = useCurrency();
+  const formatCurrency = (v: number) => fmt.full(v);
   const [debts, setDebts] = useState<Debt[]>(items ?? MOCK_DEBTS);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);

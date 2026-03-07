@@ -13,6 +13,7 @@ import type { Debt } from "@/components/DebtEntry";
 import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 // Color palette matching AssetAllocationChart
 const COLORS = [
@@ -99,21 +100,7 @@ export function computeDonutData(
   return { slices, netWorth, totalAssets, totalDebts };
 }
 
-function formatCurrency(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(value / 1_000).toFixed(0)}k`;
-  return `$${value.toFixed(0)}`;
-}
-
-function formatFullCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
+// formatCurrency and formatFullCurrency defined inside components via useCurrency()
 
 function getSliceColor(slice: DonutSlice, index: number, assetIndex: number): string {
   if (slice.type === "debt") return DEBT_COLOR;
@@ -127,6 +114,7 @@ interface CustomTooltipProps {
 }
 
 function DonutTooltip({ active, payload }: CustomTooltipProps) {
+  const fmt = useCurrency();
   if (!active || !payload?.length) return null;
   const slice = payload[0].payload;
 
@@ -138,7 +126,7 @@ function DonutTooltip({ active, payload }: CustomTooltipProps) {
           slice.type === "debt" ? "text-red-600" : "text-emerald-600"
         }`}
       >
-        {formatFullCurrency(slice.value)}
+        {fmt.full(slice.value)}
       </p>
       <p className="text-xs text-stone-400">
         {slice.percentage.toFixed(1)}% of {slice.type === "debt" ? "total debts" : "total assets"}
@@ -160,6 +148,9 @@ export default function NetWorthDonutChart({
   properties,
   stocks,
 }: NetWorthDonutChartProps) {
+  const fmt = useCurrency();
+  const formatCurrency = (v: number) => fmt.compact(v);
+  const formatFullCurrency = (v: number) => fmt.full(v);
   const { slices, netWorth, totalAssets, totalDebts } = useMemo(
     () => computeDonutData(assets, debts, properties, stocks),
     [assets, debts, properties, stocks]
@@ -282,7 +273,7 @@ export default function NetWorthDonutChart({
               </Pie>
             )}
 
-            <Tooltip content={<DonutTooltip />} />
+            <Tooltip content={<DonutTooltip />} wrapperStyle={{ pointerEvents: "none" }} position={{ x: 0, y: 0 }} />
           </PieChart>
         </ResponsiveContainer>
 
@@ -304,42 +295,62 @@ export default function NetWorthDonutChart({
         </div>
       </div>
 
-      {/* Compact legend */}
-      <div className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-stone-600" data-testid="donut-legend">
-        {(() => {
-          let legendAssetIdx = 0;
-          return slices.map((slice, i) => {
-            let color: string;
-            if (slice.type === "debt") {
-              color = DEBT_COLOR;
-            } else if (slice.isProperty) {
-              color = PROPERTY_PATTERN_COLOR;
-            } else {
-              color = COLORS[legendAssetIdx % COLORS.length];
-              legendAssetIdx++;
-            }
-            return (
-              <div key={i} className="flex items-center gap-1">
-                <span
-                  className="inline-block h-2.5 w-2.5 rounded-sm shrink-0"
-                  style={{
-                    backgroundColor: color,
-                    ...(slice.isProperty
-                      ? {
-                          backgroundImage:
-                            "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 4px)",
-                        }
-                      : {}),
-                  }}
-                />
-                <span className="truncate max-w-[100px]">
-                  {slice.name}
-                  {slice.type === "debt" ? ` (-${formatCurrency(slice.value)})` : ""}
-                </span>
-              </div>
-            );
-          });
-        })()}
+      {/* Composition table */}
+      <div className="mt-3 overflow-x-auto" data-testid="donut-composition-table">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-stone-100 text-left text-stone-400">
+              <th className="pb-1 pr-2 font-medium">Name</th>
+              <th className="pb-1 px-2 font-medium text-right">Amount</th>
+              <th className="pb-1 pl-2 font-medium text-right">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(() => {
+              let tableAssetIdx = 0;
+              return slicesWithPct.map((slice, i) => {
+                let color: string;
+                if (slice.type === "debt") {
+                  color = DEBT_COLOR;
+                } else if (slice.isProperty) {
+                  color = PROPERTY_PATTERN_COLOR;
+                } else {
+                  color = COLORS[tableAssetIdx % COLORS.length];
+                  tableAssetIdx++;
+                }
+                const total = slice.type === "asset" ? totalAssets : totalDebts;
+                const pct = total > 0 ? (slice.value / total) * 100 : 0;
+                return (
+                  <tr key={i} className="border-b border-stone-50">
+                    <td className="py-1 pr-2">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="inline-block h-2.5 w-2.5 rounded-sm shrink-0"
+                          style={{
+                            backgroundColor: color,
+                            ...(slice.isProperty
+                              ? {
+                                  backgroundImage:
+                                    "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 4px)",
+                                }
+                              : {}),
+                          }}
+                        />
+                        <span className="text-stone-700">{slice.name}</span>
+                      </div>
+                    </td>
+                    <td className={`py-1 px-2 text-right font-medium whitespace-nowrap ${slice.type === "debt" ? "text-red-600" : "text-stone-800"}`}>
+                      {slice.type === "debt" ? "-" : ""}{formatFullCurrency(slice.value)}
+                    </td>
+                    <td className="py-1 pl-2 text-right text-stone-400 whitespace-nowrap">
+                      {pct.toFixed(1)}%
+                    </td>
+                  </tr>
+                );
+              });
+            })()}
+          </tbody>
+        </table>
       </div>
     </div>
   );

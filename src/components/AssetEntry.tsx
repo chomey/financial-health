@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
+import { useCurrency } from "@/lib/CurrencyContext";
 import { getTaxTreatment, type TaxTreatment } from "@/lib/withdrawal-tax";
 
 export type RoiTaxTreatment = "capital-gains" | "income";
@@ -130,21 +131,7 @@ function projectAssetValue(amount: number, annualRoi: number, monthlyContributio
   return Math.round(balance);
 }
 
-function formatCompact(amount: number): string {
-  const abs = Math.abs(amount);
-  if (abs >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(amount / 1_000).toFixed(0)}k`;
-  return `$${amount.toFixed(0)}`;
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+// formatCurrency and formatCompact defined inside component via useCurrency()
 
 function parseCurrencyInput(value: string): number {
   const cleaned = value.replace(/[^0-9.-]/g, "");
@@ -161,6 +148,9 @@ interface AssetEntryProps {
 }
 
 export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCurrency, fxRates }: AssetEntryProps = {}) {
+  const fmt = useCurrency();
+  const formatCurrency = (v: number) => fmt.full(v);
+  const formatCompact = (v: number) => fmt.compact(v);
   const assets = items ?? MOCK_ASSETS;
 
   const updateAssets = useCallback((updater: Asset[] | ((prev: Asset[]) => Asset[])) => {

@@ -20,6 +20,7 @@ import FxRateDisplay from "@/components/FxRateDisplay";
 import InsightsPanel from "@/components/InsightsPanel";
 import ZoomableCard from "@/components/ZoomableCard";
 import { DataFlowProvider, useOptionalDataFlow, type SourceMetadataItem } from "@/components/DataFlowArrows";
+import { CurrencyProvider } from "@/lib/CurrencyContext";
 import {
   INITIAL_STATE,
   computeMetrics,
@@ -492,6 +493,7 @@ export default function Home() {
   const benchmarkDebtToIncome = annualIncome > 0 ? (debtTotal + totals.totalPropertyMortgage) / annualIncome : 0;
 
   return (
+    <CurrencyProvider currency={homeCurrency}>
     <DataFlowProvider homeCurrency={homeCurrency}>
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white px-4 py-3 shadow-sm sm:px-6 sm:py-4">
@@ -706,5 +708,6 @@ export default function Home() {
       </main>
     </div>
     </DataFlowProvider>
+    </CurrencyProvider>
   );
 }

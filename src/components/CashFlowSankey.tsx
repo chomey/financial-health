@@ -12,6 +12,7 @@ import {
   type SankeyNode,
   type CashFlowInput,
 } from "@/lib/sankey-data";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 interface D3SankeyNode extends SankeyNode {
   x0?: number;
@@ -29,12 +30,6 @@ interface D3SankeyLink {
   y0?: number;
   y1?: number;
   index?: number;
-}
-
-function formatCurrency(amount: number): string {
-  if (Math.abs(amount) >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(amount) >= 1_000) return `$${(amount / 1_000).toFixed(1)}k`;
-  return `$${Math.round(amount)}`;
 }
 
 const CHART_WIDTH = 700;
@@ -62,6 +57,7 @@ export default function CashFlowSankey({
   monthlySurplus,
   investmentReturns,
 }: CashFlowSankeyProps) {
+  const fmt = useCurrency();
   const [collapsed, setCollapsed] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<number | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
@@ -132,10 +128,10 @@ export default function CashFlowSankey({
       setTooltip({
         x: e.clientX - rect.left,
         y: e.clientY - rect.top - 10,
-        content: `${(link.source as D3SankeyNode).label} → ${(link.target as D3SankeyNode).label}: ${formatCurrency(link.value)}/mo`,
+        content: `${(link.source as D3SankeyNode).label} → ${(link.target as D3SankeyNode).label}: ${fmt.full(link.value)}/mo`,
       });
     },
-    []
+    [fmt]
   );
 
   const handleNodeEnter = useCallback(
@@ -147,10 +143,10 @@ export default function CashFlowSankey({
       setTooltip({
         x: e.clientX - rect.left,
         y: e.clientY - rect.top - 10,
-        content: `${node.label}: ${formatCurrency(node.value ?? 0)}/mo`,
+        content: `${node.label}: ${fmt.full(node.value ?? 0)}/mo`,
       });
     },
-    []
+    [fmt]
   );
 
   const handleMouseLeave = useCallback(() => {

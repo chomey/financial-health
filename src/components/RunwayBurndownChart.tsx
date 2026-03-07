@@ -12,10 +12,9 @@ import {
   ReferenceLine,
 } from "recharts";
 import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
+import { useCurrency } from "@/lib/CurrencyContext";
 
-function fmt(n: number) {
-  return `$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
-}
+// fmt defined inside component via useCurrency()
 
 function fmtDuration(months: number): string {
   if (months < 12) return `${Math.round(months)} mo`;
@@ -50,6 +49,8 @@ export function buildSummary(details: RunwayExplainerDetails): string {
 }
 
 export default function RunwayBurndownChart({ details }: { details: RunwayExplainerDetails }) {
+  const cfmt = useCurrency();
+  const fmt = (n: number) => cfmt.full(Math.abs(n));
   const hasTaxData = details.runwayAfterTaxMonths !== undefined;
   const hasTaxDrag = (details.taxDragMonths ?? 0) > 0;
 

@@ -85,6 +85,27 @@ export function formatCurrencyCompact(
   return `${sign}${symbol}${abs.toFixed(0)}`;
 }
 
+/**
+ * A currency-aware formatter. Create once with the home currency,
+ * then use `.compact()` and `.full()` everywhere.
+ */
+export class CurrencyFormatter {
+  constructor(public readonly currency: SupportedCurrency) {}
+
+  /** Compact display for chart axes / tight spaces: CA$1.2M, $55k, CA$123 */
+  compact(amount: number): string {
+    return formatCurrencyCompact(amount, this.currency);
+  }
+
+  /** Full formatted display for tooltips / tables: CA$1,234,567 */
+  full(amount: number, opts?: { showSign?: boolean; decimals?: number }): string {
+    return formatCurrency(amount, this.currency, {
+      showSign: opts?.showSign,
+      maximumFractionDigits: opts?.decimals,
+    });
+  }
+}
+
 /** Get effective FX rates: manual override if set, otherwise use provided rates or fallback */
 export function getEffectiveFxRates(
   homeCurrency: SupportedCurrency,

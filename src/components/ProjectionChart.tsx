@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { computeTotals, type FinancialState } from "@/lib/financial-state";
 import { getHomeCurrency, getEffectiveFxRates } from "@/lib/currency";
+import { useCurrency } from "@/lib/CurrencyContext";
 import {
   projectFinances,
   downsamplePoints,
@@ -29,20 +30,7 @@ interface ProjectionChartProps {
   runwayDetails?: RunwayExplainerDetails;
 }
 
-function formatCurrency(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(value / 1_000).toFixed(0)}k`;
-  return `$${value.toFixed(0)}`;
-}
-
-function formatFullCurrency(value: number, currencyCode: string = "USD"): string {
-  return value.toLocaleString("en-US", {
-    style: "currency",
-    currency: currencyCode,
-    maximumFractionDigits: 0,
-  });
-}
+// formatCurrency and formatFullCurrency defined inside components via useCurrency()
 
 const SCENARIO_LABELS: Record<Scenario, string> = {
   conservative: "Conservative",
@@ -68,7 +56,8 @@ interface CustomTooltipProps {
   label?: number;
 }
 
-function CustomTooltip({ active, payload, label, currencyCode }: CustomTooltipProps & { currencyCode?: string }) {
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+  const fmt = useCurrency();
   if (!active || !payload?.length) return null;
 
   const years = label ?? 0;
@@ -83,12 +72,12 @@ function CustomTooltip({ active, payload, label, currencyCode }: CustomTooltipPr
       <p className="mb-1 text-xs font-medium text-stone-500">{yearLabel} from now</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-sm font-semibold" style={{ color: entry.color }}>
-          {entry.name}: {formatFullCurrency(entry.value, currencyCode)}
+          {entry.name}: {fmt.full(entry.value)}
         </p>
       ))}
       {withdrawalTaxDrag > 0 && (
         <p className="mt-1 text-xs text-amber-600" data-testid="tooltip-tax-drag">
-          Withdrawal tax paid: {formatFullCurrency(withdrawalTaxDrag, currencyCode)}
+          Withdrawal tax paid: {fmt.full(withdrawalTaxDrag)}
         </p>
       )}
     </div>
@@ -138,6 +127,8 @@ function BurndownTooltip({ active, payload, label }: CustomTooltipProps) {
 }
 
 export default function ProjectionChart({ state, runwayDetails }: ProjectionChartProps) {
+  const fmt = useCurrency();
+  const formatCurrency = (v: number) => fmt.compact(v);
   const [scenario, setScenario] = useState<Scenario>("moderate");
   const [legendOpen, setLegendOpen] = useState(false);
   const [mode, setMode] = useState<ChartMode>("keep-earning");
@@ -409,7 +400,7 @@ export default function ProjectionChart({ state, runwayDetails }: ProjectionChar
               tickFormatter={formatCurrency}
               width={60}
             />
-            <Tooltip content={<CustomTooltip currencyCode={currencyCode} />} />
+            <Tooltip content={<CustomTooltip />} />
 
             {/* Net Worth line */}
             <Line

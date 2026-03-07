@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 export type IncomeFrequency = "monthly" | "weekly" | "biweekly" | "quarterly" | "semi-annually" | "annually";
 
@@ -100,15 +101,6 @@ function generateId(): string {
   return `i${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 function parseCurrencyInput(value: string): number {
   const cleaned = value.replace(/[^0-9.-]/g, "");
   const parsed = parseFloat(cleaned);
@@ -121,6 +113,8 @@ interface IncomeEntryProps {
 }
 
 export default function IncomeEntry({ items: controlledItems, onChange }: IncomeEntryProps = {}) {
+  const fmt = useCurrency();
+  const formatCurrency = (v: number) => fmt.full(v);
   const [items, setItems] = useState<IncomeItem[]>(controlledItems ?? MOCK_INCOME);
   const isExternalSync = useRef(false);
   const didMount = useRef(false);

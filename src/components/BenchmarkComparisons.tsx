@@ -6,6 +6,7 @@ import {
   DATA_SOURCES,
   type BenchmarkComparison,
 } from "@/lib/benchmarks";
+import { useCurrency } from "@/lib/CurrencyContext";
 
 interface BenchmarkComparisonsProps {
   age?: number;
@@ -18,14 +19,10 @@ interface BenchmarkComparisonsProps {
   onAgeChange: (age: number | undefined) => void;
 }
 
-function formatBarValue(value: number, format: BenchmarkComparison["format"]): string {
+function formatBarValue(value: number, format: BenchmarkComparison["format"], compactCurrency: (n: number) => string): string {
   switch (format) {
-    case "currency": {
-      const abs = Math.abs(value);
-      if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-      if (abs >= 1_000) return `$${(value / 1_000).toFixed(0)}k`;
-      return `$${value.toFixed(0)}`;
-    }
+    case "currency":
+      return compactCurrency(value);
     case "percent":
       return `${(value * 100).toFixed(0)}%`;
     case "months":
@@ -36,6 +33,7 @@ function formatBarValue(value: number, format: BenchmarkComparison["format"]): s
 }
 
 function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
+  const fmt = useCurrency();
   const { metric, userValue, benchmarkValue, nationalAverage, format, message, aboveBenchmark } = comparison;
 
   // For debt-to-income, lower is better, so we invert the visual logic
@@ -73,7 +71,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
             />
           </div>
           <span className="text-xs font-medium text-stone-700 w-16 text-right shrink-0">
-            {formatBarValue(userValue, format)}
+            {formatBarValue(userValue, format, fmt.compact.bind(fmt))}
           </span>
         </div>
 
@@ -87,7 +85,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
             />
           </div>
           <span className="text-xs font-medium text-stone-500 w-16 text-right shrink-0">
-            {formatBarValue(benchmarkValue, format)}
+            {formatBarValue(benchmarkValue, format, fmt.compact.bind(fmt))}
           </span>
         </div>
 
@@ -101,7 +99,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
             />
           </div>
           <span className="text-xs font-medium text-amber-600 w-16 text-right shrink-0">
-            {formatBarValue(nationalAverage, format)}
+            {formatBarValue(nationalAverage, format, fmt.compact.bind(fmt))}
           </span>
         </div>
       </div>

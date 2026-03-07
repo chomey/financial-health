@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { render } from "../test-utils";
 import userEvent from "@testing-library/user-event";
 import DebtEntry, { getDefaultDebtInterest, DEFAULT_DEBT_INTEREST } from "@/components/DebtEntry";
 import { encodeState, decodeState, toCompact, fromCompact } from "@/lib/url-state";

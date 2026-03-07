@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { render } from "../test-utils";
 import userEvent from "@testing-library/user-event";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
 import type { MetricData } from "@/components/SnapshotDashboard";
