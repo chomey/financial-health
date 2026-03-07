@@ -18,6 +18,8 @@ interface FastForwardPanelProps {
   state: FinancialState;
   scenario?: Scenario;
   years?: number;
+  safeWithdrawalRate?: number;
+  onSwrChange?: (rate: number) => void;
 }
 
 function formatMonthsDelta(months: number): string {
@@ -52,6 +54,8 @@ export default function FastForwardPanel({
   state,
   scenario = "moderate",
   years = 10,
+  safeWithdrawalRate = 4,
+  onSwrChange,
 }: FastForwardPanelProps) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.compact(v);
@@ -398,6 +402,49 @@ export default function FastForwardPanel({
                 )}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* FIRE safe withdrawal rate */}
+        <div data-testid="swr-adjustment">
+          <h4 className="mb-2 text-sm font-medium text-stone-700">
+            FIRE withdrawal rate
+          </h4>
+          <div className={`rounded-lg border px-3 py-2 transition-all duration-200 ${
+            safeWithdrawalRate !== 4 ? "border-amber-200 bg-amber-50" : "border-stone-200"
+          }`}>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-stone-700 flex-1">Safe withdrawal rate</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="range"
+                  min={3}
+                  max={5}
+                  step={0.5}
+                  value={safeWithdrawalRate}
+                  onChange={(e) => onSwrChange?.(parseFloat(e.target.value))}
+                  className="w-24 accent-amber-500"
+                  data-testid="swr-slider"
+                />
+                <span className={`min-w-[36px] text-right text-sm font-medium ${
+                  safeWithdrawalRate !== 4 ? "text-amber-600" : "text-stone-500"
+                }`}>
+                  {safeWithdrawalRate}%
+                </span>
+                {safeWithdrawalRate !== 4 && (
+                  <button
+                    onClick={() => onSwrChange?.(4)}
+                    className="text-xs text-stone-400 hover:text-stone-600"
+                    title="Reset to 4%"
+                  >
+                    ↩
+                  </button>
+                )}
+              </div>
+            </div>
+            <p className="mt-1 text-xs text-stone-400">
+              Adjusts the FIRE milestone on the projection chart (3% conservative, 4% standard, 5% aggressive)
+            </p>
           </div>
         </div>
 

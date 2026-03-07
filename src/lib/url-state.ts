@@ -384,5 +384,26 @@ export function updateInflationURL(adjusted: boolean, rate: number): void {
   window.history.replaceState(null, "", url.toString());
 }
 
+/** Read safe withdrawal rate from URL params (`swr=<rate>`). Defaults to 4. */
+export function getSwrFromURL(): number {
+  if (typeof window === "undefined") return 4;
+  const params = new URLSearchParams(window.location.search);
+  const parsed = parseFloat(params.get("swr") ?? "4");
+  if (isNaN(parsed)) return 4;
+  return Math.max(1, Math.min(10, parsed));
+}
+
+/** Persist safe withdrawal rate to URL params without affecting the main state param. */
+export function updateSwrURL(rate: number): void {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (rate === 4) {
+    url.searchParams.delete("swr");
+  } else {
+    url.searchParams.set("swr", String(rate));
+  }
+  window.history.replaceState(null, "", url.toString());
+}
+
 // Export for testing
 export { encode85, decode85, toCompact, fromCompact };

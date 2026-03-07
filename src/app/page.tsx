@@ -30,7 +30,7 @@ import {
 } from "@/lib/financial-state";
 import { getProfilesForCountry, type SampleProfile } from "@/lib/sample-profiles";
 import MobileWizard, { type WizardResult } from "@/components/MobileWizard";
-import { getStateFromURL, updateURL } from "@/lib/url-state";
+import { getStateFromURL, updateURL, getSwrFromURL, updateSwrURL } from "@/lib/url-state";
 import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey, formatCurrencyCompact } from "@/lib/currency";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
 import type { Asset } from "@/components/AssetEntry";
@@ -403,11 +403,13 @@ export default function Home() {
   const [fxRates, setFxRates] = useState<FxRates | undefined>(undefined);
   const [showSampleProfiles, setShowSampleProfiles] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
+  const [safeWithdrawalRate, setSafeWithdrawalRate] = useState(4);
   const isFirstRender = useRef(true);
 
   // Restore state from URL after hydration; show sample profiles if no URL state
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
+    setSafeWithdrawalRate(getSwrFromURL());
     const urlState = getStateFromURL();
     if (urlState) {
       setAssets(urlState.assets);
@@ -570,6 +572,11 @@ export default function Home() {
 
   const handleWizardSkip = useCallback(() => {
     setShowWizard(false);
+  }, []);
+
+  const handleSwrChange = useCallback((rate: number) => {
+    setSafeWithdrawalRate(rate);
+    updateSwrURL(rate);
   }, []);
 
   const homeCurrency = getHomeCurrency(country);
@@ -842,7 +849,7 @@ export default function Home() {
 
         {/* Projection Chart — full-width above the two-column layout */}
         <section id="projections" className="mb-6 space-y-4 scroll-mt-16" aria-label="Financial projections">
-          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} /></ZoomableCard>
+          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} /></ZoomableCard>
           <InsightsPanel data={financialData} insightConnections={insightConnections} />
         </section>
 
@@ -979,7 +986,7 @@ export default function Home() {
 
         {/* What If scenario panel — full-width at the bottom */}
         <section id="scenarios" className="mt-8 scroll-mt-16 print:hidden" aria-label="Scenario modeling">
-          <FastForwardPanel state={state} />
+          <FastForwardPanel state={state} safeWithdrawalRate={safeWithdrawalRate} onSwrChange={handleSwrChange} />
         </section>
 
         <PrintFooter />

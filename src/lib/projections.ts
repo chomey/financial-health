@@ -252,6 +252,29 @@ export function projectFinances(
   return { points, debtFreeMonth, consumerDebtFreeMonth, mortgageFreeMonth, milestones };
 }
 
+/**
+ * Compute the FIRE (Financial Independence, Retire Early) number.
+ * FIRE number = annual expenses / safe withdrawal rate.
+ * @param monthlyExpenses - Monthly living expenses (raw, excluding contributions/mortgage)
+ * @param safeWithdrawalRate - Safe withdrawal rate as a percentage (e.g. 4 for 4%)
+ */
+export function computeFireNumber(monthlyExpenses: number, safeWithdrawalRate: number): number {
+  if (safeWithdrawalRate <= 0 || monthlyExpenses <= 0) return 0;
+  return (monthlyExpenses * 12) / (safeWithdrawalRate / 100);
+}
+
+/**
+ * Find the month when net worth first reaches or exceeds a target value.
+ * Returns null if the target is not reached within the projection.
+ */
+export function findMonthAtTarget(points: ProjectionPoint[], target: number): number | null {
+  if (target <= 0) return null;
+  for (const p of points) {
+    if (p.netWorth >= target) return p.month;
+  }
+  return null;
+}
+
 function formatMilestoneLabel(value: number): string {
   if (value >= 1_000_000) {
     return `$${(value / 1_000_000).toFixed(value % 1_000_000 === 0 ? 0 : 1)}M`;

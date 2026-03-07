@@ -874,6 +874,9 @@ export function toFinancialData(state: FinancialState): FinancialData {
       return sum + computeEmployerMatchMonthly(a.monthlyContribution, a.employerMatchPct, a.employerMatchCap, annualEmploymentSalary) * 12;
     }, 0);
 
+  // FIRE number: annual living expenses / 4% SWR — use raw monthly expenses (excludes contributions/mortgage)
+  const fireNumber = monthlyExpenses > 0 ? (monthlyExpenses * 12) / 0.04 : undefined;
+
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
   return {
     totalAssets: totalAssets + totalStocks + totalPropertyValue,
@@ -895,6 +898,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     homeCurrency,
     withdrawalTax: computeWithdrawalTaxSummary(state, totalAssets, totalStocks),
     employerMatchAnnual: employerMatchAnnual > 0 ? employerMatchAnnual : undefined,
+    fireNumber,
   };
 }
 
