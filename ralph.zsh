@@ -264,7 +264,7 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
 
   # Pick model: Opus for MILESTONE/E2E/complex tasks, Sonnet for everything else
   next_task=$(grep '^\- \[ \]' "$TASKS_FILE" | head -n 1)
-  if echo "$next_task" | grep -qiE '\[MILESTONE\]|\[E2E\]'; then
+  if echo "$next_task" | grep -qiE '\[MILESTONE\]|\[E2E\]|\[OPUS\]'; then
     model="opus"
     print "${CYAN}  Model: opus (milestone/E2E task)${NC}"
   else

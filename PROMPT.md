@@ -107,6 +107,23 @@ Complete exactly ONE task from TASKS.md, then stop.
 
    **Git LFS**: Before committing any image files, ensure `.gitattributes` tracks image formats (`*.png`, `*.jpg`, `*.jpeg`, `*.gif`, `*.webp`, `*.svg`) via Git LFS. If it doesn't exist, create it.
 
+12. **Print summary** — After committing, print a structured summary to stdout. This is required — do NOT skip it:
+   ```
+   ## Task [NUMBER]: [TITLE]
+
+   **Changes:**
+   - **`file1.tsx`**: Brief description of what changed
+   - **`file2.ts`**: Brief description of what changed
+
+   **Tests:**
+   - T1: [X] passed ([Y] new in `test-file.test.ts`)
+   - T2: [X] passed (new `test-file.spec.ts`)
+   - Build: passes
+
+   **Screenshots:** [list captured screenshots or "N/A"]
+   **Notes:** [any gotchas, blockers, or context for future tasks]
+   ```
+
 ## Rules
 - Complete exactly ONE task per invocation. No more, no less.
 - **Every task MUST have tests at the tiers required by its agent tag.** T1 is always required. T2 is required for `[@frontend]`, `[@fullstack]`, and `[@qa]`. T3 is required for `[@qa]` tasks, `[E2E]`/`[MILESTONE]`-tagged tasks, and every 5th completed task. A task without its required-tier tests is not complete.
