@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Preset sample profiles for new users
+  {
+    version: 113,
+    title: "Sample profiles for new users",
+    description: "Added a 'Start with a sample profile' banner that appears for first-time visitors (no URL state). Three clickable profiles populate all entry fields instantly: Fresh grad (age 25, student loan, TFSA), Mid-career family (age 38, mortgage, RRSP/TFSA), and Pre-retirement (age 58, large registered accounts, near debt-free). US equivalents (Roth IRA, 401k) are shown automatically when country is set to US. A 'Clear all' button resets to a blank state. Loading a profile updates the URL, so the snapshot is immediately bookmarkable.",
+    date: "2026-03-06",
+  },
   // Employer match modeling for registered accounts
   {
     version: 112,

@@ -28,6 +28,7 @@ import {
   computeMonthlyInvestmentReturns,
   toFinancialData,
 } from "@/lib/financial-state";
+import { getProfilesForCountry, type SampleProfile } from "@/lib/sample-profiles";
 import { getStateFromURL, updateURL } from "@/lib/url-state";
 import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey, formatCurrencyCompact } from "@/lib/currency";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
@@ -326,9 +327,10 @@ export default function Home() {
   const [surplusTargetComputedId, setSurplusTargetComputedId] = useState<string | undefined>(undefined);
   const [fxManualOverride, setFxManualOverride] = useState<number | undefined>(undefined);
   const [fxRates, setFxRates] = useState<FxRates | undefined>(undefined);
+  const [showSampleProfiles, setShowSampleProfiles] = useState(false);
   const isFirstRender = useRef(true);
 
-  // Restore state from URL after hydration
+  // Restore state from URL after hydration; show sample profiles if no URL state
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const urlState = getStateFromURL();
@@ -346,6 +348,9 @@ export default function Home() {
       setProvincialTaxOverride(urlState.provincialTaxOverride);
       setSurplusTargetComputedId(urlState.surplusTargetComputedId);
       setFxManualOverride(urlState.fxManualOverride);
+    } else {
+      // No saved state — show sample profile picker for new visitors
+      setShowSampleProfiles(true);
     }
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -436,6 +441,38 @@ export default function Home() {
     setAssets(newAssets);
     const computedSurplus = newAssets.find((a) => a.computed && a.surplusTarget);
     setSurplusTargetComputedId(computedSurplus?.id);
+  }, []);
+
+  const loadProfile = useCallback((profile: SampleProfile) => {
+    const s = profile.state;
+    setAssets(s.assets);
+    setDebts(s.debts);
+    setIncome(s.income);
+    setExpenses(s.expenses);
+    setProperties(s.properties);
+    setStocks(s.stocks);
+    if (s.country) setCountry(s.country);
+    if (s.jurisdiction) setJurisdiction(s.jurisdiction);
+    if (s.age !== undefined) setAge(s.age);
+    setFederalTaxOverride(undefined);
+    setProvincialTaxOverride(undefined);
+    setSurplusTargetComputedId(undefined);
+    setFxManualOverride(undefined);
+    setShowSampleProfiles(false);
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setAssets([]);
+    setDebts([]);
+    setIncome([]);
+    setExpenses([]);
+    setProperties([]);
+    setStocks([]);
+    setFederalTaxOverride(undefined);
+    setProvincialTaxOverride(undefined);
+    setSurplusTargetComputedId(undefined);
+    setFxManualOverride(undefined);
+    setShowSampleProfiles(false);
   }, []);
 
   const homeCurrency = getHomeCurrency(country);
@@ -640,6 +677,62 @@ export default function Home() {
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
         {/* Welcome explainer for first-time visitors */}
         <WelcomeBanner />
+
+        {/* Sample profile picker for new visitors (no URL state) */}
+        {showSampleProfiles && (
+          <div className="mb-6 rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-5 shadow-sm sm:px-6" data-testid="sample-profiles-banner">
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-base font-semibold text-stone-800 sm:text-lg">Start with a sample profile</h2>
+                <p className="mt-0.5 text-sm text-stone-500">See how the tool works with realistic numbers, then edit to match your own.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSampleProfiles(false)}
+                className="shrink-0 rounded-md p-1 text-stone-400 transition-colors hover:bg-white/60 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                aria-label="Dismiss sample profiles"
+                data-testid="sample-profiles-dismiss"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {getProfilesForCountry(country).map((profile) => (
+                <button
+                  key={profile.id}
+                  type="button"
+                  onClick={() => loadProfile(profile)}
+                  className="group flex flex-col gap-2 rounded-lg border border-emerald-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:border-emerald-400 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 active:scale-95"
+                  data-testid={`sample-profile-${profile.id}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl" aria-hidden="true">{profile.emoji}</span>
+                    <span className="font-semibold text-stone-800 text-sm leading-tight group-hover:text-emerald-700 transition-colors duration-150">{profile.name}</span>
+                  </div>
+                  <p className="text-xs text-stone-500 leading-relaxed">{profile.description}</p>
+                  <div className="flex flex-wrap gap-1.5 mt-auto">
+                    {profile.highlights.map((h) => (
+                      <span key={h} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 border border-emerald-100">{h}</span>
+                    ))}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <p className="text-xs text-stone-400">Or enter your own numbers directly in the sections below.</p>
+              <button
+                type="button"
+                onClick={clearAll}
+                className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-500 shadow-sm transition-all duration-150 hover:border-stone-300 hover:text-stone-700 hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 active:scale-95"
+                data-testid="clear-all-button"
+              >
+                Clear all
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Projection Chart — full-width above the two-column layout */}
         <section id="projections" className="mb-6 space-y-4 scroll-mt-16" aria-label="Financial projections">
