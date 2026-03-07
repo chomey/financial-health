@@ -6,6 +6,10 @@ import {
   compareScenarios,
   EMPTY_MODIFICATION,
   type ScenarioModification,
+  type ScenarioPreset,
+  applyPreset,
+  isTaxSheltered,
+  getMonthlyLimit,
 } from "@/lib/scenario";
 import type { Scenario } from "@/lib/projections";
 
@@ -39,6 +43,22 @@ function formatMonthsDelta(months: number): string {
   return months < 0 ? `${duration} sooner` : `${duration} later`;
 }
 
+function formatRunway(months: number, projectionYears: number): string {
+  if (months >= projectionYears * 12) return `${projectionYears}+ years`;
+  const years = Math.floor(months / 12);
+  const remaining = months % 12;
+  const parts: string[] = [];
+  if (years > 0) parts.push(`${years} year${years !== 1 ? "s" : ""}`);
+  if (remaining > 0) parts.push(`${remaining} month${remaining !== 1 ? "s" : ""}`);
+  return parts.join(" ") || "0 months";
+}
+
+const PRESET_CONFIGS: { id: ScenarioPreset; label: string; description: string }[] = [
+  { id: "conservative", label: "Conservative", description: "Lower ROI (-2%)" },
+  { id: "aggressive-saver", label: "Aggressive Saver", description: "Max tax-sheltered" },
+  { id: "early-retirement", label: "Early Retirement", description: "No income" },
+];
+
 export default function FastForwardPanel({
   state,
   scenario = "moderate",
@@ -46,12 +66,17 @@ export default function FastForwardPanel({
 }: FastForwardPanelProps) {
   const [mod, setMod] = useState<ScenarioModification>({ ...EMPTY_MODIFICATION });
   const [isOpen, setIsOpen] = useState(false);
+  const [activePreset, setActivePreset] = useState<ScenarioPreset | null>(null);
 
   const hasModifications =
     mod.excludedDebtIds.length > 0 ||
     Object.keys(mod.contributionOverrides).length > 0 ||
     mod.incomeAdjustment !== 0 ||
-    mod.windfall > 0;
+    mod.windfall > 0 ||
+    mod.retireToday ||
+    mod.maxTaxSheltered ||
+    mod.housingDownsizePercent > 0 ||
+    mod.roiAdjustment !== 0;
 
   const comparison = useMemo(() => {
     if (!hasModifications) return null;
@@ -65,6 +90,7 @@ export default function FastForwardPanel({
         : [...prev.excludedDebtIds, debtId];
       return { ...prev, excludedDebtIds: excluded };
     });
+    setActivePreset(null);
   }, []);
 
   const setContributionOverride = useCallback((assetId: string, value: number | undefined) => {
@@ -77,22 +103,59 @@ export default function FastForwardPanel({
       }
       return { ...prev, contributionOverrides: overrides };
     });
+    setActivePreset(null);
   }, []);
 
   const setIncomeAdjustment = useCallback((value: number) => {
     setMod((prev) => ({ ...prev, incomeAdjustment: value }));
+    setActivePreset(null);
   }, []);
 
   const setWindfall = useCallback((value: number) => {
     setMod((prev) => ({ ...prev, windfall: value }));
+    setActivePreset(null);
   }, []);
+
+  const toggleRetireToday = useCallback(() => {
+    setMod((prev) => ({ ...prev, retireToday: !prev.retireToday }));
+    setActivePreset(null);
+  }, []);
+
+  const toggleMaxTaxSheltered = useCallback(() => {
+    setMod((prev) => ({ ...prev, maxTaxSheltered: !prev.maxTaxSheltered }));
+    setActivePreset(null);
+  }, []);
+
+  const setHousingDownsize = useCallback((value: number) => {
+    setMod((prev) => ({ ...prev, housingDownsizePercent: value }));
+    setActivePreset(null);
+  }, []);
+
+  const setRoiAdjustment = useCallback((value: number) => {
+    setMod((prev) => ({ ...prev, roiAdjustment: value }));
+    setActivePreset(null);
+  }, []);
+
+  const handlePreset = useCallback((preset: ScenarioPreset) => {
+    if (activePreset === preset) {
+      setMod({ ...EMPTY_MODIFICATION });
+      setActivePreset(null);
+    } else {
+      setMod(applyPreset(preset, state));
+      setActivePreset(preset);
+    }
+  }, [activePreset, state]);
 
   const resetScenario = useCallback(() => {
     setMod({ ...EMPTY_MODIFICATION });
+    setActivePreset(null);
   }, []);
 
   const hasDebts = state.debts.length > 0;
   const hasContributions = state.assets.some((a) => (a.monthlyContribution ?? 0) > 0);
+  const hasProperties = state.properties.length > 0;
+  const hasTaxSheltered = state.assets.some((a) => isTaxSheltered(a.category));
+  const totalMonthlyIncome = state.income.reduce((sum, i) => sum + i.amount, 0);
 
   if (!isOpen) {
     return (
@@ -159,7 +222,193 @@ export default function FastForwardPanel({
         Explore &quot;what if&quot; scenarios to see how changes affect your financial future. These are temporary — they won&apos;t change your saved data.
       </p>
 
+      {/* Scenario Presets */}
+      <div className="mb-4" data-testid="scenario-presets">
+        <h4 className="mb-2 text-sm font-medium text-stone-700">Quick scenarios</h4>
+        <div className="flex flex-wrap gap-2">
+          {PRESET_CONFIGS.map((preset) => (
+            <button
+              key={preset.id}
+              onClick={() => handlePreset(preset.id)}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+                activePreset === preset.id
+                  ? "border-violet-300 bg-violet-50 text-violet-700"
+                  : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50 hover:border-stone-300"
+              }`}
+              data-testid={`preset-${preset.id}`}
+            >
+              <span className="block">{preset.label}</span>
+              <span className="block text-[10px] font-normal opacity-70">{preset.description}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="space-y-4">
+        {/* Retire Today toggle */}
+        {totalMonthlyIncome > 0 && (
+          <div data-testid="retire-today">
+            <h4 className="mb-2 text-sm font-medium text-stone-700">
+              What if you retired today?
+            </h4>
+            <label
+              className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-all duration-200 ${
+                mod.retireToday
+                  ? "border-orange-200 bg-orange-50 text-orange-800"
+                  : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={mod.retireToday}
+                onChange={toggleRetireToday}
+                className="h-4 w-4 rounded border-stone-300 text-orange-600 focus:ring-orange-500"
+                data-testid="retire-today-checkbox"
+              />
+              <span className="flex-1">
+                Set all income to $0 and see how long your savings last
+              </span>
+              {mod.retireToday && (
+                <span className="text-xs font-medium text-orange-600">
+                  -{formatCurrency(totalMonthlyIncome)}/mo
+                </span>
+              )}
+            </label>
+          </div>
+        )}
+
+        {/* Max tax-sheltered contributions */}
+        {hasTaxSheltered && (
+          <div data-testid="max-tax-sheltered">
+            <h4 className="mb-2 text-sm font-medium text-stone-700">
+              What if you maxed tax-sheltered accounts?
+            </h4>
+            <label
+              className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-all duration-200 ${
+                mod.maxTaxSheltered
+                  ? "border-teal-200 bg-teal-50 text-teal-800"
+                  : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={mod.maxTaxSheltered}
+                onChange={toggleMaxTaxSheltered}
+                className="h-4 w-4 rounded border-stone-300 text-teal-600 focus:ring-teal-500"
+                data-testid="max-tax-sheltered-checkbox"
+              />
+              <span className="flex-1">
+                Maximize contributions to annual limits
+              </span>
+            </label>
+            {mod.maxTaxSheltered && (
+              <div className="mt-2 space-y-1 pl-7">
+                {state.assets
+                  .filter((a) => isTaxSheltered(a.category))
+                  .map((a) => {
+                    const limit = getMonthlyLimit(a.category);
+                    const current = a.monthlyContribution ?? 0;
+                    const isAlreadyMax = current >= limit;
+                    return (
+                      <div key={a.id} className="flex items-center justify-between text-xs text-teal-700">
+                        <span>{a.category}</span>
+                        <span>
+                          {isAlreadyMax ? (
+                            <span className="text-stone-400">Already at max</span>
+                          ) : (
+                            <>
+                              {formatCurrency(current)}/mo → <span className="font-medium">{formatCurrency(limit)}/mo</span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Housing downsize */}
+        {hasProperties && (
+          <div data-testid="housing-downsize">
+            <h4 className="mb-2 text-sm font-medium text-stone-700">
+              What if you downsized housing?
+            </h4>
+            <div className={`rounded-lg border px-3 py-2 transition-all duration-200 ${
+              mod.housingDownsizePercent > 0 ? "border-indigo-200 bg-indigo-50" : "border-stone-200"
+            }`}>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-stone-700 flex-1">
+                  Reduce property value by
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min={0}
+                    max={50}
+                    step={5}
+                    value={mod.housingDownsizePercent}
+                    onChange={(e) => setHousingDownsize(parseInt(e.target.value))}
+                    className="w-24 accent-indigo-500"
+                    data-testid="housing-downsize-slider"
+                  />
+                  <span className={`min-w-[36px] text-right text-sm font-medium ${
+                    mod.housingDownsizePercent > 0 ? "text-indigo-600" : "text-stone-500"
+                  }`}>
+                    {mod.housingDownsizePercent}%
+                  </span>
+                </div>
+              </div>
+              {mod.housingDownsizePercent > 0 && (
+                <p className="mt-1 text-xs text-indigo-600">
+                  Equity released is added to your savings
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ROI adjustment */}
+        <div data-testid="roi-adjustment">
+          <h4 className="mb-2 text-sm font-medium text-stone-700">
+            What if market returns changed?
+          </h4>
+          <div className={`rounded-lg border px-3 py-2 transition-all duration-200 ${
+            mod.roiAdjustment !== 0 ? "border-purple-200 bg-purple-50" : "border-stone-200"
+          }`}>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-stone-700 flex-1">Global ROI adjustment</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="range"
+                  min={-5}
+                  max={5}
+                  step={1}
+                  value={mod.roiAdjustment}
+                  onChange={(e) => setRoiAdjustment(parseInt(e.target.value))}
+                  className="w-24 accent-purple-500"
+                  data-testid="roi-adjustment-slider"
+                />
+                <span className={`min-w-[40px] text-right text-sm font-medium ${
+                  mod.roiAdjustment > 0 ? "text-emerald-600" : mod.roiAdjustment < 0 ? "text-red-500" : "text-stone-500"
+                }`}>
+                  {mod.roiAdjustment > 0 ? "+" : ""}{mod.roiAdjustment}%
+                </span>
+                {mod.roiAdjustment !== 0 && (
+                  <button
+                    onClick={() => setRoiAdjustment(0)}
+                    className="text-xs text-stone-400 hover:text-stone-600"
+                    title="Reset"
+                  >
+                    ↩
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Debt toggles */}
         {hasDebts && (
           <div data-testid="debt-toggles">
@@ -339,6 +588,21 @@ export default function FastForwardPanel({
           <h4 className="mb-3 text-sm font-semibold text-stone-800">
             Scenario Impact
           </h4>
+
+          {/* Runway for retire-today */}
+          {mod.retireToday && comparison.scenarioRunwayMonths !== null && (
+            <div className="mb-3 rounded-lg border border-orange-100 bg-orange-50 p-3" data-testid="runway-estimate">
+              <p className="text-sm font-medium text-orange-700">
+                Your savings would last approximately{" "}
+                <span className="font-bold">{formatRunway(comparison.scenarioRunwayMonths, years)}</span>
+                {" "}with no income
+              </p>
+              <p className="mt-1 text-xs text-orange-500">
+                Based on current expenses and asset growth projections
+              </p>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {comparison.netWorthDeltas.map(({ year, baseline, scenario: scenVal, delta }) => (
               <div
@@ -385,7 +649,7 @@ export default function FastForwardPanel({
 
       {!hasModifications && (
         <div className="mt-4 rounded-lg border border-dashed border-stone-200 p-4 text-center text-sm text-stone-400">
-          Toggle a debt, adjust a contribution, or add a windfall above to see how it impacts your financial future.
+          Pick a quick scenario above, or customize individual options to see how changes affect your financial future.
         </div>
       )}
     </section>
