@@ -34,18 +34,31 @@ export interface AllocationSlice {
   percentage: number;
 }
 
-const RETIREMENT_CATEGORIES = new Set([
-  "TFSA", "RRSP", "RESP", "FHSA", "LIRA",
-  "401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA",
-]);
-
+/** Map each asset category to a display group for the allocation chart.
+ *  Every known category gets its own slice — only truly unknown custom
+ *  categories fall into "Other". */
 function getCategoryGroup(category: string): string {
-  if (RETIREMENT_CATEGORIES.has(category)) return "Retirement Accounts";
-  const lower = category.toLowerCase();
-  if (lower.includes("saving") || lower.includes("checking")) return "Savings & Checking";
+  const trimmed = category.trim();
+
+  // Registered / tax-advantaged accounts — show individually
+  const registered = new Set([
+    "TFSA", "RRSP", "RESP", "FHSA", "LIRA",
+    "401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA",
+  ]);
+  if (registered.has(trimmed)) return trimmed;
+
+  // Common cash-like categories
+  const lower = trimmed.toLowerCase();
+  if (lower === "savings" || lower === "savings account" || lower === "hisa") return "Savings";
+  if (lower === "checking" || lower === "chequing") return "Checking";
   if (lower.includes("brokerage")) return "Brokerage";
-  if (lower.includes("vehicle")) return "Vehicle";
-  return "Other";
+  if (lower === "gic" || lower === "money market" || lower === "cd") return "Fixed Income";
+  if (lower === "vehicle") return "Vehicle";
+  if (lower === "crypto" || lower === "cryptocurrency" || lower === "bitcoin") return "Crypto";
+  if (lower === "other") return "Other";
+
+  // Anything custom the user typed — show it as-is rather than hiding it in "Other"
+  return trimmed;
 }
 
 export function computeAllocationByCategory(

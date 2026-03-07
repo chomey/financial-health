@@ -144,11 +144,15 @@ describe("Task 108 — Asset allocation composition table", () => {
     ];
     const slices = computeAllocationByCategory(assets, [], []);
 
-    const retirementSlice = slices.find((s) => s.name === "Retirement Accounts");
-    expect(retirementSlice).toBeDefined();
-    expect(retirementSlice!.value).toBe(80000); // RRSP + TFSA
+    const rrspSlice = slices.find((s) => s.name === "RRSP");
+    expect(rrspSlice).toBeDefined();
+    expect(rrspSlice!.value).toBe(50000);
 
-    const savingsSlice = slices.find((s) => s.name === "Savings & Checking");
+    const tfsaSlice = slices.find((s) => s.name === "TFSA");
+    expect(tfsaSlice).toBeDefined();
+    expect(tfsaSlice!.value).toBe(30000);
+
+    const savingsSlice = slices.find((s) => s.name === "Savings");
     expect(savingsSlice).toBeDefined();
     expect(savingsSlice!.value).toBe(20000);
   });

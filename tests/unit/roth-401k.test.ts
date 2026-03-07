@@ -52,26 +52,25 @@ describe("Roth 401k support", () => {
   });
 
   describe("asset allocation chart", () => {
-    it("groups Roth 401k into Retirement Accounts", () => {
+    it("shows Roth 401k as its own slice", () => {
       const assets: Asset[] = [
         { id: "1", category: "Roth 401k", amount: 50000 },
         { id: "2", category: "Savings", amount: 10000 },
       ];
       const result = computeAllocationByCategory(assets, [], []);
-      const retirement = result.find((s) => s.name === "Retirement Accounts");
-      expect(retirement).toBeDefined();
-      expect(retirement!.value).toBe(50000);
+      const roth401k = result.find((s) => s.name === "Roth 401k");
+      expect(roth401k).toBeDefined();
+      expect(roth401k!.value).toBe(50000);
     });
 
-    it("keeps Roth 401k and 401k in the same Retirement Accounts group", () => {
+    it("shows Roth 401k and 401k as separate slices", () => {
       const assets: Asset[] = [
         { id: "1", category: "401k", amount: 30000 },
         { id: "2", category: "Roth 401k", amount: 20000 },
       ];
       const result = computeAllocationByCategory(assets, [], []);
-      const retirement = result.find((s) => s.name === "Retirement Accounts");
-      expect(retirement).toBeDefined();
-      expect(retirement!.value).toBe(50000);
+      expect(result.find((s) => s.name === "401k")!.value).toBe(30000);
+      expect(result.find((s) => s.name === "Roth 401k")!.value).toBe(20000);
     });
   });
 });

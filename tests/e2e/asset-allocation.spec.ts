@@ -23,11 +23,9 @@ test.describe("Asset Allocation Chart", () => {
     const chart = page.locator('[data-testid="allocation-chart"]');
     await expect(chart).toBeVisible();
 
-    // Default data has TFSA + RRSP (retirement) and Savings Account (savings & checking)
-    // These appear in the compact legend below the doughnut
-    // Use first() to avoid matching both recharts Legend and compact legend
-    await expect(chart.getByText("Retirement Accounts").first()).toBeVisible();
-    await expect(chart.getByText("Savings & Checking").first()).toBeVisible();
+    // Default data has TFSA, Savings Account, and Brokerage — each shown individually
+    await expect(chart.getByText("TFSA").first()).toBeVisible();
+    await expect(chart.getByText("Savings").first()).toBeVisible();
   });
 
   test("toggles between category and liquidity views", async ({ page }) => {
@@ -41,14 +39,14 @@ test.describe("Asset Allocation Chart", () => {
     // Wait for the button to become active
     await expect(liquidityBtn).toHaveAttribute("aria-pressed", "true");
 
-    // Retirement Accounts should be gone, replaced with Liquid
-    await expect(chart.getByText("Retirement Accounts")).not.toBeVisible();
+    // Individual categories should be gone, replaced with Liquid/Illiquid
+    await expect(chart.getByText("TFSA")).not.toBeVisible();
 
     await captureScreenshot(page, "task-48-allocation-chart-liquidity");
 
     // Toggle back to category
     await chart.locator("button", { hasText: "By Type" }).click();
-    await expect(chart.getByText("Retirement Accounts").first()).toBeVisible();
+    await expect(chart.getByText("TFSA").first()).toBeVisible();
   });
 
   test("chart is positioned in the dashboard section", async ({ page }) => {
