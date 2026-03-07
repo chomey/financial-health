@@ -27,6 +27,11 @@ export interface SankeyData {
   links: SankeyLink[];
 }
 
+export interface InvestmentReturnItem {
+  label: string;
+  monthlyAmount: number;
+}
+
 export interface CashFlowInput {
   income: IncomeItem[];
   expenses: ExpenseItem[];
@@ -35,6 +40,7 @@ export interface CashFlowInput {
   monthlyFederalTax: number;
   monthlyProvincialTax: number;
   monthlySurplus: number;
+  investmentReturns?: InvestmentReturnItem[];
 }
 
 /**
@@ -53,15 +59,26 @@ export function buildSankeyData(input: CashFlowInput): SankeyData {
     }))
     .filter((item) => item.monthlyAmount > 0);
 
-  const totalGrossIncome = incomeItems.reduce((sum, i) => sum + i.monthlyAmount, 0);
+  // Investment return income items (from interest-bearing accounts)
+  const investmentReturnItems = (input.investmentReturns ?? []).filter((r) => r.monthlyAmount > 0);
+
+  const totalGrossIncome = incomeItems.reduce((sum, i) => sum + i.monthlyAmount, 0)
+    + investmentReturnItems.reduce((sum, r) => sum + r.monthlyAmount, 0);
   if (totalGrossIncome <= 0) return { nodes: [], links: [] };
 
   const totalTax = Math.max(0, input.monthlyFederalTax + input.monthlyProvincialTax);
 
-  // Add income source nodes and link them to the after-tax pool
+  // Add employment/other income source nodes
   for (const item of incomeItems) {
     const nodeId = `income-${item.id}`;
     nodes.push({ id: nodeId, label: item.category || "Income", type: "income", value: item.monthlyAmount });
+  }
+
+  // Add investment return income nodes (distinct type for teal color)
+  for (let i = 0; i < investmentReturnItems.length; i++) {
+    const item = investmentReturnItems[i];
+    const nodeId = `inv-return-${i}`;
+    nodes.push({ id: nodeId, label: `${item.label} interest`, type: "investment-income", value: item.monthlyAmount });
   }
 
   // Tax node (combined federal + provincial)
@@ -76,6 +93,26 @@ export function buildSankeyData(input: CashFlowInput): SankeyData {
   // Link each income source → taxes (proportional) and → after-tax pool
   for (const item of incomeItems) {
     const nodeId = `income-${item.id}`;
+    const proportion = item.monthlyAmount / totalGrossIncome;
+
+    if (totalTax > 0) {
+      const taxPortion = Math.round(totalTax * proportion * 100) / 100;
+      if (taxPortion > 0) {
+        links.push({ source: nodeId, target: "taxes", value: taxPortion });
+      }
+      const afterTaxPortion = item.monthlyAmount - taxPortion;
+      if (afterTaxPortion > 0) {
+        links.push({ source: nodeId, target: "after-tax", value: afterTaxPortion });
+      }
+    } else {
+      links.push({ source: nodeId, target: "after-tax", value: item.monthlyAmount });
+    }
+  }
+
+  // Link investment return sources → taxes (proportional) and → after-tax pool
+  for (let i = 0; i < investmentReturnItems.length; i++) {
+    const item = investmentReturnItems[i];
+    const nodeId = `inv-return-${i}`;
     const proportion = item.monthlyAmount / totalGrossIncome;
 
     if (totalTax > 0) {
@@ -140,11 +177,12 @@ export function buildSankeyData(input: CashFlowInput): SankeyData {
 
 // Color palette for Sankey nodes
 export const SANKEY_COLORS: Record<string, string> = {
-  income: "#10b981",     // emerald-500
-  tax: "#f59e0b",        // amber-500
-  pool: "#3b82f6",       // blue-500
-  expense: "#ef4444",    // red-500 (warm red)
-  investment: "#06b6d4", // cyan-500
-  debt: "#f97316",       // orange-500
-  surplus: "#22c55e",    // green-500
+  income: "#10b981",              // emerald-500
+  "investment-income": "#14b8a6", // teal-500
+  tax: "#f59e0b",                 // amber-500
+  pool: "#3b82f6",                // blue-500
+  expense: "#ef4444",             // red-500 (warm red)
+  investment: "#06b6d4",          // cyan-500
+  debt: "#f97316",                // orange-500
+  surplus: "#22c55e",             // green-500
 };

@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Investment interest income in Cash Flow Sankey
+  {
+    version: 105,
+    title: "Investment interest income in Cash Flow Sankey",
+    description: "The Cash Flow Sankey diagram now includes investment interest income as separate income source nodes. Only accounts with income-type ROI tax treatment (Savings, GIC, HISA, etc.) are shown — capital gains and tax-sheltered accounts are excluded since they aren't realized cash flow. Interest income nodes appear in teal to visually distinguish from employment income.",
+    date: "2026-03-06",
+  },
   // Net worth donut chart
   {
     version: 104,

@@ -31,6 +31,7 @@ import { getStateFromURL, updateURL } from "@/lib/url-state";
 import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey, formatCurrencyCompact } from "@/lib/currency";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
 import type { Asset } from "@/components/AssetEntry";
+import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
 import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
@@ -675,6 +676,14 @@ export default function Home() {
                 monthlyFederalTax={totals.totalFederalTax / 12}
                 monthlyProvincialTax={totals.totalProvincialStateTax / 12}
                 monthlySurplus={monthlySurplus}
+                investmentReturns={monthlyInvestmentReturns
+                  .filter((r) => {
+                    const asset = assets.find((a) => a.category === r.label);
+                    if (!asset) return false;
+                    const treatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
+                    return treatment === "income";
+                  })
+                  .map((r) => ({ label: r.label, monthlyAmount: r.amount }))}
               /></ZoomableCard>
               <ZoomableCard><BenchmarkComparisons
                 age={age}

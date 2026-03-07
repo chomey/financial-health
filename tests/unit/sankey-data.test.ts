@@ -163,7 +163,7 @@ describe("buildSankeyData", () => {
 
 describe("SANKEY_COLORS", () => {
   it("has colors for all node types", () => {
-    const types = ["income", "tax", "pool", "expense", "investment", "debt", "surplus"];
+    const types = ["income", "investment-income", "tax", "pool", "expense", "investment", "debt", "surplus"];
     for (const type of types) {
       expect(SANKEY_COLORS[type]).toBeDefined();
       expect(SANKEY_COLORS[type]).toMatch(/^#[0-9a-f]{6}$/i);

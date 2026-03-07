@@ -49,6 +49,7 @@ interface CashFlowSankeyProps {
   monthlyFederalTax: number;
   monthlyProvincialTax: number;
   monthlySurplus: number;
+  investmentReturns?: CashFlowInput["investmentReturns"];
 }
 
 export default function CashFlowSankey({
@@ -59,6 +60,7 @@ export default function CashFlowSankey({
   monthlyFederalTax,
   monthlyProvincialTax,
   monthlySurplus,
+  investmentReturns,
 }: CashFlowSankeyProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<number | null>(null);
@@ -79,8 +81,9 @@ export default function CashFlowSankey({
       monthlyFederalTax,
       monthlyProvincialTax,
       monthlySurplus,
+      investmentReturns,
     }),
-    [income, expenses, investmentContributions, mortgagePayments, monthlyFederalTax, monthlyProvincialTax, monthlySurplus]
+    [income, expenses, investmentContributions, mortgagePayments, monthlyFederalTax, monthlyProvincialTax, monthlySurplus, investmentReturns]
   );
 
   const rawData = useMemo(() => buildSankeyData(input), [input]);
@@ -249,7 +252,7 @@ export default function CashFlowSankey({
                   const color = SANKEY_COLORS[node.type] ?? "#94a3b8";
                   const nodeHeight = (node.y1 ?? 0) - (node.y0 ?? 0);
                   const isLeft =
-                    node.type === "income";
+                    node.type === "income" || node.type === "investment-income";
                   const isRight = !isLeft && node.type !== "pool" && node.type !== "tax";
                   const labelX = isLeft
                     ? (node.x0 ?? 0) - 6
@@ -326,6 +329,15 @@ export default function CashFlowSankey({
                   />
                   Income
                 </span>
+                {rawData.nodes.some((n) => n.type === "investment-income") && (
+                  <span className="flex items-center gap-1" data-testid="sankey-legend-investment-income">
+                    <span
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{ backgroundColor: SANKEY_COLORS["investment-income"] }}
+                    />
+                    Interest Income
+                  </span>
+                )}
                 <span className="flex items-center gap-1">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
