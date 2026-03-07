@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 108
-- **Completed**: 104
-- **Remaining**: 4
+- **Completed**: 105
+- **Remaining**: 3
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -22,24 +22,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 95: Fix withdrawal order pills overflowing container
-- **Status**: Complete
-- **Date**: 2026-03-06
-- **Changes**:
-  - `src/components/WithdrawalTaxSummary.tsx`: Changed pills container from `flex items-center gap-1` to `flex flex-wrap gap-1.5` for line wrapping. Added `max-w-[150px] truncate` to category name spans. Added `shrink-0` to chevron SVGs.
-  - `src/components/RunwayBurndownChart.tsx`: Added `max-w-[150px] truncate` to category name spans in withdrawal order pills (container already had `flex-wrap`).
-  - `src/lib/changelog.ts`: Added changelog entry for task 95, updated milestone range to [88, 95].
-  - `tests/unit/changelog.test.ts`: Updated expectations from 94 to 95 entries.
-- **Test tiers run**: T1, T2
-- **Tests**:
-  - `tests/unit/withdrawal-pills-overflow.test.tsx`: 2 tests — flex-wrap on pills container, max-w/truncate on name spans. 2 passed, 0 failed.
-  - `tests/unit/runway-burndown-chart.test.tsx`: Added 1 test for truncation classes on long category names. 13 passed, 0 failed.
-  - `tests/e2e/withdrawal-pills-overflow.spec.ts`: 2 tests — withdrawal tax summary pills wrap, burndown chart pills wrap. 2 passed, 0 failed.
-  - All T1 unit tests: 1157 passed, 0 failed
-- **Screenshots**:
-  ![Withdrawal pills wrap](screenshots/task-95-withdrawal-pills-wrap.png)
-  ![Burndown pills wrap](screenshots/task-95-burndown-pills-wrap.png)
-- **Notes**: Pre-existing changelog test failure (expected 93 entries but had 94) was fixed in a separate commit before applying task changes.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 96: [MILESTONE] E2E test for explainer and tax treatment enhancements
 - **Status**: Complete
@@ -247,3 +230,11 @@
   ![Donut center label](screenshots/task-104-donut-center-label.png)
   ![Donut legend](screenshots/task-104-donut-legend.png)
 - **Notes**: Old `NetWorthWaterfallChart.tsx` still exists (not deleted) — old unit tests still pass against it. Pre-existing milestone-5 E2E failures (ZoomableCard strict mode violations on allocation-chart, benchmark, sankey testids) fixed in separate commit.
+
+## Task 105: Include investment interest income in Cash Flow Sankey
+- **Date**: 2026-03-06
+- **Files**: `src/lib/sankey-data.ts` (added `InvestmentReturnItem` interface, `investmentReturns` field on `CashFlowInput`, investment-income nodes in `buildSankeyData`, teal color in `SANKEY_COLORS`), `src/components/CashFlowSankey.tsx` (added `investmentReturns` prop, legend entry for Interest Income, updated `isLeft` for investment-income nodes), `src/app/page.tsx` (filter `computeMonthlyInvestmentReturns` for income-type accounts and pass to Sankey), `src/lib/changelog.ts`, `tests/unit/sankey-investment-returns.test.ts` (new), `tests/e2e/sankey-investment-returns.spec.ts` (new), `tests/unit/sankey-data.test.ts` (updated SANKEY_COLORS types), `tests/unit/changelog.test.ts`
+- **Tests**: T1: 1276 passed, 0 failed (79 files). T2: 3 passed (sankey-investment-returns). T3: 330 passed, 0 failed (full suite).
+- **Screenshots**:
+  ![Sankey with investment returns](screenshots/task-105-sankey-investment-returns.png)
+  ![Sankey legend with interest income](screenshots/task-105-sankey-legend-interest.png)
