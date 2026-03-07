@@ -10,8 +10,8 @@
 
 ## Summary
 - **Total Tasks**: 120
-- **Completed**: 117
-- **Remaining**: 3
+- **Completed**: 118
+- **Remaining**: 2
 - **Last Updated**: 2026-03-06
 
 <!-- Tasks 1-90 archived to PROGRESS-ARCHIVE.md -->
@@ -52,17 +52,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 110: Inflation-adjusted projection toggle
-- **Date**: 2026-03-06
-- **Files**: `src/lib/projections.ts` (added `deflateProjectionPoints`), `src/lib/url-state.ts` (added `getInflationFromURL`, `updateInflationURL`), `src/components/ProjectionChart.tsx` (added inflation toggle UI, `displayPoints` memo with deflation, stopped click propagation so ZoomableCard doesn't open), `src/lib/changelog.ts` (v110 entry, expanded UI Polish range to 88-120), `tests/unit/inflation-deflation.test.ts` (new — 13 tests), `tests/e2e/inflation-toggle.spec.ts` (new — 6 tests), `tests/unit/changelog.test.ts` (updated counts)
-- **Tests**: T1: 1370 passed, 0 failed (84 files). T2: 6 passed (inflation-toggle). T3: 357 passed, 0 failed (full suite). Build: passes.
-- **Screenshots**:
-  ![Inflation toggle off](screenshots/task-110-inflation-toggle-off.png)
-  ![Inflation toggle on](screenshots/task-110-inflation-toggle-on.png)
-  ![Inflation values lower](screenshots/task-110-inflation-values-lower.png)
-  ![Inflation rate changed](screenshots/task-110-inflation-rate-changed.png)
-  ![Now column unchanged](screenshots/task-110-inflation-now-unchanged.png)
-- **Notes**: Inflation toggle uses `onClick={(e) => e.stopPropagation()}` on the controls container to prevent ZoomableCard from opening when interacting with the toggle. URL params `ia=1` and `ir=<rate>` persist the toggle state separately from the main `s=` state param. T3 was triggered (task 110 is the 110th completed task, divisible by 5) — all 357 E2E tests pass.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 111: Age input and personalized benchmarks
 - **Date**: 2026-03-06
@@ -165,3 +155,22 @@
   ![Allocation composition table](screenshots/task-108-allocation-composition-table.png)
   ![Projection table full currency](screenshots/task-108-projection-table-full-currency.png)
 - **Notes**: Donut chart composition table was already present from Task 104 (testid `donut-composition-table`). Fixed pre-existing E2E test failures in `donut-chart.spec.ts` that referenced wrong testid (`donut-legend` instead of `donut-composition-table`). Asset allocation chart had both a recharts Legend AND a custom composition table — removed the recharts Legend to avoid duplication.
+
+## Task 120: [MILESTONE] E2E test for new financial intelligence features
+- **Date**: 2026-03-06
+- **Files**: `tests/e2e/milestone-e2e-120.spec.ts` (new — 11 tests covering all tasks 110-119), `tests/unit/milestone-13-e2e-infra.test.ts` (new — 16 tests), `src/lib/changelog.ts` (v120 entry), `tests/unit/changelog.test.ts` (updated counts)
+- **Tests**: T1: 1531 passed, 0 failed (94 files). T2: 11 passed (milestone-e2e-120). T3: 407 passed (full suite). Build: passes.
+- **Screenshots**:
+  ![Inflation toggle](screenshots/task-120-inflation-toggle.png)
+  ![Age benchmarks](screenshots/task-120-age-benchmarks.png)
+  ![Employer match](screenshots/task-120-employer-match.png)
+  ![Sample profile loaded](screenshots/task-120-sample-profile-loaded.png)
+  ![Print layout](screenshots/task-120-print-layout.png)
+  ![Wizard completed](screenshots/task-120-wizard-completed.png)
+  ![Debt strategy insights](screenshots/task-120-debt-strategy-insights.png)
+  ![FIRE milestone](screenshots/task-120-fire-milestone.png)
+  ![FIRE SWR changed](screenshots/task-120-fire-swr-changed.png)
+  ![Tax optimization](screenshots/task-120-tax-optimization.png)
+  ![Income replacement](screenshots/task-120-income-replacement.png)
+  ![Full dashboard](screenshots/task-120-full-dashboard.png)
+- **Notes**: All 10 feature areas from tasks 110-119 verified end-to-end. Full regression suite (407 tests) passes. No pre-existing test failures.
