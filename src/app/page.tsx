@@ -715,6 +715,10 @@ export default function Home() {
     "debt-interest": [
       { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
     ],
+    "debt-to-income": [
+      { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
+      { sourceId: "section-income", label: fmtLabel(totals.monthlyIncome), value: totals.monthlyIncome, sign: "positive" },
+    ],
     "tax": [
       { sourceId: "section-income", label: fmtLabel(totals.monthlyIncome * 12), value: totals.monthlyIncome, sign: "positive" },
     ],

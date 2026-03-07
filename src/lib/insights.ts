@@ -42,6 +42,10 @@ export interface FinancialData {
   annualEmploymentIncome?: number;
   /** Income replacement ratio: % of monthly income sustainable by portfolio via 4% rule */
   incomeReplacementRatio?: number;
+  /** Total monthly debt payments (minimum payments + mortgage). Used for DTI ratio. */
+  monthlyDebtPayments?: number;
+  /** Gross monthly income before tax. Used for DTI ratio calculation. */
+  monthlyGrossIncome?: number;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** How many months shorter the runway is due to withdrawal taxes */
@@ -57,7 +61,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income";
 
 export interface Insight {
   id: string;
@@ -460,6 +464,28 @@ export function generateInsights(data: FinancialData): Insight[] {
       type: "income-replacement",
       message,
       icon: "🎯",
+    });
+  }
+
+  // Debt-to-income (DTI) ratio insight
+  if (data.monthlyDebtPayments !== undefined && data.monthlyGrossIncome && data.monthlyGrossIncome > 0) {
+    const dtiPct = (data.monthlyDebtPayments / data.monthlyGrossIncome) * 100;
+    const dtiFormatted = dtiPct.toFixed(1);
+    let message: string;
+    if (dtiPct < 20) {
+      message = `Your debt-to-income ratio is ${dtiFormatted}% — excellent. Lenders see you as low risk, which means better interest rates on mortgages, car loans, and credit cards.`;
+    } else if (dtiPct < 36) {
+      message = `Your debt-to-income ratio is ${dtiFormatted}% — good. You qualify for most loans and mortgages. Lenders use DTI to decide how much credit to extend and at what rate.`;
+    } else if (dtiPct < 44) {
+      message = `Your debt-to-income ratio is ${dtiFormatted}% — moderate. This is near the upper limit for most mortgage approvals (43%). Reducing monthly debt payments will improve your borrowing options.`;
+    } else {
+      message = `Your debt-to-income ratio is ${dtiFormatted}% — high. Lenders may decline new credit above 43–50% DTI. Paying down high-interest debts first will lower this ratio and open up better financial options.`;
+    }
+    insights.push({
+      id: "debt-to-income",
+      type: "debt-to-income",
+      message,
+      icon: "📊",
     });
   }
 
