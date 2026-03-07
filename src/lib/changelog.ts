@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Mobile guided wizard
+  {
+    version: 115,
+    title: "Mobile guided wizard entry mode",
+    description: "Added a full-screen step-by-step wizard for mobile visitors (< 768px) with no existing data. The 4-step flow collects income, expenses, savings & investments, and debts — each with large touch targets and quick-pick preset buttons. A progress bar shows current position; swipe left/right or tap Next/Back to navigate. Tapping 'See my snapshot' populates all entry fields and transitions to the dashboard. A localStorage flag ensures returning users skip the wizard and go straight to their data. Skip button is always available.",
+    date: "2026-03-06",
+  },
   // Print/PDF export
   {
     version: 114,
