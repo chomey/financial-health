@@ -7,9 +7,13 @@
 -->
 
 ## Summary
-- **Total Tasks**: 124
-- **Completed**: 124
-- **Remaining**: 0
+- **Total Tasks**: 134
+- **Completed**: 125
+- **Remaining**: 9
 - **Last Updated**: 2026-03-07
 
-<!-- All completed task entries archived to PROGRESS-ARCHIVE.md -->
+## Task 125: Fix surplus explainer showing Assets instead of Contributions
+- **Date**: 2026-03-07
+- **Files**: `src/app/page.tsx`, `src/components/DataFlowArrows.tsx`, `tests/unit/surplus-explainer.test.ts`, `tests/e2e/surplus-explainer.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: 1589 passed (6 new T1 in `surplus-explainer.test.ts`, 3 new T2 in `surplus-explainer.spec.ts`)
+- **Screenshots**: ![Surplus explainer with Contributions card](screenshots/task-125-surplus-explainer-contributions.png)

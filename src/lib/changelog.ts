@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Fix surplus explainer showing Assets instead of Contributions
+  {
+    version: 125,
+    title: "Fix surplus explainer: Contributions card",
+    description: "The Monthly Surplus explainer modal now correctly shows a 'Contributions' card (with your monthly contribution amount) instead of incorrectly showing the full 'Assets' section card. The fix uses virtual source IDs (virtual-contributions, virtual-mortgage) so the explainer displays the right label and value without pulling in unrelated section metadata.",
+    date: "2026-03-07",
+  },
   // Foreign currency support for income and expense entries
   {
     version: 124,

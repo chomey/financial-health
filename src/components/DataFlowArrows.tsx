@@ -1045,7 +1045,7 @@ function ExplainerModal({
                       <SourceSummaryCard
                         sourceId={conn.sourceId}
                         sectionName={sectionName}
-                        items={conn.items ?? (meta?.items && !conn.label?.match(/^(mortgage|contributions)\s/) ? meta.items : undefined)}
+                        items={conn.items ?? meta?.items}
                         total={displayValue}
                         isPositive={isPositive}
                         ovalSeed={i + 1}
