@@ -12,21 +12,21 @@ test.describe("T3: Milestone 5 — Comprehensive E2E for Kubera-inspired visuali
     await page.waitForTimeout(1500); // Wait for count-up animations
 
     // ========================================
-    // Step 1: Asset Allocation Chart (Task 48)
+    // Step 1: Net Worth Donut Chart with allocation toggle (Task 48 merged into donut)
     // ========================================
-    const allocationChart = page.getByTestId("allocation-chart").first();
-    await expect(allocationChart).toBeVisible();
+    const donutChartStep1 = page.getByTestId("donut-chart").first();
+    await expect(donutChartStep1).toBeVisible();
 
     // Verify "By Type" is the default view
-    const byTypeBtn = allocationChart.getByRole("button", { name: /By Type/i }).first();
-    const byLiquidityBtn = allocationChart.getByRole("button", {
+    const byTypeBtn = donutChartStep1.getByRole("button", { name: /By Type/i }).first();
+    const byLiquidityBtn = donutChartStep1.getByRole("button", {
       name: /By Liquidity/i,
     }).first();
     await expect(byTypeBtn).toBeVisible();
     await expect(byLiquidityBtn).toBeVisible();
 
     // Chart should have rendered segments (recharts renders SVG)
-    const chartSvg = allocationChart.locator("svg.recharts-surface");
+    const chartSvg = donutChartStep1.locator("svg.recharts-surface");
     await expect(chartSvg.first()).toBeVisible();
 
     // Toggle to "By Liquidity" view
@@ -41,7 +41,7 @@ test.describe("T3: Milestone 5 — Comprehensive E2E for Kubera-inspired visuali
     await byTypeBtn.click();
     await page.waitForTimeout(500);
 
-    await captureScreenshot(page, "task-55-allocation-chart-by-type");
+    await captureScreenshot(page, "task-55-donut-chart-by-type");
 
     // ========================================
     // Step 2: Expense Breakdown Chart (Task 49)
@@ -245,12 +245,12 @@ test.describe("T3: Milestone 5 — Comprehensive E2E for Kubera-inspired visuali
     await captureScreenshot(page, "task-55-full-page-top");
   });
 
-  test("allocation chart toggle changes segments", async ({ page }) => {
+  test("donut chart toggle changes between breakdown and liquidity views", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector('[data-testid="allocation-chart"]');
+    await page.waitForSelector('[data-testid="donut-chart"]');
     await page.waitForTimeout(1000);
 
-    const chart = page.getByTestId("allocation-chart").first();
+    const chart = page.getByTestId("donut-chart").first();
 
     // Get initial chart content in "By Type" view
     const byTypeContent = await chart.textContent();
@@ -267,7 +267,7 @@ test.describe("T3: Milestone 5 — Comprehensive E2E for Kubera-inspired visuali
     // Liquidity view should mention liquid/illiquid concepts
     expect(byLiquidityContent).toMatch(/liquid|illiquid/i);
 
-    await captureScreenshot(page, "task-55-allocation-liquidity-view");
+    await captureScreenshot(page, "task-55-donut-liquidity-view");
   });
 
   test("expense breakdown shows income vs expenses comparison", async ({

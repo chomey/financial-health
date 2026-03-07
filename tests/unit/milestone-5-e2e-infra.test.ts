@@ -27,8 +27,8 @@ describe("Milestone 5 E2E test infrastructure", () => {
 
   it("milestone-5-e2e.spec.ts covers all 7 visualization features", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
-    // Task 48: Asset allocation chart
-    expect(content).toContain("allocation-chart");
+    // Task 48: Asset allocation (merged into donut chart)
+    expect(content).toContain("donut-chart");
     // Task 49: Expense breakdown
     expect(content).toContain("expense-breakdown-chart");
     // Task 50: Net worth chart (donut, replaced waterfall in task 104)
