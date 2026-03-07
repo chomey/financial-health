@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // New insights E2E regression
+  {
+    version: 139,
+    title: "New insights E2E regression",
+    description: "Full Playwright regression test verifying all 5 new insight types (debt-to-income, housing cost, Coast FIRE, net worth milestones, age-based percentile) render correctly across 3 scenarios: young adult with student debt, mid-career homeowner, and high earner. Includes WCAG AA contrast ratio validation ensuring 4.5:1 minimum on all insight cards.",
+    date: "2026-03-07",
+  },
   // Net worth milestones and age-based percentile insight
   {
     version: 138,
@@ -905,7 +912,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "UI Polish", range: [88, 138] as const },
+    { milestone: "UI Polish", range: [88, 139] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
     { milestone: "Spotlight Dimming System", range: [77, 78] as const },

@@ -2458,3 +2458,10 @@
 - **Tests**: T1: 1768 passed (13 new in `housing-cost.test.ts`), T2: 5 passed (new `housing-cost.spec.ts`)
 - **Screenshots**: ![Housing cost insight default](screenshots/task-136-housing-cost-insight-default.png) ![Housing cost explainer modal](screenshots/task-136-housing-cost-explainer-modal.png)
 - **Notes**: Housing cost = mortgage payments (from PropertyEntry) OR rent expense (category containing "rent"). Four tiers: <25% well within budget, 25-30% sweet spot, 31-40% above 30% rule, 41%+ cost-burdened. Fixed pre-existing changelog test failure (task 135 added version 135 but test expected 134).
+
+## Task 138: Net worth milestones and age-based percentile insight
+- **Date**: 2026-03-07
+- **Files**: `src/lib/insights.ts`, `src/components/InsightsPanel.tsx`, `tests/unit/net-worth-milestones.test.ts`, `tests/e2e/net-worth-milestones.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: T1: 1817 passed (26 new in `net-worth-milestones.test.ts`), T2: 6 passed (new `net-worth-milestones.spec.ts`)
+- **Screenshots**: ![Net worth milestone](screenshots/task-138-net-worth-milestone.png) ![Percentile above](screenshots/task-138-net-worth-percentile-above.png) ![Percentile below](screenshots/task-138-net-worth-percentile-below.png)
+- **Notes**: Milestone only fires when `netWorth > 0` (not on empty state). Age group is looked up from Federal Reserve SCF 2022 medians. Both new types added to `INSIGHT_TYPE_SOURCES` in InsightsPanel.
