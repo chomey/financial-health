@@ -1,8 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafaf9;
-  --foreground: #1c1917;
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+
+  /* Semantic accent tokens — soft cyberpunk palette */
+  --accent-positive: #22d3ee;   /* cyan-400 — growth, surplus, positive metrics */
+  --accent-negative: #fb7185;   /* rose-400 — debts, warnings, negative metrics */
+  --accent-info: #a78bfa;       /* violet-400 — info, links, interactive elements */
+  --accent-highlight: #f472b6;  /* pink-400 — celebrations, milestones, achievements */
+  --accent-muted: #94a3b8;      /* slate-400 — secondary text, labels, borders */
+  --accent-surface: rgba(255, 255, 255, 0.05);  /* glass card surface */
+  --accent-border: rgba(255, 255, 255, 0.10);   /* subtle card borders */
 }
 
 @theme inline {
@@ -11,51 +20,51 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Warm greens — positive metrics, growth, success */
-  --color-green-50: #ecfdf5;
-  --color-green-100: #d1fae5;
-  --color-green-200: #a7f3d0;
-  --color-green-300: #6ee7b7;
-  --color-green-400: #34d399;
-  --color-green-500: #10b981;
-  --color-green-600: #059669;
-  --color-green-700: #047857;
-  --color-green-800: #065f46;
-  --color-green-900: #064e3b;
+  /* Cyan — positive metrics, growth, success (replaces green) */
+  --color-cyan-50: #ecfeff;
+  --color-cyan-100: #cffafe;
+  --color-cyan-200: #a5f3fc;
+  --color-cyan-300: #67e8f9;
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-600: #0891b2;
+  --color-cyan-700: #0e7490;
+  --color-cyan-800: #155e75;
+  --color-cyan-900: #164e63;
 
-  /* Teal — secondary positive accent */
-  --color-teal-50: #f0fdfa;
-  --color-teal-100: #ccfbf1;
-  --color-teal-200: #99f6e4;
-  --color-teal-300: #5eead4;
-  --color-teal-400: #2dd4bf;
-  --color-teal-500: #14b8a6;
-  --color-teal-600: #0d9488;
-  --color-teal-700: #0f766e;
+  /* Violet — info, links, interactive elements (replaces blue) */
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
 
-  /* Warm neutrals — backgrounds, surfaces, text */
-  --color-stone-50: #fafaf9;
-  --color-stone-100: #f5f5f4;
-  --color-stone-200: #e7e5e4;
-  --color-stone-300: #d6d3d1;
-  --color-stone-400: #a8a29e;
-  --color-stone-500: #78716c;
-  --color-stone-600: #57534e;
-  --color-stone-700: #44403c;
-  --color-stone-800: #292524;
-  --color-stone-900: #1c1917;
+  /* Rose — debts, warnings, negative values (kept, softened) */
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-200: #fecdd3;
+  --color-rose-300: #fda4af;
+  --color-rose-400: #fb7185;
+  --color-rose-500: #f43f5e;
+  --color-rose-600: #e11d48;
 
-  /* Soft blues — info, links, interactive elements */
-  --color-blue-50: #eff6ff;
-  --color-blue-100: #dbeafe;
-  --color-blue-200: #bfdbfe;
-  --color-blue-300: #93c5fd;
-  --color-blue-400: #60a5fa;
-  --color-blue-500: #3b82f6;
-  --color-blue-600: #2563eb;
-  --color-blue-700: #1d4ed8;
+  /* Slate — backgrounds, surfaces, text (replaces stone) */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
 
-  /* Celebratory gold/amber — achievements, milestones */
+  /* Amber — achievements, milestones (kept for celebrations) */
   --color-amber-50: #fffbeb;
   --color-amber-100: #fef3c7;
   --color-amber-200: #fde68a;
@@ -65,14 +74,49 @@
   --color-amber-600: #d97706;
   --color-amber-700: #b45309;
 
-  /* Soft red — debts, warnings (gentle, not alarming) */
-  --color-rose-50: #fff1f2;
-  --color-rose-100: #ffe4e6;
-  --color-rose-200: #fecdd3;
-  --color-rose-300: #fda4af;
-  --color-rose-400: #fb7185;
-  --color-rose-500: #f43f5e;
-  --color-rose-600: #e11d48;
+  /* Legacy compatibility — green mapped to cyan for gradual migration */
+  --color-green-50: #ecfeff;
+  --color-green-100: #cffafe;
+  --color-green-200: #a5f3fc;
+  --color-green-300: #67e8f9;
+  --color-green-400: #22d3ee;
+  --color-green-500: #06b6d4;
+  --color-green-600: #0891b2;
+  --color-green-700: #0e7490;
+  --color-green-800: #155e75;
+  --color-green-900: #164e63;
+
+  /* Legacy compatibility — stone mapped to slate for gradual migration */
+  --color-stone-50: #f8fafc;
+  --color-stone-100: #f1f5f9;
+  --color-stone-200: #e2e8f0;
+  --color-stone-300: #cbd5e1;
+  --color-stone-400: #94a3b8;
+  --color-stone-500: #64748b;
+  --color-stone-600: #475569;
+  --color-stone-700: #334155;
+  --color-stone-800: #1e293b;
+  --color-stone-900: #0f172a;
+
+  /* Legacy compatibility — blue mapped to violet for gradual migration */
+  --color-blue-50: #f5f3ff;
+  --color-blue-100: #ede9fe;
+  --color-blue-200: #ddd6fe;
+  --color-blue-300: #c4b5fd;
+  --color-blue-400: #a78bfa;
+  --color-blue-500: #8b5cf6;
+  --color-blue-600: #7c3aed;
+  --color-blue-700: #6d28d9;
+
+  /* Legacy compatibility — teal mapped to cyan */
+  --color-teal-50: #ecfeff;
+  --color-teal-100: #cffafe;
+  --color-teal-200: #a5f3fc;
+  --color-teal-300: #67e8f9;
+  --color-teal-400: #22d3ee;
+  --color-teal-500: #06b6d4;
+  --color-teal-600: #0891b2;
+  --color-teal-700: #0e7490;
 }
 
 body {
@@ -113,13 +157,13 @@ body {
   animation: slide-in-up 0.25s ease-out;
 }
 
-/* Celebratory glow pulse for runway >12 months */
+/* Celebratory glow pulse — cyan accent for positive metrics */
 @keyframes glow-pulse {
   0%, 100% {
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3), 0 0 16px rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 8px rgba(34, 211, 238, 0.3), 0 0 16px rgba(34, 211, 238, 0.1);
   }
   50% {
-    box-shadow: 0 0 16px rgba(16, 185, 129, 0.5), 0 0 32px rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.5), 0 0 32px rgba(34, 211, 238, 0.2);
   }
 }
 
@@ -127,13 +171,13 @@ body {
   animation: glow-pulse 3s ease-in-out infinite;
 }
 
-/* Warning glow pulse for underwater/negative surplus */
+/* Warning glow pulse — rose accent for negative metrics */
 @keyframes warning-pulse {
   0%, 100% {
-    box-shadow: 0 0 8px rgba(244, 63, 94, 0.3), 0 0 16px rgba(244, 63, 94, 0.1);
+    box-shadow: 0 0 8px rgba(251, 113, 133, 0.3), 0 0 16px rgba(251, 113, 133, 0.1);
   }
   50% {
-    box-shadow: 0 0 16px rgba(244, 63, 94, 0.5), 0 0 32px rgba(244, 63, 94, 0.2);
+    box-shadow: 0 0 16px rgba(251, 113, 133, 0.5), 0 0 32px rgba(251, 113, 133, 0.2);
   }
 }
 
@@ -275,6 +319,7 @@ body {
   /* White background */
   body {
     background: white !important;
+    color: #1c1917 !important;
   }
 
   /* Fix recharts responsive containers — they collapse to 0 height
@@ -311,10 +356,10 @@ body {
   }
 }
 
-/* Thin scrollbar for source summary cards */
+/* Thin scrollbar for source summary cards — updated for dark theme */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: #a8a29e transparent;
+  scrollbar-color: #475569 transparent;
 }
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
@@ -323,7 +368,6 @@ body {
   background: transparent;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: #a8a29e;
+  background-color: #475569;
   border-radius: 3px;
 }
-
