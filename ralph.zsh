@@ -262,8 +262,18 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   # Build the prompt from PROMPT.md
   prompt=$(cat "$PROMPT_FILE")
 
+  # Pick model: Opus for MILESTONE/E2E/complex tasks, Sonnet for everything else
+  next_task=$(grep '^\- \[ \]' "$TASKS_FILE" | head -n 1)
+  if echo "$next_task" | grep -qiE '\[MILESTONE\]|\[E2E\]'; then
+    model="opus"
+    print "${CYAN}  Model: opus (milestone/E2E task)${NC}"
+  else
+    model="sonnet"
+    print "${CYAN}  Model: sonnet${NC}"
+  fi
+
   # Run Claude with the prompt, passing project context via CLAUDE.md
-  claude --print --dangerously-skip-permissions "$prompt"
+  claude --print --dangerously-skip-permissions --model "$model" "$prompt"
 
   # Check exit code
   if [[ $? -ne 0 ]]; then
