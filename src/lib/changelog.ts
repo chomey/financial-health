@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Foreign currency support for income and expense entries
+  {
+    version: 124,
+    title: "Foreign currency income & expenses",
+    description: "Income and expense items now support a CAD/USD currency toggle, matching the existing behaviour on assets and debts. Each row shows a compact currency badge that can be clicked to mark the amount as foreign currency. When toggled, the converted home-currency equivalent is shown inline. Section totals and all downstream calculations (tax, surplus, net worth) automatically convert foreign amounts using the live FX rate.",
+    date: "2026-03-07",
+  },
   // Mortgage burndown line on projection chart
   {
     version: 123,

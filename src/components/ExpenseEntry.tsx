@@ -3,11 +3,15 @@
 import { useState, useRef, useEffect } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
+import CurrencyBadge from "@/components/CurrencyBadge";
+import type { SupportedCurrency, FxRates } from "@/lib/currency";
+import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 
 export interface ExpenseItem {
   id: string;
   category: string;
   amount: number;
+  currency?: SupportedCurrency;
 }
 
 const CATEGORY_SUGGESTIONS = [
@@ -59,9 +63,11 @@ interface ExpenseEntryProps {
   onProvincialTaxOverride?: (monthly: number | undefined) => void;
   country?: "CA" | "US";
   isUnderwater?: boolean;
+  homeCurrency?: SupportedCurrency;
+  fxRates?: FxRates;
 }
 
-export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0, surplus = 0, surplusTargetName, federalTax = 0, provincialStateTax = 0, computedFederalTax, computedProvincialStateTax, federalTaxOverride, provincialTaxOverride, onFederalTaxOverride, onProvincialTaxOverride, country = "CA", isUnderwater = false }: ExpenseEntryProps = {}) {
+export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0, surplus = 0, surplusTargetName, federalTax = 0, provincialStateTax = 0, computedFederalTax, computedProvincialStateTax, federalTaxOverride, provincialTaxOverride, onFederalTaxOverride, onProvincialTaxOverride, country = "CA", isUnderwater = false, homeCurrency, fxRates }: ExpenseEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
   const [items, setItems] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
@@ -120,8 +126,10 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const hc = homeCurrency ?? "CAD";
+  const rates = fxRates ?? FALLBACK_RATES;
   const mult = viewMode === "yearly" ? 12 : 1;
-  const itemsTotal = items.reduce((sum, item) => sum + item.amount, 0);
+  const itemsTotal = items.reduce((sum, item) => sum + convertToHome(item.amount, item.currency ?? hc, hc, rates), 0);
   const totalTax = federalTax + provincialStateTax;
   const total = itemsTotal + investmentContributions + mortgagePayments + totalTax;
   const provStateLabel = country === "US" ? "State" : "Provincial";
@@ -278,8 +286,8 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
         <div className="space-y-1" role="list" aria-label="Expense items">
           {items.map((item) => (
             <DataFlowSourceItem key={item.id} id={`expense:${item.id}`} label={item.category} value={item.amount}>
+            <div role="listitem">
             <div
-              role="listitem"
               className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-stone-50"
             >
               <div className="flex flex-1 items-center gap-3 min-w-0">
@@ -384,6 +392,21 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   />
                 </svg>
               </button>
+            </div>
+            {/* Secondary detail row: currency badge */}
+            {homeCurrency && fxRates && (
+              <div className="flex items-center gap-2 px-5 pb-1" data-testid={`expense-details-${item.id}`}>
+                <CurrencyBadge
+                  currency={item.currency}
+                  homeCurrency={homeCurrency}
+                  amount={item.amount}
+                  fxRates={fxRates}
+                  onCurrencyChange={(cu) => {
+                    setItems((prev) => prev.map((e) => e.id === item.id ? { ...e, currency: cu } : e));
+                  }}
+                />
+              </div>
+            )}
             </div>
             </DataFlowSourceItem>
           ))}
