@@ -312,20 +312,20 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
   };
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
-      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-stone-800">
+    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-lg shadow-black/20 transition-all duration-200 hover:shadow-xl hover:shadow-black/30 hover:border-white/15 hover:-translate-y-0.5 sm:p-4">
+      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-200">
         <span aria-hidden="true">💰</span>
         Income
       </h2>
 
       {items.length === 0 && !addingNew && investmentReturns.length === 0 && (
         <div className="flex flex-col items-center py-4 text-center" data-testid="income-empty-state">
-          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-400">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-400">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
             </svg>
           </div>
-          <p className="text-sm text-stone-400">
+          <p className="text-sm text-slate-500">
             Enter your income sources to understand your monthly cash flow.
           </p>
         </div>
@@ -340,8 +340,8 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
               role="listitem"
               className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 ${
                 item.incomeType === "capital-gains"
-                  ? "bg-amber-50/50 hover:bg-amber-50 border-l-2 border-amber-400"
-                  : "hover:bg-stone-50"
+                  ? "bg-amber-400/5 hover:bg-amber-400/10 border-l-2 border-amber-400/60"
+                  : "hover:bg-white/5"
               }`}
             >
               <div className="flex flex-1 items-center gap-3 min-w-0">
@@ -362,14 +362,14 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                         }, 150);
                       }}
                       onKeyDown={handleEditKeyDown}
-                      className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                      className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                       aria-label="Edit category name"
                     />
                     {showSuggestions &&
                       filteredSuggestions(editValue, item.incomeType).length > 0 && (
                         <div
                           ref={suggestionsRef}
-                          className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
+                          className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
                         >
                           {filteredSuggestions(editValue, item.incomeType).map((suggestion) => (
                             <button
@@ -379,7 +379,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                                 e.preventDefault();
                                 commitEdit(suggestion);
                               }}
-                              className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                              className="w-full px-3 py-1.5 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300"
                             >
                               {suggestion}
                             </button>
@@ -393,7 +393,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                     onClick={() =>
                       startEdit(item.id, "category", item.category)
                     }
-                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-stone-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                     aria-label={`Edit category for ${item.category}`}
                   >
                     {item.category}
@@ -409,7 +409,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                    className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                     aria-label={`Edit amount for ${item.category}`}
                   />
                 ) : (
@@ -418,14 +418,14 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                     onClick={() =>
                       startEdit(item.id, "amount", String(item.amount))
                     }
-                    className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-200"
+                    className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-emerald-400/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                     aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
                   >
-                    <div className="text-sm font-medium text-green-700">{formatCurrency(item.amount)}{FREQUENCY_SHORT_LABELS[item.frequency ?? "monthly"]}</div>
+                    <div className="text-sm font-medium text-emerald-400">{formatCurrency(item.amount)}{FREQUENCY_SHORT_LABELS[item.frequency ?? "monthly"]}</div>
                     {(item.frequency ?? "monthly") === "monthly" ? (
-                      <div className="text-xs text-stone-400">{formatCurrency(item.amount * 12)}/yr</div>
+                      <div className="text-xs text-slate-500">{formatCurrency(item.amount * 12)}/yr</div>
                     ) : (
-                      <div className="text-xs text-stone-400">{formatCurrency(normalizeToMonthly(item.amount, item.frequency))}/mo</div>
+                      <div className="text-xs text-slate-500">{formatCurrency(normalizeToMonthly(item.amount, item.frequency))}/mo</div>
                     )}
                   </button>
                 )}
@@ -434,7 +434,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                 <select
                   value={item.frequency ?? "monthly"}
                   onChange={(e) => changeFrequency(item.id, e.target.value as IncomeFrequency)}
-                  className="w-auto min-h-[44px] sm:min-h-0 rounded-md border border-stone-200 bg-stone-50 px-1.5 py-1 text-xs text-stone-500 transition-all duration-150 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 cursor-pointer"
+                  className="w-auto min-h-[44px] sm:min-h-0 rounded-md border border-white/10 bg-slate-800 px-1.5 py-1 text-xs text-slate-400 transition-all duration-150 hover:border-cyan-500/30 hover:bg-cyan-500/5 hover:text-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 cursor-pointer"
                   aria-label={`Change frequency for ${item.category}`}
                   data-testid={`frequency-${item.id}`}
                 >
@@ -449,10 +449,10 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                 <select
                   value={item.incomeType ?? "employment"}
                   onChange={(e) => changeIncomeType(item.id, e.target.value as IncomeType)}
-                  className={`w-auto min-h-[44px] sm:min-h-0 rounded-md border px-1.5 py-1 text-xs transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 cursor-pointer ${
+                  className={`w-auto min-h-[44px] sm:min-h-0 rounded-md border px-1.5 py-1 text-xs transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 cursor-pointer ${
                     item.incomeType === "capital-gains"
-                      ? "border-amber-300 bg-amber-50 text-amber-700 hover:border-amber-400 hover:bg-amber-100"
-                      : "border-stone-200 bg-stone-50 text-stone-500 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
+                      ? "border-amber-500/30 bg-amber-500/10 text-amber-400 hover:border-amber-400/50 hover:bg-amber-500/15"
+                      : "border-white/10 bg-slate-800 text-slate-400 hover:border-cyan-500/30 hover:bg-cyan-500/5 hover:text-cyan-400"
                   }`}
                   aria-label={`Change income type for ${item.category}`}
                   data-testid={`income-type-${item.id}`}
@@ -469,7 +469,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
               <button
                 type="button"
                 onClick={() => deleteItem(item.id)}
-                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-stone-300 sm:opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 sm:group-hover:opacity-100"
+                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 sm:group-hover:opacity-100"
                 aria-label={`Delete ${item.category}`}
               >
                 <svg
@@ -509,24 +509,24 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
       {/* Auto-computed investment returns */}
       {investmentReturns.length > 0 && (
         <div data-testid="investment-returns-auto-section">
-          <div className="mt-2 mb-1 border-t border-dashed border-stone-200 pt-2 px-3">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Auto-computed</span>
+          <div className="mt-2 mb-1 border-t border-dashed border-white/10 pt-2 px-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Auto-computed</span>
           </div>
           {investmentReturns.map((r) => (
             <div
               key={r.label}
-              className="flex items-center justify-between rounded-lg px-3 py-2 bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 mx-1"
+              className="flex items-center justify-between rounded-lg px-3 py-2 bg-slate-800/60 border border-dashed border-white/10 mx-1"
               data-testid="investment-return-row"
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm text-stone-500">{r.label} returns</span>
-                <span className="inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide" title="Auto-computed from your investment ROI">
+                <span className="text-sm text-slate-400">{r.label} returns</span>
+                <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 uppercase tracking-wide" title="Auto-computed from your investment ROI">
                   auto
                 </span>
               </div>
               <div className="text-right">
-                <div className="text-sm font-medium text-green-600">{formatCurrency(r.amount)}/mo</div>
-                <div className="text-xs text-stone-400">{formatCurrency(r.amount * 12)}/yr</div>
+                <div className="text-sm font-medium text-emerald-400">{formatCurrency(r.amount)}/mo</div>
+                <div className="text-xs text-slate-500">{formatCurrency(r.amount * 12)}/yr</div>
               </div>
             </div>
           ))}
@@ -535,7 +535,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
 
       {/* Add new income row */}
       {addingNew && (
-        <div className="mt-2 rounded-lg border border-dashed border-blue-200 bg-blue-50/50 px-3 py-2 animate-in">
+        <div className="mt-2 rounded-lg border border-dashed border-cyan-500/20 bg-cyan-500/5 px-3 py-2 animate-in">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <div className="relative flex-1 min-w-0">
               <input
@@ -552,12 +552,12 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
                 onKeyDown={(e) => handleNewKeyDown(e, "category")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New income category"
               />
               {showNewSuggestions &&
                 filteredSuggestions(newCategory, newIncomeType).length > 0 && (
-                  <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                  <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
                     {filteredSuggestions(newCategory, newIncomeType).map((suggestion) => (
                       <button
                         key={suggestion}
@@ -568,7 +568,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                           setShowNewSuggestions(false);
                           newAmountRef.current?.focus();
                         }}
-                        className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
+                        className="w-full px-3 py-2 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300 sm:py-1.5"
                       >
                         {suggestion}
                       </button>
@@ -584,13 +584,13 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                 value={newAmount}
                 onChange={(e) => setNewAmount(e.target.value)}
                 onKeyDown={(e) => handleNewKeyDown(e, "amount")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-right text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New income amount"
               />
               <select
                 value={newFrequency}
                 onChange={(e) => setNewFrequency(e.target.value as IncomeFrequency)}
-                className="min-h-[44px] sm:min-h-0 rounded-md border border-blue-300 bg-white px-2 py-2 text-xs text-stone-600 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:py-1 cursor-pointer"
+                className="min-h-[44px] sm:min-h-0 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-2 text-xs text-slate-300 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:py-1 cursor-pointer"
                 aria-label="New income frequency"
                 data-testid="new-income-frequency"
               >
@@ -603,7 +603,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
               <select
                 value={newIncomeType}
                 onChange={(e) => setNewIncomeType(e.target.value as IncomeType)}
-                className="min-h-[44px] sm:min-h-0 rounded-md border border-blue-300 bg-white px-2 py-2 text-xs text-stone-600 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:py-1 cursor-pointer"
+                className="min-h-[44px] sm:min-h-0 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-2 text-xs text-slate-300 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:py-1 cursor-pointer"
                 aria-label="New income type"
                 data-testid="new-income-type"
               >
@@ -616,7 +616,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
               <button
                 type="button"
                 onClick={addItem}
-                className="min-h-[44px] rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
                 aria-label="Confirm add income"
               >
                 Add
@@ -630,7 +630,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                   setNewIncomeType("employment");
                   setShowNewSuggestions(false);
                 }}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
                 aria-label="Cancel adding income"
               >
                 <svg
@@ -652,10 +652,10 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
       )}
 
       {/* Total and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3">
+      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
         <span
-          className={`text-sm font-medium text-stone-500 transition-all duration-300 ${
-            animatingTotal ? "scale-110 text-green-600" : ""
+          className={`text-sm font-medium text-slate-400 transition-all duration-300 ${
+            animatingTotal ? "scale-110 text-emerald-400" : ""
           }`}
         >
           Monthly: <span data-testid="income-monthly-total">{formatCurrency(total)}</span>
@@ -666,7 +666,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition-all duration-150 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 active:bg-blue-100"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 active:bg-cyan-500/20"
           >
             + Add Income
           </button>

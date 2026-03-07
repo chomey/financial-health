@@ -367,20 +367,20 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
   const totalEquity = properties.reduce((sum, p) => sum + Math.max(0, p.value - p.mortgage), 0);
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
-      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-stone-800">
+    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-lg shadow-black/20 transition-all duration-200 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 hover:border-white/15 sm:p-4">
+      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-200">
         <span aria-hidden="true">{properties.some(p => (p.appreciation ?? getDefaultAppreciation(p.name) ?? 0) < 0) ? "🏠🚗" : "🏠"}</span>
         Property
       </h2>
 
       {properties.length === 0 && !addingNew ? (
         <div className="flex flex-col items-center py-4 text-center" data-testid="property-empty-state">
-          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-400">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-400">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
           </div>
-          <p className="text-sm text-stone-400">
+          <p className="text-sm text-slate-500">
             Add your home or other properties to see your full net worth.
           </p>
         </div>
@@ -392,7 +392,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
               <DataFlowSourceItem key={property.id} id={`property:${property.id}`} label={property.name} value={equity}>
               <div
                 role="listitem"
-                className="group rounded-lg border border-stone-100 px-3 py-2 transition-colors duration-150 hover:bg-stone-50"
+                className="group rounded-lg border border-white/10 px-3 py-2 transition-colors duration-150 hover:bg-white/5"
               >
                 {/* Property name row */}
                 <div className="flex items-center justify-between">
@@ -405,14 +405,14 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                         onChange={(e) => setEditValue(e.target.value)}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
-                        className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                        className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                         aria-label="Edit property name"
                       />
                     ) : (
                       <button
                         type="button"
                         onClick={() => startEdit(property.id, "name", property.name)}
-                        className="min-h-[44px] sm:min-h-0 text-left text-sm font-medium text-stone-800 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        className="min-h-[44px] sm:min-h-0 text-left text-sm font-medium text-slate-200 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                         aria-label={`Edit name for ${property.name}`}
                       >
                         <span className="mr-1" aria-hidden="true">{getPropertyIcon(property.appreciation, property.name)}</span>
@@ -424,7 +424,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           return (
                             <span
                               className={`ml-1.5 inline-block rounded px-1 py-0.5 text-[10px] font-medium ${
-                                isPositive ? "bg-green-50 text-green-600" : "bg-rose-50 text-rose-600"
+                                isPositive ? "bg-emerald-500/15 text-emerald-400" : "bg-rose-500/15 text-rose-400"
                               }`}
                               data-testid={`appreciation-badge-${property.id}`}
                             >
@@ -438,7 +438,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                   <button
                     type="button"
                     onClick={() => deleteProperty(property.id)}
-                    className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-stone-300 sm:opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 sm:group-hover:opacity-100"
+                    className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-600 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-400/20 sm:group-hover:opacity-100"
                     aria-label={`Delete ${property.name}`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -451,7 +451,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                 <div className="mt-1 grid grid-cols-3 gap-2 text-xs">
                   {/* Value */}
                   <div>
-                    <span className="text-stone-400">Value</span>
+                    <span className="text-slate-500">Value</span>
                     {editingId === property.id && editingField === "value" ? (
                       <input
                         ref={inputRef}
@@ -460,14 +460,14 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                         onChange={(e) => setEditValue(e.target.value)}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
-                        className="mt-0.5 w-full rounded-md border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                        className="mt-0.5 w-full rounded-md border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                         aria-label={`Edit value for ${property.name}`}
                       />
                     ) : (
                       <button
                         type="button"
                         onClick={() => startEdit(property.id, "value", String(property.value))}
-                        className="mt-0.5 block w-full min-h-[44px] sm:min-h-0 text-left text-xs font-medium text-blue-700 rounded px-1.5 py-1 sm:py-0.5 transition-colors duration-150 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        className="mt-0.5 block w-full min-h-[44px] sm:min-h-0 text-left text-xs font-medium text-emerald-400 rounded px-1.5 py-1 sm:py-0.5 transition-colors duration-150 hover:bg-emerald-400/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                         aria-label={`Edit value for ${property.name}, currently ${formatCurrency(property.value)}`}
                       >
                         {formatCurrency(property.value)}
@@ -477,7 +477,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
 
                   {/* Mortgage */}
                   <div>
-                    <span className="text-stone-400">Mortgage</span>
+                    <span className="text-slate-500">Mortgage</span>
                     {editingId === property.id && editingField === "mortgage" ? (
                       <input
                         ref={inputRef}
@@ -486,14 +486,14 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                         onChange={(e) => setEditValue(e.target.value)}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
-                        className="mt-0.5 w-full rounded-md border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                        className="mt-0.5 w-full rounded-md border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                         aria-label={`Edit mortgage for ${property.name}`}
                       />
                     ) : (
                       <button
                         type="button"
                         onClick={() => startEdit(property.id, "mortgage", String(property.mortgage))}
-                        className="mt-0.5 block w-full min-h-[44px] sm:min-h-0 text-left text-xs font-medium text-rose-600 rounded px-1.5 py-1 sm:py-0.5 transition-colors duration-150 hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-200"
+                        className="mt-0.5 block w-full min-h-[44px] sm:min-h-0 text-left text-xs font-medium text-rose-400 rounded px-1.5 py-1 sm:py-0.5 transition-colors duration-150 hover:bg-rose-400/10 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
                         aria-label={`Edit mortgage for ${property.name}, currently ${formatCurrency(property.mortgage)}`}
                       >
                         {formatCurrency(property.mortgage)}
@@ -503,8 +503,8 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
 
                   {/* Equity (derived, not editable) */}
                   <div>
-                    <span className="text-stone-400">Equity</span>
-                    <p className="mt-0.5 px-1.5 py-1 sm:py-0.5 text-xs font-medium text-green-700" data-testid={`equity-${property.id}`}>
+                    <span className="text-slate-500">Equity</span>
+                    <p className="mt-0.5 px-1.5 py-1 sm:py-0.5 text-xs font-medium text-emerald-400" data-testid={`equity-${property.id}`}>
                       {formatCurrency(equity)}
                     </p>
                   </div>
@@ -557,7 +557,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             onChange={(e) => setEditValue(e.target.value)}
                             onBlur={commitEdit}
                             onKeyDown={handleEditKeyDown}
-                            className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                            className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
                             aria-label={`Edit interest rate for ${property.name}`}
                             placeholder="e.g. 5"
                           />
@@ -565,10 +565,10 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           <button
                             type="button"
                             onClick={() => startEdit(property.id, "interestRate", String(property.interestRate ?? ""))}
-                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
                               hasRate
-                                ? "bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                : "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
+                                ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
+                                : "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
                             }`}
                             aria-label={`Edit interest rate for ${property.name}${hasRate ? `, currently ${rate}%` : ""}`}
                             data-testid={`rate-badge-${property.id}`}
@@ -586,7 +586,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             onChange={(e) => setEditValue(e.target.value)}
                             onBlur={commitEdit}
                             onKeyDown={handleEditKeyDown}
-                            className="w-24 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                            className="w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
                             aria-label={`Edit monthly payment for ${property.name}`}
                             placeholder="e.g. 1500"
                           />
@@ -594,12 +594,12 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           <button
                             type="button"
                             onClick={() => startEdit(property.id, "monthlyPayment", String(property.monthlyPayment ?? ""))}
-                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
                               hasPayment
-                                ? "bg-green-50 text-green-600 hover:bg-green-100"
+                                ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
                                 : suggestedPayment > 0
-                                  ? "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
-                                  : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                                  ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
+                                  : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                             }`}
                             aria-label={`Edit monthly payment for ${property.name}${hasPayment ? `, currently ${formatCurrency(payment!)}` : ""}`}
                             data-testid={`payment-badge-${property.id}`}
@@ -621,7 +621,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             onChange={(e) => setEditValue(e.target.value)}
                             onBlur={commitEdit}
                             onKeyDown={handleEditKeyDown}
-                            className="w-16 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                            className="w-16 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
                             aria-label={`Edit amortization years for ${property.name}`}
                             placeholder="e.g. 25"
                           />
@@ -629,10 +629,10 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           <button
                             type="button"
                             onClick={() => startEdit(property.id, "amortizationYears", String(property.amortizationYears ?? ""))}
-                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-violet-500/20 ${
                               hasAmort
-                                ? "bg-purple-50 text-purple-600 hover:bg-purple-100"
-                                : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                                ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
+                                : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                             }`}
                             aria-label={`Edit amortization for ${property.name}${hasAmort ? `, currently ${amortYears} years` : ""}`}
                             data-testid={`amort-badge-${property.id}`}
@@ -652,7 +652,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                               onChange={(e) => setEditValue(e.target.value)}
                               onBlur={commitEdit}
                               onKeyDown={handleEditKeyDown}
-                              className="w-16 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                              className="w-16 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
                               aria-label={`Edit year purchased for ${property.name}`}
                               placeholder="e.g. 2020"
                             />
@@ -660,10 +660,10 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             <button
                               type="button"
                               onClick={() => startEdit(property.id, "yearPurchased", String(property.yearPurchased ?? ""))}
-                              className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                              className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-amber-500/20 ${
                                 hasYearPurchased
-                                  ? "bg-orange-50 text-orange-600 hover:bg-orange-100"
-                                  : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                                  ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                                  : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                               }`}
                               aria-label={`Edit year purchased for ${property.name}${hasYearPurchased ? `, currently ${property.yearPurchased}` : ""}`}
                               data-testid={`year-badge-${property.id}`}
@@ -687,7 +687,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                               onChange={(e) => setEditValue(e.target.value)}
                               onBlur={commitEdit}
                               onKeyDown={handleEditKeyDown}
-                              className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                              className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
                               aria-label={`Edit appreciation rate for ${property.name}`}
                               placeholder="e.g. 3 or -15"
                             />
@@ -695,14 +695,14 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             <button
                               type="button"
                               onClick={() => startEdit(property.id, "appreciation", String(property.appreciation ?? ""))}
-                              className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                              className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
                                 hasAppreciation
                                   ? isNegative
-                                    ? "bg-rose-50 text-rose-600 hover:bg-rose-100"
-                                    : "bg-green-50 text-green-600 hover:bg-green-100"
+                                    ? "bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+                                    : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
                                   : defaultAp !== undefined
-                                    ? "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
-                                    : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                                    ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
+                                    : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                               }`}
                               aria-label={`Edit appreciation rate for ${property.name}${hasAppreciation ? `, currently ${property.appreciation}%` : ""}`}
                               data-testid={`appreciation-edit-${property.id}`}
@@ -719,17 +719,17 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
 
                       {/* Computed mortgage info */}
                       {showComputed && breakdown && amortInfo && amortInfo.payoffMonths > 0 && (
-                        <div className="mx-1 rounded-md bg-stone-50 px-2 py-1.5 text-[11px] text-stone-500 space-y-0.5" data-testid={`mortgage-info-${property.id}`}>
+                        <div className="mx-1 rounded-md bg-slate-800/60 border border-dashed border-white/10 px-2 py-1.5 text-[11px] text-slate-500 space-y-0.5" data-testid={`mortgage-info-${property.id}`}>
                           <div className="flex justify-between">
                             <span>Current month: interest</span>
                             <span className="font-medium text-rose-500">{formatCurrency(Math.round(breakdown.interestPortion))}</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Current month: principal</span>
-                            <span className="font-medium text-green-600">{formatCurrency(Math.round(breakdown.principalPortion))}</span>
+                            <span className="font-medium text-emerald-400">{formatCurrency(Math.round(breakdown.principalPortion))}</span>
                           </div>
                           {schedule.length > 1 && (
-                            <div className="flex justify-between border-t border-stone-200 pt-0.5 mt-0.5">
+                            <div className="flex justify-between border-t border-white/10 pt-0.5 mt-0.5">
                               <span>First year avg interest</span>
                               <span className="font-medium text-rose-400">{formatCurrency(Math.round(schedule[0].interestPaid / 12))}/mo</span>
                             </div>
@@ -741,25 +741,25 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             return (
                               <div className="flex justify-between">
                                 <span>Last year avg interest</span>
-                                <span className="font-medium text-green-500">{formatCurrency(avgMonthlyInterest)}/mo</span>
+                                <span className="font-medium text-emerald-400">{formatCurrency(avgMonthlyInterest)}/mo</span>
                               </div>
                             );
                           })()}
                           {amortInfo.totalInterest > 0 && (
-                            <div className="flex justify-between border-t border-stone-200 pt-0.5 mt-0.5">
+                            <div className="flex justify-between border-t border-white/10 pt-0.5 mt-0.5">
                               <span>Total interest remaining</span>
-                              <span className="font-medium text-stone-600">{formatCurrency(Math.round(amortInfo.totalInterest))}</span>
+                              <span className="font-medium text-slate-400">{formatCurrency(Math.round(amortInfo.totalInterest))}</span>
                             </div>
                           )}
                           {property.yearPurchased !== undefined && (
                             <div className="flex justify-between">
                               <span>Remaining term</span>
-                              <span className="font-medium text-stone-600">{remainingYears}yr of {property.amortizationYears ?? 25}yr</span>
+                              <span className="font-medium text-slate-400">{remainingYears}yr of {property.amortizationYears ?? 25}yr</span>
                             </div>
                           )}
                           <div className="flex justify-between">
                             <span>Estimated payoff</span>
-                            <span className="font-medium text-stone-600">
+                            <span className="font-medium text-slate-400">
                               {(() => {
                                 const payoffDate = new Date();
                                 payoffDate.setMonth(payoffDate.getMonth() + amortInfo.payoffMonths);
@@ -769,20 +769,20 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           </div>
                           {/* View schedule expandable */}
                           {schedule.length > 0 && (
-                            <div className="border-t border-stone-200 pt-1 mt-1">
+                            <div className="border-t border-white/10 pt-1 mt-1">
                               <button
                                 type="button"
                                 onClick={() => setExpandedSchedule(expandedSchedule === property.id ? null : property.id)}
-                                className="text-[11px] text-blue-500 hover:text-blue-700 transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-blue-200 rounded px-1"
+                                className="text-[11px] text-cyan-400 hover:text-cyan-300 transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-cyan-500/20 rounded px-1"
                                 data-testid={`view-schedule-${property.id}`}
                               >
                                 {expandedSchedule === property.id ? "Hide schedule" : "View schedule"}
                               </button>
                               {expandedSchedule === property.id && (
                                 <div className="mt-1 overflow-x-auto" data-testid={`schedule-table-${property.id}`}>
-                                  <table className="w-full text-[10px] text-stone-500">
+                                  <table className="w-full text-[10px] text-slate-500">
                                     <thead>
-                                      <tr className="border-b border-stone-200">
+                                      <tr className="border-b border-white/10">
                                         <th className="py-0.5 text-left font-medium">Year</th>
                                         <th className="py-0.5 text-right font-medium">Interest</th>
                                         <th className="py-0.5 text-right font-medium">Principal</th>
@@ -791,10 +791,10 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                                     </thead>
                                     <tbody>
                                       {schedule.map((row) => (
-                                        <tr key={row.year} className="border-b border-stone-100 last:border-0">
+                                        <tr key={row.year} className="border-b border-white/5 last:border-0">
                                           <td className="py-0.5">{row.year}</td>
                                           <td className="py-0.5 text-right text-rose-400">{formatCurrency(row.interestPaid)}</td>
-                                          <td className="py-0.5 text-right text-green-500">{formatCurrency(row.principalPaid)}</td>
+                                          <td className="py-0.5 text-right text-emerald-400">{formatCurrency(row.principalPaid)}</td>
                                           <td className="py-0.5 text-right">{formatCurrency(row.endingBalance)}</td>
                                         </tr>
                                       ))}
@@ -807,7 +807,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                         </div>
                       )}
                       {showComputed && amortInfo && amortInfo.payoffMonths === -1 && (
-                        <div className="mx-1 rounded-md bg-amber-50 px-2 py-1.5 text-[11px] text-amber-600" data-testid={`mortgage-warning-${property.id}`}>
+                        <div className="mx-1 rounded-md bg-amber-500/10 border border-amber-500/20 px-2 py-1.5 text-[11px] text-amber-400" data-testid={`mortgage-warning-${property.id}`}>
                           Payment doesn&apos;t cover monthly interest — consider increasing your payment.
                         </div>
                       )}
@@ -823,7 +823,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
 
       {/* Add new property row */}
       {addingNew && (
-        <div className="mt-2 rounded-lg border border-dashed border-blue-200 bg-blue-50/50 px-3 py-2 animate-in">
+        <div className="mt-2 rounded-lg border border-dashed border-cyan-500/20 bg-cyan-500/5 px-3 py-2 animate-in">
           <div className="flex flex-col gap-2">
             <input
               ref={newNameRef}
@@ -832,7 +832,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => handleNewKeyDown(e, "name")}
-              className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+              className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
               aria-label="New property name"
             />
             <div className="grid grid-cols-2 gap-2">
@@ -843,7 +843,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                 value={newValue}
                 onChange={(e) => setNewValue(e.target.value)}
                 onKeyDown={(e) => handleNewKeyDown(e, "value")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New property value"
               />
               <input
@@ -853,7 +853,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                 value={newMortgage}
                 onChange={(e) => setNewMortgage(e.target.value)}
                 onKeyDown={(e) => handleNewKeyDown(e, "mortgage")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New property mortgage"
               />
             </div>
@@ -861,7 +861,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
               <button
                 type="button"
                 onClick={addProperty}
-                className="min-h-[44px] rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
                 aria-label="Confirm add property"
               >
                 Add
@@ -877,7 +877,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                   setNewMonthlyPayment("");
                   setNewAmortization("");
                 }}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/10"
                 aria-label="Cancel adding property"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -890,15 +890,15 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
       )}
 
       {/* Total equity and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3">
-        <span className="text-sm font-medium text-stone-500">
+      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+        <span className="text-sm font-medium text-slate-400">
           Total Equity: {formatCurrency(totalEquity)}
         </span>
         {!addingNew && (
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition-all duration-150 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 active:bg-blue-100"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 active:bg-cyan-500/20"
           >
             + Add Property
           </button>

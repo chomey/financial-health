@@ -343,20 +343,20 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
   const total = assets.filter((a) => !a.computed).reduce((sum, a) => sum + convertToHome(a.amount, a.currency ?? hc, hc, rates), 0);
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
-      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-stone-800">
+    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-lg shadow-black/20 transition-all duration-200 hover:shadow-xl hover:shadow-black/30 hover:border-white/15 hover:-translate-y-0.5 sm:p-4">
+      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-200">
         <span aria-hidden="true">📊</span>
         Assets
       </h2>
 
       {assets.length === 0 && !addingNew ? (
         <div className="flex flex-col items-center py-4 text-center" data-testid="asset-empty-state">
-          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-400">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-400">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <p className="text-sm text-stone-400">
+          <p className="text-sm text-slate-500">
             Add your savings, investments, and property to see your full picture.
           </p>
         </div>
@@ -375,12 +375,12 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
             <DataFlowSourceItem key={asset.id} id={`asset:${asset.id}`} label={asset.category} value={asset.amount}>
             <div role="listitem">
               {isFirstComputed && (
-                <div className="mt-2 mb-1 border-t border-dashed border-stone-200 pt-2 px-3">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Auto-computed</span>
+                <div className="mt-2 mb-1 border-t border-dashed border-white/10 pt-2 px-3">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Auto-computed</span>
                 </div>
               )}
               <div
-                className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 ${isComputed ? "bg-gradient-to-r from-stone-50/80 to-stone-100/50 border border-dashed border-stone-200 rounded-lg mx-1" : "hover:bg-stone-50"}`}
+                className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 ${isComputed ? "bg-slate-800/60 border border-dashed border-white/10 rounded-lg mx-1" : "hover:bg-white/5"}`}
               >
                 <div className="flex flex-1 items-center gap-3 min-w-0">
                   {/* Category */}
@@ -401,18 +401,18 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           }, 150);
                         }}
                         onKeyDown={handleEditKeyDown}
-                        className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                        className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                         aria-label="Edit category name"
                       />
                       {showSuggestions &&
                         filteredGroupedSuggestions(editValue).length > 0 && (
                           <div
                             ref={suggestionsRef}
-                            className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
+                            className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
                           >
                             {filteredGroupedSuggestions(editValue).map((group) => (
                               <div key={group.label}>
-                                <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
+                                <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500" data-testid="suggestion-group-header">{group.label}</div>
                                 {group.items.map((suggestion) => (
                                   <button
                                     key={suggestion}
@@ -421,7 +421,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                                       e.preventDefault();
                                       commitEdit(suggestion);
                                     }}
-                                    className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                                    className="w-full px-3 py-1.5 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300"
                                   >
                                     {getAssetCategoryFlag(suggestion) && (
                                       <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
@@ -436,9 +436,9 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     </div>
                   ) : (
                     isComputed ? (
-                      <span className="flex-1 min-w-0 truncate text-left text-sm text-stone-500 px-2 py-1">
+                      <span className="flex-1 min-w-0 truncate text-left text-sm text-slate-400 px-2 py-1">
                         {asset.category}
-                        <span className="ml-1.5 inline-flex items-center rounded-full bg-stone-200/60 px-1.5 py-0.5 text-[9px] font-medium text-stone-400 uppercase tracking-wide">auto</span>
+                        <span className="ml-1.5 inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 uppercase tracking-wide">auto</span>
                       </span>
                     ) : (
                     <button
@@ -446,7 +446,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       onClick={() =>
                         startEdit(asset.id, "category", asset.category)
                       }
-                      className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-stone-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                       aria-label={`Edit category for ${asset.category}`}
                     >
                       {getAssetCategoryFlag(asset.category) && (
@@ -466,12 +466,12 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       onChange={(e) => setEditValue(e.target.value)}
                       onBlur={() => commitEdit()}
                       onKeyDown={handleEditKeyDown}
-                      className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                      className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                       aria-label={`Edit amount for ${asset.category}`}
                     />
                   ) : (
                     isComputed ? (
-                      <span className="w-28 text-right text-sm font-medium text-stone-400 px-2 py-1">
+                      <span className="w-28 text-right text-sm font-medium text-slate-500 px-2 py-1">
                         {formatCurrency(asset.amount)}
                       </span>
                     ) : (
@@ -480,7 +480,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       onClick={() =>
                         startEdit(asset.id, "amount", String(asset.amount))
                       }
-                      className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-green-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-green-50 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-emerald-400 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-emerald-400/10 hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       aria-label={`Edit amount for ${asset.category}, currently ${formatCurrency(asset.amount)}`}
                     >
                       {formatCurrency(asset.amount)}
@@ -494,7 +494,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 <button
                   type="button"
                   onClick={() => deleteAsset(asset.id)}
-                  className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-stone-300 sm:opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 sm:group-hover:opacity-100"
+                  className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 sm:group-hover:opacity-100"
                   aria-label={`Delete ${asset.category}`}
                 >
                   <svg
@@ -535,9 +535,9 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   const treatments: TaxTreatment[] = ["tax-free", "tax-deferred", "taxable"];
                   const labels: Record<TaxTreatment, string> = { "tax-free": "Tax-free", "tax-deferred": "Tax-deferred", "taxable": "Taxable" };
                   const colors: Record<TaxTreatment, string> = {
-                    "tax-free": "bg-green-100 text-green-700 hover:bg-green-200",
-                    "tax-deferred": "bg-rose-100 text-rose-700 hover:bg-rose-200",
-                    "taxable": "bg-amber-100 text-amber-700 hover:bg-amber-200",
+                    "tax-free": "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25",
+                    "tax-deferred": "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25",
+                    "taxable": "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25",
                   };
                   return (
                     <button
@@ -552,7 +552,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           a.id === asset.id ? { ...a, taxTreatment: override } : a
                         ));
                       }}
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${colors[effective]}`}
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${colors[effective]}`}
                       aria-label={`Tax treatment for ${asset.category}: ${labels[effective]}${isOverridden ? " (overridden)" : " (auto-detected)"}. Click to change.`}
                       data-testid={`tax-treatment-pill-${asset.id}`}
                     >
@@ -570,7 +570,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                    className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                     aria-label={`Edit ROI for ${asset.category}`}
                     placeholder="e.g. 7"
                   />
@@ -578,12 +578,12 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   <button
                     type="button"
                     onClick={() => startEdit(asset.id, "roi", String(asset.roi ?? ""))}
-                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                       hasRoi
-                        ? "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                        ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
                         : displayRoi !== undefined
-                          ? "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
-                          : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                          ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
+                          : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                     }`}
                     aria-label={`Edit ROI for ${asset.category}${displayRoi !== undefined ? `, currently ${displayRoi}%` : ""}`}
                     data-testid={`roi-badge-${asset.id}`}
@@ -608,12 +608,12 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           a.id === asset.id ? { ...a, roiTaxTreatment: newTreatment } : a
                         ));
                       }}
-                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                         isExplicit
                           ? isIncome
-                            ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                            : "bg-blue-50 text-blue-600 hover:bg-blue-100"
-                          : "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
+                            ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                            : "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
+                          : "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
                       }`}
                       aria-label={`Toggle ROI tax treatment for ${asset.category}, currently ${isIncome ? "interest income" : "capital gains"}`}
                       data-testid={`roi-tax-treatment-${asset.id}`}
@@ -632,7 +632,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-24 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                    className="w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                     aria-label={`Edit monthly contribution for ${asset.category}`}
                     placeholder="e.g. 500"
                   />
@@ -640,10 +640,10 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   <button
                     type="button"
                     onClick={() => startEdit(asset.id, "monthlyContribution", String(asset.monthlyContribution ?? ""))}
-                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                       hasContribution
-                        ? "bg-green-50 text-green-600 hover:bg-green-100"
-                        : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                        ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                        : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                     }`}
                     aria-label={`Edit monthly contribution for ${asset.category}${hasContribution ? `, currently ${formatCurrency(asset.monthlyContribution!)}` : ""}`}
                     data-testid={`contribution-badge-${asset.id}`}
@@ -677,7 +677,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           onChange={(e) => setEditValue(e.target.value)}
                           onBlur={() => commitEdit()}
                           onKeyDown={handleEditKeyDown}
-                          className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                          className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                           aria-label={`Edit employer match percent for ${asset.category}`}
                           placeholder="e.g. 50"
                         />
@@ -685,10 +685,10 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         <button
                           type="button"
                           onClick={() => startEdit(asset.id, "employerMatchPct", String(asset.employerMatchPct ?? ""))}
-                          className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                          className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                             hasPct
-                              ? "bg-violet-50 text-violet-600 hover:bg-violet-100"
-                              : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                              ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
+                              : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                           }`}
                           aria-label={`Edit employer match percent for ${asset.category}${hasPct ? `, currently ${asset.employerMatchPct}%` : ""}`}
                           data-testid={`employer-match-pct-${asset.id}`}
@@ -705,7 +705,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           onChange={(e) => setEditValue(e.target.value)}
                           onBlur={() => commitEdit()}
                           onKeyDown={handleEditKeyDown}
-                          className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                          className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                           aria-label={`Edit employer match cap for ${asset.category}`}
                           placeholder="e.g. 6"
                         />
@@ -713,10 +713,10 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         <button
                           type="button"
                           onClick={() => startEdit(asset.id, "employerMatchCap", String(asset.employerMatchCap ?? ""))}
-                          className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                          className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                             hasCap
-                              ? "bg-violet-50 text-violet-600 hover:bg-violet-100"
-                              : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                              ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
+                              : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                           }`}
                           aria-label={`Edit employer match cap for ${asset.category}${hasCap ? `, currently ${asset.employerMatchCap}% of salary` : ""}`}
                           data-testid={`employer-match-cap-${asset.id}`}
@@ -727,7 +727,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       {/* Computed match amount */}
                       {monthlyMatch > 0 && (
                         <span
-                          className="rounded bg-violet-50 px-1.5 py-0.5 text-xs text-violet-700"
+                          className="rounded bg-violet-500/10 px-1.5 py-0.5 text-xs text-violet-400"
                           data-testid={`employer-match-amount-${asset.id}`}
                         >
                           +{formatCurrency(monthlyMatch)}/mo employer match
@@ -747,7 +747,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       onChange={(e) => setEditValue(e.target.value)}
                       onBlur={() => commitEdit()}
                       onKeyDown={handleEditKeyDown}
-                      className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                      className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                       aria-label={`Edit cost basis percent for ${asset.category}`}
                       placeholder="e.g. 80"
                     />
@@ -755,10 +755,10 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     <button
                       type="button"
                       onClick={() => startEdit(asset.id, "costBasisPercent", String(asset.costBasisPercent ?? ""))}
-                      className={`group/cb relative rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                      className={`group/cb relative rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                         asset.costBasisPercent !== undefined && asset.costBasisPercent < 100
-                          ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                          : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                          ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                          : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                       }`}
                       aria-label={`Edit cost basis percent for ${asset.category}${asset.costBasisPercent !== undefined ? `, currently ${asset.costBasisPercent}%` : ""}`}
                       data-testid={`cost-basis-badge-${asset.id}`}
@@ -776,7 +776,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
 
                 {/* Unrealized gains badge */}
                 {getTaxTreatment(asset.category, asset.taxTreatment) === "taxable" && asset.costBasisPercent !== undefined && asset.costBasisPercent < 100 && asset.amount > 0 && (
-                  <span className="rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-600" data-testid={`unrealized-gains-${asset.id}`}>
+                  <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-xs text-amber-400" data-testid={`unrealized-gains-${asset.id}`}>
                     ~{formatCurrency(Math.round(asset.amount * (100 - asset.costBasisPercent) / 100))} unrealized gains
                   </span>
                 )}
@@ -785,8 +785,8 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 <label
                   className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                     asset.surplusTarget
-                      ? "bg-amber-50 text-amber-700 cursor-default"
-                      : "text-stone-300 hover:bg-stone-50 hover:text-stone-400 cursor-pointer"
+                      ? "bg-amber-500/10 text-amber-400 cursor-default"
+                      : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500 cursor-pointer"
                   }`}
                   data-testid={`surplus-target-${asset.id}`}
                 >
@@ -803,12 +803,12 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         }))
                       );
                     }}
-                    className="h-3 w-3 border-stone-300 text-amber-600 accent-amber-500"
+                    className="h-3 w-3 border-white/20 text-amber-400 accent-amber-500"
                   />
                   Surplus goes here
                 </label>
                 {asset.surplusTarget && monthlySurplus > 0 && (
-                  <span className="rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-600" data-testid={`surplus-amount-${asset.id}`}>
+                  <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-xs text-amber-400" data-testid={`surplus-amount-${asset.id}`}>
                     +{formatCurrency(monthlySurplus)}/mo surplus
                   </span>
                 )}
@@ -822,11 +822,11 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 const totalContrib = (asset.monthlyContribution ?? 0) + matchContrib + (asset.surplusTarget ? monthlySurplus : 0);
                 const showProjection = (displayRoi !== undefined && displayRoi > 0) || totalContrib > 0;
                 return showProjection ? (
-                  <div className={`flex items-center gap-3 pb-1.5 text-[10px] text-stone-400 ${isComputed ? "px-6" : "px-5"}`} data-testid={`asset-projection-${asset.id}`}>
+                  <div className={`flex items-center gap-3 pb-1.5 text-[10px] text-slate-500 ${isComputed ? "px-6" : "px-5"}`} data-testid={`asset-projection-${asset.id}`}>
                     <span className="font-medium">Projected:</span>
-                    <span>10yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 10))}</span></span>
-                    <span>20yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 20))}</span></span>
-                    <span>30yr <span className="text-green-600 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 30))}</span></span>
+                    <span>10yr <span className="text-emerald-400 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 10))}</span></span>
+                    <span>20yr <span className="text-emerald-400 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 20))}</span></span>
+                    <span>30yr <span className="text-emerald-400 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 30))}</span></span>
                   </div>
                 ) : null;
               })()}
@@ -838,7 +838,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
 
       {/* Add new asset row */}
       {addingNew && (
-        <div className="mt-2 rounded-lg border border-dashed border-blue-200 bg-blue-50/50 px-3 py-2 animate-in">
+        <div className="mt-2 rounded-lg border border-dashed border-cyan-500/20 bg-cyan-500/5 px-3 py-2 animate-in">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <div className="relative flex-1 min-w-0">
               <input
@@ -855,15 +855,15 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
                 onKeyDown={(e) => handleNewKeyDown(e, "category")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New asset category"
               />
               {showNewSuggestions &&
                 filteredGroupedSuggestions(newCategory).length > 0 && (
-                  <div className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                  <div className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
                     {filteredGroupedSuggestions(newCategory).map((group) => (
                       <div key={group.label}>
-                        <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
+                        <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500" data-testid="suggestion-group-header">{group.label}</div>
                         {group.items.map((suggestion) => (
                           <button
                             key={suggestion}
@@ -874,7 +874,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                               setShowNewSuggestions(false);
                               newAmountRef.current?.focus();
                             }}
-                            className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
+                            className="w-full px-3 py-2 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300 sm:py-1.5"
                           >
                             {getAssetCategoryFlag(suggestion) && (
                               <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
@@ -895,13 +895,13 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 value={newAmount}
                 onChange={(e) => setNewAmount(e.target.value)}
                 onKeyDown={(e) => handleNewKeyDown(e, "amount")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-right text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New asset amount"
               />
               <button
                 type="button"
                 onClick={addAsset}
-                className="min-h-[44px] rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
                 aria-label="Confirm add asset"
               >
                 Add
@@ -914,7 +914,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   setNewAmount("");
                   setShowNewSuggestions(false);
                 }}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
                 aria-label="Cancel adding asset"
               >
                 <svg
@@ -936,15 +936,15 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
       )}
 
       {/* Total and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3">
-        <span className="text-sm font-medium text-stone-500">
+      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+        <span className="text-sm font-medium text-slate-400">
           Total: {formatCurrency(total)}
         </span>
         {!addingNew && (
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition-all duration-150 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 active:bg-blue-100"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 active:bg-cyan-500/20"
           >
             + Add Asset
           </button>

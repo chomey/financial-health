@@ -275,20 +275,20 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
   const total = debts.reduce((sum, d) => sum + convertToHome(d.amount, d.currency ?? hc, hc, rates), 0);
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 sm:p-4">
-      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-stone-800">
+    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-lg shadow-black/20 transition-all duration-200 hover:shadow-xl hover:shadow-black/30 hover:border-white/15 hover:-translate-y-0.5 sm:p-4">
+      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-200">
         <span aria-hidden="true">📋</span>
         Debts
       </h2>
 
       {debts.length === 0 && !addingNew ? (
         <div className="flex flex-col items-center py-4 text-center" data-testid="debt-empty-state">
-          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 text-rose-300">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-rose-400/10 text-rose-400">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
             </svg>
           </div>
-          <p className="text-sm text-stone-400">
+          <p className="text-sm text-slate-500">
             Track your mortgage, loans, and credit cards — every number brings clarity.
           </p>
         </div>
@@ -303,7 +303,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
             <DataFlowSourceItem key={debt.id} id={`debt:${debt.id}`} label={debt.category} value={debt.amount}>
             <div role="listitem">
               <div
-                className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-stone-50"
+                className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-white/5"
               >
               <div className="flex flex-1 items-center gap-3 min-w-0">
                 {/* Category */}
@@ -323,18 +323,18 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                         }, 150);
                       }}
                       onKeyDown={handleEditKeyDown}
-                      className="w-full rounded-md border border-blue-300 bg-white px-2 py-1 text-sm text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                      className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                       aria-label="Edit category name"
                     />
                     {showSuggestions &&
                       filteredGroupedSuggestions(editValue).length > 0 && (
                         <div
                           ref={suggestionsRef}
-                          className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
+                          className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
                         >
                           {filteredGroupedSuggestions(editValue).map((group) => (
                             <div key={group.label}>
-                              <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
+                              <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500" data-testid="suggestion-group-header">{group.label}</div>
                               {group.items.map((suggestion) => (
                                 <button
                                   key={suggestion}
@@ -343,7 +343,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                                     e.preventDefault();
                                     commitEdit(suggestion);
                                   }}
-                                  className="w-full px-3 py-1.5 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                                  className="w-full px-3 py-1.5 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300"
                                 >
                                   {getDebtCategoryFlag(suggestion) && (
                                     <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(suggestion)}</span>
@@ -362,7 +362,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     onClick={() =>
                       startEdit(debt.id, "category", debt.category)
                     }
-                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-stone-700 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                     aria-label={`Edit category for ${debt.category}`}
                   >
                     {getDebtCategoryFlag(debt.category) && (
@@ -381,7 +381,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-28 rounded-md border border-blue-300 bg-white px-2 py-1 text-right text-sm font-medium text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200"
+                    className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
                     aria-label={`Edit amount for ${debt.category}`}
                   />
                 ) : (
@@ -390,7 +390,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     onClick={() =>
                       startEdit(debt.id, "amount", String(debt.amount))
                     }
-                    className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-rose-600 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-rose-50 hover:text-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-200"
+                    className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-rose-400 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-rose-400/10 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
                     aria-label={`Edit amount for ${debt.category}, currently ${formatCurrency(debt.amount)}`}
                   >
                     {formatCurrency(debt.amount)}
@@ -402,7 +402,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
               <button
                 type="button"
                 onClick={() => deleteDebt(debt.id)}
-                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-stone-300 sm:opacity-0 transition-all duration-150 hover:bg-rose-50 hover:text-rose-500 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-200 sm:group-hover:opacity-100"
+                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 sm:group-hover:opacity-100"
                 aria-label={`Delete ${debt.category}`}
               >
                 <svg
@@ -443,7 +443,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-20 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                    className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                     aria-label={`Edit interest rate for ${debt.category}`}
                     placeholder="e.g. 19.9"
                   />
@@ -451,12 +451,12 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   <button
                     type="button"
                     onClick={() => startEdit(debt.id, "interestRate", String(debt.interestRate ?? ""))}
-                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                       hasInterest
-                        ? "bg-rose-50 text-rose-600 hover:bg-rose-100"
+                        ? "bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
                         : displayInterest !== undefined
-                          ? "bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-500"
-                          : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                          ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
+                          : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                     }`}
                     aria-label={`Edit interest rate for ${debt.category}${displayInterest !== undefined ? `, currently ${displayInterest}%` : ""}`}
                     data-testid={`interest-badge-${debt.id}`}
@@ -476,7 +476,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-24 rounded border border-blue-300 bg-white px-1.5 py-0.5 text-xs text-stone-700 outline-none ring-1 ring-blue-100"
+                    className="w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                     aria-label={`Edit monthly payment for ${debt.category}`}
                     placeholder="e.g. 150"
                   />
@@ -484,10 +484,10 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   <button
                     type="button"
                     onClick={() => startEdit(debt.id, "monthlyPayment", String(debt.monthlyPayment ?? ""))}
-                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                       hasPayment
-                        ? "bg-green-50 text-green-600 hover:bg-green-100"
-                        : "text-stone-300 hover:bg-stone-50 hover:text-stone-400"
+                        ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                        : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                     }`}
                     aria-label={`Edit monthly payment for ${debt.category}${hasPayment ? `, currently ${formatCurrency(debt.monthlyPayment!)}` : ""}`}
                     data-testid={`debt-payment-badge-${debt.id}`}
@@ -507,7 +507,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   if (!result.coversInterest) {
                     return (
                       <div
-                        className="mx-5 mb-1 rounded px-2 py-1 text-xs bg-amber-50 text-amber-700 border border-amber-200"
+                        className="mx-5 mb-1 rounded px-2 py-1 text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20"
                         data-testid={`debt-payoff-warning-${debt.id}`}
                       >
                         Payment doesn&rsquo;t cover interest &mdash; balance will grow
@@ -517,7 +517,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   if (result.months > 0) {
                     return (
                       <div
-                        className="mx-5 mb-1 rounded px-2 py-1 text-xs bg-blue-50 text-blue-600"
+                        className="mx-5 mb-1 rounded px-2 py-1 text-xs bg-cyan-500/10 text-cyan-400"
                         data-testid={`debt-payoff-${debt.id}`}
                       >
                         Paid off in {result.payoffDuration} &middot; {formatPayoffCurrency(result.totalInterest)} total interest
@@ -535,7 +535,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
 
       {/* Add new debt row */}
       {addingNew && (
-        <div className="mt-2 rounded-lg border border-dashed border-blue-200 bg-blue-50/50 px-3 py-2 animate-in">
+        <div className="mt-2 rounded-lg border border-dashed border-cyan-500/20 bg-cyan-500/5 px-3 py-2 animate-in">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <div className="relative flex-1 min-w-0">
               <input
@@ -552,15 +552,15 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
                 onKeyDown={(e) => handleNewKeyDown(e, "category")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New debt category"
               />
               {showNewSuggestions &&
                 filteredGroupedSuggestions(newCategory).length > 0 && (
-                  <div className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                  <div className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
                     {filteredGroupedSuggestions(newCategory).map((group) => (
                       <div key={group.label}>
-                        <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400" data-testid="suggestion-group-header">{group.label}</div>
+                        <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500" data-testid="suggestion-group-header">{group.label}</div>
                         {group.items.map((suggestion) => (
                           <button
                             key={suggestion}
@@ -571,7 +571,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                               setShowNewSuggestions(false);
                               newAmountRef.current?.focus();
                             }}
-                            className="w-full px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-blue-50 hover:text-blue-700 sm:py-1.5"
+                            className="w-full px-3 py-2 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300 sm:py-1.5"
                           >
                             {getDebtCategoryFlag(suggestion) && (
                               <span className="mr-1" aria-hidden="true">{getDebtCategoryFlag(suggestion)}</span>
@@ -592,13 +592,13 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                 value={newAmount}
                 onChange={(e) => setNewAmount(e.target.value)}
                 onKeyDown={(e) => handleNewKeyDown(e, "amount")}
-                className="w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-right text-base text-stone-800 outline-none ring-2 ring-blue-100 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New debt amount"
               />
               <button
                 type="button"
                 onClick={addDebt}
-                className="min-h-[44px] rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
                 aria-label="Confirm add debt"
               >
                 Add
@@ -611,7 +611,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   setNewAmount("");
                   setShowNewSuggestions(false);
                 }}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-stone-400 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-200"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
                 aria-label="Cancel adding debt"
               >
                 <svg
@@ -633,15 +633,15 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
       )}
 
       {/* Total and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3">
-        <span className="text-sm font-medium text-stone-500">
+      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+        <span className="text-sm font-medium text-slate-400">
           Total: {formatCurrency(total)}
         </span>
         {!addingNew && (
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition-all duration-150 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 active:bg-blue-100"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 active:bg-cyan-500/20"
           >
             + Add Debt
           </button>

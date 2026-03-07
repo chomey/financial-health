@@ -8,13 +8,13 @@
 
 ## Summary
 - **Total Tasks**: 134
-- **Completed**: 128
-- **Remaining**: 6
+- **Completed**: 129
+- **Remaining**: 5
 - **Last Updated**: 2026-03-07
 
-## Task 128: Update metric cards and dashboard for new theme
+## Task 129: Update entry panels and input sections for new theme
 - **Date**: 2026-03-07
-- **Files**: `src/components/SnapshotDashboard.tsx`, `src/components/DataFlowArrows.tsx`, `src/lib/changelog.ts`, `tests/unit/dashboard-dark-theme.test.ts`, `tests/e2e/dashboard-dark-theme.spec.ts`
-- **Tests**: 1646 passed (37 new T1 in `dashboard-dark-theme.test.ts`, 5 new T2 in `dashboard-dark-theme.spec.ts`)
-- **Screenshots**: ![Dashboard dark cards](screenshots/task-128-metric-cards-dark.png) ![Full dashboard](screenshots/task-128-dashboard-full.png)
-- **Notes**: Updated existing color-assertion tests in snapshot-dashboard.test.tsx, explainer-modal.test.tsx, source-summary-card.test.tsx, micro-interactions.test.tsx to match new cyan/slate theme. Tax bracket bars now use dark containers with muted neon fills (cyan→violet→rose progression) so text is always readable. Also fixed pre-existing changelog test failure (task 127 count mismatch).
+- **Files**: `src/components/AssetEntry.tsx`, `src/components/DebtEntry.tsx`, `src/components/IncomeEntry.tsx`, `src/components/ExpenseEntry.tsx`, `src/components/PropertyEntry.tsx`, `tests/unit/entry-panels-dark-theme.test.tsx`, `tests/e2e/entry-panels-dark-theme.spec.ts`, `tests/unit/debt-entry.test.tsx`, `tests/unit/income-entry.test.tsx`, `tests/unit/expense-entry.test.tsx`, `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`
+- **Tests**: 1665 passed (20 new T1 in `entry-panels-dark-theme.test.tsx`, 6 new T2 in `entry-panels-dark-theme.spec.ts`)
+- **Screenshots**: ![Entry panels dark theme](screenshots/task-129-entry-panels-dark-theme.png) ![Add expense dark form](screenshots/task-129-add-expense-dark-form.png) ![Full page dark](screenshots/task-129-full-page-dark-entry-panels.png)
+- **Notes**: Applied soft cyberpunk palette to all 5 entry components. Dark glass cards (bg-white/5 backdrop-blur border-white/10), emerald-400 for assets/income, rose-400 for debts/expenses, cyan accent buttons and inputs (bg-slate-900 border-cyan-500/50). PropertyEntry mortgage info boxes use dark dashed containers. Auto-computed badge style updated (bg-slate-700/40 text-slate-500). Fixed pre-existing changelog test failure (task 128 count mismatch).
