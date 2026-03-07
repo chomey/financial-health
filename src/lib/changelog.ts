@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Age input and personalized benchmarks
+  {
+    version: 111,
+    title: "Age input and personalized benchmarks",
+    description: "Added an optional age field to the header (next to country/jurisdiction selector). When provided, all benchmark comparisons show personalized age-group medians with actual dollar amounts: 'Your net worth of $X is above/below the median of $Y for ages 35–44.' Each metric now displays an estimated percentile within the age group using a lognormal distribution model. Age is stored in the URL state and persists across sessions.",
+    date: "2026-03-06",
+  },
   // Inflation-adjusted projection toggle
   {
     version: 110,

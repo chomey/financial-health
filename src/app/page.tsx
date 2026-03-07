@@ -105,6 +105,75 @@ function CopyLinkButton() {
   );
 }
 
+function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange: (age: number | undefined) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [input, setInput] = useState(age?.toString() ?? "");
+
+  const submit = () => {
+    const parsed = parseInt(input, 10);
+    if (parsed >= 18 && parsed <= 120) {
+      onAgeChange(parsed);
+    } else if (input === "") {
+      onAgeChange(undefined);
+    }
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1.5" data-testid="age-input-header-form">
+        <label className="text-sm font-medium text-stone-600">Age:</label>
+        <input
+          type="number"
+          min={18}
+          max={120}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") setEditing(false); }}
+          onBlur={submit}
+          autoFocus
+          className="w-16 rounded-lg border border-stone-300 px-2 py-1 text-sm text-stone-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150"
+          placeholder="e.g. 35"
+          data-testid="age-input-header"
+        />
+      </div>
+    );
+  }
+
+  if (age) {
+    return (
+      <div className="flex items-center gap-1" data-testid="age-display-header">
+        <span className="text-sm font-medium text-stone-600">Age:</span>
+        <button
+          onClick={() => { setInput(age.toString()); setEditing(true); }}
+          className="min-h-[36px] rounded-lg border border-stone-200 bg-white px-2.5 py-1 text-sm font-medium text-stone-700 shadow-sm transition-all duration-200 hover:border-stone-300 hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
+          data-testid="age-value-header"
+        >
+          {age}
+        </button>
+        <button
+          onClick={() => { onAgeChange(undefined); setInput(""); }}
+          className="p-1 text-stone-400 hover:text-stone-600 transition-colors duration-150 rounded"
+          aria-label="Clear age"
+          data-testid="age-clear-header"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => { setInput(""); setEditing(true); }}
+      className="min-h-[36px] rounded-lg border border-dashed border-stone-200 bg-white px-3 py-1 text-sm text-stone-400 transition-all duration-200 hover:border-stone-300 hover:text-stone-600 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
+      data-testid="age-add-header"
+    >
+      Add age
+    </button>
+  );
+}
+
 function WelcomeBanner() {
   const [dismissed, setDismissed] = useState(false);
 
@@ -520,6 +589,7 @@ export default function Home() {
               onCountryChange={setCountry}
               onJurisdictionChange={setJurisdiction}
             />
+            <AgeInputHeader age={age} onAgeChange={setAge} />
             <FxRateDisplay
               homeCurrency={homeCurrency}
               foreignCurrency={foreignCurrency}
