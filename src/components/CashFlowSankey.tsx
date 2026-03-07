@@ -166,22 +166,22 @@ export default function CashFlowSankey({
 
   return (
     <div
-      className="rounded-xl border border-stone-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md"
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-sm transition-all duration-200 hover:shadow-md"
       data-testid="cash-flow-sankey"
     >
       <button
         type="button"
         onClick={() => setCollapsed(!collapsed)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors duration-150 hover:bg-stone-50 rounded-xl"
+        className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors duration-150 hover:bg-white/5 rounded-xl"
         aria-expanded={!collapsed}
         data-testid="cash-flow-toggle"
       >
         <div className="flex items-center gap-2">
           <span aria-hidden="true">🌊</span>
-          <h3 className="text-sm font-semibold text-stone-800">Cash Flow</h3>
+          <h3 className="text-sm font-semibold text-slate-200">Cash Flow</h3>
         </div>
         <svg
-          className={`h-4 w-4 text-stone-400 transition-transform duration-200 ${
+          className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
             collapsed ? "" : "rotate-180"
           }`}
           fill="none"
@@ -196,7 +196,7 @@ export default function CashFlowSankey({
       {!collapsed && (
         <div className="px-4 pb-4">
           {!hasData ? (
-            <p className="text-sm text-stone-400 text-center py-6">
+            <p className="text-sm text-slate-400 text-center py-6">
               Add income to see your cash flow
             </p>
           ) : layout ? (
@@ -298,7 +298,7 @@ export default function CashFlowSankey({
                         y={(node.y0 ?? 0) + nodeHeight / 2}
                         dy="0.35em"
                         textAnchor={labelAnchor}
-                        className="text-[10px] fill-stone-600 pointer-events-none select-none"
+                        className="text-[10px] fill-slate-300 pointer-events-none select-none"
                         data-testid={`sankey-label-${node.id}`}
                       >
                         {node.label}
@@ -311,7 +311,7 @@ export default function CashFlowSankey({
               {/* Tooltip */}
               {tooltip && (
                 <div
-                  className="absolute pointer-events-none z-10 rounded-md bg-stone-800 px-2 py-1 text-xs text-white shadow-lg whitespace-nowrap"
+                  className="absolute pointer-events-none z-10 rounded-md bg-slate-900 border border-white/10 px-2 py-1 text-xs text-slate-200 shadow-lg whitespace-nowrap"
                   style={{
                     left: tooltip.x,
                     top: tooltip.y,
@@ -324,7 +324,7 @@ export default function CashFlowSankey({
               )}
 
               {/* Legend */}
-              <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-stone-500" data-testid="sankey-legend">
+              <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-slate-400" data-testid="sankey-legend">
                 <span className="flex items-center gap-1">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
