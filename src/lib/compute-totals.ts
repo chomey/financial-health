@@ -2,7 +2,7 @@ import type { FinancialState } from "@/lib/financial-types";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { getEffectivePayment } from "@/components/PropertyEntry";
 import { getStockValue } from "@/components/StockEntry";
-import { getDefaultRoi, getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
+import { getDefaultRoi, getDefaultRoiTaxTreatment, getDefaultReinvest } from "@/components/AssetEntry";
 import { getHomeCurrency, getEffectiveFxRates, convertToHome, formatCurrencyCompact } from "@/lib/currency";
 import type { SupportedCurrency } from "@/lib/currency";
 import { getTaxTreatment } from "@/lib/withdrawal-tax";
@@ -23,6 +23,7 @@ export interface MonthlyInvestmentReturn {
   amount: number;
   balance: number;
   roi: number;
+  reinvest: boolean;
 }
 
 /**
@@ -36,11 +37,13 @@ export function computeMonthlyInvestmentReturns(assets: FinancialState["assets"]
     const roi = asset.roi ?? getDefaultRoi(asset.category) ?? 0;
     if (roi <= 0) continue;
     const monthlyReturn = asset.amount * (roi / 100) / 12;
+    const reinvest = asset.reinvestReturns ?? getDefaultReinvest(asset.category);
     results.push({
       label: asset.category,
       amount: monthlyReturn,
       balance: asset.amount,
       roi,
+      reinvest,
     });
   }
   return results;

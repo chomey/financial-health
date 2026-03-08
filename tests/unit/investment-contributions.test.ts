@@ -53,9 +53,9 @@ describe("investment contributions in surplus", () => {
   });
 
   describe("computeMetrics", () => {
-    it("subtracts contributions from after-tax surplus and adds investment returns", () => {
+    it("subtracts contributions from after-tax surplus and adds payout investment returns", () => {
       const state = makeState({
-        assets: [{ id: "a1", category: "TFSA", amount: 10000, monthlyContribution: 500 }],
+        assets: [{ id: "a1", category: "TFSA", amount: 10000, monthlyContribution: 500, reinvestReturns: false }],
         income: [{ id: "i1", category: "Salary", amount: 5000 }],
         expenses: [{ id: "e1", category: "Rent", amount: 2000 }],
       });

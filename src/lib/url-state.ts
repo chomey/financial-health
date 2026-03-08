@@ -1,4 +1,5 @@
 import type { FinancialState } from "@/lib/financial-state";
+import { getDefaultReinvest } from "@/components/AssetEntry";
 import { getHomeCurrency } from "@/lib/currency";
 import type { SupportedCurrency } from "@/lib/currency";
 import { deflate, inflate } from "pako";
@@ -106,6 +107,7 @@ interface CompactAsset {
   tt?: string; // taxTreatment override ("tax-free" | "tax-deferred" | "taxable", omitted when auto-detected)
   emp?: number; // employerMatchPct (e.g., 50 = 50% match)
   emc?: number; // employerMatchCap (e.g., 6 = 6% of salary cap)
+  ri?: 0 | 1; // reinvestReturns — only stored when overriding the default
 }
 interface CompactDebt {
   c: string;
@@ -187,6 +189,7 @@ function toCompact(state: FinancialState): CompactState {
       if (x.taxTreatment) ca.tt = x.taxTreatment;
       if (x.employerMatchPct !== undefined && x.employerMatchPct > 0) ca.emp = x.employerMatchPct;
       if (x.employerMatchCap !== undefined && x.employerMatchCap > 0) ca.emc = x.employerMatchCap;
+      if (x.reinvestReturns !== undefined && x.reinvestReturns !== getDefaultReinvest(x.category)) ca.ri = x.reinvestReturns ? 1 : 0;
       return ca;
     }),
     d: state.debts.map((x) => {
@@ -261,7 +264,7 @@ function fromCompact(compact: CompactState): FinancialState {
   return {
     assets: (() => {
       const assets = compact.a.map((x, i) => {
-        const asset: { id: string; category: string; amount: number; roi?: number; roiTaxTreatment?: import("@/components/AssetEntry").RoiTaxTreatment; monthlyContribution?: number; surplusTarget?: boolean; currency?: SupportedCurrency; costBasisPercent?: number; taxTreatment?: import("@/lib/withdrawal-tax").TaxTreatment; employerMatchPct?: number; employerMatchCap?: number } = { id: `a${i + 1}`, category: x.c, amount: x.a };
+        const asset: { id: string; category: string; amount: number; roi?: number; roiTaxTreatment?: import("@/components/AssetEntry").RoiTaxTreatment; monthlyContribution?: number; surplusTarget?: boolean; currency?: SupportedCurrency; costBasisPercent?: number; taxTreatment?: import("@/lib/withdrawal-tax").TaxTreatment; employerMatchPct?: number; employerMatchCap?: number; reinvestReturns?: boolean } = { id: `a${i + 1}`, category: x.c, amount: x.a };
         if (x.r !== undefined) asset.roi = x.r;
         if (x.rt) asset.roiTaxTreatment = x.rt as import("@/components/AssetEntry").RoiTaxTreatment;
         if (x.m !== undefined) asset.monthlyContribution = x.m;
@@ -271,6 +274,7 @@ function fromCompact(compact: CompactState): FinancialState {
         if (x.tt) asset.taxTreatment = x.tt as import("@/lib/withdrawal-tax").TaxTreatment;
         if (x.emp !== undefined) asset.employerMatchPct = x.emp;
         if (x.emc !== undefined) asset.employerMatchCap = x.emc;
+        if (x.ri !== undefined) asset.reinvestReturns = x.ri === 1;
         return asset;
       });
       // Ensure exactly one asset is the surplus target — but not if a computed asset owns it (sr field)
@@ -593,8 +597,8 @@ export type WizardStep =
 export const WIZARD_STEPS: WizardStep[] = [
   "profile",
   "property",
-  "assets",
   "stocks",
+  "assets",
   "debts",
   "income",
   "tax-summary",

@@ -182,8 +182,8 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
 
   const hc = homeCurrency ?? "CAD";
   const rates = fxRates ?? FALLBACK_RATES;
-  const investmentReturnsTotal = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
-  const total = items.reduce((sum, item) => sum + convertToHome(normalizeToMonthly(item.amount, item.frequency), item.currency ?? hc, hc, rates), 0) + investmentReturnsTotal;
+  const payoutReturnsTotal = investmentReturns.filter((r) => !r.reinvest).reduce((sum, r) => sum + r.amount, 0);
+  const total = items.reduce((sum, item) => sum + convertToHome(normalizeToMonthly(item.amount, item.frequency), item.currency ?? hc, hc, rates), 0) + payoutReturnsTotal;
 
   const triggerTotalAnimation = () => {
     if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
@@ -531,8 +531,8 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
             >
               <div className="flex items-center gap-1.5">
                 <span className="text-xs text-slate-400">{r.label} returns</span>
-                <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1 py-0 text-[8px] font-medium text-slate-500 uppercase tracking-wide" title="Auto-computed from your investment ROI">
-                  auto
+                <span className={`inline-flex items-center rounded-full px-1 py-0 text-[8px] font-medium uppercase tracking-wide ${r.reinvest ? "bg-emerald-500/10 text-emerald-500" : "bg-slate-700/40 text-slate-500"}`} title={r.reinvest ? "Returns are reinvested into the account" : "Returns are paid out as income"}>
+                  {r.reinvest ? "reinvesting" : "payout"}
                 </span>
               </div>
               <div className="text-right">

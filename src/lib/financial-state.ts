@@ -39,6 +39,8 @@ export function toFinancialData(state: FinancialState): FinancialData {
   // Investment returns for surplus alignment with metric card
   const investmentReturns = computeMonthlyInvestmentReturns(state.assets);
   const totalMonthlyInvestmentReturns = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
+  // Only payout (non-reinvested) returns count toward surplus
+  const payoutInvestmentReturns = investmentReturns.filter((r) => !r.reinvest).reduce((sum, r) => sum + r.amount, 0);
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
 
@@ -116,7 +118,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     hasChildCareExpenses: state.expenses.some((e) =>
       ["child", "daycare", "babysit"].some((k) => e.category.toLowerCase().includes(k)),
     ),
-    monthlyInvestmentReturns: totalMonthlyInvestmentReturns > 0 ? totalMonthlyInvestmentReturns : undefined,
+    monthlyInvestmentReturns: payoutInvestmentReturns > 0 ? payoutInvestmentReturns : undefined,
     assetCategories: state.assets.filter((a) => !a.computed).map((a) => a.category),
     debtCategories: state.debts.map((d) => d.category),
   };

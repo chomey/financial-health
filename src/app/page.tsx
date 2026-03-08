@@ -35,7 +35,7 @@ import WizardShell from "@/components/wizard/WizardShell";
 import { formatCurrencyCompact } from "@/lib/currency";
 import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
 import { computeMortgageBreakdown, DEFAULT_INTEREST_RATE } from "@/components/PropertyEntry";
-import { getPortfolioSummary, getAnnualizedReturn } from "@/components/StockEntry";
+import { getPortfolioSummary, getAnnualizedReturn, getStockValue } from "@/components/StockEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { getFilingStatuses } from "@/lib/tax-credits";
 import { getStepFromURL, updateStepURL, type WizardStep } from "@/lib/url-state";
@@ -132,8 +132,8 @@ export default function Home() {
   const totalInvestmentContributions = assets.filter((a) => !a.computed).reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   const totalMortgagePayments = totals.totalMortgagePayments;
   const monthlyInvestmentReturns = computeMonthlyInvestmentReturns(assets);
-  const totalMonthlyInvestmentReturns = monthlyInvestmentReturns.reduce((sum, r) => sum + r.amount, 0);
-  const monthlySurplus = totals.monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - totals.monthlyExpenses - totals.totalMonthlyContributions - totalMortgagePayments - totals.totalDebtPayments;
+  const payoutInvestmentReturns = monthlyInvestmentReturns.filter((r) => !r.reinvest).reduce((sum, r) => sum + r.amount, 0);
+  const monthlySurplus = totals.monthlyAfterTaxIncome + payoutInvestmentReturns - totals.monthlyExpenses - totals.totalMonthlyContributions - totalMortgagePayments - totals.totalDebtPayments;
   const annualEmploymentSalary = income.reduce((sum, i) => {
     if ((i.incomeType ?? "employment") !== "employment") return sum;
     return sum + normalizeToMonthly(i.amount, i.frequency) * 12;
@@ -211,14 +211,24 @@ export default function Home() {
     return `${sign}${formatCurrencyCompact(Math.abs(v), homeCurrency, homeCurrency)}`;
   };
 
+  // Pre-compute per-item breakdowns for metric card click-throughs
+  const realAssets = assets.filter((a) => !a.computed);
+  const assetItems = realAssets.filter((a) => a.amount > 0).map((a) => ({ label: a.category, value: a.amount }));
+  const stockItems = stocks.filter((s) => getStockValue(s) > 0).map((s) => ({ label: s.ticker, value: getStockValue(s) }));
+  const propertyEquityItems = properties.filter((p) => p.value > p.mortgage).map((p) => ({ label: p.name || "Property", value: Math.max(0, p.value - p.mortgage) }));
+  const debtItems = debts.filter((d) => d.amount > 0).map((d) => ({ label: d.category, value: d.amount }));
+  const incomeItems = income.filter((i) => i.amount > 0).map((i) => ({ label: i.category, value: normalizeToMonthly(i.amount, i.frequency) }));
+  const expenseItems = expenses.filter((e) => e.amount > 0).map((e) => ({ label: e.category, value: e.amount }));
+  const debtPaymentItems = debts.filter((d) => (d.monthlyPayment ?? 0) > 0).map((d) => ({ label: d.category, value: d.monthlyPayment! }));
+
   const netWorthConnections: DataFlowConnectionDef[] = [
-    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" },
-    { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" },
-    ...(totals.totalPropertyEquity > 0 ? [{ sourceId: "section-property", label: fmtLabel(totals.totalPropertyEquity), value: totals.totalPropertyEquity, sign: "positive" as const }] : []),
-    { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
+    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive", items: assetItems },
+    { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive", items: stockItems },
+    ...(totals.totalPropertyEquity > 0 ? [{ sourceId: "section-property", label: fmtLabel(totals.totalPropertyEquity), value: totals.totalPropertyEquity, sign: "positive" as const, items: propertyEquityItems }] : []),
+    { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative", items: debtItems },
   ];
 
-  const incomeAndReturnsTotal = totals.monthlyIncome + totalMonthlyInvestmentReturns;
+  const incomeAndReturnsTotal = totals.monthlyIncome + payoutInvestmentReturns;
   const monthlyTaxes = totals.monthlyIncome - totals.monthlyAfterTaxIncome;
 
   // Compute mortgage principal/interest breakdown for explainer
@@ -238,42 +248,44 @@ export default function Home() {
     if (totalPrincipal > 0) mortgageItems.push({ label: "Principal", value: Math.round(totalPrincipal) });
   }
 
+  const contributionItems = realAssets.filter((a) => (a.monthlyContribution ?? 0) > 0).map((a) => ({ label: a.category, value: a.monthlyContribution! }));
+
   const monthlySurplusConnections: DataFlowConnectionDef[] = [
-    { sourceId: "section-income", label: fmtLabel(incomeAndReturnsTotal), value: incomeAndReturnsTotal, sign: "positive" },
+    { sourceId: "section-income", label: fmtLabel(incomeAndReturnsTotal), value: incomeAndReturnsTotal, sign: "positive", items: incomeItems },
     ...(monthlyTaxes > 0 ? [{ sourceId: "virtual-taxes", label: `taxes ${fmtLabel(-monthlyTaxes)}`, value: monthlyTaxes, sign: "negative" as const }] : []),
-    { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
-    ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "virtual-contributions", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const }] : []),
+    { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative", items: expenseItems },
+    ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "virtual-contributions", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const, items: contributionItems }] : []),
     ...(totalMortgagePayments > 0 ? [{ sourceId: "virtual-mortgage", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const, items: mortgageItems.length > 0 ? mortgageItems : undefined }] : []),
-    ...(totals.totalDebtPayments > 0 ? [{ sourceId: "section-debts", label: `debt payments ${fmtLabel(-totals.totalDebtPayments)}`, value: totals.totalDebtPayments, sign: "negative" as const }] : []),
+    ...(totals.totalDebtPayments > 0 ? [{ sourceId: "section-debts", label: `debt payments ${fmtLabel(-totals.totalDebtPayments)}`, value: totals.totalDebtPayments, sign: "negative" as const, items: debtPaymentItems }] : []),
   ];
 
   // Estimated Tax: green arrow from income showing gross income, label with effective rate + annual tax
   const estimatedTaxConnections: DataFlowConnectionDef[] = [
-    { sourceId: "section-income", label: totals.effectiveTaxRate > 0 ? `${(totals.effectiveTaxRate * 100).toFixed(1)}% of ${fmtLabel(totals.monthlyIncome * 12).replace(/^[+-]/, "")}` : fmtLabel(totals.monthlyIncome * 12), value: totals.monthlyIncome, sign: "positive" },
+    { sourceId: "section-income", label: totals.effectiveTaxRate > 0 ? `${(totals.effectiveTaxRate * 100).toFixed(1)}% of ${fmtLabel(totals.monthlyIncome * 12).replace(/^[+-]/, "")}` : fmtLabel(totals.monthlyIncome * 12), value: totals.monthlyIncome, sign: "positive", items: incomeItems.map((i) => ({ label: i.label, value: i.value * 12 })) },
   ];
 
   // Financial Runway: liquid assets (green) / monthly obligations (red)
   const financialRunwayConnections: DataFlowConnectionDef[] = [
-    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" },
-    { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" },
-    { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
-    ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const }] : []),
-    ...(totals.totalDebtPayments > 0 ? [{ sourceId: "section-debts", label: `debt payments ${fmtLabel(-totals.totalDebtPayments)}`, value: totals.totalDebtPayments, sign: "negative" as const }] : []),
+    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive", items: assetItems },
+    { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive", items: stockItems },
+    { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative", items: expenseItems },
+    ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const, items: mortgageItems.length > 0 ? mortgageItems : undefined }] : []),
+    ...(totals.totalDebtPayments > 0 ? [{ sourceId: "section-debts", label: `debt payments ${fmtLabel(-totals.totalDebtPayments)}`, value: totals.totalDebtPayments, sign: "negative" as const, items: debtPaymentItems }] : []),
   ];
 
   // Debt-to-Asset Ratio: all assets (green) vs all debts (red)
   const debtToAssetConnections: DataFlowConnectionDef[] = [
-    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" },
-    { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" },
-    ...(totals.totalPropertyValue > 0 ? [{ sourceId: "section-property", label: `value ${fmtLabel(totals.totalPropertyValue)}`, value: totals.totalPropertyValue, sign: "positive" as const }] : []),
-    { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
-    ...(totals.totalPropertyMortgage > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totals.totalPropertyMortgage)}`, value: totals.totalPropertyMortgage, sign: "negative" as const }] : []),
+    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive", items: assetItems },
+    { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive", items: stockItems },
+    ...(totals.totalPropertyValue > 0 ? [{ sourceId: "section-property", label: `value ${fmtLabel(totals.totalPropertyValue)}`, value: totals.totalPropertyValue, sign: "positive" as const, items: properties.map((p) => ({ label: p.name || "Property", value: p.value })) }] : []),
+    { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative", items: debtItems },
+    ...(totals.totalPropertyMortgage > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totals.totalPropertyMortgage)}`, value: totals.totalPropertyMortgage, sign: "negative" as const, items: properties.filter((p) => p.mortgage > 0).map((p) => ({ label: p.name || "Property", value: p.mortgage })) }] : []),
   ];
 
   // Income Replacement: invested assets (green) driving the 4% withdrawal
   const incomeReplacementConnections: DataFlowConnectionDef[] = [
-    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" as const },
-    ...(totals.totalStocks > 0 ? [{ sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" as const }] : []),
+    { sourceId: "section-assets", label: fmtLabel(totals.totalAssets), value: totals.totalAssets, sign: "positive" as const, items: assetItems },
+    ...(totals.totalStocks > 0 ? [{ sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" as const, items: stockItems }] : []),
   ].filter((c) => c.value > 0);
 
   const dataFlowConnections: Record<string, DataFlowConnectionDef[]> = {
@@ -415,20 +427,22 @@ export default function Home() {
           {/* Row 2: Dashboard sub-sections (left-to-right matches top-to-bottom page order) */}
           <div className="flex items-center gap-1 overflow-x-auto py-1.5 text-sm">
             {[
-              { id: "projections", icon: "📈", label: "Projections" },
+              { id: "top", icon: "🏠", label: "Intro" },
               { id: "insights", icon: "💡", label: "Insights" },
-              { id: "roadmap", icon: "🗺️", label: "Money Steps" },
               { id: "metrics", icon: "🎯", label: "Metrics" },
               { id: "cashflow", icon: "💸", label: "Cash Flow" },
               { id: "breakdowns", icon: "📉", label: "Breakdowns" },
+              { id: "roadmap", icon: "🗺️", label: "Money Steps" },
               { id: "compare", icon: "📊", label: "Compare" },
+              { id: "projections", icon: "📈", label: "Projections" },
               { id: "scenarios", icon: "🔮", label: "What If" },
             ].map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => {
-                  document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  if (item.id === "top") { window.scrollTo({ top: 0, behavior: "smooth" }); }
+                  else { document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }
                 }}
                 className="flex-shrink-0 rounded-md px-2.5 py-1.5 font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
               >
@@ -500,30 +514,12 @@ export default function Home() {
           </div>
         )}
 
-        {/* 1. Projections */}
-        <section id="projections" className="mb-4 snap-start scroll-mt-24" aria-label="Financial projections">
-          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} onMilestonesChange={handleMilestonesChange} /></ZoomableCard>
-        </section>
-
-        {/* 2. Insights */}
+        {/* 1. Insights */}
         <section id="insights" className="mb-4 snap-start scroll-mt-24" aria-label="Financial insights">
           <InsightsPanel data={financialData} insightConnections={insightConnections} milestones={projectionMilestones} />
         </section>
 
-        {/* 3. Money Steps */}
-        <section id="roadmap" className="mb-4 snap-start scroll-mt-24" aria-label="Money steps">
-          <FinancialFlowchart
-            state={state}
-            acknowledged={flowchartAcks}
-            skipped={flowchartSkips}
-            isRetired={isRetired}
-            onAcksChange={setFlowchartAcks}
-            onSkipsChange={setFlowchartSkips}
-            onRetiredChange={setIsRetired}
-          />
-        </section>
-
-        {/* 4. Metrics */}
+        {/* 2. Metrics */}
         <section
           id="metrics"
           className="mb-4 snap-start scroll-mt-24 print:col-span-full"
@@ -533,7 +529,7 @@ export default function Home() {
           <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
         </section>
 
-        {/* 5. Cash Flow */}
+        {/* 3. Cash Flow */}
         <section id="cashflow" className="mb-4 snap-start scroll-mt-24" aria-label="Cash flow">
           <ZoomableCard><CashFlowSankey
             income={income}
@@ -545,6 +541,7 @@ export default function Home() {
             monthlySurplus={monthlySurplus}
             investmentReturns={monthlyInvestmentReturns
               .filter((r) => {
+                if (r.reinvest) return false; // reinvested returns don't flow through income
                 const asset = assets.find((a) => a.category === r.label);
                 if (!asset) return false;
                 const treatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
@@ -554,7 +551,7 @@ export default function Home() {
           /></ZoomableCard>
         </section>
 
-        {/* 6. Breakdowns — Expense + Net Worth side by side */}
+        {/* 4. Breakdowns — Expense + Net Worth side by side */}
         <section id="breakdowns" className="mb-4 snap-start scroll-mt-24" aria-label="Expense and net worth breakdowns">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <ZoomableCard><ExpenseBreakdownChart
@@ -575,7 +572,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 7. Compare — Benchmarks + Portfolio Performance */}
+        {/* 5. Money Steps */}
+        <section id="roadmap" className="mb-4 snap-start scroll-mt-24" aria-label="Money steps">
+          <FinancialFlowchart
+            state={state}
+            acknowledged={flowchartAcks}
+            skipped={flowchartSkips}
+            isRetired={isRetired}
+            onAcksChange={setFlowchartAcks}
+            onSkipsChange={setFlowchartSkips}
+            onRetiredChange={setIsRetired}
+          />
+        </section>
+
+        {/* 6. Compare — Benchmarks + Portfolio Performance */}
         <section id="compare" className="mb-4 snap-start scroll-mt-24" aria-label="Comparisons and benchmarks">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <ZoomableCard><BenchmarkComparisons
@@ -626,6 +636,11 @@ export default function Home() {
               );
             })()}
           </div>
+        </section>
+
+        {/* 7. Projections */}
+        <section id="projections" className="mb-4 snap-start scroll-mt-24" aria-label="Financial projections">
+          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} onMilestonesChange={handleMilestonesChange} /></ZoomableCard>
         </section>
 
         {/* 8. What If */}

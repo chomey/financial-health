@@ -254,7 +254,7 @@ export default function WizardShell(props: WizardProps) {
               className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
               data-testid="wizard-skip-to-dashboard"
             >
-              Dashboard →
+              Go to Dashboard →
             </button>
           </div>
           <WizardStepper

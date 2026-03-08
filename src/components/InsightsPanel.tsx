@@ -128,17 +128,11 @@ export default function InsightsPanel({
 }) {
   const allInsights = generateInsights(data);
   const insights = allInsights.slice(0, MAX_INSIGHTS);
-  const [expanded, setExpanded] = useState(false);
-
   const hasMilestones = milestones && milestones.length > 0;
 
   if (insights.length === 0 && !hasMilestones) {
     return null;
   }
-
-  const COLLAPSED_COUNT = 5;
-  const showToggle = insights.length > COLLAPSED_COUNT;
-  const visibleInsights = expanded ? insights : insights.slice(0, COLLAPSED_COUNT);
 
   const milestoneColorMap = { emerald: "text-emerald-400", amber: "text-amber-400", slate: "text-slate-400" };
 
@@ -162,7 +156,7 @@ export default function InsightsPanel({
         {insights.length} Insights
       </h3>
       <ul className="space-y-2">
-        {visibleInsights.map((insight, i) => (
+        {insights.map((insight, i) => (
           <InsightRow
             key={insight.id}
             insight={insight}
@@ -171,16 +165,6 @@ export default function InsightsPanel({
           />
         ))}
       </ul>
-      {showToggle && (
-        <button
-          type="button"
-          onClick={() => setExpanded(!expanded)}
-          className="mt-2 text-xs text-cyan-400 hover:text-cyan-300 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 rounded px-1"
-          data-testid="insights-toggle"
-        >
-          {expanded ? "Show less" : `Show ${insights.length - COLLAPSED_COUNT} more`}
-        </button>
-      )}
     </div>
   );
 }

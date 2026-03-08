@@ -5,8 +5,8 @@ import IncomeEntry from "@/components/IncomeEntry";
 import type { MonthlyInvestmentReturn } from "@/lib/financial-state";
 
 const sampleReturns: MonthlyInvestmentReturn[] = [
-  { label: "TFSA", amount: 250, balance: 30000, roi: 10 },
-  { label: "RRSP", amount: 125, balance: 15000, roi: 10 },
+  { label: "TFSA", amount: 250, balance: 30000, roi: 10, reinvest: true },
+  { label: "RRSP", amount: 125, balance: 15000, roi: 10, reinvest: false },
 ];
 
 describe("IncomeEntry - investment returns auto-computed section", () => {
@@ -37,10 +37,10 @@ describe("IncomeEntry - investment returns auto-computed section", () => {
     expect(screen.getByText("RRSP returns")).toBeInTheDocument();
   });
 
-  it("displays auto badge on each row", () => {
+  it("displays reinvest/payout badge on each row", () => {
     render(<IncomeEntry items={[]} investmentReturns={sampleReturns} />);
-    const autoBadges = screen.getAllByText("auto");
-    expect(autoBadges.length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("reinvesting")).toBeInTheDocument();
+    expect(screen.getByText("payout")).toBeInTheDocument();
   });
 
   it("displays formatted monthly return amounts", () => {
@@ -50,17 +50,17 @@ describe("IncomeEntry - investment returns auto-computed section", () => {
     expect(screen.getByText("$125/mo")).toBeInTheDocument();
   });
 
-  it("includes investment returns in monthly total", () => {
+  it("includes only payout investment returns in monthly total", () => {
     const items = [{ id: "i1", category: "Salary", amount: 5000 }];
     render(<IncomeEntry items={items} investmentReturns={sampleReturns} />);
-    // total = 5000 + 250 + 125 = 5375
-    expect(screen.getByTestId("income-monthly-total")).toHaveTextContent("$5,375");
+    // total = 5000 + 125 (payout only, TFSA is reinvesting) = 5125
+    expect(screen.getByTestId("income-monthly-total")).toHaveTextContent("$5,125");
   });
 
-  it("shows only investment return total when no manual items", () => {
+  it("shows only payout investment return total when no manual items", () => {
     render(<IncomeEntry items={[]} investmentReturns={sampleReturns} />);
-    // total = 250 + 125 = 375
-    expect(screen.getByTestId("income-monthly-total")).toHaveTextContent("$375");
+    // total = 125 (payout only, TFSA is reinvesting)
+    expect(screen.getByTestId("income-monthly-total")).toHaveTextContent("$125");
   });
 
   it("does not show empty state when investment returns present but no manual items", () => {

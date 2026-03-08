@@ -155,10 +155,10 @@ describe("financial-state", () => {
       const metrics = computeMetrics(INITIAL_STATE);
       const totals = computeTotals(INITIAL_STATE);
       const investmentReturns = computeMonthlyInvestmentReturns(INITIAL_STATE.assets);
-      const totalReturns = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
+      const payoutReturns = investmentReturns.filter((r) => !r.reinvest).reduce((sum, r) => sum + r.amount, 0);
       const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
       expect(surplus!.value).toBeCloseTo(
-        totals.monthlyAfterTaxIncome + totalReturns - totals.monthlyExpenses - totals.totalMonthlyContributions,
+        totals.monthlyAfterTaxIncome + payoutReturns - totals.monthlyExpenses - totals.totalMonthlyContributions,
         2
       );
     });
@@ -509,10 +509,10 @@ describe("financial-state", () => {
       expect(returns).toHaveLength(0);
     });
 
-    it("surplus includes investment returns for assets with ROI", () => {
+    it("surplus includes payout investment returns for assets with ROI", () => {
       const state: FinancialState = {
         assets: [
-          { id: "a1", category: "TFSA", amount: 120000, roi: 6 }, // 6% → $600/mo
+          { id: "a1", category: "TFSA", amount: 120000, roi: 6, reinvestReturns: false }, // 6% → $600/mo, paid out
         ],
         debts: [],
         income: [],
@@ -524,9 +524,28 @@ describe("financial-state", () => {
       };
       const metrics = computeMetrics(state);
       const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
-      // No income, but investment returns of $600/mo - $500 expenses = $100 surplus
+      // No income, but payout investment returns of $600/mo - $500 expenses = $100 surplus
       expect(surplus!.value).toBeCloseTo(120000 * 0.06 / 12 - 500, 2);
       expect(surplus!.positive).toBe(true);
+    });
+
+    it("surplus excludes reinvested investment returns", () => {
+      const state: FinancialState = {
+        assets: [
+          { id: "a1", category: "TFSA", amount: 120000, roi: 6 }, // defaults to reinvest
+        ],
+        debts: [],
+        income: [],
+        expenses: [{ id: "e1", category: "Living", amount: 500 }],
+        properties: [],
+        stocks: [],
+        country: "CA",
+        jurisdiction: "ON",
+      };
+      const metrics = computeMetrics(state);
+      const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
+      // Reinvested returns don't count toward surplus
+      expect(surplus!.value).toBeCloseTo(-500, 2);
     });
   });
 

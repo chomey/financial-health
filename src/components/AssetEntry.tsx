@@ -23,6 +23,7 @@ export interface Asset {
   taxTreatment?: TaxTreatment; // user override for tax treatment (auto-detected if not set)
   employerMatchPct?: number; // employer match percentage (e.g., 50 = 50% match on contributions)
   employerMatchCap?: number; // employer match salary cap (e.g., 6 = 6% of annual salary)
+  reinvestReturns?: boolean; // true = compound returns back into balance, false = pay out as income
 }
 
 const CATEGORY_SUGGESTIONS = {
@@ -127,6 +128,18 @@ export function getDefaultRoiTaxTreatment(category: string): RoiTaxTreatment {
 /** Whether the ROI tax treatment toggle should be shown for a category */
 export function shouldShowRoiTaxToggle(category: string, taxTreatmentOverride?: TaxTreatment): boolean {
   return !TAX_SHELTERED_CATEGORIES.has(category) && getTaxTreatment(category, taxTreatmentOverride) !== "tax-free";
+}
+
+/** Categories that default to reinvesting returns (compound within the account) */
+const REINVEST_DEFAULT_CATEGORIES = new Set([
+  "401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA",
+  "TFSA", "RRSP", "RESP", "FHSA", "LIRA",
+  "Brokerage",
+]);
+
+/** Get the default reinvest-returns setting for a category */
+export function getDefaultReinvest(category: string): boolean {
+  return REINVEST_DEFAULT_CATEGORIES.has(category);
 }
 
 /** Returns a flag emoji if the category is region-specific, or empty string */
@@ -624,6 +637,33 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       data-testid={`roi-tax-treatment-${asset.id}`}
                     >
                       {isIncome ? "Interest income" : "Capital gains"}
+                    </button>
+                  );
+                })()}
+
+                {/* Reinvest returns toggle — only when ROI > 0 */}
+                {displayRoi !== undefined && displayRoi > 0 && (() => {
+                  const effectiveReinvest = asset.reinvestReturns ?? getDefaultReinvest(asset.category);
+                  const isExplicit = asset.reinvestReturns !== undefined;
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateAssets(assets.map((a) =>
+                          a.id === asset.id ? { ...a, reinvestReturns: !effectiveReinvest } : a
+                        ));
+                      }}
+                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                        isExplicit
+                          ? effectiveReinvest
+                            ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                            : "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
+                          : "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
+                      }`}
+                      aria-label={`Toggle reinvest returns for ${asset.category}, currently ${effectiveReinvest ? "reinvesting" : "paying out"}`}
+                      data-testid={`reinvest-toggle-${asset.id}`}
+                    >
+                      {effectiveReinvest ? "Reinvesting" : "Payout"}
                     </button>
                   );
                 })()}

@@ -96,8 +96,10 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   // Compute estimated monthly investment returns from all assets (real + computed)
   const investmentReturns = computeMonthlyInvestmentReturns(state.assets);
   const totalMonthlyInvestmentReturns = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
-  // Surplus uses after-tax income + investment returns, subtracts expenses, contributions, mortgage payments, AND debt payments
-  const surplus = computeSurplus(monthlyAfterTaxIncome, totalMonthlyInvestmentReturns, monthlyExpenses, totalMonthlyContributions, totalMortgagePayments, totalDebtPayments);
+  // Only payout (non-reinvested) returns count toward surplus — reinvested returns stay in the asset
+  const payoutInvestmentReturns = investmentReturns.filter((r) => !r.reinvest).reduce((sum, r) => sum + r.amount, 0);
+  // Surplus uses after-tax income + payout investment returns, subtracts expenses, contributions, mortgage payments, AND debt payments
+  const surplus = computeSurplus(monthlyAfterTaxIncome, payoutInvestmentReturns, monthlyExpenses, totalMonthlyContributions, totalMortgagePayments, totalDebtPayments);
   // Runway uses liquid assets + stocks (NOT property), divided by total monthly obligations (including debt payments)
   const liquidTotal = totalAssets + totalStocks;
   const monthlyObligations = computeMonthlyObligations(monthlyExpenses, totalMortgagePayments, totalDebtPayments);
@@ -209,12 +211,13 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const surplusOutflow: string[] = [];
   const monthlyTaxes = monthlyIncome - monthlyAfterTaxIncome;
   // List income sources largest-first (use gross income, taxes shown as outflow)
-  if (totalMonthlyInvestmentReturns > monthlyIncome) {
-    if (totalMonthlyInvestmentReturns > 0) surplusIncome.push(`${$(totalMonthlyInvestmentReturns)} investment returns`);
+  // Only payout (non-reinvested) returns appear in the surplus formula
+  if (payoutInvestmentReturns > monthlyIncome) {
+    if (payoutInvestmentReturns > 0) surplusIncome.push(`${$(payoutInvestmentReturns)} investment returns`);
     if (monthlyIncome > 0) surplusIncome.push(`${$(monthlyIncome)} gross income`);
   } else {
     if (monthlyIncome > 0) surplusIncome.push(`${$(monthlyIncome)} gross income`);
-    if (totalMonthlyInvestmentReturns > 0) surplusIncome.push(`${$(totalMonthlyInvestmentReturns)} investment returns`);
+    if (payoutInvestmentReturns > 0) surplusIncome.push(`${$(payoutInvestmentReturns)} investment returns`);
   }
   if (monthlyTaxes > 0) surplusOutflow.push(`${$(monthlyTaxes)} taxes`);
   if (monthlyExpenses > 0) surplusOutflow.push(`${$(monthlyExpenses)} expenses`);
