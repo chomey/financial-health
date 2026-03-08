@@ -378,7 +378,7 @@ export default function TaxCreditEntry({
                       <button
                         type="button"
                         onClick={() => startEdit(tc.id, "category", tc.category)}
-                        className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
+                        className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                         aria-label={`Edit category for ${tc.category}`}
                       >
                         {tc.category}

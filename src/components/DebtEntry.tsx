@@ -365,7 +365,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     onClick={() =>
                       startEdit(debt.id, "category", debt.category)
                     }
-                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
+                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                     aria-label={`Edit category for ${debt.category}`}
                   >
                     {getDebtCategoryFlag(debt.category) && (
@@ -437,7 +437,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
               </div>
 
               {/* Secondary detail fields: interest rate and monthly payment */}
-              <div className="flex flex-wrap items-center gap-2 px-3 -mt-1 pb-0.5" data-testid={`debt-details-${debt.id}`}>
+              <div className="flex flex-wrap items-center gap-1.5 px-3 -mt-1 pb-0.5" data-testid={`debt-details-${debt.id}`}>
                 {/* Interest rate badge/editor */}
                 {editingId === debt.id && editingField === "interestRate" ? (
                   <input

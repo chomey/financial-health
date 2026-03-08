@@ -436,7 +436,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     </div>
                   ) : (
                     isComputed ? (
-                      <span className="flex-1 min-w-0 truncate text-left text-sm text-slate-400 px-2 py-1">
+                      <span className="flex-1 min-w-0 text-left text-sm text-slate-400 px-2 py-1">
                         {asset.category}
                         <span className="ml-1.5 inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 uppercase tracking-wide">auto</span>
                       </span>
@@ -446,7 +446,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       onClick={() =>
                         startEdit(asset.id, "category", asset.category)
                       }
-                      className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 truncate text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
+                      className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                       aria-label={`Edit category for ${asset.category}`}
                     >
                       {getAssetCategoryFlag(asset.category) && (
@@ -527,7 +527,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
               </div>
 
               {/* Secondary detail fields */}
-              <div className={`flex flex-wrap items-center gap-2 pb-1 ${isComputed ? "px-4" : "px-3"}`} data-testid={`asset-details-${asset.id}`}>
+              <div className="flex flex-wrap items-center gap-1.5 pb-1 px-3" data-testid={`asset-details-${asset.id}`}>
                 {/* Tax treatment pill — auto-detected, click to override */}
                 {(() => {
                   const autoDetected = getTaxTreatment(asset.category);
@@ -553,7 +553,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           a.id === asset.id ? { ...a, taxTreatment: override } : a
                         ));
                       }}
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${colors[effective]}`}
+                      className={`rounded px-1.5 py-0.5 text-xs font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${colors[effective]}`}
                       aria-label={`Tax treatment for ${asset.category}: ${labels[effective]}${isOverridden ? " (overridden)" : " (auto-detected)"}. Click to change.`}
                       data-testid={`tax-treatment-pill-${asset.id}`}
                     >

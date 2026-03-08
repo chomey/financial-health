@@ -586,7 +586,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                 </div>
 
                 {/* Secondary details: cost basis, gain/loss */}
-                <div className="flex flex-wrap items-center gap-2 px-3 -mt-1 pb-0.5" data-testid={`stock-details-${stock.id}`}>
+                <div className="flex flex-wrap items-center gap-1.5 px-3 -mt-1 pb-0.5" data-testid={`stock-details-${stock.id}`}>
                   {/* Cost basis */}
                   {editingId === stock.id && editingField === "costBasis" ? (
                     <input

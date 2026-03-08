@@ -548,7 +548,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                   return (
                     <div className="mt-1.5 space-y-1.5" data-testid={`property-details-${property.id}`}>
                       {/* Editable detail badges */}
-                      <div className="flex flex-wrap items-center gap-2 px-3">
+                      <div className="flex flex-wrap items-center gap-1.5 px-3">
                         {/* Interest rate */}
                         {editingId === property.id && editingField === "interestRate" ? (
                           <input
