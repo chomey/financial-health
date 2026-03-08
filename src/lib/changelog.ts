@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Financial roadmap inference engine
+  {
+    version: 149,
+    title: "Financial roadmap step definitions and inference engine",
+    description: "Added src/lib/flowchart-steps.ts with full 10-step roadmap definitions for both CA (r/PersonalFinanceCanada Money Steps: budget, starter EF, employer RRSP match, high-interest debt, full EF, TFSA, RRSP, moderate debt, RESP/FHSA, taxable investing) and US (r/personalfinance How to handle $: budget, starter EF, 401k match, high-interest debt, full EF, HSA, IRA/Roth IRA, 401k, moderate debt, taxable investing). Inference engine computes completion status and progress from FinancialState: budget from income/expense presence, emergency fund from liquid assets vs monthly obligations, debt steps from interest rate thresholds (>8% high, 4–8% moderate), account steps from asset category keywords. Steps that can't be inferred are userAcknowledgeable (employer match, RESP/FHSA, taxable investing) with optional skipLabel. URL persistence helpers added to url-state.ts: getFlowchartAcksFromURL(), getFlowchartSkipsFromURL(), updateFlowchartOverridesURL() using fca= and fcs= params.",
+    date: "2026-03-08",
+  },
   // Context-aware insights
   {
     version: 148,

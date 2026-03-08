@@ -7,10 +7,20 @@
 -->
 
 ## Summary
-- **Total Tasks**: 148
-- **Completed**: 148
-- **Remaining**: 0
+- **Total Tasks**: 151
+- **Completed**: 149
+- **Remaining**: 2
 - **Last Updated**: 2026-03-08
+
+## Task 149: Financial roadmap step definitions and inference engine
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/flowchart-steps.ts` (new): FlowchartStep type, `getFlowchartSteps(state)`, `getCurrentStepIndex(steps)`, `applyUserOverrides(steps, acks, skips)`. 10-step CA and US flowcharts with inference engine (budget, EF, debt, tax-advantaged accounts).
+  - `src/lib/url-state.ts`: Added `getFlowchartAcksFromURL()`, `getFlowchartSkipsFromURL()`, `updateFlowchartOverridesURL()` using `fca=` and `fcs=` params.
+  - `tests/unit/flowchart-steps.test.ts` (new): 42 unit tests covering no-data, partial, fully funded, CA-only, US-only, high debt, no debt, stock counting, employer match, applyUserOverrides, getCurrentStepIndex.
+  - `tests/unit/changelog.test.ts`: Fixed pre-existing test failure (147→148 count/range).
+- **Tests**: T1: 2061 passed (all), Build: passes
+- **Notes**: `getStockValue` uses `lastFetchedPrice ?? 0` (not costBasis). Steps with `isComplete=true` remain "complete" even after first in-progress step (independent, not purely sequential). Steps marked `userAcknowledgeable` (employer match, RESP/FHSA, taxable investing) require user confirmation to mark complete.
 
 ## Task 148: Make insights context-aware of user's actual accounts
 - **Date**: 2026-03-08

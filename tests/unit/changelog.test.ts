@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for completed tasks (147 entries, versions 1-147)", () => {
-    expect(CHANGELOG.length).toBe(147);
+  it("contains entries for completed tasks (148 entries, versions 1-148)", () => {
+    expect(CHANGELOG.length).toBe(148);
   });
 
   it("has unique version numbers", () => {
@@ -11,11 +11,11 @@ describe("changelog data", () => {
     expect(new Set(versions).size).toBe(versions.length);
   });
 
-  it("covers versions 1 through 147", () => {
+  it("covers versions 1 through 148", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(147);
-    for (let i = 1; i <= 147; i++) {
+    expect(versions[versions.length - 1]).toBe(148);
+    for (let i = 1; i <= 148; i++) {
       expect(versions).toContain(i);
     }
   });

@@ -465,5 +465,57 @@ export function updateOutlookYearsURL(years: OutlookYears): void {
   window.history.replaceState(null, "", url.toString());
 }
 
+// ── Flowchart override URL helpers ────────────────────────────────────────────
+
+/**
+ * Read flowchart-acknowledged step IDs from URL param `fca=`.
+ * Format: comma-separated step IDs, e.g. "ca-employer-match,ca-resp-fhsa"
+ */
+export function getFlowchartAcksFromURL(): string[] {
+  if (typeof window === "undefined") return [];
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get("fca");
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Read flowchart-skipped step IDs from URL param `fcs=`.
+ * Format: comma-separated step IDs, e.g. "ca-employer-match"
+ */
+export function getFlowchartSkipsFromURL(): string[] {
+  if (typeof window === "undefined") return [];
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get("fcs");
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Persist flowchart acknowledged and skipped step IDs to URL params
+ * `fca=` and `fcs=` without affecting the main state param.
+ */
+export function updateFlowchartOverridesURL(acknowledged: string[], skipped: string[]): void {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (acknowledged.length > 0) {
+    url.searchParams.set("fca", acknowledged.join(","));
+  } else {
+    url.searchParams.delete("fca");
+  }
+  if (skipped.length > 0) {
+    url.searchParams.set("fcs", skipped.join(","));
+  } else {
+    url.searchParams.delete("fcs");
+  }
+  window.history.replaceState(null, "", url.toString());
+}
+
 // Export for testing
 export { encode85, decode85, toCompact, fromCompact };
