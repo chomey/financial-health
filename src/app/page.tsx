@@ -1,5 +1,14 @@
 "use client";
 
+// Suppress Recharts dimension warnings for collapsed/hidden chart containers
+if (typeof window !== "undefined") {
+  const origError = console.error;
+  console.error = (...args: unknown[]) => {
+    if (typeof args[0] === "string" && args[0].includes("The width(-1) and height(-1)")) return;
+    origError.apply(console, args);
+  };
+}
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
