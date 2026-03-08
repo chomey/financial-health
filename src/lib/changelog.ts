@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Retirement-aware Money Steps
+  {
+    version: 156,
+    title: "Retirement-aware Money Steps",
+    description: "Added an 'I'm retired' toggle to the Money Steps panel. When enabled, employer match steps auto-complete with a 'Retired' hint, tax-advantaged contribution steps (TFSA, RRSP, HSA, IRA, 401k) become skippable, and the Budget step completes with expenses alone — showing 'Expenses tracked — living on savings/investments' instead of 'no income yet'. A heuristic auto-suggests retirement mode when all income is non-employment and either runway exceeds 20 years or investment returns exceed monthly expenses. The retired flag persists in URL state as fret=1.",
+    date: "2026-03-08",
+  },
   // Validate US tax credits/brackets for 2025/2026
   {
     version: 155,

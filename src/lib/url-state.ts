@@ -468,6 +468,32 @@ export function updateOutlookYearsURL(years: OutlookYears): void {
   window.history.replaceState(null, "", url.toString());
 }
 
+// ── Flowchart retirement URL helpers ─────────────────────────────────────────
+
+/**
+ * Read retirement flag from URL param `fret=1`.
+ * When true, the user has indicated they are retired.
+ */
+export function getRetiredFromURL(): boolean {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(window.location.search);
+  return params.get("fret") === "1";
+}
+
+/**
+ * Persist retirement flag to URL param `fret=1` without affecting other params.
+ */
+export function updateRetiredURL(isRetired: boolean): void {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (isRetired) {
+    url.searchParams.set("fret", "1");
+  } else {
+    url.searchParams.delete("fret");
+  }
+  window.history.replaceState(null, "", url.toString());
+}
+
 // ── Flowchart override URL helpers ────────────────────────────────────────────
 
 /**

@@ -177,3 +177,5 @@
 - [x] Task 149: Financial roadmap step definitions and inference engine — Step definitions for US and CA with contextual inference logic and URL persistence. [@fullstack]
 - [x] Task 150: Financial roadmap visual component — Interactive vertical flowchart with acknowledge/skip checkboxes. [@frontend]
 - [x] Task 151: [MILESTONE] Financial roadmap E2E regression — Full Playwright regression for the roadmap feature. [@qa]
+
+- [x] Task 152: Apply tax credits to displayed tax and cash flow — The credit-adjusted tax is computed in compute-metrics.ts (`creditAdjustedAnnualTax`) but never fed back into the displayed "Taxes (est.)" value or the surplus/cash flow calculation. Fix: use `creditAdjustedAnnualTax` as the displayed tax, and compute `monthlyAfterTaxIncome` using the credit-adjusted tax so surplus reflects the real take-home. Update the tax breakdown strings and surplus formula accordingly. Non-refundable credits reduce tax (capped at $0), refundable credits can exceed tax, deductions should reduce taxable income before bracket computation. [@fullstack] [MATH]

@@ -6,13 +6,18 @@ import {
   getFlowchartSteps,
   getCurrentStepIndex,
   applyUserOverrides,
+  getStepContext,
+  detectRetirementHeuristic,
   type FlowchartStep,
   type StepStatus,
+  type StepContext,
 } from "@/lib/flowchart-steps";
 import {
   getFlowchartAcksFromURL,
   getFlowchartSkipsFromURL,
   updateFlowchartOverridesURL,
+  getRetiredFromURL,
+  updateRetiredURL,
 } from "@/lib/url-state";
 import type { FinancialState } from "@/lib/financial-types";
 
@@ -73,10 +78,79 @@ function StepCircle({ step, size = "sm" }: { step: FlowchartStep; size?: "sm" | 
   );
 }
 
+// ── Currency formatter ───────────────────────────────────────────────────────
+
+function fmtMoney(n: number): string {
+  const abs = Math.abs(n);
+  const formatted = abs >= 1000
+    ? "$" + Math.round(abs).toLocaleString()
+    : "$" + abs.toFixed(0);
+  return n < 0 ? "-" + formatted : formatted;
+}
+
+// ── Step context display ─────────────────────────────────────────────────────
+
+function StepContextSection({ context }: { context: StepContext }) {
+  const hasItems = context.items.length > 0;
+  const hasProgress = context.progress && context.progress.target > 0;
+
+  if (!hasItems && !hasProgress) {
+    return (
+      <div className="mt-3 rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2.5">
+        <p className="text-xs font-medium text-slate-500 mb-1">{context.heading}</p>
+        <p className="text-xs text-slate-600 italic">None found in your data yet</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3 rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2.5">
+      <p className="text-xs font-medium text-slate-500 mb-1.5">{context.heading}</p>
+      {hasItems && (
+        <div className="space-y-1">
+          {context.items.map((item, i) => (
+            <div key={i} className="flex items-center justify-between gap-2 text-sm">
+              <span className="text-slate-300 truncate">{item.label}</span>
+              <span className="flex-shrink-0 tabular-nums text-slate-400">
+                {fmtMoney(item.amount)}
+                {item.detail && <span className="text-slate-600 text-xs ml-0.5">{item.detail}</span>}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      {hasProgress && context.progress && (
+        <div className="mt-2 pt-2 border-t border-white/5">
+          <div className="flex items-center justify-between text-xs mb-1">
+            <span className="text-slate-500">
+              {fmtMoney(context.progress.current)} of {fmtMoney(context.progress.target)}
+            </span>
+            <span className="font-medium tabular-nums text-amber-400">
+              {Math.min(100, Math.round((context.progress.current / context.progress.target) * 100))}%
+            </span>
+          </div>
+          <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${Math.min(100, (context.progress.current / context.progress.target) * 100)}%`,
+                background: context.progress.current >= context.progress.target
+                  ? "linear-gradient(to right, #10b981, #34d399)"
+                  : "linear-gradient(to right, #f59e0b, #fbbf24)",
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Detail modal (portal) ────────────────────────────────────────────────────
 
 function StepDetailModal({
   step,
+  context,
   isAcknowledged,
   isSkipped,
   onAcknowledge,
@@ -85,6 +159,7 @@ function StepDetailModal({
   onClose,
 }: {
   step: FlowchartStep;
+  context: StepContext | null;
   isAcknowledged: boolean;
   isSkipped: boolean;
   onAcknowledge: (checked: boolean) => void;
@@ -118,6 +193,7 @@ function StepDetailModal({
       onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
       <div
+        data-testid={`step-modal-${step.id}`}
         className={`relative w-full max-w-md overflow-auto rounded-2xl bg-slate-900 border border-white/10 p-5 shadow-2xl transition-all duration-150 ease-out ${isVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
       >
         <button
@@ -155,6 +231,8 @@ function StepDetailModal({
         <div className="text-sm leading-relaxed text-slate-400" data-testid={`step-detail-${step.id}`}>
           <p>{step.detailText}</p>
         </div>
+
+        {context && <StepContextSection context={context} />}
 
         {(step.userAcknowledgeable || step.skippable) && (
           <div className="mt-3 space-y-2 border-t border-white/10 pt-3">
@@ -237,41 +315,20 @@ function ZigZagStep({
             <span className="ml-1.5 rounded-full bg-slate-700/60 px-1.5 py-0.5 text-[10px] font-normal text-slate-500">N/A</span>
           )}
         </p>
-        <p className="mt-0.5 text-[11px] leading-snug text-slate-500 line-clamp-2">{step.completionHint}</p>
+        <p className="mt-0.5 text-[11px] leading-snug text-slate-600 line-clamp-1">{step.description}</p>
+        <p className="mt-0.5 text-[11px] leading-snug text-slate-500 line-clamp-1">{step.completionHint}</p>
       </div>
     </button>
   );
 }
 
-// ── Connector arrows between rows ────────────────────────────────────────────
+// ── Vertical connector between steps ─────────────────────────────────────────
 
-function HorizontalConnector({ status }: { status: StepStatus }) {
-  const color = status === "complete" ? "border-emerald-500/40" : "border-white/10";
+function VerticalConnector({ status }: { status: StepStatus }) {
+  const color = status === "complete" ? "bg-emerald-500/40" : "bg-white/10";
   return (
-    <div className={`hidden sm:flex items-center self-center`} aria-hidden="true">
-      <div className={`w-4 lg:w-6 border-t-2 border-dashed ${color}`} />
-    </div>
-  );
-}
-
-function ZigZagTurn({ direction, status }: { direction: "right" | "left"; status: StepStatus }) {
-  const color = status === "complete" ? "border-emerald-500/40" : "border-white/10";
-  // "right" turn: connector drops down from right edge, "left" turn: drops down from left edge
-  return (
-    <div className="hidden sm:flex w-full py-1 sm:py-2" aria-hidden="true">
-      {direction === "right" ? (
-        <div className="ml-auto mr-6 flex flex-col items-end">
-          <div className={`h-4 border-r-2 border-dashed ${color}`} />
-          <div className={`w-[calc(100vw-6rem)] max-w-[calc(100%-3rem)] border-b-2 border-dashed ${color} rounded-br-xl`} style={{ width: "80%" }} />
-          <div className={`h-4 border-l-2 border-dashed ${color} self-start`} />
-        </div>
-      ) : (
-        <div className="ml-6 mr-auto flex flex-col items-start">
-          <div className={`h-4 border-l-2 border-dashed ${color}`} />
-          <div className={`border-b-2 border-dashed ${color} rounded-bl-xl`} style={{ width: "80%" }} />
-          <div className={`h-4 border-r-2 border-dashed ${color} self-end`} />
-        </div>
-      )}
+    <div className="flex justify-center py-0.5" aria-hidden="true">
+      <div className={`h-4 w-0.5 ${color} rounded-full`} />
     </div>
   );
 }
@@ -282,16 +339,28 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
   const [acknowledged, setAcknowledged] = useState<string[]>([]);
   const [skipped, setSkipped] = useState<string[]>([]);
   const [detailStep, setDetailStep] = useState<FlowchartStep | null>(null);
+  const [isRetired, setIsRetired] = useState(false);
 
   useEffect(() => {
     const acks = getFlowchartAcksFromURL();
     const skps = getFlowchartSkipsFromURL();
     setAcknowledged(acks);
     setSkipped(skps);
+    setIsRetired(getRetiredFromURL());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const baseSteps = useMemo(() => getFlowchartSteps(state), [state]);
+  const retirementSuggested = useMemo(
+    () => !isRetired && detectRetirementHeuristic(state),
+    [isRetired, state],
+  );
+
+  const handleRetiredChange = useCallback((checked: boolean) => {
+    setIsRetired(checked);
+    updateRetiredURL(checked);
+  }, []);
+
+  const baseSteps = useMemo(() => getFlowchartSteps(state, isRetired), [state, isRetired]);
   const steps = useMemo(
     () => applyUserOverrides(baseSteps, acknowledged, skipped),
     [baseSteps, acknowledged, skipped],
@@ -345,20 +414,6 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
     setDetailStep(null);
   }, []);
 
-  // Split steps into rows for zig-zag: 4 per row on desktop, 2 on mobile
-  // We use a fixed 4-per-row for the zig-zag pattern
-  const COLS = 4;
-  const rows: FlowchartStep[][] = [];
-  for (let i = 0; i < steps.length; i += COLS) {
-    const row = steps.slice(i, i + COLS);
-    // Odd rows (1, 3, ...) are right-to-left, so reverse them
-    if (rows.length % 2 === 1) {
-      rows.push([...row].reverse());
-    } else {
-      rows.push(row);
-    }
-  }
-
   const caWikiUrl = "https://www.reddit.com/r/PersonalFinanceCanada/wiki/money-steps";
   const usWikiUrl = "https://www.reddit.com/r/personalfinance/wiki/commontopics";
 
@@ -367,8 +422,8 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
       className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 shadow-sm transition-all duration-200"
       data-testid="financial-flowchart"
     >
-      {/* Header row */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
           <span className="text-lg" aria-hidden="true">🗺️</span>
           <h3 className="text-sm font-medium text-slate-400">Money Steps</h3>
@@ -398,51 +453,68 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
         </div>
       </div>
 
-      {/* Zig-zag flowchart */}
+      {/* Retirement toggle */}
+      <div className="mb-3 flex items-center gap-2">
+        <label className="flex cursor-pointer items-center gap-2" data-testid="retired-toggle-label">
+          <input
+            type="checkbox"
+            checked={isRetired}
+            onChange={(e) => handleRetiredChange(e.target.checked)}
+            className="h-4 w-4 flex-shrink-0 rounded accent-violet-500"
+            data-testid="retired-toggle"
+          />
+          <span className="text-xs text-slate-500">I&apos;m retired</span>
+        </label>
+        {isRetired && (
+          <span className="rounded-full bg-violet-500/15 px-2 py-0.5 text-[10px] font-medium text-violet-400">
+            Retirement mode
+          </span>
+        )}
+      </div>
+
+      {/* Retirement suggestion banner */}
+      {retirementSuggested && (
+        <div
+          className="mb-3 flex items-start gap-2 rounded-lg border border-violet-500/20 bg-violet-500/5 px-3 py-2.5"
+          data-testid="retirement-suggestion"
+        >
+          <span className="mt-0.5 text-sm text-violet-400" aria-hidden="true">💡</span>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-slate-400">
+              It looks like you may be retired — your income is non-employment and you have a long runway.
+            </p>
+            <button
+              type="button"
+              onClick={() => handleRetiredChange(true)}
+              className="mt-1 text-xs font-medium text-violet-400 underline underline-offset-2 transition-colors hover:text-violet-300"
+            >
+              Enable retirement mode
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Top-down vertical flow */}
       <div role="list" aria-label="Money steps">
-        {rows.map((row, rowIdx) => {
-          const isReversedRow = rowIdx % 2 === 1;
-          // Determine the status of the last step in this row for the turn connector
-          const lastStepInRow = isReversedRow ? row[0] : row[row.length - 1];
-          const isLastRow = rowIdx === rows.length - 1;
-
-          return (
-            <div key={rowIdx}>
-              {/* Row of step cards with horizontal connectors */}
-              <div className="grid gap-2 sm:flex sm:items-stretch sm:gap-0">
-                {row.map((step, colIdx) => {
-                  const isLastInRow = colIdx === row.length - 1;
-                  return (
-                    <div key={step.id} role="listitem" className="flex items-stretch sm:flex-1 min-w-0">
-                      <div className="flex-1 min-w-0">
-                        <ZigZagStep
-                          step={step}
-                          isSkipped={skipped.includes(step.id)}
-                          onClick={() => openDetail(step)}
-                        />
-                      </div>
-                      {!isLastInRow && <HorizontalConnector status={step.status} />}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Zig-zag turn connector between rows */}
-              {!isLastRow && (
-                <ZigZagTurn
-                  direction={isReversedRow ? "left" : "right"}
-                  status={lastStepInRow.status}
-                />
-              )}
+        {steps.map((step, idx) => (
+          <div key={step.id}>
+            {idx > 0 && <VerticalConnector status={steps[idx - 1].status} />}
+            <div role="listitem">
+              <ZigZagStep
+                step={step}
+                isSkipped={skipped.includes(step.id)}
+                onClick={() => openDetail(step)}
+              />
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* Detail modal */}
       {detailStep && (
         <StepDetailModal
           step={detailStep}
+          context={getStepContext(detailStep.id, state)}
           isAcknowledged={acknowledged.includes(detailStep.id)}
           isSkipped={skipped.includes(detailStep.id)}
           onAcknowledge={(checked) => handleAcknowledge(detailStep.id, checked)}

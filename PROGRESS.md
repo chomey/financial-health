@@ -7,10 +7,23 @@
 -->
 
 ## Summary
-- **Total Tasks**: 155
-- **Completed**: 155
-- **Remaining**: 1
+- **Total Tasks**: 156
+- **Completed**: 156
+- **Remaining**: 0
 - **Last Updated**: 2026-03-08
+
+## Task 156: Retirement-aware Money Steps [@fullstack]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/url-state.ts`: Added `getRetiredFromURL()` and `updateRetiredURL()` helpers for `fret=1` URL param.
+  - `src/lib/flowchart-steps.ts`: Added `detectRetirementHeuristic()` export. Updated `getFlowchartSteps()` to accept `isRetired` param. When retired: budget step completes with expenses alone (hint: "Expenses tracked — living on savings/investments"), employer match auto-completes ("Retired — employer match not applicable"), TFSA/RRSP/HSA/IRA/401k steps become skippable with "Retired — contributions are optional" label.
+  - `src/components/FinancialFlowchart.tsx`: Added `isRetired` state loaded from/saved to URL. Added "I'm retired" toggle checkbox in header. Added "Retirement mode" badge when active. Added retirement suggestion banner (shows when heuristic fires but user hasn't enabled mode). Added `data-testid="step-modal-{id}"` to modal dialog.
+  - `src/lib/changelog.ts`: Added version 156 entry.
+  - `tests/unit/retirement-aware-steps.test.ts`: New — 20 unit tests covering heuristic detection, CA/US retirement step behavior.
+  - `tests/unit/changelog.test.ts`: Updated entry count to 156.
+  - `tests/e2e/retirement-aware-steps.spec.ts`: New — 6 Playwright tests: toggle visibility, badge, URL persistence, suggestion banner, employer match modal, uncheck.
+- **Tests**: T1: 2223 passed (124 files), T2: 6/6 passed, Build: passes
+- **Screenshots**: task-156-retired-toggle-unchecked.png, task-156-retired-toggle-checked.png, task-156-employer-match-retired.png
 
 ## Task 155: Validate all US tax credits/brackets for 2025/2026 [@backend] [MATH]
 - **Date**: 2026-03-08
