@@ -108,7 +108,6 @@ export default function Home() {
 
   // ── Dashboard section definitions (for header stepper scroll-to links) ──
   const DASHBOARD_SECTIONS = useMemo(() => [
-    { id: "intro", icon: "🏠", label: "Intro", shortLabel: "Intro" },
     { id: "insights", icon: "💡", label: "Insights", shortLabel: "Insights" },
     { id: "metrics", icon: "🎯", label: "Metrics", shortLabel: "Metrics" },
     { id: "roadmap", icon: "🗺️", label: "Flowchart", shortLabel: "Flow" },
@@ -120,7 +119,7 @@ export default function Home() {
   ] as const, []);
 
   // Track which section is visible for highlighting the stepper
-  const [visibleSection, setVisibleSection] = useState("intro");
+  const [visibleSection, setVisibleSection] = useState("insights");
   useEffect(() => {
     if (phase !== "dashboard" || typeof IntersectionObserver === "undefined") return;
     const sectionIds = DASHBOARD_SECTIONS.map(s => s.id);
@@ -466,64 +465,6 @@ export default function Home() {
       <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
         <div className="mx-auto max-w-5xl space-y-8">
 
-          {/* Intro */}
-          <section id="section-dash-intro" className="scroll-mt-28 max-w-3xl mx-auto">
-            <WelcomeBanner />
-            {showSampleProfiles && (
-              <div className="mb-6 rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/10 to-emerald-400/5 px-4 py-5 shadow-sm sm:px-6 print:hidden backdrop-blur-sm" data-testid="sample-profiles-banner">
-                <div className="mb-4 flex items-start justify-between gap-4">
-                  <div>
-                    <h2 className="text-base font-semibold text-slate-200 sm:text-lg">Start with a sample profile</h2>
-                    <p className="mt-0.5 text-sm text-slate-400">See how the tool works with realistic numbers, then edit to match your own.</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowSampleProfiles(false)}
-                    className="shrink-0 rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
-                    aria-label="Dismiss sample profiles"
-                    data-testid="sample-profiles-dismiss"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  {getProfilesForCountry(country).map((profile) => (
-                    <button
-                      key={profile.id}
-                      type="button"
-                      onClick={() => loadProfile(profile)}
-                      className="group flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-4 text-left shadow-sm transition-all duration-200 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95"
-                      data-testid={`sample-profile-${profile.id}`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl" aria-hidden="true">{profile.emoji}</span>
-                        <span className="font-semibold text-slate-200 text-sm leading-tight group-hover:text-cyan-400 transition-colors duration-150">{profile.name}</span>
-                      </div>
-                      <p className="text-xs text-slate-400 leading-relaxed">{profile.description}</p>
-                      <div className="flex flex-wrap gap-1.5 mt-auto">
-                        {profile.highlights.map((h) => (
-                          <span key={h} className="rounded-full bg-cyan-400/10 px-2 py-0.5 text-xs font-medium text-cyan-300 border border-cyan-400/20">{h}</span>
-                        ))}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <p className="text-xs text-slate-500">Or enter your own numbers directly in the sections below.</p>
-                  <button
-                    type="button"
-                    onClick={clearAll}
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-400 shadow-sm transition-all duration-150 hover:border-white/20 hover:text-slate-200 hover:shadow focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 active:scale-95"
-                    data-testid="clear-all-button"
-                  >
-                    Clear all
-                  </button>
-                </div>
-              </div>
-            )}
-          </section>
 
           {/* Insights */}
           <section id="section-dash-insights" className="scroll-mt-28" aria-label="Financial insights">
