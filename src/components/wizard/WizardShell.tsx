@@ -253,7 +253,7 @@ export default function WizardShell(props: WizardProps) {
     <div className="min-h-screen bg-slate-950 flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-2 sm:px-6">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl">
           {/* Title + phase toggle */}
           <div className="flex items-center gap-2 mb-1.5">
             <h1 className="text-sm font-bold text-white sm:text-base">Financial Health</h1>
@@ -305,7 +305,7 @@ export default function WizardShell(props: WizardProps) {
 
       {/* Footer navigation */}
       <footer className="sticky bottom-0 border-t border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-3 sm:px-6">
-        <div className="mx-auto max-w-3xl flex items-center justify-between gap-3">
+        <div className="mx-auto max-w-5xl flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={goPrev}
