@@ -10,6 +10,7 @@ import {
   buildSankeyData,
   SANKEY_COLORS,
   type SankeyNode,
+  type SankeyLink,
   type CashFlowInput,
 } from "@/lib/sankey-data";
 import { useCurrency } from "@/lib/CurrencyContext";
@@ -45,6 +46,83 @@ interface CashFlowSankeyProps {
   monthlyProvincialTax: number;
   monthlySurplus: number;
   investmentReturns?: CashFlowInput["investmentReturns"];
+}
+
+/** Mobile-friendly table showing cash flow as grouped rows */
+function CashFlowTable({
+  links,
+  nodes,
+  fmt,
+}: {
+  links: SankeyLink[];
+  nodes: SankeyNode[];
+  fmt: { full: (v: number) => string };
+}) {
+  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+
+  // Group links by source type for a clean breakdown
+  const sections: { title: string; color: string; rows: { label: string; value: number }[] }[] = [];
+
+  // Income sources
+  const incomeRows = nodes
+    .filter((n) => n.type === "income" || n.type === "investment-income")
+    .map((n) => ({ label: n.label, value: n.value ?? 0 }))
+    .filter((r) => r.value > 0);
+  if (incomeRows.length > 0) {
+    sections.push({ title: "Income", color: SANKEY_COLORS.income, rows: incomeRows });
+  }
+
+  // Outflows: group by target type from the pool
+  const outflowTypes: { title: string; type: string; color: string }[] = [
+    { title: "Taxes", type: "tax", color: SANKEY_COLORS.tax },
+    { title: "Expenses", type: "expense", color: SANKEY_COLORS.expense },
+    { title: "Investments", type: "investment", color: SANKEY_COLORS.investment },
+    { title: "Debt & Mortgage", type: "debt", color: SANKEY_COLORS.debt },
+    { title: "Surplus", type: "surplus", color: SANKEY_COLORS.surplus },
+  ];
+
+  for (const { title, type, color } of outflowTypes) {
+    const rows = nodes
+      .filter((n) => n.type === type)
+      .map((n) => {
+        // Get the actual flow value from links targeting this node
+        const flowValue = links
+          .filter((l) => l.target === n.id)
+          .reduce((sum, l) => sum + l.value, 0);
+        return { label: n.label, value: flowValue || n.value || 0 };
+      })
+      .filter((r) => r.value > 0);
+    if (rows.length > 0) {
+      sections.push({ title, color, rows });
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      {sections.map((section) => {
+        const sectionTotal = section.rows.reduce((sum, r) => sum + r.value, 0);
+        return (
+          <div key={section.title}>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1.5">
+                <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: section.color }} />
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">{section.title}</span>
+              </div>
+              <span className="text-xs font-medium text-slate-400">{fmt.full(sectionTotal)}/mo</span>
+            </div>
+            <div className="space-y-0.5">
+              {section.rows.map((row) => (
+                <div key={row.label} className="flex items-center justify-between rounded px-2 py-1 bg-white/5">
+                  <span className="text-xs text-slate-300">{row.label}</span>
+                  <span className="text-xs font-medium text-slate-300">{fmt.full(row.value)}/mo</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function CashFlowSankey({
@@ -200,7 +278,13 @@ export default function CashFlowSankey({
               Add income to see your cash flow
             </p>
           ) : layout ? (
-            <div className="relative" data-testid="sankey-chart">
+            <>
+            {/* Mobile: table view */}
+            <div className="sm:hidden" data-testid="sankey-table">
+              <CashFlowTable links={rawData.links} nodes={rawData.nodes} fmt={fmt} />
+            </div>
+            {/* Desktop: SVG Sankey */}
+            <div className="relative hidden sm:block" data-testid="sankey-chart">
               <svg
                 ref={svgRef}
                 viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
@@ -371,6 +455,7 @@ export default function CashFlowSankey({
                 </span>
               </div>
             </div>
+            </>
           ) : null}
         </div>
       )}

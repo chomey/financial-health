@@ -347,7 +347,9 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                   : "hover:bg-white/5"
               }`}
             >
-              <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
+              <div className="flex flex-1 flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 min-w-0">
+                {/* Row 1 on mobile: Category + Amount */}
+                <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                 {/* Category */}
                 {editingId === item.id && editingField === "category" ? (
                   <div className="relative flex-1 min-w-0">
@@ -396,7 +398,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                     onClick={() =>
                       startEdit(item.id, "category", item.category)
                     }
-                    className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
+                    className="min-w-0 min-h-[44px] sm:min-h-0 text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                     aria-label={`Edit category for ${item.category}`}
                   >
                     {item.category}
@@ -404,7 +406,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                 )}
 
                 {/* Amount + Currency */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 ml-auto">
                   {homeCurrency && fxRates && (
                     <span data-testid={`income-details-${item.id}`}>
                       <CurrencyBadge
@@ -435,7 +437,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                       onClick={() =>
                         startEdit(item.id, "amount", String(item.amount))
                       }
-                      className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-emerald-400/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                      className="min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-emerald-400/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
                     >
                       <div className="text-sm font-medium text-emerald-400">{formatCurrency(item.amount)}{FREQUENCY_SHORT_LABELS[item.frequency ?? "monthly"]}</div>
@@ -447,7 +449,10 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                     </button>
                   )}
                 </div>
+                </div>
 
+                {/* Row 2 on mobile: Frequency + Income type dropdowns */}
+                <div className="flex items-center gap-1.5 sm:gap-1">
                 {/* Frequency badge/dropdown */}
                 <select
                   value={item.frequency ?? "monthly"}
@@ -481,6 +486,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                     </option>
                   ))}
                 </select>
+                </div>
               </div>
 
               {/* Delete button */}
