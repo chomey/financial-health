@@ -8,13 +8,13 @@
 
 ## Summary
 - **Total Tasks**: 145
-- **Completed**: 144
-- **Remaining**: 1
+- **Completed**: 145
+- **Remaining**: 0
 - **Last Updated**: 2026-03-07
 
-## Task 144: Tax credits impact on dashboard metrics
+## Task 145: [MILESTONE] Tax credits E2E regression
 - **Date**: 2026-03-07
-- **Files**: `src/components/SnapshotDashboard.tsx`, `src/lib/financial-state.ts`, `src/lib/changelog.ts`, `tests/unit/tax-credit-metrics.test.ts`, `tests/e2e/tax-credit-metrics.spec.ts`
-- **Tests**: T1: 1957 passed (12 new in `tax-credit-metrics.test.ts`), T2: 5 passed (new `tax-credit-metrics.spec.ts`), Build: passes
-- **Screenshots**: ![Monthly boost](screenshots/task-144-credit-monthly-boost.png) ![Tax rate adjusted](screenshots/task-144-tax-rate-adjusted.png) ![Surplus badge](screenshots/task-144-surplus-credit-badge.png) ![Runway adjusted](screenshots/task-144-runway-adjusted.png)
-- **Notes**: Added 3 new fields to `MetricData`: `taxCreditAdjustedRate`, `taxCreditMonthlyBoost`, `taxCreditAdjustedRunway`. Non-refundable credits capped at `totalTaxEstimate` to avoid negative taxes. Adjusted runway only shows if it exceeds base runway by >0.1 mo.
+- **Files**: `tests/e2e/tax-credit-regression.spec.ts`, `tests/unit/tax-credit-regression.test.ts`, `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`
+- **Tests**: T1: 1970 passed (13 new in `tax-credit-regression.test.ts`), T2: 16 passed (new `tax-credit-regression.spec.ts`), T3: 546 passed (full suite), Build: passes
+- **Screenshots**: ![CA credits loaded](screenshots/task-145-ca-credits-loaded.png) ![US credits loaded](screenshots/task-145-us-credits-loaded.png) ![CA insights summary](screenshots/task-145-ca-insights-summary.png) ![US insights summary](screenshots/task-145-us-insights-summary.png) ![CA dashboard tax rate](screenshots/task-145-ca-dashboard-tax-rate.png) ![CA dashboard surplus](screenshots/task-145-ca-dashboard-surplus.png) ![CA dashboard runway](screenshots/task-145-ca-dashboard-runway.png) ![US dashboard metrics](screenshots/task-145-us-dashboard-metrics.png) ![CA URL roundtrip](screenshots/task-145-ca-url-roundtrip.png) ![US URL roundtrip](screenshots/task-145-us-url-roundtrip.png) ![Interactive URL persist](screenshots/task-145-interactive-url-persist.png) ![US filing status](screenshots/task-145-us-filing-status.png) ![CA credit entry](screenshots/task-145-ca-credit-entry.png)
+- **Notes**: Fixed pre-existing changelog test failure (task 144 added entry without updating count assertions). Pre-encoded URL states must use `category`/`amount` field names (matching FinancialState interface), not `source`/`monthlyAmount`/`name`.
