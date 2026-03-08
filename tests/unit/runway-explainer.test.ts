@@ -111,9 +111,9 @@ describe("computeMetrics runwayDetails", () => {
     const runway = metrics.find((m) => m.title === "Financial Runway");
     expect(runway!.runwayDetails).toBeDefined();
     const order = runway!.runwayDetails!.withdrawalOrder;
-    // Tax-free first (TFSA), then taxable (Savings Account), then tax-deferred (RRSP)
-    expect(order[0].category).toBe("TFSA");
-    expect(order[0].taxTreatment).toBe("tax-free");
+    // Taxable first (Savings Account), then tax-free (TFSA) to preserve shelter, then tax-deferred (RRSP)
+    expect(order[0].category).toBe("Savings Account");
+    expect(order[0].taxTreatment).toBe("taxable");
     expect(order[order.length - 1].category).toBe("RRSP");
     expect(order[order.length - 1].taxTreatment).toBe("tax-deferred");
   });

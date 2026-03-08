@@ -341,7 +341,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
             <div>
             <div
               role="listitem"
-              className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 ${
+              className={`group flex items-center justify-between rounded-lg px-3 py-1.5 transition-colors duration-150 ${
                 item.incomeType === "capital-gains"
                   ? "bg-amber-400/5 hover:bg-amber-400/10 border-l-2 border-amber-400/60"
                   : "hover:bg-white/5"
@@ -403,35 +403,50 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                   </button>
                 )}
 
-                {/* Amount */}
-                {editingId === item.id && editingField === "amount" ? (
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => commitEdit()}
-                    onKeyDown={handleEditKeyDown}
-                    className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
-                    aria-label={`Edit amount for ${item.category}`}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      startEdit(item.id, "amount", String(item.amount))
-                    }
-                    className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-emerald-400/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
-                    aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
-                  >
-                    <div className="text-sm font-medium text-emerald-400">{formatCurrency(item.amount)}{FREQUENCY_SHORT_LABELS[item.frequency ?? "monthly"]}</div>
-                    {(item.frequency ?? "monthly") === "monthly" ? (
-                      <div className="text-xs text-slate-500">{formatCurrency(item.amount * 12)}/yr</div>
-                    ) : (
-                      <div className="text-xs text-slate-500">{formatCurrency(normalizeToMonthly(item.amount, item.frequency))}/mo</div>
-                    )}
-                  </button>
-                )}
+                {/* Amount + Currency */}
+                <div className="flex items-center gap-1">
+                  {homeCurrency && fxRates && (
+                    <span data-testid={`income-details-${item.id}`}>
+                      <CurrencyBadge
+                        currency={item.currency}
+                        homeCurrency={homeCurrency}
+                        amount={normalizeToMonthly(item.amount, item.frequency)}
+                        fxRates={fxRates}
+                        onCurrencyChange={(cu) => {
+                          setItems((prev) => prev.map((i) => i.id === item.id ? { ...i, currency: cu } : i));
+                        }}
+                      />
+                    </span>
+                  )}
+                  {editingId === item.id && editingField === "amount" ? (
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={() => commitEdit()}
+                      onKeyDown={handleEditKeyDown}
+                      className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                      aria-label={`Edit amount for ${item.category}`}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startEdit(item.id, "amount", String(item.amount))
+                      }
+                      className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-emerald-400/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                      aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
+                    >
+                      <div className="text-sm font-medium text-emerald-400">{formatCurrency(item.amount)}{FREQUENCY_SHORT_LABELS[item.frequency ?? "monthly"]}</div>
+                      {(item.frequency ?? "monthly") === "monthly" ? (
+                        <div className="text-xs text-slate-500">{formatCurrency(item.amount * 12)}/yr</div>
+                      ) : (
+                        <div className="text-xs text-slate-500">{formatCurrency(normalizeToMonthly(item.amount, item.frequency))}/mo</div>
+                      )}
+                    </button>
+                  )}
+                </div>
 
                 {/* Frequency badge/dropdown */}
                 <select
@@ -489,20 +504,6 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                 </svg>
               </button>
             </div>
-            {/* Secondary detail row: currency badge */}
-            {homeCurrency && fxRates && (
-              <div className="flex items-center gap-2 px-5 pb-1" data-testid={`income-details-${item.id}`}>
-                <CurrencyBadge
-                  currency={item.currency}
-                  homeCurrency={homeCurrency}
-                  amount={normalizeToMonthly(item.amount, item.frequency)}
-                  fxRates={fxRates}
-                  onCurrencyChange={(cu) => {
-                    setItems((prev) => prev.map((i) => i.id === item.id ? { ...i, currency: cu } : i));
-                  }}
-                />
-              </div>
-            )}
             </div>
             </DataFlowSourceItem>
           ))}
@@ -512,27 +513,29 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
       {/* Auto-computed investment returns */}
       {investmentReturns.length > 0 && (
         <div data-testid="investment-returns-auto-section">
-          <div className="mt-2 mb-1 border-t border-dashed border-white/10 pt-2 px-3">
+          <div className="mt-1.5 mb-0.5 border-t border-dashed border-white/10 pt-1.5 px-3">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Auto-computed</span>
           </div>
+          <div className="space-y-0.5 mx-1">
           {investmentReturns.map((r) => (
             <div
               key={r.label}
-              className="flex items-center justify-between rounded-lg px-3 py-2 bg-slate-800/60 border border-dashed border-white/10 mx-1"
+              className="flex items-center justify-between rounded-md px-3 py-1 bg-slate-800/60 border border-dashed border-white/10"
               data-testid="investment-return-row"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-slate-400">{r.label} returns</span>
-                <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 uppercase tracking-wide" title="Auto-computed from your investment ROI">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-slate-400">{r.label} returns</span>
+                <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1 py-0 text-[8px] font-medium text-slate-500 uppercase tracking-wide" title="Auto-computed from your investment ROI">
                   auto
                 </span>
               </div>
               <div className="text-right">
-                <div className="text-sm font-medium text-emerald-400">{formatCurrency(r.amount)}/mo</div>
-                <div className="text-xs text-slate-500">{formatCurrency(r.amount * 12)}/yr</div>
+                <span className="text-xs font-medium text-emerald-400">{formatCurrency(r.amount)}/mo</span>
+                <span className="text-[10px] text-slate-500 ml-1.5">{formatCurrency(r.amount * 12)}/yr</span>
               </div>
             </div>
           ))}
+          </div>
         </div>
       )}
 
@@ -655,7 +658,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
       )}
 
       {/* Total and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+      <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2">
         <span
           className={`text-sm font-medium text-slate-400 transition-all duration-300 ${
             animatingTotal ? "scale-110 text-emerald-400" : ""

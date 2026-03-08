@@ -273,7 +273,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
             <DataFlowSourceItem key={item.id} id={`expense:${item.id}`} label={item.category} value={item.amount}>
             <div role="listitem">
             <div
-              className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-white/5"
+              className="group flex items-center justify-between rounded-lg px-3 py-1.5 transition-colors duration-150 hover:bg-white/5"
             >
               <div className="flex flex-1 items-center gap-3 min-w-0">
                 {/* Category */}
@@ -331,31 +331,44 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                   </button>
                 )}
 
-                {/* Amount */}
-                {editingId === item.id && editingField === "amount" ? (
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => commitEdit()}
-                    onKeyDown={handleEditKeyDown}
-                    className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
-                    aria-label={`Edit amount for ${item.category}`}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      startEdit(item.id, "amount", String(item.amount))
-                    }
-                    className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-rose-400/10 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
-                    aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
-                  >
-                    <div className="text-sm font-medium text-rose-400">{formatCurrency(item.amount)}/mo</div>
-                    <div className="text-xs text-slate-500">{formatCurrency(item.amount * 12)}/yr</div>
-                  </button>
-                )}
+                {/* Amount + Currency */}
+                <div className="flex items-center gap-1" data-testid={`expense-details-${item.id}`}>
+                  {homeCurrency && fxRates && (
+                    <CurrencyBadge
+                      currency={item.currency}
+                      homeCurrency={homeCurrency}
+                      amount={item.amount}
+                      fxRates={fxRates}
+                      onCurrencyChange={(cu) => {
+                        setItems((prev) => prev.map((e) => e.id === item.id ? { ...e, currency: cu } : e));
+                      }}
+                    />
+                  )}
+                  {editingId === item.id && editingField === "amount" ? (
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={() => commitEdit()}
+                      onKeyDown={handleEditKeyDown}
+                      className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                      aria-label={`Edit amount for ${item.category}`}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startEdit(item.id, "amount", String(item.amount))
+                      }
+                      className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-rose-400/10 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                      aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
+                    >
+                      <div className="text-sm font-medium text-rose-400">{formatCurrency(item.amount)}/mo</div>
+                      <div className="text-xs text-slate-500">{formatCurrency(item.amount * 12)}/yr</div>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Delete button */}
@@ -379,20 +392,6 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                 </svg>
               </button>
             </div>
-            {/* Secondary detail row: currency badge */}
-            {homeCurrency && fxRates && (
-              <div className="flex items-center gap-2 px-5 pb-1" data-testid={`expense-details-${item.id}`}>
-                <CurrencyBadge
-                  currency={item.currency}
-                  homeCurrency={homeCurrency}
-                  amount={item.amount}
-                  fxRates={fxRates}
-                  onCurrencyChange={(cu) => {
-                    setItems((prev) => prev.map((e) => e.id === item.id ? { ...e, currency: cu } : e));
-                  }}
-                />
-              </div>
-            )}
             </div>
             </DataFlowSourceItem>
           ))}
@@ -682,7 +681,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       )}
 
       {/* Total breakdown and Add button */}
-      <div className="mt-4 border-t border-white/10 pt-3 space-y-1.5">
+      <div className="mt-2 border-t border-white/10 pt-2 space-y-1">
         {/* Sub-totals breakdown */}
         {(totalTax > 0 || investmentContributions > 0 || mortgagePayments > 0) && (
           <div className="space-y-0.5 text-xs text-slate-500" data-testid="expense-subtotals">

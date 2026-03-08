@@ -44,7 +44,7 @@ function simulateRunwayWithGrowth(
 }
 /**
  * Simulate runway with tax-aware withdrawal ordering.
- * Withdraws from accounts in tax-optimal order: tax-free first, taxable second, tax-deferred last.
+ * Withdraws from accounts in tax-optimal order: taxable first, tax-free second (preserve shelter), tax-deferred last.
  * Grosses up withdrawals from taxed accounts so after-tax amount covers the monthly obligation.
  */
 function simulateRunwayWithTax(
@@ -59,7 +59,7 @@ function simulateRunwayWithTax(
   const MAX_MONTHS = 1200;
 
   // Priority order: tax-free (0), taxable (1), tax-deferred (2)
-  const priorityMap: Record<TaxTreatment, number> = { "tax-free": 0, "taxable": 1, "tax-deferred": 2 };
+  const priorityMap: Record<TaxTreatment, number> = { "taxable": 0, "tax-free": 1, "tax-deferred": 2 };
   const sortedIndices = buckets
     .map((_, i) => i)
     .sort((a, b) => priorityMap[buckets[a].taxTreatment] - priorityMap[buckets[b].taxTreatment]);
@@ -113,7 +113,7 @@ function simulateRunwayWithTax(
 /**
  * Simulate runway month-by-month, returning a time series for charting.
  * Captures per-account balances each month with both growth-aware and no-growth scenarios.
- * Uses tax-aware withdrawal ordering (tax-free → taxable → tax-deferred).
+ * Uses tax-aware withdrawal ordering (taxable → tax-free → tax-deferred).
  */
 export function simulateRunwayTimeSeries(
   buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number; roiTaxTreatment?: "capital-gains" | "income" }[],
@@ -129,7 +129,7 @@ export function simulateRunwayTimeSeries(
   const categories = buckets.map((b) => b.category);
 
   // Priority order: tax-free (0), taxable (1), tax-deferred (2)
-  const priorityMap: Record<TaxTreatment, number> = { "tax-free": 0, "taxable": 1, "tax-deferred": 2 };
+  const priorityMap: Record<TaxTreatment, number> = { "taxable": 0, "tax-free": 1, "tax-deferred": 2 };
   const sortedIndices = buckets
     .map((_, i) => i)
     .sort((a, b) => priorityMap[buckets[a].taxTreatment] - priorityMap[buckets[b].taxTreatment]);
@@ -473,7 +473,7 @@ function buildRunwayExplainerDetails(
   const categories = [...new Set(detailedBuckets.map((b) => b.category))];
 
   // Withdrawal order sorted by tax priority
-  const priorityMap: Record<TaxTreatment, number> = { "tax-free": 0, "taxable": 1, "tax-deferred": 2 };
+  const priorityMap: Record<TaxTreatment, number> = { "taxable": 0, "tax-free": 1, "tax-deferred": 2 };
   const sortedBuckets = [...detailedBuckets].sort((a, b) => priorityMap[a.taxTreatment] - priorityMap[b.taxTreatment]);
 
   const withdrawalOrder: RunwayWithdrawalOrderEntry[] = sortedBuckets.map((b) => {
@@ -1151,10 +1151,10 @@ export function computeWithdrawalTaxSummary(
   const totalLiquid = taxFree.total + taxDeferred.total + taxable.total;
   if (totalLiquid <= 0) return undefined;
 
-  // Build withdrawal order (tax-free first, taxable second, tax-deferred last)
+  // Build withdrawal order (taxable first, tax-free second to preserve shelter, tax-deferred last)
   const withdrawalOrder: string[] = [];
-  if (taxFree.categories.length > 0) withdrawalOrder.push(...taxFree.categories);
   if (taxable.categories.length > 0) withdrawalOrder.push(...taxable.categories);
+  if (taxFree.categories.length > 0) withdrawalOrder.push(...taxFree.categories);
   if (taxDeferred.categories.length > 0) withdrawalOrder.push(...taxDeferred.categories);
 
   // Compute tax drag: difference between base runway and tax-adjusted runway

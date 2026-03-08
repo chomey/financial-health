@@ -375,30 +375,43 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   </button>
                 )}
 
-                {/* Amount */}
-                {editingId === debt.id && editingField === "amount" ? (
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => commitEdit()}
-                    onKeyDown={handleEditKeyDown}
-                    className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
-                    aria-label={`Edit amount for ${debt.category}`}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      startEdit(debt.id, "amount", String(debt.amount))
-                    }
-                    className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-rose-400 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-rose-400/10 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
-                    aria-label={`Edit amount for ${debt.category}, currently ${formatCurrency(debt.amount)}`}
-                  >
-                    {formatCurrency(debt.amount)}
-                  </button>
-                )}
+                {/* Amount + Currency */}
+                <div className="flex items-center gap-1">
+                  {homeCurrency && fxRates && (
+                    <CurrencyBadge
+                      currency={debt.currency}
+                      homeCurrency={homeCurrency}
+                      amount={debt.amount}
+                      fxRates={fxRates}
+                      onCurrencyChange={(cu) => {
+                        setDebts(debts.map((d) => d.id === debt.id ? { ...d, currency: cu } : d));
+                      }}
+                    />
+                  )}
+                  {editingId === debt.id && editingField === "amount" ? (
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={() => commitEdit()}
+                      onKeyDown={handleEditKeyDown}
+                      className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                      aria-label={`Edit amount for ${debt.category}`}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startEdit(debt.id, "amount", String(debt.amount))
+                      }
+                      className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-rose-400 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-rose-400/10 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                      aria-label={`Edit amount for ${debt.category}, currently ${formatCurrency(debt.amount)}`}
+                    >
+                      {formatCurrency(debt.amount)}
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Delete button */}
@@ -424,19 +437,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
               </div>
 
               {/* Secondary detail fields: interest rate and monthly payment */}
-              <div className="flex flex-wrap items-center gap-2 px-5 pb-1" data-testid={`debt-details-${debt.id}`}>
-                {/* Currency badge */}
-                {homeCurrency && fxRates && (
-                  <CurrencyBadge
-                    currency={debt.currency}
-                    homeCurrency={homeCurrency}
-                    amount={debt.amount}
-                    fxRates={fxRates}
-                    onCurrencyChange={(cu) => {
-                      setDebts(debts.map((d) => d.id === debt.id ? { ...d, currency: cu } : d));
-                    }}
-                  />
-                )}
+              <div className="flex flex-wrap items-center gap-2 px-3 -mt-1 pb-0.5" data-testid={`debt-details-${debt.id}`}>
                 {/* Interest rate badge/editor */}
                 {editingId === debt.id && editingField === "interestRate" ? (
                   <input
@@ -459,7 +460,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                         ? "bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
                         : displayInterest !== undefined
                           ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
-                          : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                          : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                     }`}
                     aria-label={`Edit interest rate for ${debt.category}${displayInterest !== undefined ? `, currently ${displayInterest}%` : ""}`}
                     data-testid={`interest-badge-${debt.id}`}
@@ -490,7 +491,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                       hasPayment
                         ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                        : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                        : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                     }`}
                     aria-label={`Edit monthly payment for ${debt.category}${hasPayment ? `, currently ${formatCurrency(debt.monthlyPayment!)}` : ""}`}
                     data-testid={`debt-payment-badge-${debt.id}`}
@@ -636,7 +637,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
       )}
 
       {/* Total and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+      <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2">
         <span className="text-sm font-medium text-slate-400">
           Total: {formatCurrency(total)}
         </span>
