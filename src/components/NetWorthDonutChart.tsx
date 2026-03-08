@@ -61,7 +61,7 @@ const COLORS = [
 ];
 
 const DEBT_COLOR = "#f87171"; // red-400
-const PROPERTY_PATTERN_COLOR = "#94a3b8"; // slate-400 for property equity hatching
+const PROPERTY_PATTERN_COLOR = "#2dd4bf"; // teal-400 for property equity
 
 export interface DonutSlice {
   name: string;
@@ -262,17 +262,6 @@ export default function NetWorthDonutChart({
       <div className="mb-3 flex items-center justify-between gap-2 flex-wrap">
         <h3 className="text-sm font-medium text-slate-400">Net Worth Breakdown</h3>
         <div className="flex items-center gap-3">
-          {properties.some(p => p.mortgage > 0) && view === "breakdown" && (
-            <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={showMortgages}
-                onChange={(e) => setShowMortgages(e.target.checked)}
-                className="rounded border-white/20 bg-white/5 text-violet-500 focus:ring-violet-400/30 h-3.5 w-3.5"
-              />
-              Mortgages
-            </label>
-          )}
         <div className="flex rounded-lg border border-white/10 text-xs">
           <button
             onClick={() => setView("breakdown")}
@@ -297,6 +286,17 @@ export default function NetWorthDonutChart({
             By Liquidity
           </button>
         </div>
+          {properties.some(p => p.mortgage > 0) && view === "breakdown" && (
+            <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showMortgages}
+                onChange={(e) => setShowMortgages(e.target.checked)}
+                className="rounded border-white/20 bg-white/5 text-violet-500 focus:ring-violet-400/30 h-3.5 w-3.5"
+              />
+              Mortgages
+            </label>
+          )}
         </div>
       </div>
 

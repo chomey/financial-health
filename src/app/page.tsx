@@ -119,6 +119,7 @@ export default function Home() {
   ] as const, []);
 
   // Track which section is visible for highlighting the stepper
+  const stepperNavRef = useRef<HTMLElement>(null);
   const [visibleSection, setVisibleSection] = useState("insights");
   useEffect(() => {
     if (phase !== "dashboard" || typeof IntersectionObserver === "undefined") return;
@@ -136,6 +137,19 @@ export default function Home() {
     }
     return () => observer.disconnect();
   }, [phase, DASHBOARD_SECTIONS]);
+
+  // Auto-scroll stepper nav to keep active section button visible
+  useEffect(() => {
+    const nav = stepperNavRef.current;
+    if (!nav) return;
+    const active = nav.querySelector("[aria-current='step']") as HTMLElement | null;
+    if (active) {
+      const navRect = nav.getBoundingClientRect();
+      const btnRect = active.getBoundingClientRect();
+      const scrollLeft = active.offsetLeft - navRect.width / 2 + btnRect.width / 2;
+      nav.scrollTo({ left: scrollLeft, behavior: "smooth" });
+    }
+  }, [visibleSection]);
 
   useEffect(() => {
     const urlStep = getStepFromURL();
@@ -397,26 +411,27 @@ export default function Home() {
       <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-2 sm:px-6">
         <div className="mx-auto max-w-5xl">
           {/* Title + phase toggle + actions */}
-          <div className="flex items-center gap-2 mb-1.5 print:hidden">
-            <h1 className="text-sm font-bold text-white sm:text-base">Financial Health</h1>
-            <span className="text-slate-700 select-none">·</span>
-            <button
-              type="button"
-              onClick={switchToWizard}
-              className="rounded-md px-2 py-1 text-xs font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
-            >
-              📝 Inputs
-            </button>
-            <span className="text-slate-600 select-none text-xs">/</span>
-            <span className="rounded-md bg-violet-500/15 px-2 py-1 text-xs font-medium text-violet-300 ring-1 ring-violet-500/30">
-              📊 Dashboard
-            </span>
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 print:hidden">
+            <h1 className="text-sm font-bold text-white whitespace-nowrap"><span className="hidden sm:inline">Financial Health</span><span className="sm:hidden">FH</span></h1>
+            {/* Inputs / Dashboard pill toggle */}
+            <div className="flex rounded-lg border border-white/10 text-xs">
+              <button
+                type="button"
+                onClick={switchToWizard}
+                className="rounded-l-lg px-2 py-1 font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400"
+              >
+                <span className="hidden sm:inline">📝 </span>Inputs
+              </button>
+              <span className="rounded-r-lg bg-violet-500/15 px-2 py-1 font-medium text-violet-300 ring-1 ring-inset ring-violet-500/30">
+                <span className="hidden sm:inline">📊 </span>Dashboard
+              </span>
+            </div>
             <span className="flex-1" />
             <a
               href="/changelog"
               className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
             >
-              Changelog
+              <span className="hidden sm:inline">Changelog</span><span className="sm:hidden text-sm">📋</span>
             </a>
             <a
               href="https://ko-fi.com/R6R11VMSML"
@@ -424,14 +439,16 @@ export default function Home() {
               rel="noopener noreferrer"
               className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
             >
-              ☕ Tip
+              <span className="hidden sm:inline">☕ Tip</span><span className="sm:hidden text-sm">☕</span>
             </a>
-            <CopyLinkButton />
-            <PrintSnapshotButton />
+            <span className="hidden sm:flex sm:items-center sm:gap-1">
+              <CopyLinkButton />
+              <PrintSnapshotButton />
+            </span>
           </div>
           {/* Dashboard section stepper (scroll-to links) */}
-          <nav className="w-full overflow-x-auto scrollbar-hide print:hidden" aria-label="Dashboard sections" style={{ scrollbarWidth: "none" }}>
-            <ol className="flex items-center gap-0 min-w-max px-1 py-0.5 pr-8">
+          <nav ref={stepperNavRef} className="w-full overflow-x-auto scrollbar-hide print:hidden" aria-label="Dashboard sections" style={{ scrollbarWidth: "none" }}>
+            <ol className="flex items-center gap-0 px-1 py-0.5">
               {DASHBOARD_SECTIONS.map((sec, idx) => {
                 const isCurrent = sec.id === visibleSection;
                 return (
