@@ -259,7 +259,7 @@ export default function WizardShell(props: WizardProps) {
             <h1 className="text-sm font-bold text-white sm:text-base">Financial Health</h1>
             <span className="text-slate-700 select-none">·</span>
             <span className="rounded-md bg-violet-500/15 px-2 py-1 text-xs font-medium text-violet-300 ring-1 ring-violet-500/30">
-              📝 My Finances
+              📝 Inputs
             </span>
             <span className="text-slate-600 select-none text-xs">/</span>
             <button

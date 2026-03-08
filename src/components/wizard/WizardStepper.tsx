@@ -34,7 +34,7 @@ export default function WizardStepper({
 
   return (
     <nav className="w-full overflow-x-auto scrollbar-hide" aria-label="Wizard steps" style={{ scrollbarWidth: "none" }}>
-      <ol className="flex items-center gap-0 min-w-max px-0 py-0.5 pr-8">
+      <ol className="flex items-center gap-0 min-w-max px-1 py-0.5 pr-8">
         {WIZARD_STEPS.map((step, idx) => {
           const meta = STEP_META[step];
           const isCurrent = step === currentStep;
@@ -50,9 +50,7 @@ export default function WizardStepper({
                 className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-violet-400 ${
                   isCurrent
                     ? "bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30"
-                    : isComplete || isPast
-                      ? "text-emerald-400/70 hover:bg-white/5 hover:text-emerald-300"
-                      : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                    : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
                 }`}
                 aria-current={isCurrent ? "step" : undefined}
                 data-testid={`wizard-step-${step}`}
@@ -63,9 +61,7 @@ export default function WizardStepper({
               </button>
               {idx < WIZARD_STEPS.length - 1 && (
                 <div
-                  className={`mx-0.5 h-px w-4 ${
-                    isPast || (isComplete && idx < currentIdx) ? "bg-emerald-500/40" : "bg-white/10"
-                  }`}
+                  className="mx-0.5 h-px w-4 bg-white/10"
                   aria-hidden="true"
                 />
               )}

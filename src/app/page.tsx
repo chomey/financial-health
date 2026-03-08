@@ -401,7 +401,7 @@ export default function Home() {
               onClick={switchToWizard}
               className="rounded-md px-2 py-1 text-xs font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
             >
-              📝 My Finances
+              📝 Inputs
             </button>
             <span className="text-slate-600 select-none text-xs">/</span>
             <span className="rounded-md bg-violet-500/15 px-2 py-1 text-xs font-medium text-violet-300 ring-1 ring-violet-500/30">
@@ -427,7 +427,7 @@ export default function Home() {
           </div>
           {/* Dashboard section stepper (scroll-to links) */}
           <nav className="w-full overflow-x-auto scrollbar-hide print:hidden" aria-label="Dashboard sections" style={{ scrollbarWidth: "none" }}>
-            <ol className="flex items-center gap-0 min-w-max px-0 py-0.5 pr-8">
+            <ol className="flex items-center gap-0 min-w-max px-1 py-0.5 pr-8">
               {DASHBOARD_SECTIONS.map((sec, idx) => {
                 const isCurrent = sec.id === visibleSection;
                 return (
