@@ -48,6 +48,24 @@ const CA_NATIONAL_AVERAGE: NationalAverage = {
   income: 62_000,
 };
 
+// Australian benchmarks (AUD) — ABS Household Income and Wealth 2021-22, ABS Survey of Income and Housing
+const AU_BENCHMARKS: AgeGroupBenchmark[] = [
+  { ageMin: 18, ageMax: 24, label: "18–24", medianNetWorth: 43_000, medianSavingsRate: 0.08, medianDebtToIncomeRatio: 0.2, recommendedEmergencyMonths: 3, medianIncome: 36_000 },
+  { ageMin: 25, ageMax: 34, label: "25–34", medianNetWorth: 145_000, medianSavingsRate: 0.10, medianDebtToIncomeRatio: 2.0, recommendedEmergencyMonths: 3, medianIncome: 68_000 },
+  { ageMin: 35, ageMax: 44, label: "35–44", medianNetWorth: 470_000, medianSavingsRate: 0.12, medianDebtToIncomeRatio: 2.5, recommendedEmergencyMonths: 4, medianIncome: 80_000 },
+  { ageMin: 45, ageMax: 54, label: "45–54", medianNetWorth: 860_000, medianSavingsRate: 0.15, medianDebtToIncomeRatio: 1.8, recommendedEmergencyMonths: 5, medianIncome: 85_000 },
+  { ageMin: 55, ageMax: 64, label: "55–64", medianNetWorth: 1_150_000, medianSavingsRate: 0.18, medianDebtToIncomeRatio: 0.8, recommendedEmergencyMonths: 6, medianIncome: 65_000 },
+  { ageMin: 65, ageMax: 120, label: "65+", medianNetWorth: 1_100_000, medianSavingsRate: 0.15, medianDebtToIncomeRatio: 0.2, recommendedEmergencyMonths: 6, medianIncome: 42_000 },
+];
+
+const AU_NATIONAL_AVERAGE: NationalAverage = {
+  netWorth: 672_800,
+  savingsRate: 0.12,
+  debtToIncomeRatio: 1.8,
+  emergencyMonths: 4,
+  income: 65_000,
+};
+
 // US benchmarks (USD) — Federal Reserve SCF 2022, Census Bureau
 const US_BENCHMARKS: AgeGroupBenchmark[] = [
   { ageMin: 18, ageMax: 24, label: "18–24", medianNetWorth: 8_000, medianSavingsRate: 0.05, medianDebtToIncomeRatio: 0.4, recommendedEmergencyMonths: 3, medianIncome: 30_000 },
@@ -67,11 +85,15 @@ const US_NATIONAL_AVERAGE: NationalAverage = {
 };
 
 export function getBenchmarksForCountry(country: "CA" | "US" | "AU"): AgeGroupBenchmark[] {
-  return country === "CA" ? CA_BENCHMARKS : US_BENCHMARKS;
+  if (country === "CA") return CA_BENCHMARKS;
+  if (country === "AU") return AU_BENCHMARKS;
+  return US_BENCHMARKS;
 }
 
 export function getNationalAverage(country: "CA" | "US" | "AU"): NationalAverage {
-  return country === "CA" ? CA_NATIONAL_AVERAGE : US_NATIONAL_AVERAGE;
+  if (country === "CA") return CA_NATIONAL_AVERAGE;
+  if (country === "AU") return AU_NATIONAL_AVERAGE;
+  return US_NATIONAL_AVERAGE;
 }
 
 export function getBenchmarkForAge(age: number, country: "CA" | "US" | "AU"): AgeGroupBenchmark | null {

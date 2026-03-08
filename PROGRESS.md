@@ -8,19 +8,22 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 163
-- **Remaining**: 6
+- **Completed**: 164
+- **Remaining**: 5
 - **Last Updated**: 2026-03-08
 
-## Task 163: AU Money Steps flowchart [@backend]
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 164: AU benchmarks [@backend]
 - **Date**: 2026-03-08
 - **Files**:
-  - `src/lib/flowchart-steps.ts`: Added AU keyword constants (`AU_SUPER_KEYWORDS`, `AU_FHSS_KEYWORDS`, `AU_ETF_KEYWORDS`). Added `buildAUSteps()` with 10 AU-specific steps following r/AusFinance conventions. Updated `getFlowchartSteps()` to route `country === "AU"` to AU steps. Added AU cases to `getStepContext()` for super, FHSS, ETF, high-debt, moderate-debt, budget, and emergency fund steps.
-  - `tests/unit/au-flowchart-steps.test.ts`: New — 52 tests covering step structure, all AU step IDs, budget, emergency fund, super guarantee, high-interest debt (HECS-HELP boundary), salary sacrifice, FHSS, moderate debt, ETF investing, non-concessional super, lifestyle/giving, sequential status logic, fully-funded scenario, user overrides, step context, and CA/US regression.
-  - `src/lib/changelog.ts`: Added version 163 entry.
-- **Tests**: T1: 2413 passed (129 files), Build: passes
+  - `src/lib/benchmarks.ts`: Added `AU_BENCHMARKS` (6 age groups, ABS Household Income and Wealth 2021-22) and `AU_NATIONAL_AVERAGE` (net worth $672,800, income $65k AUD, DTI 1.8). Updated `getBenchmarksForCountry` and `getNationalAverage` to return AU data for AU country.
+  - `tests/unit/au-benchmarks.test.ts`: New — 32 tests covering age groups, contiguous ranges, positive values, age-specific lookups, national average, computeBenchmarkComparisons for AU, DATA_SOURCES, and CA/US regression.
+  - `tests/unit/changelog.test.ts`: Updated counts (163→164, AU milestone entries 6→7).
+  - `src/lib/changelog.ts`: Added version 164 entry.
+- **Tests**: T1: 2445 passed (130 files), Build: passes
 - **Screenshots**: N/A (backend task)
-- **Notes**: AU skips the $1,000 starter EF (goes straight to 3–6 month full EF). Super guarantee step auto-completes for retired users. FHSS and non-concessional super steps are skippable. `getStepContext("au-lifestyle-giving")` returns null (no quantifiable data).
+- **Notes**: AU net worth benchmarks are significantly higher than CA/US due to Australian property prices. DTI ratios are higher due to mortgage burden. Pre-existing changelog test failure (from task 163) fixed in separate commit.
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

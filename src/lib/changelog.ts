@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: AU benchmarks
+  {
+    version: 164,
+    title: "Australia: age-group benchmarks",
+    description: "Added Australian benchmarks for 6 age groups (18–24 through 65+) using ABS Household Income and Wealth 2021-22 data. Covers median net worth, savings rate, debt-to-income ratio, emergency fund months, and median income in AUD. AU national average net worth $672,800. Updated getBenchmarksForCountry and getNationalAverage to return AU-specific data.",
+    date: "2026-03-08",
+  },
   // Australia: AU Money Steps flowchart
   {
     version: 163,
