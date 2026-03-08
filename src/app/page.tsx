@@ -892,25 +892,14 @@ export default function Home() {
           <InsightsPanel data={financialData} insightConnections={insightConnections} />
         </section>
 
-        {/* Dashboard Panel — metrics at top */}
-        <section
-          id="dashboard"
-          className="mb-6 scroll-mt-16 print:col-span-full"
-          data-testid="dashboard-panel"
-          aria-label="Financial dashboard"
-        >
-          <div className="space-y-6">
-            <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
-          </div>
-        </section>
-
-        {/* Entry Panel */}
-        <section
-          className="mb-6 print:hidden"
-          aria-label="Financial data entry"
-          data-testid="entry-panel"
-        >
-          <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          {/* Entry Panel — left side on desktop, top on mobile */}
+          <section
+            className="lg:col-span-7 print:hidden"
+            aria-label="Financial data entry"
+            data-testid="entry-panel"
+          >
+            <div className="space-y-3">
               <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)} dataFlowId="section-assets" dataFlowValue={assetTotal} dataFlowLabel="Assets" dataFlowItems={assetItems}>
                 <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={effectiveFxRates} annualEmploymentSalary={annualEmploymentSalary} />
               </CollapsibleSection>
@@ -937,8 +926,15 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Charts and additional dashboard widgets */}
-          <section className="space-y-6 mb-6" aria-label="Charts and analysis">
+          {/* Dashboard Panel — right side on desktop, bottom on mobile */}
+          <section
+            id="dashboard"
+            className="lg:col-span-5 scroll-mt-16 print:col-span-full"
+            data-testid="dashboard-panel"
+            aria-label="Financial dashboard"
+          >
+            <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
+              <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
               {stocks.length > 0 && (() => {
                 const portfolio = getPortfolioSummary(stocks);
                 const stocksWithReturns = stocks
@@ -1018,7 +1014,9 @@ export default function Home() {
                 annualIncome={annualIncome}
                 onAgeChange={setAge}
               /></ZoomableCard>
+            </div>
           </section>
+        </div>
 
         {/* What If scenario panel — full-width at the bottom */}
         <section id="scenarios" className="mt-8 scroll-mt-16 print:hidden" aria-label="Scenario modeling">
