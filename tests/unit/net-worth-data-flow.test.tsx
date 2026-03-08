@@ -94,30 +94,10 @@ describe("Net Worth data-flow connections", () => {
   });
 });
 
-describe("MetricCard hover interactions", () => {
-  it("shows breakdown text on hover", () => {
+describe("MetricCard breakdown visibility", () => {
+  it("shows breakdown text always (no hover required)", () => {
     renderWithProvider({ "Net Worth": NET_WORTH_CONNECTIONS });
-    const card = screen.getByTestId("metric-card-net-worth");
-    fireEvent.mouseEnter(card);
     expect(screen.getByTestId("metric-breakdown")).toBeInTheDocument();
-  });
-
-  it("hides breakdown on mouse leave", () => {
-    renderWithProvider({ "Net Worth": NET_WORTH_CONNECTIONS });
-    const card = screen.getByTestId("metric-card-net-worth");
-    fireEvent.mouseEnter(card);
-    fireEvent.mouseLeave(card);
-    // Breakdown should be hidden (opacity-0)
-    const breakdown = screen.getByTestId("metric-breakdown");
-    expect(breakdown.className).toContain("opacity-0");
-  });
-
-  it("activates breakdown on focus (keyboard)", () => {
-    renderWithProvider({ "Net Worth": NET_WORTH_CONNECTIONS });
-    const card = screen.getByTestId("metric-card-net-worth");
-    fireEvent.focus(card);
-    const breakdown = screen.getByTestId("metric-breakdown");
-    expect(breakdown.className).toContain("opacity-100");
   });
 });
 

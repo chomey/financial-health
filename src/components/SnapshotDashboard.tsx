@@ -141,7 +141,6 @@ function useCountUp(target: number, duration: number = 1000): number {
 
 function MetricCard({ metric, insights, homeCurrency, connections }: { metric: MetricData; insights: string[]; homeCurrency?: string; connections?: DataFlowConnectionDef[] }) {
   const animatedValue = useCountUp(metric.value);
-  const [showTooltip, setShowTooltip] = useState(false);
   const [ariaAnnouncement, setAriaAnnouncement] = useState("");
   const cardRef = useRef<HTMLDivElement>(null);
   const ctx = useOptionalDataFlow();
@@ -205,10 +204,6 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       aria-label={metric.title}
       data-testid={`metric-card-${metric.title.toLowerCase().replace(/\s+/g, "-")}`}
       onClick={handleClick}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-      onFocus={() => setShowTooltip(true)}
-      onBlur={() => setShowTooltip(false)}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
       tabIndex={0}
     >
@@ -280,24 +275,15 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
           ))}
         </div>
       )}
-      {/* Breakdown on hover — highlighted when data-flow arrows are active. Hidden for percent format (shown in progress bar section). */}
+      {/* Breakdown — always visible. Hidden for percent format (shown in progress bar section). */}
       {metric.breakdown && metric.format !== "percent" && (
-        <p className={`mt-2 text-sm leading-relaxed transition-all duration-200 ${showTooltip ? `opacity-100 ${hasConnections ? "text-slate-300 font-medium" : "text-slate-500"}` : "opacity-0 h-0 overflow-hidden"}`} data-testid="metric-breakdown">
+        <p className="mt-2 text-sm leading-relaxed text-slate-500" data-testid="metric-breakdown">
           {metric.breakdown}
         </p>
       )}
       <p className="mt-2 text-sm text-slate-500 leading-relaxed">
         {metric.tooltip}
       </p>
-      {/* Click to explain hint */}
-      {hasConnections && (
-        <p className={`mt-2 flex items-center gap-1 text-sm text-slate-500 transition-opacity duration-200 ${showTooltip ? "opacity-100" : "opacity-0"}`} data-testid="click-to-explain-hint">
-          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Click to explain
-        </p>
-      )}
       {/* Accessibility: announce data sources to screen readers */}
       <span className="sr-only" aria-live="polite" data-testid="dataflow-aria-live">
         {ariaAnnouncement}

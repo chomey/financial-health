@@ -118,30 +118,10 @@ describe("Monthly Cash Flow data-flow connections", () => {
   });
 });
 
-describe("Monthly Cash Flow MetricCard hover interactions", () => {
-  it("shows breakdown text on hover", () => {
+describe("Monthly Cash Flow MetricCard breakdown visibility", () => {
+  it("shows breakdown text always (no hover required)", () => {
     renderWithProvider({ "Monthly Cash Flow": SURPLUS_CONNECTIONS });
-    const card = screen.getByTestId("metric-card-monthly-cash-flow");
-    fireEvent.mouseEnter(card);
     expect(screen.getByTestId("metric-breakdown")).toBeInTheDocument();
-    expect(screen.getByTestId("metric-breakdown").className).toContain("opacity-100");
-  });
-
-  it("hides breakdown on mouse leave", () => {
-    renderWithProvider({ "Monthly Cash Flow": SURPLUS_CONNECTIONS });
-    const card = screen.getByTestId("metric-card-monthly-cash-flow");
-    fireEvent.mouseEnter(card);
-    fireEvent.mouseLeave(card);
-    const breakdown = screen.getByTestId("metric-breakdown");
-    expect(breakdown.className).toContain("opacity-0");
-  });
-
-  it("activates breakdown on focus (keyboard)", () => {
-    renderWithProvider({ "Monthly Cash Flow": SURPLUS_CONNECTIONS });
-    const card = screen.getByTestId("metric-card-monthly-cash-flow");
-    fireEvent.focus(card);
-    const breakdown = screen.getByTestId("metric-breakdown");
-    expect(breakdown.className).toContain("opacity-100");
   });
 });
 

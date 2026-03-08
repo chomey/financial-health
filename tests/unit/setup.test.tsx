@@ -26,7 +26,7 @@ describe("App shell layout", () => {
   it("renders the phase toggle showing Dashboard as active", () => {
     render(<Home />);
     expect(screen.getByText(/Dashboard/)).toBeInTheDocument();
-    expect(screen.getByText(/Inputs/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Inputs/).length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders all dashboard sections on one page", () => {

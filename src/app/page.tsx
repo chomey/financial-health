@@ -465,6 +465,12 @@ export default function Home() {
       <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
         <div className="mx-auto max-w-5xl space-y-8">
 
+          {/* Welcome */}
+          <p className="text-sm text-slate-500 max-w-3xl">
+            Your financial snapshot at a glance. Edit numbers in{" "}
+            <button type="button" onClick={switchToWizard} className="text-violet-400 hover:text-violet-300 transition-colors underline underline-offset-2">Inputs</button>
+            {" "}— everything stays in your browser, nothing is stored.
+          </p>
 
           {/* Insights */}
           <section id="section-dash-insights" className="scroll-mt-28" aria-label="Financial insights">
