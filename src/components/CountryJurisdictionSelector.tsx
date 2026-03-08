@@ -107,87 +107,90 @@ export default function CountryJurisdictionSelector({
   );
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5" data-testid="country-jurisdiction-selector">
-      {/* Country segmented control */}
-      <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
-        <button
-          type="button"
-          onClick={() => handleCountryChange("CA")}
-          className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
-            country === "CA"
-              ? "bg-white/15 text-slate-100 shadow-sm"
-              : "text-slate-500 hover:text-slate-300"
-          }`}
-          aria-pressed={country === "CA"}
-          aria-label="Select Canada"
-          data-testid="country-ca"
-        >
-          <span aria-hidden="true" className="text-base leading-none">🇨🇦</span>
-          <span className="hidden sm:inline">Canada</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => handleCountryChange("US")}
-          className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
-            country === "US"
-              ? "bg-white/15 text-slate-100 shadow-sm"
-              : "text-slate-500 hover:text-slate-300"
-          }`}
-          aria-pressed={country === "US"}
-          aria-label="Select United States"
-          data-testid="country-us"
-        >
-          <span aria-hidden="true" className="text-base leading-none">🇺🇸</span>
-          <span className="hidden sm:inline">USA</span>
-        </button>
-      </div>
-
-      {/* Jurisdiction dropdown */}
-      <select
-        value={jurisdiction}
-        onChange={(e) => onJurisdictionChange(e.target.value)}
-        className="min-h-[36px] min-w-0 flex-1 sm:flex-none rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
-        aria-label={country === "CA" ? "Select province or territory" : "Select state"}
-        data-testid="jurisdiction-select"
-      >
-        {jurisdictions.map((j) => (
-          <option key={j.code} value={j.code}>
-            {j.name} ({j.code})
-          </option>
-        ))}
-      </select>
-
-      {/* Tax year selector */}
-      {onTaxYearChange && (
+    <div className="space-y-2" data-testid="country-jurisdiction-selector">
+      {/* Country + Region row */}
+      <div className="flex items-center gap-2">
         <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
           <button
             type="button"
-            onClick={() => onTaxYearChange(2025)}
-            className={`inline-flex min-h-[36px] items-center rounded-md px-2 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
-              taxYear === 2025
+            onClick={() => handleCountryChange("CA")}
+            className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
+              country === "CA"
                 ? "bg-white/15 text-slate-100 shadow-sm"
                 : "text-slate-500 hover:text-slate-300"
             }`}
-            aria-pressed={taxYear === 2025}
-            aria-label="Tax year 2025"
-            data-testid="tax-year-2025"
+            aria-pressed={country === "CA"}
+            aria-label="Select Canada"
+            data-testid="country-ca"
           >
-            2025
+            <span aria-hidden="true" className="text-base leading-none">🇨🇦</span>
+            Canada
           </button>
           <button
             type="button"
-            onClick={() => onTaxYearChange(2026)}
-            className={`inline-flex min-h-[36px] items-center rounded-md px-2 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
-              taxYear === 2026
+            onClick={() => handleCountryChange("US")}
+            className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
+              country === "US"
                 ? "bg-white/15 text-slate-100 shadow-sm"
                 : "text-slate-500 hover:text-slate-300"
             }`}
-            aria-pressed={taxYear === 2026}
-            aria-label="Tax year 2026"
-            data-testid="tax-year-2026"
+            aria-pressed={country === "US"}
+            aria-label="Select United States"
+            data-testid="country-us"
           >
-            2026
+            <span aria-hidden="true" className="text-base leading-none">🇺🇸</span>
+            USA
           </button>
+        </div>
+        <select
+          value={jurisdiction}
+          onChange={(e) => onJurisdictionChange(e.target.value)}
+          className="min-h-[36px] flex-1 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
+          aria-label={country === "CA" ? "Select province or territory" : "Select state"}
+          data-testid="jurisdiction-select"
+        >
+          {jurisdictions.map((j) => (
+            <option key={j.code} value={j.code}>
+              {j.name} ({j.code})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Tax year row */}
+      {onTaxYearChange && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500">Tax Year</span>
+          <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
+            <button
+              type="button"
+              onClick={() => onTaxYearChange(2025)}
+              className={`inline-flex min-h-[36px] items-center rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
+                taxYear === 2025
+                  ? "bg-white/15 text-slate-100 shadow-sm"
+                  : "text-slate-500 hover:text-slate-300"
+              }`}
+              aria-pressed={taxYear === 2025}
+              aria-label="Tax year 2025"
+              data-testid="tax-year-2025"
+            >
+              2025
+            </button>
+            <button
+              type="button"
+              onClick={() => onTaxYearChange(2026)}
+              className={`inline-flex min-h-[36px] items-center rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
+                taxYear === 2026
+                  ? "bg-white/15 text-slate-100 shadow-sm"
+                  : "text-slate-500 hover:text-slate-300"
+              }`}
+              aria-pressed={taxYear === 2026}
+              aria-label="Tax year 2026"
+              data-testid="tax-year-2026"
+            >
+              2026
+            </button>
+          </div>
         </div>
       )}
     </div>
