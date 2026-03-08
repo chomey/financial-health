@@ -121,16 +121,29 @@ export default function Home() {
   // Track which section is visible for highlighting the stepper
   const stepperNavRef = useRef<HTMLElement>(null);
   const [visibleSection, setVisibleSection] = useState("insights");
+  const visibleSectionsRef = useRef(new Set<string>());
   useEffect(() => {
     if (phase !== "dashboard" || typeof IntersectionObserver === "undefined") return;
     const sectionIds = DASHBOARD_SECTIONS.map(s => s.id);
+    const visible = visibleSectionsRef.current;
+    visible.clear();
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
+        const id = entry.target.id.replace("section-dash-", "");
         if (entry.isIntersecting) {
-          setVisibleSection(entry.target.id.replace("section-dash-", ""));
+          visible.add(id);
+        } else {
+          visible.delete(id);
         }
       }
-    }, { rootMargin: "-40% 0px -55% 0px" });
+      // Pick the first (topmost) visible section in DOM order
+      for (const id of sectionIds) {
+        if (visible.has(id)) {
+          setVisibleSection(id);
+          return;
+        }
+      }
+    }, { rootMargin: "-20% 0px -60% 0px" });
     for (const id of sectionIds) {
       const el = document.getElementById(`section-dash-${id}`);
       if (el) observer.observe(el);
@@ -545,7 +558,6 @@ export default function Home() {
                 emergencyMonths={benchmarkEmergencyMonths}
                 debtToIncomeRatio={benchmarkDebtToIncome}
                 annualIncome={annualIncome}
-                onAgeChange={setAge}
               /></ZoomableCard>
             </div>
             {stocks.length > 0 && (() => {

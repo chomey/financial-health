@@ -16,7 +16,6 @@ interface BenchmarkComparisonsProps {
   emergencyMonths: number;
   debtToIncomeRatio: number;
   annualIncome?: number;
-  onAgeChange: (age: number | undefined) => void;
 }
 
 function formatBarValue(value: number, format: BenchmarkComparison["format"], compactCurrency: (n: number) => string): string {
@@ -128,25 +127,12 @@ export default function BenchmarkComparisons({
   emergencyMonths,
   debtToIncomeRatio,
   annualIncome,
-  onAgeChange,
 }: BenchmarkComparisonsProps) {
   const [showInfo, setShowInfo] = useState(false);
-  const [editingAge, setEditingAge] = useState(false);
-  const [ageInput, setAgeInput] = useState(age?.toString() ?? "");
 
   const comparisons = age
     ? computeBenchmarkComparisons(age, country, netWorth, savingsRate, emergencyMonths, debtToIncomeRatio, annualIncome)
     : [];
-
-  const handleAgeSubmit = () => {
-    const parsed = parseInt(ageInput, 10);
-    if (parsed >= 18 && parsed <= 120) {
-      onAgeChange(parsed);
-    } else if (ageInput === "") {
-      onAgeChange(undefined);
-    }
-    setEditingAge(false);
-  };
 
   return (
     <div
@@ -157,6 +143,7 @@ export default function BenchmarkComparisons({
         <div className="flex items-center gap-2">
           <span className="text-lg" aria-hidden="true">📊</span>
           <h3 className="text-base font-semibold text-slate-200">How You Compare</h3>
+          {age && <span className="text-xs text-slate-500">Age {age}</span>}
         </div>
         <button
           onClick={() => setShowInfo(!showInfo)}
@@ -180,58 +167,6 @@ export default function BenchmarkComparisons({
         </div>
       )}
 
-      {/* Age input */}
-      <div className="mb-4">
-        {!age && !editingAge ? (
-          <button
-            onClick={() => setEditingAge(true)}
-            className="w-full text-center py-3 px-4 border-2 border-dashed border-white/10 rounded-lg text-sm text-slate-500 hover:border-white/20 hover:text-slate-300 hover:bg-white/5 transition-all duration-200"
-            data-testid="add-age-button"
-          >
-            Enter your age to see personalized benchmarks
-          </button>
-        ) : editingAge ? (
-          <div className="flex items-center gap-2" data-testid="age-input-form">
-            <label className="text-sm text-slate-400">Age:</label>
-            <input
-              type="number"
-              min={18}
-              max={120}
-              value={ageInput}
-              onChange={(e) => setAgeInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleAgeSubmit();
-                if (e.key === "Escape") setEditingAge(false);
-              }}
-              onBlur={handleAgeSubmit}
-              autoFocus
-              className="w-20 rounded-md border border-white/10 bg-slate-800 px-2 py-1.5 text-sm text-slate-200 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20 transition-all duration-150"
-              placeholder="e.g. 30"
-              data-testid="age-input"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400">Age:</span>
-            <button
-              onClick={() => { setAgeInput(age?.toString() ?? ""); setEditingAge(true); }}
-              className="text-sm font-medium text-slate-300 hover:text-violet-400 transition-colors duration-150 underline decoration-slate-600 hover:decoration-violet-400"
-              data-testid="age-display"
-            >
-              {age}
-            </button>
-            <button
-              onClick={() => { onAgeChange(undefined); setAgeInput(""); }}
-              className="text-xs text-slate-500 hover:text-slate-300 transition-colors duration-150"
-              aria-label="Remove age"
-              data-testid="remove-age-button"
-            >
-              ✕
-            </button>
-          </div>
-        )}
-      </div>
-
       {/* Comparisons */}
       {comparisons.length > 0 ? (
         <div className="space-y-5">
@@ -241,7 +176,7 @@ export default function BenchmarkComparisons({
         </div>
       ) : !age ? (
         <p className="text-sm text-slate-500 text-center py-2">
-          Add your age above to unlock benchmark comparisons
+          Set your age in Inputs &rarr; Profile to see personalized benchmarks
         </p>
       ) : null}
     </div>
