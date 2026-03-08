@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Tax credits E2E regression
+  {
+    version: 145,
+    title: "Tax credits E2E regression",
+    description: "Full Playwright regression test covering the complete tax credits feature across CA and US: credit entry, category swapping on country switch, all four insight types, dashboard metric updates (effective tax rate, monthly cash flow, runway), and URL state round-trip persistence. Confirms the entire tax credits pipeline works end-to-end.",
+    date: "2026-03-07",
+  },
   // Tax credits impact on dashboard metrics
   {
     version: 144,

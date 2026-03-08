@@ -454,7 +454,20 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                 <div className="mt-1 grid grid-cols-3 gap-2 text-xs">
                   {/* Value */}
                   <div>
-                    <span className="text-slate-500">Value</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-500">Value</span>
+                      {homeCurrency && fxRates && (
+                        <CurrencyBadge
+                          currency={property.currency}
+                          homeCurrency={homeCurrency}
+                          amount={property.value}
+                          fxRates={fxRates}
+                          onCurrencyChange={(cu) => {
+                            setProperties(properties.map((p) => p.id === property.id ? { ...p, currency: cu } : p));
+                          }}
+                        />
+                      )}
+                    </div>
                     {editingId === property.id && editingField === "value" ? (
                       <input
                         ref={inputRef}
@@ -513,21 +526,6 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                   </div>
                 </div>
 
-                {/* Currency badge */}
-                {homeCurrency && fxRates && (
-                  <div className="flex items-center gap-2 px-5 pb-1">
-                    <CurrencyBadge
-                      currency={property.currency}
-                      homeCurrency={homeCurrency}
-                      amount={property.value}
-                      fxRates={fxRates}
-                      onCurrencyChange={(cu) => {
-                        setProperties(properties.map((p) => p.id === property.id ? { ...p, currency: cu } : p));
-                      }}
-                    />
-                  </div>
-                )}
-
                 {/* Secondary detail fields: interest rate, monthly payment, amortization */}
                 {(() => {
                   const rate = property.interestRate;
@@ -550,7 +548,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                   return (
                     <div className="mt-1.5 space-y-1.5" data-testid={`property-details-${property.id}`}>
                       {/* Editable detail badges */}
-                      <div className="flex flex-wrap items-center gap-2 px-1">
+                      <div className="flex flex-wrap items-center gap-2 px-3">
                         {/* Interest rate */}
                         {editingId === property.id && editingField === "interestRate" ? (
                           <input
@@ -602,7 +600,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                                 ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
                                 : suggestedPayment > 0
                                   ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
-                                  : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                                  : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                             }`}
                             aria-label={`Edit monthly payment for ${property.name}${hasPayment ? `, currently ${formatCurrency(payment!)}` : ""}`}
                             data-testid={`payment-badge-${property.id}`}
@@ -635,7 +633,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-violet-500/20 ${
                               hasAmort
                                 ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
-                                : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                                : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                             }`}
                             aria-label={`Edit amortization for ${property.name}${hasAmort ? `, currently ${amortYears} years` : ""}`}
                             data-testid={`amort-badge-${property.id}`}
@@ -666,7 +664,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                               className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-amber-500/20 ${
                                 hasYearPurchased
                                   ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
-                                  : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                                  : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                               }`}
                               aria-label={`Edit year purchased for ${property.name}${hasYearPurchased ? `, currently ${property.yearPurchased}` : ""}`}
                               data-testid={`year-badge-${property.id}`}
@@ -705,7 +703,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                                     : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
                                   : defaultAp !== undefined
                                     ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
-                                    : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                                    : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                               }`}
                               aria-label={`Edit appreciation rate for ${property.name}${hasAppreciation ? `, currently ${property.appreciation}%` : ""}`}
                               data-testid={`appreciation-edit-${property.id}`}
@@ -893,7 +891,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
       )}
 
       {/* Total equity and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+      <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2">
         <span className="text-sm font-medium text-slate-400">
           Total Equity: {formatCurrency(totalEquity)}
         </span>

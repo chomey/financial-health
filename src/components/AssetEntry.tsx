@@ -375,12 +375,12 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
             <DataFlowSourceItem key={asset.id} id={`asset:${asset.id}`} label={asset.category} value={asset.amount}>
             <div role="listitem">
               {isFirstComputed && (
-                <div className="mt-2 mb-1 border-t border-dashed border-white/10 pt-2 px-3">
+                <div className="mt-1.5 mb-0.5 border-t border-dashed border-white/10 pt-1.5 px-3">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Auto-computed</span>
                 </div>
               )}
               <div
-                className={`group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 ${isComputed ? "bg-slate-800/60 border border-dashed border-white/10 rounded-lg mx-1" : "hover:bg-white/5"}`}
+                className={`group flex items-center justify-between rounded-lg px-3 transition-all duration-200 ${isComputed ? "py-1 bg-slate-800/60 border border-dashed border-white/10 rounded-md mx-1" : "py-1.5 hover:bg-white/5"}`}
               >
                 <div className="flex flex-1 items-center gap-3 min-w-0">
                   {/* Category */}
@@ -457,36 +457,49 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     )
                   )}
 
-                  {/* Amount */}
-                  {editingId === asset.id && editingField === "amount" && !isComputed ? (
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={() => commitEdit()}
-                      onKeyDown={handleEditKeyDown}
-                      className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
-                      aria-label={`Edit amount for ${asset.category}`}
-                    />
-                  ) : (
-                    isComputed ? (
-                      <span className="w-28 text-right text-sm font-medium text-slate-500 px-2 py-1">
-                        {formatCurrency(asset.amount)}
-                      </span>
+                  {/* Amount + Currency */}
+                  <div className="flex items-center gap-1">
+                    {homeCurrency && fxRates && !isComputed && (
+                      <CurrencyBadge
+                        currency={asset.currency}
+                        homeCurrency={homeCurrency}
+                        amount={asset.amount}
+                        fxRates={fxRates}
+                        onCurrencyChange={(cu) => {
+                          updateAssets(assets.map((a) => a.id === asset.id ? { ...a, currency: cu } : a));
+                        }}
+                      />
+                    )}
+                    {editingId === asset.id && editingField === "amount" && !isComputed ? (
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onBlur={() => commitEdit()}
+                        onKeyDown={handleEditKeyDown}
+                        className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                        aria-label={`Edit amount for ${asset.category}`}
+                      />
                     ) : (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        startEdit(asset.id, "amount", String(asset.amount))
-                      }
-                      className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-emerald-400 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-emerald-400/10 hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
-                      aria-label={`Edit amount for ${asset.category}, currently ${formatCurrency(asset.amount)}`}
-                    >
-                      {formatCurrency(asset.amount)}
-                    </button>
-                    )
-                  )}
+                      isComputed ? (
+                        <span className="w-28 text-right text-sm font-medium text-slate-500 px-2 py-1">
+                          {formatCurrency(asset.amount)}
+                        </span>
+                      ) : (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          startEdit(asset.id, "amount", String(asset.amount))
+                        }
+                        className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-emerald-400 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-emerald-400/10 hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                        aria-label={`Edit amount for ${asset.category}, currently ${formatCurrency(asset.amount)}`}
+                      >
+                        {formatCurrency(asset.amount)}
+                      </button>
+                      )
+                    )}
+                  </div>
                 </div>
 
                 {/* Delete button — hidden for computed assets */}
@@ -514,19 +527,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
               </div>
 
               {/* Secondary detail fields */}
-              <div className={`flex flex-wrap items-center gap-2 pb-1 ${isComputed ? "px-6" : "px-5"}`} data-testid={`asset-details-${asset.id}`}>
-                {/* Currency badge */}
-                {homeCurrency && fxRates && !isComputed && (
-                  <CurrencyBadge
-                    currency={asset.currency}
-                    homeCurrency={homeCurrency}
-                    amount={asset.amount}
-                    fxRates={fxRates}
-                    onCurrencyChange={(cu) => {
-                      updateAssets(assets.map((a) => a.id === asset.id ? { ...a, currency: cu } : a));
-                    }}
-                  />
-                )}
+              <div className={`flex flex-wrap items-center gap-2 pb-1 ${isComputed ? "px-4" : "px-3"}`} data-testid={`asset-details-${asset.id}`}>
                 {/* Tax treatment pill — auto-detected, click to override */}
                 {(() => {
                   const autoDetected = getTaxTreatment(asset.category);
@@ -583,7 +584,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
                         : displayRoi !== undefined
                           ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
-                          : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                          : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                     }`}
                     aria-label={`Edit ROI for ${asset.category}${displayRoi !== undefined ? `, currently ${displayRoi}%` : ""}`}
                     data-testid={`roi-badge-${asset.id}`}
@@ -643,7 +644,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                       hasContribution
                         ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                        : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                        : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                     }`}
                     aria-label={`Edit monthly contribution for ${asset.category}${hasContribution ? `, currently ${formatCurrency(asset.monthlyContribution!)}` : ""}`}
                     data-testid={`contribution-badge-${asset.id}`}
@@ -688,7 +689,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                             hasPct
                               ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
-                              : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                              : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                           }`}
                           aria-label={`Edit employer match percent for ${asset.category}${hasPct ? `, currently ${asset.employerMatchPct}%` : ""}`}
                           data-testid={`employer-match-pct-${asset.id}`}
@@ -716,7 +717,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                             hasCap
                               ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
-                              : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                              : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                           }`}
                           aria-label={`Edit employer match cap for ${asset.category}${hasCap ? `, currently ${asset.employerMatchCap}% of salary` : ""}`}
                           data-testid={`employer-match-cap-${asset.id}`}
@@ -758,7 +759,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       className={`group/cb relative rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                         asset.costBasisPercent !== undefined && asset.costBasisPercent < 100
                           ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
-                          : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                          : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
                       }`}
                       aria-label={`Edit cost basis percent for ${asset.category}${asset.costBasisPercent !== undefined ? `, currently ${asset.costBasisPercent}%` : ""}`}
                       data-testid={`cost-basis-badge-${asset.id}`}
@@ -786,7 +787,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                     asset.surplusTarget
                       ? "bg-amber-500/10 text-amber-400 cursor-default"
-                      : "text-slate-600 hover:bg-slate-800/60 hover:text-slate-500 cursor-pointer"
+                      : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500 cursor-pointer"
                   }`}
                   data-testid={`surplus-target-${asset.id}`}
                 >
@@ -822,7 +823,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 const totalContrib = (asset.monthlyContribution ?? 0) + matchContrib + (asset.surplusTarget ? monthlySurplus : 0);
                 const showProjection = (displayRoi !== undefined && displayRoi > 0) || totalContrib > 0;
                 return showProjection ? (
-                  <div className={`flex items-center gap-3 pb-1.5 text-[10px] text-slate-500 ${isComputed ? "px-6" : "px-5"}`} data-testid={`asset-projection-${asset.id}`}>
+                  <div className={`flex items-center gap-3 pb-1.5 text-[10px] text-slate-500 ${isComputed ? "px-4" : "px-3"}`} data-testid={`asset-projection-${asset.id}`}>
                     <span className="font-medium">Projected:</span>
                     <span>10yr <span className="text-emerald-400 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 10))}</span></span>
                     <span>20yr <span className="text-emerald-400 font-medium">{formatCompact(projectAssetValue(asset.amount, displayRoi ?? 0, totalContrib, 20))}</span></span>
@@ -936,7 +937,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
       )}
 
       {/* Total and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+      <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2">
         <span className="text-sm font-medium text-slate-400">
           Total: {formatCurrency(total)}
         </span>

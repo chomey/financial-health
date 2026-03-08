@@ -59,7 +59,7 @@ describe("computeWithdrawalTaxSummary", () => {
     expect(result!.accountsByTreatment.taxable.categories).toContain("Brokerage");
   });
 
-  it("builds correct withdrawal order (tax-free first, taxable second, tax-deferred last)", () => {
+  it("builds correct withdrawal order (taxable first, tax-free second, tax-deferred last)", () => {
     const state: FinancialState = {
       ...INITIAL_STATE,
       assets: [
@@ -72,12 +72,12 @@ describe("computeWithdrawalTaxSummary", () => {
     };
     const result = computeWithdrawalTaxSummary(state, 60000, 0);
     expect(result).toBeDefined();
-    // Tax-free categories first, then taxable, then tax-deferred
-    const tfIdx = result!.withdrawalOrder.indexOf("TFSA");
+    // Taxable first (preserve tax shelters), then tax-free, then tax-deferred
     const brIdx = result!.withdrawalOrder.indexOf("Brokerage");
+    const tfIdx = result!.withdrawalOrder.indexOf("TFSA");
     const rrIdx = result!.withdrawalOrder.indexOf("RRSP");
-    expect(tfIdx).toBeLessThan(brIdx);
-    expect(brIdx).toBeLessThan(rrIdx);
+    expect(brIdx).toBeLessThan(tfIdx);
+    expect(tfIdx).toBeLessThan(rrIdx);
   });
 
   it("computes tax drag > 0 for RRSP-heavy portfolio", () => {

@@ -586,7 +586,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                 </div>
 
                 {/* Secondary details: cost basis, gain/loss */}
-                <div className="flex flex-wrap items-center gap-2 px-5 pb-1" data-testid={`stock-details-${stock.id}`}>
+                <div className="flex flex-wrap items-center gap-2 px-3 -mt-1 pb-0.5" data-testid={`stock-details-${stock.id}`}>
                   {/* Cost basis */}
                   {editingId === stock.id && editingField === "costBasis" ? (
                     <input
@@ -607,7 +607,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                       className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
                         stock.costBasis !== undefined
                           ? "bg-white/10 text-slate-300 hover:bg-white/15"
-                          : "text-slate-600 hover:bg-white/5 hover:text-slate-500"
+                          : "border border-dashed border-white/10 text-slate-600 hover:bg-white/5 hover:text-slate-500"
                       }`}
                       aria-label={`Set cost basis for ${stock.ticker}${stock.costBasis ? `, currently ${formatPrice(stock.costBasis)}` : ""}`}
                       data-testid={`cost-basis-${stock.id}`}
@@ -637,7 +637,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                       className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
                         stock.purchaseDate
                           ? "bg-white/10 text-slate-300 hover:bg-white/15"
-                          : "text-slate-600 hover:bg-white/5 hover:text-slate-500"
+                          : "border border-dashed border-white/10 text-slate-600 hover:bg-white/5 hover:text-slate-500"
                       }`}
                       aria-label={`Set purchase date for ${stock.ticker}${stock.purchaseDate ? `, currently ${stock.purchaseDate}` : ""}`}
                       data-testid={`purchase-date-${stock.id}`}
@@ -750,7 +750,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
       )}
 
       {/* Total and Add button */}
-      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+      <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2">
         <span className="text-sm font-medium text-slate-400">
           Total: {formatCurrency(total)}
         </span>
