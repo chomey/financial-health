@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { WIZARD_STEPS, type WizardStep, getStepFromURL, updateStepURL } from "@/lib/url-state";
-import { CopyLinkButton, PrintSnapshotButton } from "@/app/_page-helpers";
+import { AppHeader } from "@/app/_page-helpers";
 import WizardStepper from "./WizardStepper";
 import WelcomeStep from "./steps/WelcomeStep";
 import ProfileStep from "./steps/ProfileStep";
@@ -251,50 +251,13 @@ export default function WizardShell(props: WizardProps) {
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-2 sm:px-6">
-        <div className="mx-auto max-w-5xl">
-          {/* Title + phase toggle */}
-          <div className="flex items-center gap-2 mb-1.5">
-            <h1 className="text-sm font-bold text-white sm:text-base">Financial Health</h1>
-            <span className="text-slate-700 select-none">·</span>
-            <span className="rounded-md bg-violet-500/15 px-2 py-1 text-xs font-medium text-violet-300 ring-1 ring-violet-500/30">
-              📝 Inputs
-            </span>
-            <span className="text-slate-600 select-none text-xs">/</span>
-            <button
-              type="button"
-              onClick={props.onFinish}
-              className="rounded-md px-2 py-1 text-xs font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
-              data-testid="wizard-skip-to-dashboard"
-            >
-              📊 Dashboard
-            </button>
-            <span className="flex-1" />
-            <a
-              href="/changelog"
-              className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
-            >
-              Changelog
-            </a>
-            <a
-              href="https://ko-fi.com/R6R11VMSML"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
-            >
-              ☕ Tip
-            </a>
-            <CopyLinkButton />
-            <PrintSnapshotButton />
-          </div>
+      <AppHeader activePhase="inputs" onSwitchPhase={props.onFinish}>
           <WizardStepper
             currentStep={currentStep}
             onStepChange={navigateTo}
             stepCompletion={stepCompletion}
           />
-        </div>
-      </header>
+      </AppHeader>
 
       {/* Step content */}
       <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">

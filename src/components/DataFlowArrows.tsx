@@ -1211,7 +1211,8 @@ function ExplainerModal({
                 const meta = getSourceMetadata(conn.sourceId);
                 const isPositive = conn.sign !== "negative";
                 const showOperator = i > 0;
-                const sectionName = meta?.label || conn.sourceId.replace("section-", "").replace("virtual-", "");
+                const rawName = conn.sourceId.replace("section-", "").replace("virtual-", "");
+                const sectionName = meta?.label || rawName.charAt(0).toUpperCase() + rawName.slice(1);
                 const displayValue = formatCurrency(conn.value ?? 0, homeCurrencyProp);
                 const cardDelay = i * 50; // Stagger card fade-ins
 

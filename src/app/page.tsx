@@ -42,8 +42,8 @@ import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { getStepFromURL, updateStepURL, type WizardStep } from "@/lib/url-state";
 import {
   PrintSnapshotButton,
+  AppHeader,
   PrintFooter,
-  CopyLinkButton,
   WelcomeBanner,
 } from "@/app/_page-helpers";
 import { useFinancialState } from "@/app/_use-financial-state";
@@ -408,44 +408,7 @@ export default function Home() {
     <DataFlowProvider homeCurrency={homeCurrency}>
     <div className="min-h-screen bg-slate-950 flex flex-col">
       {/* ── Header (sticky) ── */}
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-2 sm:px-6">
-        <div className="mx-auto max-w-5xl">
-          {/* Title + phase toggle + actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 print:hidden">
-            <h1 className="text-sm font-bold text-white whitespace-nowrap"><span className="hidden sm:inline">Financial Health</span><span className="sm:hidden">FH</span></h1>
-            {/* Inputs / Dashboard pill toggle */}
-            <div className="flex rounded-lg border border-white/10 text-xs">
-              <button
-                type="button"
-                onClick={switchToWizard}
-                className="rounded-l-lg px-2 py-1 font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400"
-              >
-                <span className="hidden sm:inline">📝 </span>Inputs
-              </button>
-              <span className="rounded-r-lg bg-violet-500/15 px-2 py-1 font-medium text-violet-300 ring-1 ring-inset ring-violet-500/30">
-                <span className="hidden sm:inline">📊 </span>Dashboard
-              </span>
-            </div>
-            <span className="flex-1" />
-            <a
-              href="/changelog"
-              className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
-            >
-              <span className="hidden sm:inline">Changelog</span><span className="sm:hidden text-sm">📋</span>
-            </a>
-            <a
-              href="https://ko-fi.com/R6R11VMSML"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
-            >
-              <span className="hidden sm:inline">☕ Tip</span><span className="sm:hidden text-sm">☕</span>
-            </a>
-            <span className="hidden sm:flex sm:items-center sm:gap-1">
-              <CopyLinkButton />
-              <PrintSnapshotButton />
-            </span>
-          </div>
+      <AppHeader activePhase="dashboard" onSwitchPhase={switchToWizard}>
           {/* Dashboard section stepper (scroll-to links) */}
           <nav ref={stepperNavRef} className="w-full overflow-x-auto scrollbar-hide print:hidden" aria-label="Dashboard sections" style={{ scrollbarWidth: "none" }}>
             <ol className="flex items-center gap-0 px-1 py-0.5">
@@ -480,8 +443,7 @@ export default function Home() {
               })}
             </ol>
           </nav>
-        </div>
-      </header>
+      </AppHeader>
 
       {/* ── All sections (scrollable) ── */}
       <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
@@ -585,44 +547,45 @@ export default function Home() {
                 annualIncome={annualIncome}
                 onAgeChange={setAge}
               /></ZoomableCard>
-              {stocks.length > 0 && (() => {
-                const portfolio = getPortfolioSummary(stocks);
-                const stocksWithReturns = stocks
-                  .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
-                  .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
-                return (
-                  <ZoomableCard><div className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
-                      <span className="text-lg" aria-hidden="true">📊</span>
-                    </div>
-                    <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                      {portfolio.totalGainLoss >= 0 ? "+" : "-"}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.abs(portfolio.totalGainLoss))}
-                    </p>
-                    {portfolio.totalCostBasis > 0 && (
-                      <p className="mt-0.5 text-sm text-slate-400" data-testid="portfolio-return-pct">
-                        {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% overall return
-                      </p>
-                    )}
-                    {stocksWithReturns.length > 0 && (
-                      <div className="mt-2 space-y-0.5">
-                        {stocksWithReturns.map((s) => (
-                          <p key={s.ticker} className="text-xs text-slate-500">
-                            <span className="font-mono font-medium text-slate-400">{s.ticker}</span>{" "}
-                            <span className={s.annualized >= 0 ? "text-emerald-400" : "text-rose-400"}>
-                              {s.annualized >= 0 ? "+" : ""}{s.annualized.toFixed(1)}%/yr
-                            </span>
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                    <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
-                      Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
-                    </p>
-                  </div></ZoomableCard>
-                );
-              })()}
             </div>
+            {stocks.length > 0 && (() => {
+              const portfolio = getPortfolioSummary(stocks);
+              if (portfolio.totalCostBasis === 0 && portfolio.totalGainLoss === 0) return null;
+              const stocksWithReturns = stocks
+                .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
+                .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
+              return (
+                <ZoomableCard><div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
+                    <span className="text-lg" aria-hidden="true">📊</span>
+                  </div>
+                  <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                    {portfolio.totalGainLoss >= 0 ? "+" : "-"}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.abs(portfolio.totalGainLoss))}
+                  </p>
+                  {portfolio.totalCostBasis > 0 && (
+                    <p className="mt-0.5 text-sm text-slate-400" data-testid="portfolio-return-pct">
+                      {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% overall return
+                    </p>
+                  )}
+                  {stocksWithReturns.length > 0 && (
+                    <div className="mt-2 space-y-0.5">
+                      {stocksWithReturns.map((s) => (
+                        <p key={s.ticker} className="text-xs text-slate-500">
+                          <span className="font-mono font-medium text-slate-400">{s.ticker}</span>{" "}
+                          <span className={s.annualized >= 0 ? "text-emerald-400" : "text-rose-400"}>
+                            {s.annualized >= 0 ? "+" : ""}{s.annualized.toFixed(1)}%/yr
+                          </span>
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                  <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
+                    Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
+                  </p>
+                </div></ZoomableCard>
+              );
+            })()}
           </section>
 
           {/* What If */}

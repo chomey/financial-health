@@ -31,6 +31,88 @@ export function PrintSnapshotButton() {
   );
 }
 
+/**
+ * Shared header bar for both Dashboard and Wizard views.
+ * `activePhase` controls which pill is highlighted; the other is a clickable button.
+ */
+export function AppHeader({
+  activePhase,
+  onSwitchPhase,
+  children,
+}: {
+  activePhase: "inputs" | "dashboard";
+  onSwitchPhase: () => void;
+  /** Optional extra content below the title row (e.g. stepper nav) */
+  children?: React.ReactNode;
+}) {
+  const inputsActive = activePhase === "inputs";
+  return (
+    <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-2 sm:px-6">
+      <div className="mx-auto max-w-5xl">
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 print:hidden">
+          <h1 className="text-sm font-bold text-white whitespace-nowrap">
+            <span className="hidden sm:inline">Financial Health</span>
+            <span className="sm:hidden">FH</span>
+          </h1>
+          {/* Inputs / Dashboard pill toggle */}
+          <div className="flex rounded-lg border border-white/10 text-xs">
+            {inputsActive ? (
+              <>
+                <span className="rounded-l-lg bg-violet-500/15 px-2 py-1 font-medium text-violet-300 ring-1 ring-inset ring-violet-500/30">
+                  <span className="hidden sm:inline">📝 </span>Inputs
+                </span>
+                <button
+                  type="button"
+                  onClick={onSwitchPhase}
+                  className="rounded-r-lg px-2 py-1 font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400"
+                  data-testid="wizard-skip-to-dashboard"
+                >
+                  <span className="hidden sm:inline">📊 </span>Dashboard
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={onSwitchPhase}
+                  className="rounded-l-lg px-2 py-1 font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400"
+                >
+                  <span className="hidden sm:inline">📝 </span>Inputs
+                </button>
+                <span className="rounded-r-lg bg-violet-500/15 px-2 py-1 font-medium text-violet-300 ring-1 ring-inset ring-violet-500/30">
+                  <span className="hidden sm:inline">📊 </span>Dashboard
+                </span>
+              </>
+            )}
+          </div>
+          <span className="flex-1" />
+          <a
+            href="/changelog"
+            className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+          >
+            <span className="hidden sm:inline">Changelog</span>
+            <span className="sm:hidden text-sm">📋</span>
+          </a>
+          <a
+            href="https://ko-fi.com/R6R11VMSML"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+          >
+            <span className="hidden sm:inline">☕ Tip</span>
+            <span className="sm:hidden text-sm">☕</span>
+          </a>
+          <span className="hidden sm:flex sm:items-center sm:gap-1">
+            <CopyLinkButton />
+            <PrintSnapshotButton />
+          </span>
+        </div>
+        {children}
+      </div>
+    </header>
+  );
+}
+
 export function PrintFooter() {
   const [date, setDate] = useState("");
   const [url, setUrl] = useState("");

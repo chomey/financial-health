@@ -34,7 +34,7 @@ export default function WizardStepper({
 
   return (
     <nav className="w-full overflow-x-auto scrollbar-hide" aria-label="Wizard steps" style={{ scrollbarWidth: "none" }}>
-      <ol className="flex items-center gap-0 min-w-max px-1 py-0.5 pr-8">
+      <ol className="flex items-center gap-0 px-1 py-0.5">
         {WIZARD_STEPS.map((step, idx) => {
           const meta = STEP_META[step];
           const isCurrent = step === currentStep;
