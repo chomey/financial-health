@@ -511,7 +511,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   if (!result.coversInterest) {
                     return (
                       <div
-                        className="mx-5 mb-1 rounded px-2 py-1 text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                        className="mx-3 mb-1 rounded px-2 py-1 text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20"
                         data-testid={`debt-payoff-warning-${debt.id}`}
                       >
                         Payment doesn&rsquo;t cover interest &mdash; balance will grow
@@ -521,7 +521,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   if (result.months > 0) {
                     return (
                       <div
-                        className="mx-5 mb-1 rounded px-2 py-1 text-xs bg-cyan-500/10 text-cyan-400"
+                        className="mx-3 mb-1 rounded px-2 py-1 text-xs bg-cyan-500/10 text-cyan-400"
                         data-testid={`debt-payoff-${debt.id}`}
                       >
                         Paid off in {result.payoffDuration} &middot; {formatPayoffCurrency(result.totalInterest)} total interest

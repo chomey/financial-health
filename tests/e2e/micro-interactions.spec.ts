@@ -17,25 +17,18 @@ test.describe("Micro-interactions and polish", () => {
     await captureScreenshot(page, "task-13-active-state-button");
   });
 
-  test("runway celebratory glow when > 12 months", async ({ page }) => {
+  test("metric cards have consistent styling without glow animations", async ({ page }) => {
     await page.goto("/");
 
-    // Default mock data has 22.2 months runway — should show glow
     const runwayCard = page.getByRole("group", { name: "Financial Runway" });
     await expect(runwayCard).toBeVisible();
 
-    // Check for the celebration data attribute
-    await expect(runwayCard).toHaveAttribute("data-runway-celebration", "true");
-
-    // Check for celebration text
-    await expect(page.getByTestId("runway-celebration-text")).toHaveText("Excellent safety net!");
-
-    // Check the green border styling
+    // No special glow or pulse animations on any card
     const className = await runwayCard.getAttribute("class");
-    expect(className).toContain("border-green-300");
-    expect(className).toContain("animate-glow-pulse");
+    expect(className).not.toContain("animate-glow-pulse");
+    expect(className).not.toContain("animate-warning-pulse");
 
-    await captureScreenshot(page, "task-13-runway-glow");
+    await captureScreenshot(page, "task-13-runway-consistent");
   });
 
   test("tooltip has fade-in animation", async ({ page }) => {

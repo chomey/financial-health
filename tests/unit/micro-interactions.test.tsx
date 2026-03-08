@@ -8,8 +8,8 @@ import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
-describe("Runway celebratory glow", () => {
-  it("shows celebratory glow when runway exceeds 12 months", () => {
+describe("Metric cards have consistent styling", () => {
+  it("metric cards have no special glow or pulse animations", () => {
     const metrics: MetricData[] = [
       { title: "Net Worth", value: 100000, format: "currency", icon: "💰", tooltip: "test", positive: true },
       { title: "Monthly Cash Flow", value: 2000, format: "currency", icon: "📈", tooltip: "test", positive: true },
@@ -18,46 +18,9 @@ describe("Runway celebratory glow", () => {
     ];
     render(<SnapshotDashboard metrics={metrics} />);
     const runwayCard = screen.getByRole("group", { name: "Financial Runway" });
-    expect(runwayCard.getAttribute("data-runway-celebration")).toBeTruthy();
-    expect(runwayCard.className).toContain("animate-glow-pulse");
-    expect(runwayCard.className).toContain("border-emerald-500/40");
-  });
-
-  it("shows 'Excellent safety net!' text for runway > 12 months", () => {
-    const metrics: MetricData[] = [
-      { title: "Net Worth", value: 100000, format: "currency", icon: "💰", tooltip: "test", positive: true },
-      { title: "Monthly Cash Flow", value: 2000, format: "currency", icon: "📈", tooltip: "test", positive: true },
-      { title: "Financial Runway", value: 15.0, format: "months", icon: "🛡️", tooltip: "test", positive: true },
-      { title: "Debt-to-Asset Ratio", value: 0.5, format: "ratio", icon: "⚖️", tooltip: "test", positive: true },
-    ];
-    render(<SnapshotDashboard metrics={metrics} />);
-    expect(screen.getByTestId("runway-celebration-text")).toHaveTextContent("Excellent safety net!");
-  });
-
-  it("does NOT show celebratory glow when runway is below 12 months", () => {
-    const metrics: MetricData[] = [
-      { title: "Net Worth", value: 50000, format: "currency", icon: "💰", tooltip: "test", positive: true },
-      { title: "Monthly Cash Flow", value: 1000, format: "currency", icon: "📈", tooltip: "test", positive: true },
-      { title: "Financial Runway", value: 8.0, format: "months", icon: "🛡️", tooltip: "test", positive: true },
-      { title: "Debt-to-Asset Ratio", value: 1.0, format: "ratio", icon: "⚖️", tooltip: "test", positive: false },
-    ];
-    render(<SnapshotDashboard metrics={metrics} />);
-    const runwayCard = screen.getByRole("group", { name: "Financial Runway" });
-    expect(runwayCard.getAttribute("data-runway-celebration")).toBeNull();
     expect(runwayCard.className).not.toContain("animate-glow-pulse");
-    expect(screen.queryByTestId("runway-celebration-text")).not.toBeInTheDocument();
-  });
-
-  it("does NOT show glow when runway is exactly 12 months", () => {
-    const metrics: MetricData[] = [
-      { title: "Net Worth", value: 50000, format: "currency", icon: "💰", tooltip: "test", positive: true },
-      { title: "Monthly Cash Flow", value: 1000, format: "currency", icon: "📈", tooltip: "test", positive: true },
-      { title: "Financial Runway", value: 12.0, format: "months", icon: "🛡️", tooltip: "test", positive: true },
-      { title: "Debt-to-Asset Ratio", value: 1.0, format: "ratio", icon: "⚖️", tooltip: "test", positive: false },
-    ];
-    render(<SnapshotDashboard metrics={metrics} />);
-    const runwayCard = screen.getByRole("group", { name: "Financial Runway" });
-    expect(runwayCard.className).not.toContain("animate-glow-pulse");
+    expect(runwayCard.className).not.toContain("animate-warning-pulse");
+    expect(runwayCard.className).toContain("border-white/10");
   });
 });
 
