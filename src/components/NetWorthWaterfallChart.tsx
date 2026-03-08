@@ -16,6 +16,7 @@ import type { Debt } from "@/components/DebtEntry";
 import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
+import { formatCurrencyCompact } from "@/lib/currency";
 
 export interface WaterfallSegment {
   name: string;
@@ -126,10 +127,7 @@ export function computeWaterfallData(
 }
 
 function formatCurrency(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(value / 1_000).toFixed(1)}k`;
-  return `$${value.toFixed(0)}`;
+  return formatCurrencyCompact(value, "USD", "USD");
 }
 
 function getBarColor(segment: WaterfallSegment): string {

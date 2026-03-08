@@ -285,3 +285,40 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
 export function fmtShort(n: number, currency: SupportedCurrency): string {
   return formatCurrencyCompact(n, currency, currency);
 }
+
+// --- Consolidated computation helpers ---
+
+/**
+ * FIRE number: annual living expenses / 4% safe withdrawal rate.
+ * Single source of truth used by toFinancialData and computeCoastFireAge.
+ */
+export function computeFireNumber(monthlyExpenses: number): number | undefined {
+  return monthlyExpenses > 0 ? (monthlyExpenses * 12) / 0.04 : undefined;
+}
+
+/**
+ * Monthly obligations: expenses + mortgage payments + debt payments.
+ * Used for runway calculations across compute-metrics, insights, and withdrawal tax.
+ */
+export function computeMonthlyObligations(
+  monthlyExpenses: number,
+  totalMortgagePayments: number,
+  totalDebtPayments: number,
+): number {
+  return monthlyExpenses + totalMortgagePayments + totalDebtPayments;
+}
+
+/**
+ * Monthly surplus: after-tax income + investment returns - all outflows.
+ * Single source of truth for surplus calculations.
+ */
+export function computeSurplus(
+  monthlyAfterTaxIncome: number,
+  totalMonthlyInvestmentReturns: number,
+  monthlyExpenses: number,
+  totalMonthlyContributions: number,
+  totalMortgagePayments: number,
+  totalDebtPayments: number,
+): number {
+  return monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments - totalDebtPayments;
+}

@@ -9,7 +9,7 @@ export { INITIAL_STATE } from "@/lib/financial-types";
 
 // Totals & investment returns
 export type { InvestmentIncomeAccount, MonthlyInvestmentReturn } from "@/lib/compute-totals";
-export { computeTotals, computeMonthlyInvestmentReturns } from "@/lib/compute-totals";
+export { computeTotals, computeMonthlyInvestmentReturns, computeFireNumber, computeMonthlyObligations, computeSurplus } from "@/lib/compute-totals";
 
 // Metrics
 export { computeMetrics, computeIncomeReplacementDetails } from "@/lib/compute-metrics";
@@ -29,7 +29,7 @@ import { getHomeCurrency, getEffectiveFxRates, convertToHome } from "@/lib/curre
 import type { SupportedCurrency } from "@/lib/currency";
 import { getTaxTreatment } from "@/lib/withdrawal-tax";
 import { getMarginalRateForIncome } from "@/lib/tax-engine";
-import { computeTotals, computeMonthlyInvestmentReturns } from "@/lib/compute-totals";
+import { computeTotals, computeMonthlyInvestmentReturns, computeFireNumber, computeMonthlyObligations } from "@/lib/compute-totals";
 import { simulateRunwayWithGrowth, simulateRunwayWithTax } from "@/lib/runway-simulation";
 import type { Asset } from "@/components/AssetEntry";
 
@@ -55,7 +55,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     }, 0);
 
   // FIRE number: annual living expenses / 4% SWR — use raw monthly expenses (excludes contributions/mortgage)
-  const fireNumber = monthlyExpenses > 0 ? (monthlyExpenses * 12) / 0.04 : undefined;
+  const fireNumber = computeFireNumber(monthlyExpenses);
 
   // Monthly debt payments: sum of minimum debt payments + mortgage payments
   const monthlyDebtPayments = state.debts.reduce((sum, d) => sum + (d.monthlyPayment ?? 0), 0) + totalMortgagePayments;
@@ -136,7 +136,7 @@ export function computeCoastFireAge(
   if (currentAge >= targetAge || annualExpenses <= 0 || currentInvested <= 0) return null;
 
   // FIRE number: annual expenses / 4% SWR
-  const fireNumber = annualExpenses / 0.04;
+  const fireNumber = computeFireNumber(annualExpenses / 12)!;
   const monthlyReturn = Math.pow(1 + realReturn, 1 / 12) - 1;
 
   // Simulate year by year: grow portfolio with contributions, check if coasting
@@ -202,9 +202,10 @@ export function computeWithdrawalTaxSummary(
   if (taxDeferred.categories.length > 0) withdrawalOrder.push(...taxDeferred.categories);
 
   // Compute tax drag: difference between base runway and tax-adjusted runway
-  const monthlyObligations = state.expenses.reduce((sum, e) => sum + e.amount, 0) +
-    (state.properties ?? []).reduce((sum, p) => sum + getEffectivePayment(p), 0) +
-    state.debts.reduce((sum, d) => sum + (d.monthlyPayment ?? 0), 0);
+  const rawExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
+  const rawMortgage = (state.properties ?? []).reduce((sum, p) => sum + getEffectivePayment(p), 0);
+  const rawDebtPayments = state.debts.reduce((sum, d) => sum + (d.monthlyPayment ?? 0), 0);
+  const monthlyObligations = computeMonthlyObligations(rawExpenses, rawMortgage, rawDebtPayments);
 
   let taxDragMonths = 0;
   if (monthlyObligations > 0 && totalLiquid > 0) {

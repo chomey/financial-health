@@ -10,6 +10,7 @@ import {
   checkIncomeEligibility,
   getIncomeLimitDescription,
 } from "@/lib/tax-credits";
+import { formatCurrency as canonicalFormatCurrency } from "@/lib/currency";
 
 export type { TaxCredit } from "@/lib/tax-credits";
 
@@ -32,11 +33,7 @@ function parseCurrencyInput(value: string): number {
 }
 
 function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
+  return canonicalFormatCurrency(value, "USD", { homeCurrency: "USD" });
 }
 
 function typeBadgeClasses(type: TaxCredit["type"]): string {

@@ -7,7 +7,7 @@ import { getDefaultRoi } from "@/components/AssetEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { getHomeCurrency, getEffectiveFxRates, convertToHome } from "@/lib/currency";
 import type { SupportedCurrency } from "@/lib/currency";
-import { computeTotals, computeMonthlyInvestmentReturns, buildTaxExplainerDetails, fmtShort } from "@/lib/compute-totals";
+import { computeTotals, computeMonthlyInvestmentReturns, buildTaxExplainerDetails, fmtShort, computeMonthlyObligations, computeSurplus } from "@/lib/compute-totals";
 import { simulateRunwayWithGrowth, simulateRunwayWithTax, buildRunwayExplainerDetails, type DetailedBucket } from "@/lib/runway-simulation";
 
 const INCOME_REPLACEMENT_TIERS = [
@@ -97,10 +97,10 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   const investmentReturns = computeMonthlyInvestmentReturns(state.assets);
   const totalMonthlyInvestmentReturns = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
   // Surplus uses after-tax income + investment returns, subtracts expenses, contributions, mortgage payments, AND debt payments
-  const surplus = monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments - totalDebtPayments;
+  const surplus = computeSurplus(monthlyAfterTaxIncome, totalMonthlyInvestmentReturns, monthlyExpenses, totalMonthlyContributions, totalMortgagePayments, totalDebtPayments);
   // Runway uses liquid assets + stocks (NOT property), divided by total monthly obligations (including debt payments)
   const liquidTotal = totalAssets + totalStocks;
-  const monthlyObligations = monthlyExpenses + totalMortgagePayments + totalDebtPayments;
+  const monthlyObligations = computeMonthlyObligations(monthlyExpenses, totalMortgagePayments, totalDebtPayments);
   const runway = monthlyObligations > 0 ? liquidTotal / monthlyObligations : 0;
 
   // Runway with investment growth: each asset account draws down proportionally, earning its own ROR.

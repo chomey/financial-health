@@ -1,22 +1,20 @@
 import type { FilingStatus } from "@/lib/tax-credits";
+import { formatCurrency as canonicalFormatCurrency, formatCurrencyCompact } from "@/lib/currency";
+import type { SupportedCurrency } from "@/lib/currency";
 
 // Module-level currency code, set per generateInsights call
-export let _insightCurrency = "USD";
+export let _insightCurrency: SupportedCurrency = "USD";
 
 export function setInsightCurrency(currency: string) {
-  _insightCurrency = currency;
+  _insightCurrency = currency as SupportedCurrency;
 }
 
 export function formatCurrency(amount: number): string {
-  const abs = Math.abs(amount);
-  return "$" + new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(abs);
+  return canonicalFormatCurrency(Math.abs(amount), _insightCurrency, { homeCurrency: _insightCurrency });
 }
 
 export function formatCompact(amount: number): string {
-  const abs = Math.abs(amount);
-  if (abs >= 1_000_000) return `$${(abs / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$${(abs / 1_000).toFixed(0)}k`;
-  return formatCurrency(amount);
+  return formatCurrencyCompact(Math.abs(amount), _insightCurrency, _insightCurrency);
 }
 
 /** Returns a human-readable label for a filing status. */

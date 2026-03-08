@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Deduplicate computation functions
+  {
+    version: 147,
+    title: "Deduplicate computation functions",
+    description: "Consolidated duplicate calculations into single sources of truth. Added computeFireNumber(), computeMonthlyObligations(), and computeSurplus() to compute-totals.ts. Replaced 4 independent formatCurrency implementations (insights/formatting.ts, NetWorthWaterfallChart, TaxCreditEntry, _page-helpers) with delegations to the canonical currency.ts module. compute-metrics.ts and financial-state.ts now use the shared helpers instead of inline formulas.",
+    date: "2026-03-08",
+  },
   // Large file splits for Claude efficiency
   {
     version: 146,

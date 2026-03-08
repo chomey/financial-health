@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useOptionalDataFlow, type SourceMetadataItem } from "@/components/DataFlowArrows";
+import { formatCurrencyCompact } from "@/lib/currency";
 
 export function PrintSnapshotButton() {
   return (
@@ -341,7 +342,5 @@ export function CollapsibleSection({
 }
 
 export function formatCurrencySummary(amount: number): string {
-  if (Math.abs(amount) >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(amount) >= 1_000) return `$${(amount / 1_000).toFixed(0)}k`;
-  return `$${amount.toFixed(0)}`;
+  return formatCurrencyCompact(amount, "USD", "USD");
 }
