@@ -211,7 +211,9 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       } ${
         isUnderwaterWarning
           ? "border-red-500/40 ring-1 ring-red-500/20 animate-warning-pulse"
-          : "border-white/10"
+          : isRunwayCelebration
+            ? "border-emerald-500/40 ring-1 ring-emerald-500/20 animate-glow-pulse"
+            : "border-white/10"
       }`}
       role="group"
       aria-label={metric.title}
