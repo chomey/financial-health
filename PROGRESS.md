@@ -8,9 +8,19 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 158
-- **Remaining**: 11
+- **Completed**: 159
+- **Remaining**: 10
 - **Last Updated**: 2026-03-08
+
+## Task 159: AU states/territories in CountryJurisdictionSelector [@frontend]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/components/CountryJurisdictionSelector.tsx`: Added `AU_STATES_TERRITORIES` array (NSW, VIC, QLD, SA, WA, TAS, NT, ACT, alphabetically sorted). Updated `jurisdictions` to use AU list when country is "AU". Added 🇦🇺 AU button to the country toggle (`data-testid="country-au"`).
+  - `tests/unit/country-jurisdiction-selector.test.tsx`: Added 8 new tests covering AU button active state, AU states shown, switching to AU resets jurisdiction, and AU data validation tests.
+  - `tests/e2e/country-jurisdiction.spec.ts`: Added 2 new E2E tests (switching to AU, switching from AU to CA). Updated screenshot capture to task-159.
+  - `src/lib/changelog.ts`: Added version 159 entry.
+- **Tests**: T1: 2254 passed (125 files), Build: passes, T2: 8 passed (country-jurisdiction.spec.ts)
+- **Screenshots**: task-159-country-jurisdiction-selector.png
 
 ## Task 158: Widen country type to CA | US | AU [@backend]
 - **Date**: 2026-03-08

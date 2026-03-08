@@ -72,6 +72,17 @@ export const US_STATES: { code: string; name: string }[] = [
   { code: "WY", name: "Wyoming" },
 ];
 
+export const AU_STATES_TERRITORIES: { code: string; name: string }[] = [
+  { code: "ACT", name: "Australian Capital Territory" },
+  { code: "NSW", name: "New South Wales" },
+  { code: "NT", name: "Northern Territory" },
+  { code: "QLD", name: "Queensland" },
+  { code: "SA", name: "South Australia" },
+  { code: "TAS", name: "Tasmania" },
+  { code: "VIC", name: "Victoria" },
+  { code: "WA", name: "Western Australia" },
+];
+
 export const DEFAULT_JURISDICTION: Record<"CA" | "US" | "AU", string> = {
   CA: "ON",
   US: "CA",
@@ -95,8 +106,8 @@ export default function CountryJurisdictionSelector({
   taxYear = new Date().getFullYear(),
   onTaxYearChange,
 }: CountryJurisdictionSelectorProps) {
-  // AU states/territories will be added in Task 159; use empty list for now
-  const jurisdictions = country === "CA" ? CA_PROVINCES : country === "US" ? US_STATES : [];
+  const jurisdictions =
+    country === "CA" ? CA_PROVINCES : country === "US" ? US_STATES : AU_STATES_TERRITORIES;
 
   const handleCountryChange = useCallback(
     (newCountry: "CA" | "US" | "AU") => {
@@ -174,6 +185,21 @@ export default function CountryJurisdictionSelector({
           >
             <span aria-hidden="true" className="text-base leading-none">🇺🇸</span>
             USA
+          </button>
+          <button
+            type="button"
+            onClick={() => handleCountryChange("AU")}
+            className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
+              country === "AU"
+                ? "bg-white/15 text-slate-100 shadow-sm"
+                : "text-slate-500 hover:text-slate-300"
+            }`}
+            aria-pressed={country === "AU"}
+            aria-label="Select Australia"
+            data-testid="country-au"
+          >
+            <span aria-hidden="true" className="text-base leading-none">🇦🇺</span>
+            AU
           </button>
         </div>
         <select

@@ -13,6 +13,7 @@ test.describe("Country and Jurisdiction Selector", () => {
     await expect(selector).toBeVisible();
     await expect(page.getByTestId("country-ca")).toBeVisible();
     await expect(page.getByTestId("country-us")).toBeVisible();
+    await expect(page.getByTestId("country-au")).toBeVisible();
     await expect(page.getByTestId("jurisdiction-select")).toBeVisible();
   });
 
@@ -63,6 +64,32 @@ test.describe("Country and Jurisdiction Selector", () => {
     await expect(select).toHaveValue("BC");
   });
 
+  test("switching to AU resets jurisdiction to NSW", async ({ page }) => {
+    await page.getByTestId("country-au").click();
+
+    const auBtn = page.getByTestId("country-au");
+    await expect(auBtn).toHaveAttribute("aria-pressed", "true");
+
+    const select = page.getByTestId("jurisdiction-select");
+    await expect(select).toHaveValue("NSW");
+
+    // Should show AU states/territories
+    const options = await select.locator("option").allTextContents();
+    expect(options.some((o) => o.includes("New South Wales"))).toBe(true);
+    expect(options.some((o) => o.includes("Victoria"))).toBe(true);
+    expect(options.some((o) => o.includes("Queensland"))).toBe(true);
+    expect(options.some((o) => o.includes("Northern Territory"))).toBe(true);
+    expect(options.some((o) => o.includes("Australian Capital Territory"))).toBe(true);
+  });
+
+  test("switching from AU to CA resets jurisdiction to ON", async ({ page }) => {
+    await page.getByTestId("country-au").click();
+    await page.getByTestId("country-ca").click();
+
+    await expect(page.getByTestId("country-ca")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("jurisdiction-select")).toHaveValue("ON");
+  });
+
   test("country and jurisdiction persist in URL after reload", async ({ page }) => {
     // Switch to US / New York
     await page.getByTestId("country-us").click();
@@ -79,6 +106,6 @@ test.describe("Country and Jurisdiction Selector", () => {
     await expect(usBtn).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("jurisdiction-select")).toHaveValue("NY");
 
-    await captureScreenshot(page, "task-42-country-jurisdiction-selector");
+    await captureScreenshot(page, "task-159-country-jurisdiction-selector");
   });
 });

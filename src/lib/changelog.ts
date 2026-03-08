@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: AU states/territories in CountryJurisdictionSelector
+  {
+    version: 159,
+    title: "Australia: states and territories selector",
+    description: "Added 🇦🇺 AU button to the country toggle. Added all 8 Australian states and territories (NSW, VIC, QLD, SA, WA, TAS, NT, ACT) to the jurisdiction dropdown. Switching to AU resets jurisdiction to NSW. Switching away from AU resets to the default for the target country.",
+    date: "2026-03-08",
+  },
   // Australia: widen country type to CA | US | AU
   {
     version: 158,

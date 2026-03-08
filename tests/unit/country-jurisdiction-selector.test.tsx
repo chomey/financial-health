@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import CountryJurisdictionSelector, {
   CA_PROVINCES,
   US_STATES,
+  AU_STATES_TERRITORIES,
   DEFAULT_JURISDICTION,
 } from "@/components/CountryJurisdictionSelector";
 
@@ -19,6 +20,7 @@ describe("CountryJurisdictionSelector", () => {
     render(<CountryJurisdictionSelector {...defaultProps} />);
     expect(screen.getByTestId("country-ca")).toBeInTheDocument();
     expect(screen.getByTestId("country-us")).toBeInTheDocument();
+    expect(screen.getByTestId("country-au")).toBeInTheDocument();
     expect(screen.getByTestId("jurisdiction-select")).toBeInTheDocument();
   });
 
@@ -38,6 +40,63 @@ describe("CountryJurisdictionSelector", () => {
     const usBtn = screen.getByTestId("country-us");
     expect(caBtn).toHaveAttribute("aria-pressed", "false");
     expect(usBtn).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("shows AU button as active when country is AU", () => {
+    render(
+      <CountryJurisdictionSelector {...defaultProps} country="AU" jurisdiction="NSW" />
+    );
+    expect(screen.getByTestId("country-au")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("country-ca")).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByTestId("country-us")).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("shows AU states/territories when country is AU", () => {
+    render(
+      <CountryJurisdictionSelector {...defaultProps} country="AU" jurisdiction="NSW" />
+    );
+    const select = screen.getByTestId("jurisdiction-select") as HTMLSelectElement;
+    const options = Array.from(select.options);
+    expect(options).toHaveLength(AU_STATES_TERRITORIES.length);
+    expect(options.some((o) => o.value === "NSW")).toBe(true);
+    expect(options.some((o) => o.value === "VIC")).toBe(true);
+    expect(options.some((o) => o.value === "QLD")).toBe(true);
+    // Should NOT show CA provinces or US states
+    expect(options.some((o) => o.value === "ON")).toBe(false);
+    expect(options.some((o) => o.value === "NY")).toBe(false);
+  });
+
+  it("calls onCountryChange and resets jurisdiction when switching to AU", async () => {
+    const onCountryChange = vi.fn();
+    const onJurisdictionChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <CountryJurisdictionSelector
+        {...defaultProps}
+        onCountryChange={onCountryChange}
+        onJurisdictionChange={onJurisdictionChange}
+      />
+    );
+
+    await user.click(screen.getByTestId("country-au"));
+    expect(onCountryChange).toHaveBeenCalledWith("AU");
+    expect(onJurisdictionChange).toHaveBeenCalledWith("NSW"); // default AU jurisdiction
+  });
+
+  it("does not call onCountryChange when clicking the already-selected AU country", async () => {
+    const onCountryChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <CountryJurisdictionSelector
+        {...defaultProps}
+        country="AU"
+        jurisdiction="NSW"
+        onCountryChange={onCountryChange}
+      />
+    );
+
+    await user.click(screen.getByTestId("country-au"));
+    expect(onCountryChange).not.toHaveBeenCalled();
   });
 
   it("shows Canadian provinces when country is CA", () => {
@@ -164,8 +223,31 @@ describe("jurisdiction data", () => {
     expect(names).toEqual(sorted);
   });
 
+  it("AU_STATES_TERRITORIES has 8 entries (6 states + 2 territories)", () => {
+    expect(AU_STATES_TERRITORIES).toHaveLength(8);
+  });
+
+  it("AU_STATES_TERRITORIES includes all expected codes", () => {
+    const codes = AU_STATES_TERRITORIES.map((s) => s.code);
+    expect(codes).toContain("NSW");
+    expect(codes).toContain("VIC");
+    expect(codes).toContain("QLD");
+    expect(codes).toContain("SA");
+    expect(codes).toContain("WA");
+    expect(codes).toContain("TAS");
+    expect(codes).toContain("NT");
+    expect(codes).toContain("ACT");
+  });
+
+  it("AU_STATES_TERRITORIES are sorted alphabetically by name", () => {
+    const names = AU_STATES_TERRITORIES.map((s) => s.name);
+    const sorted = [...names].sort();
+    expect(names).toEqual(sorted);
+  });
+
   it("default jurisdictions are valid", () => {
     expect(CA_PROVINCES.some((p) => p.code === DEFAULT_JURISDICTION.CA)).toBe(true);
     expect(US_STATES.some((s) => s.code === DEFAULT_JURISDICTION.US)).toBe(true);
+    expect(AU_STATES_TERRITORIES.some((s) => s.code === DEFAULT_JURISDICTION.AU)).toBe(true);
   });
 });
