@@ -46,6 +46,7 @@ export interface TaxCreditYearOverride {
   maxAmount?: number;
   description?: string;
   incomeLimits?: Partial<Record<FilingStatus, IncomeLimitThresholds>>;
+  amountOptions?: { label: string; value: number }[];
 }
 
 /** A tax credit/deduction category definition */
@@ -68,6 +69,10 @@ export interface TaxCreditCategory {
   requiresSpouse?: boolean;
   /** Year-specific overrides (e.g., indexed amounts for 2026) */
   yearOverrides?: Record<number, TaxCreditYearOverride>;
+  /** If true, the amount is fixed (read-only) — user can't change it */
+  fixedAmount?: boolean;
+  /** Discrete amount options for credits with multiple tiers (e.g., DTC adult vs child) */
+  amountOptions?: { label: string; value: number }[];
 }
 
 /** A user-entered tax credit/deduction */
@@ -147,6 +152,7 @@ function resolveCategoryForYear(category: TaxCreditCategory, year: number): TaxC
     ...(overrides.maxAmount !== undefined ? { maxAmount: overrides.maxAmount } : {}),
     ...(overrides.description !== undefined ? { description: overrides.description } : {}),
     ...(overrides.incomeLimits !== undefined ? { incomeLimits: overrides.incomeLimits } : {}),
+    ...(overrides.amountOptions !== undefined ? { amountOptions: overrides.amountOptions } : {}),
   };
 }
 
@@ -203,10 +209,19 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "For individuals with a severe and prolonged impairment in mental or physical functions. Worth ~$10,138 federally (plus ~$5,914 supplement for under-18). No income limit — available regardless of income. Unused portion can be transferred to a supporting spouse or family member.",
     incomeLimits: {},
     maxAmount: 10_138,
+    fixedAmount: true,
+    amountOptions: [
+      { label: "Adult", value: 10_138 },
+      { label: "Adult + child under 18", value: 16_052 },
+    ],
     yearOverrides: {
       2026: {
         maxAmount: 10_412,
         description: "For individuals with a severe and prolonged impairment in mental or physical functions. Worth ~$10,412 federally (plus ~$6,074 supplement for under-18). No income limit — available regardless of income. Unused portion can be transferred to a supporting spouse or family member.",
+        amountOptions: [
+          { label: "Adult", value: 10_412 },
+          { label: "Adult + child under 18", value: 16_486 },
+        ],
       },
     },
   },
@@ -219,6 +234,7 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     incomeLimits: {},
     requiresSpouse: true,
     maxAmount: 2_419,
+    fixedAmount: true,
     yearOverrides: {
       2026: {
         maxAmount: 2_485,
@@ -234,6 +250,7 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "For individuals supporting a dependent with a physical or mental impairment. Worth up to ~$8,601. Phases out as the dependant's net income exceeds ~$20,197 (based on dependant's income, not yours).",
     incomeLimits: {},
     maxAmount: 8_601,
+    fixedAmount: true,
     yearOverrides: {
       2026: {
         maxAmount: 8_833,
@@ -274,6 +291,7 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-common-law": { phaseOutStart: 28_494, phaseOutEnd: 47_247 },
     },
     maxAmount: 1_633,
+    fixedAmount: true,
     yearOverrides: {
       2026: {
         maxAmount: 1_677,
@@ -296,6 +314,7 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-common-law": { phaseOutStart: 45_521, phaseOutEnd: 66_841 },
     },
     maxAmount: 533,
+    fixedAmount: true,
     yearOverrides: {
       2026: {
         maxAmount: 547,
@@ -318,6 +337,14 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-common-law": { phaseOutStart: 37_487 },
     },
     maxAmount: 7_997,
+    fixedAmount: true,
+    amountOptions: [
+      { label: "1 child under 6", value: 7_997 },
+      { label: "1 child aged 6–17", value: 6_748 },
+      { label: "2 children (under 6)", value: 15_994 },
+      { label: "2 children (1 under 6 + 1 aged 6–17)", value: 14_745 },
+      { label: "3+ children (under 6)", value: 23_991 },
+    ],
     yearOverrides: {
       2026: {
         maxAmount: 8_213,
@@ -326,6 +353,13 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
           single: { phaseOutStart: 38_499 },
           "married-common-law": { phaseOutStart: 38_499 },
         },
+        amountOptions: [
+          { label: "1 child under 6", value: 8_213 },
+          { label: "1 child aged 6–17", value: 6_930 },
+          { label: "2 children (under 6)", value: 16_426 },
+          { label: "2 children (1 under 6 + 1 aged 6–17)", value: 15_143 },
+          { label: "3+ children (under 6)", value: 24_639 },
+        ],
       },
     },
   },
@@ -348,6 +382,7 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-common-law": { hardCap: 154_534 },
     },
     maxAmount: 250,
+    fixedAmount: true,
     yearOverrides: {
       2026: {
         description: "Up to $250/year (lifetime limit $5,000) for eligible training fees at designated institutions. Your individual income must be between $10,908 and $158,706. Not affected by spousal income.",
@@ -414,6 +449,13 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-separately": { ineligible: true },
     },
     maxAmount: 8_046,
+    fixedAmount: true,
+    amountOptions: [
+      { label: "No children", value: 649 },
+      { label: "1 child", value: 4_328 },
+      { label: "2 children", value: 7_152 },
+      { label: "3+ children", value: 8_046 },
+    ],
     yearOverrides: {
       2026: {
         maxAmount: 8_271,

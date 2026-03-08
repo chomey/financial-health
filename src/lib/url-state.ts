@@ -583,6 +583,7 @@ export function updateFlowchartOverridesURL(acknowledged: string[], skipped: str
 // ── Wizard step URL helpers ───────────────────────────────────────────────────
 
 export type WizardStep =
+  | "welcome"
   | "profile"
   | "property"
   | "assets"
@@ -595,18 +596,18 @@ export type WizardStep =
   | "dashboard";
 
 export const WIZARD_STEPS: WizardStep[] = [
+  "welcome",
   "profile",
   "property",
   "stocks",
   "assets",
   "debts",
   "income",
-  "tax-summary",
   "expenses",
-  "tax-credits",
+  "tax-summary",
 ] as const;
 
-const VALID_WIZARD_STEPS = new Set<string>([...WIZARD_STEPS, "dashboard"]);
+const VALID_WIZARD_STEPS = new Set<string>([...WIZARD_STEPS, "dashboard", "tax-credits"]);
 
 /** Read wizard step from URL param `step=`. Returns null if absent or invalid. */
 export function getStepFromURL(): WizardStep | null {

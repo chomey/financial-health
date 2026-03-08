@@ -388,7 +388,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
           </p>
         </div>
       ) : (
-        <div className="space-y-3" role="list" aria-label="Property items">
+        <div className="space-y-2" role="list" aria-label="Property items">
           {properties.map((property) => {
             const equity = Math.max(0, property.value - property.mortgage);
             return (

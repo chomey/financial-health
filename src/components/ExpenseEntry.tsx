@@ -268,12 +268,12 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
           </p>
         </div>
       ) : (
-        <div className="space-y-1" role="list" aria-label="Expense items">
+        <div className="space-y-0" role="list" aria-label="Expense items">
           {items.map((item) => (
             <DataFlowSourceItem key={item.id} id={`expense:${item.id}`} label={item.category} value={item.amount}>
             <div role="listitem">
             <div
-              className="group flex items-center justify-between rounded-lg px-3 py-1.5 transition-colors duration-150 hover:bg-white/5"
+              className="group flex items-center justify-between rounded-lg px-3 py-0.5 transition-colors duration-150 hover:bg-white/5"
             >
               <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                 {/* Category */}
@@ -400,7 +400,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
 
       {/* Auto-computed section */}
       {(totalTax > 0 || investmentContributions > 0 || mortgagePayments > 0 || surplus > 0) && (
-        <div className="mt-2 mb-1 border-t border-dashed border-white/10 pt-2 px-3">
+        <div className="mt-1.5 mb-0.5 border-t border-dashed border-white/10 pt-1.5 px-3">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Auto-computed</span>
         </div>
       )}
@@ -410,7 +410,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
         <div className="space-y-1" data-testid="tax-breakdown">
           {/* Federal Tax */}
           <div
-            className="flex items-center justify-between rounded-lg px-3 py-2 bg-slate-800/60 border border-dashed border-white/10 mx-1"
+            className="flex items-center justify-between rounded-md px-3 py-1 bg-slate-800/60 border border-dashed border-white/10 mx-1"
             data-testid="federal-tax-row"
           >
             <div className="flex flex-1 items-center gap-2 min-w-0">
@@ -466,7 +466,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
 
           {/* Provincial/State Tax */}
           <div
-            className="flex items-center justify-between rounded-lg px-3 py-2 bg-slate-800/60 border border-dashed border-white/10 mx-1"
+            className="flex items-center justify-between rounded-md px-3 py-1 bg-slate-800/60 border border-dashed border-white/10 mx-1"
             data-testid="provincial-state-tax-row"
           >
             <div className="flex flex-1 items-center gap-2 min-w-0">

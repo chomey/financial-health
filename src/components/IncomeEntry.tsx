@@ -335,13 +335,13 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
       )}
 
       {items.length > 0 && (
-        <div className="space-y-1" role="list" aria-label="Income items">
+        <div className="space-y-0" role="list" aria-label="Income items">
           {items.map((item) => (
             <DataFlowSourceItem key={item.id} id={`income:${item.id}`} label={item.category} value={normalizeToMonthly(item.amount, item.frequency)}>
             <div>
             <div
               role="listitem"
-              className={`group flex items-center justify-between rounded-lg px-3 py-1.5 transition-colors duration-150 ${
+              className={`group flex items-center justify-between rounded-lg px-3 py-0.5 transition-colors duration-150 ${
                 item.incomeType === "capital-gains"
                   ? "bg-amber-400/5 hover:bg-amber-400/10 border-l-2 border-amber-400/60"
                   : "hover:bg-white/5"

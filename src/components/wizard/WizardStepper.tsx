@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { WIZARD_STEPS, type WizardStep } from "@/lib/url-state";
 
 const STEP_META: Record<string, { icon: string; label: string; shortLabel: string }> = {
+  welcome: { icon: "👋", label: "Welcome", shortLabel: "Start" },
   profile: { icon: "👤", label: "Profile", shortLabel: "Profile" },
   property: { icon: "🏠", label: "Properties", shortLabel: "Property" },
   assets: { icon: "💰", label: "Assets", shortLabel: "Assets" },
@@ -11,8 +12,7 @@ const STEP_META: Record<string, { icon: string; label: string; shortLabel: strin
   debts: { icon: "💳", label: "Debts", shortLabel: "Debts" },
   income: { icon: "💵", label: "Income", shortLabel: "Income" },
   "tax-summary": { icon: "📋", label: "Tax Summary", shortLabel: "Tax" },
-  expenses: { icon: "🧾", label: "Expenses", shortLabel: "Expenses" },
-  "tax-credits": { icon: "🏷️", label: "Tax Credits", shortLabel: "Credits" },
+  expenses: { icon: "🧾", label: "Expenses & Credits", shortLabel: "Expenses" },
 };
 
 export default function WizardStepper({

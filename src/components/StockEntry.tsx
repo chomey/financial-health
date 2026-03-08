@@ -478,7 +478,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
           </p>
         </div>
       ) : (
-        <div className="space-y-1" role="list" aria-label="Stock holdings">
+        <div className="space-y-0" role="list" aria-label="Stock holdings">
           {sortedStocks.map((stock) => {
             const price = getStockPrice(stock);
             const value = getStockValue(stock);
@@ -488,7 +488,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
             return (
               <DataFlowSourceItem key={stock.id} id={`stock:${stock.id}`} label={stock.ticker} value={value}>
               <div role="listitem">
-                <div className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-white/5">
+                <div className="group flex items-center justify-between rounded-lg px-3 py-0.5 transition-all duration-200 hover:bg-white/5">
                   <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                     {/* Ticker + Company Name */}
                     <div className="flex flex-col">

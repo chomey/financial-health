@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { WIZARD_STEPS, type WizardStep, getStepFromURL, updateStepURL } from "@/lib/url-state";
 import WizardStepper from "./WizardStepper";
+import WelcomeStep from "./steps/WelcomeStep";
 import ProfileStep from "./steps/ProfileStep";
 import PropertyStep from "./steps/PropertyStep";
 import AssetsStep from "./steps/AssetsStep";
@@ -11,7 +12,7 @@ import DebtsStep from "./steps/DebtsStep";
 import IncomeStep from "./steps/IncomeStep";
 import TaxSummaryStep from "./steps/TaxSummaryStep";
 import ExpensesStep from "./steps/ExpensesStep";
-import TaxCreditsStep from "./steps/TaxCreditsStep";
+// TaxCreditsStep merged into ExpensesStep
 import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
 import type { Property } from "@/components/PropertyEntry";
@@ -22,6 +23,7 @@ import type { TaxCredit, FilingStatus } from "@/lib/tax-credits";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
 import type { MonthlyInvestmentReturn } from "@/lib/financial-state";
 import type { FinancialState } from "@/lib/financial-types";
+import type { SampleProfile } from "@/lib/sample-profiles";
 
 export interface WizardProps {
   // State
@@ -66,12 +68,14 @@ export interface WizardProps {
   setFxManualOverride: (v: number | undefined) => void;
   setFederalTaxOverride: (v: number | undefined) => void;
   setProvincialTaxOverride: (v: number | undefined) => void;
+  // Sample profiles
+  loadProfile: (profile: SampleProfile) => void;
   // Navigation
   onFinish: () => void;
 }
 
 export default function WizardShell(props: WizardProps) {
-  const [currentStep, setCurrentStep] = useState<WizardStep>("profile");
+  const [currentStep, setCurrentStep] = useState<WizardStep>("welcome");
 
   useEffect(() => {
     const urlStep = getStepFromURL();
@@ -105,6 +109,7 @@ export default function WizardShell(props: WizardProps) {
   }, [currentIdx, isFirst, navigateTo]);
 
   const stepCompletion = useMemo(() => ({
+    welcome: true, // landing step, always complete
     profile: !!(props.country && props.jurisdiction),
     property: true, // optional, always "complete"
     assets: props.assets.filter(a => !a.computed).length > 0,
@@ -113,7 +118,6 @@ export default function WizardShell(props: WizardProps) {
     income: props.income.length > 0,
     "tax-summary": true, // read-only interstitial, always complete
     expenses: props.expenses.length > 0,
-    "tax-credits": true, // optional
   }), [props.assets, props.income, props.expenses, props.country, props.jurisdiction]);
 
   // Build FinancialState for tax summary step
@@ -139,6 +143,15 @@ export default function WizardShell(props: WizardProps) {
 
   const renderStep = () => {
     switch (currentStep) {
+      case "welcome":
+        return (
+          <WelcomeStep
+            country={props.country}
+            loadProfile={props.loadProfile}
+            onProfileLoaded={props.onFinish}
+            onEnterOwn={goNext}
+          />
+        );
       case "profile":
         return (
           <ProfileStep
@@ -210,6 +223,7 @@ export default function WizardShell(props: WizardProps) {
           <TaxSummaryStep state={state} />
         );
       case "expenses":
+      case "tax-credits": // backward compat — merged into expenses
         return (
           <ExpensesStep
             items={props.expenses}
@@ -221,13 +235,8 @@ export default function WizardShell(props: WizardProps) {
             state={state}
             homeCurrency={props.homeCurrency}
             fxRates={props.effectiveFxRates}
-          />
-        );
-      case "tax-credits":
-        return (
-          <TaxCreditsStep
-            items={props.taxCredits}
-            onChange={props.setTaxCredits}
+            taxCredits={props.taxCredits}
+            onTaxCreditsChange={props.setTaxCredits}
             country={props.country}
             filingStatus={props.filingStatus}
             annualIncome={props.income.reduce((sum, i) => sum + (i.amount ?? 0), 0) * 12}

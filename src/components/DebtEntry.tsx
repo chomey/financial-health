@@ -296,7 +296,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
           </p>
         </div>
       ) : (
-        <div className="space-y-1" role="list" aria-label="Debt items">
+        <div className="space-y-0" role="list" aria-label="Debt items">
           {debts.map((debt) => {
             const defaultInterest = getDefaultDebtInterest(debt.category);
             const displayInterest = debt.interestRate ?? defaultInterest;
@@ -306,7 +306,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
             <DataFlowSourceItem key={debt.id} id={`debt:${debt.id}`} label={debt.category} value={debt.amount}>
             <div role="listitem">
               <div
-                className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-white/5"
+                className="group flex items-center justify-between rounded-lg px-3 py-0.5 transition-all duration-200 hover:bg-white/5"
               >
               <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                 {/* Category */}

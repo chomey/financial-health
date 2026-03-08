@@ -1,8 +1,15 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Home from "@/app/page";
 
 describe("App shell layout", () => {
+  beforeEach(() => {
+    // Simulate returning user with dashboard step so tests get the dashboard view
+    const url = new URL(window.location.href);
+    url.searchParams.set("step", "dashboard");
+    window.history.replaceState(null, "", url.toString());
+  });
+
   it("renders the app title", () => {
     render(<Home />);
     // Use getAllByText since PrintFooter also contains this text (hidden in print mode)

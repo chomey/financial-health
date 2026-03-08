@@ -205,11 +205,20 @@ export default function TaxCreditEntry({
           if (tc.id !== editingId) return tc;
           if (editingField === "category") {
             const catDef = findCreditCategory(value, country, taxYear);
-            return {
+            const updated = {
               ...tc,
               category: value || tc.category,
               type: catDef?.type ?? tc.type,
             };
+            // Auto-set amount for fixed-amount credits
+            if (catDef?.fixedAmount) {
+              if (catDef.amountOptions && catDef.amountOptions.length > 0) {
+                updated.annualAmount = catDef.amountOptions[0].value;
+              } else if (catDef.maxAmount) {
+                updated.annualAmount = catDef.maxAmount;
+              }
+            }
+            return updated;
           }
           return { ...tc, annualAmount: parseCurrencyInput(value) };
         }),
@@ -233,6 +242,9 @@ export default function TaxCreditEntry({
   const deleteCredit = (id: string) => {
     setCredits((prev) => prev.filter((tc) => tc.id !== id));
   };
+
+  // Resolve the category def for the currently-being-added credit
+  const newCatDef = newCategory ? findCreditCategory(newCategory.trim(), country, taxYear) : undefined;
 
   const addCredit = () => {
     if (!newCategory.trim()) return;
@@ -324,7 +336,7 @@ export default function TaxCreditEntry({
           </p>
         </div>
       ) : (
-        <div className="space-y-1" role="list" aria-label="Tax credit items">
+        <div className="space-y-0" role="list" aria-label="Tax credit items">
           {credits.map((tc) => {
             const catDef = findCreditCategory(tc.category, country, taxYear);
             const eligibility = catDef
@@ -333,7 +345,7 @@ export default function TaxCreditEntry({
 
             return (
               <div key={tc.id} role="listitem">
-                <div className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-white/5">
+                <div className="group flex items-center justify-between rounded-lg px-3 py-0.5 transition-all duration-200 hover:bg-white/5">
                   <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                     {/* Category */}
                     {editingId === tc.id && editingField === "category" ? (
@@ -387,7 +399,44 @@ export default function TaxCreditEntry({
                     )}
 
                     {/* Amount */}
-                    {editingId === tc.id && editingField === "amount" ? (
+                    {catDef?.fixedAmount && catDef.amountOptions ? (
+                      // Fixed amount with discrete options — show a select dropdown
+                      <select
+                        value={tc.annualAmount}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          setCredits((prev) =>
+                            prev.map((c) =>
+                              c.id === tc.id ? { ...c, annualAmount: val } : c,
+                            ),
+                          );
+                        }}
+                        className={`w-auto min-w-[8rem] max-w-[14rem] min-h-[44px] sm:min-h-0 text-right text-sm font-medium rounded px-2 py-2 sm:py-1 bg-transparent border border-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-violet-500/30 cursor-pointer ${
+                          eligibility === "ineligible"
+                            ? "text-slate-500"
+                            : "text-violet-400"
+                        }`}
+                        aria-label={`Select amount for ${tc.category}`}
+                      >
+                        {catDef.amountOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value} className="bg-slate-800 text-slate-200">
+                            {opt.label} — {formatCurrency(opt.value)}/yr
+                          </option>
+                        ))}
+                      </select>
+                    ) : catDef?.fixedAmount ? (
+                      // Fixed amount, no options — read-only display
+                      <span
+                        className={`w-28 text-right text-sm font-medium px-2 py-2 sm:py-1 ${
+                          eligibility === "ineligible"
+                            ? "text-slate-500 line-through"
+                            : "text-violet-400"
+                        }`}
+                        title="Fixed amount"
+                      >
+                        {formatCurrency(tc.annualAmount)}/yr
+                      </span>
+                    ) : editingId === tc.id && editingField === "amount" ? (
                       <input
                         ref={inputRef}
                         type="text"
@@ -486,11 +535,15 @@ export default function TaxCreditEntry({
                           e.preventDefault();
                           setNewCategory(cat.name);
                           setShowNewSuggestions(false);
-                          // Pre-fill amount from maxAmount if available
-                          if (cat.maxAmount && !newAmount) {
+                          // Pre-fill amount: use first amountOption, or maxAmount, or leave blank
+                          if (cat.amountOptions && cat.amountOptions.length > 0) {
+                            setNewAmount(String(cat.amountOptions[0].value));
+                          } else if (cat.maxAmount) {
                             setNewAmount(String(cat.maxAmount));
                           }
-                          newAmountRef.current?.focus();
+                          if (!cat.fixedAmount) {
+                            newAmountRef.current?.focus();
+                          }
                         }}
                         className="w-full px-3 py-2 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300 sm:py-1.5"
                       >
@@ -514,16 +567,37 @@ export default function TaxCreditEntry({
               )}
             </div>
             <div className="flex items-center gap-2">
-              <input
-                ref={newAmountRef}
-                type="text"
-                placeholder="$/year"
-                value={newAmount}
-                onChange={(e) => setNewAmount(e.target.value)}
-                onKeyDown={(e) => handleNewKeyDown(e, "amount")}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
-                aria-label="New credit annual amount"
-              />
+              {newCatDef?.fixedAmount && newCatDef.amountOptions ? (
+                // Discrete options dropdown
+                <select
+                  value={newAmount}
+                  onChange={(e) => setNewAmount(e.target.value)}
+                  className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-auto sm:min-w-[10rem] sm:max-w-[16rem] sm:px-2 sm:py-1 sm:text-sm"
+                  aria-label="Select credit amount"
+                >
+                  {newCatDef.amountOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value} className="bg-slate-800 text-slate-200">
+                      {opt.label} — {formatCurrency(opt.value)}/yr
+                    </option>
+                  ))}
+                </select>
+              ) : newCatDef?.fixedAmount ? (
+                // Fixed amount, read-only
+                <span className="w-full text-right text-base font-medium text-violet-400 px-3 py-2 sm:w-28 sm:px-2 sm:py-1 sm:text-sm">
+                  {newAmount ? `${formatCurrency(Number(newAmount))}/yr` : "—"}
+                </span>
+              ) : (
+                <input
+                  ref={newAmountRef}
+                  type="text"
+                  placeholder="$/year"
+                  value={newAmount}
+                  onChange={(e) => setNewAmount(e.target.value)}
+                  onKeyDown={(e) => handleNewKeyDown(e, "amount")}
+                  className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                  aria-label="New credit annual amount"
+                />
+              )}
               <button
                 type="button"
                 onClick={addCredit}

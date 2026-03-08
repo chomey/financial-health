@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Wizard UX overhaul, compact entry panels, tax credit improvements
+  {
+    version: 157,
+    title: "Wizard welcome step, compact panels, tax credit UX",
+    description: "Fresh visits now open the wizard with a dedicated Welcome step showing sample profiles — clicking one goes straight to the dashboard. Added 'Enter your own' path into the profile form. Tax credits merged into the Expenses step. Fixed-amount credits (DTC, CWB, GST/HST, CCB, EITC, etc.) now show read-only amounts or discrete option dropdowns instead of free-text inputs. All entry panels (assets, debts, income, expenses, stocks, properties, tax credits) tightened to compact row spacing.",
+    date: "2026-03-08",
+  },
   // Retirement-aware Money Steps
   {
     version: 156,

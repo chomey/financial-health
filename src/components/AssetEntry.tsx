@@ -374,7 +374,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
           </p>
         </div>
       ) : (
-        <div className="space-y-1" role="list" aria-label="Asset items">
+        <div className="space-y-0" role="list" aria-label="Asset items">
           {/* Regular assets first, computed assets at the bottom */}
           {[...assets.filter((a) => !a.computed), ...assets.filter((a) => a.computed)].map((asset, idx, sortedAssets) => {
             const defaultRoi = getDefaultRoi(asset.category);
@@ -393,7 +393,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 </div>
               )}
               <div
-                className={`group flex items-center justify-between rounded-lg px-3 transition-all duration-200 ${isComputed ? "py-1 bg-slate-800/60 border border-dashed border-white/10 rounded-md mx-1" : "py-1.5 hover:bg-white/5"}`}
+                className={`group flex items-center justify-between rounded-lg px-3 transition-all duration-200 ${isComputed ? "py-0.5 bg-slate-800/60 border border-dashed border-white/10 rounded-md mx-1" : "py-0.5 hover:bg-white/5"}`}
               >
                 <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                   {/* Category */}

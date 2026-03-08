@@ -110,8 +110,13 @@ export default function Home() {
     const urlStep = getStepFromURL();
     if (urlStep && urlStep !== "dashboard") {
       setPhase("wizard");
-    } else {
+    } else if (urlStep === "dashboard" || new URLSearchParams(window.location.search).has("s")) {
+      // Explicit dashboard step or has saved state → dashboard
       setPhase("dashboard");
+    } else {
+      // Fresh visit with no state → wizard
+      setPhase("wizard");
+      updateStepURL("welcome" as WizardStep);
     }
   }, []);
 
@@ -188,6 +193,7 @@ export default function Home() {
         setFxManualOverride={setFxManualOverride}
         setFederalTaxOverride={setFederalTaxOverride}
         setProvincialTaxOverride={setProvincialTaxOverride}
+        loadProfile={loadProfile}
         onFinish={switchToDashboard}
       />
       </CurrencyProvider>
