@@ -334,7 +334,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
       {items.length > 0 && (
         <div className="space-y-1" role="list" aria-label="Income items">
           {items.map((item) => (
-            <DataFlowSourceItem key={item.id} id={`income:${item.id}`} label={item.category} value={item.amount}>
+            <DataFlowSourceItem key={item.id} id={`income:${item.id}`} label={item.category} value={normalizeToMonthly(item.amount, item.frequency)}>
             <div>
             <div
               role="listitem"

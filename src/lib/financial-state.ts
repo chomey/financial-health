@@ -272,6 +272,8 @@ export interface FinancialState {
   surplusTargetComputedId?: string; // set when surplus target is a computed asset (e.g. "_computed_stocks")
   fxRates?: import("@/lib/currency").FxRates; // live FX rates (transient, not URL-persisted)
   fxManualOverride?: number; // manual FX override: 1 foreign = X home (persisted in URL)
+  taxCredits?: import("@/lib/tax-credits").TaxCredit[]; // tax credits and deductions
+  filingStatus?: import("@/lib/tax-credits").FilingStatus; // filing status for income limit checks
 }
 
 export const INITIAL_STATE: FinancialState = {

@@ -143,6 +143,11 @@ interface CompactStock {
   cb?: number; // costBasis
   pd?: string; // purchaseDate (ISO date string)
 }
+interface CompactTaxCredit {
+  c: string; // category
+  a: number; // annualAmount
+  t: string; // type ("refundable" | "non-refundable" | "deduction")
+}
 interface CompactState {
   a: CompactAsset[];
   d: CompactDebt[];
@@ -157,6 +162,8 @@ interface CompactState {
   pt?: number; // provincial/state tax override (annual)
   sr?: string; // surplusTargetComputedId — set when surplus target is a computed asset (e.g. "_computed_stocks")
   fxm?: number; // FX manual override: 1 foreign = X home
+  tc?: CompactTaxCredit[]; // tax credits and deductions
+  fs?: string; // filing status
 }
 
 function toCompact(state: FinancialState): CompactState {
@@ -230,6 +237,15 @@ function toCompact(state: FinancialState): CompactState {
   const surplusComputedId = computedSurplusTarget?.id ?? state.surplusTargetComputedId;
   if (surplusComputedId) compact.sr = surplusComputedId;
   if (state.fxManualOverride !== undefined && state.fxManualOverride > 0) compact.fxm = state.fxManualOverride;
+  const taxCredits = state.taxCredits ?? [];
+  if (taxCredits.length > 0) {
+    compact.tc = taxCredits.map((x) => ({
+      c: x.category,
+      a: x.annualAmount,
+      t: x.type,
+    }));
+  }
+  if (state.filingStatus) compact.fs = state.filingStatus;
   return compact;
 }
 
@@ -306,6 +322,13 @@ function fromCompact(compact: CompactState): FinancialState {
     provincialTaxOverride: compact.pt,
     surplusTargetComputedId: compact.sr,
     fxManualOverride: compact.fxm,
+    taxCredits: (compact.tc ?? []).map((x, i) => ({
+      id: `tc${i + 1}`,
+      category: x.c,
+      annualAmount: x.a,
+      type: x.t as "refundable" | "non-refundable" | "deduction",
+    })),
+    filingStatus: compact.fs as import("@/lib/tax-credits").FilingStatus | undefined,
   };
 }
 
