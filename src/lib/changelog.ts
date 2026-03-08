@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: AU tax credits and offsets
+  {
+    version: 162,
+    title: "Australia: tax credits and offsets",
+    description: "Added AU tax offsets and credits: Low Income Tax Offset (LITO, up to $700), Senior Australians and Pensioners Tax Offset (SAPTO, up to $2,230), Medicare Levy Surcharge info, Private Health Insurance Rebate tiers, Franking Credits (dividend imputation, refundable), Zone Tax Offset, Super Co-contribution, and Spouse Super Tax Offset. Added AU filing statuses: single and married/de facto. LMITO excluded (expired June 2022).",
+    date: "2026-03-08",
+  },
   // Australia: AU superannuation account types
   {
     version: 161,

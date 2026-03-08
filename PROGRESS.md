@@ -8,9 +8,21 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 161
-- **Remaining**: 8
+- **Completed**: 162
+- **Remaining**: 7
 - **Last Updated**: 2026-03-08
+
+## Task 162: AU tax credits and offsets [@backend] [MATH]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/tax-credits.ts`: Added `AUFilingStatus` type ("single" | "married-de-facto"). Updated `getFilingStatuses` for AU. Added 9 AU credit categories: LITO, SAPTO, MLS (info-only), Private Health Insurance Rebate, Franking Credits, Zone Tax Offset, Super Co-contribution, Spouse Super Tax Offset, Super Concessional Contributions (info-only). Updated `isMarried` check and `getIncomeLimitDescription` for married-de-facto.
+  - `src/lib/insights/formatting.ts`: Added "Married/De Facto" label for married-de-facto status.
+  - `src/lib/changelog.ts`: Added version 162 entry.
+  - `tests/unit/au-tax-credits.test.ts`: New — 36 tests covering AU filing statuses, credit categories, LITO phase-out, SAPTO thresholds, MLS info-only, PHI rebate, franking credits, super co-contribution, spouse super offset, zone tax offset, income limit descriptions, and CA/US regression.
+  - `tests/unit/au-country-type.test.ts`: Fixed pre-existing test (separate commit) — AU now has credits.
+- **Tests**: T1: 2361 passed (128 files), Build: passes
+- **Screenshots**: N/A (backend/math task)
+- **Notes**: LMITO excluded — expired June 30, 2022. Franking credits are refundable (excess credits produce a cash refund). MLS is info-only since it's a surcharge, not a claimable credit.
 
 ## Task 161: AU superannuation account types [@backend] [MATH]
 - **Date**: 2026-03-08

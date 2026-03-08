@@ -25,6 +25,7 @@ export function _filingStatusLabel(status: FilingStatus): string {
     case "married-separately": return "Married Filing Separately";
     case "head-of-household": return "Head of Household";
     case "married-common-law": return "Married/Common-Law";
+    case "married-de-facto": return "Married/De Facto";
     default: return status;
   }
 }
