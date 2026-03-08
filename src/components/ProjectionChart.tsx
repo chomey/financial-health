@@ -531,7 +531,9 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     x={mortgageFreeYear}
                     stroke="#059669"
                     strokeDasharray="6 3"
-                    label={<MilestoneLabelContent value="Mortgage Free" fill="#059669" offsetY={20} />}
+                    label={<MilestoneLabelContent value="Mortgage Free" fill="#059669" offsetY={
+                      consumerDebtFreeYear !== null && Math.abs(mortgageFreeYear - consumerDebtFreeYear) < years * 0.15 ? 20 : 0
+                    } />}
                   />
                 )}
               </>

@@ -142,7 +142,7 @@ describe("SourceSummaryCard", () => {
     );
     const itemsContainer = screen.getByTestId("source-summary-items-section-assets");
     expect(itemsContainer.className).toContain("overflow-y-auto");
-    expect(itemsContainer.className).toContain("max-h-[200px]");
+    expect(itemsContainer.className).toContain("max-h-[160px]");
   });
 
   it("has sticky total row with shadow", () => {

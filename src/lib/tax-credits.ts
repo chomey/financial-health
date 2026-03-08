@@ -206,21 +206,21 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     type: "non-refundable",
     jurisdiction: "CA",
     description:
-      "For individuals with a severe and prolonged impairment in mental or physical functions. Worth ~$10,138 federally (plus ~$5,914 supplement for under-18). No income limit — available regardless of income. Unused portion can be transferred to a supporting spouse or family member.",
+      "For individuals with a severe and prolonged impairment in mental or physical functions. Base amount ~$10,138 federally. Children under 18 qualify for an additional ~$5,914 supplement. No income limit — available regardless of income. Unused portion can be transferred to a supporting spouse or family member.",
     incomeLimits: {},
     maxAmount: 10_138,
     fixedAmount: true,
     amountOptions: [
-      { label: "Adult", value: 10_138 },
-      { label: "Adult + child under 18", value: 16_052 },
+      { label: "Adult (18+)", value: 10_138 },
+      { label: "Child under 18", value: 16_052 },
     ],
     yearOverrides: {
       2026: {
         maxAmount: 10_412,
-        description: "For individuals with a severe and prolonged impairment in mental or physical functions. Worth ~$10,412 federally (plus ~$6,074 supplement for under-18). No income limit — available regardless of income. Unused portion can be transferred to a supporting spouse or family member.",
+        description: "For individuals with a severe and prolonged impairment in mental or physical functions. Base amount ~$10,412 federally. Children under 18 qualify for an additional ~$6,074 supplement. No income limit — available regardless of income. Unused portion can be transferred to a supporting spouse or family member.",
         amountOptions: [
-          { label: "Adult", value: 10_412 },
-          { label: "Adult + child under 18", value: 16_486 },
+          { label: "Adult (18+)", value: 10_412 },
+          { label: "Child under 18", value: 16_486 },
         ],
       },
     },

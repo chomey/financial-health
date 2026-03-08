@@ -289,13 +289,18 @@ export default function Home() {
 
   const contributionItems = realAssets.filter((a) => (a.monthlyContribution ?? 0) > 0).map((a) => ({ label: a.category, value: a.monthlyContribution! }));
 
+  // Merge all outflows into a single card with categorized items
+  const outflowItems: { label: string; value: number }[] = [];
+  if (monthlyTaxes > 0) outflowItems.push({ label: "Taxes", value: Math.round(monthlyTaxes) });
+  for (const e of expenseItems) outflowItems.push(e);
+  for (const c of contributionItems) outflowItems.push({ label: `${c.label} (contribution)`, value: c.value });
+  if (totalMortgagePayments > 0) outflowItems.push({ label: "Mortgage", value: Math.round(totalMortgagePayments) });
+  for (const d of debtPaymentItems) outflowItems.push({ label: `${d.label} (payment)`, value: d.value });
+  const totalOutflows = Math.round(monthlyTaxes + totals.monthlyExpenses + totals.totalMonthlyContributions + totalMortgagePayments + totals.totalDebtPayments);
+
   const monthlySurplusConnections: DataFlowConnectionDef[] = [
     { sourceId: "section-income", label: fmtLabel(incomeAndReturnsTotal), value: incomeAndReturnsTotal, sign: "positive", items: incomeItems },
-    ...(monthlyTaxes > 0 ? [{ sourceId: "virtual-taxes", label: `taxes ${fmtLabel(-monthlyTaxes)}`, value: monthlyTaxes, sign: "negative" as const }] : []),
-    { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative", items: expenseItems },
-    ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "virtual-contributions", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const, items: contributionItems }] : []),
-    ...(totalMortgagePayments > 0 ? [{ sourceId: "virtual-mortgage", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const, items: mortgageItems.length > 0 ? mortgageItems : undefined }] : []),
-    ...(totals.totalDebtPayments > 0 ? [{ sourceId: "section-debts", label: `debt payments ${fmtLabel(-totals.totalDebtPayments)}`, value: totals.totalDebtPayments, sign: "negative" as const, items: debtPaymentItems }] : []),
+    { sourceId: "section-expenses", label: fmtLabel(-totalOutflows), value: totalOutflows, sign: "negative", items: outflowItems },
   ];
 
   // Estimated Tax: green arrow from income showing gross income, label with effective rate + annual tax

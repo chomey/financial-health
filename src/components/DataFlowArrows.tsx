@@ -333,38 +333,38 @@ export function SourceSummaryCard({
 
   return (
     <div
-      className={`relative flex flex-col rounded-xl border-l-4 bg-slate-700/50 p-5 shadow-sm ${
+      className={`relative flex flex-col rounded-lg border-l-[3px] bg-slate-700/50 px-3 py-2 shadow-sm ${
         isPositive ? "border-l-cyan-500" : "border-l-rose-500"
       }`}
       data-testid={`source-summary-${sourceId}`}
     >
       {/* Header: icon + title */}
-      <div className="mb-2 flex items-center gap-2">
-        {icon && <span aria-hidden="true" className="text-base">{icon}</span>}
-        <span className="text-sm font-semibold text-slate-200" data-testid={`source-summary-title-${sourceId}`}>{sectionName}</span>
+      <div className="mb-1 flex items-center gap-1.5">
+        {icon && <span aria-hidden="true" className="text-sm">{icon}</span>}
+        <span className="text-xs font-semibold text-slate-200" data-testid={`source-summary-title-${sourceId}`}>{sectionName}</span>
       </div>
 
       {/* Scrollable item list */}
       {items && items.length > 0 && (
-        <div className="max-h-[200px] overflow-y-auto mb-3 scrollbar-thin" data-testid={`source-summary-items-${sourceId}`}>
-          <ul className="space-y-1">
+        <div className="max-h-[160px] overflow-y-auto mb-1.5 scrollbar-thin" data-testid={`source-summary-items-${sourceId}`}>
+          <ul className="space-y-0">
             {items.map((item, i) => {
               const itemCur = item.currency ?? cur;
               const showCurrencyCode = item.currency && item.currency !== cur;
               return (
-                <li key={i} className="flex items-center justify-between text-sm">
+                <li key={i} className="flex items-center justify-between text-xs leading-relaxed">
                   <span className="text-slate-400 truncate mr-2">
                     {item.label}
                     {(() => {
                       const tickerName = getTickerName(item.label);
                       return tickerName ? (
-                        <span className="ml-1 text-[10px] text-slate-500" data-testid={`source-item-name-${i}`}>({tickerName})</span>
+                        <span className="ml-1 text-[9px] text-slate-500" data-testid={`source-item-name-${i}`}>({tickerName})</span>
                       ) : null;
                     })()}
                   </span>
                   <span className="font-medium text-slate-200 whitespace-nowrap">
                     {formatCurrency(Math.abs(item.value), itemCur)}
-                    {showCurrencyCode && <span className="ml-1 text-xs text-slate-500">{itemCur}</span>}
+                    {showCurrencyCode && <span className="ml-1 text-[10px] text-slate-500">{itemCur}</span>}
                   </span>
                 </li>
               );
@@ -374,18 +374,18 @@ export function SourceSummaryCard({
       )}
 
       {/* Total with hand-drawn oval — sticky at bottom */}
-      <div className="sticky bottom-0 flex items-center justify-between border-t border-slate-600 pt-2 bg-slate-700/80 shadow-[0_-2px_4px_rgba(0,0,0,0.2)]" data-testid={`source-summary-total-row-${sourceId}`}>
-        <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">Total</span>
+      <div className="sticky bottom-0 flex items-center justify-between border-t border-slate-600 pt-1.5 bg-slate-700/80" data-testid={`source-summary-total-row-${sourceId}`}>
+        <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">Total</span>
         <div className="relative">
           <span
-            className={`text-xl font-bold ${isPositive ? "text-cyan-400" : "text-rose-400"}`}
+            className={`text-base font-bold ${isPositive ? "text-cyan-400" : "text-rose-400"}`}
             data-testid={`source-summary-total-${sourceId}`}
           >
             {total}
           </span>
           {/* Hand-drawn oval annotation */}
           <svg
-            className="pointer-events-none absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)]"
+            className="pointer-events-none absolute -inset-1.5 h-[calc(100%+12px)] w-[calc(100%+12px)]"
             viewBox="0 0 100 40"
             preserveAspectRatio="none"
             aria-hidden="true"
@@ -423,7 +423,7 @@ function ConnectorLine({
   const delayMs = 400 + index * 50; // Stagger connector draws
   return (
     <svg
-      className="mx-auto h-6 w-12"
+      className="mx-auto h-4 w-8"
       viewBox="0 0 48 24"
       aria-hidden="true"
       data-testid={`explainer-connector-${index}`}
@@ -1174,7 +1174,7 @@ function ExplainerModal({
       <div
         ref={modalRef}
         data-testid="explainer-modal"
-        className={`relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-slate-800 border border-slate-700 p-6 shadow-2xl sm:p-8 ${closing ? "animate-modal-content-out" : "animate-modal-content-in"}`}
+        className={`relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-slate-800 border border-slate-700 p-4 shadow-2xl sm:p-5 ${closing ? "animate-modal-content-out" : "animate-modal-content-in"}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -1191,9 +1191,9 @@ function ExplainerModal({
         </button>
 
         {/* Metric title & value */}
-        <div className="mb-6 text-center">
-          <h2 className="text-lg font-semibold text-slate-200" data-testid="explainer-title">{targetMeta.label}</h2>
-          <p className="mt-1 text-3xl font-bold text-slate-100" data-testid="explainer-value">{targetMeta.formattedValue}</p>
+        <div className="mb-3 text-center">
+          <h2 className="text-sm font-semibold text-slate-200" data-testid="explainer-title">{targetMeta.label}</h2>
+          <p className="mt-0.5 text-2xl font-bold text-slate-100" data-testid="explainer-value">{targetMeta.formattedValue}</p>
         </div>
 
         {/* Metric-specific content or generic source cards */}
@@ -1211,17 +1211,16 @@ function ExplainerModal({
                 const meta = getSourceMetadata(conn.sourceId);
                 const isPositive = conn.sign !== "negative";
                 const showOperator = i > 0;
-                const labelOverride = conn.label?.startsWith("mortgage") ? "Mortgage" : conn.label?.startsWith("contributions") ? "Contributions" : undefined;
-                const sectionName = labelOverride || meta?.label || conn.label || conn.sourceId.replace("section-", "");
+                const sectionName = meta?.label || conn.sourceId.replace("section-", "").replace("virtual-", "");
                 const displayValue = formatCurrency(conn.value ?? 0, homeCurrencyProp);
                 const cardDelay = i * 50; // Stagger card fade-ins
 
                 return (
                   <div key={conn.sourceId + i} data-testid={`explainer-source-${conn.sourceId}`}>
                     {showOperator && (
-                      <div className="flex justify-center py-1">
+                      <div className="flex justify-center py-0.5">
                         <span
-                          className={`text-2xl font-bold animate-operator-in ${isPositive ? "text-cyan-400" : "text-rose-400"}`}
+                          className={`text-lg font-bold animate-operator-in ${isPositive ? "text-cyan-400" : "text-rose-400"}`}
                           data-testid={`explainer-operator-${i}`}
                           style={{ animationDelay: `${600 + i * 50}ms` }}
                         >
@@ -1269,9 +1268,9 @@ function ExplainerModal({
                   className="animate-draw-sum-bar"
                 />
               </svg>
-              <div className="mt-3 flex items-center justify-center gap-2 animate-result-in" data-testid="explainer-result-area">
-                <span className="text-xl font-bold text-slate-400">=</span>
-                <span className="text-2xl font-bold text-slate-100" data-testid="explainer-result-value">
+              <div className="mt-2 flex items-center justify-center gap-2 animate-result-in" data-testid="explainer-result-area">
+                <span className="text-lg font-bold text-slate-400">=</span>
+                <span className="text-xl font-bold text-slate-100" data-testid="explainer-result-value">
                   <CountUpValue formattedValue={targetMeta.formattedValue} />
                 </span>
               </div>
