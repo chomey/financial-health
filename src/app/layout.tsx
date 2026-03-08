@@ -35,7 +35,7 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
         <Script id="kofi-init" strategy="lazyOnload">
-          {`kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'R6R11VMSML');kofiwidget2.draw();`}
+          {`(function k(){if(typeof kofiwidget2!=="undefined"){kofiwidget2.init("Support me on Ko-fi","#72a4f2","R6R11VMSML");kofiwidget2.draw()}else{setTimeout(k,200)}})()`}
         </Script>
       </body>
     </html>
