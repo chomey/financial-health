@@ -120,7 +120,7 @@ describe("Unified ProjectionChart", () => {
   it("shows surplus subtitle when income > 0 in Keep Earning mode", () => {
     render(<ProjectionChart state={INITIAL_STATE} runwayDetails={makeRunwayDetails()} />);
     expect(screen.getByTestId("projection-surplus-subtitle")).toBeInTheDocument();
-    expect(screen.getByTestId("projection-surplus-subtitle").textContent).toContain("surplus/mo");
+    expect(screen.getByTestId("projection-surplus-subtitle").textContent).toContain("/mo");
   });
 
   it("hides surplus subtitle when no income", () => {

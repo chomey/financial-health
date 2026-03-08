@@ -35,7 +35,7 @@ interface D3SankeyLink {
 
 const CHART_WIDTH = 700;
 const CHART_HEIGHT = 400;
-const CHART_PADDING = { top: 10, right: 90, bottom: 10, left: 90 };
+const CHART_PADDING = { top: 10, right: 120, bottom: 10, left: 90 };
 
 interface CashFlowSankeyProps {
   income: CashFlowInput["income"];
@@ -336,7 +336,7 @@ export default function CashFlowSankey({
                   const nodeHeight = (node.y1 ?? 0) - (node.y0 ?? 0);
                   const isLeft =
                     node.type === "income" || node.type === "investment-income";
-                  const isRight = !isLeft && node.type !== "pool" && node.type !== "tax";
+                  const isRight = !isLeft && node.type !== "pool";
                   const labelX = isLeft
                     ? (node.x0 ?? 0) - 6
                     : isRight
@@ -381,7 +381,7 @@ export default function CashFlowSankey({
                         className="text-[10px] fill-slate-300 pointer-events-none select-none"
                         data-testid={`sankey-label-${node.id}`}
                       >
-                        {node.label.length > 14 ? node.label.slice(0, 13) + "…" : node.label}
+                        {node.label.length > 20 ? node.label.slice(0, 19) + "…" : node.label}
                       </text>
                     </g>
                   );

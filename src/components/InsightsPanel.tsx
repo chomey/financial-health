@@ -111,18 +111,28 @@ function InsightRow({
   );
 }
 
+export interface ProjectionMilestoneDisplay {
+  icon: string;
+  text: string;
+  color: "emerald" | "amber" | "slate";
+}
+
 export default function InsightsPanel({
   data = MOCK_FINANCIAL_DATA,
   insightConnections,
+  milestones,
 }: {
   data?: FinancialData;
   insightConnections?: Record<string, DataFlowConnectionDef[]>;
+  milestones?: ProjectionMilestoneDisplay[];
 }) {
   const allInsights = generateInsights(data);
   const insights = allInsights.slice(0, MAX_INSIGHTS);
   const [expanded, setExpanded] = useState(false);
 
-  if (insights.length === 0) {
+  const hasMilestones = milestones && milestones.length > 0;
+
+  if (insights.length === 0 && !hasMilestones) {
     return null;
   }
 
@@ -130,11 +140,24 @@ export default function InsightsPanel({
   const showToggle = insights.length > COLLAPSED_COUNT;
   const visibleInsights = expanded ? insights : insights.slice(0, COLLAPSED_COUNT);
 
+  const milestoneColorMap = { emerald: "text-emerald-400", amber: "text-amber-400", slate: "text-slate-400" };
+
   return (
     <div
       className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-4"
       data-testid="insights-panel"
     >
+      {/* Projection milestones */}
+      {hasMilestones && (
+        <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1" data-testid="projection-milestones">
+          {milestones.map((m, i) => (
+            <span key={i} className={`text-xs font-medium ${milestoneColorMap[m.color]}`}>
+              {m.icon} {m.text}
+            </span>
+          ))}
+        </div>
+      )}
+
       <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
         {insights.length} Insights
       </h3>

@@ -62,7 +62,7 @@ export default function FastForwardPanel({
   const formatCurrency = (v: number) => fmt.compact(v);
   const formatDelta = (v: number) => (v > 0 ? "+" : "") + fmt.compact(v);
   const [mod, setMod] = useState<ScenarioModification>({ ...EMPTY_MODIFICATION });
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [activePreset, setActivePreset] = useState<ScenarioPreset | null>(null);
 
   const hasModifications =

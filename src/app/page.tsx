@@ -9,13 +9,7 @@ if (typeof window !== "undefined") {
   };
 }
 
-import { useState, useEffect, useCallback } from "react";
-import AssetEntry from "@/components/AssetEntry";
-import DebtEntry from "@/components/DebtEntry";
-import PropertyEntry from "@/components/PropertyEntry";
-import StockEntry, { getStockValue } from "@/components/StockEntry";
-import IncomeEntry from "@/components/IncomeEntry";
-import ExpenseEntry from "@/components/ExpenseEntry";
+import { useState, useEffect, useCallback, useRef } from "react";
 import SnapshotDashboard, { type DataFlowConnectionDef } from "@/components/SnapshotDashboard";
 import ProjectionChart from "@/components/ProjectionChart";
 import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
@@ -28,7 +22,7 @@ import FxRateDisplay from "@/components/FxRateDisplay";
 import InsightsPanel from "@/components/InsightsPanel";
 import FinancialFlowchart from "@/components/FinancialFlowchart";
 import ZoomableCard from "@/components/ZoomableCard";
-import { DataFlowProvider, type SourceMetadataItem } from "@/components/DataFlowArrows";
+import { DataFlowProvider } from "@/components/DataFlowArrows";
 import { CurrencyProvider } from "@/lib/CurrencyContext";
 import {
   computeMetrics,
@@ -39,12 +33,10 @@ import {
 import { getProfilesForCountry } from "@/lib/sample-profiles";
 import WizardShell from "@/components/wizard/WizardShell";
 import { formatCurrencyCompact } from "@/lib/currency";
-/* MobileWizard is superseded by the new wizard; keeping import for backward compat */
 import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
 import { computeMortgageBreakdown, DEFAULT_INTEREST_RATE } from "@/components/PropertyEntry";
 import { getPortfolioSummary, getAnnualizedReturn } from "@/components/StockEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
-import TaxCreditEntry from "@/components/TaxCreditEntry";
 import { getFilingStatuses } from "@/lib/tax-credits";
 import { getStepFromURL, updateStepURL, type WizardStep } from "@/lib/url-state";
 import {
@@ -53,8 +45,6 @@ import {
   CopyLinkButton,
   AgeInputHeader,
   WelcomeBanner,
-  CollapsibleSection,
-  formatCurrencySummary,
 } from "@/app/_page-helpers";
 import { useFinancialState } from "@/app/_use-financial-state";
 
@@ -149,6 +139,12 @@ export default function Home() {
     return sum + normalizeToMonthly(i.amount, i.frequency) * 12;
   }, 0);
 
+  // Projection milestones (reported by ProjectionChart, displayed in InsightsPanel)
+  const [projectionMilestones, setProjectionMilestones] = useState<import("@/components/projection/ProjectionUtils").ProjectionMilestone[]>([]);
+  const milestonesRef = useRef(setProjectionMilestones);
+  milestonesRef.current = setProjectionMilestones;
+  const handleMilestonesChange = useCallback((m: import("@/components/projection/ProjectionUtils").ProjectionMilestone[]) => milestonesRef.current(m), []);
+
   // ── Render wizard phase ───────────────────────────────────────────────────
   if (phase === "wizard") {
     return (
@@ -207,27 +203,7 @@ export default function Home() {
   const metrics = computeMetrics(state);
   const runwayDetails = metrics.find(m => m.title === "Financial Runway")?.runwayDetails;
   const financialData = { ...toFinancialData(state), outlookYears };
-  const realAssets = assets.filter((a) => !a.computed);
-  const surplusTargetName = realAssets.find((a) => a.surplusTarget)?.category ?? realAssets[0]?.category;
-
-  // Summaries for collapsed sections — use converted totals from computeTotals
-  const assetTotal = totals.totalAssets;
   const debtTotal = totals.totalDebts;
-  const incomeTotal = totals.monthlyIncome;
-  const expenseTotal = totals.monthlyExpenses;
-  const propertyCount = properties.length;
-  const stockCount = stocks.length;
-
-  // Build item-level data for source summary cards in explainer modal
-  const assetItems: SourceMetadataItem[] = assets.filter((a) => !a.computed).map((a) => ({ label: a.category, value: a.amount, currency: a.currency }));
-  const debtItems: SourceMetadataItem[] = debts.map((d) => ({ label: d.category, value: d.amount, currency: d.currency }));
-  const incomeItems: SourceMetadataItem[] = [
-    ...income.map((i) => ({ label: i.category, value: normalizeToMonthly(i.amount, i.frequency) })),
-    ...monthlyInvestmentReturns.map((r) => ({ label: `${r.label} returns`, value: Math.round(r.amount) })),
-  ];
-  const expenseItems: SourceMetadataItem[] = expenses.map((e) => ({ label: e.category, value: e.amount }));
-  const propertyItems: SourceMetadataItem[] = properties.map((p) => ({ label: p.name, value: Math.max(0, p.value - p.mortgage), currency: p.currency }));
-  const stockItems: SourceMetadataItem[] = stocks.map((s) => ({ label: s.ticker, value: getStockValue(s) }));
 
   // Data-flow connections for metric cards
   const fmtLabel = (v: number) => {
@@ -380,14 +356,6 @@ export default function Home() {
               </p>
             </div>
             <div className="flex-shrink-0 flex items-center gap-2 print:hidden">
-              <button
-                type="button"
-                onClick={switchToWizard}
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-400 shadow-sm transition-all duration-200 hover:border-violet-400/40 hover:bg-white/10 hover:text-violet-300 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95 print:hidden"
-                data-testid="edit-data-wizard"
-              >
-                Edit data
-              </button>
               <CopyLinkButton />
               <PrintSnapshotButton />
             </div>
@@ -427,18 +395,33 @@ export default function Home() {
       </header>
 
       <nav className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/90 backdrop-blur-sm shadow-sm print:hidden">
-        <div className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6">
-          <div className="flex items-center gap-1 py-1.5 text-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          {/* Row 1: Phase toggle */}
+          <div className="flex items-center gap-1 border-b border-white/5 py-1.5 text-sm">
+            <button
+              type="button"
+              onClick={switchToWizard}
+              className="flex-shrink-0 rounded-md px-3 py-1.5 font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
+            >
+              <span aria-hidden="true" className="mr-1">📝</span>
+              My Finances
+            </button>
+            <span className="text-slate-600 select-none">/</span>
+            <span className="rounded-md bg-violet-500/15 px-3 py-1.5 font-medium text-violet-300 ring-1 ring-violet-500/30 text-sm">
+              <span aria-hidden="true" className="mr-1">📊</span>
+              Dashboard
+            </span>
+          </div>
+          {/* Row 2: Dashboard sub-sections (left-to-right matches top-to-bottom page order) */}
+          <div className="flex items-center gap-1 overflow-x-auto py-1.5 text-sm">
             {[
               { id: "projections", icon: "📈", label: "Projections" },
-              { id: "assets", icon: "💰", label: "Assets" },
-              { id: "debts", icon: "💳", label: "Debts" },
-              { id: "income", icon: "💵", label: "Income" },
-              { id: "expenses", icon: "🧾", label: "Expenses" },
-              { id: "property", icon: "🏠", label: "Property" },
-              { id: "stocks", icon: "📊", label: "Stocks" },
-              { id: "dashboard", icon: "🎯", label: "Dashboard" },
+              { id: "insights", icon: "💡", label: "Insights" },
               { id: "roadmap", icon: "🗺️", label: "Money Steps" },
+              { id: "metrics", icon: "🎯", label: "Metrics" },
+              { id: "cashflow", icon: "💸", label: "Cash Flow" },
+              { id: "breakdowns", icon: "📉", label: "Breakdowns" },
+              { id: "compare", icon: "📊", label: "Compare" },
               { id: "scenarios", icon: "🔮", label: "What If" },
             ].map((item) => (
               <button
@@ -457,13 +440,13 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-8">
+      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6">
         {/* Welcome explainer for first-time visitors */}
         <WelcomeBanner />
 
         {/* Sample profile picker for new visitors (no URL state) */}
         {showSampleProfiles && (
-          <div className="mb-6 rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/10 to-emerald-400/5 px-4 py-5 shadow-sm sm:px-6 print:hidden backdrop-blur-sm" data-testid="sample-profiles-banner">
+          <div className="mb-6 snap-start scroll-mt-24 rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/10 to-emerald-400/5 px-4 py-5 shadow-sm sm:px-6 print:hidden backdrop-blur-sm" data-testid="sample-profiles-banner">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-base font-semibold text-slate-200 sm:text-lg">Start with a sample profile</h2>
@@ -517,155 +500,136 @@ export default function Home() {
           </div>
         )}
 
-        {/* Projection Chart — full-width above the two-column layout */}
-        <section id="projections" className="mb-4 sm:mb-6 space-y-3 sm:space-y-4 scroll-mt-16" aria-label="Financial projections">
-          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} /></ZoomableCard>
-          <InsightsPanel data={financialData} insightConnections={insightConnections} />
-          <section id="roadmap" className="scroll-mt-16" aria-label="Money steps">
-            <FinancialFlowchart
-              state={state}
-              acknowledged={flowchartAcks}
-              skipped={flowchartSkips}
-              isRetired={isRetired}
-              onAcksChange={setFlowchartAcks}
-              onSkipsChange={setFlowchartSkips}
-              onRetiredChange={setIsRetired}
-            />
-          </section>
+        {/* 1. Projections */}
+        <section id="projections" className="mb-4 snap-start scroll-mt-24" aria-label="Financial projections">
+          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} onMilestonesChange={handleMilestonesChange} /></ZoomableCard>
         </section>
 
-        <div className="grid grid-cols-1 gap-4 sm:gap-8 lg:grid-cols-12">
-          {/* Entry Panel — left side on desktop, top on mobile */}
-          <section
-            className="lg:col-span-7 print:hidden"
-            aria-label="Financial data entry"
-            data-testid="entry-panel"
-          >
-            <div className="space-y-3">
-              <CollapsibleSection id="assets" title="Assets" icon="💰" summary={formatCurrencySummary(assetTotal)} dataFlowId="section-assets" dataFlowValue={assetTotal} dataFlowLabel="Assets" dataFlowItems={assetItems}>
-                <AssetEntry items={assets} onChange={handleAssetsChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={effectiveFxRates} annualEmploymentSalary={annualEmploymentSalary} />
-              </CollapsibleSection>
+        {/* 2. Insights */}
+        <section id="insights" className="mb-4 snap-start scroll-mt-24" aria-label="Financial insights">
+          <InsightsPanel data={financialData} insightConnections={insightConnections} milestones={projectionMilestones} />
+        </section>
 
-              <CollapsibleSection id="debts" title="Debts" icon="💳" summary={debtTotal > 0 ? formatCurrencySummary(debtTotal) : "None"} dataFlowId="section-debts" dataFlowValue={debtTotal} dataFlowLabel="Debts" dataFlowItems={debtItems}>
-                <DebtEntry items={debts} onChange={setDebts} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
-              </CollapsibleSection>
+        {/* 3. Money Steps */}
+        <section id="roadmap" className="mb-4 snap-start scroll-mt-24" aria-label="Money steps">
+          <FinancialFlowchart
+            state={state}
+            acknowledged={flowchartAcks}
+            skipped={flowchartSkips}
+            isRetired={isRetired}
+            onAcksChange={setFlowchartAcks}
+            onSkipsChange={setFlowchartSkips}
+            onRetiredChange={setIsRetired}
+          />
+        </section>
 
-              <CollapsibleSection id="income" title="Income" icon="💵" summary={formatCurrencySummary(incomeTotal)} dataFlowId="section-income" dataFlowValue={incomeTotal + totalMonthlyInvestmentReturns} dataFlowLabel="Income & Returns" dataFlowItems={incomeItems}>
-                <IncomeEntry items={income} onChange={setIncome} investmentReturns={monthlyInvestmentReturns} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
-              </CollapsibleSection>
+        {/* 4. Metrics */}
+        <section
+          id="metrics"
+          className="mb-4 snap-start scroll-mt-24 print:col-span-full"
+          data-testid="dashboard-panel"
+          aria-label="Financial dashboard"
+        >
+          <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
+        </section>
 
-              <CollapsibleSection id="expenses" title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)} dataFlowId="section-expenses" dataFlowValue={expenseTotal} dataFlowLabel="Expenses" dataFlowItems={expenseItems}>
-                <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} surplusTargetName={surplusTargetName} federalTax={totals.totalFederalTax / 12} provincialStateTax={totals.totalProvincialStateTax / 12} computedFederalTax={totals.computedFederalTax / 12} computedProvincialStateTax={totals.computedProvincialStateTax / 12} federalTaxOverride={federalTaxOverride !== undefined ? federalTaxOverride / 12 : undefined} provincialTaxOverride={provincialTaxOverride !== undefined ? provincialTaxOverride / 12 : undefined} onFederalTaxOverride={(monthly) => setFederalTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} onProvincialTaxOverride={(monthly) => setProvincialTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} country={country} isUnderwater={monthlySurplus < 0} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
-              </CollapsibleSection>
+        {/* 5. Cash Flow */}
+        <section id="cashflow" className="mb-4 snap-start scroll-mt-24" aria-label="Cash flow">
+          <ZoomableCard><CashFlowSankey
+            income={income}
+            expenses={expenses}
+            investmentContributions={totalInvestmentContributions}
+            mortgagePayments={totalMortgagePayments}
+            monthlyFederalTax={totals.totalFederalTax / 12}
+            monthlyProvincialTax={totals.totalProvincialStateTax / 12}
+            monthlySurplus={monthlySurplus}
+            investmentReturns={monthlyInvestmentReturns
+              .filter((r) => {
+                const asset = assets.find((a) => a.category === r.label);
+                if (!asset) return false;
+                const treatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
+                return treatment === "income";
+              })
+              .map((r) => ({ label: r.label, monthlyAmount: r.amount }))}
+          /></ZoomableCard>
+        </section>
 
-              <CollapsibleSection id="tax-credits" title="Tax Credits" icon="🏷️" summary={taxCredits.length > 0 ? `${taxCredits.length} credit${taxCredits.length !== 1 ? "s" : ""}` : "None"}>
-                <TaxCreditEntry items={taxCredits} onChange={setTaxCredits} country={country} filingStatus={filingStatus} annualIncome={totals.monthlyIncome * 12} taxYear={taxYear} />
-              </CollapsibleSection>
+        {/* 6. Breakdowns — Expense + Net Worth side by side */}
+        <section id="breakdowns" className="mb-4 snap-start scroll-mt-24" aria-label="Expense and net worth breakdowns">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <ZoomableCard><ExpenseBreakdownChart
+              expenses={expenses}
+              investmentContributions={totalInvestmentContributions}
+              mortgagePayments={totalMortgagePayments}
+              federalTax={totals.totalFederalTax / 12}
+              provincialStateTax={totals.totalProvincialStateTax / 12}
+              monthlyAfterTaxIncome={totals.monthlyAfterTaxIncome}
+              monthlyGrossIncome={totals.monthlyIncome}
+            /></ZoomableCard>
+            <ZoomableCard><NetWorthDonutChart
+              assets={assets}
+              debts={debts}
+              properties={properties}
+              stocks={stocks}
+            /></ZoomableCard>
+          </div>
+        </section>
 
-              <CollapsibleSection id="property" title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"} dataFlowId="section-property" dataFlowValue={totals.totalPropertyEquity} dataFlowLabel="Property" dataFlowItems={propertyItems}>
-                <PropertyEntry items={properties} onChange={setProperties} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
-              </CollapsibleSection>
-
-              <CollapsibleSection id="stocks" title="Stocks" icon="📊" summary={stockCount > 0 ? `${stockCount} holding${stockCount !== 1 ? "s" : ""}` : "None"} dataFlowId="section-stocks" dataFlowValue={totals.totalStocks} dataFlowLabel="Stocks" dataFlowItems={stockItems}>
-                <StockEntry items={stocks} onChange={setStocks} />
-              </CollapsibleSection>
-            </div>
-          </section>
-
-          {/* Dashboard Panel — right side on desktop, bottom on mobile */}
-          <section
-            id="dashboard"
-            className="lg:col-span-5 scroll-mt-16 print:col-span-full"
-            data-testid="dashboard-panel"
-            aria-label="Financial dashboard"
-          >
-            <div className="lg:sticky lg:top-8 overflow-visible space-y-3 sm:space-y-6">
-              <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
-              {stocks.length > 0 && (() => {
-                const portfolio = getPortfolioSummary(stocks);
-                const stocksWithReturns = stocks
-                  .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
-                  .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
-                return (
-                  <ZoomableCard><div className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
-                      <span className="text-lg" aria-hidden="true">📊</span>
+        {/* 7. Compare — Benchmarks + Portfolio Performance */}
+        <section id="compare" className="mb-4 snap-start scroll-mt-24" aria-label="Comparisons and benchmarks">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <ZoomableCard><BenchmarkComparisons
+              age={age}
+              country={country}
+              netWorth={benchmarkNetWorth}
+              savingsRate={benchmarkSavingsRate}
+              emergencyMonths={benchmarkEmergencyMonths}
+              debtToIncomeRatio={benchmarkDebtToIncome}
+              annualIncome={annualIncome}
+              onAgeChange={setAge}
+            /></ZoomableCard>
+            {stocks.length > 0 && (() => {
+              const portfolio = getPortfolioSummary(stocks);
+              const stocksWithReturns = stocks
+                .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
+                .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
+              return (
+                <ZoomableCard><div className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
+                    <span className="text-lg" aria-hidden="true">📊</span>
+                  </div>
+                  <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                    {portfolio.totalGainLoss >= 0 ? "+" : "-"}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.abs(portfolio.totalGainLoss))}
+                  </p>
+                  {portfolio.totalCostBasis > 0 && (
+                    <p className="mt-0.5 text-sm text-slate-400" data-testid="portfolio-return-pct">
+                      {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% overall return
+                    </p>
+                  )}
+                  {stocksWithReturns.length > 0 && (
+                    <div className="mt-2 space-y-0.5">
+                      {stocksWithReturns.map((s) => (
+                        <p key={s.ticker} className="text-xs text-slate-500">
+                          <span className="font-mono font-medium text-slate-400">{s.ticker}</span>{" "}
+                          <span className={s.annualized >= 0 ? "text-emerald-400" : "text-rose-400"}>
+                            {s.annualized >= 0 ? "+" : ""}{s.annualized.toFixed(1)}%/yr
+                          </span>
+                        </p>
+                      ))}
                     </div>
-                    <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                      {portfolio.totalGainLoss >= 0 ? "+" : "-"}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.abs(portfolio.totalGainLoss))}
-                    </p>
-                    {portfolio.totalCostBasis > 0 && (
-                      <p className="mt-0.5 text-sm text-slate-400" data-testid="portfolio-return-pct">
-                        {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% overall return
-                      </p>
-                    )}
-                    {stocksWithReturns.length > 0 && (
-                      <div className="mt-2 space-y-0.5">
-                        {stocksWithReturns.map((s) => (
-                          <p key={s.ticker} className="text-xs text-slate-500">
-                            <span className="font-mono font-medium text-slate-400">{s.ticker}</span>{" "}
-                            <span className={s.annualized >= 0 ? "text-emerald-400" : "text-rose-400"}>
-                              {s.annualized >= 0 ? "+" : ""}{s.annualized.toFixed(1)}%/yr
-                            </span>
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                    <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
-                      Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
-                    </p>
-                  </div></ZoomableCard>
-                );
-              })()}
-              <ZoomableCard><ExpenseBreakdownChart
-                expenses={expenses}
-                investmentContributions={totalInvestmentContributions}
-                mortgagePayments={totalMortgagePayments}
-                federalTax={totals.totalFederalTax / 12}
-                provincialStateTax={totals.totalProvincialStateTax / 12}
-                monthlyAfterTaxIncome={totals.monthlyAfterTaxIncome}
-                monthlyGrossIncome={totals.monthlyIncome}
-              /></ZoomableCard>
-              <ZoomableCard><NetWorthDonutChart
-                assets={assets}
-                debts={debts}
-                properties={properties}
-                stocks={stocks}
-              /></ZoomableCard>
-              <ZoomableCard><CashFlowSankey
-                income={income}
-                expenses={expenses}
-                investmentContributions={totalInvestmentContributions}
-                mortgagePayments={totalMortgagePayments}
-                monthlyFederalTax={totals.totalFederalTax / 12}
-                monthlyProvincialTax={totals.totalProvincialStateTax / 12}
-                monthlySurplus={monthlySurplus}
-                investmentReturns={monthlyInvestmentReturns
-                  .filter((r) => {
-                    const asset = assets.find((a) => a.category === r.label);
-                    if (!asset) return false;
-                    const treatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
-                    return treatment === "income";
-                  })
-                  .map((r) => ({ label: r.label, monthlyAmount: r.amount }))}
-              /></ZoomableCard>
-              <ZoomableCard><BenchmarkComparisons
-                age={age}
-                country={country}
-                netWorth={benchmarkNetWorth}
-                savingsRate={benchmarkSavingsRate}
-                emergencyMonths={benchmarkEmergencyMonths}
-                debtToIncomeRatio={benchmarkDebtToIncome}
-                annualIncome={annualIncome}
-                onAgeChange={setAge}
-              /></ZoomableCard>
-            </div>
-          </section>
-        </div>
+                  )}
+                  <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
+                    Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
+                  </p>
+                </div></ZoomableCard>
+              );
+            })()}
+          </div>
+        </section>
 
-        {/* What If scenario panel — full-width at the bottom */}
-        <section id="scenarios" className="mt-8 scroll-mt-16 print:hidden" aria-label="Scenario modeling">
+        {/* 8. What If */}
+        <section id="scenarios" className="mb-4 snap-start scroll-mt-24 print:hidden" aria-label="Scenario modeling">
           <FastForwardPanel state={state} safeWithdrawalRate={safeWithdrawalRate} onSwrChange={handleSwrChange} />
         </section>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   LineChart,
   Line,
@@ -29,6 +29,7 @@ import { buildSummary } from "@/components/RunwayBurndownChart";
 import {
   type ChartMode,
   type ProjectionChartProps,
+  type ProjectionMilestone,
   SCENARIO_LABELS,
   SCENARIO_COLORS,
   SCENARIO_DESCRIPTIONS,
@@ -42,7 +43,7 @@ import {
   MilestoneLabelContent,
 } from "@/components/projection/ProjectionTooltips";
 
-export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRate = 4, onOutlookChange }: ProjectionChartProps) {
+export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRate = 4, onOutlookChange, onMilestonesChange }: ProjectionChartProps) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.compact(v);
   const formatTableCurrency = (v: number) => fmt.full(v);
@@ -143,6 +144,42 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
   const fireYear = fireMonth !== null ? parseFloat((fireMonth / 12).toFixed(1)) : null;
   const currentNetWorth = projection.points[0]?.netWorth ?? 0;
   const fireAlreadyReached = fireNumber > 0 && currentNetWorth >= fireNumber;
+
+  // Report milestones to parent for display in InsightsPanel
+  // Build milestones as a stable memo, then report via ref to avoid infinite re-render loops
+  const milestoneItems = useMemo(() => {
+    const items: ProjectionMilestone[] = [];
+    if (fireNumber > 0) {
+      if (fireAlreadyReached) {
+        items.push({ icon: "🎉", text: `FIRE number ${formatCurrency(fireNumber)} reached — financial independence achieved`, color: "amber" });
+      } else if (fireYear !== null) {
+        items.push({ icon: "🔥", text: `FIRE ${formatCurrency(fireNumber)} (${safeWithdrawalRate}% rule) — ~${fmtYears(fireYear)}`, color: "amber" });
+      }
+    }
+    if (hasBothDebtTypes) {
+      if (consumerDebtFreeYear !== null && consumerDebtFreeYear > 0)
+        items.push({ icon: "🎉", text: `Consumer debt free in ~${consumerDebtFreeYear.toFixed(1)} years`, color: "emerald" });
+      if (mortgageFreeYear !== null && mortgageFreeYear > 0)
+        items.push({ icon: "🏠", text: `Mortgage free in ~${mortgageFreeYear.toFixed(1)} years`, color: "emerald" });
+    } else if (debtFreeYear !== null && debtFreeYear > 0) {
+      items.push({ icon: "🎉", text: `Debt free in ~${debtFreeYear.toFixed(1)} years`, color: "emerald" });
+    }
+    for (const m of projection.milestones) {
+      if (m.month > 0) items.push({ icon: "⭐", text: `${m.label} net worth in ~${(m.month / 12).toFixed(1)} years`, color: "slate" });
+    }
+    return items;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fireNumber, fireAlreadyReached, fireYear, debtFreeYear, consumerDebtFreeYear, mortgageFreeYear, hasBothDebtTypes, projection.milestones, safeWithdrawalRate]);
+
+  const prevMilestoneKey = useRef("");
+  useEffect(() => {
+    if (!onMilestonesChange) return;
+    const key = milestoneItems.map((m) => m.text).join("|");
+    if (key !== prevMilestoneKey.current) {
+      prevMilestoneKey.current = key;
+      onMilestonesChange(milestoneItems);
+    }
+  }, [milestoneItems, onMilestonesChange]);
 
   const milestoneYears = useMemo(() => computeTableMilestones(years), [years]);
 
@@ -245,105 +282,97 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
         )}
       </div>
 
-      {/* Mode tabs */}
-      {runwayDetails && (
-        <div className="mb-3 sm:mb-4 flex gap-1" data-testid="chart-mode-tabs">
-          <button
-            onClick={(e) => { e.stopPropagation(); setMode("keep-earning"); }}
-            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
-              mode === "keep-earning"
-                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
-                : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
-            }`}
-            data-testid="mode-keep-earning"
-          >
-            Keep Earning
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); setMode("income-stops"); }}
-            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
-              mode === "income-stops"
-                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
-                : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
-            }`}
-            data-testid="mode-income-stops"
-          >
-            Income Stops
-          </button>
-        </div>
-      )}
-
-      {/* Outlook years toggle */}
-      <div className="mb-3 flex flex-wrap items-center gap-3" data-testid="outlook-controls" onClick={(e) => e.stopPropagation()}>
-        <span className="text-xs text-slate-400">Outlook</span>
-        <div className="flex rounded-lg border border-white/10 text-xs">
-          {OUTLOOK_YEAR_OPTIONS.map((opt, i) => (
+      {/* Controls bar — compact single row on desktop, wrapping on mobile */}
+      <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2" onClick={(e) => e.stopPropagation()}>
+        {/* Mode tabs */}
+        {runwayDetails && (
+          <div className="flex gap-1" data-testid="chart-mode-tabs">
             <button
-              key={opt}
-              onClick={() => handleOutlookChange(opt)}
-              className={`px-2.5 py-1 transition-colors duration-150 ${
-                i === 0 ? "rounded-l-lg" : i === OUTLOOK_YEAR_OPTIONS.length - 1 ? "rounded-r-lg" : ""
-              } ${
-                outlookYears === opt
-                  ? "bg-emerald-500/20 text-emerald-400 font-medium"
-                  : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
+              onClick={(e) => { e.stopPropagation(); setMode("keep-earning"); }}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                mode === "keep-earning"
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
+                  : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
               }`}
-              data-testid={`outlook-${opt}yr`}
+              data-testid="mode-keep-earning"
             >
-              {opt}yr
+              Keep Earning
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Inflation adjustment toggle — stopPropagation prevents ZoomableCard from opening */}
-      <div className="mb-3 flex flex-wrap items-center gap-3" data-testid="inflation-controls" onClick={(e) => e.stopPropagation()}>
-        <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-400">
-          <input
-            type="checkbox"
-            checked={inflationAdjusted}
-            onChange={(e) => handleInflationToggle(e.target.checked)}
-            className="h-3.5 w-3.5 cursor-pointer accent-emerald-400"
-            data-testid="inflation-toggle"
-            aria-label="Adjust for inflation"
-          />
-          Adjust for inflation
-        </label>
-        {inflationAdjusted && (
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <input
-              type="number"
-              min="0"
-              max="20"
-              step="0.1"
-              value={inflationRateInput}
-              onChange={(e) => handleInflationRateChange(e.target.value)}
-              className="w-14 rounded border border-white/10 bg-slate-800 px-1.5 py-0.5 text-right text-xs text-slate-200 transition-colors focus:border-emerald-500/50 focus:outline-none"
-              data-testid="inflation-rate-input"
-              aria-label="Annual inflation rate"
-            />
-            <span>% / yr</span>
-            <span
-              className="ml-1 cursor-help text-slate-500"
-              title={`Values shown in today's dollars, deflated by ${inflationRate}% per year`}
-              data-testid="inflation-tooltip"
-              aria-label={`In today's dollars, adjusted for ${inflationRate}% annual inflation`}
+            <button
+              onClick={(e) => { e.stopPropagation(); setMode("income-stops"); }}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                mode === "income-stops"
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
+                  : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
+              }`}
+              data-testid="mode-income-stops"
             >
-              ⓘ
-            </span>
-            <span className="text-xs text-slate-500">
-              (today&apos;s dollars)
-            </span>
+              Income Stops
+            </button>
           </div>
         )}
-      </div>
 
-      {/* Surplus subtitle for Keep Earning mode */}
-      {mode === "keep-earning" && surplusInfo.income > 0 && (
-        <p className="mb-3 text-xs text-slate-500" data-testid="projection-surplus-subtitle">
-          Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)}{surplusInfo.contributions > 0 ? ` − Contributions ${formatCurrency(surplusInfo.contributions)}` : ""} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-emerald-400" : "font-medium text-red-400"}>{formatCurrency(surplusInfo.surplus)}</span> surplus/mo
-        </p>
-      )}
+        {/* Outlook years */}
+        <div className="flex items-center gap-2" data-testid="outlook-controls">
+          <span className="text-xs text-slate-500">Outlook</span>
+          <div className="flex rounded-lg border border-white/10 text-xs">
+            {OUTLOOK_YEAR_OPTIONS.map((opt, i) => (
+              <button
+                key={opt}
+                onClick={() => handleOutlookChange(opt)}
+                className={`px-2 py-0.5 transition-colors duration-150 ${
+                  i === 0 ? "rounded-l-lg" : i === OUTLOOK_YEAR_OPTIONS.length - 1 ? "rounded-r-lg" : ""
+                } ${
+                  outlookYears === opt
+                    ? "bg-emerald-500/20 text-emerald-400 font-medium"
+                    : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                }`}
+                data-testid={`outlook-${opt}yr`}
+              >
+                {opt}yr
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Inflation toggle */}
+        <div className="flex items-center gap-2" data-testid="inflation-controls">
+          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-slate-500">
+            <input
+              type="checkbox"
+              checked={inflationAdjusted}
+              onChange={(e) => handleInflationToggle(e.target.checked)}
+              className="h-3 w-3 cursor-pointer accent-emerald-400"
+              data-testid="inflation-toggle"
+              aria-label="Adjust for inflation"
+            />
+            Inflation
+          </label>
+          {inflationAdjusted && (
+            <div className="flex items-center gap-1 text-xs text-slate-400">
+              <input
+                type="number"
+                min="0"
+                max="20"
+                step="0.1"
+                value={inflationRateInput}
+                onChange={(e) => handleInflationRateChange(e.target.value)}
+                className="w-12 rounded border border-white/10 bg-slate-800 px-1 py-0.5 text-right text-xs text-slate-200 transition-colors focus:border-emerald-500/50 focus:outline-none"
+                data-testid="inflation-rate-input"
+                aria-label="Annual inflation rate"
+              />
+              <span>%/yr</span>
+            </div>
+          )}
+        </div>
+
+        {/* Surplus subtitle inline */}
+        {mode === "keep-earning" && surplusInfo.income > 0 && (
+          <p className="text-xs text-slate-500" data-testid="projection-surplus-subtitle">
+            Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-emerald-400" : "font-medium text-red-400"}>{formatCurrency(surplusInfo.surplus)}</span>/mo
+          </p>
+        )}
+      </div>
 
       {mode === "keep-earning" && (<>
       {/* Summary table: dynamic milestone year projections */}
@@ -615,55 +644,6 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
         )}
       </div>
 
-      {/* FIRE milestone callout */}
-      {fireNumber > 0 && (
-        <div className="mt-3 rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-2" data-testid="fire-milestone">
-          {fireAlreadyReached ? (
-            <p className="text-xs font-medium text-amber-400">
-              🎉 You&apos;ve already reached your FIRE number of {fmt.compact(fireNumber)}! Financial independence achieved.
-            </p>
-          ) : fireYear !== null ? (
-            <p className="text-xs font-medium text-amber-400" data-testid="fire-year">
-              🔥 FIRE number: {fmt.compact(fireNumber)} ({safeWithdrawalRate}% rule) — projected in ~{fmtYears(fireYear)}
-            </p>
-          ) : (
-            <p className="text-xs font-medium text-amber-400">
-              🔥 FIRE number: {fmt.compact(fireNumber)} ({safeWithdrawalRate}% rule) — not reached within 50 years at current rate
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Milestone details */}
-      {(milestoneMarkers.length > 0 || debtFreeYear !== null) && (
-        <div className="mt-3 space-y-1 border-t border-white/10 pt-3">
-          {hasBothDebtTypes ? (
-            <>
-              {consumerDebtFreeYear !== null && consumerDebtFreeYear > 0 && (
-                <p className="text-xs text-emerald-400" data-testid="consumer-debt-free-label">
-                  🎉 Consumer debt free in ~{consumerDebtFreeYear.toFixed(1)} years
-                </p>
-              )}
-              {mortgageFreeYear !== null && mortgageFreeYear > 0 && (
-                <p className="text-xs text-emerald-400" data-testid="mortgage-free-label">
-                  🏠 Mortgage free in ~{mortgageFreeYear.toFixed(1)} years
-                </p>
-              )}
-            </>
-          ) : (
-            debtFreeYear !== null && debtFreeYear > 0 && (
-              <p className="text-xs text-emerald-400" data-testid="debt-free-label">
-                🎉 Debt free in ~{debtFreeYear.toFixed(1)} years
-              </p>
-            )
-          )}
-          {milestoneMarkers.map((m: Milestone) => (
-            <p key={m.label} className="text-xs text-slate-500" data-testid="milestone-label">
-              ⭐ {m.label} net worth in ~{(m.month / 12).toFixed(1)} years
-            </p>
-          ))}
-        </div>
-      )}
 
       {/* Per-asset projections with dynamic milestones */}
       {assetProjections.length > 0 && (

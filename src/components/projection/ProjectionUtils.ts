@@ -5,11 +5,18 @@ import type { OutlookYears } from "@/lib/url-state";
 
 export type ChartMode = "keep-earning" | "income-stops";
 
+export interface ProjectionMilestone {
+  icon: string;
+  text: string;
+  color: "emerald" | "amber" | "slate";
+}
+
 export interface ProjectionChartProps {
   state: FinancialState;
   runwayDetails?: RunwayExplainerDetails;
   safeWithdrawalRate?: number;
   onOutlookChange?: (years: OutlookYears) => void;
+  onMilestonesChange?: (milestones: ProjectionMilestone[]) => void;
 }
 
 export interface CustomTooltipProps {

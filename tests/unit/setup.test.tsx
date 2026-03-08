@@ -20,14 +20,6 @@ describe("App shell layout", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the entry panel with section label", () => {
-    render(<Home />);
-    const entryPanel = screen.getByRole("region", {
-      name: "Financial data entry",
-    });
-    expect(entryPanel).toBeInTheDocument();
-  });
-
   it("renders the dashboard panel with section label", () => {
     render(<Home />);
     const dashboardPanel = screen.getByRole("region", {
