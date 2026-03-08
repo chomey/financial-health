@@ -192,15 +192,15 @@ describe("starter emergency fund step", () => {
     expect(ef.progress).toBe(0);
   });
 
-  it("counts stocks toward liquid assets", () => {
+  it("stocks do not count toward cash-like emergency fund", () => {
     const state: FinancialState = {
       ...caBaseState,
       stocks: [{ id: "s1", ticker: "XEQ", shares: 10, costBasis: 120, lastFetchedPrice: 120 }],
     };
     const steps = getFlowchartSteps(state);
     const ef = steps.find((s) => s.id === "ca-starter-ef")!;
-    // 10 shares * lastFetchedPrice 120 = 1200 >= 1000
-    expect(ef.status).toBe("complete");
+    // Stocks are not cash-like, so EF remains incomplete
+    expect(ef.status).not.toBe("complete");
   });
 });
 

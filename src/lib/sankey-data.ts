@@ -78,7 +78,7 @@ export function buildSankeyData(input: CashFlowInput): SankeyData {
   for (let i = 0; i < investmentReturnItems.length; i++) {
     const item = investmentReturnItems[i];
     const nodeId = `inv-return-${i}`;
-    nodes.push({ id: nodeId, label: `${item.label} interest`, type: "investment-income", value: item.monthlyAmount });
+    nodes.push({ id: nodeId, label: item.label, type: "investment-income", value: item.monthlyAmount });
   }
 
   // Tax node (combined federal + provincial)

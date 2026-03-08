@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -66,13 +66,14 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
   const [inflationAdjusted, setInflationAdjusted] = useState(false);
   const [inflationRate, setInflationRate] = useState(2.5);
   const [inflationRateInput, setInflationRateInput] = useState("2.5");
-  // Read URL params once on mount
-  useState(() => {
+  // Read URL params once on mount (useEffect to avoid SSR/client mismatch)
+  useEffect(() => {
     const { adjusted, rate } = getInflationFromURL();
     setInflationAdjusted(adjusted);
     setInflationRate(rate);
     setInflationRateInput(String(rate));
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleInflationToggle(enabled: boolean) {
     setInflationAdjusted(enabled);

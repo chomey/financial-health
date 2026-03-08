@@ -278,58 +278,81 @@ function StepDetailModal({
   );
 }
 
-// ── Zig-zag step card (compact, no inline expand) ───────────────────────────
+// ── Timeline step row (compact) ──────────────────────────────────────────────
 
-function ZigZagStep({
+function TimelineStep({
   step,
   isSkipped,
+  isLast,
   onClick,
 }: {
   step: FlowchartStep;
   isSkipped: boolean;
+  isLast: boolean;
   onClick: () => void;
 }) {
-  const borderColor =
-    step.status === "complete"
-      ? "border-emerald-500/30"
-      : step.status === "in-progress"
-        ? "border-amber-400/30"
-        : "border-white/10";
-  const bgColor =
-    step.status === "in-progress"
-      ? "bg-amber-500/5"
-      : "bg-white/[0.02]";
+  // Timeline line color: completed segments are green, others are dim
+  const lineColor = step.status === "complete" ? "bg-emerald-500/40" : "bg-white/10";
 
   return (
     <button
       type="button"
-      className={`group flex w-full items-start gap-3 rounded-xl border ${borderColor} ${bgColor} px-3 py-2.5 text-left transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-violet-400`}
+      className="group flex w-full items-stretch gap-0 text-left focus:outline-none"
       onClick={onClick}
       data-testid={`flowchart-step-${step.id}`}
     >
-      <StepCircle step={step} />
-      <div className="min-w-0 flex-1">
-        <p className={`text-sm font-semibold leading-tight ${getStepTitleColor(step.status)}`}>
-          {step.title}
+      {/* Timeline column: circle + connecting line */}
+      <div className="relative flex flex-col items-center w-8 flex-shrink-0">
+        {/* Top line segment (connects to previous step) */}
+        <div className={`w-0.5 flex-1 min-h-1 ${lineColor}`} />
+        {/* Circle */}
+        <div className="flex-shrink-0 my-0.5">
+          <StepCircle step={step} />
+        </div>
+        {/* Bottom line segment (connects to next step) */}
+        {!isLast ? (
+          <div className={`w-0.5 flex-1 min-h-1 ${lineColor}`} />
+        ) : (
+          <div className="flex-1" />
+        )}
+      </div>
+
+      {/* Content */}
+      <div
+        className={`flex-1 min-w-0 py-1.5 pl-2 pr-2 my-0.5 rounded-lg transition-all duration-200 ${
+          step.status === "in-progress"
+            ? "bg-amber-500/8 ring-1 ring-amber-400/25 hover:bg-amber-500/12"
+            : step.status === "complete"
+              ? "hover:bg-white/[0.03]"
+              : "hover:bg-white/[0.03]"
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <p className={`text-sm font-medium leading-tight truncate ${
+            step.status === "complete"
+              ? "text-emerald-400/70"
+              : step.status === "in-progress"
+                ? "text-amber-300 font-semibold"
+                : "text-slate-500"
+          }`}>
+            {step.title}
+          </p>
           {isSkipped && (
-            <span className="ml-1.5 rounded-full bg-slate-700/60 px-1.5 py-0.5 text-[10px] font-normal text-slate-500">N/A</span>
+            <span className="flex-shrink-0 rounded-full bg-slate-700/60 px-1.5 py-0.5 text-[10px] text-slate-500">N/A</span>
           )}
-        </p>
-        <p className="mt-0.5 text-[11px] leading-snug text-slate-600 line-clamp-1">{step.description}</p>
-        <p className="mt-0.5 text-[11px] leading-snug text-slate-500 line-clamp-1">{step.completionHint}</p>
+          {step.status === "in-progress" && step.progress > 0 && step.progress < 100 && (
+            <span className="flex-shrink-0 text-[10px] font-medium tabular-nums text-amber-400/80">{step.progress}%</span>
+          )}
+          {/* Chevron */}
+          <svg className="ml-auto h-3.5 w-3.5 flex-shrink-0 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+        {step.status !== "complete" && step.completionHint && (
+          <p className="mt-0.5 text-[11px] leading-snug text-slate-600 truncate">{step.completionHint}</p>
+        )}
       </div>
     </button>
-  );
-}
-
-// ── Vertical connector between steps ─────────────────────────────────────────
-
-function VerticalConnector({ status }: { status: StepStatus }) {
-  const color = status === "complete" ? "bg-emerald-500/40" : "bg-white/10";
-  return (
-    <div className="flex justify-center py-0.5" aria-hidden="true">
-      <div className={`h-4 w-0.5 ${color} rounded-full`} />
-    </div>
   );
 }
 
@@ -494,18 +517,16 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
         </div>
       )}
 
-      {/* Top-down vertical flow */}
+      {/* Top-down timeline flow */}
       <div role="list" aria-label="Money steps">
         {steps.map((step, idx) => (
-          <div key={step.id}>
-            {idx > 0 && <VerticalConnector status={steps[idx - 1].status} />}
-            <div role="listitem">
-              <ZigZagStep
-                step={step}
-                isSkipped={skipped.includes(step.id)}
-                onClick={() => openDetail(step)}
-              />
-            </div>
+          <div key={step.id} role="listitem">
+            <TimelineStep
+              step={step}
+              isSkipped={skipped.includes(step.id)}
+              isLast={idx === steps.length - 1}
+              onClick={() => openDetail(step)}
+            />
           </div>
         ))}
       </div>

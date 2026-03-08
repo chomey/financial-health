@@ -50,8 +50,9 @@ describe("Roadmap regression unit tests (Task 151)", () => {
     expect(steps.every((s) => s.id.startsWith("ca-"))).toBe(true);
   });
 
-  test("default CA state: 7 of 10 steps complete", () => {
-    expect(completeCount(INITIAL_STATE)).toBe(7);
+  test("default CA state: 6 of 10 steps complete", () => {
+    // Full EF no longer complete: only $5K savings (cash-like) vs ~$7K target
+    expect(completeCount(INITIAL_STATE)).toBe(6);
   });
 
   test("default CA state: budget step is complete (has income and expenses)", () => {
@@ -75,12 +76,11 @@ describe("Roadmap regression unit tests (Task 151)", () => {
     expect(rrsp.completionHint).toMatch(/RRSP/);
   });
 
-  test("default CA state: full EF step shows months covered in hint", () => {
+  test("default CA state: full EF step is not complete (only cash-like assets count)", () => {
     const steps = getFlowchartSteps(INITIAL_STATE);
     const ef = steps.find((s) => s.id === "ca-full-ef")!;
-    // Default state has 55k in assets vs ~7k target → complete
-    expect(ef.status).toBe("complete");
-    expect(ef.completionHint).toMatch(/months/i);
+    // Only $5K savings (cash-like) vs ~$7K target — TFSA/RRSP don't count
+    expect(ef.status).not.toBe("complete");
   });
 
   // ── Scenario 2: Switch to US ──────────────────────────────────────────────────
@@ -112,9 +112,9 @@ describe("Roadmap regression unit tests (Task 151)", () => {
 
   // ── Scenario 3: Acknowledge employer match ────────────────────────────────────
 
-  test("acknowledging CA employer match increases complete count from 7 to 8", () => {
-    expect(completeCount(INITIAL_STATE)).toBe(7);
-    expect(completeCount(INITIAL_STATE, ["ca-employer-match"])).toBe(8);
+  test("acknowledging CA employer match increases complete count from 6 to 7", () => {
+    expect(completeCount(INITIAL_STATE)).toBe(6);
+    expect(completeCount(INITIAL_STATE, ["ca-employer-match"])).toBe(7);
   });
 
   test("acknowledging US employer match increases complete count", () => {
@@ -137,11 +137,11 @@ describe("Roadmap regression unit tests (Task 151)", () => {
 
   // ── Scenario 5: Undo acknowledgement ─────────────────────────────────────────
 
-  test("undoing ca-employer-match acknowledgement reverts to 7 complete", () => {
-    // With ack: 8 complete
-    expect(completeCount(INITIAL_STATE, ["ca-employer-match"])).toBe(8);
+  test("undoing ca-employer-match acknowledgement reverts to 6 complete", () => {
+    // With ack: 7 complete
+    expect(completeCount(INITIAL_STATE, ["ca-employer-match"])).toBe(7);
     // After undo (acks=[]):
-    expect(completeCount(INITIAL_STATE, [])).toBe(7);
+    expect(completeCount(INITIAL_STATE, [])).toBe(6);
   });
 
   test("undone employer match step is in-progress (first non-complete)", () => {
@@ -174,8 +174,8 @@ describe("Roadmap regression unit tests (Task 151)", () => {
         { id: "d2", category: "Credit Card", amount: 3000, interestRate: 20 },
       ],
     };
-    expect(completeCount(INITIAL_STATE)).toBe(7);
-    expect(completeCount(stateWithDebt)).toBe(6);
+    expect(completeCount(INITIAL_STATE)).toBe(6);
+    expect(completeCount(stateWithDebt)).toBe(5);
   });
 
   test("high-interest debt step becomes in-progress when employer match is acked", () => {
@@ -221,20 +221,20 @@ describe("Roadmap regression unit tests (Task 151)", () => {
 
   // ── Scenario 8: Progress bar updates ─────────────────────────────────────────
 
-  test("progress bar percentage: 7/10 = 70% for default CA state", () => {
+  test("progress bar percentage: 6/10 = 60% for default CA state", () => {
     const steps = getFlowchartSteps(INITIAL_STATE);
     const completed = steps.filter((s) => s.status === "complete").length;
     const total = steps.length;
     const percentage = Math.round((completed / total) * 100);
-    expect(percentage).toBe(70);
+    expect(percentage).toBe(60);
   });
 
-  test("progress bar percentage: 80% after acknowledging employer match", () => {
+  test("progress bar percentage: 70% after acknowledging employer match", () => {
     const base = getFlowchartSteps(INITIAL_STATE);
     const steps = applyUserOverrides(base, ["ca-employer-match"], []);
     const completed = steps.filter((s) => s.status === "complete").length;
     const total = steps.length;
     const percentage = Math.round((completed / total) * 100);
-    expect(percentage).toBe(80);
+    expect(percentage).toBe(70);
   });
 });

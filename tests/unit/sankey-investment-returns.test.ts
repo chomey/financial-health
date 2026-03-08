@@ -26,9 +26,9 @@ describe("buildSankeyData — investment returns", () => {
     );
     const invIncomeNodes = result.nodes.filter((n) => n.type === "investment-income");
     expect(invIncomeNodes).toHaveLength(2);
-    expect(invIncomeNodes[0].label).toBe("Savings Account interest");
+    expect(invIncomeNodes[0].label).toBe("Savings Account");
     expect(invIncomeNodes[0].value).toBe(50);
-    expect(invIncomeNodes[1].label).toBe("GIC interest");
+    expect(invIncomeNodes[1].label).toBe("GIC");
     expect(invIncomeNodes[1].value).toBe(30);
   });
 

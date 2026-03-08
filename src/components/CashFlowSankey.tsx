@@ -381,7 +381,7 @@ export default function CashFlowSankey({
                         className="text-[10px] fill-slate-300 pointer-events-none select-none"
                         data-testid={`sankey-label-${node.id}`}
                       >
-                        {node.label}
+                        {node.label.length > 14 ? node.label.slice(0, 13) + "…" : node.label}
                       </text>
                     </g>
                   );

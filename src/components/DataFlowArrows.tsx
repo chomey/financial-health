@@ -76,6 +76,12 @@ export interface TaxExplainerDetails {
     totalAnnualInterest: number;
     accounts: { label: string; balance: number; roi: number; annualInterest: number }[];
   };
+  taxCreditSummary?: {
+    totalBenefit: number;
+    deductions: number;
+    rawTax: number;
+    credits: { name: string; amount: number; type: "refundable" | "non-refundable" | "deduction" }[];
+  };
 }
 
 export interface RunwayTimeSeriesPoint {
@@ -738,6 +744,35 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
           <p className="text-xs text-slate-500">
             Interest income is taxed annually as ordinary income. Capital gains and tax-deferred withdrawals are taxed only when realized.
           </p>
+        </div>
+      )}
+
+      {/* Tax credits & deductions applied */}
+      {details.taxCreditSummary && details.taxCreditSummary.credits.length > 0 && (
+        <div className="rounded-xl border border-emerald-700/40 bg-emerald-900/20 p-4" data-testid="tax-credits-summary">
+          <p className="text-sm font-semibold text-slate-200 mb-2">Tax Credits &amp; Deductions</p>
+          <div className="space-y-1 mb-2">
+            {details.taxCreditSummary.credits.map((c, i) => (
+              <div key={i} className="flex items-center justify-between text-xs text-slate-400">
+                <span>
+                  {c.name}
+                  <span className="ml-1.5 text-[10px] text-slate-500">
+                    {c.type === "refundable" ? "refundable" : c.type === "non-refundable" ? "non-refundable" : "deduction"}
+                  </span>
+                </span>
+                <span className="font-semibold text-emerald-400">-{fmt(c.amount)}</span>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-200 border-t border-emerald-700/40 pt-1.5">
+            <span>Tax after credits</span>
+            <span className="text-emerald-400">{fmt(details.totalTax)}/yr</span>
+          </div>
+          {details.taxCreditSummary.deductions > 0 && (
+            <p className="mt-1.5 text-[11px] text-slate-500">
+              Deductions reduced taxable income by {fmt(details.taxCreditSummary.deductions)} before computing brackets.
+            </p>
+          )}
         </div>
       )}
 
