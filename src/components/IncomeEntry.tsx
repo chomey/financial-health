@@ -347,7 +347,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                   : "hover:bg-white/5"
               }`}
             >
-              <div className="flex flex-1 items-center gap-3 min-w-0">
+              <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                 {/* Category */}
                 {editingId === item.id && editingField === "category" ? (
                   <div className="relative flex-1 min-w-0">

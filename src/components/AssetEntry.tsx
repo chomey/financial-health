@@ -382,7 +382,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
               <div
                 className={`group flex items-center justify-between rounded-lg px-3 transition-all duration-200 ${isComputed ? "py-1 bg-slate-800/60 border border-dashed border-white/10 rounded-md mx-1" : "py-1.5 hover:bg-white/5"}`}
               >
-                <div className="flex flex-1 items-center gap-3 min-w-0">
+                <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                   {/* Category */}
                   {editingId === asset.id && editingField === "category" && !isComputed ? (
                     <div className="relative flex-1 min-w-0">

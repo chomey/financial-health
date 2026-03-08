@@ -275,7 +275,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
             <div
               className="group flex items-center justify-between rounded-lg px-3 py-1.5 transition-colors duration-150 hover:bg-white/5"
             >
-              <div className="flex flex-1 items-center gap-3 min-w-0">
+              <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                 {/* Category */}
                 {editingId === item.id && editingField === "category" ? (
                   <div className="relative flex-1 min-w-0">

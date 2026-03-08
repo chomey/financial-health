@@ -308,7 +308,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
               <div
                 className="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-white/5"
               >
-              <div className="flex flex-1 items-center gap-3 min-w-0">
+              <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                 {/* Category */}
                 {editingId === debt.id && editingField === "category" ? (
                   <div className="relative flex-1 min-w-0">
