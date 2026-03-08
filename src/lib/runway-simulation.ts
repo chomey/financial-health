@@ -50,7 +50,7 @@ export function simulateRunwayWithTax(
   const MAX_MONTHS = 1200;
 
   // Priority order: tax-free (0), taxable (1), tax-deferred (2)
-  const priorityMap: Record<TaxTreatment, number> = { "taxable": 0, "tax-free": 1, "tax-deferred": 2 };
+  const priorityMap: Record<TaxTreatment, number> = { "taxable": 0, "super-accumulation": 0, "super-fhss": 1, "tax-free": 1, "tax-deferred": 2 };
   const sortedIndices = buckets
     .map((_, i) => i)
     .sort((a, b) => priorityMap[buckets[a].taxTreatment] - priorityMap[buckets[b].taxTreatment]);
@@ -110,7 +110,7 @@ export function simulateRunwayTimeSeries(
   const categories = buckets.map((b) => b.category);
 
   // Priority order: tax-free (0), taxable (1), tax-deferred (2)
-  const priorityMap: Record<TaxTreatment, number> = { "taxable": 0, "tax-free": 1, "tax-deferred": 2 };
+  const priorityMap: Record<TaxTreatment, number> = { "taxable": 0, "super-accumulation": 0, "super-fhss": 1, "tax-free": 1, "tax-deferred": 2 };
   const sortedIndices = buckets
     .map((_, i) => i)
     .sort((a, b) => priorityMap[buckets[a].taxTreatment] - priorityMap[buckets[b].taxTreatment]);
@@ -261,7 +261,7 @@ export function buildRunwayExplainerDetails(
   const categories = [...new Set(detailedBuckets.map((b) => b.category))];
 
   // Withdrawal order sorted by tax priority
-  const priorityMap: Record<TaxTreatment, number> = { "taxable": 0, "tax-free": 1, "tax-deferred": 2 };
+  const priorityMap: Record<TaxTreatment, number> = { "taxable": 0, "super-accumulation": 0, "super-fhss": 1, "tax-free": 1, "tax-deferred": 2 };
   const sortedBuckets = [...detailedBuckets].sort((a, b) => priorityMap[a.taxTreatment] - priorityMap[b.taxTreatment]);
 
   const withdrawalOrder: RunwayWithdrawalOrderEntry[] = sortedBuckets.map((b) => {
@@ -270,6 +270,12 @@ export function buildRunwayExplainerDetails(
     if (b.taxTreatment === "tax-deferred") {
       // Rough: assume ~25% effective rate on full balance
       estimatedTaxCost = b.balance * 0.25;
+    } else if (b.taxTreatment === "super-accumulation") {
+      // AU super accumulation: flat 15% on earnings
+      estimatedTaxCost = b.balance * 0.15;
+    } else if (b.taxTreatment === "super-fhss") {
+      // AU FHSS: marginal rate minus 30% offset, rough ~10%
+      estimatedTaxCost = b.balance * 0.10;
     } else if (b.taxTreatment === "taxable") {
       // Rough: gains portion at ~15% rate
       const gainsPercent = (100 - b.costBasisPercent) / 100;

@@ -149,8 +149,8 @@ describe("getAllCategorySuggestions", () => {
     expect(suggestions).toContain("Brokerage");
   });
 
-  it("returns 16 total suggestions", () => {
+  it("returns 19 total suggestions", () => {
     const suggestions = getAllCategorySuggestions();
-    expect(suggestions.length).toBe(16);
+    expect(suggestions.length).toBe(19);
   });
 });

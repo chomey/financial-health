@@ -27,12 +27,13 @@ describe("Asset category suggestions (no region filter)", () => {
     expect(all).toContain("Other");
   });
 
-  it("getGroupedCategorySuggestions returns three groups: Canada, USA, General", () => {
+  it("getGroupedCategorySuggestions returns four groups: Canada, USA, Australia, General", () => {
     const groups = getGroupedCategorySuggestions();
-    expect(groups).toHaveLength(3);
+    expect(groups).toHaveLength(4);
     expect(groups[0].label).toBe("🇨🇦 Canada");
     expect(groups[1].label).toBe("🇺🇸 USA");
-    expect(groups[2].label).toBe("General");
+    expect(groups[2].label).toBe("🇦🇺 Australia");
+    expect(groups[3].label).toBe("General");
   });
 
   it("Canada group contains CA-specific types", () => {
@@ -57,7 +58,7 @@ describe("Asset category suggestions (no region filter)", () => {
 
   it("General group contains universal types", () => {
     const groups = getGroupedCategorySuggestions();
-    const general = groups[2];
+    const general = groups[3];
     expect(general.items).toContain("Savings");
     expect(general.items).toContain("Checking");
     expect(general.items).toContain("Brokerage");

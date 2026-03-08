@@ -44,6 +44,9 @@ export const TAX_SHELTERED_LIMITS: Record<string, { annual: number; country: "CA
   "Roth IRA": { annual: 7000, country: "US" },
   "529": { annual: 18000, country: "US" },
   HSA: { annual: 4300, country: "US" },
+  "Super (Accumulation)": { annual: 30000, country: "AU" },
+  "Super (Pension Phase)": { annual: 120000, country: "AU" },
+  "First Home Super Saver": { annual: 15000, country: "AU" },
 };
 
 /** Check if an asset category is a tax-sheltered account */

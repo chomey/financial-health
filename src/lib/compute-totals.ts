@@ -102,7 +102,7 @@ export function computeTotals(state: FinancialState) {
     const roi = asset.roi ?? getDefaultRoi(asset.category) ?? 0;
     if (roi <= 0) continue;
     const taxTreatment = getTaxTreatment(asset.category, asset.taxTreatment);
-    if (taxTreatment === "tax-free" || taxTreatment === "tax-deferred") continue;
+    if (taxTreatment === "tax-free" || taxTreatment === "tax-deferred" || taxTreatment === "super-accumulation" || taxTreatment === "super-fhss") continue;
     const roiTaxTreatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
     if (roiTaxTreatment !== "income") continue;
     const annualInterest = asset.amount * (roi / 100);

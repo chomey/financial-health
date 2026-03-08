@@ -89,7 +89,7 @@ export function projectFinances(
   });
 
   // Withdrawal order priority: tax-free first, taxable second, tax-deferred last
-  const withdrawalPriority: Record<TaxTreatment, number> = { "tax-free": 0, "taxable": 1, "tax-deferred": 2 };
+  const withdrawalPriority: Record<TaxTreatment, number> = { "tax-free": 0, "super-fhss": 1, "super-accumulation": 1, "taxable": 1, "tax-deferred": 2 };
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
   let cumulativeWithdrawalTax = 0;

@@ -29,6 +29,7 @@ export interface Asset {
 const CATEGORY_SUGGESTIONS = {
   CA: ["TFSA", "RRSP", "RESP", "FHSA", "LIRA"],
   US: ["401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA"],
+  AU: ["Super (Accumulation)", "Super (Pension Phase)", "First Home Super Saver"],
   universal: [
     "Savings",
     "Checking",
@@ -42,11 +43,14 @@ const CATEGORY_SUGGESTIONS = {
 export const CA_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.CA);
 /** Set of US-specific asset category names */
 export const US_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.US);
+/** Set of AU-specific asset category names */
+export const AU_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.AU);
 
 export function getAllCategorySuggestions(): string[] {
   return [
     ...CATEGORY_SUGGESTIONS.CA,
     ...CATEGORY_SUGGESTIONS.US,
+    ...CATEGORY_SUGGESTIONS.AU,
     ...CATEGORY_SUGGESTIONS.universal,
   ];
 }
@@ -60,6 +64,7 @@ export function getGroupedCategorySuggestions(): SuggestionGroup[] {
   return [
     { label: "🇨🇦 Canada", items: CATEGORY_SUGGESTIONS.CA },
     { label: "🇺🇸 USA", items: CATEGORY_SUGGESTIONS.US },
+    { label: "🇦🇺 Australia", items: CATEGORY_SUGGESTIONS.AU },
     { label: "General", items: CATEGORY_SUGGESTIONS.universal },
   ];
 }
@@ -75,6 +80,9 @@ export const DEFAULT_ROI: Record<string, number> = {
   "RESP": 5,
   "FHSA": 5,
   "LIRA": 5,
+  "Super (Accumulation)": 7,
+  "Super (Pension Phase)": 7,
+  "First Home Super Saver": 7,
   "Savings": 2,
   "Savings Account": 2,
   "Checking": 0.5,
@@ -90,7 +98,7 @@ export function getDefaultRoi(category: string): number | undefined {
 
 /** Employer-sponsored registered accounts eligible for employer match */
 export const EMPLOYER_MATCH_ELIGIBLE = new Set([
-  "RRSP", "401k", "Roth 401k",
+  "RRSP", "401k", "Roth 401k", "Super (Accumulation)",
 ]);
 
 /**
@@ -118,6 +126,7 @@ const INCOME_TAX_ROI_CATEGORIES = new Set([
 /** Tax-sheltered accounts where ROI is tax-free — toggle should be hidden */
 const TAX_SHELTERED_CATEGORIES = new Set([
   "TFSA", "Roth IRA", "Roth 401k", "FHSA", "HSA",
+  "Super (Pension Phase)",
 ]);
 
 /** Get the default ROI tax treatment for a category */
@@ -134,6 +143,7 @@ export function shouldShowRoiTaxToggle(category: string, taxTreatmentOverride?: 
 const REINVEST_DEFAULT_CATEGORIES = new Set([
   "401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA",
   "TFSA", "RRSP", "RESP", "FHSA", "LIRA",
+  "Super (Accumulation)", "Super (Pension Phase)", "First Home Super Saver",
   "Brokerage",
 ]);
 
@@ -146,6 +156,7 @@ export function getDefaultReinvest(category: string): boolean {
 export function getAssetCategoryFlag(category: string): string {
   if (CA_ASSET_CATEGORIES.has(category)) return "🇨🇦";
   if (US_ASSET_CATEGORIES.has(category)) return "🇺🇸";
+  if (AU_ASSET_CATEGORIES.has(category)) return "🇦🇺";
   return "";
 }
 
@@ -551,11 +562,13 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   const effective = asset.taxTreatment ?? autoDetected;
                   const isOverridden = asset.taxTreatment !== undefined;
                   const treatments: TaxTreatment[] = ["tax-free", "tax-deferred", "taxable"];
-                  const labels: Record<TaxTreatment, string> = { "tax-free": "Tax-free", "tax-deferred": "Tax-deferred", "taxable": "Taxable" };
+                  const labels: Record<TaxTreatment, string> = { "tax-free": "Tax-free", "tax-deferred": "Tax-deferred", "taxable": "Taxable", "super-accumulation": "Super 15%", "super-fhss": "FHSS" };
                   const colors: Record<TaxTreatment, string> = {
                     "tax-free": "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25",
                     "tax-deferred": "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25",
                     "taxable": "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25",
+                    "super-accumulation": "bg-sky-500/15 text-sky-400 hover:bg-sky-500/25",
+                    "super-fhss": "bg-violet-500/15 text-violet-400 hover:bg-violet-500/25",
                   };
                   return (
                     <button

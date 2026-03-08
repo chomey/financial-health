@@ -8,9 +8,26 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 160
-- **Remaining**: 9
+- **Completed**: 161
+- **Remaining**: 8
 - **Last Updated**: 2026-03-08
+
+## Task 161: AU superannuation account types [@backend] [MATH]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/components/AssetEntry.tsx`: Added AU category suggestions (Super Accumulation, Pension Phase, FHSS), 7% default ROI, AU_ASSET_CATEGORIES set, AU flag emoji, employer match eligibility for accumulation, tax-sheltered and reinvest defaults.
+  - `src/lib/scenario.ts`: Added TAX_SHELTERED_LIMITS: concessional $30k/yr, non-concessional $120k/yr, FHSS $15k/yr.
+  - `src/lib/withdrawal-tax.ts`: Added `super-accumulation` and `super-fhss` TaxTreatment types. Super pension phase → tax-free, accumulation → flat 15%, FHSS → marginal minus 30% offset.
+  - `src/lib/runway-simulation.ts`: Updated all withdrawal priority maps for new treatment types with estimated tax costs.
+  - `src/lib/projections.ts`: Updated withdrawal priority map for new treatment types.
+  - `src/lib/compute-totals.ts`: Skip super accounts from investment income tax calculation.
+  - `tests/unit/au-super-accounts.test.ts`: New — 28 tests covering suggestions, ROI, employer match, reinvest, tax sheltering, contribution limits, tax classification, withdrawal tax computation, and CA/US regression.
+  - `tests/unit/grouped-dropdowns.test.ts`: Updated for 4 groups (added AU).
+  - `tests/unit/asset-entry.test.tsx`: Updated suggestion count 16→19.
+  - `src/lib/changelog.ts`: Added version 161 entry.
+- **Tests**: T1: 2325 passed (127 files), Build: passes
+- **Screenshots**: N/A (backend/math task)
+- **Notes**: Super (Pension Phase) classified as tax-free (assumes retirement-age withdrawals after 60). Super (Accumulation) uses flat 15% tax on earnings within the fund. FHSS uses marginal rate minus 30% offset, which zeroes out at low incomes.
 
 ## Task 160: AU federal income tax brackets 2025/2026 [@backend] [MATH]
 - **Date**: 2026-03-08

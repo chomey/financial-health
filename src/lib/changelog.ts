@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: AU superannuation account types
+  {
+    version: 161,
+    title: "Australia: superannuation account types",
+    description: "Added AU financial vehicles: Super (Accumulation), Super (Pension Phase), and First Home Super Saver. Default 7% ROI for balanced super funds. Contribution limits: concessional $30k/yr, non-concessional $120k/yr, FHSS $15k/yr. Tax treatment: pension phase tax-free after 60, accumulation at flat 15% on earnings, FHSS at marginal rate minus 30% offset. Super (Accumulation) eligible for employer match (super guarantee).",
+    date: "2026-03-08",
+  },
   // Australia: AU federal income tax brackets
   {
     version: 160,

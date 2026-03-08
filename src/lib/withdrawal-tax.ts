@@ -2,14 +2,16 @@
  * Withdrawal Tax Classification and Computation
  *
  * Classifies account types by tax treatment for withdrawal modeling:
- * - "tax-free": Withdrawals are never taxed (TFSA, Roth IRA, HSA)
+ * - "tax-free": Withdrawals are never taxed (TFSA, Roth IRA, HSA, Super Pension Phase after 60)
  * - "tax-deferred": Full withdrawal is taxed as income (RRSP, 401k, IRA, LIRA, RESP, 529)
  * - "taxable": Only gains portion is taxed at capital gains rates (Savings, Checking, Brokerage)
+ * - "super-accumulation": Earnings taxed at flat 15% within the fund
+ * - "super-fhss": Taxed at marginal rate minus 30% offset
  */
 
 import { computeTax } from "./tax-engine";
 
-export type TaxTreatment = "tax-free" | "tax-deferred" | "taxable";
+export type TaxTreatment = "tax-free" | "tax-deferred" | "taxable" | "super-accumulation" | "super-fhss";
 
 export interface WithdrawalTaxResult {
   effectiveRate: number;
@@ -20,18 +22,30 @@ export interface WithdrawalTaxResult {
 /**
  * Keyword lists for auto-classifying account categories by tax treatment.
  * Matched case-insensitively against any substring of the category name.
- * Tax-free keywords are checked first so "Roth 401k" → tax-free, not tax-deferred.
+ * AU super accounts are checked first, then tax-free, then tax-deferred.
  */
 const TAX_FREE_KEYWORDS = ["tfsa", "roth", "hsa", "fhsa", "tax-free", "tax free"];
 const TAX_DEFERRED_KEYWORDS = ["rrsp", "401k", "ira", "lira", "resp", "529", "pension", "retirement"];
 
 /**
  * Classify an account category by tax treatment using keyword matching.
+ * AU super accounts have special treatment checked first.
  * Tax-free keywords take priority over tax-deferred (e.g. "Roth 401k" → tax-free).
  * Unknown categories default to "taxable".
  */
 export function classifyTaxTreatment(category: string): TaxTreatment {
   const lower = category.toLowerCase();
+
+  // AU super accounts — check before generic keywords to avoid "pension" match
+  if (lower.includes("super") && lower.includes("pension")) {
+    return "tax-free"; // Tax-free after age 60 (we assume retirement-age withdrawals)
+  }
+  if (lower.includes("first home super") || lower === "fhss") {
+    return "super-fhss";
+  }
+  if (lower.includes("super") && lower.includes("accumulation")) {
+    return "super-accumulation";
+  }
 
   // Tax-free keywords take priority (so "Roth 401k" matches "roth" → tax-free)
   if (TAX_FREE_KEYWORDS.some((kw) => lower.includes(kw))) {
@@ -85,7 +99,7 @@ export function getWithdrawalTaxRate(
 
   switch (treatment) {
     case "tax-free": {
-      // No tax on withdrawals
+      // No tax on withdrawals (includes Super Pension Phase — tax-free after 60)
       return {
         effectiveRate: 0,
         taxFreeAmount: annualWithdrawal,
@@ -99,6 +113,28 @@ export function getWithdrawalTaxRate(
       return {
         effectiveRate: taxResult.effectiveRate,
         taxFreeAmount: 0,
+        taxableAmount: annualWithdrawal,
+      };
+    }
+
+    case "super-accumulation": {
+      // AU Super Accumulation: earnings taxed at flat 15% within the fund
+      const taxAmount = annualWithdrawal * 0.15;
+      return {
+        effectiveRate: 0.15,
+        taxFreeAmount: annualWithdrawal - taxAmount,
+        taxableAmount: annualWithdrawal,
+      };
+    }
+
+    case "super-fhss": {
+      // AU First Home Super Saver: taxed at marginal rate minus 30% offset
+      const marginalResult = computeTax(annualWithdrawal, "employment", country, jurisdiction, year);
+      const offsetRate = Math.max(0, marginalResult.effectiveRate - 0.30);
+      const taxAmount = annualWithdrawal * offsetRate;
+      return {
+        effectiveRate: offsetRate,
+        taxFreeAmount: annualWithdrawal - taxAmount,
         taxableAmount: annualWithdrawal,
       };
     }
