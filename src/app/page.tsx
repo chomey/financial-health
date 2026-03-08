@@ -9,7 +9,6 @@ if (typeof window !== "undefined") {
   };
 }
 
-import { useState, useEffect, useCallback, useRef } from "react";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import PropertyEntry from "@/components/PropertyEntry";
@@ -27,588 +26,81 @@ import CashFlowSankey from "@/components/CashFlowSankey";
 import FxRateDisplay from "@/components/FxRateDisplay";
 import InsightsPanel from "@/components/InsightsPanel";
 import ZoomableCard from "@/components/ZoomableCard";
-import { DataFlowProvider, useOptionalDataFlow, type SourceMetadataItem } from "@/components/DataFlowArrows";
+import { DataFlowProvider, type SourceMetadataItem } from "@/components/DataFlowArrows";
 import { CurrencyProvider } from "@/lib/CurrencyContext";
 import {
-  INITIAL_STATE,
   computeMetrics,
   computeTotals,
   computeMonthlyInvestmentReturns,
   toFinancialData,
 } from "@/lib/financial-state";
-import { getProfilesForCountry, type SampleProfile } from "@/lib/sample-profiles";
-import MobileWizard, { type WizardResult } from "@/components/MobileWizard";
-import { getStateFromURL, updateURL, getSwrFromURL, updateSwrURL, getOutlookYearsFromURL, type OutlookYears } from "@/lib/url-state";
-import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey, formatCurrencyCompact } from "@/lib/currency";
-import type { FxRates, SupportedCurrency } from "@/lib/currency";
-import type { Asset } from "@/components/AssetEntry";
+import { getProfilesForCountry } from "@/lib/sample-profiles";
+import MobileWizard from "@/components/MobileWizard";
+import { formatCurrencyCompact } from "@/lib/currency";
 import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
-import type { Debt } from "@/components/DebtEntry";
 import { computeMortgageBreakdown, DEFAULT_INTEREST_RATE } from "@/components/PropertyEntry";
-import type { Property } from "@/components/PropertyEntry";
-import type { StockHolding } from "@/components/StockEntry";
 import { getPortfolioSummary, getAnnualizedReturn } from "@/components/StockEntry";
-import type { IncomeItem } from "@/components/IncomeEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
-import type { ExpenseItem } from "@/components/ExpenseEntry";
 import TaxCreditEntry from "@/components/TaxCreditEntry";
-import type { TaxCredit } from "@/lib/tax-credits";
-import { type FilingStatus, getDefaultFilingStatus, getFilingStatuses } from "@/lib/tax-credits";
-
-function PrintSnapshotButton() {
-  return (
-    <button
-      type="button"
-      onClick={() => window.print()}
-      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-400 shadow-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95 print:hidden"
-      aria-label="Print snapshot"
-      data-testid="print-snapshot-button"
-    >
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-        aria-hidden="true"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-        />
-      </svg>
-      Print
-    </button>
-  );
-}
-
-function PrintFooter() {
-  const [date, setDate] = useState("");
-  const [url, setUrl] = useState("");
-
-  useEffect(() => {
-    const updateValues = () => {
-      setDate(
-        new Date().toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
-      );
-      setUrl(window.location.href);
-    };
-    updateValues();
-    // Also refresh right before the browser opens the print dialog
-    window.addEventListener("beforeprint", updateValues);
-    return () => window.removeEventListener("beforeprint", updateValues);
-  }, []);
-
-  return (
-    <footer
-      className="mt-8 hidden border-t border-slate-700 pt-4 print:block"
-      data-testid="print-footer"
-    >
-      <div className="flex items-start justify-between gap-4 text-xs text-slate-500">
-        <div>
-          <p className="font-semibold text-slate-300">Financial Health Snapshot</p>
-          <p className="mt-0.5">Your finances at a glance — no accounts, no data stored</p>
-        </div>
-        <div className="space-y-0.5 text-right">
-          <p data-testid="print-footer-date">{date}</p>
-          <p
-            className="break-all font-mono text-xs text-slate-500"
-            data-testid="print-footer-url"
-          >
-            {url}
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function CopyLinkButton() {
-  const [copied, setCopied] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback for browsers without clipboard API
-      const input = document.createElement("input");
-      input.value = window.location.href;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand("copy");
-      document.body.removeChild(input);
-      setCopied(true);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
-    }
-  }, []);
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-400 shadow-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95"
-      aria-label="Copy link to clipboard"
-    >
-      {copied ? (
-        <>
-          <svg
-            className="h-4 w-4 text-emerald-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-          <span className="text-cyan-400">Copied!</span>
-        </>
-      ) : (
-        <>
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-            />
-          </svg>
-          Copy Link
-        </>
-      )}
-    </button>
-  );
-}
-
-function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange: (age: number | undefined) => void }) {
-  const [editing, setEditing] = useState(false);
-  const [input, setInput] = useState(age?.toString() ?? "");
-
-  const submit = () => {
-    const parsed = parseInt(input, 10);
-    if (parsed >= 18 && parsed <= 120) {
-      onAgeChange(parsed);
-    } else if (input === "") {
-      onAgeChange(undefined);
-    }
-    setEditing(false);
-  };
-
-  if (editing) {
-    return (
-      <div className="flex items-center gap-1.5" data-testid="age-input-header-form">
-        <label className="text-sm font-medium text-slate-400">Age:</label>
-        <input
-          type="number"
-          min={18}
-          max={120}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") setEditing(false); }}
-          onBlur={submit}
-          autoFocus
-          className="w-16 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm text-slate-200 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20 transition-all duration-150"
-          placeholder="e.g. 35"
-          data-testid="age-input-header"
-        />
-      </div>
-    );
-  }
-
-  if (age) {
-    return (
-      <div className="flex items-center gap-1" data-testid="age-display-header">
-        <span className="text-sm font-medium text-slate-400">Age:</span>
-        <button
-          onClick={() => { setInput(age.toString()); setEditing(true); }}
-          className="min-h-[36px] rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
-          data-testid="age-value-header"
-        >
-          {age}
-        </button>
-        <button
-          onClick={() => { onAgeChange(undefined); setInput(""); }}
-          className="p-1 text-slate-500 hover:text-slate-300 transition-colors duration-150 rounded"
-          aria-label="Clear age"
-          data-testid="age-clear-header"
-        >
-          ✕
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <button
-      onClick={() => { setInput(""); setEditing(true); }}
-      className="min-h-[36px] rounded-lg border border-dashed border-white/10 bg-transparent px-3 py-1 text-sm text-slate-500 transition-all duration-200 hover:border-white/20 hover:text-slate-300 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
-      data-testid="age-add-header"
-    >
-      Add age
-    </button>
-  );
-}
-
-function WelcomeBanner() {
-  const [dismissed, setDismissed] = useState(false);
-
-  if (dismissed) return null;
-
-  return (
-    <div className="relative mb-6 rounded-xl border border-violet-400/20 bg-gradient-to-br from-violet-400/10 to-cyan-400/5 px-4 py-4 shadow-sm sm:px-6 sm:py-5 backdrop-blur-sm">
-      <button
-        type="button"
-        onClick={() => setDismissed(true)}
-        className="absolute right-3 top-3 rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
-        aria-label="Dismiss welcome message"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg>
-      </button>
-      <h2 className="mb-2 text-base font-semibold text-slate-200 sm:text-lg">
-        Welcome! Here&apos;s how this works
-      </h2>
-      <div className="space-y-2 text-base leading-relaxed text-slate-300">
-        <p>
-          This is a simple tool to help you see your <strong>full financial picture in one place</strong>. Just fill in some rough numbers for your savings, debts, income, and expenses — it doesn&apos;t need to be exact.
-        </p>
-        <p>
-          You&apos;ll get a snapshot of where you stand, plus a projection of how things could look in 10, 20, or 30 years.
-        </p>
-        <div className="mt-3 rounded-lg bg-white/5 px-3 py-2.5 text-sm text-slate-400 sm:text-base">
-          <strong className="text-slate-300">Your privacy is fully protected.</strong> Nothing you enter is stored on any server or sent anywhere. All your data stays right here in your browser. The numbers are saved in the page link itself — so you can bookmark it or share it, but nobody can see your information unless you give them that link.
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CollapsibleSection({
-  id,
-  title,
-  icon,
-  summary,
-  children,
-  defaultOpen = true,
-  dataFlowId,
-  dataFlowValue,
-  dataFlowLabel,
-  dataFlowItems,
-}: {
-  id?: string;
-  title: string;
-  icon: string;
-  summary?: string;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-  dataFlowId?: string;
-  dataFlowValue?: number;
-  dataFlowLabel?: string;
-  dataFlowItems?: SourceMetadataItem[];
-}) {
-  const [open, setOpen] = useState(defaultOpen);
-  const collapsedRef = useRef<HTMLButtonElement>(null);
-  const expandedRef = useRef<HTMLDivElement>(null);
-  const ctx = useOptionalDataFlow();
-
-  // Register the appropriate element as a data-flow source based on open/collapsed state
-  useEffect(() => {
-    if (!dataFlowId || !ctx) return;
-    const ref = open ? expandedRef : collapsedRef;
-    ctx.registerSource(dataFlowId, ref, {
-      label: dataFlowLabel ?? title,
-      value: dataFlowValue ?? 0,
-      items: dataFlowItems,
-    });
-    return () => ctx.unregisterSource(dataFlowId);
-  }, [dataFlowId, dataFlowLabel, dataFlowValue, dataFlowItems, title, open, ctx]);
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        ref={collapsedRef}
-        id={id}
-        onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 shadow-sm text-left transition-all duration-200 hover:shadow-md hover:bg-white/10 scroll-mt-16"
-        aria-expanded={false}
-        data-dataflow-source={dataFlowId}
-      >
-        <div className="flex items-center gap-2 min-w-0">
-          <span aria-hidden="true">{icon}</span>
-          <h2 className="text-base font-semibold text-slate-200">{title}</h2>
-          {summary && (
-            <span className="ml-2 text-sm text-slate-500 truncate">{summary}</span>
-          )}
-        </div>
-        <svg
-          className="h-4 w-4 flex-shrink-0 text-slate-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-    );
-  }
-
-  return (
-    <div ref={expandedRef} id={id} className="relative scroll-mt-16" data-dataflow-source={dataFlowId}>
-      <button
-        type="button"
-        onClick={() => setOpen(false)}
-        className="absolute right-3 top-3 z-10 rounded-md p-1 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300"
-        aria-expanded={true}
-        aria-label={`Collapse ${title}`}
-      >
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-        </svg>
-      </button>
-      {children}
-    </div>
-  );
-}
-
-function formatCurrencySummary(amount: number): string {
-  if (Math.abs(amount) >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(amount) >= 1_000) return `$${(amount / 1_000).toFixed(0)}k`;
-  return `$${amount.toFixed(0)}`;
-}
+import { getFilingStatuses } from "@/lib/tax-credits";
+import {
+  PrintSnapshotButton,
+  PrintFooter,
+  CopyLinkButton,
+  AgeInputHeader,
+  WelcomeBanner,
+  CollapsibleSection,
+  formatCurrencySummary,
+} from "@/app/_page-helpers";
+import { useFinancialState } from "@/app/_use-financial-state";
 
 export default function Home() {
-  const [assets, setAssets] = useState<Asset[]>(INITIAL_STATE.assets);
-  const [debts, setDebts] = useState<Debt[]>(INITIAL_STATE.debts);
-  const [properties, setProperties] = useState<Property[]>(INITIAL_STATE.properties);
-  const [stocks, setStocks] = useState<StockHolding[]>(INITIAL_STATE.stocks);
-  const [income, setIncome] = useState<IncomeItem[]>(INITIAL_STATE.income);
-  const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
-  const [country, setCountry] = useState<"CA" | "US">(INITIAL_STATE.country ?? "CA");
-  const [jurisdiction, setJurisdiction] = useState<string>(INITIAL_STATE.jurisdiction ?? "ON");
-  const [age, setAge] = useState<number | undefined>(INITIAL_STATE.age);
-  const [federalTaxOverride, setFederalTaxOverride] = useState<number | undefined>(undefined);
-  const [provincialTaxOverride, setProvincialTaxOverride] = useState<number | undefined>(undefined);
-  const [surplusTargetComputedId, setSurplusTargetComputedId] = useState<string | undefined>(undefined);
-  const [fxManualOverride, setFxManualOverride] = useState<number | undefined>(undefined);
-  const [fxRates, setFxRates] = useState<FxRates | undefined>(undefined);
-  const [taxCredits, setTaxCredits] = useState<TaxCredit[]>(INITIAL_STATE.taxCredits ?? []);
-  const [filingStatus, setFilingStatus] = useState<FilingStatus>(INITIAL_STATE.filingStatus ?? getDefaultFilingStatus(INITIAL_STATE.country ?? "CA"));
-  const [showSampleProfiles, setShowSampleProfiles] = useState(false);
-  const [showWizard, setShowWizard] = useState(false);
-  const [safeWithdrawalRate, setSafeWithdrawalRate] = useState(4);
-  const [outlookYears, setOutlookYears] = useState<OutlookYears>(30);
-  const isFirstRender = useRef(true);
+  const {
+    assets,
+    debts,
+    properties,
+    stocks,
+    income,
+    expenses,
+    country,
+    jurisdiction,
+    age,
+    federalTaxOverride,
+    provincialTaxOverride,
+    fxManualOverride,
+    taxCredits,
+    filingStatus,
+    showSampleProfiles,
+    showWizard,
+    safeWithdrawalRate,
+    outlookYears,
+    surplusTargetComputedId,
+    homeCurrency,
+    foreignCurrency,
+    effectiveFxRates,
+    setAge,
+    setJurisdiction,
+    setFilingStatus,
+    setFxManualOverride,
+    setShowSampleProfiles,
+    setOutlookYears,
+    setTaxCredits,
+    setDebts,
+    setIncome,
+    setExpenses,
+    setProperties,
+    setStocks,
+    setFederalTaxOverride,
+    setProvincialTaxOverride,
+    handleAssetsChange,
+    loadProfile,
+    handleCountryChange,
+    clearAll,
+    handleWizardComplete,
+    handleWizardSkip,
+    handleSwrChange,
+  } = useFinancialState();
 
-  // Restore state from URL after hydration; show sample profiles if no URL state
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    setSafeWithdrawalRate(getSwrFromURL());
-    setOutlookYears(getOutlookYearsFromURL());
-    const urlState = getStateFromURL();
-    if (urlState) {
-      setAssets(urlState.assets);
-      setDebts(urlState.debts);
-      setProperties(urlState.properties);
-      setStocks(urlState.stocks);
-      setIncome(urlState.income);
-      setExpenses(urlState.expenses);
-      if (urlState.country) setCountry(urlState.country);
-      if (urlState.jurisdiction) setJurisdiction(urlState.jurisdiction);
-      if (urlState.age !== undefined) setAge(urlState.age);
-      setFederalTaxOverride(urlState.federalTaxOverride);
-      setProvincialTaxOverride(urlState.provincialTaxOverride);
-      setSurplusTargetComputedId(urlState.surplusTargetComputedId);
-      setFxManualOverride(urlState.fxManualOverride);
-      if (urlState.taxCredits) setTaxCredits(urlState.taxCredits);
-      if (urlState.filingStatus) setFilingStatus(urlState.filingStatus);
-    } else {
-      // No saved state — show sample profile picker for new visitors
-      setShowSampleProfiles(true);
-      // Show guided wizard for new users on any viewport
-      try {
-        const wizardDone = localStorage.getItem("fhs-wizard-done");
-        if (!wizardDone) {
-          setShowWizard(true);
-        }
-      } catch {
-        // localStorage unavailable (private browsing, test environment, etc.)
-      }
-    }
-  }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
-
-  // Fetch live FX rates on mount and when country changes (skip if manual override is set)
-  useEffect(() => {
-    if (fxManualOverride !== undefined && fxManualOverride > 0) return;
-    const homeCurrency = getHomeCurrency(country);
-    const foreignCurrency = getForeignCurrency(homeCurrency);
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch(`/api/fx-rate?from=${foreignCurrency}&to=${homeCurrency}`);
-        if (!res.ok || cancelled) return;
-        const data = await res.json();
-        if (cancelled) return;
-        const rate = data.rate as number;
-        setFxRates({
-          [fxPairKey(foreignCurrency, homeCurrency)]: rate,
-          [fxPairKey(homeCurrency, foreignCurrency)]: 1 / rate,
-        });
-      } catch {
-        // Silently fall back to hardcoded rates
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [country, fxManualOverride]);
-
-  // Update URL whenever state changes (skip initial render to keep URL clean with defaults)
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus });
-  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus]);
-
-  // Sync computed assets for stocks and property equity (auto-update amounts, preserve ROI & surplusTarget)
-  const syncComputedAssets = useCallback(() => {
-    const totalStockValue = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
-    const totalEquity = properties.reduce((sum, p) => sum + Math.max(0, p.value - p.mortgage), 0);
-
-    setAssets((prev) => {
-      let next = [...prev];
-      const stocksIdx = next.findIndex((a) => a.id === "_computed_stocks");
-
-      if (totalStockValue > 0) {
-        const existing = stocksIdx >= 0 ? next[stocksIdx] : undefined;
-        const isSurplusTarget = existing?.surplusTarget || surplusTargetComputedId === "_computed_stocks";
-        const entry: Asset = { id: "_computed_stocks", category: "Stocks & Equity", amount: totalStockValue, computed: true as const, roi: existing?.roi, surplusTarget: isSurplusTarget || undefined };
-        if (stocksIdx >= 0) next[stocksIdx] = entry;
-        else next = [entry, ...next];
-      } else if (stocksIdx >= 0) {
-        next.splice(stocksIdx, 1);
-      }
-
-      const equityIdxAfter = next.findIndex((a) => a.id === "_computed_equity");
-      if (totalEquity > 0) {
-        const existing = equityIdxAfter >= 0 ? next[equityIdxAfter] : undefined;
-        const isSurplusTarget = existing?.surplusTarget || surplusTargetComputedId === "_computed_equity";
-        const entry: Asset = { id: "_computed_equity", category: "Property Equity", amount: totalEquity, computed: true as const, roi: existing?.roi, surplusTarget: isSurplusTarget || undefined };
-        if (equityIdxAfter >= 0) next[equityIdxAfter] = entry;
-        else {
-          const insertIdx = next.findIndex((a) => a.id === "_computed_stocks") >= 0 ? 1 : 0;
-          next.splice(insertIdx, 0, entry);
-        }
-      } else if (equityIdxAfter >= 0) {
-        next.splice(equityIdxAfter, 1);
-      }
-
-      // If a computed asset is the surplus target, clear it from real assets
-      const computedHasSurplus = next.some((a) => a.computed && a.surplusTarget);
-      if (computedHasSurplus) {
-        next = next.map((a) => a.computed ? a : { ...a, surplusTarget: false });
-      }
-
-      return next;
-    });
-  }, [stocks, properties, surplusTargetComputedId]);
-
-  // Sync on stocks/properties change
-  useEffect(() => {
-    syncComputedAssets();
-  }, [syncComputedAssets]);
-
-  // Wrap setAssets to track surplus target on computed assets
-  const handleAssetsChange = useCallback((newAssets: Asset[]) => {
-    setAssets(newAssets);
-    const computedSurplus = newAssets.find((a) => a.computed && a.surplusTarget);
-    setSurplusTargetComputedId(computedSurplus?.id);
-  }, []);
-
-  const loadProfile = useCallback((profile: SampleProfile) => {
-    const s = profile.state;
-    setAssets(s.assets);
-    setDebts(s.debts);
-    setIncome(s.income);
-    setExpenses(s.expenses);
-    setProperties(s.properties);
-    setStocks(s.stocks);
-    if (s.country) setCountry(s.country);
-    if (s.jurisdiction) setJurisdiction(s.jurisdiction);
-    if (s.age !== undefined) setAge(s.age);
-    setFederalTaxOverride(undefined);
-    setProvincialTaxOverride(undefined);
-    setSurplusTargetComputedId(undefined);
-    setFxManualOverride(undefined);
-    setTaxCredits([]);
-    setFilingStatus(getDefaultFilingStatus(s.country ?? "CA"));
-    setShowSampleProfiles(false);
-  }, []);
-
-  const handleCountryChange = useCallback((newCountry: "CA" | "US") => {
-    setCountry(newCountry);
-    // Reset filing status to the default for the new country
-    setFilingStatus(getDefaultFilingStatus(newCountry));
-  }, []);
-
-  const clearAll = useCallback(() => {
-    setAssets([]);
-    setDebts([]);
-    setIncome([]);
-    setExpenses([]);
-    setProperties([]);
-    setStocks([]);
-    setTaxCredits([]);
-    setFederalTaxOverride(undefined);
-    setProvincialTaxOverride(undefined);
-    setSurplusTargetComputedId(undefined);
-    setFxManualOverride(undefined);
-    setShowSampleProfiles(false);
-  }, []);
-
-  const handleWizardComplete = useCallback((result: WizardResult) => {
-    setAssets(result.assets);
-    setDebts(result.debts);
-    setIncome(result.income);
-    setExpenses(result.expenses);
-    setShowWizard(false);
-    setShowSampleProfiles(false);
-  }, []);
-
-  const handleWizardSkip = useCallback(() => {
-    setShowWizard(false);
-  }, []);
-
-  const handleSwrChange = useCallback((rate: number) => {
-    setSafeWithdrawalRate(rate);
-    updateSwrURL(rate);
-  }, []);
-
-  const homeCurrency = getHomeCurrency(country);
-  const foreignCurrency = getForeignCurrency(homeCurrency);
-  const effectiveFxRates = getEffectiveFxRates(homeCurrency, fxManualOverride, fxRates);
   const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride, taxCredits, filingStatus };
   const metrics = computeMetrics(state);
   const runwayDetails = metrics.find(m => m.title === "Financial Runway")?.runwayDetails;
@@ -817,7 +309,7 @@ export default function Home() {
             />
             <select
               value={filingStatus}
-              onChange={(e) => setFilingStatus(e.target.value as FilingStatus)}
+              onChange={(e) => setFilingStatus(e.target.value as typeof filingStatus)}
               className="min-h-[44px] rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400 sm:min-h-0"
               aria-label="Filing status"
               data-testid="filing-status-selector"

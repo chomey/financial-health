@@ -6,12 +6,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
-  // Mobile UX improvements
+  // Large file splits for Claude efficiency
   {
     version: 146,
-    title: "Mobile UX polish and wizard landing",
-    description: "The guided setup wizard is now the default landing page for new visitors on all screen sizes. Tightened mobile whitespace across charts, dashboard cards, and entry components. Insights panel now shows a count and 'swipe' hint with a right-edge fade to indicate horizontal scrollability. Removed truncated category names on mobile (they wrap instead). Unified badge spacing and removed inconsistent glow animations from metric cards.",
-    date: "2026-03-07",
+    title: "Codebase modularization: split large files",
+    description: "Factored 800+ line files into focused modules. page.tsx (1078→572 lines): extracted helper components (PrintButton, CopyLink, AgeInput, WelcomeBanner, CollapsibleSection) into _page-helpers.tsx and state management into useFinancialState hook. insights.ts (941→2 lines): split into insights/ folder with types.ts, formatting.ts, net-worth.ts, generate.ts, and index.ts barrel. ProjectionChart.tsx (949→820 lines): extracted tooltip components to projection/ProjectionTooltips.tsx and utility constants/functions to projection/ProjectionUtils.ts. Added reusable useInlineEdit hook in src/hooks/. All public APIs preserved via barrel re-exports. All 1966 tests pass.",
+    date: "2026-03-08",
   },
   // Tax credits E2E regression
   {

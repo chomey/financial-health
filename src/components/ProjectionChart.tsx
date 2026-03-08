@@ -26,150 +26,21 @@ import type { Scenario, Milestone } from "@/lib/projections";
 import { getInflationFromURL, updateInflationURL, getOutlookYearsFromURL, updateOutlookYearsURL, OUTLOOK_YEAR_OPTIONS, type OutlookYears } from "@/lib/url-state";
 import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
 import { buildSummary } from "@/components/RunwayBurndownChart";
-
-type ChartMode = "keep-earning" | "income-stops";
-
-interface ProjectionChartProps {
-  state: FinancialState;
-  runwayDetails?: RunwayExplainerDetails;
-  safeWithdrawalRate?: number;
-  onOutlookChange?: (years: OutlookYears) => void;
-}
-
-// formatCurrency and formatFullCurrency defined inside components via useCurrency()
-
-const SCENARIO_LABELS: Record<Scenario, string> = {
-  conservative: "Conservative",
-  moderate: "Moderate",
-  optimistic: "Optimistic",
-};
-
-const SCENARIO_COLORS: Record<Scenario, string> = {
-  conservative: "#f59e0b", // amber-400
-  moderate: "#34d399",    // emerald-400
-  optimistic: "#60a5fa",  // blue-400
-};
-
-const SCENARIO_DESCRIPTIONS: Record<Scenario, string> = {
-  conservative: "30% below your entered returns — accounts for market downturns and lower growth",
-  moderate: "Uses your entered ROI values as-is — expected returns based on your inputs",
-  optimistic: "30% above your entered returns — best-case growth scenario",
-};
-
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: Array<{ value: number; name: string; color: string; payload?: Record<string, unknown> }>;
-  label?: number;
-}
-
-function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
-  const fmt = useCurrency();
-  if (!active || !payload?.length) return null;
-
-  const years = label ?? 0;
-  const yearLabel = years === 1 ? "1 year" : `${years} years`;
-
-  // Extract withdrawal tax drag from the data point (available via the first payload entry)
-  const dataPoint = payload[0]?.payload;
-  const withdrawalTaxDrag = typeof dataPoint?.withdrawalTaxDrag === "number" ? dataPoint.withdrawalTaxDrag : 0;
-
-  return (
-    <div className="rounded-lg border border-white/10 bg-slate-900/90 p-3 shadow-lg backdrop-blur-sm">
-      <p className="mb-1 text-xs font-medium text-slate-400">{yearLabel} from now</p>
-      {payload.map((entry, i) => (
-        <p key={i} className="text-sm font-semibold" style={{ color: entry.color }}>
-          {entry.name}: {fmt.full(entry.value)}
-        </p>
-      ))}
-      {withdrawalTaxDrag > 0 && (
-        <p className="mt-1 text-xs text-amber-400" data-testid="tooltip-tax-drag">
-          Withdrawal tax paid: {fmt.full(withdrawalTaxDrag)}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function computeTableMilestones(years: number): number[] {
-  if (years <= 20) return [5, 10, 15, 20];
-  if (years <= 30) return [5, 10, 20, 30];
-  if (years <= 40) return [10, 20, 30, 40];
-  return [10, 20, 30, 40, 50];
-}
-
-/** Compute X-axis tick values: every 5 years */
-function computeXTicks(years: number): number[] {
-  const ticks: number[] = [];
-  for (let y = 0; y <= years; y += 5) {
-    ticks.push(y);
-  }
-  return ticks;
-}
-
-function fmtDuration(months: number): string {
-  if (months < 12) return `${Math.round(months)} mo`;
-  const years = months / 12;
-  return years % 1 === 0 ? `${years} yr` : `${years.toFixed(1)} yr`;
-}
-
-function fmtYears(years: number): string {
-  if (years < 1) return `${Math.round(years * 12)} mo`;
-  return years % 1 === 0 ? `${years} yr` : `${years.toFixed(1)} yr`;
-}
-
-function BurndownTooltip({ active, payload, label }: CustomTooltipProps) {
-  if (!active || !payload?.length) return null;
-  const yearVal = label ?? 0;
-  const yearLabel = yearVal < 1 ? `${Math.round(yearVal * 12)} months` : yearVal === 1 ? "1 year" : `${Number(yearVal.toFixed(1))} years`;
-  return (
-    <div className="rounded-lg border border-white/10 bg-slate-900/90 p-3 shadow-lg backdrop-blur-sm">
-      <p className="mb-1 text-xs font-medium text-slate-400">{yearLabel}</p>
-      {payload.map((entry, i) => {
-        const n = String(entry.name ?? "");
-        const displayName = n === "withGrowth" ? "With growth" : n === "withoutGrowth" ? "Without growth" : n === "withTax" ? "After taxes" : n;
-        return (
-          <p key={i} className="text-sm font-semibold" style={{ color: entry.color }}>
-            {displayName}: ${Math.abs(entry.value).toLocaleString("en-US", { maximumFractionDigits: 0 })}
-          </p>
-        );
-      })}
-    </div>
-  );
-}
-
-/** Custom SVG label for vertical ReferenceLine — renders a pill below the top edge to prevent clipping */
-function MilestoneLabelContent({
-  viewBox,
-  value,
-  fill = "#10b981",
-}: {
-  viewBox?: { x: number; y: number; width: number; height: number };
-  value?: string;
-  fill?: string;
-}) {
-  if (!viewBox || !value) return null;
-  const { x, y } = viewBox;
-  const textWidth = value.length * 5.8 + 10;
-  return (
-    <g>
-      <rect
-        x={x + 3}
-        y={y + 6}
-        width={textWidth}
-        height={15}
-        rx={3}
-        fill="#0f172a"
-        fillOpacity={0.9}
-        stroke={fill}
-        strokeWidth={0.5}
-        strokeOpacity={0.7}
-      />
-      <text x={x + 7} y={y + 17} fontSize={10} fill={fill} fontWeight={600}>
-        {value}
-      </text>
-    </g>
-  );
-}
+import {
+  type ChartMode,
+  type ProjectionChartProps,
+  SCENARIO_LABELS,
+  SCENARIO_COLORS,
+  SCENARIO_DESCRIPTIONS,
+  computeTableMilestones,
+  computeXTicks,
+  fmtYears,
+} from "@/components/projection/ProjectionUtils";
+import {
+  CustomTooltip,
+  BurndownTooltip,
+  MilestoneLabelContent,
+} from "@/components/projection/ProjectionTooltips";
 
 export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRate = 4, onOutlookChange }: ProjectionChartProps) {
   const fmt = useCurrency();

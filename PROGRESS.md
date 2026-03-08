@@ -7,14 +7,28 @@
 -->
 
 ## Summary
-- **Total Tasks**: 145
-- **Completed**: 145
+- **Total Tasks**: 146
+- **Completed**: 146
 - **Remaining**: 0
-- **Last Updated**: 2026-03-07
+- **Last Updated**: 2026-03-08
 
-## Task 145: [MILESTONE] Tax credits E2E regression
-- **Date**: 2026-03-07
-- **Files**: `tests/e2e/tax-credit-regression.spec.ts`, `tests/unit/tax-credit-regression.test.ts`, `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`
-- **Tests**: T1: 1970 passed (13 new in `tax-credit-regression.test.ts`), T2: 16 passed (new `tax-credit-regression.spec.ts`), T3: 546 passed (full suite), Build: passes
-- **Screenshots**: ![CA credits loaded](screenshots/task-145-ca-credits-loaded.png) ![US credits loaded](screenshots/task-145-us-credits-loaded.png) ![CA insights summary](screenshots/task-145-ca-insights-summary.png) ![US insights summary](screenshots/task-145-us-insights-summary.png) ![CA dashboard tax rate](screenshots/task-145-ca-dashboard-tax-rate.png) ![CA dashboard surplus](screenshots/task-145-ca-dashboard-surplus.png) ![CA dashboard runway](screenshots/task-145-ca-dashboard-runway.png) ![US dashboard metrics](screenshots/task-145-us-dashboard-metrics.png) ![CA URL roundtrip](screenshots/task-145-ca-url-roundtrip.png) ![US URL roundtrip](screenshots/task-145-us-url-roundtrip.png) ![Interactive URL persist](screenshots/task-145-interactive-url-persist.png) ![US filing status](screenshots/task-145-us-filing-status.png) ![CA credit entry](screenshots/task-145-ca-credit-entry.png)
-- **Notes**: Fixed pre-existing changelog test failure (task 144 added entry without updating count assertions). Pre-encoded URL states must use `category`/`amount` field names (matching FinancialState interface), not `source`/`monthlyAmount`/`name`.
+## Task 146: Continue splitting large files for Claude efficiency
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/app/page.tsx` (1080→572 lines)
+  - `src/app/_page-helpers.tsx` (new, 347 lines): PrintSnapshotButton, PrintFooter, CopyLinkButton, AgeInputHeader, WelcomeBanner, CollapsibleSection, formatCurrencySummary
+  - `src/app/_use-financial-state.ts` (new, 288 lines): useFinancialState hook with all state/effects/handlers
+  - `src/lib/insights.ts` (941→2 lines, barrel re-export)
+  - `src/lib/insights/types.ts` (new, 94 lines): DebtDetail, FinancialData, InsightType, Insight, MAX_INSIGHTS
+  - `src/lib/insights/formatting.ts` (new, 32 lines): formatCurrency, formatCompact, _filingStatusLabel
+  - `src/lib/insights/net-worth.ts` (new, 47 lines): getNetWorthMilestone, getAgeGroup, NET_WORTH_MILESTONES, AGE_GROUPS
+  - `src/lib/insights/generate.ts` (new, 773 lines): generateInsights, deduplicateInsights
+  - `src/lib/insights/index.ts` (new, 4 lines): barrel
+  - `src/components/ProjectionChart.tsx` (949→820 lines)
+  - `src/components/projection/ProjectionUtils.ts` (new, 64 lines): types, constants, utility functions
+  - `src/components/projection/ProjectionTooltips.tsx` (new, 86 lines): CustomTooltip, BurndownTooltip, MilestoneLabelContent
+  - `src/hooks/useInlineEdit.ts` (new, 134 lines): useInlineEdit, useInlineEditState, useInlineEditRef hooks
+  - `tests/unit/scenario-legend.test.ts` (updated to check both ProjectionChart.tsx and ProjectionUtils.ts)
+  - `src/lib/changelog.ts` (updated entry 146)
+- **Tests**: T1: 1966 passed (all), Build: passes
+- **Notes**: All public APIs preserved via barrel re-exports. scenario-legend.test.ts updated to read from both ProjectionChart.tsx and ProjectionUtils.ts since SCENARIO_DESCRIPTIONS constants moved to utils file. AssetEntry.tsx and PropertyEntry.tsx not modified — useInlineEdit hook created as a new reusable utility without disrupting existing working code.
