@@ -8,9 +8,19 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 162
-- **Remaining**: 7
+- **Completed**: 163
+- **Remaining**: 6
 - **Last Updated**: 2026-03-08
+
+## Task 163: AU Money Steps flowchart [@backend]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/flowchart-steps.ts`: Added AU keyword constants (`AU_SUPER_KEYWORDS`, `AU_FHSS_KEYWORDS`, `AU_ETF_KEYWORDS`). Added `buildAUSteps()` with 10 AU-specific steps following r/AusFinance conventions. Updated `getFlowchartSteps()` to route `country === "AU"` to AU steps. Added AU cases to `getStepContext()` for super, FHSS, ETF, high-debt, moderate-debt, budget, and emergency fund steps.
+  - `tests/unit/au-flowchart-steps.test.ts`: New — 52 tests covering step structure, all AU step IDs, budget, emergency fund, super guarantee, high-interest debt (HECS-HELP boundary), salary sacrifice, FHSS, moderate debt, ETF investing, non-concessional super, lifestyle/giving, sequential status logic, fully-funded scenario, user overrides, step context, and CA/US regression.
+  - `src/lib/changelog.ts`: Added version 163 entry.
+- **Tests**: T1: 2413 passed (129 files), Build: passes
+- **Screenshots**: N/A (backend task)
+- **Notes**: AU skips the $1,000 starter EF (goes straight to 3–6 month full EF). Super guarantee step auto-completes for retired users. FHSS and non-concessional super steps are skippable. `getStepContext("au-lifestyle-giving")` returns null (no quantifiable data).
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

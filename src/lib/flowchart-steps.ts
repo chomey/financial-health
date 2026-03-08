@@ -1,12 +1,14 @@
 /**
  * Financial Roadmap Step Definitions and Inference Engine
  *
- * Implements the r/personalfinance "How to handle $" (US) and
- * r/PersonalFinanceCanada "Money Steps" (CA) flowcharts.
+ * Implements the r/personalfinance "How to handle $" (US),
+ * r/PersonalFinanceCanada "Money Steps" (CA), and
+ * r/AusFinance flowchart (AU).
  *
  * References:
  *   CA: https://www.reddit.com/r/PersonalFinanceCanada/wiki/money-steps
  *   US: https://www.reddit.com/r/personalfinance/wiki/commontopics
+ *   AU: https://www.reddit.com/r/AusFinance/wiki/index
  */
 
 import type { FinancialState } from "@/lib/financial-types";
@@ -52,6 +54,9 @@ const CA_RESP_FHSA_KEYWORDS = ["resp", "fhsa"];
 const US_HSA_KEYWORDS = ["hsa"];
 const US_IRA_KEYWORDS = ["roth ira", "ira"];
 const US_401K_KEYWORDS = ["401k", "roth 401k", "403b", "457b", "457"];
+const AU_SUPER_KEYWORDS = ["super", "superannuation"];
+const AU_FHSS_KEYWORDS = ["fhss", "first home super saver"];
+const AU_ETF_KEYWORDS = ["etf", "brokerage", "index fund", "shares", "asx", "investment"];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -579,6 +584,186 @@ function buildUSSteps(d: InferredData): RawStep[] {
   ];
 }
 
+// ── AU step definitions ───────────────────────────────────────────────────────
+
+function buildAUSteps(d: InferredData): RawStep[] {
+  const { cashAssets, monthlyObligations, assetCategories, highInterestDebts, moderateInterestDebts, isRetired } = d;
+
+  const fullEFTarget = monthlyObligations > 0 ? monthlyObligations * 3 : 0;
+  const fullEFProgress = fullEFTarget > 0 ? Math.round(clamp((cashAssets / fullEFTarget) * 100, 0, 100)) : 0;
+  const efMonths = monthlyObligations > 0 ? cashAssets / monthlyObligations : 0;
+
+  const hasSuper = hasAccount(assetCategories, AU_SUPER_KEYWORDS);
+  const hasFHSS = hasAccount(assetCategories, AU_FHSS_KEYWORDS);
+  const hasETF = hasAccount(assetCategories, AU_ETF_KEYWORDS);
+
+  return [
+    {
+      id: "au-budget",
+      title: "Budget & Essentials",
+      description:
+        "Track your income and essential expenses. Know where your money goes before anything else.",
+      completionHint:
+        d.hasIncome && d.hasExpenses
+          ? "Income and expenses are entered — great start."
+          : d.hasIncome
+            ? "Income entered, but no expenses yet."
+            : d.hasExpenses
+              ? isRetired
+                ? "Expenses tracked — living on savings/investments."
+                : "Expenses entered, but no income yet."
+              : "Enter your income and expenses to begin.",
+      detailText:
+        "List all income sources and essential expenses (housing, food, utilities, transport, insurance). Create a spending plan that covers necessities first. Apps like YNAB, PocketBook, or your bank's budgeting tools are popular with Australians. Knowing your monthly cash flow is the foundation of every financial decision that follows.",
+      progress: (isRetired ? d.hasExpenses : d.hasIncome && d.hasExpenses) ? 100 : d.hasIncome || d.hasExpenses ? 50 : 0,
+      isComplete: isRetired ? d.hasExpenses : d.hasIncome && d.hasExpenses,
+    },
+    {
+      id: "au-emergency-fund",
+      title: "Emergency Fund (3–6 Months)",
+      description: "Build cash savings to cover 3–6 months of living expenses before investing.",
+      completionHint:
+        fullEFTarget > 0
+          ? cashAssets >= fullEFTarget
+            ? `Your cash savings cover ~${efMonths.toFixed(1)} months — emergency fund complete.`
+            : `~${efMonths.toFixed(1)} of 3 months covered.`
+          : "Enter your expenses to calculate your emergency fund target.",
+      detailText:
+        "Unlike the US/CA flowcharts, AusFinance recommends building a full 3–6 month emergency fund before aggressively investing. Keep it in a High Interest Savings Account (HISA) — online banks like ING, Ubank, or Macquarie typically offer the best rates. This covers unexpected costs (car repairs, medical, job loss) without raiding your super or going into debt.",
+      progress: fullEFProgress,
+      isComplete: fullEFTarget > 0 && cashAssets >= fullEFTarget,
+    },
+    {
+      id: "au-super-guarantee",
+      title: "Employer Super Guarantee (11.5%)",
+      description:
+        "Ensure your employer is paying the compulsory 11.5% super guarantee on your salary.",
+      completionHint: isRetired
+        ? "Retired — super guarantee not applicable."
+        : "Confirm your employer is paying 11.5% SGC.",
+      detailText:
+        "Australian employers must contribute 11.5% of your ordinary time earnings to your super fund (increasing to 12% from 1 July 2025). Check your payslip or myGov to confirm. If your employer is not paying the SGC, contact the ATO. Consolidate multiple super accounts via myGov to avoid paying multiple sets of fees — this is one of the easiest wins available.",
+      progress: isRetired ? 100 : 0,
+      isComplete: isRetired,
+      userAcknowledgeable: !isRetired,
+      acknowledgeLabel: "My employer is paying the full 11.5% super guarantee",
+      skippable: !isRetired,
+      skipLabel: "Self-employed or employer super not applicable",
+    },
+    {
+      id: "au-high-debt",
+      title: "Pay High-Interest Debt (>8%)",
+      description:
+        "Eliminate debt with interest rates above 8% — credit cards, personal loans, buy-now-pay-later.",
+      completionHint:
+        highInterestDebts.length === 0
+          ? "No high-interest debt detected."
+          : `High-interest debt: ${highInterestDebts.map((d) => d.category).join(", ")}.`,
+      detailText:
+        "High-interest debt costs more than most investments earn. Australian credit cards typically charge 20–22% p.a. — paying these off is a guaranteed ~20% return. Use the avalanche method (highest rate first) or snowball method (smallest balance first, for motivation). HECS-HELP is indexed to CPI (not standard interest) — it's generally low priority and can wait. Enter debt interest rates in the Debts section for tracking.",
+      progress: highInterestDebts.length === 0 ? 100 : 0,
+      isComplete: highInterestDebts.length === 0,
+    },
+    {
+      id: "au-salary-sacrifice",
+      title: "Salary Sacrifice to Super",
+      description:
+        "Contribute to super via salary sacrifice up to the $30,000 concessional cap for tax savings.",
+      completionHint: isRetired
+        ? "Retired — salary sacrifice not applicable."
+        : hasSuper
+          ? "You have a super account. Confirm you're making concessional contributions."
+          : "No super account detected — confirm contributions are being made.",
+      detailText:
+        "Salary sacrifice contributions to super are taxed at just 15% (instead of your marginal tax rate), making this highly effective for most Australians. The concessional cap is $30,000/year (including the 11.5% SGC from your employer). Unused cap space from prior years can also be carried forward. Access to super is generally preserved until age 60, so balance contributions against short-term liquidity needs. Set up salary sacrifice via your employer's payroll.",
+      progress: isRetired ? 100 : hasSuper ? 50 : 0,
+      isComplete: isRetired,
+      userAcknowledgeable: !isRetired,
+      acknowledgeLabel: "I'm making concessional super contributions (salary sacrifice or personal deductible)",
+      skippable: !isRetired,
+      skipLabel: "Self-employed or salary sacrifice not applicable",
+    },
+    {
+      id: "au-fhss",
+      title: "First Home Super Saver (FHSS)",
+      description:
+        "Use the FHSS scheme to save for your first home inside super — with tax advantages.",
+      completionHint: hasFHSS
+        ? "You have an FHSS account in your assets."
+        : "No FHSS detected. Only applies if saving for a first home.",
+      detailText:
+        "The First Home Super Saver scheme lets first-home buyers save up to $15,000/year (max $50,000 total) inside super using concessional or non-concessional contributions. Withdrawals are taxed at your marginal rate minus a 30% tax offset — typically better than saving in a standard savings account. You must apply to the ATO to release FHSS funds before signing a contract. Only applies if you've never owned a home in Australia.",
+      progress: hasFHSS ? 100 : 0,
+      isComplete: hasFHSS,
+      userAcknowledgeable: true,
+      acknowledgeLabel: "I'm actively saving via the FHSS scheme",
+      skippable: true,
+      skipLabel: "Already own a home or not saving for a first home",
+    },
+    {
+      id: "au-moderate-debt",
+      title: "Pay Moderate-Interest Debt (4–8%)",
+      description:
+        "Pay down debt with interest rates between 4% and 8% — car loans, personal loans, lines of credit.",
+      completionHint:
+        moderateInterestDebts.length === 0
+          ? "No moderate-interest debt detected."
+          : `Moderate-interest debt: ${moderateInterestDebts.map((d) => d.category).join(", ")}.`,
+      detailText:
+        "Once emergency fund and super contributions are in order, tackle moderate-interest debt. At 4–8%, the expected return from investing is competitive with the guaranteed return from paying down debt — the right choice depends on your risk tolerance. Many Australians split extra cash between debt reduction and investing at this stage. HECS-HELP (indexed to CPI only) is generally low priority.",
+      progress: moderateInterestDebts.length === 0 ? 100 : 0,
+      isComplete: moderateInterestDebts.length === 0,
+    },
+    {
+      id: "au-etf-invest",
+      title: "Invest in Diversified ETFs (ASX)",
+      description:
+        "Invest surplus savings in diversified index ETFs via the ASX for long-term wealth building.",
+      completionHint: hasETF
+        ? "You have investment/ETF holdings in your assets."
+        : "No investment accounts detected — consider opening a brokerage account.",
+      detailText:
+        "Once debt is managed and super is on track, invest surplus in a diversified share portfolio outside super. Low-cost, globally diversified ETFs on the ASX are the AusFinance community standard: Vanguard (VAS, VGS, VDHG), iShares (IVV), or Betashares (NDQ, DHHF). Open a share trading account with CommSec, SelfWealth, Stake, or similar. Consider franking credits on Australian shares — these can reduce or eliminate your tax liability.",
+      progress: hasETF ? 100 : 0,
+      isComplete: hasETF,
+      skippable: isRetired,
+      skipLabel: "Already investing or retired",
+    },
+    {
+      id: "au-nonconcessional-super",
+      title: "Non-Concessional Super Contributions",
+      description:
+        "Make after-tax contributions to super up to the $120,000 non-concessional cap.",
+      completionHint: isRetired
+        ? "Retired — additional super contributions may still apply."
+        : hasSuper
+          ? "You have a super account. Consider non-concessional contributions."
+          : "No super account detected.",
+      detailText:
+        "Non-concessional contributions (after-tax money into super) are taxed at 0% inside super — all growth and withdrawals in pension phase are tax-free. The annual cap is $120,000; a bring-forward rule allows up to $360,000 in a single year (if eligible). Particularly effective for those approaching retirement with additional savings to shelter. Remember: super is preserved until preservation age (60–65 depending on birth year).",
+      progress: isRetired ? 100 : hasSuper ? 50 : 0,
+      isComplete: false,
+      userAcknowledgeable: true,
+      acknowledgeLabel: "I'm making or planning non-concessional super contributions",
+      skippable: true,
+      skipLabel: "Not applicable at this stage",
+    },
+    {
+      id: "au-lifestyle-giving",
+      title: "Lifestyle & Giving Goals",
+      description:
+        "Pursue lifestyle goals, charitable giving, and additional wealth building beyond core investments.",
+      completionHint: "Plan for lifestyle goals, charitable giving, and beyond.",
+      detailText:
+        "Once you've reached this step, you're in an excellent financial position. Consider: upgrading your investment property portfolio, donating to registered charities (tax-deductible in Australia), contributing to your children's education, travel and lifestyle funds, or gifting. Review your estate plan, beneficiary nominations on your super (binding death benefit nominations), and income protection / life insurance needs. Revisit your strategy annually.",
+      progress: 0,
+      isComplete: false,
+      userAcknowledgeable: true,
+      acknowledgeLabel: "I'm actively pursuing lifestyle goals and long-term planning",
+    },
+  ];
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
@@ -592,7 +777,8 @@ function buildUSSteps(d: InferredData): RawStep[] {
 export function getFlowchartSteps(state: FinancialState, isRetired = false): FlowchartStep[] {
   const country = state.country ?? "CA";
   const d = inferData(state, isRetired);
-  const rawSteps = country === "US" ? buildUSSteps(d) : buildCASteps(d);
+  const rawSteps =
+    country === "US" ? buildUSSteps(d) : country === "AU" ? buildAUSteps(d) : buildCASteps(d);
 
   // Assign sequential status: complete → complete, first incomplete → in-progress, rest → upcoming
   let foundFirstIncomplete = false;
@@ -668,6 +854,7 @@ function matchingAssetItems(state: FinancialState, keywords: string[]): StepCont
  */
 export function getStepContext(stepId: string, state: FinancialState): StepContext | null {
   switch (stepId) {
+    case "au-budget":
     case "ca-budget":
     case "us-budget": {
       const items: StepContextItem[] = [
@@ -697,6 +884,7 @@ export function getStepContext(stepId: string, state: FinancialState): StepConte
       };
     }
 
+    case "au-emergency-fund":
     case "ca-full-ef":
     case "us-full-ef": {
       const cash = getCashAssets(state);
@@ -719,6 +907,20 @@ export function getStepContext(stepId: string, state: FinancialState): StepConte
       };
     }
 
+    case "au-super-guarantee":
+    case "au-salary-sacrifice":
+    case "au-nonconcessional-super":
+      return { heading: "Your super accounts", items: matchingAssetItems(state, AU_SUPER_KEYWORDS) };
+    case "au-fhss":
+      return { heading: "Your FHSS accounts", items: matchingAssetItems(state, AU_FHSS_KEYWORDS) };
+    case "au-etf-invest": {
+      const items = state.assets
+        .filter((a) => !a.computed && hasAccount([a.category], AU_ETF_KEYWORDS))
+        .map((a) => ({ label: a.category, amount: a.amount }));
+      const stockItems = (state.stocks ?? []).map((s) => ({ label: s.ticker || "Stock", amount: getStockValue(s) }));
+      return { heading: "Your investment / ETF holdings", items: [...items, ...stockItems] };
+    }
+
     case "ca-tfsa":
       return { heading: "Your TFSA accounts", items: matchingAssetItems(state, CA_TAX_FREE_KEYWORDS) };
     case "ca-rrsp":
@@ -737,6 +939,7 @@ export function getStepContext(stepId: string, state: FinancialState): StepConte
     case "us-employer-match":
       return { heading: "Your 401(k) accounts", items: matchingAssetItems(state, US_401K_KEYWORDS) };
 
+    case "au-high-debt":
     case "ca-high-debt":
     case "us-high-debt": {
       const debts = state.debts.filter((d) => d.interestRate !== undefined && d.interestRate > 8);
@@ -746,6 +949,7 @@ export function getStepContext(stepId: string, state: FinancialState): StepConte
       };
     }
 
+    case "au-moderate-debt":
     case "ca-moderate-debt":
     case "us-moderate-debt": {
       const debts = state.debts.filter((d) => d.interestRate !== undefined && d.interestRate >= 4 && d.interestRate <= 8);
@@ -754,6 +958,9 @@ export function getStepContext(stepId: string, state: FinancialState): StepConte
         items: debts.map((d) => ({ label: d.category, amount: d.amount, detail: `@ ${d.interestRate}%` })),
       };
     }
+
+    case "au-lifestyle-giving":
+      return null;
 
     case "ca-taxable":
     case "us-taxable": {

@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: AU Money Steps flowchart
+  {
+    version: 163,
+    title: "Australia: Money Steps flowchart",
+    description: "Added AU-specific Money Steps following r/AusFinance conventions: (1) Budget & Essentials, (2) Emergency Fund (3–6 months, no $1k starter), (3) Employer Super Guarantee (11.5%), (4) High-Interest Debt, (5) Salary Sacrifice to Super (concessional cap $30k), (6) FHSS scheme (skippable), (7) Moderate-Interest Debt, (8) ETF Investing via ASX, (9) Non-Concessional Super ($120k cap), (10) Lifestyle & Giving. Full step context (getStepContext) and user override support for all AU steps.",
+    date: "2026-03-08",
+  },
   // Australia: AU tax credits and offsets
   {
     version: 162,
