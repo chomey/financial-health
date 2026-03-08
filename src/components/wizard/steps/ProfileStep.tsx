@@ -48,7 +48,40 @@ export default function ProfileStep({
         </p>
       </div>
 
+      {/* Country, Region, Tax, Filing */}
       <div className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5">
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">Tax Year</label>
+          <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
+            <button
+              type="button"
+              onClick={() => onTaxYearChange(2025)}
+              className={`inline-flex min-h-[36px] items-center rounded-md px-3 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
+                taxYear === 2025
+                  ? "bg-white/15 text-slate-100 shadow-sm"
+                  : "text-slate-500 hover:text-slate-300"
+              }`}
+              aria-pressed={taxYear === 2025}
+              data-testid="tax-year-2025"
+            >
+              2025
+            </button>
+            <button
+              type="button"
+              onClick={() => onTaxYearChange(2026)}
+              className={`inline-flex min-h-[36px] items-center rounded-md px-3 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
+                taxYear === 2026
+                  ? "bg-white/15 text-slate-100 shadow-sm"
+                  : "text-slate-500 hover:text-slate-300"
+              }`}
+              aria-pressed={taxYear === 2026}
+              data-testid="tax-year-2026"
+            >
+              2026
+            </button>
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2">Country &amp; Region</label>
           <CountryJurisdictionSelector
@@ -56,25 +89,7 @@ export default function ProfileStep({
             jurisdiction={jurisdiction}
             onCountryChange={onCountryChange}
             onJurisdictionChange={onJurisdictionChange}
-            taxYear={taxYear}
-            onTaxYearChange={onTaxYearChange}
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">Filing Status</label>
-          <select
-            value={filingStatus}
-            onChange={(e) => onFilingStatusChange(e.target.value as FilingStatus)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
-            data-testid="wizard-filing-status"
-          >
-            {getFilingStatuses(country).map((fs) => (
-              <option key={fs.value} value={fs.value} className="bg-slate-800">
-                {fs.label}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div>
@@ -93,6 +108,22 @@ export default function ProfileStep({
             data-testid="wizard-age-input"
           />
           <p className="mt-1 text-xs text-slate-500">Used for retirement projections and age-based benchmarks.</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">Filing Status</label>
+          <select
+            value={filingStatus}
+            onChange={(e) => onFilingStatusChange(e.target.value as FilingStatus)}
+            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
+            data-testid="wizard-filing-status"
+          >
+            {getFilingStatuses(country).map((fs) => (
+              <option key={fs.value} value={fs.value} className="bg-slate-800">
+                {fs.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

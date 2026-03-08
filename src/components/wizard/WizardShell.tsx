@@ -112,7 +112,7 @@ export default function WizardShell(props: WizardProps) {
 
   const stepCompletion = useMemo(() => ({
     welcome: true, // landing step, always complete
-    profile: !!(props.country && props.jurisdiction && props.age),
+    profile: !!(props.country && props.jurisdiction),
     property: true, // optional, always "complete"
     assets: props.assets.filter(a => !a.computed).length > 0,
     stocks: true, // optional
@@ -120,7 +120,7 @@ export default function WizardShell(props: WizardProps) {
     income: props.income.length > 0,
     "tax-summary": true, // read-only interstitial, always complete
     expenses: props.expenses.length > 0,
-  }), [props.assets, props.income, props.expenses, props.country, props.jurisdiction, props.age]);
+  }), [props.assets, props.income, props.expenses, props.country, props.jurisdiction]);
 
   // Build FinancialState for tax summary step
   const state: FinancialState = useMemo(() => ({
