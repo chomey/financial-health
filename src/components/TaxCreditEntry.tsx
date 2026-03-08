@@ -121,6 +121,7 @@ export default function TaxCreditEntry({
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
   const syncDidMount = useRef(false);
+  const lastSentToParent = useRef<TaxCredit[] | null>(null);
 
   // Sync with parent
   useEffect(() => {
@@ -128,7 +129,8 @@ export default function TaxCreditEntry({
       syncDidMount.current = true;
       return;
     }
-    if (items !== undefined) {
+    // Skip echo-back: parent passing back the same items we just sent
+    if (items !== undefined && items !== lastSentToParent.current) {
       isExternalSync.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCredits(items);
@@ -148,6 +150,7 @@ export default function TaxCreditEntry({
       isExternalSync.current = false;
       return;
     }
+    lastSentToParent.current = credits;
     onChangeRef.current?.(credits);
   }, [credits]);
 

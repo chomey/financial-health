@@ -114,6 +114,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
   const syncDidMount = useRef(false);
+  const lastSentToParent = useRef<StockHolding[] | null>(null);
 
   // Sync with parent if controlled — preserve locally-fetched prices
   useEffect(() => {
@@ -121,7 +122,8 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
       syncDidMount.current = true;
       return;
     }
-    if (items !== undefined) {
+    // Skip echo-back: parent passing back the same items we just sent
+    if (items !== undefined && items !== lastSentToParent.current) {
       isExternalSync.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setStocks((prev) => {
@@ -155,6 +157,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
       isExternalSync.current = false;
       return;
     }
+    lastSentToParent.current = stocks;
     onChangeRef.current?.(stocks);
   }, [stocks]);
 

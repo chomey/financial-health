@@ -74,6 +74,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
   const syncDidMount = useRef(false);
+  const lastSentToParent = useRef<ExpenseItem[] | null>(null);
 
   // Sync with parent if controlled — intentional external-system sync
   // Skip initial mount since useState already handles the initial value
@@ -82,7 +83,8 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       syncDidMount.current = true;
       return;
     }
-    if (controlledItems !== undefined) {
+    // Skip echo-back: parent passing back the same items we just sent
+    if (controlledItems !== undefined && controlledItems !== lastSentToParent.current) {
       isExternalSync.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setItems(controlledItems);
@@ -103,6 +105,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
       isExternalSync.current = false;
       return;
     }
+    lastSentToParent.current = items;
     onChangeRef.current?.(items);
   }, [items]);
   const [editingId, setEditingId] = useState<string | null>(null);
