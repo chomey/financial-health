@@ -36,7 +36,7 @@ import WizardShell from "@/components/wizard/WizardShell";
 import { formatCurrencyCompact } from "@/lib/currency";
 import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
 import { computeMortgageBreakdown, DEFAULT_INTEREST_RATE } from "@/components/PropertyEntry";
-import { getPortfolioSummary, getAnnualizedReturn, getStockValue } from "@/components/StockEntry";
+import { getPortfolioSummary, getAnnualizedReturn, getStockValue, getStockGainLoss } from "@/components/StockEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 // getFilingStatuses moved to wizard-only
 import { getStepFromURL, updateStepURL, type WizardStep } from "@/lib/url-state";
@@ -111,7 +111,7 @@ export default function Home() {
     { id: "projections", icon: "📈", label: "Projections", shortLabel: "Project" },
     { id: "insights", icon: "💡", label: "Insights", shortLabel: "Insights" },
     { id: "metrics", icon: "🎯", label: "Metrics", shortLabel: "Metrics" },
-    { id: "roadmap", icon: "🗺️", label: "Flowchart", shortLabel: "Flow" },
+    { id: "roadmap", icon: "🗺️", label: "Money Steps", shortLabel: "Steps" },
     { id: "cashflow", icon: "💸", label: "Cash Flow", shortLabel: "Cash" },
     { id: "breakdowns", icon: "📉", label: "Breakdowns", shortLabel: "Charts" },
     { id: "compare", icon: "📊", label: "Compare", shortLabel: "Compare" },
@@ -550,39 +550,111 @@ export default function Home() {
             </div>
             {stocks.length > 0 && (() => {
               const portfolio = getPortfolioSummary(stocks);
-              if (portfolio.totalCostBasis === 0 && portfolio.totalGainLoss === 0) return null;
-              const stocksWithReturns = stocks
-                .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
-                .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
+              if (portfolio.totalValue === 0) return null;
+              const fc = (v: number) => formatCurrencyCompact(Math.abs(v), homeCurrency, homeCurrency);
+              const ALLOC_COLORS = ["#a78bfa", "#22d3ee", "#f472b6", "#34d399", "#fbbf24", "#fb923c", "#60a5fa", "#e879f9"];
+              const stockDetails = stocks
+                .filter((s) => getStockValue(s) > 0)
+                .map((s) => {
+                  const value = getStockValue(s);
+                  const gainLoss = getStockGainLoss(s);
+                  const annualized = getAnnualizedReturn(s);
+                  const weight = portfolio.totalValue > 0 ? (value / portfolio.totalValue) * 100 : 0;
+                  return { ...s, value, gainLoss, annualized, weight };
+                })
+                .sort((a, b) => b.value - a.value);
+              const bestPerformer = stockDetails.reduce<typeof stockDetails[0] | null>((best, s) =>
+                s.gainLoss && (!best || !best.gainLoss || s.gainLoss.percentage > best.gainLoss.percentage) ? s : best, null);
+              const worstPerformer = stockDetails.reduce<typeof stockDetails[0] | null>((worst, s) =>
+                s.gainLoss && (!worst || !worst.gainLoss || s.gainLoss.percentage < worst.gainLoss.percentage) ? s : worst, null);
               return (
-                <ZoomableCard><div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
+                <ZoomableCard><div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4 shadow-sm transition-all duration-200 sm:p-5" data-testid="portfolio-performance">
+                  {/* Header */}
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
                     <span className="text-lg" aria-hidden="true">📊</span>
                   </div>
-                  <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                    {portfolio.totalGainLoss >= 0 ? "+" : "-"}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.abs(portfolio.totalGainLoss))}
-                  </p>
-                  {portfolio.totalCostBasis > 0 && (
-                    <p className="mt-0.5 text-sm text-slate-400" data-testid="portfolio-return-pct">
-                      {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% overall return
+
+                  {/* Total gain/loss + return */}
+                  <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                    <p className={`text-2xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                      {portfolio.totalGainLoss >= 0 ? "+" : ""}{fc(portfolio.totalGainLoss)}
                     </p>
-                  )}
-                  {stocksWithReturns.length > 0 && (
-                    <div className="mt-2 space-y-0.5">
-                      {stocksWithReturns.map((s) => (
-                        <p key={s.ticker} className="text-xs text-slate-500">
-                          <span className="font-mono font-medium text-slate-400">{s.ticker}</span>{" "}
-                          <span className={s.annualized >= 0 ? "text-emerald-400" : "text-rose-400"}>
-                            {s.annualized >= 0 ? "+" : ""}{s.annualized.toFixed(1)}%/yr
+                    {portfolio.totalCostBasis > 0 && (
+                      <p className="text-sm text-slate-400" data-testid="portfolio-return-pct">
+                        {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% return on {fc(portfolio.totalCostBasis)} invested
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Allocation bar */}
+                  {stockDetails.length > 1 && (
+                    <div className="mt-3">
+                      <p className="mb-1 text-xs font-medium text-slate-500">Allocation</p>
+                      <div className="flex h-3 overflow-hidden rounded-full">
+                        {stockDetails.map((s, i) => (
+                          <div
+                            key={s.id}
+                            className="transition-all duration-300"
+                            style={{ width: `${s.weight}%`, backgroundColor: ALLOC_COLORS[i % ALLOC_COLORS.length], minWidth: s.weight > 0 ? 4 : 0 }}
+                            title={`${s.ticker} ${s.weight.toFixed(1)}%`}
+                          />
+                        ))}
+                      </div>
+                      <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+                        {stockDetails.map((s, i) => (
+                          <span key={s.id} className="flex items-center gap-1 text-[10px] text-slate-400">
+                            <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: ALLOC_COLORS[i % ALLOC_COLORS.length] }} />
+                            {s.ticker} {s.weight.toFixed(0)}%
                           </span>
-                        </p>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   )}
-                  <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
-                    Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
-                  </p>
+
+                  {/* Per-stock table */}
+                  <div className="mt-3 overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-white/10 text-slate-500">
+                          <th className="py-1.5 text-left font-medium">Ticker</th>
+                          <th className="py-1.5 text-right font-medium">Value</th>
+                          <th className="py-1.5 text-right font-medium">Gain/Loss</th>
+                          <th className="py-1.5 text-right font-medium">Return</th>
+                          <th className="py-1.5 text-right font-medium hidden sm:table-cell">CAGR</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {stockDetails.map((s) => (
+                          <tr key={s.id} className="border-b border-white/5">
+                            <td className="py-1.5 font-mono font-medium text-slate-300">{s.ticker}</td>
+                            <td className="py-1.5 text-right text-slate-300">{fc(s.value)}</td>
+                            <td className={`py-1.5 text-right font-medium ${s.gainLoss ? (s.gainLoss.amount >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
+                              {s.gainLoss ? `${s.gainLoss.amount >= 0 ? "+" : ""}${fc(s.gainLoss.amount)}` : "—"}
+                            </td>
+                            <td className={`py-1.5 text-right ${s.gainLoss ? (s.gainLoss.percentage >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
+                              {s.gainLoss ? `${s.gainLoss.percentage >= 0 ? "+" : ""}${s.gainLoss.percentage.toFixed(1)}%` : "—"}
+                            </td>
+                            <td className={`py-1.5 text-right hidden sm:table-cell ${s.annualized !== null ? (s.annualized >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
+                              {s.annualized !== null ? `${s.annualized >= 0 ? "+" : ""}${s.annualized.toFixed(1)}%/yr` : "—"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Best / Worst performers */}
+                  {stockDetails.length > 1 && bestPerformer?.gainLoss && worstPerformer?.gainLoss && bestPerformer.ticker !== worstPerformer.ticker && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-400/10 px-2 py-1 text-[11px] font-medium text-emerald-400">
+                        Best: {bestPerformer.ticker} +{bestPerformer.gainLoss.percentage.toFixed(1)}%
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-md bg-rose-400/10 px-2 py-1 text-[11px] font-medium text-rose-400">
+                        Worst: {worstPerformer.ticker} {worstPerformer.gainLoss.percentage.toFixed(1)}%
+                      </span>
+                    </div>
+                  )}
                 </div></ZoomableCard>
               );
             })()}

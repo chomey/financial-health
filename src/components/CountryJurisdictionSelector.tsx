@@ -108,8 +108,40 @@ export default function CountryJurisdictionSelector({
 
   return (
     <div className="space-y-2" data-testid="country-jurisdiction-selector">
-      {/* Country + Region row */}
-      <div className="flex items-center gap-2">
+      {/* Tax year + Country + Region row */}
+      <div className="flex flex-wrap items-center gap-2">
+        {onTaxYearChange && (
+          <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
+            <button
+              type="button"
+              onClick={() => onTaxYearChange(2025)}
+              className={`inline-flex min-h-[36px] items-center rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
+                taxYear === 2025
+                  ? "bg-white/15 text-slate-100 shadow-sm"
+                  : "text-slate-500 hover:text-slate-300"
+              }`}
+              aria-pressed={taxYear === 2025}
+              aria-label="Tax year 2025"
+              data-testid="tax-year-2025"
+            >
+              2025
+            </button>
+            <button
+              type="button"
+              onClick={() => onTaxYearChange(2026)}
+              className={`inline-flex min-h-[36px] items-center rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
+                taxYear === 2026
+                  ? "bg-white/15 text-slate-100 shadow-sm"
+                  : "text-slate-500 hover:text-slate-300"
+              }`}
+              aria-pressed={taxYear === 2026}
+              aria-label="Tax year 2026"
+              data-testid="tax-year-2026"
+            >
+              2026
+            </button>
+          </div>
+        )}
         <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
           <button
             type="button"
@@ -156,43 +188,6 @@ export default function CountryJurisdictionSelector({
           ))}
         </select>
       </div>
-
-      {/* Tax year row */}
-      {onTaxYearChange && (
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500">Tax Year</span>
-          <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
-            <button
-              type="button"
-              onClick={() => onTaxYearChange(2025)}
-              className={`inline-flex min-h-[36px] items-center rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
-                taxYear === 2025
-                  ? "bg-white/15 text-slate-100 shadow-sm"
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
-              aria-pressed={taxYear === 2025}
-              aria-label="Tax year 2025"
-              data-testid="tax-year-2025"
-            >
-              2025
-            </button>
-            <button
-              type="button"
-              onClick={() => onTaxYearChange(2026)}
-              className={`inline-flex min-h-[36px] items-center rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
-                taxYear === 2026
-                  ? "bg-white/15 text-slate-100 shadow-sm"
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
-              aria-pressed={taxYear === 2026}
-              aria-label="Tax year 2026"
-              data-testid="tax-year-2026"
-            >
-              2026
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

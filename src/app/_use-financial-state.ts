@@ -41,7 +41,7 @@ export function useFinancialState() {
   const [showSampleProfiles, setShowSampleProfiles] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [safeWithdrawalRate, setSafeWithdrawalRate] = useState(4);
-  const [outlookYears, setOutlookYears] = useState<OutlookYears>(30);
+  const [outlookYears, setOutlookYears] = useState<OutlookYears>(10);
   const isFirstRender = useRef(true);
 
   // Restore state from URL after hydration; show sample profiles if no URL state
@@ -166,6 +166,30 @@ export function useFinancialState() {
   useEffect(() => {
     syncComputedAssets();
   }, [syncComputedAssets]);
+
+  // Fetch stock prices for any stocks missing a lastFetchedPrice
+  const fetchedTickersRef = useRef(new Set<string>());
+  useEffect(() => {
+    const toFetch = stocks.filter((s) => s.ticker.trim() && !s.lastFetchedPrice && !fetchedTickersRef.current.has(s.ticker));
+    if (toFetch.length === 0) return;
+    for (const stock of toFetch) {
+      fetchedTickersRef.current.add(stock.ticker);
+      fetch(`/api/stock-price?ticker=${encodeURIComponent(stock.ticker.toUpperCase())}`)
+        .then((res) => res.ok ? res.json() : null)
+        .then((data) => {
+          if (data?.price != null) {
+            setStocks((prev) =>
+              prev.map((s) =>
+                s.id === stock.id
+                  ? { ...s, lastFetchedPrice: data.price, lastUpdated: data.timestamp || new Date().toISOString(), priceCurrency: data.currency }
+                  : s
+              )
+            );
+          }
+        })
+        .catch(() => {});
+    }
+  }, [stocks]);
 
   // Wrap setAssets to track surplus target on computed assets
   const handleAssetsChange = useCallback((newAssets: Asset[]) => {

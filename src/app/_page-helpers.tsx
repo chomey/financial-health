@@ -35,6 +35,29 @@ export function PrintSnapshotButton() {
  * Shared header bar for both Dashboard and Wizard views.
  * `activePhase` controls which pill is highlighted; the other is a clickable button.
  */
+export function ResetButton() {
+  const handleReset = useCallback(() => {
+    if (window.confirm("This will erase all your data and start fresh. Are you sure?")) {
+      window.location.href = window.location.pathname;
+    }
+  }, []);
+
+  return (
+    <button
+      type="button"
+      onClick={handleReset}
+      className="rounded-md p-1.5 text-slate-500 transition-all duration-150 hover:bg-rose-500/10 hover:text-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-400 active:scale-95 print:hidden"
+      aria-label="Reset all data"
+      title="Reset all data"
+      data-testid="reset-all-button"
+    >
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    </button>
+  );
+}
+
 export function AppHeader({
   activePhase,
   onSwitchPhase,
@@ -102,6 +125,7 @@ export function AppHeader({
             <span className="hidden sm:inline">☕ Tip</span>
             <span className="sm:hidden text-sm">☕</span>
           </a>
+          <ResetButton />
           <span className="hidden sm:flex sm:items-center sm:gap-1">
             <CopyLinkButton />
             <PrintSnapshotButton />

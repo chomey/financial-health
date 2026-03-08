@@ -1,14 +1,25 @@
 "use client";
 
 import { getProfilesForCountry, type SampleProfile } from "@/lib/sample-profiles";
+import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
 
 export default function WelcomeStep({
   country,
+  jurisdiction,
+  taxYear,
+  onCountryChange,
+  onJurisdictionChange,
+  onTaxYearChange,
   loadProfile,
   onProfileLoaded,
   onEnterOwn,
 }: {
   country: "CA" | "US";
+  jurisdiction: string;
+  taxYear: number;
+  onCountryChange: (country: "CA" | "US") => void;
+  onJurisdictionChange: (jurisdiction: string) => void;
+  onTaxYearChange: (year: number) => void;
   loadProfile: (profile: SampleProfile) => void;
   onProfileLoaded: () => void;
   onEnterOwn: () => void;
@@ -20,9 +31,19 @@ export default function WelcomeStep({
       <div>
         <h2 className="text-xl font-bold text-white">Get Started</h2>
         <p className="mt-1 text-sm text-slate-400">
-          Pick a sample profile to see how the tool works, or enter your own numbers.
+          Choose your country and region, then pick a sample profile or enter your own numbers.
         </p>
       </div>
+
+      {/* Country / Jurisdiction / Tax Year */}
+      <CountryJurisdictionSelector
+        country={country}
+        jurisdiction={jurisdiction}
+        onCountryChange={onCountryChange}
+        onJurisdictionChange={onJurisdictionChange}
+        taxYear={taxYear}
+        onTaxYearChange={onTaxYearChange}
+      />
 
       {/* Sample profiles */}
       <div className="rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/5 to-emerald-400/5 p-4 sm:p-5">

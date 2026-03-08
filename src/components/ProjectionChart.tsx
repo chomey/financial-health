@@ -53,7 +53,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
   const currencyCode = getHomeCurrency(state.country ?? "CA");
 
   // Outlook years state — read from URL on mount
-  const [outlookYears, setOutlookYears] = useState<OutlookYears>(30);
+  const [outlookYears, setOutlookYears] = useState<OutlookYears>(10);
   useState(() => {
     setOutlookYears(getOutlookYearsFromURL());
   });

@@ -57,20 +57,18 @@ describe("50-year unified chart", () => {
     expect(screen.queryByTestId("timeline-30yr")).not.toBeInTheDocument();
   });
 
-  it("summary table shows default 30yr milestone columns", () => {
+  it("summary table shows default 10yr milestone columns", () => {
     render(<ProjectionChart state={INITIAL_STATE} />);
     const table = screen.getByTestId("projection-summary-table");
     expect(table.textContent).toContain("5yr");
     expect(table.textContent).toContain("10yr");
-    expect(table.textContent).toContain("20yr");
-    expect(table.textContent).toContain("30yr");
   });
 
-  it("asset projections table shows default 30yr milestone columns", () => {
+  it("asset projections table shows default 10yr milestone columns", () => {
     render(<ProjectionChart state={INITIAL_STATE} />);
     const table = screen.getByTestId("asset-projections-table");
+    expect(table.textContent).toContain("5yr");
     expect(table.textContent).toContain("10yr");
-    expect(table.textContent).toContain("30yr");
   });
 
   it("burndown chart uses year-based X-axis data", () => {

@@ -148,6 +148,11 @@ export default function WizardShell(props: WizardProps) {
         return (
           <WelcomeStep
             country={props.country}
+            jurisdiction={props.jurisdiction}
+            taxYear={props.taxYear}
+            onCountryChange={props.handleCountryChange}
+            onJurisdictionChange={props.setJurisdiction}
+            onTaxYearChange={props.setTaxYear}
             loadProfile={props.loadProfile}
             onProfileLoaded={props.onFinish}
             onEnterOwn={goNext}

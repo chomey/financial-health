@@ -53,7 +53,7 @@ export function generateInsights(data: FinancialData): Insight[] {
   const netWorth = totalAssets - totalDebts;
   const investmentReturns = data.monthlyInvestmentReturns ?? 0;
   const surplus = monthlyIncome + investmentReturns - monthlyExpenses;
-  const outlookYears = data.outlookYears ?? 30;
+  const outlookYears = data.outlookYears ?? 10;
   // Use liquid assets for runway if available, otherwise fall back to totalAssets
   // Use raw expenses (not including investment contributions) to match the metric card
   const runwayAssets = data.liquidAssets ?? totalAssets;
