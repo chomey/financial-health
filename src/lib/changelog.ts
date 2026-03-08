@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Tax credits impact on dashboard metrics
+  {
+    version: 144,
+    title: "Tax credits impact on dashboard metrics",
+    description: "Tax credits now visibly affect three dashboard metrics. Estimated Tax shows your effective rate before and after credits (e.g. '22.5% → 18.2%') with a 'Tax Credits Applied' badge. Monthly Cash Flow shows a '+$X/mo from tax credits' line for refundable credits. Financial Runway shows an adjusted runway factoring in both refundable credits (treated as income) and non-refundable credits (reduced tax burden). All credit indicators include a 'Tax Credits Applied' badge so you know why the metric changed.",
+    date: "2026-03-07",
+  },
   // Tax credit insights with income eligibility awareness
   {
     version: 143,
