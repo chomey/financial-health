@@ -31,41 +31,47 @@ const NON_REFUNDABLE_CREDIT: TaxCredit = {
   type: "non-refundable",
 };
 
-describe("tax credit metrics — taxCreditAdjustedRate", () => {
-  it("is undefined when no tax credits are present", () => {
+describe("tax credits reduce displayed tax", () => {
+  it("no credits: taxCreditsApplied is falsy", () => {
     const state = makeState({
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
     });
     const metrics = computeMetrics(state);
     const tax = metrics.find((m) => m.title === "Estimated Tax")!;
-    expect(tax.taxCreditAdjustedRate).toBeUndefined();
+    expect(tax.taxCreditsApplied).toBeFalsy();
   });
 
-  it("is lower than effectiveRate when refundable credits are present", () => {
-    const state = makeState({
+  it("refundable credits reduce displayed tax value", () => {
+    const stateNoCredits = makeState({
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+    });
+    const stateWithCredits = makeState({
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
       taxCredits: [REFUNDABLE_CREDIT],
       filingStatus: "single",
     });
-    const metrics = computeMetrics(state);
-    const tax = metrics.find((m) => m.title === "Estimated Tax")!;
-    expect(tax.taxCreditAdjustedRate).toBeDefined();
-    expect(tax.taxCreditAdjustedRate!).toBeLessThan(tax.effectiveRate!);
+    const taxWithout = computeMetrics(stateNoCredits).find((m) => m.title === "Estimated Tax")!;
+    const taxWith = computeMetrics(stateWithCredits).find((m) => m.title === "Estimated Tax")!;
+    expect(taxWith.value).toBeLessThan(taxWithout.value);
+    expect(taxWith.taxCreditsApplied).toBe(true);
   });
 
-  it("is lower than effectiveRate when non-refundable credits are present", () => {
-    const state = makeState({
+  it("non-refundable credits reduce displayed tax value", () => {
+    const stateNoCredits = makeState({
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+    });
+    const stateWithCredits = makeState({
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
       taxCredits: [NON_REFUNDABLE_CREDIT],
       filingStatus: "single",
     });
-    const metrics = computeMetrics(state);
-    const tax = metrics.find((m) => m.title === "Estimated Tax")!;
-    expect(tax.taxCreditAdjustedRate).toBeDefined();
-    expect(tax.taxCreditAdjustedRate!).toBeLessThan(tax.effectiveRate!);
+    const taxWithout = computeMetrics(stateNoCredits).find((m) => m.title === "Estimated Tax")!;
+    const taxWith = computeMetrics(stateWithCredits).find((m) => m.title === "Estimated Tax")!;
+    expect(taxWith.value).toBeLessThan(taxWithout.value);
+    expect(taxWith.taxCreditsApplied).toBe(true);
   });
 
-  it("non-refundable credits cannot reduce tax rate below 0", () => {
+  it("non-refundable credits cannot reduce tax below 0", () => {
     const largeNonRefundable: TaxCredit = {
       id: "c3",
       category: "Disability Tax Credit",
@@ -79,10 +85,10 @@ describe("tax credit metrics — taxCreditAdjustedRate", () => {
     });
     const metrics = computeMetrics(state);
     const tax = metrics.find((m) => m.title === "Estimated Tax")!;
-    expect(tax.taxCreditAdjustedRate!).toBeGreaterThanOrEqual(0);
+    expect(tax.value).toBe(0);
   });
 
-  it("refundable credits can reduce the adjusted rate to near 0 for large credits vs small income", () => {
+  it("refundable credits can reduce tax to 0", () => {
     const largeRefundable: TaxCredit = {
       id: "c4",
       category: "GST/HST Credit",
@@ -96,101 +102,71 @@ describe("tax credit metrics — taxCreditAdjustedRate", () => {
     });
     const metrics = computeMetrics(state);
     const tax = metrics.find((m) => m.title === "Estimated Tax")!;
-    expect(tax.taxCreditAdjustedRate!).toBe(0);
+    expect(tax.value).toBe(0);
   });
 });
 
-describe("tax credit metrics — taxCreditMonthlyBoost (Monthly Cash Flow)", () => {
-  it("is undefined when no credits are present", () => {
-    const state = makeState({
+describe("tax credits improve surplus (Monthly Cash Flow)", () => {
+  it("refundable credits increase surplus", () => {
+    const stateNoCredits = makeState({
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      expenses: [{ id: "e1", category: "Rent", amount: 2000 }],
     });
-    const metrics = computeMetrics(state);
-    const surplus = metrics.find((m) => m.title === "Monthly Cash Flow")!;
-    expect(surplus.taxCreditMonthlyBoost).toBeUndefined();
-  });
-
-  it("equals annualRefundableCredits / 12 when refundable credits are present", () => {
-    const state = makeState({
+    const stateWithCredits = makeState({
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
-      taxCredits: [REFUNDABLE_CREDIT], // $600/year
-      filingStatus: "single",
-    });
-    const metrics = computeMetrics(state);
-    const surplus = metrics.find((m) => m.title === "Monthly Cash Flow")!;
-    expect(surplus.taxCreditMonthlyBoost).toBeCloseTo(50, 1); // 600 / 12 = 50
-  });
-
-  it("is undefined when only non-refundable credits are present", () => {
-    const state = makeState({
-      income: [{ id: "i1", category: "Salary", amount: 5000 }],
-      taxCredits: [NON_REFUNDABLE_CREDIT],
-      filingStatus: "single",
-    });
-    const metrics = computeMetrics(state);
-    const surplus = metrics.find((m) => m.title === "Monthly Cash Flow")!;
-    // Non-refundable credits don't boost the surplus directly (they reduce tax burden)
-    expect(surplus.taxCreditMonthlyBoost).toBeUndefined();
-  });
-
-  it("reflects total of multiple refundable credits", () => {
-    const secondCredit: TaxCredit = {
-      id: "c5",
-      category: "Canada Workers Benefit",
-      annualAmount: 1200,
-      type: "refundable",
-    };
-    const state = makeState({
-      income: [{ id: "i1", category: "Salary", amount: 5000 }],
-      taxCredits: [REFUNDABLE_CREDIT, secondCredit], // $600 + $1200 = $1800/year
-      filingStatus: "single",
-    });
-    const metrics = computeMetrics(state);
-    const surplus = metrics.find((m) => m.title === "Monthly Cash Flow")!;
-    expect(surplus.taxCreditMonthlyBoost).toBeCloseTo(150, 1); // 1800 / 12 = 150
-  });
-});
-
-describe("tax credit metrics — taxCreditAdjustedRunway (Financial Runway)", () => {
-  it("is undefined when no credits are present", () => {
-    const state = makeState({
-      assets: [{ id: "a1", category: "Savings Account", amount: 30_000 }],
-      expenses: [{ id: "e1", category: "Rent", amount: 2_000 }],
-    });
-    const metrics = computeMetrics(state);
-    const runway = metrics.find((m) => m.title === "Financial Runway")!;
-    expect(runway.taxCreditAdjustedRunway).toBeUndefined();
-  });
-
-  it("is greater than base runway when credits reduce effective obligations", () => {
-    const state = makeState({
-      assets: [{ id: "a1", category: "Savings Account", amount: 30_000 }],
-      expenses: [{ id: "e1", category: "Rent", amount: 2_000 }],
-      income: [{ id: "i1", category: "Salary", amount: 5_000 }],
-      taxCredits: [REFUNDABLE_CREDIT, NON_REFUNDABLE_CREDIT],
-      filingStatus: "single",
-    });
-    const metrics = computeMetrics(state);
-    const runway = metrics.find((m) => m.title === "Financial Runway")!;
-    // Base runway = 30_000 / 2_000 = 15 months
-    // With credits reducing effective obligations, adjusted runway should be > 15
-    if (runway.taxCreditAdjustedRunway !== undefined) {
-      expect(runway.taxCreditAdjustedRunway).toBeGreaterThan(runway.value);
-    }
-    // (May be undefined if credit benefit is too small relative to obligations, which is fine)
-  });
-
-  it("is undefined when no monthly obligations exist", () => {
-    // If monthlyObligations is 0, base runway is 0 and there's nothing to adjust
-    const state = makeState({
-      assets: [{ id: "a1", category: "Savings Account", amount: 30_000 }],
-      income: [{ id: "i1", category: "Salary", amount: 5_000 }],
+      expenses: [{ id: "e1", category: "Rent", amount: 2000 }],
       taxCredits: [REFUNDABLE_CREDIT],
       filingStatus: "single",
     });
-    const metrics = computeMetrics(state);
-    const runway = metrics.find((m) => m.title === "Financial Runway")!;
-    // No expenses → monthlyObligations = 0 → runway = 0 → adjusted runway undefined
-    expect(runway.taxCreditAdjustedRunway).toBeUndefined();
+    const surplusWithout = computeMetrics(stateNoCredits).find((m) => m.title === "Monthly Cash Flow")!;
+    const surplusWith = computeMetrics(stateWithCredits).find((m) => m.title === "Monthly Cash Flow")!;
+    expect(surplusWith.value).toBeGreaterThan(surplusWithout.value);
+  });
+
+  it("non-refundable credits increase surplus by reducing tax", () => {
+    const stateNoCredits = makeState({
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      expenses: [{ id: "e1", category: "Rent", amount: 2000 }],
+    });
+    const stateWithCredits = makeState({
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      expenses: [{ id: "e1", category: "Rent", amount: 2000 }],
+      taxCredits: [NON_REFUNDABLE_CREDIT],
+      filingStatus: "single",
+    });
+    const surplusWithout = computeMetrics(stateNoCredits).find((m) => m.title === "Monthly Cash Flow")!;
+    const surplusWith = computeMetrics(stateWithCredits).find((m) => m.title === "Monthly Cash Flow")!;
+    expect(surplusWith.value).toBeGreaterThan(surplusWithout.value);
+  });
+});
+
+describe("deductions reduce taxable income", () => {
+  it("deduction reduces tax by lowering taxable income before brackets", () => {
+    const stateNoDeduction = makeState({
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+    });
+    const stateWithDeduction = makeState({
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      taxCredits: [{ id: "d1", category: "Moving Expenses", annualAmount: 5000, type: "deduction" }],
+    });
+    const taxWithout = computeMetrics(stateNoDeduction).find((m) => m.title === "Estimated Tax")!;
+    const taxWith = computeMetrics(stateWithDeduction).find((m) => m.title === "Estimated Tax")!;
+    expect(taxWith.value).toBeLessThan(taxWithout.value);
+  });
+
+  it("deduction + non-refundable credit both reduce tax", () => {
+    const stateBase = makeState({
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+    });
+    const stateWithBoth = makeState({
+      income: [{ id: "i1", category: "Salary", amount: 5000 }],
+      taxCredits: [
+        { id: "d1", category: "Moving Expenses", annualAmount: 3000, type: "deduction" },
+        NON_REFUNDABLE_CREDIT,
+      ],
+    });
+    const taxBase = computeMetrics(stateBase).find((m) => m.title === "Estimated Tax")!;
+    const taxBoth = computeMetrics(stateWithBoth).find((m) => m.title === "Estimated Tax")!;
+    expect(taxBoth.value).toBeLessThan(taxBase.value);
   });
 });

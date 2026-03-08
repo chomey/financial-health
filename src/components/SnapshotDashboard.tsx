@@ -21,9 +21,7 @@ interface MetricData {
   runwayDetails?: RunwayExplainerDetails; // detailed runway breakdown for explainer
   investmentReturns?: import("@/lib/financial-state").MonthlyInvestmentReturn[]; // per-asset monthly ROI for surplus explainer
   incomeReplacementDetails?: IncomeReplacementExplainerDetails; // detailed income replacement breakdown for explainer
-  taxCreditAdjustedRate?: number; // effective tax rate after credits applied
-  taxCreditMonthlyBoost?: number; // monthly surplus boost from refundable tax credits
-  taxCreditAdjustedRunway?: number; // runway in months factoring in monthly credit income
+  taxCreditsApplied?: boolean; // whether tax credits are factored into the displayed tax
 }
 
 // Mock values based on existing entry component mock data
@@ -261,44 +259,17 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
           ({formatMetricValue(metric.runwayAfterTax, "months", homeCurrency)} after withdrawal taxes)
         </p>
       )}
-      {/* Effective tax rate sub-line — with credit-adjusted delta if applicable */}
+      {/* Effective tax rate sub-line */}
       {metric.effectiveRate !== undefined && metric.effectiveRate > 0 && (
         <p className="mt-0.5 text-sm text-slate-400" data-testid="effective-tax-rate">
-          {metric.taxCreditAdjustedRate !== undefined && metric.taxCreditAdjustedRate < metric.effectiveRate ? (
-            <>
-              <span className="line-through opacity-60">{(metric.effectiveRate * 100).toFixed(1)}%</span>
-              {" → "}
-              <span className="text-emerald-400 font-medium" data-testid="tax-rate-after-credits">{(metric.taxCreditAdjustedRate * 100).toFixed(1)}%</span>
-              {" effective rate"}
-            </>
-          ) : (
-            `${(metric.effectiveRate * 100).toFixed(1)}% effective rate`
-          )}
+          {(metric.effectiveRate * 100).toFixed(1)}% effective rate
         </p>
       )}
-      {/* Tax credits applied badge for Estimated Tax */}
-      {metric.taxCreditAdjustedRate !== undefined && metric.taxCreditAdjustedRate < (metric.effectiveRate ?? Infinity) && (
+      {/* Tax credits applied badge */}
+      {metric.taxCreditsApplied && (
         <span className="mt-1 inline-block rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-400" data-testid="tax-credits-applied-badge">
           Tax Credits Applied
         </span>
-      )}
-      {/* Monthly credit boost for Monthly Cash Flow */}
-      {metric.taxCreditMonthlyBoost !== undefined && metric.taxCreditMonthlyBoost > 0 && (
-        <p className="mt-0.5 text-sm text-emerald-400" data-testid="tax-credit-monthly-boost">
-          +{formatMetricValue(metric.taxCreditMonthlyBoost, "currency", homeCurrency)}/mo from tax credits
-          <span className="ml-1.5 inline-block rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium" data-testid="tax-credits-applied-badge-surplus">
-            Tax Credits Applied
-          </span>
-        </p>
-      )}
-      {/* Credit-adjusted runway for Financial Runway */}
-      {metric.taxCreditAdjustedRunway !== undefined && metric.taxCreditAdjustedRunway !== metric.value && metric.taxCreditAdjustedRunway > metric.value && (
-        <p className="mt-0.5 text-sm text-emerald-400" data-testid="tax-credit-adjusted-runway">
-          ({metric.taxCreditAdjustedRunway === Infinity ? "∞" : formatMetricValue(metric.taxCreditAdjustedRunway, "months", homeCurrency)} with tax credits)
-          <span className="ml-1.5 inline-block rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium" data-testid="tax-credits-applied-badge-runway">
-            Tax Credits Applied
-          </span>
-        </p>
       )}
       {/* Contextual insights below value */}
       {insights.length > 0 && (

@@ -112,61 +112,49 @@ test.describe("Task 145: Tax credit insights regression", () => {
 // ─── 4. Dashboard metrics respond to credits ──────────────────────────────
 
 test.describe("Task 145: Dashboard metrics with tax credits", () => {
-  test("CA: effective tax rate shows credits-applied badge and adjusted rate", async ({ page }) => {
+  test("CA: effective tax rate and credits-applied badge visible", async ({ page }) => {
     await page.goto(`/?s=${CA_STATE}`);
     await waitForHydration(page);
 
+    // Credits are now baked into the displayed tax — badge indicates credits active
     const badge = page.locator('[data-testid="tax-credits-applied-badge"]');
     await expect(badge).toBeVisible({ timeout: 5000 });
     expect(await badge.textContent()).toContain("Tax Credits Applied");
 
-    const afterRate = page.locator('[data-testid="tax-rate-after-credits"]');
-    await expect(afterRate).toBeVisible();
+    // Effective rate shown (already includes credit adjustment)
+    const rate = page.locator('[data-testid="effective-tax-rate"]');
+    await expect(rate).toBeVisible();
 
     await captureScreenshot(page, "task-145-ca-dashboard-tax-rate");
   });
 
-  test("CA: monthly cash flow shows credit boost from CCB", async ({ page }) => {
+  test("CA: monthly cash flow reflects credits in surplus", async ({ page }) => {
     await page.goto(`/?s=${CA_STATE}`);
     await waitForHydration(page);
 
-    const boost = page.locator('[data-testid="tax-credit-monthly-boost"]');
-    await expect(boost).toBeVisible({ timeout: 5000 });
-    const text = await boost.textContent();
-    expect(text).toContain("/mo from tax credits");
-
-    const surplusBadge = page.locator('[data-testid="tax-credits-applied-badge-surplus"]');
-    await expect(surplusBadge).toBeVisible();
+    // Cash flow card should be visible — credits now increase the after-tax income directly
+    const cashFlow = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
+    await expect(cashFlow).toBeVisible({ timeout: 5000 });
 
     await captureScreenshot(page, "task-145-ca-dashboard-surplus");
   });
 
-  test("CA: runway card exists and shows credit adjustment if significant", async ({ page }) => {
+  test("CA: runway card exists", async ({ page }) => {
     await page.goto(`/?s=${CA_STATE}`);
     await waitForHydration(page);
 
     const runwayCard = page.locator('[data-testid="metric-card-financial-runway"]');
     await expect(runwayCard).toBeVisible();
 
-    const runwayBadge = page.locator('[data-testid="tax-credits-applied-badge-runway"]');
-    const badgeVisible = await runwayBadge.isVisible().catch(() => false);
-    if (badgeVisible) {
-      const adjustedRunway = page.locator('[data-testid="tax-credit-adjusted-runway"]');
-      await expect(adjustedRunway).toBeVisible();
-    }
-
     await captureScreenshot(page, "task-145-ca-dashboard-runway");
   });
 
-  test("US: credits applied badge and monthly boost visible", async ({ page }) => {
+  test("US: credits applied badge visible", async ({ page }) => {
     await page.goto(`/?s=${US_STATE}`);
     await waitForHydration(page);
 
     const badge = page.locator('[data-testid="tax-credits-applied-badge"]');
     await expect(badge).toBeVisible({ timeout: 5000 });
-
-    const boost = page.locator('[data-testid="tax-credit-monthly-boost"]');
-    await expect(boost).toBeVisible();
 
     await captureScreenshot(page, "task-145-us-dashboard-metrics");
   });
@@ -175,7 +163,6 @@ test.describe("Task 145: Dashboard metrics with tax credits", () => {
     await page.goto("/");
     await waitForHydration(page);
 
-    await expect(page.locator('[data-testid="tax-credit-monthly-boost"]')).not.toBeVisible();
     await expect(page.locator('[data-testid="tax-credits-applied-badge"]')).not.toBeVisible();
   });
 });

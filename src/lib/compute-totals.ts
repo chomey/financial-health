@@ -114,6 +114,21 @@ export function computeTotals(state: FinancialState) {
     incomeByType["employment"] = (incomeByType["employment"] ?? 0) + totalInvestmentInterest;
   }
 
+  // Apply deductions: reduce taxable income before bracket computation
+  const taxCredits = state.taxCredits ?? [];
+  const totalDeductions = taxCredits
+    .filter((c) => c.type === "deduction")
+    .reduce((s, c) => s + c.annualAmount, 0);
+
+  // Distribute deductions proportionally across income types
+  const totalPreDeductionIncome = Object.values(incomeByType).reduce((s, v) => s + v, 0);
+  if (totalDeductions > 0 && totalPreDeductionIncome > 0) {
+    const deductionRatio = Math.min(1, totalDeductions / totalPreDeductionIncome);
+    for (const type of Object.keys(incomeByType)) {
+      incomeByType[type] = Math.max(0, incomeByType[type] - incomeByType[type] * deductionRatio);
+    }
+  }
+
   let totalAnnualTax = 0;
   let totalFederalTax = 0;
   let totalProvincialStateTax = 0;
@@ -129,7 +144,27 @@ export function computeTotals(state: FinancialState) {
     weightedEffectiveRate += taxResult.effectiveRate * annualAmt;
   }
 
-  // Apply user overrides if present (annual amounts)
+  // Apply non-refundable and refundable credits to reduce computed tax
+  const totalNonRefundableCredits = taxCredits
+    .filter((c) => c.type === "non-refundable")
+    .reduce((s, c) => s + c.annualAmount, 0);
+  const totalRefundableCredits = taxCredits
+    .filter((c) => c.type === "refundable")
+    .reduce((s, c) => s + c.annualAmount, 0);
+
+  // Non-refundable credits reduce tax but can't go below 0
+  const rawTotalTax = totalAnnualTax;
+  const nonRefundableBenefit = Math.min(totalNonRefundableCredits, totalAnnualTax);
+  // Refundable credits can reduce tax below 0 (generating a refund)
+  const creditAdjustedTax = Math.max(0, totalAnnualTax - nonRefundableBenefit - totalRefundableCredits);
+
+  // Apply credits proportionally to federal/provincial split
+  const taxReductionRatio = totalAnnualTax > 0 ? creditAdjustedTax / totalAnnualTax : 0;
+  totalFederalTax = totalAnnualTax > 0 ? totalFederalTax * taxReductionRatio : 0;
+  totalProvincialStateTax = totalAnnualTax > 0 ? totalProvincialStateTax * taxReductionRatio : 0;
+  totalAnnualTax = creditAdjustedTax;
+
+  // Apply user overrides if present (annual amounts) — overrides replace credit-adjusted values
   const finalFederalTax = state.federalTaxOverride ?? totalFederalTax;
   const finalProvincialStateTax = state.provincialTaxOverride ?? totalProvincialStateTax;
   const finalAnnualTax = finalFederalTax + finalProvincialStateTax;
@@ -140,9 +175,12 @@ export function computeTotals(state: FinancialState) {
   const effectiveTaxRate = totalTaxableBase > 0 ? finalAnnualTax / totalTaxableBase : 0;
   const monthlyAfterTaxIncome = finalAfterTaxAnnual / 12;
   const totalTaxEstimate = finalAnnualTax;
+  // Pre-credit tax for explainer/breakdown display
+  const rawTaxEstimate = rawTotalTax;
+  const totalCreditBenefit = nonRefundableBenefit + Math.min(totalRefundableCredits, Math.max(0, rawTotalTax - nonRefundableBenefit));
 
   // Also export the computed (non-overridden) values so the UI can show defaults
-  return { totalAssets, totalDebts, totalDebtPayments, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase };
+  return { totalAssets, totalDebts, totalDebtPayments, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase, rawTaxEstimate, totalCreditBenefit, totalDeductions };
 }
 
 // --- Tax explainer helpers ---

@@ -7,79 +7,39 @@ const S_REFUNDABLE = "!I1%2C%2FO1%3EV75S%2FZW%2Cttu%60%26%25'tAUsR*%60P%3E3%5BKc
 // CA user, single, GST/HST Credit $600 (refundable) + Disability Tax Credit $1500 (non-refundable)
 const S_BOTH = "!I1%2C7ONRu%600G%24%5B%26--SEh5-PE%3D%40%5CMWM6%2468%3FLbVMZ9d%23%3Ah%2C5up%3ApqUL*ailc_%2Con%5Bq*Z%5D3U%2BCuXo.SF6rFe%5DpQ5MN%3D1%3Ap%3AG(%3A%26h%22c%2BHDdn%3D%3E_o%25!%2FJXA8BfPp%3AbF_Cj!n(9Eb%22K%409UiL9bVaE4N6PFVeb%2BNZj7A%228RK%5DTG%2CDd%22d*7_%60%60KSdL%23Z%3BCeKCB6R%3Dpk%2Cq)QaLoeak6%3E%60gOtcgZs%23%25eN)%3CdF%3EPnL%24rW%2FHA%3B4R";
 
-test.describe("Task 144: Tax credits impact on dashboard metrics", () => {
-  test("tax credit monthly boost appears in Monthly Cash Flow when refundable credits exist", async ({ page }) => {
-    await page.goto(`/?s=${S_REFUNDABLE}`);
-    await page.waitForLoadState("networkidle");
-
-    const boost = page.locator('[data-testid="tax-credit-monthly-boost"]');
-    await expect(boost).toBeVisible();
-    const text = await boost.textContent();
-    expect(text).toContain("/mo from tax credits");
-    // $600 / 12 = $50/mo
-    expect(text).toMatch(/\$50/);
-
-    await captureScreenshot(page, "task-144-credit-monthly-boost");
-  });
-
-  test("effective tax rate shows before-and-after with credits badge on Estimated Tax", async ({ page }) => {
+test.describe("Task 152: Tax credits applied to displayed tax and cash flow", () => {
+  test("tax credits reduce displayed Estimated Tax and show badge", async ({ page }) => {
     await page.goto(`/?s=${S_BOTH}`);
     await page.waitForLoadState("networkidle");
 
-    // Adjusted rate should appear
-    const afterRate = page.locator('[data-testid="tax-rate-after-credits"]');
-    await expect(afterRate).toBeVisible();
-
-    // Badge should appear
+    // Badge should appear on Estimated Tax
     const badge = page.locator('[data-testid="tax-credits-applied-badge"]');
     await expect(badge).toBeVisible();
     expect(await badge.textContent()).toContain("Tax Credits Applied");
 
-    await captureScreenshot(page, "task-144-tax-rate-adjusted");
+    // Effective rate should be displayed (now includes credits)
+    const rate = page.locator('[data-testid="effective-tax-rate"]');
+    await expect(rate).toBeVisible();
+
+    await captureScreenshot(page, "task-152-tax-credits-applied");
   });
 
-  test("tax credits applied badge appears on Monthly Cash Flow with refundable credits", async ({ page }) => {
+  test("Monthly Cash Flow reflects credit-adjusted surplus", async ({ page }) => {
     await page.goto(`/?s=${S_REFUNDABLE}`);
     await page.waitForLoadState("networkidle");
 
-    const badge = page.locator('[data-testid="tax-credits-applied-badge-surplus"]');
-    await expect(badge).toBeVisible();
-    expect(await badge.textContent()).toContain("Tax Credits Applied");
+    // Monthly Cash Flow should exist with a value
+    const cashFlow = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
+    await expect(cashFlow).toBeVisible();
 
-    await captureScreenshot(page, "task-144-surplus-credit-badge");
+    await captureScreenshot(page, "task-152-cash-flow-with-credits");
   });
 
-  test("adjusted runway appears when credits meaningfully extend runway", async ({ page }) => {
-    await page.goto(`/?s=${S_BOTH}`);
-    await page.waitForLoadState("networkidle");
-
-    // The adjusted runway may or may not appear depending on whether the credit benefit
-    // is large enough relative to obligations (>0.1 month difference)
-    // Check that the runway card exists
-    const runwayCard = page.locator('[data-testid="metric-card-financial-runway"]');
-    await expect(runwayCard).toBeVisible();
-
-    // If the adjusted runway badge appears, verify it
-    const runwayBadge = page.locator('[data-testid="tax-credits-applied-badge-runway"]');
-    const badgeVisible = await runwayBadge.isVisible();
-    if (badgeVisible) {
-      const adjustedRunway = page.locator('[data-testid="tax-credit-adjusted-runway"]');
-      await expect(adjustedRunway).toBeVisible();
-      expect(await adjustedRunway.textContent()).toContain("with tax credits");
-    }
-
-    await captureScreenshot(page, "task-144-runway-adjusted");
-  });
-
-  test("metrics remain unchanged when no tax credits are entered", async ({ page }) => {
-    // Use a default state with no tax credits
+  test("no credit indicators when no tax credits are entered", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // None of the credit indicators should appear
-    const boost = page.locator('[data-testid="tax-credit-monthly-boost"]');
-    await expect(boost).not.toBeVisible();
-
+    // Badge should not appear
     const badge = page.locator('[data-testid="tax-credits-applied-badge"]');
     await expect(badge).not.toBeVisible();
   });

@@ -85,7 +85,7 @@ export function computeIncomeReplacementDetails(
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, totalDebtPayments, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase } = computeTotals(state);
+  const { totalAssets, totalDebts, totalDebtPayments, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase, rawTaxEstimate, totalCreditBenefit, totalDeductions } = computeTotals(state);
   const hc = getHomeCurrency(state.country ?? "CA");
   const $ = (n: number) => fmtShort(n, hc);
 
@@ -179,26 +179,10 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       }
     }
   }
-  // Tax credit impact on metrics
+  // Tax credits are now applied in computeTotals — totalTaxEstimate already reflects credits.
+  // Track whether credits are active for UI badge display.
   const taxCredits = state.taxCredits ?? [];
-  const totalRefundableCredits = taxCredits.filter((c) => c.type === "refundable").reduce((s, c) => s + c.annualAmount, 0);
-  const totalNonRefundableCredits = taxCredits.filter((c) => c.type === "non-refundable").reduce((s, c) => s + c.annualAmount, 0);
-  // Non-refundable credits are capped at the total tax estimate (can't reduce tax below 0)
-  const nonRefundableBenefit = Math.min(totalNonRefundableCredits, totalTaxEstimate);
-  const creditAdjustedAnnualTax = Math.max(0, totalTaxEstimate - nonRefundableBenefit - totalRefundableCredits);
-  const taxCreditAdjustedRate = taxCredits.length > 0 && totalTaxableBase > 0
-    ? creditAdjustedAnnualTax / totalTaxableBase
-    : undefined;
-  // Monthly benefit from refundable credits (direct cash / income supplement)
-  const monthlyRefundableCredits = totalRefundableCredits / 12;
-  // Monthly benefit from non-refundable credits (reduced tax burden = more take-home)
-  const monthlyNonRefundableBenefit = nonRefundableBenefit / 12;
-  const totalMonthlyCreditBenefit = monthlyRefundableCredits + monthlyNonRefundableBenefit;
-  // Credit-adjusted runway: credits reduce effective monthly obligations
-  const creditAdjMonthlyObligations = Math.max(0.01, monthlyObligations - totalMonthlyCreditBenefit);
-  const taxCreditAdjustedRunway = taxCredits.length > 0 && monthlyObligations > 0
-    ? parseFloat((liquidTotal / creditAdjMonthlyObligations).toFixed(1))
-    : undefined;
+  const hasActiveCredits = totalCreditBenefit > 0;
 
   // Debt-to-asset ratio includes property: (debts + mortgages) / (liquid assets + stocks + property values)
   // Use property VALUE (not equity) on asset side — equity already nets out the mortgage,
@@ -254,8 +238,17 @@ export function computeMetrics(state: FinancialState): MetricData[] {
     ? `${$(totalAllDebts)} debts / ${$(totalAllAssets)} assets`
     : undefined;
 
-  const taxBreakdown = totalTaxEstimate > 0
-    ? `${$(monthlyIncome)} gross${totalInvestmentInterest > 0 ? ` + ${$(totalInvestmentInterest / 12)} inv. interest` : ""} - ${$(monthlyIncome - monthlyAfterTaxIncome)} tax = ${$(monthlyAfterTaxIncome)}/mo`
+  const taxBreakdownParts = [`${$(monthlyIncome)} gross`];
+  if (totalInvestmentInterest > 0) taxBreakdownParts[0] += ` + ${$(totalInvestmentInterest / 12)} inv. interest`;
+  const monthlyTaxAmount = monthlyIncome - monthlyAfterTaxIncome;
+  if (hasActiveCredits) {
+    taxBreakdownParts.push(`${$(rawTaxEstimate / 12)} tax`);
+    taxBreakdownParts.push(`${$(totalCreditBenefit / 12)} credits = ${$(monthlyAfterTaxIncome)}/mo`);
+  } else {
+    taxBreakdownParts.push(`${$(monthlyTaxAmount)} tax = ${$(monthlyAfterTaxIncome)}/mo`);
+  }
+  const taxBreakdown = totalTaxEstimate > 0 || hasActiveCredits
+    ? taxBreakdownParts.join(" - ")
     : undefined;
 
   return [
@@ -280,7 +273,6 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       positive: surplus > 0,
       breakdown: surplusBreakdown,
       investmentReturns: investmentReturns.length > 0 ? investmentReturns : undefined,
-      taxCreditMonthlyBoost: monthlyRefundableCredits > 0 ? parseFloat(monthlyRefundableCredits.toFixed(2)) : undefined,
     },
     {
       title: "Estimated Tax",
@@ -288,12 +280,14 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       format: "currency",
       icon: "🏛️",
       tooltip:
-        "Estimated annual income tax based on your income, income types, and selected country/jurisdiction. This is a rough estimate — consult a tax professional for accuracy.",
+        hasActiveCredits
+          ? "Estimated annual income tax after applying your tax credits and deductions. This is a rough estimate — consult a tax professional for accuracy."
+          : "Estimated annual income tax based on your income, income types, and selected country/jurisdiction. This is a rough estimate — consult a tax professional for accuracy.",
       positive: true,
       breakdown: taxBreakdown,
       effectiveRate: effectiveTaxRate,
       taxDetails: buildTaxExplainerDetails(state, totalTaxableBase, totalFederalTax, totalProvincialStateTax, effectiveTaxRate, totalTaxEstimate, investmentIncomeAccounts),
-      taxCreditAdjustedRate,
+      taxCreditsApplied: hasActiveCredits,
     },
     {
       title: "Financial Runway",
@@ -307,7 +301,6 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       runwayWithGrowth,
       runwayAfterTax,
       runwayDetails: buildRunwayExplainerDetails(detailedBuckets, monthlyObligations, monthlyExpenses, totalMortgagePayments, runway, runwayWithGrowth, runwayAfterTax, country, jurisdiction),
-      taxCreditAdjustedRunway: taxCreditAdjustedRunway !== undefined && taxCreditAdjustedRunway > runway + 0.1 ? taxCreditAdjustedRunway : undefined,
     },
     {
       title: "Debt-to-Asset Ratio",

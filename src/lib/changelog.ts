@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Tax credits applied to displayed tax and cash flow
+  {
+    version: 152,
+    title: "Tax credits now reduce displayed tax and cash flow",
+    description: "Tax credits (non-refundable, refundable) and deductions are now applied directly to the displayed Estimated Tax value and Monthly Cash Flow surplus. Previously, credits were computed but only shown as secondary indicators — the primary tax and surplus numbers ignored them. Non-refundable credits reduce tax (capped at $0), refundable credits can reduce to $0, and deductions reduce taxable income before bracket computation. The 'Tax Credits Applied' badge appears when credits are active.",
+    date: "2026-03-08",
+  },
   // Financial roadmap E2E regression
   {
     version: 151,
