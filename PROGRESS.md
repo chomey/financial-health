@@ -12,9 +12,9 @@
 - **Remaining**: 0
 - **Last Updated**: 2026-03-07
 
-## Task 140: [OPUS] Tax Credits & Deductions data model, filing status selector, and entry UI
+## Task 141: Add Canadian tax credit and deduction categories with income limits and spousal status
 - **Date**: 2026-03-07
-- **Files**: `src/components/TaxCreditEntry.tsx`, `src/lib/tax-credits.ts`, `src/app/page.tsx`, `src/lib/url-state.ts`, `src/lib/financial-state.ts`, `src/lib/changelog.ts`, `src/components/SnapshotDashboard.tsx`, `tests/unit/tax-credits.test.ts`, `tests/unit/changelog.test.ts`, `tests/unit/dashboard-dark-theme.test.ts`, `tests/e2e/tax-credits.spec.ts`
-- **Tests**: T1: 1869 passed, T2: 8 passed (in `tax-credits.spec.ts`)
-- **Screenshots**: ![Credit added](screenshots/task-140-credit-added.png) ![Eligibility warning](screenshots/task-140-eligibility-warning.png) ![Multiple credits](screenshots/task-140-multiple-credits.png) ![URL persistence](screenshots/task-140-url-persistence.png)
-- **Notes**: Implementation was done by user in commit 9d1b06d. Ralph formalized: fixed 3 pre-existing test failures (celebratory glow CSS classes missing in SnapshotDashboard, dark theme test regex mismatch), fixed 2 E2E test bugs (strict mode violation on amount text, wrong filter query for CCB), added changelog entry with new "Tax Credits & Deductions" milestone group, updated changelog tests.
+- **Files**: `src/lib/tax-credits.ts`, `src/components/TaxCreditEntry.tsx`, `tests/unit/tax-credits.test.ts`, `tests/e2e/ca-tax-categories.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: T1: 49 passed (in `tax-credits.test.ts`), T2: 3 passed (in `ca-tax-categories.spec.ts`), Build: passes
+- **Screenshots**: ![CA single categories](screenshots/task-141-ca-single-categories.png) ![CA married categories](screenshots/task-141-ca-married-categories.png) ![CA deduction selected](screenshots/task-141-ca-deduction-selected.png)
+- **Notes**: Added `requiresSpouse` field to `TaxCreditCategory` interface and `getCreditCategoriesForFilingStatus()` function. 12 pre-existing test failures exist (9 from committed state, 3 from user WIP changes to page.tsx/financial-state.ts) — none caused by this task.

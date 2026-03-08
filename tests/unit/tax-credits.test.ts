@@ -3,6 +3,7 @@ import {
   checkIncomeEligibility,
   getIncomeLimitDescription,
   getCreditCategories,
+  getCreditCategoriesForFilingStatus,
   getAllCreditCategories,
   findCreditCategory,
   getFilingStatuses,
@@ -175,6 +176,151 @@ describe("Tax Credits — income eligibility", () => {
       const desc = getIncomeLimitDescription(eitc, "married-separately");
       expect(desc).toContain("Not available");
       expect(desc).toContain("Married Filing Separately");
+    });
+  });
+});
+
+describe("Tax Credits — Canadian categories (Task 141)", () => {
+  describe("getCreditCategoriesForFilingStatus", () => {
+    it("returns all CA categories for single filers", () => {
+      const cats = getCreditCategoriesForFilingStatus("CA", "single");
+      expect(cats.every((c) => c.jurisdiction === "CA")).toBe(true);
+      expect(cats.every((c) => !c.infoOnly)).toBe(true);
+    });
+
+    it("excludes RRSP Deduction (info-only) for single filers", () => {
+      const cats = getCreditCategoriesForFilingStatus("CA", "single");
+      expect(cats.find((c) => c.name === "RRSP Deduction")).toBeUndefined();
+    });
+
+    it("excludes Spousal Amount Credit for single filers", () => {
+      const cats = getCreditCategoriesForFilingStatus("CA", "single");
+      expect(cats.find((c) => c.name === "Spousal Amount Credit")).toBeUndefined();
+    });
+
+    it("includes Spousal Amount Credit for married-common-law filers", () => {
+      const cats = getCreditCategoriesForFilingStatus("CA", "married-common-law");
+      expect(cats.find((c) => c.name === "Spousal Amount Credit")).toBeDefined();
+    });
+
+    it("includes all non-spouse-only CA credits for married-common-law filers", () => {
+      const cats = getCreditCategoriesForFilingStatus("CA", "married-common-law");
+      const names = cats.map((c) => c.name);
+      expect(names).toContain("Disability Tax Credit (DTC)");
+      expect(names).toContain("Canada Caregiver Credit");
+      expect(names).toContain("Medical Expense Tax Credit");
+      expect(names).toContain("Home Accessibility Tax Credit");
+      expect(names).toContain("Canada Workers Benefit (CWB)");
+      expect(names).toContain("GST/HST Credit");
+      expect(names).toContain("Canada Child Benefit (CCB)");
+      expect(names).toContain("Climate Action Incentive");
+      expect(names).toContain("Canada Training Credit");
+      expect(names).toContain("Moving Expenses Deduction");
+      expect(names).toContain("Child Care Expenses Deduction");
+      expect(names).toContain("Union & Professional Dues");
+      expect(names).toContain("Northern Residents Deduction");
+    });
+
+    it("returns no US categories for CA", () => {
+      const cats = getCreditCategoriesForFilingStatus("CA", "single");
+      expect(cats.every((c) => c.jurisdiction === "CA")).toBe(true);
+    });
+
+    it("works for US filing statuses too", () => {
+      const cats = getCreditCategoriesForFilingStatus("US", "married-jointly");
+      expect(cats.every((c) => c.jurisdiction === "US")).toBe(true);
+      expect(cats.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("CA category income limits", () => {
+    it("DTC has no income limits — always eligible", () => {
+      const dtc = findCreditCategory("Disability Tax Credit (DTC)", "CA")!;
+      expect(checkIncomeEligibility(dtc, 500000, "single")).toBe("eligible");
+      expect(checkIncomeEligibility(dtc, 500000, "married-common-law")).toBe("eligible");
+    });
+
+    it("Spousal Amount Credit has no income limits on user's income", () => {
+      const spousal = findCreditCategory("Spousal Amount Credit", "CA")!;
+      expect(spousal).toBeDefined();
+      expect(spousal.requiresSpouse).toBe(true);
+      expect(checkIncomeEligibility(spousal, 200000, "married-common-law")).toBe("eligible");
+    });
+
+    it("Home Accessibility Tax Credit has no income limits", () => {
+      const hac = findCreditCategory("Home Accessibility Tax Credit", "CA")!;
+      expect(hac).toBeDefined();
+      expect(checkIncomeEligibility(hac, 999999, "single")).toBe("eligible");
+    });
+
+    it("CWB uses different thresholds for single vs married", () => {
+      const cwb = findCreditCategory("Canada Workers Benefit (CWB)", "CA")!;
+      // single: phaseOutStart 23495, phaseOutEnd 33015
+      expect(checkIncomeEligibility(cwb, 20000, "single")).toBe("eligible");
+      expect(checkIncomeEligibility(cwb, 28000, "single")).toBe("reduced");
+      expect(checkIncomeEligibility(cwb, 40000, "single")).toBe("ineligible");
+      // married-common-law: phaseOutStart 26805, phaseOutEnd 43212
+      expect(checkIncomeEligibility(cwb, 25000, "married-common-law")).toBe("eligible");
+      expect(checkIncomeEligibility(cwb, 30000, "married-common-law")).toBe("reduced");
+      expect(checkIncomeEligibility(cwb, 50000, "married-common-law")).toBe("ineligible");
+    });
+
+    it("GST/HST Credit has different thresholds for single vs married", () => {
+      const gst = findCreditCategory("GST/HST Credit", "CA")!;
+      expect(checkIncomeEligibility(gst, 40000, "single")).toBe("eligible");
+      expect(checkIncomeEligibility(gst, 45000, "single")).toBe("reduced");
+      expect(checkIncomeEligibility(gst, 40000, "married-common-law")).toBe("eligible");
+      expect(checkIncomeEligibility(gst, 60000, "married-common-law")).toBe("reduced");
+    });
+
+    it("Canada Training Credit has a hard cap at $150,473", () => {
+      const ctc = findCreditCategory("Canada Training Credit", "CA")!;
+      expect(checkIncomeEligibility(ctc, 100000, "single")).toBe("eligible");
+      expect(checkIncomeEligibility(ctc, 160000, "single")).toBe("ineligible");
+      expect(checkIncomeEligibility(ctc, 160000, "married-common-law")).toBe("ineligible");
+    });
+
+    it("Climate Action Incentive phases out above $68,000", () => {
+      const cai = findCreditCategory("Climate Action Incentive", "CA")!;
+      expect(cai).toBeDefined();
+      expect(checkIncomeEligibility(cai, 60000, "single")).toBe("eligible");
+      expect(checkIncomeEligibility(cai, 70000, "single")).toBe("reduced");
+      expect(checkIncomeEligibility(cai, 70000, "married-common-law")).toBe("reduced");
+    });
+
+    it("Moving Expenses Deduction has no income limits", () => {
+      const mov = findCreditCategory("Moving Expenses Deduction", "CA")!;
+      expect(mov).toBeDefined();
+      expect(checkIncomeEligibility(mov, 999999, "single")).toBe("eligible");
+    });
+
+    it("Union & Professional Dues have no income limits", () => {
+      const dues = findCreditCategory("Union & Professional Dues", "CA")!;
+      expect(dues).toBeDefined();
+      expect(dues.type).toBe("deduction");
+      expect(checkIncomeEligibility(dues, 999999, "single")).toBe("eligible");
+    });
+
+    it("Northern Residents Deduction has no income limits", () => {
+      const nrd = findCreditCategory("Northern Residents Deduction", "CA")!;
+      expect(nrd).toBeDefined();
+      expect(nrd.type).toBe("deduction");
+      expect(checkIncomeEligibility(nrd, 999999, "single")).toBe("eligible");
+    });
+
+    it("Canada Caregiver Credit has no user income limits", () => {
+      const ccc = findCreditCategory("Canada Caregiver Credit", "CA")!;
+      expect(ccc).toBeDefined();
+      expect(ccc.type).toBe("non-refundable");
+      expect(checkIncomeEligibility(ccc, 999999, "single")).toBe("eligible");
+    });
+
+    it("CCB phases out at $36,502 for both filing statuses", () => {
+      const ccb = findCreditCategory("Canada Child Benefit (CCB)", "CA")!;
+      expect(checkIncomeEligibility(ccb, 30000, "single")).toBe("eligible");
+      expect(checkIncomeEligibility(ccb, 40000, "single")).toBe("reduced");
+      expect(checkIncomeEligibility(ccb, 30000, "married-common-law")).toBe("eligible");
+      expect(checkIncomeEligibility(ccb, 40000, "married-common-law")).toBe("reduced");
     });
   });
 });

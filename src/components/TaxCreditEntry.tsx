@@ -5,7 +5,7 @@ import type { TaxCredit } from "@/lib/tax-credits";
 import {
   type FilingStatus,
   type TaxCreditCategory,
-  getCreditCategories,
+  getCreditCategoriesForFilingStatus,
   findCreditCategory,
   checkIncomeEligibility,
   getIncomeLimitDescription,
@@ -177,7 +177,7 @@ export default function TaxCreditEntry({
     }
   }, [editingId, editingField]);
 
-  const categories = getCreditCategories(country);
+  const categories = getCreditCategoriesForFilingStatus(country, filingStatus);
 
   const filteredSuggestions = (query: string): TaxCreditCategory[] => {
     if (!query) return categories;
