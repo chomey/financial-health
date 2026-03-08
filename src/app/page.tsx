@@ -270,14 +270,14 @@ function WelcomeBanner() {
       <h2 className="mb-2 text-base font-semibold text-slate-200 sm:text-lg">
         Welcome! Here&apos;s how this works
       </h2>
-      <div className="space-y-2 text-sm leading-relaxed text-slate-400">
+      <div className="space-y-2 text-base leading-relaxed text-slate-300">
         <p>
           This is a simple tool to help you see your <strong>full financial picture in one place</strong>. Just fill in some rough numbers for your savings, debts, income, and expenses — it doesn&apos;t need to be exact.
         </p>
         <p>
           You&apos;ll get a snapshot of where you stand, plus a projection of how things could look in 10, 20, or 30 years.
         </p>
-        <div className="mt-3 rounded-lg bg-white/5 px-3 py-2.5 text-xs text-slate-400 sm:text-sm">
+        <div className="mt-3 rounded-lg bg-white/5 px-3 py-2.5 text-sm text-slate-400 sm:text-base">
           <strong className="text-slate-300">Your privacy is fully protected.</strong> Nothing you enter is stored on any server or sent anywhere. All your data stays right here in your browser. The numbers are saved in the page link itself — so you can bookmark it or share it, but nobody can see your information unless you give them that link.
         </div>
       </div>
