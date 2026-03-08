@@ -387,63 +387,65 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
 
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm transition-all duration-200 sm:p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-slate-200">
-          <span aria-hidden="true">📈</span>
-          Stocks &amp; Equity
-        </h2>
-        {stocks.length > 0 && (
-          <div className="flex items-center gap-1">
-            <div className="flex rounded-md border border-white/10 text-[10px]">
-              {([
-                ["alpha", "A-Z", "Sort alphabetically"],
-                ["position", "Size", "Sort by position size"],
-                ["returnPct", "Return %", "Sort by return percentage"],
-                ["returnAbs", "Return $", "Sort by return amount"],
-              ] as const).map(([key, label, ariaLabel], i, arr) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setSortBy(key)}
-                  className={`px-1.5 py-0.5 transition-colors duration-150 ${
-                    i === 0 ? "rounded-l-md" : ""
-                  } ${i === arr.length - 1 ? "rounded-r-md" : ""} ${
-                    sortBy === key
-                      ? "bg-violet-400/20 text-violet-300 font-medium"
-                      : "text-slate-500 hover:bg-white/5"
-                  }`}
-                  aria-label={ariaLabel}
-                  aria-pressed={sortBy === key}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          <button
-            type="button"
-            onClick={refreshAllPrices}
-            disabled={fetchingPrices.size > 0}
-            className="rounded-md px-2 py-1 text-xs font-medium text-violet-400 transition-all duration-150 hover:bg-violet-400/10 hover:text-violet-300 focus:outline-none focus:ring-2 focus:ring-violet-400/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Refresh all stock prices"
-            data-testid="refresh-all-prices"
-          >
-            {fetchingPrices.size > 0 ? (
-              <span className="flex items-center gap-1">
-                <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Updating...
-              </span>
-            ) : (
-              <span className="flex items-center gap-1">
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Refresh
-              </span>
-            )}
-          </button>
+      <div className="mb-3 space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="flex items-center gap-2 text-base font-semibold text-slate-200">
+            <span aria-hidden="true">📈</span>
+            Stocks &amp; Equity
+          </h2>
+          {stocks.length > 0 && (
+            <button
+              type="button"
+              onClick={refreshAllPrices}
+              disabled={fetchingPrices.size > 0}
+              className="rounded-md px-2 py-1 text-xs font-medium text-violet-400 transition-all duration-150 hover:bg-violet-400/10 hover:text-violet-300 focus:outline-none focus:ring-2 focus:ring-violet-400/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Refresh all stock prices"
+              data-testid="refresh-all-prices"
+            >
+              {fetchingPrices.size > 0 ? (
+                <span className="flex items-center gap-1">
+                  <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Updating...
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh
+                </span>
+              )}
+            </button>
+          )}
+        </div>
+        {stocks.length > 1 && (
+          <div className="flex rounded-md border border-white/10 text-[10px] w-fit">
+            {([
+              ["alpha", "A-Z", "Sort alphabetically"],
+              ["position", "Size", "Sort by position size"],
+              ["returnPct", "Return %", "Sort by return percentage"],
+              ["returnAbs", "Return $", "Sort by return amount"],
+            ] as const).map(([key, label, ariaLabel], i, arr) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setSortBy(key)}
+                className={`px-1.5 py-0.5 transition-colors duration-150 ${
+                  i === 0 ? "rounded-l-md" : ""
+                } ${i === arr.length - 1 ? "rounded-r-md" : ""} ${
+                  sortBy === key
+                    ? "bg-violet-400/20 text-violet-300 font-medium"
+                    : "text-slate-500 hover:bg-white/5"
+                }`}
+                aria-label={ariaLabel}
+                aria-pressed={sortBy === key}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -488,8 +490,8 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
             return (
               <DataFlowSourceItem key={stock.id} id={`stock:${stock.id}`} label={stock.ticker} value={value}>
               <div role="listitem">
-                <div className="group flex items-center justify-between rounded-lg px-3 py-0.5 transition-all duration-200 hover:bg-white/5">
-                  <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
+                <div className="group flex items-start justify-between rounded-lg px-3 py-1 transition-all duration-200 hover:bg-white/5">
+                  <div className="flex flex-1 flex-wrap items-center gap-x-2 gap-y-0 min-w-0">
                     {/* Ticker + Company Name */}
                     <div className="flex flex-col">
                       {editingId === stock.id && editingField === "ticker" ? (
@@ -507,7 +509,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                         <button
                           type="button"
                           onClick={() => startEdit(stock.id, "ticker", stock.ticker)}
-                          className="min-h-[44px] sm:min-h-0 rounded px-2 py-2 sm:py-1 text-sm font-mono font-semibold text-slate-200 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400/30 text-left"
+                          className="min-h-[44px] sm:min-h-0 rounded px-1 py-2 sm:py-1 text-sm font-mono font-semibold text-slate-200 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400/30 text-left"
                           aria-label={`Edit ticker for ${stock.ticker}`}
                           data-testid={`ticker-${stock.id}`}
                         >
@@ -516,7 +518,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                       )}
                       {resolvedNames[stock.ticker.toUpperCase().trim()] && (
                         <span
-                          className="px-2 text-[10px] leading-tight text-slate-500 truncate max-w-[120px]"
+                          className="px-1 text-[10px] leading-tight text-slate-500 truncate max-w-[120px]"
                           data-testid={`ticker-name-${stock.id}`}
                           title={resolvedNames[stock.ticker.toUpperCase().trim()]}
                         >
@@ -541,48 +543,33 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                       <button
                         type="button"
                         onClick={() => startEdit(stock.id, "shares", String(stock.shares))}
-                        className="min-h-[44px] sm:min-h-0 rounded px-2 py-2 sm:py-1 text-sm text-slate-400 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
+                        className="min-h-[44px] sm:min-h-0 rounded px-1 py-2 sm:py-1 text-xs text-slate-400 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
                         aria-label={`Edit shares for ${stock.ticker}, currently ${stock.shares} shares`}
                       >
-                        {stock.shares} shares
+                        {stock.shares}×{isFetching ? "..." : formatPrice(price)}
                       </button>
                     )}
+                  </div>
 
-                    {/* Price display */}
-                    <span className="text-xs text-slate-500">
-                      @{" "}
-                      {isFetching ? (
-                        <span className="inline-flex items-center gap-1">
-                          <svg className="h-3 w-3 animate-spin text-blue-400" viewBox="0 0 24 24" fill="none">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                          </svg>
-                        </span>
-                      ) : (
-                        formatPrice(price)
-                      )}
-                    </span>
-
-                    {/* Total value */}
+                  {/* Total value + delete */}
+                  <div className="flex items-center gap-1 shrink-0">
                     <span
-                      className="ml-auto text-sm font-medium text-green-700"
+                      className="text-sm font-medium text-green-700"
                       data-testid={`stock-value-${stock.id}`}
                     >
                       {formatCurrency(value)}
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => deleteStock(stock.id)}
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-400/30 sm:group-hover:opacity-100"
+                      aria-label={`Delete ${stock.ticker}`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
                   </div>
-
-                  {/* Delete button */}
-                  <button
-                    type="button"
-                    onClick={() => deleteStock(stock.id)}
-                    className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-400/30 sm:group-hover:opacity-100"
-                    aria-label={`Delete ${stock.ticker}`}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
                 </div>
 
                 {/* Secondary details: cost basis, gain/loss */}

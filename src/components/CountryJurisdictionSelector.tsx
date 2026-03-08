@@ -107,7 +107,7 @@ export default function CountryJurisdictionSelector({
   );
 
   return (
-    <div className="flex items-center gap-1.5" data-testid="country-jurisdiction-selector">
+    <div className="flex flex-wrap items-center gap-1.5" data-testid="country-jurisdiction-selector">
       {/* Country segmented control */}
       <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
         <button
@@ -146,7 +146,7 @@ export default function CountryJurisdictionSelector({
       <select
         value={jurisdiction}
         onChange={(e) => onJurisdictionChange(e.target.value)}
-        className="min-h-[36px] rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
+        className="min-h-[36px] min-w-0 flex-1 sm:flex-none rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
         aria-label={country === "CA" ? "Select province or territory" : "Select state"}
         data-testid="jurisdiction-select"
       >

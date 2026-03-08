@@ -107,7 +107,13 @@ export function AppHeader({
             <PrintSnapshotButton />
           </span>
         </div>
-        {children}
+        {children && (
+          <div className="relative">
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-slate-900 to-transparent z-10 sm:hidden" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-slate-900 to-transparent z-10 sm:hidden" />
+            {children}
+          </div>
+        )}
       </div>
     </header>
   );
