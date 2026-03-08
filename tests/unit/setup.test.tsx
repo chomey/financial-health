@@ -33,7 +33,7 @@ describe("App shell layout", () => {
   it("renders the phase toggle showing Dashboard as active", () => {
     render(<Home />);
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    expect(screen.getByText("My Finances")).toBeInTheDocument();
+    expect(screen.getByText("Edit")).toBeInTheDocument();
   });
 
   it("renders prev/next navigation footer", () => {

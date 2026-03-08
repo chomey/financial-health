@@ -445,37 +445,31 @@ export default function Home() {
     <CurrencyProvider currency={homeCurrency}>
     <DataFlowProvider homeCurrency={homeCurrency}>
     <div className="min-h-screen bg-slate-950 flex flex-col">
-      {/* ── Header ── */}
-      <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-sm px-4 py-3 sm:px-6">
+      {/* ── Header (sticky) ── */}
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-2 sm:px-6">
         <div className="mx-auto max-w-3xl">
-          <div className="flex items-center justify-between gap-3 mb-2">
-            <h1 className="text-lg font-bold text-white sm:text-xl">
-              Financial Health Snapshot
-            </h1>
-            <div className="flex-shrink-0 flex items-center gap-1.5 print:hidden">
-              <CopyLinkButton />
-              <PrintSnapshotButton />
-            </div>
-          </div>
-          {/* Phase toggle */}
-          <div className="flex items-center gap-1 border-b border-white/5 pb-2 mb-2 text-sm print:hidden">
+          {/* Title row + phase toggle + actions */}
+          <div className="flex items-center gap-2 mb-1.5 print:hidden">
             <button
               type="button"
               onClick={switchToWizard}
-              className="flex-shrink-0 rounded-md px-3 py-1.5 font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
+              className="flex-shrink-0 rounded-md px-2 py-1 text-xs font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
             >
-              <span aria-hidden="true" className="mr-1">📝</span>
-              My Finances
+              <span aria-hidden="true" className="mr-0.5">📝</span>
+              Edit
             </button>
-            <span className="text-slate-600 select-none">/</span>
-            <span className="rounded-md bg-violet-500/15 px-3 py-1.5 font-medium text-violet-300 ring-1 ring-violet-500/30 text-sm">
-              <span aria-hidden="true" className="mr-1">📊</span>
+            <span className="text-slate-600 select-none text-xs">/</span>
+            <span className="rounded-md bg-violet-500/15 px-2 py-1 text-xs font-medium text-violet-300 ring-1 ring-violet-500/30">
+              <span aria-hidden="true" className="mr-0.5">📊</span>
               Dashboard
             </span>
+            <span className="flex-1" />
+            <CopyLinkButton />
+            <PrintSnapshotButton />
           </div>
           {/* Dashboard tab stepper */}
           <nav className="w-full overflow-x-auto scrollbar-hide print:hidden" aria-label="Dashboard sections" style={{ scrollbarWidth: "none" }}>
-            <ol className="flex items-center gap-0 min-w-max px-0 py-1">
+            <ol className="flex items-center gap-0 min-w-max px-0 py-0.5">
               {DASHBOARD_TABS.map((tab, idx) => {
                 const isCurrent = tab.id === activeTab;
                 const isPast = idx < activeTabIdx;

@@ -66,7 +66,9 @@ export const SAMPLE_PROFILES: SampleProfile[] = [
         { id: "a2", category: "TFSA", amount: 15000, roi: 6 },
         { id: "a3", category: "Savings Account", amount: 8000, surplusTarget: true },
       ],
-      debts: [],
+      debts: [
+        { id: "d1", category: "Car Loan", amount: 12000, interestRate: 5.9, monthlyPayment: 350 },
+      ],
       properties: [
         {
           id: "p1",
@@ -80,7 +82,10 @@ export const SAMPLE_PROFILES: SampleProfile[] = [
           appreciation: 3,
         },
       ],
-      stocks: [],
+      stocks: [
+        { id: "s1", ticker: "XIU.TO", shares: 50, costBasis: 28 },
+        { id: "s2", ticker: "VFV.TO", shares: 30, costBasis: 95 },
+      ],
     },
   },
   {
@@ -109,7 +114,9 @@ export const SAMPLE_PROFILES: SampleProfile[] = [
         { id: "a3", category: "Savings Account", amount: 45000, surplusTarget: true },
         { id: "a4", category: "Non-Registered", amount: 60000, roi: 7 },
       ],
-      debts: [],
+      debts: [
+        { id: "d1", category: "Line of Credit", amount: 5000, interestRate: 7, monthlyPayment: 200 },
+      ],
       properties: [
         {
           id: "p1",
@@ -123,7 +130,11 @@ export const SAMPLE_PROFILES: SampleProfile[] = [
           appreciation: 2.5,
         },
       ],
-      stocks: [],
+      stocks: [
+        { id: "s1", ticker: "XIU.TO", shares: 200, costBasis: 22 },
+        { id: "s2", ticker: "XAW.TO", shares: 150, costBasis: 26 },
+        { id: "s3", ticker: "TD.TO", shares: 100, costBasis: 65 },
+      ],
     },
   },
 ];
@@ -186,7 +197,9 @@ export const US_SAMPLE_PROFILES: SampleProfile[] = [
         { id: "a2", category: "Roth IRA", amount: 20000, roi: 7 },
         { id: "a3", category: "Savings Account", amount: 10000, surplusTarget: true },
       ],
-      debts: [],
+      debts: [
+        { id: "d1", category: "Car Loan", amount: 15000, interestRate: 6.4, monthlyPayment: 400 },
+      ],
       properties: [
         {
           id: "p1",
@@ -200,7 +213,10 @@ export const US_SAMPLE_PROFILES: SampleProfile[] = [
           appreciation: 3,
         },
       ],
-      stocks: [],
+      stocks: [
+        { id: "s1", ticker: "VTI", shares: 40, costBasis: 200 },
+        { id: "s2", ticker: "AAPL", shares: 15, costBasis: 150 },
+      ],
     },
   },
   {
@@ -229,7 +245,9 @@ export const US_SAMPLE_PROFILES: SampleProfile[] = [
         { id: "a3", category: "Savings Account", amount: 50000, surplusTarget: true },
         { id: "a4", category: "Brokerage", amount: 70000, roi: 7 },
       ],
-      debts: [],
+      debts: [
+        { id: "d1", category: "Credit Card", amount: 3000, interestRate: 19.9, monthlyPayment: 150 },
+      ],
       properties: [
         {
           id: "p1",
@@ -243,7 +261,11 @@ export const US_SAMPLE_PROFILES: SampleProfile[] = [
           appreciation: 2.5,
         },
       ],
-      stocks: [],
+      stocks: [
+        { id: "s1", ticker: "VTI", shares: 150, costBasis: 160 },
+        { id: "s2", ticker: "VOO", shares: 80, costBasis: 320 },
+        { id: "s3", ticker: "MSFT", shares: 50, costBasis: 250 },
+      ],
     },
   },
 ];
