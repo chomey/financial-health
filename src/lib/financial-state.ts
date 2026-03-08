@@ -806,6 +806,8 @@ export function computeMetrics(state: FinancialState): MetricData[] {
     if (hasGrowth) {
       const simBuckets = detailedBuckets.map((b) => ({ balance: b.balance, monthlyRate: b.ror / 100 / 12 }));
       const months = simulateRunwayWithGrowth(simBuckets, monthlyObligations);
+      // DEBUG: trace growth simulation inputs
+      console.log("[RUNWAY DEBUG] monthlyObligations:", monthlyObligations, "expenses:", monthlyExpenses, "mortgage:", totalMortgagePayments, "debt:", totalDebtPayments, "simMonths:", months, "baseRunway:", runway);
       if (months - runway > 0.5) {
         runwayWithGrowth = months >= 1200 ? Infinity : parseFloat(months.toFixed(1));
       }

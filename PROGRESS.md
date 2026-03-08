@@ -7,14 +7,14 @@
 -->
 
 ## Summary
-- **Total Tasks**: 140
-- **Completed**: 140
+- **Total Tasks**: 143
+- **Completed**: 143
 - **Remaining**: 0
 - **Last Updated**: 2026-03-07
 
-## Task 142: Add US tax credit and deduction categories with income limits and filing status
+## Task 143: Tax credit insights with income eligibility awareness
 - **Date**: 2026-03-07
-- **Files**: `src/lib/tax-credits.ts`, `tests/unit/tax-credits.test.ts`, `tests/e2e/us-tax-categories.spec.ts`, `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`
-- **Tests**: T1: 83 passed (in `tax-credits.test.ts`, 34 new for US), T2: 3 passed (new `us-tax-categories.spec.ts`), Build: passes
-- **Screenshots**: ![US single categories](screenshots/task-142-us-single-categories.png) ![US MFJ categories](screenshots/task-142-us-mfj-categories.png) ![US adoption credit](screenshots/task-142-us-adoption-credit-selected.png)
-- **Notes**: Fixed pre-existing changelog test failures (tests expected 140 entries but task 141 added entry 141). SALT deduction renamed to "State and Local Tax (SALT) Deduction". Added Child and Dependent Care, Premium Tax Credit, Adoption Credit, Standard Deduction (info), Charitable Contributions, SSDI/SSI Benefits (info). MFS ineligibility handled via incomeLimits.
+- **Files**: `src/lib/insights.ts`, `src/lib/financial-state.ts`, `src/components/InsightsPanel.tsx`, `src/app/page.tsx`, `tests/unit/tax-credit-insights.test.ts`, `tests/e2e/tax-credit-insights.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: T1: 1945 passed (23 new in `tax-credit-insights.test.ts`), T2: 4 passed (new `tax-credit-insights.spec.ts`), Build: passes
+- **Screenshots**: ![Tax credits summary](screenshots/task-143-tax-credits-summary.png) ![Ineligible credits](screenshots/task-143-tax-credits-ineligible.png) ![Refundable credits](screenshots/task-143-tax-credits-refundable.png) ![Unclaimed credits](screenshots/task-143-tax-credits-unclaimed.png)
+- **Notes**: Added `taxCredits`, `filingStatus`, `isHomeowner`, `hasStudentLoans`, `hasChildCareExpenses` to `FinancialData`. Fixed page.tsx state object to include `taxCredits` and `filingStatus` (they were omitted from the `state` variable used in `toFinancialData`). New insight types added to `INSIGHT_TYPE_SOURCES` in InsightsPanel. Encoded test URLs use `jurisdiction: "CA"` for US states to avoid runtime tax-table error.

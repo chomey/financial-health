@@ -1,5 +1,12 @@
 import { compareDebtStrategies, formatDuration } from "@/lib/debt-payoff";
 import { computeCoastFireAge } from "@/lib/financial-state";
+import {
+  type TaxCredit,
+  type FilingStatus,
+  checkIncomeEligibility,
+  findCreditCategory,
+  ALL_CREDIT_CATEGORIES,
+} from "@/lib/tax-credits";
 
 export interface DebtDetail {
   category: string;
@@ -53,6 +60,16 @@ export interface FinancialData {
   currentAge?: number;
   /** Total monthly investment contributions. Used for Coast FIRE projection. */
   monthlySavings?: number;
+  /** User-entered tax credits and deductions */
+  taxCredits?: TaxCredit[];
+  /** Filing status for income limit eligibility checks */
+  filingStatus?: FilingStatus;
+  /** Whether user owns property (for homeowner-specific credit suggestions) */
+  isHomeowner?: boolean;
+  /** Whether user has student loan debts (for education credit suggestions) */
+  hasStudentLoans?: boolean;
+  /** Whether user has child care expenses (for child-related credit suggestions) */
+  hasChildCareExpenses?: boolean;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** How many months shorter the runway is due to withdrawal taxes */
@@ -68,7 +85,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost" | "coast-fire" | "net-worth-milestone" | "net-worth-percentile";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost" | "coast-fire" | "net-worth-milestone" | "net-worth-percentile" | "tax-credits-summary" | "tax-credits-unclaimed" | "tax-credits-refundable" | "tax-credits-ineligible";
 
 export interface Insight {
   id: string;
@@ -578,6 +595,163 @@ export function generateInsights(data: FinancialData): Insight[] {
     });
   }
 
+  // Tax credit insights — only when user has entered credits
+  if (data.taxCredits && data.taxCredits.length > 0) {
+    const country = data.country ?? "CA";
+    const filingStatus = data.filingStatus ?? "single";
+    const annualGrossIncome = (data.monthlyGrossIncome ?? 0) * 12;
+    const totalCredits = data.taxCredits.reduce((sum, c) => sum + c.annualAmount, 0);
+
+    // (1) tax-credits-summary
+    if (totalCredits > 0) {
+      let adjustedTotal = totalCredits;
+      let phaseOutAmount = 0;
+      if (annualGrossIncome > 0) {
+        for (const credit of data.taxCredits) {
+          const category = findCreditCategory(credit.category, country);
+          if (category) {
+            const elig = checkIncomeEligibility(category, annualGrossIncome, filingStatus);
+            if (elig === "ineligible") {
+              adjustedTotal -= credit.annualAmount;
+              phaseOutAmount += credit.annualAmount;
+            }
+          }
+        }
+      }
+
+      let message: string;
+      if (annualGrossIncome > 0 && data.annualTax !== undefined && data.annualTax > 0) {
+        const taxBefore = data.annualTax + totalCredits;
+        const taxAfter = Math.max(0, data.annualTax);
+        const rateBefore = ((taxBefore / annualGrossIncome) * 100).toFixed(1);
+        const rateAfter = ((taxAfter / annualGrossIncome) * 100).toFixed(1);
+        message = `You're claiming ${formatCurrency(totalCredits)} in annual tax credits, reducing your effective tax rate from ${rateBefore}% to ${rateAfter}%.`;
+      } else {
+        message = `You're claiming ${formatCurrency(totalCredits)} in annual tax credits.`;
+      }
+
+      if (phaseOutAmount > 0) {
+        message += ` Note: ${formatCurrency(phaseOutAmount)} of your claimed credits may be reduced or unavailable at your income level — adjusted total: ${formatCurrency(adjustedTotal)}.`;
+      }
+
+      insights.push({
+        id: "tax-credits-summary",
+        type: "tax-credits-summary",
+        message,
+        icon: "🏛️",
+      });
+    }
+
+    // (2) tax-credits-unclaimed — suggest credits the user hasn't claimed (max 2)
+    {
+      const claimed = new Set(data.taxCredits.map((c) => c.category));
+      const suggestions: Array<{ name: string; maxAmount?: number }> = [];
+
+      // Helper: check eligibility before suggesting
+      const eligible = (creditName: string): boolean => {
+        const cat = ALL_CREDIT_CATEGORIES.find((c) => c.name === creditName && c.jurisdiction === country);
+        if (!cat) return false;
+        if (annualGrossIncome > 0) {
+          return checkIncomeEligibility(cat, annualGrossIncome, filingStatus) !== "ineligible";
+        }
+        return true;
+      };
+
+      if (country === "CA") {
+        if (data.hasChildCareExpenses && !claimed.has("Canada Child Benefit (CCB)") && eligible("Canada Child Benefit (CCB)")) {
+          suggestions.push({ name: "Canada Child Benefit (CCB)", maxAmount: 7437 });
+        }
+        if (!claimed.has("Canada Workers Benefit (CWB)") && annualGrossIncome > 0 && annualGrossIncome < 43212 && eligible("Canada Workers Benefit (CWB)")) {
+          suggestions.push({ name: "Canada Workers Benefit (CWB)", maxAmount: 1518 });
+        }
+        if (!claimed.has("Disability Tax Credit (DTC)") && !claimed.has("Medical Expense Tax Credit")) {
+          suggestions.push({ name: "Disability Tax Credit (DTC)", maxAmount: 9428 });
+        }
+        if (data.isHomeowner && !claimed.has("Home Accessibility Tax Credit")) {
+          suggestions.push({ name: "Home Accessibility Tax Credit", maxAmount: 20000 });
+        }
+        if (data.hasStudentLoans && !claimed.has("Canada Training Credit") && eligible("Canada Training Credit")) {
+          suggestions.push({ name: "Canada Training Credit", maxAmount: 250 });
+        }
+      } else {
+        if (data.hasChildCareExpenses && !claimed.has("Child Tax Credit") && eligible("Child Tax Credit")) {
+          suggestions.push({ name: "Child Tax Credit", maxAmount: 2000 });
+        }
+        if (!claimed.has("Earned Income Tax Credit (EITC)") && annualGrossIncome > 0 && annualGrossIncome < 64268 && eligible("Earned Income Tax Credit (EITC)")) {
+          suggestions.push({ name: "Earned Income Tax Credit (EITC)", maxAmount: 7430 });
+        }
+        if (!claimed.has("Disability Tax Credit (DTC)") && !claimed.has("Child and Dependent Care Credit")) {
+          // Universal suggestion for people who may have disability or dependent care
+        }
+        if (data.isHomeowner && !claimed.has("Residential Clean Energy Credit")) {
+          suggestions.push({ name: "Residential Clean Energy Credit" });
+        }
+        if (data.hasStudentLoans && !claimed.has("American Opportunity Tax Credit (AOTC)") && eligible("American Opportunity Tax Credit (AOTC)")) {
+          suggestions.push({ name: "American Opportunity Tax Credit (AOTC)", maxAmount: 2500 });
+        } else if (data.hasStudentLoans && !claimed.has("Lifetime Learning Credit") && eligible("Lifetime Learning Credit")) {
+          suggestions.push({ name: "Lifetime Learning Credit", maxAmount: 2000 });
+        }
+      }
+
+      const filingLabel = _filingStatusLabel(filingStatus);
+      for (const suggestion of suggestions.slice(0, 2)) {
+        const amountStr = suggestion.maxAmount ? `worth up to ${formatCurrency(suggestion.maxAmount)}/year` : "potentially valuable";
+        insights.push({
+          id: `tax-credits-unclaimed-${suggestion.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+          type: "tax-credits-unclaimed",
+          message: `You may be eligible for the ${suggestion.name} — ${amountStr} for ${filingLabel}. Worth checking with a tax professional!`,
+          icon: "💡",
+        });
+      }
+    }
+
+    // (3) tax-credits-refundable — if refundable credits exceed estimated tax
+    {
+      const totalRefundable = data.taxCredits
+        .filter((c) => c.type === "refundable")
+        .reduce((sum, c) => sum + c.annualAmount, 0);
+      if (totalRefundable > 0 && data.annualTax !== undefined && totalRefundable > data.annualTax) {
+        insights.push({
+          id: "tax-credits-refundable",
+          type: "tax-credits-refundable",
+          message: `Your refundable tax credits (${formatCurrency(totalRefundable)}) may result in a tax refund.`,
+          icon: "💰",
+        });
+      }
+    }
+
+    // (4) tax-credits-ineligible — credits user likely can't claim
+    if (annualGrossIncome > 0 || data.filingStatus) {
+      let ineligibleCount = 0;
+      let ineligibleAmount = 0;
+      let adjustedTotal = 0;
+      for (const credit of data.taxCredits) {
+        const category = findCreditCategory(credit.category, country);
+        if (!category || annualGrossIncome === 0) {
+          adjustedTotal += credit.annualAmount;
+          continue;
+        }
+        const elig = checkIncomeEligibility(category, annualGrossIncome, filingStatus);
+        if (elig === "ineligible") {
+          ineligibleCount++;
+          ineligibleAmount += credit.annualAmount;
+        } else {
+          adjustedTotal += credit.annualAmount;
+        }
+      }
+      if (ineligibleCount > 0) {
+        const filingLabel = _filingStatusLabel(filingStatus);
+        const incomeStr = annualGrossIncome > 0 ? ` ($${Math.round(annualGrossIncome).toLocaleString()} AGI, filing ${filingLabel})` : ` (filing ${filingLabel})`;
+        insights.push({
+          id: "tax-credits-ineligible",
+          type: "tax-credits-ineligible",
+          message: `Heads up: ${ineligibleCount} of your claimed credit${ineligibleCount !== 1 ? "s" : ""} may be reduced or unavailable at your income level${incomeStr}. The adjusted credit total is ${formatCurrency(adjustedTotal)}. Consider reviewing with a tax professional.`,
+          icon: "⚠️",
+        });
+      }
+    }
+  }
+
   // Age-based net worth percentile insight
   if (data.currentAge !== undefined && data.currentAge > 0) {
     const ageGroup = getAgeGroup(data.currentAge);
@@ -653,6 +827,18 @@ const AGE_GROUPS: Array<{ minAge: number; maxAge: number | null } & AgeGroup> = 
   { minAge: 35, maxAge: 44, label: "35–44", median: 135_000 },
   { minAge: 0, maxAge: 34, label: "Under 35", median: 39_000 },
 ];
+
+/** Returns a human-readable label for a filing status. */
+function _filingStatusLabel(status: FilingStatus): string {
+  switch (status) {
+    case "single": return "single filers";
+    case "married-jointly": return "Married Filing Jointly";
+    case "married-separately": return "Married Filing Separately";
+    case "head-of-household": return "Head of Household";
+    case "married-common-law": return "Married/Common-Law";
+    default: return status;
+  }
+}
 
 /** Returns the age group and SCF median net worth for a given age. */
 export function getAgeGroup(age: number): AgeGroup | null {
