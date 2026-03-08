@@ -279,12 +279,8 @@ export default function CashFlowSankey({
             </p>
           ) : layout ? (
             <>
-            {/* Mobile: table view */}
-            <div className="sm:hidden" data-testid="sankey-table">
-              <CashFlowTable links={rawData.links} nodes={rawData.nodes} fmt={fmt} />
-            </div>
-            {/* Desktop: SVG Sankey */}
-            <div className="relative hidden sm:block" data-testid="sankey-chart">
+            {/* SVG Sankey diagram */}
+            <div className="relative" data-testid="sankey-chart">
               <svg
                 ref={svgRef}
                 viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
@@ -454,6 +450,10 @@ export default function CashFlowSankey({
                   Surplus
                 </span>
               </div>
+            </div>
+            {/* Cash flow breakdown table */}
+            <div className="mt-3 border-t border-white/10 pt-3" data-testid="sankey-table">
+              <CashFlowTable links={rawData.links} nodes={rawData.nodes} fmt={fmt} />
             </div>
             </>
           ) : null}
