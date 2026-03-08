@@ -8,9 +8,22 @@
 
 ## Summary
 - **Total Tasks**: 151
-- **Completed**: 149
-- **Remaining**: 2
+- **Completed**: 150
+- **Remaining**: 1
 - **Last Updated**: 2026-03-08
+
+## Task 150: Financial roadmap visual component
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/components/FinancialFlowchart.tsx` (new): Interactive vertical flowchart. Green checkmark circle (complete), amber pulse circle (in-progress), grey number circle (upcoming). Connector lines colour-coded by status. Click-to-expand step detail with detailText + checkboxes. `userAcknowledgeable` steps: acknowledge checkbox; `skippable` steps: skip checkbox; Undo button when overridden. Auto-expands first non-complete step on load. Gradient progress bar. Community credit links + disclaimer. URL persistence via `fca=`/`fcs=` helpers. Exports `computeFlowchartSummary`, `getStepTitleColor`, `getConnectorColor` for unit tests.
+  - `src/app/page.tsx`: Added `FinancialFlowchart` import, `Roadmap` nav link, `<section id="roadmap">` in right dashboard column.
+  - `src/lib/changelog.ts`: Added version 150 entry; added "Financial Roadmap" milestone group (range 147–151) to `getChangelogByMilestone`.
+  - `tests/unit/financial-flowchart.test.ts` (new): 8 unit tests for `computeFlowchartSummary`, `getStepTitleColor`, `getConnectorColor`.
+  - `tests/unit/changelog.test.ts`: Updated for 150 entries, 14 milestone groups, new "Financial Roadmap" milestone.
+  - `tests/e2e/financial-flowchart.spec.ts` (new): 6 Playwright tests — renders 10 steps, auto-expands current step, ack/unack checkbox + URL persistence, skip/unskip checkbox + N/A badge, undo button, nav link scroll.
+- **Tests**: T1: 2072 passed (all), T2: 6 passed, Build: passes
+- **Screenshots**: `task-150-flowchart-ca-default.png`, `task-150-flowchart-after-nav.png`
+- **Notes**: ZoomableCard intentionally omitted — the flowchart is interactive with URL-synced state; wrapping in ZoomableCard creates two React instances with divergent state (acknowledged/expanded). The `<section id="roadmap">` is placed directly in the right column. E2E tests for expand-then-click use pre-loaded URL params (`?fca=` / `?fcs=`) to avoid a sticky-column click-interactability edge case with fresh page state.
 
 ## Task 149: Financial roadmap step definitions and inference engine
 - **Date**: 2026-03-08

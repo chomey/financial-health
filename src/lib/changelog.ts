@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Financial roadmap visual component
+  {
+    version: 150,
+    title: "Financial roadmap visual component",
+    description: "Added FinancialFlowchart.tsx: an interactive vertical flowchart rendering the 10-step CA or US financial roadmap from Task 149. Each step shows a colour-coded circle (green checkmark when complete, amber pulse when in-progress, grey when upcoming) with vertical connector lines. Steps are click-to-expand with full detail text. User-acknowledgeable steps (employer match, RESP/FHSA, taxable investing) have checkboxes; skippable steps show a skip checkbox. Acknowledged/skipped steps show an Undo button. A gradient progress bar at the top tracks X/N steps complete. The current step auto-expands on load. Acknowledge/skip state persists in URL via fca= and fcs= params (from Task 149 helpers). Wired into page.tsx in the right dashboard column with a Roadmap nav link. Community credit links to r/PersonalFinanceCanada and r/personalfinance wikis. Includes disclaimer: general guidance, not financial advice.",
+    date: "2026-03-08",
+  },
   // Financial roadmap inference engine
   {
     version: 149,
@@ -982,6 +989,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
+    { milestone: "Financial Roadmap", range: [147, 151] as const },
     { milestone: "Tax Credits & Deductions", range: [140, 146] as const },
     { milestone: "UI Polish", range: [88, 139] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },

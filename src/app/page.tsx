@@ -25,6 +25,7 @@ import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import CashFlowSankey from "@/components/CashFlowSankey";
 import FxRateDisplay from "@/components/FxRateDisplay";
 import InsightsPanel from "@/components/InsightsPanel";
+import FinancialFlowchart from "@/components/FinancialFlowchart";
 import ZoomableCard from "@/components/ZoomableCard";
 import { DataFlowProvider, type SourceMetadataItem } from "@/components/DataFlowArrows";
 import { CurrencyProvider } from "@/lib/CurrencyContext";
@@ -344,6 +345,7 @@ export default function Home() {
               { id: "property", icon: "🏠", label: "Property" },
               { id: "stocks", icon: "📊", label: "Stocks" },
               { id: "dashboard", icon: "🎯", label: "Dashboard" },
+              { id: "roadmap", icon: "🗺️", label: "Roadmap" },
               { id: "scenarios", icon: "🔮", label: "What If" },
             ].map((item) => (
               <button
@@ -554,6 +556,9 @@ export default function Home() {
                 annualIncome={annualIncome}
                 onAgeChange={setAge}
               /></ZoomableCard>
+              <section id="roadmap" className="scroll-mt-16" aria-label="Financial roadmap">
+                <FinancialFlowchart state={state} />
+              </section>
             </div>
           </section>
         </div>
