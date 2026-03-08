@@ -194,34 +194,17 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       ? "text-red-400"
       : "text-slate-200";
 
-  // Celebratory glow for Financial Runway > 12 months
-  const isRunwayCelebration =
-    metric.title === "Financial Runway" &&
-    metric.format === "months" &&
-    metric.value > 12;
-
-  // Warning glow for negative Monthly Cash Flow (underwater)
-  const isUnderwaterWarning =
-    metric.title === "Monthly Cash Flow" && metric.value < 0;
-
   const hasConnections = connections && connections.length > 0;
 
   return (
     <div
       ref={cardRef}
-      className={`relative rounded-xl border bg-white/5 backdrop-blur-sm p-5 shadow-sm ${
+      className={`relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 shadow-sm ${
         hasConnections ? "cursor-pointer" : "cursor-default"
-      } ${
-        isUnderwaterWarning
-          ? "border-red-500/40 ring-1 ring-red-500/20 animate-warning-pulse"
-          : isRunwayCelebration
-            ? "border-emerald-500/40 ring-1 ring-emerald-500/20 animate-glow-pulse"
-            : "border-white/10"
       }`}
       role="group"
       aria-label={metric.title}
       data-testid={`metric-card-${metric.title.toLowerCase().replace(/\s+/g, "-")}`}
-      data-runway-celebration={isRunwayCelebration || undefined}
       onClick={handleClick}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
@@ -324,11 +307,6 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
             <p key={i} className="text-sm font-medium text-emerald-400">{msg}</p>
           ))}
         </div>
-      )}
-      {isRunwayCelebration && insights.length === 0 && (
-        <p className="mt-2 text-sm font-medium text-emerald-400" data-testid="runway-celebration-text">
-          Excellent safety net!
-        </p>
       )}
       {/* Breakdown on hover — highlighted when data-flow arrows are active. Hidden for percent format (shown in progress bar section). */}
       {metric.breakdown && metric.format !== "percent" && (

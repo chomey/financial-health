@@ -53,14 +53,10 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
     expect(dashboardSrc).not.toContain("via-green-400");
   });
 
-  it("runway celebration uses emerald glow border", () => {
-    expect(dashboardSrc).toContain("border-emerald-500/40");
-    expect(dashboardSrc).not.toContain("border-green-300");
-  });
-
-  it("underwater warning uses red glow border", () => {
-    expect(dashboardSrc).toContain("border-red-500/40");
-    expect(dashboardSrc).not.toContain("border-rose-300");
+  it("metric cards use consistent border without special glow", () => {
+    expect(dashboardSrc).toContain("border-white/10");
+    expect(dashboardSrc).not.toContain("animate-glow-pulse");
+    expect(dashboardSrc).not.toContain("animate-warning-pulse");
   });
 
   it("insight text uses emerald-400 instead of green-600", () => {
