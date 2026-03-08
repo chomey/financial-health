@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // US tax credit categories with income limits and filing status
+  {
+    version: 142,
+    title: "Full US tax credit category list",
+    description: "Added 13 US credit/deduction categories with per-filing-status income limits: Child and Dependent Care Credit, Premium Tax Credit, Adoption Credit, Standard Deduction (info baseline), State and Local Tax (SALT) Deduction, Charitable Contributions Deduction, and SSDI/SSI Benefits (info). Updated descriptions for all existing US credits (EITC, Child Tax Credit, AOTC, Lifetime Learning, Saver's Credit, EV Credit, Clean Energy, Student Loan Interest) with plain-English income limit explanations.",
+    date: "2026-03-07",
+  },
   // Canadian tax credit categories with income limits and spousal status
   {
     version: 141,

@@ -12,9 +12,9 @@
 - **Remaining**: 0
 - **Last Updated**: 2026-03-07
 
-## Task 141: Add Canadian tax credit and deduction categories with income limits and spousal status
+## Task 142: Add US tax credit and deduction categories with income limits and filing status
 - **Date**: 2026-03-07
-- **Files**: `src/lib/tax-credits.ts`, `src/components/TaxCreditEntry.tsx`, `tests/unit/tax-credits.test.ts`, `tests/e2e/ca-tax-categories.spec.ts`, `src/lib/changelog.ts`
-- **Tests**: T1: 49 passed (in `tax-credits.test.ts`), T2: 3 passed (in `ca-tax-categories.spec.ts`), Build: passes
-- **Screenshots**: ![CA single categories](screenshots/task-141-ca-single-categories.png) ![CA married categories](screenshots/task-141-ca-married-categories.png) ![CA deduction selected](screenshots/task-141-ca-deduction-selected.png)
-- **Notes**: Added `requiresSpouse` field to `TaxCreditCategory` interface and `getCreditCategoriesForFilingStatus()` function. 12 pre-existing test failures exist (9 from committed state, 3 from user WIP changes to page.tsx/financial-state.ts) — none caused by this task.
+- **Files**: `src/lib/tax-credits.ts`, `tests/unit/tax-credits.test.ts`, `tests/e2e/us-tax-categories.spec.ts`, `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`
+- **Tests**: T1: 83 passed (in `tax-credits.test.ts`, 34 new for US), T2: 3 passed (new `us-tax-categories.spec.ts`), Build: passes
+- **Screenshots**: ![US single categories](screenshots/task-142-us-single-categories.png) ![US MFJ categories](screenshots/task-142-us-mfj-categories.png) ![US adoption credit](screenshots/task-142-us-adoption-credit-selected.png)
+- **Notes**: Fixed pre-existing changelog test failures (tests expected 140 entries but task 141 added entry 141). SALT deduction renamed to "State and Local Tax (SALT) Deduction". Added Child and Dependent Care, Premium Tax Credit, Adoption Credit, Standard Deduction (info), Charitable Contributions, SSDI/SSI Benefits (info). MFS ineligibility handled via incomeLimits.
