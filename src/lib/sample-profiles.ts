@@ -296,9 +296,161 @@ export const US_SAMPLE_PROFILES: SampleProfile[] = [
   },
 ];
 
+/** Australian sample profiles */
+export const AU_SAMPLE_PROFILES: SampleProfile[] = [
+  {
+    id: "au-young-professional",
+    name: "Young professional, age 25",
+    emoji: "🦘",
+    description: "Renting in Sydney — Super accumulation, HECS-HELP debt, ETF portfolio",
+    highlights: ["$75k salary", "$35k HECS-HELP", "Super building"],
+    state: {
+      country: "AU",
+      jurisdiction: "NSW",
+      age: 25,
+      income: [
+        { id: "i1", category: "Salary", amount: 6250, frequency: "monthly", incomeType: "employment" },
+      ],
+      expenses: [
+        { id: "e1", category: "Rent/Mortgage Payment", amount: 2200 },
+        { id: "e2", category: "Groceries", amount: 450 },
+        { id: "e3", category: "Transportation", amount: 180 },
+        { id: "e4", category: "Utilities", amount: 120 },
+        { id: "e5", category: "Phone", amount: 70 },
+        { id: "e6", category: "Dining Out", amount: 250 },
+        { id: "e7", category: "Subscriptions", amount: 80 },
+      ],
+      assets: [
+        { id: "a1", category: "Super (Accumulation)", amount: 15000, roi: 7, monthlyContribution: 719 },
+        { id: "a2", category: "Savings Account", amount: 5000, roi: 4.5, surplusTarget: true },
+      ],
+      debts: [
+        { id: "d1", category: "HECS-HELP", amount: 35000, interestRate: 3.8, monthlyPayment: 250 },
+      ],
+      properties: [],
+      stocks: [
+        { id: "s1", ticker: "VAS.AX", shares: 30, costBasis: 95, purchaseDate: "2024-03-15" },
+        { id: "s2", ticker: "VGS.AX", shares: 20, costBasis: 115, purchaseDate: "2024-06-01" },
+      ],
+    },
+  },
+  {
+    id: "au-mid-career-family",
+    name: "Mid-career family, age 40",
+    emoji: "🏡",
+    description: "Dual income in Melbourne — Super, mortgage, salary sacrifice to super",
+    highlights: ["$120k salary", "Mortgage + Super", "Salary sacrifice"],
+    state: {
+      country: "AU",
+      jurisdiction: "VIC",
+      age: 40,
+      income: [
+        { id: "i1", category: "Salary", amount: 10000, frequency: "monthly", incomeType: "employment" },
+      ],
+      expenses: [
+        { id: "e1", category: "Groceries", amount: 800 },
+        { id: "e2", category: "Transportation", amount: 350 },
+        { id: "e3", category: "Utilities", amount: 220 },
+        { id: "e4", category: "Phone", amount: 120 },
+        { id: "e5", category: "Childcare", amount: 1200 },
+        { id: "e6", category: "Dining Out", amount: 300 },
+        { id: "e7", category: "Subscriptions", amount: 150 },
+        { id: "e8", category: "Insurance", amount: 280 },
+      ],
+      assets: [
+        { id: "a1", category: "Super (Accumulation)", amount: 90000, roi: 7, monthlyContribution: 1650 },
+        { id: "a2", category: "Savings Account", amount: 25000, roi: 4.5, surplusTarget: true },
+        { id: "a3", category: "Non-Registered", amount: 30000, roi: 8 },
+      ],
+      debts: [],
+      properties: [
+        {
+          id: "p1",
+          name: "Primary Home",
+          value: 950000,
+          mortgage: 620000,
+          interestRate: 6.1,
+          monthlyPayment: 3800,
+          amortizationYears: 30,
+          yearPurchased: 2019,
+          appreciation: 3.5,
+        },
+      ],
+      stocks: [
+        { id: "s1", ticker: "VAS.AX", shares: 60, costBasis: 88, purchaseDate: "2021-03-10" },
+        { id: "s2", ticker: "A200.AX", shares: 40, costBasis: 130, purchaseDate: "2022-07-15" },
+        { id: "s3", ticker: "NDQ.AX", shares: 25, costBasis: 40, purchaseDate: "2023-01-20" },
+      ],
+    },
+  },
+  {
+    id: "au-pre-retiree",
+    name: "Pre-retiree, age 58",
+    emoji: "🌅",
+    description: "Pre-retirement in Brisbane — Super, investment property, franking credits",
+    highlights: ["$150k salary", "Super + property", "Franking credits"],
+    state: {
+      country: "AU",
+      jurisdiction: "QLD",
+      age: 58,
+      income: [
+        { id: "i1", category: "Salary", amount: 12500, frequency: "monthly", incomeType: "employment" },
+      ],
+      expenses: [
+        { id: "e1", category: "Groceries", amount: 700 },
+        { id: "e2", category: "Transportation", amount: 350 },
+        { id: "e3", category: "Utilities", amount: 200 },
+        { id: "e4", category: "Phone", amount: 100 },
+        { id: "e5", category: "Travel", amount: 600 },
+        { id: "e6", category: "Dining Out", amount: 400 },
+        { id: "e7", category: "Insurance", amount: 400 },
+        { id: "e8", category: "Health", amount: 200 },
+      ],
+      assets: [
+        { id: "a1", category: "Super (Accumulation)", amount: 420000, roi: 7, monthlyContribution: 1438 },
+        { id: "a2", category: "Savings Account", amount: 55000, roi: 5, surplusTarget: true },
+        { id: "a3", category: "Non-Registered", amount: 85000, roi: 7, costBasisPercent: 55 },
+      ],
+      debts: [
+        { id: "d1", category: "Line of Credit", amount: 8000, interestRate: 8.5, monthlyPayment: 300 },
+      ],
+      properties: [
+        {
+          id: "p1",
+          name: "Primary Home",
+          value: 850000,
+          mortgage: 0,
+          interestRate: 0,
+          monthlyPayment: 0,
+          amortizationYears: 25,
+          yearPurchased: 2008,
+          appreciation: 3,
+        },
+        {
+          id: "p2",
+          name: "Investment Property",
+          value: 650000,
+          mortgage: 280000,
+          interestRate: 6.2,
+          monthlyPayment: 1800,
+          amortizationYears: 30,
+          yearPurchased: 2015,
+          appreciation: 4,
+        },
+      ],
+      stocks: [
+        { id: "s1", ticker: "CBA.AX", shares: 80, costBasis: 98, purchaseDate: "2018-05-15" },
+        { id: "s2", ticker: "BHP.AX", shares: 100, costBasis: 42, purchaseDate: "2016-09-10" },
+        { id: "s3", ticker: "VAS.AX", shares: 150, costBasis: 82, purchaseDate: "2019-03-20" },
+        { id: "s4", ticker: "WES.AX", shares: 60, costBasis: 55, purchaseDate: "2020-11-05" },
+      ],
+    },
+  },
+];
+
 /** Get the profiles appropriate for the given country */
 export function getProfilesForCountry(country: "CA" | "US" | "AU"): SampleProfile[] {
   if (country === "US") return US_SAMPLE_PROFILES;
-  // AU profiles will be added in Task 165; fall back to CA profiles for now
+  if (country === "AU") return AU_SAMPLE_PROFILES;
   return SAMPLE_PROFILES;
 }

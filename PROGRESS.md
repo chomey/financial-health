@@ -8,22 +8,25 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 164
-- **Remaining**: 5
+- **Completed**: 165
+- **Remaining**: 4
 - **Last Updated**: 2026-03-08
+
+## Task 165: AU sample profiles [@frontend]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/sample-profiles.ts`: Added `AU_SAMPLE_PROFILES` (3 profiles). Updated `getProfilesForCountry` to return AU profiles for "AU" instead of falling back to CA.
+  - `src/lib/changelog.ts`: Added version 165 entry.
+  - `tests/unit/sample-profiles.test.ts`: Added AU profile tests (13 new tests); updated `getProfilesForCountry` tests for AU. Updated changelog.test.ts count 164→165.
+  - `tests/unit/changelog.test.ts`: Updated counts from 164 to 165.
+  - `tests/e2e/au-sample-profiles.spec.ts`: New — 6 E2E tests covering AU country toggle, profile card display, profile loading navigation, highlight text.
+- **Tests**: T1: 2457 passed (130 files), T2: 6 passed, Build: passes
+- **Screenshots**: task-165-au-profiles-wizard.png, task-165-au-young-professional-dashboard.png, task-165-au-mid-career-family-dashboard.png, task-165-au-pre-retiree-dashboard.png, task-165-au-profile-cards.png
+- **Notes**: AU profiles: (1) Young professional Sydney — Super Accumulation, HECS-HELP $35k, VAS.AX/VGS.AX; (2) Mid-career Melbourne — salary sacrifice $1,650/mo super, mortgage $950k property, A200.AX/NDQ.AX; (3) Pre-retiree Brisbane — $420k Super, paid-off home + investment property, CBA.AX/BHP.AX/WES.AX.
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 164: AU benchmarks [@backend]
-- **Date**: 2026-03-08
-- **Files**:
-  - `src/lib/benchmarks.ts`: Added `AU_BENCHMARKS` (6 age groups, ABS Household Income and Wealth 2021-22) and `AU_NATIONAL_AVERAGE` (net worth $672,800, income $65k AUD, DTI 1.8). Updated `getBenchmarksForCountry` and `getNationalAverage` to return AU data for AU country.
-  - `tests/unit/au-benchmarks.test.ts`: New — 32 tests covering age groups, contiguous ranges, positive values, age-specific lookups, national average, computeBenchmarkComparisons for AU, DATA_SOURCES, and CA/US regression.
-  - `tests/unit/changelog.test.ts`: Updated counts (163→164, AU milestone entries 6→7).
-  - `src/lib/changelog.ts`: Added version 164 entry.
-- **Tests**: T1: 2445 passed (130 files), Build: passes
-- **Screenshots**: N/A (backend task)
-- **Notes**: AU net worth benchmarks are significantly higher than CA/US due to Australian property prices. DTI ratios are higher due to mortgage burden. Pre-existing changelog test failure (from task 163) fixed in separate commit.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

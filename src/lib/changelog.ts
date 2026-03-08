@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: AU sample profiles
+  {
+    version: 165,
+    title: "Australia: sample profiles",
+    description: "Added 3 Australian sample profiles: (1) Young professional in Sydney — Super (Accumulation), HECS-HELP debt, VAS.AX/VGS.AX ETFs; (2) Mid-career family in Melbourne — salary sacrifice to super, mortgage, A200.AX/NDQ.AX portfolio; (3) Pre-retiree in Brisbane — large Super, paid-off primary home plus investment property, CBA.AX/BHP.AX/WES.AX franking credit stocks. getProfilesForCountry now returns AU profiles for country=AU.",
+    date: "2026-03-08",
+  },
   // Australia: AU benchmarks
   {
     version: 164,
