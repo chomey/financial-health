@@ -411,7 +411,7 @@ export default function Home() {
       <AppHeader activePhase="dashboard" onSwitchPhase={switchToWizard}>
           {/* Dashboard section stepper (scroll-to links) */}
           <nav ref={stepperNavRef} className="w-full overflow-x-auto scrollbar-hide print:hidden" aria-label="Dashboard sections" style={{ scrollbarWidth: "none" }}>
-            <ol className="flex items-center gap-0 px-1 py-0.5">
+            <ol className="flex items-center gap-0 px-4 py-0.5">
               {DASHBOARD_SECTIONS.map((sec, idx) => {
                 const isCurrent = sec.id === visibleSection;
                 return (

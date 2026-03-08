@@ -183,7 +183,7 @@ export default function FastForwardPanel({
 
   return (
     <section
-      className="rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm sm:p-6"
+      className="overflow-hidden rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm sm:p-6"
       data-testid="fast-forward-panel"
       aria-label="Fast Forward scenario modeling"
     >
@@ -216,7 +216,7 @@ export default function FastForwardPanel({
       </div>
 
       <p className="mb-4 text-xs text-slate-400">
-        Explore &quot;what if&quot; scenarios to see how changes affect your financial future. These are temporary — they won&apos;t change your saved data.
+        Explore &quot;what if&quot; scenarios. These are temporary — they won&apos;t change your saved data.
       </p>
 
       {/* Scenario Presets */}
@@ -335,8 +335,8 @@ export default function FastForwardPanel({
             <div className={`rounded-lg border px-3 py-2 transition-all duration-200 ${
               mod.housingDownsizePercent > 0 ? "border-violet-400/40 bg-violet-400/10" : "border-white/10"
             }`}>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-slate-300 flex-1">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="text-sm text-slate-300 flex-1 min-w-[140px]">
                   Reduce property value by
                 </span>
                 <div className="flex items-center gap-2">
@@ -368,14 +368,14 @@ export default function FastForwardPanel({
 
         {/* ROI adjustment */}
         <div data-testid="roi-adjustment">
-          <h4 className="mb-2 text-sm font-medium text-stone-700">
+          <h4 className="mb-2 text-sm font-medium text-slate-300">
             What if market returns changed?
           </h4>
           <div className={`rounded-lg border px-3 py-2 transition-all duration-200 ${
             mod.roiAdjustment !== 0 ? "border-pink-400/40 bg-pink-400/10" : "border-white/10"
           }`}>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-slate-300 flex-1">Global ROI adjustment</span>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="text-sm text-slate-300 flex-1 min-w-[140px]">Global ROI adjustment</span>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -408,14 +408,14 @@ export default function FastForwardPanel({
 
         {/* FIRE safe withdrawal rate */}
         <div data-testid="swr-adjustment">
-          <h4 className="mb-2 text-sm font-medium text-stone-700">
+          <h4 className="mb-2 text-sm font-medium text-slate-300">
             FIRE withdrawal rate
           </h4>
           <div className={`rounded-lg border px-3 py-2 transition-all duration-200 ${
             safeWithdrawalRate !== 4 ? "border-amber-400/40 bg-amber-400/10" : "border-white/10"
           }`}>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-slate-300 flex-1">Safe withdrawal rate</span>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="text-sm text-slate-300 flex-1 min-w-[140px]">Safe withdrawal rate</span>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -545,13 +545,13 @@ export default function FastForwardPanel({
 
         {/* Income adjustment */}
         <div data-testid="income-adjustment">
-          <h4 className="mb-2 text-sm font-medium text-stone-700">
+          <h4 className="mb-2 text-sm font-medium text-slate-300">
             What if your income changed?
           </h4>
-          <div className={`flex items-center gap-3 rounded-lg border px-3 py-2 transition-all duration-200 ${
+          <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-3 py-2 transition-all duration-200 ${
             mod.incomeAdjustment !== 0 ? "border-cyan-400/40 bg-cyan-400/10" : "border-white/10"
           }`}>
-            <span className="text-sm text-slate-300 flex-1">Monthly adjustment</span>
+            <span className="text-sm text-slate-300 flex-1 min-w-[140px]">Monthly adjustment</span>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setIncomeAdjustment(mod.incomeAdjustment - 500)}
@@ -587,14 +587,14 @@ export default function FastForwardPanel({
 
         {/* Windfall */}
         <div data-testid="windfall-input">
-          <h4 className="mb-2 text-sm font-medium text-stone-700">
+          <h4 className="mb-2 text-sm font-medium text-slate-300">
             One-time windfall
           </h4>
-          <div className={`flex items-center gap-3 rounded-lg border px-3 py-2 transition-all duration-200 ${
+          <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-3 py-2 transition-all duration-200 ${
             mod.windfall > 0 ? "border-amber-400/40 bg-amber-400/10" : "border-white/10"
           }`}>
-            <span className="text-sm text-slate-300 flex-1">
-              Bonus, inheritance, or other lump sum
+            <span className="text-sm text-slate-300 flex-1 min-w-[140px]">
+              Bonus, inheritance, or lump sum
             </span>
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-slate-500">$</span>
