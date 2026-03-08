@@ -8,9 +8,20 @@
 
 ## Summary
 - **Total Tasks**: 151
-- **Completed**: 150
-- **Remaining**: 1
+- **Completed**: 151
+- **Remaining**: 0
 - **Last Updated**: 2026-03-08
+
+## Task 151: Financial roadmap E2E regression [MILESTONE]
+- **Date**: 2026-03-08
+- **Files**:
+  - `tests/unit/roadmap-regression.test.ts` (new): 20 unit tests covering all 8 regression scenarios at unit level — default CA state (7/10 complete, budget/TFSA/RRSP/EF complete), US mode (10 us- steps, 401k/HSA/IRA present), acknowledge/undo employer match, skip HSA, high-interest debt reduces complete count, fresh-grad EF completes after savings added, progress bar percentages.
+  - `tests/e2e/milestone-roadmap-regression.spec.ts` (new): 8 Playwright tests — CA default (10 steps, budget hint, EF months, TFSA/RRSP), switch to US (US step titles, no CA titles, US community credit), acknowledge employer match with URL fca= reload persistence, skip HSA with N/A badge and fcs= param, undo acknowledgement (URL cleared, checkbox reverts), add high-interest debt via UI (step hint shows debt name), add savings to fresh-grad profile to complete 3-month EF, progress bar live updates (70% → 80% → 70% on ack/undo).
+  - `src/lib/changelog.ts`: Added version 151 entry.
+  - `TASKS.md`: Task 151 marked complete.
+- **Tests**: T1: 2093 passed (all), T3: 239 passed (full suite), Build: passes
+- **Screenshots**: `task-151-ca-roadmap-default.png`, `task-151-us-roadmap.png`
+- **Notes**: Full suite took ~37 min due to two concurrent playwright runs competing. Individual run is typically 4–5 min. Task is a `[@qa]` milestone — all T1+T2+T3 tiers satisfied (T2 covered by milestone-roadmap-regression.spec.ts as part of the T3 full run; task 150's E2E spec already provides dedicated T2 coverage for flowchart rendering).
 
 ## Task 150: Financial roadmap visual component
 - **Date**: 2026-03-08

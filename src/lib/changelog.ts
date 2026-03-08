@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Financial roadmap E2E regression
+  {
+    version: 151,
+    title: "Financial roadmap E2E regression",
+    description: "Full Playwright regression suite for the financial roadmap feature (Tasks 149–150). Covers all 8 key scenarios: CA default (10 steps, budget complete, TFSA/RRSP detected), US mode switch (401k/HSA/IRA steps replace CA steps, community credit updates), employer match acknowledgement with URL fca= persistence and reload, HSA skip with N/A badge and fcs= URL param, undo acknowledgement (step reverts, URL cleared), adding high-interest debt triggers step in-progress state, adding savings to complete 3-month emergency fund, and progress bar live updates. Screenshots captured for CA and US roadmaps. Also adds unit tests validating the step inference logic for all regression scenarios.",
+    date: "2026-03-08",
+  },
   // Financial roadmap visual component
   {
     version: 150,
