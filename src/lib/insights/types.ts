@@ -37,7 +37,7 @@ export interface FinancialData {
   /** Marginal tax rate (0-1) for tax optimization suggestions */
   marginalRate?: number;
   /** Country code for country-specific account name suggestions */
-  country?: "CA" | "US";
+  country?: "CA" | "US" | "AU";
   /** Annual employment income for RRSP/401k contribution suggestions */
   annualEmploymentIncome?: number;
   /** Income replacement ratio: % of monthly income sustainable by portfolio via 4% rule */

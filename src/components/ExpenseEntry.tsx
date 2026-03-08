@@ -61,7 +61,7 @@ interface ExpenseEntryProps {
   provincialTaxOverride?: number;
   onFederalTaxOverride?: (monthly: number | undefined) => void;
   onProvincialTaxOverride?: (monthly: number | undefined) => void;
-  country?: "CA" | "US";
+  country?: "CA" | "US" | "AU";
   isUnderwater?: boolean;
   homeCurrency?: SupportedCurrency;
   fxRates?: FxRates;

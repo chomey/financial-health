@@ -69,7 +69,7 @@ export interface TaxExplainerDetails {
   provincialBasicPersonalAmount?: number;
   hasCapitalGains: boolean;
   capitalGainsInfo?: {
-    country: "CA" | "US";
+    country: "CA" | "US" | "AU";
     totalCapitalGains: number;
   };
   investmentIncomeTax?: {

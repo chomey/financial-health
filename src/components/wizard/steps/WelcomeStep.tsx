@@ -14,10 +14,10 @@ export default function WelcomeStep({
   onProfileLoaded,
   onEnterOwn,
 }: {
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   jurisdiction: string;
   taxYear: number;
-  onCountryChange: (country: "CA" | "US") => void;
+  onCountryChange: (country: "CA" | "US" | "AU") => void;
   onJurisdictionChange: (jurisdiction: string) => void;
   onTaxYearChange: (year: number) => void;
   loadProfile: (profile: SampleProfile) => void;

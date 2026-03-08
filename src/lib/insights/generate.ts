@@ -14,7 +14,7 @@ import { getNetWorthMilestone, getAgeGroup } from "./net-worth";
  * Checks which tax-advantaged accounts the user already has and suggests
  * what's missing or encourages maximizing existing ones.
  */
-function buildTaxRateHighMessage(ratePercent: string, country: "CA" | "US", assetCategories: string[]): string {
+function buildTaxRateHighMessage(ratePercent: string, country: "CA" | "US" | "AU", assetCategories: string[]): string {
   const cats = assetCategories.map((c) => c.toLowerCase());
   const prefix = `Your effective tax rate is ${ratePercent}% —`;
 

@@ -10,7 +10,7 @@ import { useCurrency } from "@/lib/CurrencyContext";
 
 interface BenchmarkComparisonsProps {
   age?: number;
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   netWorth: number;
   savingsRate: number;
   emergencyMonths: number;

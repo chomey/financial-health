@@ -24,7 +24,7 @@ export function useFinancialState() {
   const [stocks, setStocks] = useState<StockHolding[]>(INITIAL_STATE.stocks);
   const [income, setIncome] = useState<IncomeItem[]>(INITIAL_STATE.income);
   const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_STATE.expenses);
-  const [country, setCountry] = useState<"CA" | "US">(INITIAL_STATE.country ?? "CA");
+  const [country, setCountry] = useState<"CA" | "US" | "AU">(INITIAL_STATE.country ?? "CA");
   const [jurisdiction, setJurisdiction] = useState<string>(INITIAL_STATE.jurisdiction ?? "ON");
   const [age, setAge] = useState<number | undefined>(INITIAL_STATE.age);
   const [federalTaxOverride, setFederalTaxOverride] = useState<number | undefined>(undefined);
@@ -218,7 +218,7 @@ export function useFinancialState() {
     setShowSampleProfiles(false);
   }, []);
 
-  const handleCountryChange = useCallback((newCountry: "CA" | "US") => {
+  const handleCountryChange = useCallback((newCountry: "CA" | "US" | "AU") => {
     setCountry(newCountry);
     // Reset filing status to the default for the new country
     setFilingStatus(getDefaultFilingStatus(newCountry));

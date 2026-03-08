@@ -14,7 +14,7 @@ export interface WizardResult {
 }
 
 interface MobileWizardProps {
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   onComplete: (result: WizardResult) => void;
   onSkip: () => void;
 }
@@ -33,7 +33,7 @@ interface WizardData {
   debt3: number;
 }
 
-export function buildWizardResult(country: "CA" | "US", data: WizardData): WizardResult {
+export function buildWizardResult(country: "CA" | "US" | "AU", data: WizardData): WizardResult {
   const incomeItems: IncomeItem[] = [];
   if (data.income > 0) {
     incomeItems.push({ id: "w-income", category: "Employment Income", amount: data.income, frequency: "monthly" });

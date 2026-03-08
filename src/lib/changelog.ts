@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: widen country type to CA | US | AU
+  {
+    version: 158,
+    title: "Australia country support: type foundation",
+    description: "Widened every 'CA' | 'US' union type to 'CA' | 'US' | 'AU' across the codebase. Added 'AUD' to SupportedCurrency. getHomeCurrency('AU') returns 'AUD'. Added AUD↔CAD and AUD↔USD fallback FX rates. getForeignCurrency for AUD returns USD as the primary foreign. Tax engine returns a zero-tax stub for AU (full implementation in Task 160). All existing CA/US code paths are unchanged.",
+    date: "2026-03-08",
+  },
   // Wizard UX overhaul, compact entry panels, tax credit improvements
   {
     version: 157,
@@ -1038,6 +1045,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
+    { milestone: "Australia Country Support", range: [158, 169] as const },
     { milestone: "Wizard & Dashboard Overhaul", range: [152, 157] as const },
     { milestone: "Financial Roadmap", range: [147, 151] as const },
     { milestone: "Tax Credits & Deductions", range: [140, 146] as const },

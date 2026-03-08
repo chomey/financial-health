@@ -1,4 +1,4 @@
-export type SupportedCurrency = "CAD" | "USD";
+export type SupportedCurrency = "CAD" | "USD" | "AUD";
 
 export interface FxRates {
   /** Rate to convert from foreign currency to home currency. Key is "CAD_USD" or "USD_CAD". */
@@ -6,13 +6,18 @@ export interface FxRates {
 }
 
 /** Derive home currency from country code */
-export function getHomeCurrency(country: "CA" | "US"): SupportedCurrency {
-  return country === "CA" ? "CAD" : "USD";
+export function getHomeCurrency(country: "CA" | "US" | "AU"): SupportedCurrency {
+  if (country === "CA") return "CAD";
+  if (country === "AU") return "AUD";
+  return "USD";
 }
 
-/** Get the foreign currency (the one that isn't home) */
+/** Get the primary foreign currency (the one that isn't home).
+ *  For CA → USD, for US → CAD, for AU → USD. */
 export function getForeignCurrency(homeCurrency: SupportedCurrency): SupportedCurrency {
-  return homeCurrency === "CAD" ? "USD" : "CAD";
+  if (homeCurrency === "CAD") return "USD";
+  if (homeCurrency === "AUD") return "USD";
+  return "CAD";
 }
 
 /** Build an FX rate pair key */
@@ -24,6 +29,10 @@ export function fxPairKey(from: SupportedCurrency, to: SupportedCurrency): strin
 export const FALLBACK_RATES: FxRates = {
   CAD_USD: 0.73,
   USD_CAD: 1.37,
+  AUD_USD: 0.63,
+  USD_AUD: 1.59,
+  AUD_CAD: 0.87,
+  CAD_AUD: 1.15,
 };
 
 /**
@@ -80,7 +89,8 @@ export function formatCurrencyCompact(
   const abs = Math.abs(amount);
   const sign = amount < 0 ? "-" : "";
   const isForeign = homeCurrency !== undefined && currency !== homeCurrency;
-  const symbol = isForeign ? (currency === "CAD" ? "CA$" : "US$") : "$";
+  const symbolMap: Record<SupportedCurrency, string> = { CAD: "CA$", USD: "US$", AUD: "AU$" };
+  const symbol = isForeign ? symbolMap[currency] : "$";
   if (abs >= 1_000_000) return `${sign}${symbol}${parseFloat((abs / 1_000_000).toFixed(1))}M`;
   if (abs >= 1_000) return `${sign}${symbol}${(abs / 1_000).toFixed(0)}k`;
   return `${sign}${symbol}${abs.toFixed(0)}`;

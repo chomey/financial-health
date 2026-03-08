@@ -72,15 +72,16 @@ export const US_STATES: { code: string; name: string }[] = [
   { code: "WY", name: "Wyoming" },
 ];
 
-export const DEFAULT_JURISDICTION: Record<"CA" | "US", string> = {
+export const DEFAULT_JURISDICTION: Record<"CA" | "US" | "AU", string> = {
   CA: "ON",
   US: "CA",
+  AU: "NSW",
 };
 
 interface CountryJurisdictionSelectorProps {
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   jurisdiction: string;
-  onCountryChange: (country: "CA" | "US") => void;
+  onCountryChange: (country: "CA" | "US" | "AU") => void;
   onJurisdictionChange: (jurisdiction: string) => void;
   taxYear?: number;
   onTaxYearChange?: (year: number) => void;
@@ -94,10 +95,11 @@ export default function CountryJurisdictionSelector({
   taxYear = new Date().getFullYear(),
   onTaxYearChange,
 }: CountryJurisdictionSelectorProps) {
-  const jurisdictions = country === "CA" ? CA_PROVINCES : US_STATES;
+  // AU states/territories will be added in Task 159; use empty list for now
+  const jurisdictions = country === "CA" ? CA_PROVINCES : country === "US" ? US_STATES : [];
 
   const handleCountryChange = useCallback(
-    (newCountry: "CA" | "US") => {
+    (newCountry: "CA" | "US" | "AU") => {
       if (newCountry !== country) {
         onCountryChange(newCountry);
         onJurisdictionChange(DEFAULT_JURISDICTION[newCountry]);
@@ -178,7 +180,7 @@ export default function CountryJurisdictionSelector({
           value={jurisdiction}
           onChange={(e) => onJurisdictionChange(e.target.value)}
           className="min-h-[36px] flex-1 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
-          aria-label={country === "CA" ? "Select province or territory" : "Select state"}
+          aria-label={country === "CA" ? "Select province or territory" : country === "AU" ? "Select state or territory" : "Select state"}
           data-testid="jurisdiction-select"
         >
           {jurisdictions.map((j) => (

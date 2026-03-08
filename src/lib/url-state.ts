@@ -157,7 +157,7 @@ interface CompactState {
   e: CompactExpense[];
   p?: CompactProperty[]; // properties (optional for backward compat)
   st?: CompactStock[]; // stocks (optional for backward compat)
-  co?: string; // country ("CA" | "US", optional for backward compat)
+  co?: string; // country ("CA" | "US" | "AU", optional for backward compat)
   ju?: string; // jurisdiction (province/state code, optional for backward compat)
   ag?: number; // age (optional)
   ft?: number; // federal tax override (annual)
@@ -327,7 +327,7 @@ function fromCompact(compact: CompactState): FinancialState {
       if (x.pd) stock.purchaseDate = x.pd;
       return stock;
     }),
-    country: (compact.co as "CA" | "US") ?? "CA",
+    country: (compact.co as "CA" | "US" | "AU") ?? "CA",
     jurisdiction: compact.ju ?? "ON",
     age: compact.ag,
     federalTaxOverride: compact.ft,

@@ -34,7 +34,7 @@ export interface WizardProps {
   stocks: StockHolding[];
   income: IncomeItem[];
   expenses: ExpenseItem[];
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   jurisdiction: string;
   age: number | undefined;
   taxCredits: TaxCredit[];
@@ -60,7 +60,7 @@ export interface WizardProps {
   setStocks: (stocks: StockHolding[]) => void;
   setIncome: (income: IncomeItem[]) => void;
   setExpenses: (expenses: ExpenseItem[]) => void;
-  handleCountryChange: (country: "CA" | "US") => void;
+  handleCountryChange: (country: "CA" | "US" | "AU") => void;
   setJurisdiction: (j: string) => void;
   setAge: (age: number | undefined) => void;
   setTaxCredits: (credits: TaxCredit[]) => void;

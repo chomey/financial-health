@@ -81,7 +81,7 @@ function getUSFederalMarginalRate(grossIncome: number, table: BracketTable): num
 export function computeTax(
   annualIncome: number,
   incomeType: IncomeType,
-  country: "CA" | "US",
+  country: "CA" | "US" | "AU",
   jurisdiction: string,
   year: number = new Date().getFullYear()
 ): TaxResult {
@@ -98,6 +98,16 @@ export function computeTax(
 
   if (country === "CA") {
     return computeCanadianTax(annualIncome, incomeType, jurisdiction, year);
+  } else if (country === "AU") {
+    // AU tax engine will be implemented in Task 160; return zeros for now
+    return {
+      federalTax: 0,
+      provincialStateTax: 0,
+      totalTax: 0,
+      effectiveRate: 0,
+      afterTaxIncome: annualIncome,
+      marginalRate: 0,
+    };
   } else {
     return computeUSTax(annualIncome, incomeType, jurisdiction, year);
   }
@@ -234,7 +244,7 @@ function computeUSCapitalGainsTax(
  */
 export function getMarginalRateForIncome(
   annualIncome: number,
-  country: "CA" | "US",
+  country: "CA" | "US" | "AU",
   jurisdiction: string,
   year: number = new Date().getFullYear()
 ): number {

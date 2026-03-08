@@ -66,15 +66,15 @@ const US_NATIONAL_AVERAGE: NationalAverage = {
   income: 59_000,
 };
 
-export function getBenchmarksForCountry(country: "CA" | "US"): AgeGroupBenchmark[] {
+export function getBenchmarksForCountry(country: "CA" | "US" | "AU"): AgeGroupBenchmark[] {
   return country === "CA" ? CA_BENCHMARKS : US_BENCHMARKS;
 }
 
-export function getNationalAverage(country: "CA" | "US"): NationalAverage {
+export function getNationalAverage(country: "CA" | "US" | "AU"): NationalAverage {
   return country === "CA" ? CA_NATIONAL_AVERAGE : US_NATIONAL_AVERAGE;
 }
 
-export function getBenchmarkForAge(age: number, country: "CA" | "US"): AgeGroupBenchmark | null {
+export function getBenchmarkForAge(age: number, country: "CA" | "US" | "AU"): AgeGroupBenchmark | null {
   const benchmarks = getBenchmarksForCountry(country);
   return benchmarks.find((b) => age >= b.ageMin && age <= b.ageMax) ?? null;
 }
@@ -141,7 +141,7 @@ export function estimatePercentile(
 
 import { CurrencyFormatter, getHomeCurrency } from "@/lib/currency";
 
-function fmtCurrency(n: number, country: "CA" | "US" = "US"): string {
+function fmtCurrency(n: number, country: "CA" | "US" | "AU" = "US"): string {
   return new CurrencyFormatter(getHomeCurrency(country)).compact(n);
 }
 
@@ -151,7 +151,7 @@ function fmtPercent(n: number): string {
 
 export function computeBenchmarkComparisons(
   age: number,
-  country: "CA" | "US",
+  country: "CA" | "US" | "AU",
   netWorth: number,
   savingsRate: number, // surplus / income, as decimal
   emergencyMonths: number,
@@ -259,7 +259,8 @@ export function computeBenchmarkComparisons(
   return comparisons;
 }
 
-export const DATA_SOURCES = {
+export const DATA_SOURCES: Record<"CA" | "US" | "AU", string> = {
   CA: "Statistics Canada, Survey of Financial Security (SFS) 2023, Census 2021",
   US: "Federal Reserve, Survey of Consumer Finances (SCF) 2022, Census Bureau",
+  AU: "Australian Bureau of Statistics, Survey of Income and Housing 2021-22",
 };

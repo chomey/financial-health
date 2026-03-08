@@ -7,10 +7,34 @@
 -->
 
 ## Summary
-- **Total Tasks**: 156
-- **Completed**: 156
-- **Remaining**: 0
+- **Total Tasks**: 169
+- **Completed**: 158
+- **Remaining**: 11
 - **Last Updated**: 2026-03-08
+
+## Task 158: Widen country type to CA | US | AU [@backend]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/financial-types.ts`: `country?: "CA" | "US"` → `"CA" | "US" | "AU"`
+  - `src/lib/currency.ts`: Added "AUD" to SupportedCurrency. `getHomeCurrency("AU")` → "AUD". `getForeignCurrency("AUD")` → "USD". Added AUD↔USD and AUD↔CAD fallback rates. Fixed `formatCurrencyCompact` symbol map for AUD ("AU$").
+  - `src/lib/url-state.ts`: Updated cast comment and country cast to include "AU".
+  - `src/lib/tax-credits.ts`: All `"CA" | "US"` widened to `"CA" | "US" | "AU"`. AU returns empty arrays (no credits defined yet).
+  - `src/lib/sample-profiles.ts`: `getProfilesForCountry` accepts AU (falls back to CA profiles until Task 165).
+  - `src/lib/benchmarks.ts`: All functions accept AU. Added AU entry to DATA_SOURCES.
+  - `src/lib/scenario.ts`: TAX_SHELTERED_LIMITS country type widened.
+  - `src/lib/runway-simulation.ts`: All country params widened.
+  - `src/lib/withdrawal-tax.ts`: country param widened.
+  - `src/lib/tax-engine.ts`: Added AU stub returning zero taxes (full impl in Task 160).
+  - `src/lib/insights/types.ts` and `generate.ts`: country widened.
+  - `src/app/_use-financial-state.ts`: state and handler types widened.
+  - `src/components/CountryJurisdictionSelector.tsx`: DEFAULT_JURISDICTION includes AU→NSW. Jurisdictions list handles AU (empty until Task 159). aria-label updated.
+  - `src/components/BenchmarkComparisons.tsx`, `DataFlowArrows.tsx`, `ExpenseEntry.tsx`, `TaxCreditEntry.tsx`, `MobileWizard.tsx`: prop types widened.
+  - `src/components/wizard/WizardShell.tsx`, `ProfileStep.tsx`, `WelcomeStep.tsx`, `ExpensesStep.tsx`, `TaxCreditsStep.tsx`: prop types widened.
+  - `src/lib/changelog.ts`: Added version 158 entry. Added "Australia Country Support" milestone (158-169).
+  - `tests/unit/au-country-type.test.ts`: New — 28 unit tests covering currency, FX rates, profiles, benchmarks, credits, tax engine, and FinancialState type.
+  - `tests/unit/changelog.test.ts`: Updated counts (157→158, 15→16 milestones).
+- **Tests**: T1: 2247 passed (125 files), Build: passes
+- **Screenshots**: N/A (backend/type-widening task)
 
 ## Task 156: Retirement-aware Money Steps [@fullstack]
 - **Date**: 2026-03-08

@@ -36,7 +36,7 @@ export default function ExpensesStep({
   fxRates: FxRates;
   taxCredits: TaxCredit[];
   onTaxCreditsChange: (items: TaxCredit[]) => void;
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   filingStatus: FilingStatus;
   annualIncome: number;
   taxYear: number;

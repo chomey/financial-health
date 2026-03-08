@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for completed tasks (157 entries, versions 1-157)", () => {
-    expect(CHANGELOG.length).toBe(157);
+  it("contains entries for completed tasks (158 entries, versions 1-158)", () => {
+    expect(CHANGELOG.length).toBe(158);
   });
 
   it("has unique version numbers", () => {
@@ -11,11 +11,11 @@ describe("changelog data", () => {
     expect(new Set(versions).size).toBe(versions.length);
   });
 
-  it("covers versions 1 through 157", () => {
+  it("covers versions 1 through 158", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(157);
-    for (let i = 1; i <= 157; i++) {
+    expect(versions[versions.length - 1]).toBe(158);
+    for (let i = 1; i <= 158; i++) {
       expect(versions).toContain(i);
     }
   });
@@ -46,63 +46,66 @@ describe("changelog data", () => {
 });
 
 describe("getChangelogByMilestone", () => {
-  it("returns 15 milestone groups", () => {
+  it("returns 16 milestone groups", () => {
     const milestones = getChangelogByMilestone();
-    expect(milestones.length).toBe(15);
+    expect(milestones.length).toBe(16);
   });
 
   it("contains all entries across all groups", () => {
     const milestones = getChangelogByMilestone();
     const totalEntries = milestones.reduce((sum, m) => sum + m.entries.length, 0);
-    expect(totalEntries).toBe(157);
+    expect(totalEntries).toBe(158);
   });
 
   it("groups entries correctly by milestone range", () => {
     const milestones = getChangelogByMilestone();
+    // Australia Country Support: 158+
+    expect(milestones[0].milestone).toBe("Australia Country Support");
+    expect(milestones[0].entries.length).toBe(1); // only 158 so far
     // Wizard & Dashboard Overhaul: 152-157
-    expect(milestones[0].milestone).toBe("Wizard & Dashboard Overhaul");
-    expect(milestones[0].entries.length).toBe(6); // 152-157
-    expect(milestones[0].entries.every((e) => e.version >= 152 && e.version <= 157)).toBe(true);
+    expect(milestones[1].milestone).toBe("Wizard & Dashboard Overhaul");
+    expect(milestones[1].entries.length).toBe(6); // 152-157
+    expect(milestones[1].entries.every((e) => e.version >= 152 && e.version <= 157)).toBe(true);
     // Financial Roadmap: 147-151
-    expect(milestones[1].milestone).toBe("Financial Roadmap");
-    expect(milestones[1].entries.length).toBe(5); // 147, 148, 149, 150, 151
-    expect(milestones[1].entries.every((e) => e.version >= 147 && e.version <= 151)).toBe(true);
+    expect(milestones[2].milestone).toBe("Financial Roadmap");
+    expect(milestones[2].entries.length).toBe(5); // 147, 148, 149, 150, 151
+    expect(milestones[2].entries.every((e) => e.version >= 147 && e.version <= 151)).toBe(true);
     // Tax Credits & Deductions: 140-146
-    expect(milestones[2].milestone).toBe("Tax Credits & Deductions");
-    expect(milestones[2].entries.length).toBe(7); // 140, 141, 142, 143, 144, 145, 146
-    expect(milestones[2].entries.every((e) => e.version >= 140 && e.version <= 146)).toBe(true);
+    expect(milestones[3].milestone).toBe("Tax Credits & Deductions");
+    expect(milestones[3].entries.length).toBe(7); // 140, 141, 142, 143, 144, 145, 146
+    expect(milestones[3].entries.every((e) => e.version >= 140 && e.version <= 146)).toBe(true);
     // UI Polish: 88-139
-    expect(milestones[3].milestone).toBe("UI Polish");
-    expect(milestones[3].entries.length).toBe(52); // 88-139
-    expect(milestones[3].entries.every((e) => e.version >= 88 && e.version <= 139)).toBe(true);
+    expect(milestones[4].milestone).toBe("UI Polish");
+    expect(milestones[4].entries.length).toBe(52); // 88-139
+    expect(milestones[4].entries.every((e) => e.version >= 88 && e.version <= 139)).toBe(true);
     // Metric-Specific Explainers: 83-87
-    expect(milestones[4].milestone).toBe("Metric-Specific Explainers");
-    expect(milestones[4].entries.length).toBe(5); // 83, 84, 85, 86, 87
-    expect(milestones[4].entries.every((e) => e.version >= 83 && e.version <= 87)).toBe(true);
+    expect(milestones[5].milestone).toBe("Metric-Specific Explainers");
+    expect(milestones[5].entries.length).toBe(5); // 83, 84, 85, 86, 87
+    expect(milestones[5].entries.every((e) => e.version >= 83 && e.version <= 87)).toBe(true);
     // Whiteboard Explainer Mode: 79-82
-    expect(milestones[5].milestone).toBe("Whiteboard Explainer Mode");
-    expect(milestones[5].entries.length).toBe(4);
-    expect(milestones[5].entries.every((e) => e.version >= 79 && e.version <= 82)).toBe(true);
+    expect(milestones[6].milestone).toBe("Whiteboard Explainer Mode");
+    expect(milestones[6].entries.length).toBe(4);
+    expect(milestones[6].entries.every((e) => e.version >= 79 && e.version <= 82)).toBe(true);
     // Spotlight Dimming System: 77-78
-    expect(milestones[6].milestone).toBe("Spotlight Dimming System");
-    expect(milestones[6].entries.length).toBe(2);
-    expect(milestones[6].entries.every((e) => e.version >= 77 && e.version <= 78)).toBe(true);
+    expect(milestones[7].milestone).toBe("Spotlight Dimming System");
+    expect(milestones[7].entries.length).toBe(2);
+    expect(milestones[7].entries.every((e) => e.version >= 77 && e.version <= 78)).toBe(true);
     // Data Flow Visualization: 69-76
-    expect(milestones[7].milestone).toBe("Data Flow Visualization");
-    expect(milestones[7].entries.length).toBe(8);
-    expect(milestones[7].entries.every((e) => e.version >= 69 && e.version <= 76)).toBe(true);
+    expect(milestones[8].milestone).toBe("Data Flow Visualization");
+    expect(milestones[8].entries.length).toBe(8);
+    expect(milestones[8].entries.every((e) => e.version >= 69 && e.version <= 76)).toBe(true);
     // Withdrawal Tax Modeling: 62-68
-    expect(milestones[8].milestone).toBe("Withdrawal Tax Modeling");
-    expect(milestones[8].entries.length).toBe(7);
-    expect(milestones[8].entries.every((e) => e.version >= 62 && e.version <= 68)).toBe(true);
+    expect(milestones[9].milestone).toBe("Withdrawal Tax Modeling");
+    expect(milestones[9].entries.length).toBe(7);
+    expect(milestones[9].entries.every((e) => e.version >= 62 && e.version <= 68)).toBe(true);
     // Multi-Currency: 56-61
-    expect(milestones[9].milestone).toBe("Multi-Currency Support");
-    expect(milestones[9].entries.length).toBe(6);
-    expect(milestones[9].entries.every((e) => e.version >= 56 && e.version <= 61)).toBe(true);
+    expect(milestones[10].milestone).toBe("Multi-Currency Support");
+    expect(milestones[10].entries.length).toBe(6);
+    expect(milestones[10].entries.every((e) => e.version >= 56 && e.version <= 61)).toBe(true);
     // Foundation: 1-14
-    expect(milestones[14].milestone).toBe("Foundation & Initial Build");
-    expect(milestones[14].entries.length).toBe(14);
-    expect(milestones[14].entries.every((e) => e.version >= 1 && e.version <= 14)).toBe(true);
+    expect(milestones[15].milestone).toBe("Foundation & Initial Build");
+    expect(milestones[15].entries.length).toBe(14);
+    expect(milestones[15].entries.every((e) => e.version >= 1 && e.version <= 14)).toBe(true);
   });
 
   it("each milestone has a non-empty name", () => {

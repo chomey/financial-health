@@ -17,7 +17,7 @@ export type { TaxCredit } from "@/lib/tax-credits";
 interface TaxCreditEntryProps {
   items?: TaxCredit[];
   onChange?: (items: TaxCredit[]) => void;
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   filingStatus: FilingStatus;
   annualIncome: number;
   taxYear?: number;
@@ -69,7 +69,7 @@ function EligibilityBadge({
   category: string;
   annualIncome: number;
   filingStatus: FilingStatus;
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   taxYear?: number;
 }) {
   const catDef = findCreditCategory(category, country, taxYear);

@@ -14,7 +14,7 @@ export interface FinancialState {
   expenses: ExpenseItem[];
   properties: Property[];
   stocks: StockHolding[];
-  country?: "CA" | "US";
+  country?: "CA" | "US" | "AU";
   jurisdiction?: string;
   age?: number;
   federalTaxOverride?: number; // annual override; undefined = use computed

@@ -41,7 +41,7 @@ export function simulateRunwayWithGrowth(
 export function simulateRunwayWithTax(
   buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number; roiTaxTreatment?: "capital-gains" | "income" }[],
   monthlyWithdrawal: number,
-  country: "CA" | "US",
+  country: "CA" | "US" | "AU",
   jurisdiction: string,
 ): number {
   if (monthlyWithdrawal <= 0) return 0;
@@ -99,7 +99,7 @@ export function simulateRunwayWithTax(
 export function simulateRunwayTimeSeries(
   buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number; roiTaxTreatment?: "capital-gains" | "income" }[],
   monthlyWithdrawal: number,
-  country: "CA" | "US",
+  country: "CA" | "US" | "AU",
   jurisdiction: string,
 ): { withGrowth: RunwayTimeSeriesPoint[]; withoutGrowth: RunwayTimeSeriesPoint[]; withTax: RunwayTimeSeriesPoint[] } {
   if (monthlyWithdrawal <= 0 || buckets.length === 0) {
@@ -241,7 +241,7 @@ export function buildRunwayExplainerDetails(
   runway: number,
   runwayWithGrowth: number | undefined,
   runwayAfterTax: number | undefined,
-  country: "CA" | "US",
+  country: "CA" | "US" | "AU",
   jurisdiction: string,
 ): RunwayExplainerDetails | undefined {
   if (detailedBuckets.length === 0 || monthlyObligations <= 0) return undefined;

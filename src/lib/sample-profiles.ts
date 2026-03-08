@@ -297,6 +297,8 @@ export const US_SAMPLE_PROFILES: SampleProfile[] = [
 ];
 
 /** Get the profiles appropriate for the given country */
-export function getProfilesForCountry(country: "CA" | "US"): SampleProfile[] {
-  return country === "US" ? US_SAMPLE_PROFILES : SAMPLE_PROFILES;
+export function getProfilesForCountry(country: "CA" | "US" | "AU"): SampleProfile[] {
+  if (country === "US") return US_SAMPLE_PROFILES;
+  // AU profiles will be added in Task 165; fall back to CA profiles for now
+  return SAMPLE_PROFILES;
 }

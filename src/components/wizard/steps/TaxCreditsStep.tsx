@@ -13,7 +13,7 @@ export default function TaxCreditsStep({
 }: {
   items: TaxCredit[];
   onChange: (items: TaxCredit[]) => void;
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   filingStatus: FilingStatus;
   annualIncome: number;
   taxYear: number;

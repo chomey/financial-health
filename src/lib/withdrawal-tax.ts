@@ -70,7 +70,7 @@ export function getTaxTreatment(category: string, override?: TaxTreatment): TaxT
  */
 export function getWithdrawalTaxRate(
   category: string,
-  country: "CA" | "US",
+  country: "CA" | "US" | "AU",
   jurisdiction: string,
   annualWithdrawal: number,
   costBasisPercent: number = 100,

@@ -33,7 +33,7 @@ export const EMPTY_MODIFICATION: ScenarioModification = {
 };
 
 /** Annual contribution limits for tax-sheltered accounts (2024/2025 values) */
-export const TAX_SHELTERED_LIMITS: Record<string, { annual: number; country: "CA" | "US" }> = {
+export const TAX_SHELTERED_LIMITS: Record<string, { annual: number; country: "CA" | "US" | "AU" }> = {
   TFSA: { annual: 7000, country: "CA" },
   RRSP: { annual: 31560, country: "CA" },
   RESP: { annual: 2500, country: "CA" },

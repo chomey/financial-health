@@ -23,7 +23,7 @@ export default function ProfileStep({
   onTaxYearChange,
   onFxManualOverrideChange,
 }: {
-  country: "CA" | "US";
+  country: "CA" | "US" | "AU";
   jurisdiction: string;
   age: number | undefined;
   filingStatus: FilingStatus;
@@ -32,7 +32,7 @@ export default function ProfileStep({
   foreignCurrency: SupportedCurrency;
   effectiveFxRates: FxRates;
   fxManualOverride: number | undefined;
-  onCountryChange: (c: "CA" | "US") => void;
+  onCountryChange: (c: "CA" | "US" | "AU") => void;
   onJurisdictionChange: (j: string) => void;
   onAgeChange: (a: number | undefined) => void;
   onFilingStatusChange: (fs: FilingStatus) => void;

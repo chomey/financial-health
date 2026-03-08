@@ -9,7 +9,7 @@ export type CAFilingStatus = "single" | "married-common-law";
 export type FilingStatus = USFilingStatus | CAFilingStatus;
 
 /** Get available filing statuses for a country */
-export function getFilingStatuses(country: "CA" | "US"): { value: FilingStatus; label: string }[] {
+export function getFilingStatuses(country: "CA" | "US" | "AU"): { value: FilingStatus; label: string }[] {
   if (country === "US") {
     return [
       { value: "single", label: "Single" },
@@ -25,7 +25,7 @@ export function getFilingStatuses(country: "CA" | "US"): { value: FilingStatus; 
 }
 
 /** Get the default filing status for a country */
-export function getDefaultFilingStatus(country: "CA" | "US"): FilingStatus {
+export function getDefaultFilingStatus(country: "CA" | "US" | "AU"): FilingStatus {
   return "single";
 }
 
@@ -56,7 +56,7 @@ export interface TaxCreditCategory {
   /** Credit type */
   type: "refundable" | "non-refundable" | "deduction";
   /** Which jurisdiction this applies to */
-  jurisdiction: "CA" | "US";
+  jurisdiction: "CA" | "US" | "AU";
   /** Short plain-English explanation */
   description: string;
   /** Income limits per filing status */
@@ -157,7 +157,7 @@ function resolveCategoryForYear(category: TaxCreditCategory, year: number): TaxC
 }
 
 /** Get all credit categories for a jurisdiction, excluding info-only entries */
-export function getCreditCategories(jurisdiction: "CA" | "US", year: number = 2025): TaxCreditCategory[] {
+export function getCreditCategories(jurisdiction: "CA" | "US" | "AU", year: number = 2025): TaxCreditCategory[] {
   return ALL_CREDIT_CATEGORIES
     .filter((c) => c.jurisdiction === jurisdiction && !c.infoOnly)
     .map((c) => resolveCategoryForYear(c, year));
@@ -168,7 +168,7 @@ export function getCreditCategories(jurisdiction: "CA" | "US", year: number = 20
  * Excludes info-only entries and spouse-only credits when not married.
  */
 export function getCreditCategoriesForFilingStatus(
-  jurisdiction: "CA" | "US",
+  jurisdiction: "CA" | "US" | "AU",
   filingStatus: FilingStatus,
   year: number = 2025,
 ): TaxCreditCategory[] {
@@ -185,14 +185,14 @@ export function getCreditCategoriesForFilingStatus(
 }
 
 /** Get all credit categories including info-only for a jurisdiction */
-export function getAllCreditCategories(jurisdiction: "CA" | "US", year: number = 2025): TaxCreditCategory[] {
+export function getAllCreditCategories(jurisdiction: "CA" | "US" | "AU", year: number = 2025): TaxCreditCategory[] {
   return ALL_CREDIT_CATEGORIES
     .filter((c) => c.jurisdiction === jurisdiction)
     .map((c) => resolveCategoryForYear(c, year));
 }
 
 /** Look up a category definition by name and jurisdiction */
-export function findCreditCategory(name: string, jurisdiction: "CA" | "US", year: number = 2025): TaxCreditCategory | undefined {
+export function findCreditCategory(name: string, jurisdiction: "CA" | "US" | "AU", year: number = 2025): TaxCreditCategory | undefined {
   const found = ALL_CREDIT_CATEGORIES.find(
     (c) => c.name === name && c.jurisdiction === jurisdiction,
   );
