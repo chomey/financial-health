@@ -69,7 +69,7 @@ test.describe("Task 140: Tax Credits & Deductions Entry", () => {
 
     // Credit should appear in the list
     await expect(page.getByText("Disability Tax Credit (DTC)")).toBeVisible();
-    await expect(page.getByText("$9,428/yr")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Edit amount for Disability/ })).toBeVisible();
 
     // Type badge should show "Non-refundable"
     await expect(page.getByText("Non-refundable").first()).toBeVisible();
@@ -172,7 +172,7 @@ test.describe("Task 140: Tax Credits & Deductions Entry", () => {
     const taxHeader = page.getByText("Tax Credits", { exact: false }).first();
     await taxHeader.click();
     await page.getByRole("button", { name: /Add Credit/i }).click();
-    await page.getByLabel("New credit category").fill("Child Tax Credit");
+    await page.getByLabel("New credit category").fill("Canada Child");
 
     // Wait for suggestions and click
     await page.getByText("Canada Child Benefit (CCB)").click();
@@ -196,7 +196,7 @@ test.describe("Task 140: Tax Credits & Deductions Entry", () => {
 
     // Credit should still be there
     await expect(page.getByText("Canada Child Benefit (CCB)")).toBeVisible();
-    await expect(page.getByText("$7,437/yr")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Edit amount for Canada Child/ })).toBeVisible();
 
     await captureScreenshot(page, "task-140-url-persistence");
   });

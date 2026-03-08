@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Tax credits entry UI, filing status selector, and data model
+  {
+    version: 140,
+    title: "Tax Credits & Deductions entry UI",
+    description: "New TaxCreditEntry component with jurisdiction-filtered categories, income eligibility badges (reduced/ineligible), refundable/non-refundable/deduction type badges, and info tooltip. Filing status selector in header (US: single/MFJ/MFS/HoH, CA: single/married-common-law). Tax credits and filing status persisted in URL state with compact encoding. Per-filing-status income limits with phase-out, hard cap, and ineligible indicators.",
+    date: "2026-03-07",
+  },
   // New insights E2E regression
   {
     version: 139,
@@ -912,6 +919,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
+    { milestone: "Tax Credits & Deductions", range: [140, 145] as const },
     { milestone: "UI Polish", range: [88, 139] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
