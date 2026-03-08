@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Validate US tax credits/brackets for 2025/2026
+  {
+    version: 155,
+    title: "Corrected US tax credit values for 2025/2026",
+    description: "Updated all US tax credit amounts, phase-out thresholds, and descriptions to match IRS 2025 values (Rev. Proc. 2024-40). Key corrections: EITC $8,046 (was $7,430), CTC refundable portion $1,700 (was $1,600), Adoption Credit $17,280 with phase-out $259k-$299k (was $15,950/$252k-$292k), Saver's Credit limits $39,500/$59,250/$79,000 (were $38,250/$57,375/$76,500), Student Loan Interest phase-out $85k-$100k single (was $80k-$95k). All 2026 overrides re-estimated with ~2.8% inflation indexing.",
+    date: "2026-03-08",
+  },
   // Validate Canadian tax credits/brackets for 2025/2026
   {
     version: 154,

@@ -406,22 +406,22 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     type: "refundable",
     jurisdiction: "US",
     description:
-      "Refundable credit for low-to-moderate income workers. Amount varies by income and number of children — up to $7,430 with 3+ children. Phases out: Single/HoH from $17,640 to $56,838 (3+ children), MFJ from $24,210 to $64,268. Not available for Married Filing Separately.",
+      "Refundable credit for low-to-moderate income workers. Amount varies by income and number of children — up to $8,046 with 3+ children. Phases out: Single/HoH from $21,370 to $59,899 (3+ children), MFJ from $28,120 to $66,819. Not available for Married Filing Separately.",
     incomeLimits: {
-      single: { phaseOutStart: 17640, phaseOutEnd: 56838 },
-      "head-of-household": { phaseOutStart: 17640, phaseOutEnd: 56838 },
-      "married-jointly": { phaseOutStart: 24210, phaseOutEnd: 64268 },
+      single: { phaseOutStart: 21_370, phaseOutEnd: 59_899 },
+      "head-of-household": { phaseOutStart: 21_370, phaseOutEnd: 59_899 },
+      "married-jointly": { phaseOutStart: 28_120, phaseOutEnd: 66_819 },
       "married-separately": { ineligible: true },
     },
-    maxAmount: 7430,
+    maxAmount: 8_046,
     yearOverrides: {
       2026: {
-        maxAmount: 8_046,
-        description: "Refundable credit for low-to-moderate income workers. Amount varies by income and number of children — up to $8,046 with 3+ children. Phases out: Single/HoH from $18,134 to $58,428 (3+ children), MFJ from $24,888 to $65,858. Not available for Married Filing Separately.",
+        maxAmount: 8_271,
+        description: "Refundable credit for low-to-moderate income workers. Amount varies by income and number of children — up to $8,271 with 3+ children. Phases out: Single/HoH from $21,968 to $61,577 (3+ children), MFJ from $28,907 to $68,690. Not available for Married Filing Separately.",
         incomeLimits: {
-          single: { phaseOutStart: 18134, phaseOutEnd: 58428 },
-          "head-of-household": { phaseOutStart: 18134, phaseOutEnd: 58428 },
-          "married-jointly": { phaseOutStart: 24888, phaseOutEnd: 65858 },
+          single: { phaseOutStart: 21_968, phaseOutEnd: 61_577 },
+          "head-of-household": { phaseOutStart: 21_968, phaseOutEnd: 61_577 },
+          "married-jointly": { phaseOutStart: 28_907, phaseOutEnd: 68_690 },
           "married-separately": { ineligible: true },
         },
       },
@@ -432,18 +432,17 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     type: "refundable",
     jurisdiction: "US",
     description:
-      "$2,000 per qualifying child under 17. Up to $1,600 is refundable (Additional Child Tax Credit). Phases out $50 per $1,000 of AGI above $200,000 (Single/HoH/MFS) or $400,000 (MFJ). Most families with children under 17 qualify.",
+      "$2,000 per qualifying child under 17. Up to $1,700 is refundable (Additional Child Tax Credit). Phases out $50 per $1,000 of AGI above $200,000 (Single/HoH/MFS) or $400,000 (MFJ). Most families with children under 17 qualify.",
     incomeLimits: {
-      single: { phaseOutStart: 200000 },
-      "head-of-household": { phaseOutStart: 200000 },
-      "married-jointly": { phaseOutStart: 400000 },
-      "married-separately": { phaseOutStart: 200000 },
+      single: { phaseOutStart: 200_000 },
+      "head-of-household": { phaseOutStart: 200_000 },
+      "married-jointly": { phaseOutStart: 400_000 },
+      "married-separately": { phaseOutStart: 200_000 },
     },
-    maxAmount: 2000,
+    maxAmount: 2_000,
     yearOverrides: {
       2026: {
-        maxAmount: 2_200,
-        description: "$2,200 per qualifying child under 17. Up to $1,700 is refundable (Additional Child Tax Credit). Phases out $50 per $1,000 of AGI above $200,000 (Single/HoH/MFS) or $400,000 (MFJ). Most families with children under 17 qualify.",
+        description: "$2,000 per qualifying child under 17. Up to $1,748 is refundable (Additional Child Tax Credit). Phases out $50 per $1,000 of AGI above $200,000 (Single/HoH/MFS) or $400,000 (MFJ). Most families with children under 17 qualify.",
       },
     },
   },
@@ -494,22 +493,22 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     type: "non-refundable",
     jurisdiction: "US",
     description:
-      "Non-refundable credit for low- and moderate-income individuals who contribute to a 401(k), IRA, or other retirement account. Worth 10–50% of contributions up to $2,000 ($4,000 MFJ). Fully ineligible above: $38,250 (Single/MFS), $57,375 (HoH), $76,500 (MFJ).",
+      "Non-refundable credit for low- and moderate-income individuals who contribute to a 401(k), IRA, or other retirement account. Worth 10–50% of contributions up to $2,000 ($4,000 MFJ). Fully ineligible above: $39,500 (Single/MFS), $59,250 (HoH), $79,000 (MFJ).",
     incomeLimits: {
-      single: { hardCap: 38250 },
-      "head-of-household": { hardCap: 57375 },
-      "married-jointly": { hardCap: 76500 },
-      "married-separately": { hardCap: 38250 },
+      single: { hardCap: 39_500 },
+      "head-of-household": { hardCap: 59_250 },
+      "married-jointly": { hardCap: 79_000 },
+      "married-separately": { hardCap: 39_500 },
     },
-    maxAmount: 2000,
+    maxAmount: 2_000,
     yearOverrides: {
       2026: {
-        description: "Non-refundable credit for low- and moderate-income individuals who contribute to a 401(k), IRA, or other retirement account. Worth 10–50% of contributions up to $2,000 ($4,000 MFJ). Fully ineligible above: $39,500 (Single/MFS), $59,250 (HoH), $79,000 (MFJ).",
+        description: "Non-refundable credit for low- and moderate-income individuals who contribute to a 401(k), IRA, or other retirement account. Worth 10–50% of contributions up to $2,000 ($4,000 MFJ). Fully ineligible above: $40,600 (Single/MFS), $60,900 (HoH), $81,200 (MFJ).",
         incomeLimits: {
-          single: { hardCap: 39500 },
-          "head-of-household": { hardCap: 59250 },
-          "married-jointly": { hardCap: 79000 },
-          "married-separately": { hardCap: 39500 },
+          single: { hardCap: 40_600 },
+          "head-of-household": { hardCap: 60_900 },
+          "married-jointly": { hardCap: 81_200 },
+          "married-separately": { hardCap: 40_600 },
         },
       },
     },
@@ -528,14 +527,26 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     type: "non-refundable",
     jurisdiction: "US",
     description:
-      "Up to $15,950 (2024) of qualified adoption expenses per eligible child. Non-refundable but can be carried forward up to 5 years. Phases out between $239,230 and $279,230 of modified AGI. Not available for Married Filing Separately.",
+      "Up to $17,280 of qualified adoption expenses per eligible child. Non-refundable but can be carried forward up to 5 years. Phases out between $259,190 and $299,190 of modified AGI. Not available for Married Filing Separately.",
     incomeLimits: {
-      single: { phaseOutStart: 252150, phaseOutEnd: 292150 },
-      "head-of-household": { phaseOutStart: 252150, phaseOutEnd: 292150 },
-      "married-jointly": { phaseOutStart: 252150, phaseOutEnd: 292150 },
+      single: { phaseOutStart: 259_190, phaseOutEnd: 299_190 },
+      "head-of-household": { phaseOutStart: 259_190, phaseOutEnd: 299_190 },
+      "married-jointly": { phaseOutStart: 259_190, phaseOutEnd: 299_190 },
       "married-separately": { ineligible: true },
     },
-    maxAmount: 15950,
+    maxAmount: 17_280,
+    yearOverrides: {
+      2026: {
+        maxAmount: 17_764,
+        description: "Up to $17,764 of qualified adoption expenses per eligible child. Non-refundable but can be carried forward up to 5 years. Phases out between $266,447 and $307,447 of modified AGI. Not available for Married Filing Separately.",
+        incomeLimits: {
+          single: { phaseOutStart: 266_447, phaseOutEnd: 307_447 },
+          "head-of-household": { phaseOutStart: 266_447, phaseOutEnd: 307_447 },
+          "married-jointly": { phaseOutStart: 266_447, phaseOutEnd: 307_447 },
+          "married-separately": { ineligible: true },
+        },
+      },
+    },
   },
   {
     name: "Residential Clean Energy Credit",
@@ -598,14 +609,25 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     type: "deduction",
     jurisdiction: "US",
     description:
-      "Deduct up to $2,500 of student loan interest paid during the year — no itemizing required. Phases out: Single/HoH from $80,000 to $95,000, MFJ from $165,000 to $195,000. Not available for Married Filing Separately.",
+      "Deduct up to $2,500 of student loan interest paid during the year — no itemizing required. Phases out: Single/HoH from $85,000 to $100,000, MFJ from $175,000 to $205,000. Not available for Married Filing Separately.",
     incomeLimits: {
-      single: { phaseOutStart: 80000, phaseOutEnd: 95000 },
-      "head-of-household": { phaseOutStart: 80000, phaseOutEnd: 95000 },
-      "married-jointly": { phaseOutStart: 165000, phaseOutEnd: 195000 },
+      single: { phaseOutStart: 85_000, phaseOutEnd: 100_000 },
+      "head-of-household": { phaseOutStart: 85_000, phaseOutEnd: 100_000 },
+      "married-jointly": { phaseOutStart: 175_000, phaseOutEnd: 205_000 },
       "married-separately": { ineligible: true },
     },
-    maxAmount: 2500,
+    maxAmount: 2_500,
+    yearOverrides: {
+      2026: {
+        description: "Deduct up to $2,500 of student loan interest paid during the year — no itemizing required. Phases out: Single/HoH from $87,380 to $102,800, MFJ from $179,900 to $210,740. Not available for Married Filing Separately.",
+        incomeLimits: {
+          single: { phaseOutStart: 87_380, phaseOutEnd: 102_800 },
+          "head-of-household": { phaseOutStart: 87_380, phaseOutEnd: 102_800 },
+          "married-jointly": { phaseOutStart: 179_900, phaseOutEnd: 210_740 },
+          "married-separately": { ineligible: true },
+        },
+      },
+    },
   },
   {
     name: "Charitable Contributions Deduction",

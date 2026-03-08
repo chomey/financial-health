@@ -386,19 +386,19 @@ describe("Tax Credits — US categories (Task 142)", () => {
   });
 
   describe("US income eligibility — per filing status", () => {
-    it("EITC: eligible for single below $17,640", () => {
+    it("EITC: eligible for single below $21,370", () => {
       const eitc = findCreditCategory("Earned Income Tax Credit (EITC)", "US")!;
       expect(checkIncomeEligibility(eitc, 15000, "single")).toBe("eligible");
     });
 
-    it("EITC: reduced for single between $17,640 and $56,838", () => {
+    it("EITC: reduced for single between $21,370 and $59,899", () => {
       const eitc = findCreditCategory("Earned Income Tax Credit (EITC)", "US")!;
       expect(checkIncomeEligibility(eitc, 30000, "single")).toBe("reduced");
     });
 
-    it("EITC: ineligible for single above $56,838", () => {
+    it("EITC: ineligible for single above $59,899", () => {
       const eitc = findCreditCategory("Earned Income Tax Credit (EITC)", "US")!;
-      expect(checkIncomeEligibility(eitc, 60000, "single")).toBe("ineligible");
+      expect(checkIncomeEligibility(eitc, 65000, "single")).toBe("ineligible");
     });
 
     it("EITC: ineligible for married-separately regardless of income", () => {
@@ -475,7 +475,7 @@ describe("Tax Credits — US categories (Task 142)", () => {
       expect(checkIncomeEligibility(ptc, 500000, "single")).toBe("eligible");
     });
 
-    it("Adoption Credit: phases out $252k–$292k, ineligible for MFS", () => {
+    it("Adoption Credit: phases out $259k–$299k, ineligible for MFS", () => {
       const ac = findCreditCategory("Adoption Credit", "US")!;
       expect(ac).toBeDefined();
       expect(ac.type).toBe("non-refundable");
@@ -511,11 +511,11 @@ describe("Tax Credits — US categories (Task 142)", () => {
       expect(checkIncomeEligibility(salt, 999999, "single")).toBe("eligible");
     });
 
-    it("Student Loan Interest Deduction: phases out and ineligible for MFS", () => {
+    it("Student Loan Interest Deduction: phases out $85k–$100k and ineligible for MFS", () => {
       const slid = findCreditCategory("Student Loan Interest Deduction", "US")!;
-      expect(checkIncomeEligibility(slid, 70000, "single")).toBe("eligible");
-      expect(checkIncomeEligibility(slid, 85000, "single")).toBe("reduced");
-      expect(checkIncomeEligibility(slid, 100000, "single")).toBe("ineligible");
+      expect(checkIncomeEligibility(slid, 80000, "single")).toBe("eligible");
+      expect(checkIncomeEligibility(slid, 90000, "single")).toBe("reduced");
+      expect(checkIncomeEligibility(slid, 105000, "single")).toBe("ineligible");
       expect(checkIncomeEligibility(slid, 10000, "married-separately")).toBe("ineligible");
     });
 
@@ -544,14 +544,14 @@ describe("Tax Credits — US categories (Task 142)", () => {
     it("Saver's Credit: describes hard cap for single", () => {
       const sc = findCreditCategory("Saver's Credit", "US")!;
       const desc = getIncomeLimitDescription(sc, "single");
-      expect(desc).toContain("38,250");
+      expect(desc).toContain("39,500");
     });
 
     it("Adoption Credit: describes phase-out for single", () => {
       const ac = findCreditCategory("Adoption Credit", "US")!;
       const desc = getIncomeLimitDescription(ac, "single");
-      expect(desc).toContain("252,150");
-      expect(desc).toContain("292,150");
+      expect(desc).toContain("259,190");
+      expect(desc).toContain("299,190");
     });
 
     it("Residential Clean Energy Credit: no income limit description", () => {

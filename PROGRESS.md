@@ -7,10 +7,22 @@
 -->
 
 ## Summary
-- **Total Tasks**: 154
-- **Completed**: 154
-- **Remaining**: 2
+- **Total Tasks**: 155
+- **Completed**: 155
+- **Remaining**: 1
 - **Last Updated**: 2026-03-08
+
+## Task 155: Validate all US tax credits/brackets for 2025/2026 [@backend] [MATH]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/tax-credits.ts`: Updated all US credit values to IRS 2025 amounts (Rev. Proc. 2024-40). EITC $8,046 (was $7,430), phase-outs $21,370/$59,899 single (was $17,640/$56,838). CTC refundable $1,700 (was $1,600). Adoption Credit $17,280 with phase-out $259,190-$299,190 (was $15,950/$252,150-$292,150). Saver's Credit limits $39,500/$59,250/$79,000 (was $38,250/$57,375/$76,500). Student Loan Interest phase-out $85,000-$100,000 (was $80,000-$95,000). All 2026 overrides re-estimated with ~2.8% inflation.
+  - `tests/unit/us-tax-credit-validation.test.ts`: New — 41 tests validating all corrected US credit values for both 2025 and 2026.
+  - `tests/unit/tax-credits.test.ts`: Updated existing tests to match corrected values.
+  - `tests/unit/tax-year-selector.test.ts`: Updated existing tests to match corrected values.
+  - `tests/unit/changelog.test.ts`: Updated entry count to 155.
+  - `src/lib/changelog.ts`: Added version 155 entry.
+- **Tests**: T1: 158 passed (tax credit tests), Build: passes
+- **Screenshots**: N/A (backend/data-only task)
 
 ## Task 154: Validate all Canadian tax credits/brackets for 2025/2026 [@backend] [MATH]
 - **Date**: 2026-03-08

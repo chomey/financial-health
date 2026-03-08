@@ -170,17 +170,17 @@ describe("tax credits year overrides", () => {
 
   it("US EITC has updated values for 2026", () => {
     const eitc2026 = findCreditCategory("Earned Income Tax Credit (EITC)", "US", 2026);
-    expect(eitc2026!.maxAmount).toBe(8046);
+    expect(eitc2026!.maxAmount).toBe(8_271);
   });
 
-  it("US Child Tax Credit has updated values for 2026", () => {
+  it("US Child Tax Credit has same base amount for 2026 (statutory, not indexed)", () => {
     const ctc2026 = findCreditCategory("Child Tax Credit", "US", 2026);
-    expect(ctc2026!.maxAmount).toBe(2200);
+    expect(ctc2026!.maxAmount).toBe(2_000);
   });
 
   it("US Saver's Credit has updated income limits for 2026", () => {
     const sc2026 = findCreditCategory("Saver's Credit", "US", 2026);
-    expect(sc2026!.incomeLimits.single?.hardCap).toBe(39500);
+    expect(sc2026!.incomeLimits.single?.hardCap).toBe(40_600);
   });
 
   it("getCreditCategories returns year-resolved categories", () => {
