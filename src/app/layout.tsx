@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Script from "next/script";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -30,13 +30,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <Script
-          src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"
-          strategy="lazyOnload"
-        />
-        <Script id="kofi-init" strategy="lazyOnload">
-          {`(function k(){if(typeof kofiwidget2!=="undefined"){kofiwidget2.init("Support me on Ko-fi","#72a4f2","R6R11VMSML");kofiwidget2.draw()}else{setTimeout(k,200)}})()`}
-        </Script>
       </body>
     </html>
   );

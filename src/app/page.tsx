@@ -371,6 +371,15 @@ export default function Home() {
                 >
                   Changelog
                 </a>
+                <span className="mx-1.5 text-slate-600">·</span>
+                <a
+                  href="https://ko-fi.com/R6R11VMSML"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-violet-400 transition-colors duration-200 hover:text-violet-300 hover:underline"
+                >
+                  Support on Ko-fi ☕
+                </a>
               </p>
             </div>
             <div className="flex-shrink-0 flex items-center gap-2 print:hidden">
