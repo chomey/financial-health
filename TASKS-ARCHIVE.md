@@ -182,4 +182,10 @@
 
 - [x] Task 153: Add tax year selector (2025/2026) with year-specific credit and bracket values — Add a tax year toggle to the UI (default 2025). Split tax-credits.ts and tax-tables.ts to store per-year values. When user selects a year, all bracket tables, BPA amounts, credit maxAmounts, phase-out thresholds, and descriptions reflect that year. Persist selection in URL state. Include 2026 values where published (CRA/IRS inflation-indexed amounts). [@fullstack] [OPUS]
 
+- [x] Task 154: Validate all Canadian tax credits/brackets for 2025/2026 — Verify and fix tax-credits.ts and tax-tables.ts CA values against CRA sources for both tax years. DTC federal $10,138, DTC under-18 supplement $5,914, CCB $7,997/<6 and $6,748/6-17, CWB $1,633 single / $2,813 family, GST/HST $533 single, Spousal Amount, Canada Caregiver $8,601, and all other CA credits. [@backend] [MATH]
+
+- [x] Task 155: Validate all US tax credits/brackets for 2025/2026 — Verify and fix tax-credits.ts and tax-tables.ts US values against IRS sources for both tax years. EITC up to $8,046 (3+ children), Child Tax Credit $2,200 (refundable $1,700), Adoption Credit $17,280, Saver's Credit income limits, AOTC, Lifetime Learning Credit, student loan interest deduction phase-outs, standard deduction amounts, EV credit. [@backend] [MATH]
+
+- [x] Task 156: Retirement-aware Money Steps — Add an "I'm retired" toggle to the Money Steps panel. When enabled, employer match steps auto-complete, tax-advantaged contribution steps become skippable, and Budget step shows "Expenses tracked — living on savings/investments". Heuristic auto-suggests retirement mode. Persists in URL state as fret=1. [@fullstack]
+
 - [x] Task 157: Wizard welcome step, compact panels, tax credit UX — Add a dedicated Welcome wizard step with sample profile cards and "enter your own" option. Merge tax credits into the Expenses step. Compact spacing across all wizard entry panels. Add Ko-fi widget. Default tax year to current year instead of hardcoded 2025. Tax credit UX improvements: fixedAmount categories show read-only values, amountOptions categories show discrete dropdowns. [@fullstack]

@@ -212,22 +212,8 @@ export function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange
 }
 
 export function WelcomeBanner() {
-  const [dismissed, setDismissed] = useState(false);
-
-  if (dismissed) return null;
-
   return (
     <div className="relative mb-6 rounded-xl border border-violet-400/20 bg-gradient-to-br from-violet-400/10 to-cyan-400/5 px-4 py-4 shadow-sm sm:px-6 sm:py-5 backdrop-blur-sm">
-      <button
-        type="button"
-        onClick={() => setDismissed(true)}
-        className="absolute right-3 top-3 rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
-        aria-label="Dismiss welcome message"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg>
-      </button>
       <h2 className="mb-2 text-base font-semibold text-slate-200 sm:text-lg">
         Welcome! Here&apos;s how this works
       </h2>

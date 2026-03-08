@@ -9,16 +9,16 @@ if (typeof window !== "undefined") {
   };
 }
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import SnapshotDashboard, { type DataFlowConnectionDef } from "@/components/SnapshotDashboard";
 import ProjectionChart from "@/components/ProjectionChart";
-import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
+// CountryJurisdictionSelector moved to wizard-only
 import ExpenseBreakdownChart from "@/components/ExpenseBreakdownChart";
 import NetWorthDonutChart from "@/components/NetWorthDonutChart";
 import FastForwardPanel from "@/components/FastForwardPanel";
 import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import CashFlowSankey from "@/components/CashFlowSankey";
-import FxRateDisplay from "@/components/FxRateDisplay";
+// FxRateDisplay moved to wizard-only
 import InsightsPanel from "@/components/InsightsPanel";
 import FinancialFlowchart from "@/components/FinancialFlowchart";
 import ZoomableCard from "@/components/ZoomableCard";
@@ -37,13 +37,12 @@ import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
 import { computeMortgageBreakdown, DEFAULT_INTEREST_RATE } from "@/components/PropertyEntry";
 import { getPortfolioSummary, getAnnualizedReturn, getStockValue } from "@/components/StockEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
-import { getFilingStatuses } from "@/lib/tax-credits";
+// getFilingStatuses moved to wizard-only
 import { getStepFromURL, updateStepURL, type WizardStep } from "@/lib/url-state";
 import {
   PrintSnapshotButton,
   PrintFooter,
   CopyLinkButton,
-  AgeInputHeader,
   WelcomeBanner,
 } from "@/app/_page-helpers";
 import { useFinancialState } from "@/app/_use-financial-state";
@@ -105,6 +104,97 @@ export default function Home() {
 
   // ── Phase routing: wizard vs dashboard ──────────────────────────────────────
   const [phase, setPhase] = useState<"wizard" | "dashboard" | null>(null);
+
+  // ── Dashboard pagination (like wizard) ─────────────────────────────────────
+  const DASHBOARD_TABS = useMemo(() => [
+    { id: "intro", icon: "🏠", label: "Intro", shortLabel: "Intro" },
+    { id: "insights", icon: "💡", label: "Insights", shortLabel: "Insights" },
+    { id: "metrics", icon: "🎯", label: "Metrics", shortLabel: "Metrics" },
+    { id: "cashflow", icon: "💸", label: "Cash Flow", shortLabel: "Cash" },
+    { id: "breakdowns", icon: "📉", label: "Breakdowns", shortLabel: "Charts" },
+    { id: "roadmap", icon: "🗺️", label: "Money Steps", shortLabel: "Steps" },
+    { id: "compare", icon: "📊", label: "Compare", shortLabel: "Compare" },
+    { id: "projections", icon: "📈", label: "Projections", shortLabel: "Project" },
+    { id: "scenarios", icon: "🔮", label: "What If", shortLabel: "What If" },
+  ] as const, []);
+  type DashboardTab = typeof DASHBOARD_TABS[number]["id"];
+  const [activeTab, setActiveTab] = useState<DashboardTab>("intro");
+  const activeTabIdx = DASHBOARD_TABS.findIndex(t => t.id === activeTab);
+  const isFirstTab = activeTabIdx === 0;
+  const isLastTab = activeTabIdx === DASHBOARD_TABS.length - 1;
+  const activeTabRef = useRef<HTMLButtonElement>(null);
+
+  const goNextTab = useCallback(() => {
+    const idx = DASHBOARD_TABS.findIndex(t => t.id === activeTab);
+    if (idx < DASHBOARD_TABS.length - 1) {
+      setActiveTab(DASHBOARD_TABS[idx + 1].id);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [activeTab, DASHBOARD_TABS]);
+
+  const goPrevTab = useCallback(() => {
+    const idx = DASHBOARD_TABS.findIndex(t => t.id === activeTab);
+    if (idx > 0) {
+      setActiveTab(DASHBOARD_TABS[idx - 1].id);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [activeTab, DASHBOARD_TABS]);
+
+  // Scroll past boundary to navigate tabs
+  const boundaryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastWheelRef = useRef(0);
+
+  useEffect(() => {
+    if (phase !== "dashboard") return;
+
+    const handleWheel = (e: WheelEvent) => {
+      const now = Date.now();
+      // Debounce: ignore events within 100ms of each other
+      if (now - lastWheelRef.current < 100) return;
+      lastWheelRef.current = now;
+
+      const scrollTop = window.scrollY;
+      const atTop = scrollTop <= 5;
+      const atBottom = (window.innerHeight + scrollTop) >= (document.documentElement.scrollHeight - 5);
+
+      if (atBottom && e.deltaY > 30) {
+        if (boundaryTimerRef.current) clearTimeout(boundaryTimerRef.current);
+        boundaryTimerRef.current = setTimeout(() => { boundaryTimerRef.current = null; }, 600);
+        goNextTab();
+      } else if (atTop && e.deltaY < -30) {
+        if (boundaryTimerRef.current) clearTimeout(boundaryTimerRef.current);
+        boundaryTimerRef.current = setTimeout(() => { boundaryTimerRef.current = null; }, 600);
+        goPrevTab();
+      }
+    };
+
+    // Touch-based boundary navigation
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
+    const handleTouchEnd = (e: TouchEvent) => {
+      const dy = touchStartY - e.changedTouches[0].clientY;
+      const scrollTop = window.scrollY;
+      const atTop = scrollTop <= 5;
+      const atBottom = (window.innerHeight + scrollTop) >= (document.documentElement.scrollHeight - 5);
+
+      if (atBottom && dy > 60) goNextTab();
+      else if (atTop && dy < -60) goPrevTab();
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [phase, goNextTab, goPrevTab]);
+
+  // Auto-scroll active tab button into view
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [activeTab]);
 
   useEffect(() => {
     const urlStep = getStepFromURL();
@@ -354,77 +444,21 @@ export default function Home() {
   return (
     <CurrencyProvider currency={homeCurrency}>
     <DataFlowProvider homeCurrency={homeCurrency}>
-    <div className="min-h-screen bg-slate-950">
-      <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-sm px-4 py-3 shadow-sm sm:px-6 sm:py-4">
-        <div className="mx-auto max-w-7xl space-y-2">
-          <div className="flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold text-white sm:text-2xl">
-                Financial Health Snapshot
-              </h1>
-              <p className="text-xs text-slate-400 sm:text-sm">
-                Your finances at a glance — no judgment, just clarity
-                <span className="mx-1.5 text-slate-600">·</span>
-                <a
-                  href="/changelog"
-                  className="text-violet-400 transition-colors duration-200 hover:text-violet-300 hover:underline"
-                >
-                  Changelog
-                </a>
-                <span className="mx-1.5 text-slate-600">·</span>
-                <a
-                  href="https://ko-fi.com/R6R11VMSML"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-violet-400 transition-colors duration-200 hover:text-violet-300 hover:underline"
-                >
-                  Support on Ko-fi ☕
-                </a>
-              </p>
-            </div>
-            <div className="flex-shrink-0 flex items-center gap-2 print:hidden">
+    <div className="min-h-screen bg-slate-950 flex flex-col">
+      {/* ── Header ── */}
+      <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-sm px-4 py-3 sm:px-6">
+        <div className="mx-auto max-w-3xl">
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <h1 className="text-lg font-bold text-white sm:text-xl">
+              Financial Health Snapshot
+            </h1>
+            <div className="flex-shrink-0 flex items-center gap-1.5 print:hidden">
               <CopyLinkButton />
               <PrintSnapshotButton />
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 print:hidden">
-            <CountryJurisdictionSelector
-              country={country}
-              jurisdiction={jurisdiction}
-              onCountryChange={handleCountryChange}
-              onJurisdictionChange={setJurisdiction}
-              taxYear={taxYear}
-              onTaxYearChange={setTaxYear}
-            />
-            <select
-              value={filingStatus}
-              onChange={(e) => setFilingStatus(e.target.value as typeof filingStatus)}
-              className="min-h-[44px] rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400 sm:min-h-0"
-              aria-label="Filing status"
-              data-testid="filing-status-selector"
-            >
-              {getFilingStatuses(country).map((fs) => (
-                <option key={fs.value} value={fs.value} className="bg-slate-800">
-                  {fs.label}
-                </option>
-              ))}
-            </select>
-            <AgeInputHeader age={age} onAgeChange={setAge} />
-            <FxRateDisplay
-              homeCurrency={homeCurrency}
-              foreignCurrency={foreignCurrency}
-              fxRates={effectiveFxRates}
-              fxManualOverride={fxManualOverride}
-              onManualOverrideChange={setFxManualOverride}
-            />
-          </div>
-        </div>
-      </header>
-
-      <nav className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/90 backdrop-blur-sm shadow-sm print:hidden">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Row 1: Phase toggle */}
-          <div className="flex items-center gap-1 border-b border-white/5 py-1.5 text-sm">
+          {/* Phase toggle */}
+          <div className="flex items-center gap-1 border-b border-white/5 pb-2 mb-2 text-sm print:hidden">
             <button
               type="button"
               onClick={switchToWizard}
@@ -439,232 +473,287 @@ export default function Home() {
               Dashboard
             </span>
           </div>
-          {/* Row 2: Dashboard sub-sections (left-to-right matches top-to-bottom page order) */}
-          <div className="flex items-center gap-1 overflow-x-auto py-1.5 text-sm">
-            {[
-              { id: "top", icon: "🏠", label: "Intro" },
-              { id: "insights", icon: "💡", label: "Insights" },
-              { id: "metrics", icon: "🎯", label: "Metrics" },
-              { id: "cashflow", icon: "💸", label: "Cash Flow" },
-              { id: "breakdowns", icon: "📉", label: "Breakdowns" },
-              { id: "roadmap", icon: "🗺️", label: "Money Steps" },
-              { id: "compare", icon: "📊", label: "Compare" },
-              { id: "projections", icon: "📈", label: "Projections" },
-              { id: "scenarios", icon: "🔮", label: "What If" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  if (item.id === "top") { window.scrollTo({ top: 0, behavior: "smooth" }); }
-                  else { document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }
-                }}
-                className="flex-shrink-0 rounded-md px-2.5 py-1.5 font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
-              >
-                <span aria-hidden="true" className="mr-1">{item.icon}</span>
-                {item.label}
-              </button>
-            ))}
-          </div>
+          {/* Dashboard tab stepper */}
+          <nav className="w-full overflow-x-auto scrollbar-hide print:hidden" aria-label="Dashboard sections" style={{ scrollbarWidth: "none" }}>
+            <ol className="flex items-center gap-0 min-w-max px-0 py-1">
+              {DASHBOARD_TABS.map((tab, idx) => {
+                const isCurrent = tab.id === activeTab;
+                const isPast = idx < activeTabIdx;
+                return (
+                  <li key={tab.id} className="flex items-center">
+                    <button
+                      ref={isCurrent ? activeTabRef : undefined}
+                      type="button"
+                      onClick={() => { setActiveTab(tab.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+                        isCurrent
+                          ? "bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30"
+                          : isPast
+                            ? "text-emerald-400/70 hover:bg-white/5 hover:text-emerald-300"
+                            : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                      }`}
+                      aria-current={isCurrent ? "step" : undefined}
+                    >
+                      {isPast && !isCurrent ? (
+                        <svg className="h-3.5 w-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <span className="text-sm" aria-hidden="true">{tab.icon}</span>
+                      )}
+                      <span className="hidden sm:inline">{tab.label}</span>
+                      <span className="sm:hidden">{tab.shortLabel}</span>
+                    </button>
+                    {idx < DASHBOARD_TABS.length - 1 && (
+                      <div
+                        className={`mx-0.5 h-px w-4 ${isPast ? "bg-emerald-500/40" : "bg-white/10"}`}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
         </div>
-      </nav>
+      </header>
 
-      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6">
-        {/* Welcome explainer for first-time visitors */}
-        <WelcomeBanner />
+      {/* ── Tab content ── */}
+      <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
+        <div className="mx-auto max-w-3xl">
 
-        {/* Sample profile picker for new visitors (no URL state) */}
-        {showSampleProfiles && (
-          <div className="mb-6 snap-start scroll-mt-24 rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/10 to-emerald-400/5 px-4 py-5 shadow-sm sm:px-6 print:hidden backdrop-blur-sm" data-testid="sample-profiles-banner">
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-base font-semibold text-slate-200 sm:text-lg">Start with a sample profile</h2>
-                <p className="mt-0.5 text-sm text-slate-400">See how the tool works with realistic numbers, then edit to match your own.</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowSampleProfiles(false)}
-                className="shrink-0 rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
-                aria-label="Dismiss sample profiles"
-                data-testid="sample-profiles-dismiss"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
-            </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              {getProfilesForCountry(country).map((profile) => (
-                <button
-                  key={profile.id}
-                  type="button"
-                  onClick={() => loadProfile(profile)}
-                  className="group flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-4 text-left shadow-sm transition-all duration-200 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95"
-                  data-testid={`sample-profile-${profile.id}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl" aria-hidden="true">{profile.emoji}</span>
-                    <span className="font-semibold text-slate-200 text-sm leading-tight group-hover:text-cyan-400 transition-colors duration-150">{profile.name}</span>
+          {activeTab === "intro" && (
+            <>
+              <WelcomeBanner />
+              {showSampleProfiles && (
+                <div className="mb-6 rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/10 to-emerald-400/5 px-4 py-5 shadow-sm sm:px-6 print:hidden backdrop-blur-sm" data-testid="sample-profiles-banner">
+                  <div className="mb-4 flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="text-base font-semibold text-slate-200 sm:text-lg">Start with a sample profile</h2>
+                      <p className="mt-0.5 text-sm text-slate-400">See how the tool works with realistic numbers, then edit to match your own.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowSampleProfiles(false)}
+                      className="shrink-0 rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+                      aria-label="Dismiss sample profiles"
+                      data-testid="sample-profiles-dismiss"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">{profile.description}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-auto">
-                    {profile.highlights.map((h) => (
-                      <span key={h} className="rounded-full bg-cyan-400/10 px-2 py-0.5 text-xs font-medium text-cyan-300 border border-cyan-400/20">{h}</span>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    {getProfilesForCountry(country).map((profile) => (
+                      <button
+                        key={profile.id}
+                        type="button"
+                        onClick={() => loadProfile(profile)}
+                        className="group flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-4 text-left shadow-sm transition-all duration-200 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95"
+                        data-testid={`sample-profile-${profile.id}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl" aria-hidden="true">{profile.emoji}</span>
+                          <span className="font-semibold text-slate-200 text-sm leading-tight group-hover:text-cyan-400 transition-colors duration-150">{profile.name}</span>
+                        </div>
+                        <p className="text-xs text-slate-400 leading-relaxed">{profile.description}</p>
+                        <div className="flex flex-wrap gap-1.5 mt-auto">
+                          {profile.highlights.map((h) => (
+                            <span key={h} className="rounded-full bg-cyan-400/10 px-2 py-0.5 text-xs font-medium text-cyan-300 border border-cyan-400/20">{h}</span>
+                          ))}
+                        </div>
+                      </button>
                     ))}
                   </div>
-                </button>
-              ))}
-            </div>
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <p className="text-xs text-slate-500">Or enter your own numbers directly in the sections below.</p>
-              <button
-                type="button"
-                onClick={clearAll}
-                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-400 shadow-sm transition-all duration-150 hover:border-white/20 hover:text-slate-200 hover:shadow focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 active:scale-95"
-                data-testid="clear-all-button"
-              >
-                Clear all
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* 1. Insights */}
-        <section id="insights" className="mb-4 snap-start scroll-mt-24" aria-label="Financial insights">
-          <InsightsPanel data={financialData} insightConnections={insightConnections} milestones={projectionMilestones} />
-        </section>
-
-        {/* 2. Metrics */}
-        <section
-          id="metrics"
-          className="mb-4 snap-start scroll-mt-24 print:col-span-full"
-          data-testid="dashboard-panel"
-          aria-label="Financial dashboard"
-        >
-          <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
-        </section>
-
-        {/* 3. Cash Flow */}
-        <section id="cashflow" className="mb-4 snap-start scroll-mt-24" aria-label="Cash flow">
-          <ZoomableCard><CashFlowSankey
-            income={income}
-            expenses={expenses}
-            investmentContributions={totalInvestmentContributions}
-            mortgagePayments={totalMortgagePayments}
-            monthlyFederalTax={totals.totalFederalTax / 12}
-            monthlyProvincialTax={totals.totalProvincialStateTax / 12}
-            monthlySurplus={monthlySurplus}
-            investmentReturns={monthlyInvestmentReturns
-              .filter((r) => {
-                if (r.reinvest) return false; // reinvested returns don't flow through income
-                const asset = assets.find((a) => a.category === r.label);
-                if (!asset) return false;
-                const treatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
-                return treatment === "income";
-              })
-              .map((r) => ({ label: r.label, monthlyAmount: r.amount }))}
-          /></ZoomableCard>
-        </section>
-
-        {/* 4. Breakdowns — Expense + Net Worth side by side */}
-        <section id="breakdowns" className="mb-4 snap-start scroll-mt-24" aria-label="Expense and net worth breakdowns">
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <ZoomableCard><ExpenseBreakdownChart
-              expenses={expenses}
-              investmentContributions={totalInvestmentContributions}
-              mortgagePayments={totalMortgagePayments}
-              federalTax={totals.totalFederalTax / 12}
-              provincialStateTax={totals.totalProvincialStateTax / 12}
-              monthlyAfterTaxIncome={totals.monthlyAfterTaxIncome}
-              monthlyGrossIncome={totals.monthlyIncome}
-            /></ZoomableCard>
-            <ZoomableCard><NetWorthDonutChart
-              assets={assets}
-              debts={debts}
-              properties={properties}
-              stocks={stocks}
-            /></ZoomableCard>
-          </div>
-        </section>
-
-        {/* 5. Money Steps */}
-        <section id="roadmap" className="mb-4 snap-start scroll-mt-24" aria-label="Money steps">
-          <FinancialFlowchart
-            state={state}
-            acknowledged={flowchartAcks}
-            skipped={flowchartSkips}
-            isRetired={isRetired}
-            onAcksChange={setFlowchartAcks}
-            onSkipsChange={setFlowchartSkips}
-            onRetiredChange={setIsRetired}
-          />
-        </section>
-
-        {/* 6. Compare — Benchmarks + Portfolio Performance */}
-        <section id="compare" className="mb-4 snap-start scroll-mt-24" aria-label="Comparisons and benchmarks">
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <ZoomableCard><BenchmarkComparisons
-              age={age}
-              country={country}
-              netWorth={benchmarkNetWorth}
-              savingsRate={benchmarkSavingsRate}
-              emergencyMonths={benchmarkEmergencyMonths}
-              debtToIncomeRatio={benchmarkDebtToIncome}
-              annualIncome={annualIncome}
-              onAgeChange={setAge}
-            /></ZoomableCard>
-            {stocks.length > 0 && (() => {
-              const portfolio = getPortfolioSummary(stocks);
-              const stocksWithReturns = stocks
-                .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
-                .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
-              return (
-                <ZoomableCard><div className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
-                    <span className="text-lg" aria-hidden="true">📊</span>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <p className="text-xs text-slate-500">Or enter your own numbers directly in the sections below.</p>
+                    <button
+                      type="button"
+                      onClick={clearAll}
+                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-400 shadow-sm transition-all duration-150 hover:border-white/20 hover:text-slate-200 hover:shadow focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 active:scale-95"
+                      data-testid="clear-all-button"
+                    >
+                      Clear all
+                    </button>
                   </div>
-                  <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                    {portfolio.totalGainLoss >= 0 ? "+" : "-"}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.abs(portfolio.totalGainLoss))}
-                  </p>
-                  {portfolio.totalCostBasis > 0 && (
-                    <p className="mt-0.5 text-sm text-slate-400" data-testid="portfolio-return-pct">
-                      {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% overall return
-                    </p>
-                  )}
-                  {stocksWithReturns.length > 0 && (
-                    <div className="mt-2 space-y-0.5">
-                      {stocksWithReturns.map((s) => (
-                        <p key={s.ticker} className="text-xs text-slate-500">
-                          <span className="font-mono font-medium text-slate-400">{s.ticker}</span>{" "}
-                          <span className={s.annualized >= 0 ? "text-emerald-400" : "text-rose-400"}>
-                            {s.annualized >= 0 ? "+" : ""}{s.annualized.toFixed(1)}%/yr
-                          </span>
+                </div>
+              )}
+              <div className="text-center mt-4">
+                <p className="text-xs text-slate-500">
+                  <a href="/changelog" className="text-violet-400 transition-colors hover:text-violet-300 hover:underline">Changelog</a>
+                  <span className="mx-1.5 text-slate-600">·</span>
+                  <a href="https://ko-fi.com/R6R11VMSML" target="_blank" rel="noopener noreferrer" className="text-violet-400 transition-colors hover:text-violet-300 hover:underline">If this helped, tips appreciated ☕</a>
+                </p>
+              </div>
+            </>
+          )}
+
+          {activeTab === "insights" && (
+            <section aria-label="Financial insights">
+              <InsightsPanel data={financialData} insightConnections={insightConnections} milestones={projectionMilestones} />
+            </section>
+          )}
+
+          {activeTab === "metrics" && (
+            <section data-testid="dashboard-panel" aria-label="Financial dashboard">
+              <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
+            </section>
+          )}
+
+          {activeTab === "cashflow" && (
+            <section aria-label="Cash flow">
+              <ZoomableCard><CashFlowSankey
+                income={income}
+                expenses={expenses}
+                investmentContributions={totalInvestmentContributions}
+                mortgagePayments={totalMortgagePayments}
+                monthlyFederalTax={totals.totalFederalTax / 12}
+                monthlyProvincialTax={totals.totalProvincialStateTax / 12}
+                monthlySurplus={monthlySurplus}
+                investmentReturns={monthlyInvestmentReturns
+                  .filter((r) => {
+                    if (r.reinvest) return false;
+                    const asset = assets.find((a) => a.category === r.label);
+                    if (!asset) return false;
+                    const treatment = asset.roiTaxTreatment ?? getDefaultRoiTaxTreatment(asset.category);
+                    return treatment === "income";
+                  })
+                  .map((r) => ({ label: r.label, monthlyAmount: r.amount }))}
+              /></ZoomableCard>
+            </section>
+          )}
+
+          {activeTab === "breakdowns" && (
+            <section aria-label="Expense and net worth breakdowns">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <ZoomableCard><ExpenseBreakdownChart
+                  expenses={expenses}
+                  investmentContributions={totalInvestmentContributions}
+                  mortgagePayments={totalMortgagePayments}
+                  federalTax={totals.totalFederalTax / 12}
+                  provincialStateTax={totals.totalProvincialStateTax / 12}
+                  monthlyAfterTaxIncome={totals.monthlyAfterTaxIncome}
+                  monthlyGrossIncome={totals.monthlyIncome}
+                /></ZoomableCard>
+                <ZoomableCard><NetWorthDonutChart
+                  assets={assets}
+                  debts={debts}
+                  properties={properties}
+                  stocks={stocks}
+                /></ZoomableCard>
+              </div>
+            </section>
+          )}
+
+          {activeTab === "roadmap" && (
+            <section aria-label="Money steps">
+              <FinancialFlowchart
+                state={state}
+                acknowledged={flowchartAcks}
+                skipped={flowchartSkips}
+                isRetired={isRetired}
+                onAcksChange={setFlowchartAcks}
+                onSkipsChange={setFlowchartSkips}
+                onRetiredChange={setIsRetired}
+              />
+            </section>
+          )}
+
+          {activeTab === "compare" && (
+            <section aria-label="Comparisons and benchmarks">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <ZoomableCard><BenchmarkComparisons
+                  age={age}
+                  country={country}
+                  netWorth={benchmarkNetWorth}
+                  savingsRate={benchmarkSavingsRate}
+                  emergencyMonths={benchmarkEmergencyMonths}
+                  debtToIncomeRatio={benchmarkDebtToIncome}
+                  annualIncome={annualIncome}
+                  onAgeChange={setAge}
+                /></ZoomableCard>
+                {stocks.length > 0 && (() => {
+                  const portfolio = getPortfolioSummary(stocks);
+                  const stocksWithReturns = stocks
+                    .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
+                    .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
+                  return (
+                    <ZoomableCard><div className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
+                        <span className="text-lg" aria-hidden="true">📊</span>
+                      </div>
+                      <p className={`mt-1.5 text-3xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                        {portfolio.totalGainLoss >= 0 ? "+" : "-"}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.abs(portfolio.totalGainLoss))}
+                      </p>
+                      {portfolio.totalCostBasis > 0 && (
+                        <p className="mt-0.5 text-sm text-slate-400" data-testid="portfolio-return-pct">
+                          {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% overall return
                         </p>
-                      ))}
-                    </div>
-                  )}
-                  <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
-                    Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
-                  </p>
-                </div></ZoomableCard>
-              );
-            })()}
-          </div>
-        </section>
+                      )}
+                      {stocksWithReturns.length > 0 && (
+                        <div className="mt-2 space-y-0.5">
+                          {stocksWithReturns.map((s) => (
+                            <p key={s.ticker} className="text-xs text-slate-500">
+                              <span className="font-mono font-medium text-slate-400">{s.ticker}</span>{" "}
+                              <span className={s.annualized >= 0 ? "text-emerald-400" : "text-rose-400"}>
+                                {s.annualized >= 0 ? "+" : ""}{s.annualized.toFixed(1)}%/yr
+                              </span>
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                      <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
+                        Total gain/loss across your stock holdings based on cost basis. Annualized returns shown for holdings with purchase dates.
+                      </p>
+                    </div></ZoomableCard>
+                  );
+                })()}
+              </div>
+            </section>
+          )}
 
-        {/* 7. Projections */}
-        <section id="projections" className="mb-4 snap-start scroll-mt-24" aria-label="Financial projections">
-          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} onMilestonesChange={handleMilestonesChange} /></ZoomableCard>
-        </section>
+          {activeTab === "projections" && (
+            <section aria-label="Financial projections">
+              <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} onMilestonesChange={handleMilestonesChange} /></ZoomableCard>
+            </section>
+          )}
 
-        {/* 8. What If */}
-        <section id="scenarios" className="mb-4 snap-start scroll-mt-24 print:hidden" aria-label="Scenario modeling">
-          <FastForwardPanel state={state} safeWithdrawalRate={safeWithdrawalRate} onSwrChange={handleSwrChange} />
-        </section>
+          {activeTab === "scenarios" && (
+            <section aria-label="Scenario modeling">
+              <FastForwardPanel state={state} safeWithdrawalRate={safeWithdrawalRate} onSwrChange={handleSwrChange} />
+            </section>
+          )}
 
+        </div>
         <PrintFooter />
       </main>
+
+      {/* ── Footer navigation ── */}
+      <footer className="sticky bottom-0 border-t border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-3 sm:px-6 print:hidden">
+        <div className="mx-auto max-w-3xl flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={goPrevTab}
+            disabled={isFirstTab}
+            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-violet-400"
+          >
+            ← Back
+          </button>
+          <span className="text-xs text-slate-600 tabular-nums">
+            {activeTabIdx + 1} of {DASHBOARD_TABS.length}
+          </span>
+          <button
+            type="button"
+            onClick={goNextTab}
+            disabled={isLastTab}
+            className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-violet-500 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-violet-400"
+          >
+            Next →
+          </button>
+        </div>
+      </footer>
     </div>
     </DataFlowProvider>
     </CurrencyProvider>

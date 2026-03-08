@@ -18,54 +18,28 @@ describe("App shell layout", () => {
     ).toBeGreaterThanOrEqual(1);
   });
 
-  it("renders the tagline", () => {
+  it("renders the intro tab by default with welcome banner", () => {
     render(<Home />);
     expect(
-      screen.getByText(
-        "Your finances at a glance — no judgment, just clarity"
-      )
+      screen.getByText("Welcome! Here's how this works")
     ).toBeInTheDocument();
   });
 
-  it("renders the dashboard panel with section label", () => {
+  it("renders the dashboard tab stepper", () => {
     render(<Home />);
-    const dashboardPanel = screen.getByRole("region", {
-      name: "Financial dashboard",
-    });
-    expect(dashboardPanel).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Dashboard sections" })).toBeInTheDocument();
   });
 
-  it("renders all four entry sections", () => {
+  it("renders the phase toggle showing Dashboard as active", () => {
     render(<Home />);
-    // Use getAllByText for terms that appear in both entry sections and chart legend
-    expect(screen.getAllByText("Assets").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Debts").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Income").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Expenses").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(screen.getByText("My Finances")).toBeInTheDocument();
   });
 
-  it("renders all four dashboard metric cards", () => {
+  it("renders prev/next navigation footer", () => {
     render(<Home />);
-    // Use role-based queries to scope to the metric cards (avoid ambiguity with chart legend)
-    expect(screen.getByRole("group", { name: "Net Worth" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Monthly Cash Flow" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Financial Runway" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Debt-to-Asset Ratio" })).toBeInTheDocument();
-  });
-
-  it("shows metric values in dashboard cards", () => {
-    render(<Home />);
-    // Each metric card has a group role with the metric title as label
-    expect(screen.getByRole("group", { name: "Net Worth" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Monthly Cash Flow" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Financial Runway" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Debt-to-Asset Ratio" })).toBeInTheDocument();
-  });
-
-  it("shows mock data in income and expense sections", () => {
-    render(<Home />);
-    // Use getAllByText since "Salary" may appear in both income entry and Sankey diagram
-    expect(screen.getAllByText("Salary").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Rent/Mortgage Payment").length).toBeGreaterThan(0);
+    expect(screen.getByText("← Back")).toBeInTheDocument();
+    expect(screen.getByText("Next →")).toBeInTheDocument();
+    expect(screen.getByText("1 of 9")).toBeInTheDocument();
   });
 });
