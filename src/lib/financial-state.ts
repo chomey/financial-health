@@ -1140,6 +1140,8 @@ export function computeWithdrawalTaxSummary(
 
   for (const asset of allAssets) {
     if (asset.amount <= 0) continue;
+    // Exclude property equity — it's not a liquid, withdrawable account
+    if (asset.id === "_computed_equity") continue;
     const treatment = getTaxTreatment(asset.category, asset.taxTreatment);
     const bucket = treatment === "tax-free" ? taxFree : treatment === "tax-deferred" ? taxDeferred : taxable;
     bucket.total += asset.amount;
@@ -1168,7 +1170,7 @@ export function computeWithdrawalTaxSummary(
 
     // Build tax-aware buckets for simulation
     const taxBuckets = allAssets
-      .filter((a) => a.amount > 0)
+      .filter((a) => a.amount > 0 && a.id !== "_computed_equity")
       .map((a) => ({
         balance: a.amount,
         monthlyRate: (a.roi ?? getDefaultRoi(a.category) ?? 0) / 100 / 12,
