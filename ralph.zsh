@@ -386,7 +386,7 @@ grep '^\- \[ \]' "$TASKS_FILE" | head -n "$TASK_COUNT" | while IFS= read -r task
   local title=$(extract_task_title "$task")
   local tag=$(extract_agent_tag "$task")
   local model_hint=""
-  if echo "$task" | grep -qiE '\[MILESTONE\]|\[E2E\]|\[OPUS\]'; then
+  if echo "$task" | grep -qiE '\[OPUS\]|\[MATH\]'; then
     model_hint=" ${MAGENTA}opus${NC}"
   else
     model_hint=" ${CYAN}sonnet${NC}"
@@ -439,10 +439,12 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   # Build the prompt from PROMPT.md
   prompt=$(cat "$PROMPT_FILE")
 
-  # Pick model: Opus for MILESTONE/E2E/complex tasks, Sonnet for everything else
-  if echo "$next_task" | grep -qiE '\[MILESTONE\]|\[E2E\]|\[OPUS\]'; then
+  # Pick model: Opus for tasks needing deep reasoning, Sonnet for everything else
+  if echo "$next_task" | grep -qiE '\[OPUS\]|\[MATH\]'; then
     model="opus"
-    print "  ${MAGENTA}▸ Model: opus${NC} ${DIM}(milestone/complex task)${NC}"
+    local tag_reason="complex"
+    echo "$next_task" | grep -qiE '\[MATH\]' && tag_reason="math-heavy"
+    print "  ${MAGENTA}▸ Model: opus${NC} ${DIM}(${tag_reason} task)${NC}"
   else
     model="sonnet"
     print "  ${CYAN}▸ Model: sonnet${NC}"
