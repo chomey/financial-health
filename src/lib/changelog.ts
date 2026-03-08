@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Canadian tax credit categories with income limits and spousal status
+  {
+    version: 141,
+    title: "Full Canadian tax credit category list",
+    description: "Added 15 Canadian credit and deduction categories to the Tax Credits entry: DTC, Spousal Amount, Canada Caregiver, Medical Expense, Home Accessibility, CWB, GST/HST, CCB, Climate Action Incentive, Canada Training, Moving Expenses, Child Care, RRSP (info), Union & Professional Dues, and Northern Residents Deduction. Each includes per-filing-status income limits. Spousal Amount Credit is hidden for single filers and shown only for married/common-law. Introduced getCreditCategoriesForFilingStatus() to filter spouse-only credits based on filing status.",
+    date: "2026-03-07",
+  },
   // Tax credits entry UI, filing status selector, and data model
   {
     version: 140,

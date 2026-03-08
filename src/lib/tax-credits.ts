@@ -57,6 +57,8 @@ export interface TaxCreditCategory {
   infoOnly?: boolean;
   /** Maximum credit amount (for display) */
   maxAmount?: number;
+  /** If true, only show when filing status is married/common-law */
+  requiresSpouse?: boolean;
 }
 
 /** A user-entered tax credit/deduction */
@@ -131,6 +133,24 @@ export function getCreditCategories(jurisdiction: "CA" | "US"): TaxCreditCategor
   );
 }
 
+/**
+ * Get credit categories filtered by jurisdiction and filing status.
+ * Excludes info-only entries and spouse-only credits when not married.
+ */
+export function getCreditCategoriesForFilingStatus(
+  jurisdiction: "CA" | "US",
+  filingStatus: FilingStatus,
+): TaxCreditCategory[] {
+  const isMarried =
+    filingStatus === "married-common-law" || filingStatus === "married-jointly";
+  return ALL_CREDIT_CATEGORIES.filter(
+    (c) =>
+      c.jurisdiction === jurisdiction &&
+      !c.infoOnly &&
+      (!c.requiresSpouse || isMarried),
+  );
+}
+
 /** Get all credit categories including info-only for a jurisdiction */
 export function getAllCreditCategories(jurisdiction: "CA" | "US"): TaxCreditCategory[] {
   return ALL_CREDIT_CATEGORIES.filter((c) => c.jurisdiction === jurisdiction);
@@ -143,34 +163,59 @@ export function findCreditCategory(name: string, jurisdiction: "CA" | "US"): Tax
   );
 }
 
-// Placeholder categories — Tasks 141 and 142 will populate these fully.
-// For now, include a representative set so the UI and encoding are testable.
 export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
   // --- Canadian credits ---
   {
     name: "Disability Tax Credit (DTC)",
     type: "non-refundable",
     jurisdiction: "CA",
-    description: "For individuals with a severe and prolonged impairment. No income limit.",
+    description:
+      "For individuals with a severe and prolonged impairment in mental or physical functions. Worth ~$9,428 federally (plus ~$5,500 supplement for under-18). No income limit — available regardless of income. Unused portion can be transferred to a supporting spouse or family member.",
     incomeLimits: {},
     maxAmount: 9428,
   },
   {
-    name: "Canada Child Benefit (CCB)",
-    type: "refundable",
+    name: "Spousal Amount Credit",
+    type: "non-refundable",
     jurisdiction: "CA",
-    description: "Monthly payment for families with children under 18. Based on family net income.",
-    incomeLimits: {
-      single: { phaseOutStart: 36502 },
-      "married-common-law": { phaseOutStart: 36502 },
-    },
-    maxAmount: 7437,
+    description:
+      "Claimable when your spouse or common-law partner's net income is below ~$15,705. Worth up to ~$2,359 federally. Only available to married or common-law couples.",
+    incomeLimits: {},
+    requiresSpouse: true,
+    maxAmount: 2359,
+  },
+  {
+    name: "Canada Caregiver Credit",
+    type: "non-refundable",
+    jurisdiction: "CA",
+    description:
+      "For individuals supporting a dependent with a physical or mental impairment. Worth up to ~$7,999. Phases out as the dependant's net income exceeds ~$18,783 (based on dependant's income, not yours).",
+    incomeLimits: {},
+    maxAmount: 7999,
+  },
+  {
+    name: "Medical Expense Tax Credit",
+    type: "non-refundable",
+    jurisdiction: "CA",
+    description:
+      "15% federal credit on eligible medical expenses exceeding the lesser of 3% of your net income or $2,759. No income cap, but the effective benefit shrinks as income rises since the 3% floor grows. Includes prescriptions, dental, vision, and many specialist costs.",
+    incomeLimits: {},
+  },
+  {
+    name: "Home Accessibility Tax Credit",
+    type: "non-refundable",
+    jurisdiction: "CA",
+    description:
+      "15% credit on up to $20,000 of eligible renovation costs that make your home safer or more accessible. Available to individuals 65+ or those who qualify for the Disability Tax Credit. No income limit.",
+    incomeLimits: {},
+    maxAmount: 20000,
   },
   {
     name: "Canada Workers Benefit (CWB)",
     type: "refundable",
     jurisdiction: "CA",
-    description: "Refundable credit for low-income workers.",
+    description:
+      "Refundable credit for low-income workers. Single: phases out between $23,495 and $33,015. Married/common-law: phases out between $26,805 and $43,212 based on combined family income.",
     incomeLimits: {
       single: { phaseOutStart: 23495, phaseOutEnd: 33015 },
       "married-common-law": { phaseOutStart: 26805, phaseOutEnd: 43212 },
@@ -181,7 +226,8 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     name: "GST/HST Credit",
     type: "refundable",
     jurisdiction: "CA",
-    description: "Quarterly payment to offset sales tax for low/moderate-income individuals.",
+    description:
+      "Quarterly payment to offset the cost of sales tax for low- and moderate-income individuals and families. Single: phases out above ~$42,335. Married/common-law: phases out above ~$55,286 in combined family net income.",
     incomeLimits: {
       single: { phaseOutStart: 42335 },
       "married-common-law": { phaseOutStart: 55286 },
@@ -189,17 +235,34 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     maxAmount: 519,
   },
   {
-    name: "Medical Expense Tax Credit",
-    type: "non-refundable",
+    name: "Canada Child Benefit (CCB)",
+    type: "refundable",
     jurisdiction: "CA",
-    description: "For medical expenses exceeding 3% of net income or ~$2,759. No income cap.",
-    incomeLimits: {},
+    description:
+      "Monthly tax-free payment for families with children under 18. Based on combined family net income — always uses spousal income when married/common-law. Phases out above $36,502 family net income (rate depends on number of children).",
+    incomeLimits: {
+      single: { phaseOutStart: 36502 },
+      "married-common-law": { phaseOutStart: 36502 },
+    },
+    maxAmount: 7437,
+  },
+  {
+    name: "Climate Action Incentive",
+    type: "refundable",
+    jurisdiction: "CA",
+    description:
+      "Quarterly carbon rebate for residents in provinces where the federal fuel charge applies (AB, SK, MB, ON, NB, NS, PEI, NL). Married/common-law families receive a higher base amount. Phases out above ~$68,000 in family net income.",
+    incomeLimits: {
+      single: { phaseOutStart: 68000 },
+      "married-common-law": { phaseOutStart: 68000 },
+    },
   },
   {
     name: "Canada Training Credit",
     type: "refundable",
     jurisdiction: "CA",
-    description: "Up to $250/year for eligible training. Income must be between $10,342 and $150,473.",
+    description:
+      "Up to $250/year (lifetime limit $5,000) for eligible training fees at designated institutions. Your individual income must be between $10,342 and $150,473. Not affected by spousal income.",
     incomeLimits: {
       single: { hardCap: 150473 },
       "married-common-law": { hardCap: 150473 },
@@ -207,10 +270,19 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     maxAmount: 250,
   },
   {
+    name: "Moving Expenses Deduction",
+    type: "deduction",
+    jurisdiction: "CA",
+    description:
+      "Deductible moving costs when you relocate at least 40 km closer to a new job, business, or post-secondary school. Covers transport, storage, travel, and temporary accommodation. No income limit; deducted against income earned at new location.",
+    incomeLimits: {},
+  },
+  {
     name: "Child Care Expenses Deduction",
     type: "deduction",
     jurisdiction: "CA",
-    description: "Up to $8,000/child under 7. Claimed by lower-income spouse when married.",
+    description:
+      "Deductible child care costs (daycare, camps, babysitters) up to $8,000/child under 7, $5,000 for ages 7–16. Must generally be claimed by the lower-income spouse when married/common-law.",
     incomeLimits: {},
     maxAmount: 8000,
   },
@@ -218,9 +290,25 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     name: "RRSP Deduction",
     type: "deduction",
     jurisdiction: "CA",
-    description: "Already tracked in your Assets — no need to enter here.",
+    description: "Already tracked in your Assets — no need to enter here. Spousal RRSP contributions are also tracked there.",
     incomeLimits: {},
     infoOnly: true,
+  },
+  {
+    name: "Union & Professional Dues",
+    type: "deduction",
+    jurisdiction: "CA",
+    description:
+      "Annual dues paid to a union, professional association, or regulatory body required to maintain your professional status are fully deductible. No income limit.",
+    incomeLimits: {},
+  },
+  {
+    name: "Northern Residents Deduction",
+    type: "deduction",
+    jurisdiction: "CA",
+    description:
+      "For individuals who live in a prescribed northern or intermediate zone for at least 6 consecutive months. Includes a residency deduction and a travel benefit deduction. No income limit — you must qualify geographically.",
+    incomeLimits: {},
   },
 
   // --- US credits ---
