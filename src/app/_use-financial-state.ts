@@ -34,7 +34,7 @@ export function useFinancialState() {
   const [fxRates, setFxRates] = useState<FxRates | undefined>(undefined);
   const [taxCredits, setTaxCredits] = useState<TaxCredit[]>(INITIAL_STATE.taxCredits ?? []);
   const [filingStatus, setFilingStatus] = useState<FilingStatus>(INITIAL_STATE.filingStatus ?? getDefaultFilingStatus(INITIAL_STATE.country ?? "CA"));
-  const [taxYear, setTaxYear] = useState<number>(2025);
+  const [taxYear, setTaxYear] = useState<number>(new Date().getFullYear());
   const [flowchartAcks, setFlowchartAcks] = useState<string[]>([]);
   const [flowchartSkips, setFlowchartSkips] = useState<string[]>([]);
   const [isRetired, setIsRetired] = useState(false);

@@ -2,9 +2,10 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 151. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 157. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 - [x] Task 154: Validate all Canadian tax credits/brackets for 2025/2026 — Verify and fix tax-credits.ts and tax-tables.ts CA values against CRA sources for both tax years. DTC federal $10,138 (was $9,428), DTC under-18 supplement $5,914, CCB $7,997/<6 and $6,748/6-17 (phase-out $37,487), CWB $1,633 single / $2,813 family, GST/HST $533 single (phase-out $56,181), Spousal Amount, Canada Caregiver $8,601 (dependant threshold $20,197), and all other CA credits. Update descriptions and maxAmount fields. [@backend] [MATH]
 - [x] Task 155: Validate all US tax credits/brackets for 2025/2026 — Verify and fix tax-credits.ts and tax-tables.ts US values against IRS sources for both tax years. EITC up to $8,046 (3+ children), Child Tax Credit $2,200 (refundable portion $1,700), Adoption Credit $17,280, Saver's Credit income limits, AOTC, Lifetime Learning Credit, student loan interest deduction phase-outs, standard deduction amounts, EV credit, and all other US credits. Update descriptions, maxAmount, and phase-out thresholds. [@backend] [MATH]
 - [x] Task 156: Retirement-aware Money Steps — Add an "I'm retired" checkbox in the step detail modal that marks income-dependent steps as complete/N/A. Persist in URL state (e.g. `fret=1`). Auto-detect retirement heuristically: if no employment income AND (runway > 20 years OR monthly investment returns > monthly expenses), suggest the checkbox. When retired, "Budget & Essentials" hint should say "Expenses tracked — living on savings/investments" instead of "no income yet". Employer match, tax-advantaged contribution steps become skippable. Steps like emergency fund and debt payoff remain relevant. [@fullstack]
+- [x] Task 157: Wizard welcome step, compact panels, tax credit UX — Add a dedicated Welcome wizard step with sample profile cards and "enter your own" option. Merge tax credits into Expenses step. Compact spacing across all wizard entry panels. Add Ko-fi widget. Default tax year to current year. [@fullstack]

@@ -253,7 +253,7 @@ function toCompact(state: FinancialState): CompactState {
     }));
   }
   if (state.filingStatus) compact.fs = state.filingStatus;
-  if (state.taxYear !== undefined && state.taxYear !== 2025) compact.ty = state.taxYear;
+  if (state.taxYear !== undefined) compact.ty = state.taxYear;
   if (state.flowchartAcks && state.flowchartAcks.length > 0) compact.fca = state.flowchartAcks;
   if (state.flowchartSkips && state.flowchartSkips.length > 0) compact.fcs2 = state.flowchartSkips;
   if (state.isRetired) compact.ret = 1;

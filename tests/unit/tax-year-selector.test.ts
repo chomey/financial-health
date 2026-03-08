@@ -121,10 +121,10 @@ describe("computeTax with year parameter", () => {
     expect(tax2026.totalTax).toBeLessThan(tax2025.totalTax);
   });
 
-  it("defaults to 2025 when year not specified", () => {
+  it("defaults to current year when year not specified", () => {
     const taxDefault = computeTax(60000, "employment", "CA", "ON");
-    const tax2025 = computeTax(60000, "employment", "CA", "ON", 2025);
-    expect(taxDefault.totalTax).toEqual(tax2025.totalTax);
+    const taxCurrentYear = computeTax(60000, "employment", "CA", "ON", new Date().getFullYear());
+    expect(taxDefault.totalTax).toEqual(taxCurrentYear.totalTax);
   });
 
   it("computes US capital gains with year-specific brackets", () => {
@@ -215,13 +215,12 @@ describe("URL state roundtrip with taxYear", () => {
     expect(decoded!.taxYear).toBe(2026);
   });
 
-  it("omits taxYear from URL when 2025 (default)", () => {
+  it("preserves taxYear 2025 in URL", () => {
     const state: FinancialState = { ...INITIAL_STATE, taxYear: 2025 };
     const encoded = encodeState(state);
     const decoded = decodeState(encoded);
     expect(decoded).not.toBeNull();
-    // taxYear should be undefined (omitted) since 2025 is default
-    expect(decoded!.taxYear).toBeUndefined();
+    expect(decoded!.taxYear).toBe(2025);
   });
 
   it("backward compatible: old URLs without taxYear decode to undefined", () => {

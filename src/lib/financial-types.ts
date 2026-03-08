@@ -24,7 +24,7 @@ export interface FinancialState {
   fxManualOverride?: number; // manual FX override: 1 foreign = X home (persisted in URL)
   taxCredits?: TaxCredit[]; // tax credits and deductions
   filingStatus?: FilingStatus; // filing status for income limit checks
-  taxYear?: number; // tax year for brackets/credits (2025 or 2026, default 2025)
+  taxYear?: number; // tax year for brackets/credits (default: current year)
   flowchartAcks?: string[]; // Money Steps acknowledged step IDs
   flowchartSkips?: string[]; // Money Steps skipped (N/A) step IDs
   isRetired?: boolean; // retirement mode flag

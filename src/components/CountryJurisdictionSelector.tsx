@@ -91,7 +91,7 @@ export default function CountryJurisdictionSelector({
   jurisdiction,
   onCountryChange,
   onJurisdictionChange,
-  taxYear = 2025,
+  taxYear = new Date().getFullYear(),
   onTaxYearChange,
 }: CountryJurisdictionSelectorProps) {
   const jurisdictions = country === "CA" ? CA_PROVINCES : US_STATES;

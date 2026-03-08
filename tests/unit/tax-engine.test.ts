@@ -55,7 +55,7 @@ describe("computeTax — edge cases", () => {
 
 describe("computeTax — Canadian employment income", () => {
   it("computes tax for $50,000 income in Ontario", () => {
-    const result = computeTax(50_000, "employment", "CA", "ON");
+    const result = computeTax(50_000, "employment", "CA", "ON", 2025);
     expectValidResult(result);
 
     // Federal: $50,000 in first bracket (15%), BPA credit = $16,129 × 0.15
@@ -71,7 +71,7 @@ describe("computeTax — Canadian employment income", () => {
   });
 
   it("computes tax for $100,000 income in Ontario", () => {
-    const result = computeTax(100_000, "employment", "CA", "ON");
+    const result = computeTax(100_000, "employment", "CA", "ON", 2025);
     expectValidResult(result);
 
     // Combined federal + ON ≈ $21,307
@@ -80,7 +80,7 @@ describe("computeTax — Canadian employment income", () => {
   });
 
   it("computes tax for $100,000 income in Alberta", () => {
-    const result = computeTax(100_000, "employment", "CA", "AB");
+    const result = computeTax(100_000, "employment", "CA", "AB", 2025);
     expectValidResult(result);
 
     // Federal ≈ $14,925
@@ -179,7 +179,7 @@ describe("computeTax — Canadian capital gains", () => {
 
 describe("computeTax — US employment income", () => {
   it("computes tax for $50,000 income in California", () => {
-    const result = computeTax(50_000, "employment", "US", "CA");
+    const result = computeTax(50_000, "employment", "US", "CA", 2025);
     expectValidResult(result);
 
     // Federal: $50k - $15k deduction = $35k taxable
@@ -252,7 +252,7 @@ describe("computeTax — US employment income", () => {
     // The US tax engine should apply standard deduction as a deduction from income,
     // not as a credit. So $50k income should have lower federal tax than
     // calculateProgressiveTax($50k, US_FEDERAL) which uses credit approach.
-    const result = computeTax(50_000, "employment", "US", "TX");
+    const result = computeTax(50_000, "employment", "US", "TX", 2025);
     // Taxable = $50k - $15k = $35k
     // Tax on $35k: $11,925 × 10% + ($35k - $11,925) × 12%
     // = $1,192.50 + $2,769 = $3,961.50
@@ -274,7 +274,7 @@ describe("computeTax — US capital gains", () => {
   });
 
   it("applies 15% rate for gains between thresholds", () => {
-    const result = computeTax(100_000, "capital-gains", "US", "TX");
+    const result = computeTax(100_000, "capital-gains", "US", "TX", 2025);
     // Federal: $48,350 × 0% + ($100k - $48,350) × 15% = $7,747.50
     expect(result.federalTax).toBeCloseTo(7_747.5, 0);
     expect(result.provincialStateTax).toBe(0);

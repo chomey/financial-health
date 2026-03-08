@@ -64,7 +64,7 @@ function EligibilityBadge({
   annualIncome,
   filingStatus,
   country,
-  taxYear = 2025,
+  taxYear = new Date().getFullYear(),
 }: {
   category: string;
   annualIncome: number;
@@ -116,7 +116,7 @@ export default function TaxCreditEntry({
   country,
   filingStatus,
   annualIncome,
-  taxYear = 2025,
+  taxYear = new Date().getFullYear(),
 }: TaxCreditEntryProps) {
   const [credits, setCredits] = useState<TaxCredit[]>(items ?? []);
   const isExternalSync = useRef(false);

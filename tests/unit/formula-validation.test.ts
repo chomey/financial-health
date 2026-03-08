@@ -435,9 +435,10 @@ describe("Formula Validation — Cross-metric Consistency", () => {
   it("tax components are consistent between computeTotals and computeTax", () => {
     const state = makeState({
       income: [{ id: "i1", category: "Salary", amount: 6000 }],
+      taxYear: 2025,
     });
     const totals = computeTotals(state);
-    const directTax = computeTax(6000 * 12, "employment", "CA", "ON");
+    const directTax = computeTax(6000 * 12, "employment", "CA", "ON", 2025);
 
     expect(totals.totalFederalTax).toBeCloseTo(directTax.federalTax, 2);
     expect(totals.totalProvincialStateTax).toBeCloseTo(directTax.provincialStateTax, 2);

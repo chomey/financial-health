@@ -75,7 +75,7 @@ function getUSFederalMarginalRate(grossIncome: number, table: BracketTable): num
  * @param incomeType - Type of income: "employment", "capital-gains", or "other"
  * @param country - "CA" for Canada or "US" for United States
  * @param jurisdiction - Province/territory code (e.g., "ON") or state code (e.g., "CA")
- * @param year - Tax year (2025 or 2026; defaults to 2025)
+ * @param year - Tax year (2025 or 2026; defaults to current year)
  * @returns TaxResult with federal, provincial/state, total tax, rates, and after-tax income
  */
 export function computeTax(
@@ -83,7 +83,7 @@ export function computeTax(
   incomeType: IncomeType,
   country: "CA" | "US",
   jurisdiction: string,
-  year: number = 2025
+  year: number = new Date().getFullYear()
 ): TaxResult {
   if (annualIncome <= 0) {
     return {
@@ -107,7 +107,7 @@ function computeCanadianTax(
   annualIncome: number,
   incomeType: IncomeType,
   province: string,
-  year: number = 2025
+  year: number = new Date().getFullYear()
 ): TaxResult {
   const { federal, provincial } = getCanadianBrackets(province, year);
 
@@ -155,7 +155,7 @@ function computeUSTax(
   annualIncome: number,
   incomeType: IncomeType,
   state: string,
-  year: number = 2025
+  year: number = new Date().getFullYear()
 ): TaxResult {
   const { federal, state: stateTable } = getUSBrackets(state, year);
 
@@ -197,7 +197,7 @@ function computeUSCapitalGainsTax(
   capitalGains: number,
   federal: BracketTable,
   stateTable: BracketTable,
-  year: number = 2025
+  year: number = new Date().getFullYear()
 ): TaxResult {
   // US long-term capital gains use their own bracket table
   const capGainsBrackets = getUSCapitalGainsBrackets(year);
@@ -236,7 +236,7 @@ export function getMarginalRateForIncome(
   annualIncome: number,
   country: "CA" | "US",
   jurisdiction: string,
-  year: number = 2025
+  year: number = new Date().getFullYear()
 ): number {
   if (annualIncome <= 0) return 0;
   return computeTax(annualIncome, "employment", country, jurisdiction, year).marginalRate;

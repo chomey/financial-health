@@ -76,9 +76,10 @@ describe("financial-state", () => {
     });
 
     it("computes after-tax income matching individual tax computations", () => {
-      const totals = computeTotals(INITIAL_STATE);
+      const state = { ...INITIAL_STATE, taxYear: 2025 };
+      const totals = computeTotals(state);
       // Salary $54k + investment interest ($5000 Savings @ 2% = $100/yr) = $54100 employment income
-      const salaryPlusInterestTax = computeTax(54100, "employment", "CA", "ON");
+      const salaryPlusInterestTax = computeTax(54100, "employment", "CA", "ON", 2025);
       // monthlyAfterTaxIncome is based on salary only (before investment interest)
       // but tax includes investment interest, so after-tax = salary - total tax
       const expectedAfterTaxAnnual = 54000 - salaryPlusInterestTax.totalTax;
@@ -94,11 +95,12 @@ describe("financial-state", () => {
         ],
         country: "CA",
         jurisdiction: "ON",
+        taxYear: 2025,
       };
       const totals = computeTotals(state);
       // Capital gains taxed separately + investment interest ($100/yr) as employment
-      const capGainsTax = computeTax(60000, "capital-gains", "CA", "ON");
-      const interestTax = computeTax(totals.totalInvestmentInterest, "employment", "CA", "ON");
+      const capGainsTax = computeTax(60000, "capital-gains", "CA", "ON", 2025);
+      const interestTax = computeTax(totals.totalInvestmentInterest, "employment", "CA", "ON", 2025);
       const expectedAfterTax = 60000 - capGainsTax.totalTax - interestTax.totalTax;
       expect(totals.monthlyAfterTaxIncome).toBeCloseTo(expectedAfterTax / 12, 2);
     });
@@ -111,11 +113,12 @@ describe("financial-state", () => {
         ],
         country: "US",
         jurisdiction: "CA",
+        taxYear: 2025,
       };
       const totals = computeTotals(state);
       // Salary $60k + investment interest from Savings Account ($5000 @ 2% = $100/yr)
       const totalEmployment = 60000 + totals.totalInvestmentInterest;
-      const usTax = computeTax(totalEmployment, "employment", "US", "CA");
+      const usTax = computeTax(totalEmployment, "employment", "US", "CA", 2025);
       const expectedAfterTaxAnnual = 60000 - usTax.totalTax;
       expect(totals.monthlyAfterTaxIncome).toBeCloseTo(expectedAfterTaxAnnual / 12, 2);
       expect(totals.totalTaxEstimate).toBeCloseTo(usTax.totalTax, 2);

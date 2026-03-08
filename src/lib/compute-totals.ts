@@ -52,7 +52,7 @@ export function computeMonthlyInvestmentReturns(assets: FinancialState["assets"]
 export function computeTotals(state: FinancialState) {
   const homeCurrency = getHomeCurrency(state.country ?? "CA");
   const fxRates = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
-  const taxYear = state.taxYear ?? 2025;
+  const taxYear = state.taxYear ?? new Date().getFullYear();
 
   // Helper to convert an item amount to home currency
   const toHome = (amount: number, itemCurrency?: SupportedCurrency) =>
@@ -208,7 +208,7 @@ function computeBracketSegments(taxableIncome: number, table: BracketTable): Tax
 export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: number, federalTax: number, provincialStateTax: number, effectiveTaxRate: number, totalTax: number, investmentIncomeAccounts?: InvestmentIncomeAccount[]): TaxExplainerDetails | undefined {
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
-  const taxYear = state.taxYear ?? 2025;
+  const taxYear = state.taxYear ?? new Date().getFullYear();
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
 
   // Get jurisdiction label
