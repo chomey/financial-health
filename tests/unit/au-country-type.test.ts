@@ -122,10 +122,11 @@ describe("AU country type – benchmarks", () => {
 });
 
 describe("AU country type – tax credits", () => {
-  it("getCreditCategories returns empty array for AU (no credits defined yet)", () => {
+  it("getCreditCategories returns AU credits", () => {
     const credits = getCreditCategories("AU", 2025);
     expect(Array.isArray(credits)).toBe(true);
-    expect(credits.length).toBe(0);
+    expect(credits.length).toBeGreaterThan(0);
+    expect(credits.every((c) => c.jurisdiction === "AU")).toBe(true);
   });
 
   it("getFilingStatuses accepts AU and returns defaults", () => {
