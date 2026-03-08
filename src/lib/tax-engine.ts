@@ -10,7 +10,7 @@ import {
   calculateCanadianCapitalGainsInclusion,
   getCanadianBrackets,
   getUSBrackets,
-  US_CAPITAL_GAINS_2025,
+  getUSCapitalGainsBrackets,
   type BracketTable,
 } from "./tax-tables";
 
@@ -75,13 +75,15 @@ function getUSFederalMarginalRate(grossIncome: number, table: BracketTable): num
  * @param incomeType - Type of income: "employment", "capital-gains", or "other"
  * @param country - "CA" for Canada or "US" for United States
  * @param jurisdiction - Province/territory code (e.g., "ON") or state code (e.g., "CA")
+ * @param year - Tax year (2025 or 2026; defaults to 2025)
  * @returns TaxResult with federal, provincial/state, total tax, rates, and after-tax income
  */
 export function computeTax(
   annualIncome: number,
   incomeType: IncomeType,
   country: "CA" | "US",
-  jurisdiction: string
+  jurisdiction: string,
+  year: number = 2025
 ): TaxResult {
   if (annualIncome <= 0) {
     return {
@@ -95,18 +97,19 @@ export function computeTax(
   }
 
   if (country === "CA") {
-    return computeCanadianTax(annualIncome, incomeType, jurisdiction);
+    return computeCanadianTax(annualIncome, incomeType, jurisdiction, year);
   } else {
-    return computeUSTax(annualIncome, incomeType, jurisdiction);
+    return computeUSTax(annualIncome, incomeType, jurisdiction, year);
   }
 }
 
 function computeCanadianTax(
   annualIncome: number,
   incomeType: IncomeType,
-  province: string
+  province: string,
+  year: number = 2025
 ): TaxResult {
-  const { federal, provincial } = getCanadianBrackets(province);
+  const { federal, provincial } = getCanadianBrackets(province, year);
 
   let taxableIncome: number;
   if (incomeType === "capital-gains") {
@@ -151,12 +154,13 @@ function computeCanadianTax(
 function computeUSTax(
   annualIncome: number,
   incomeType: IncomeType,
-  state: string
+  state: string,
+  year: number = 2025
 ): TaxResult {
-  const { federal, state: stateTable } = getUSBrackets(state);
+  const { federal, state: stateTable } = getUSBrackets(state, year);
 
   if (incomeType === "capital-gains") {
-    return computeUSCapitalGainsTax(annualIncome, federal, stateTable);
+    return computeUSCapitalGainsTax(annualIncome, federal, stateTable, year);
   }
 
   // Employment / other income: apply standard deduction for federal
@@ -192,10 +196,12 @@ function computeUSTax(
 function computeUSCapitalGainsTax(
   capitalGains: number,
   federal: BracketTable,
-  stateTable: BracketTable
+  stateTable: BracketTable,
+  year: number = 2025
 ): TaxResult {
   // US long-term capital gains use their own bracket table
-  const federalTax = calculateProgressiveTax(capitalGains, US_CAPITAL_GAINS_2025);
+  const capGainsBrackets = getUSCapitalGainsBrackets(year);
+  const federalTax = calculateProgressiveTax(capitalGains, capGainsBrackets);
 
   // Most states tax capital gains as ordinary income
   const stateTax = stateTable.brackets.length > 0
@@ -206,7 +212,7 @@ function computeUSCapitalGainsTax(
   const effectiveRate = capitalGains > 0 ? totalTax / capitalGains : 0;
   const afterTaxIncome = capitalGains - totalTax;
 
-  const federalMarginal = getMarginalRate(capitalGains, US_CAPITAL_GAINS_2025);
+  const federalMarginal = getMarginalRate(capitalGains, capGainsBrackets);
   const stateMarginal = stateTable.brackets.length > 0
     ? getMarginalRate(capitalGains, stateTable)
     : 0;
@@ -229,8 +235,9 @@ function computeUSCapitalGainsTax(
 export function getMarginalRateForIncome(
   annualIncome: number,
   country: "CA" | "US",
-  jurisdiction: string
+  jurisdiction: string,
+  year: number = 2025
 ): number {
   if (annualIncome <= 0) return 0;
-  return computeTax(annualIncome, "employment", country, jurisdiction).marginalRate;
+  return computeTax(annualIncome, "employment", country, jurisdiction, year).marginalRate;
 }

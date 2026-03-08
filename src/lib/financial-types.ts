@@ -24,6 +24,7 @@ export interface FinancialState {
   fxManualOverride?: number; // manual FX override: 1 foreign = X home (persisted in URL)
   taxCredits?: TaxCredit[]; // tax credits and deductions
   filingStatus?: FilingStatus; // filing status for income limit checks
+  taxYear?: number; // tax year for brackets/credits (2025 or 2026, default 2025)
 }
 
 export const INITIAL_STATE: FinancialState = {

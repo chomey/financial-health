@@ -71,6 +71,7 @@ export default function Home() {
     fxManualOverride,
     taxCredits,
     filingStatus,
+    taxYear,
     showSampleProfiles,
     showWizard,
     safeWithdrawalRate,
@@ -82,6 +83,7 @@ export default function Home() {
     setAge,
     setJurisdiction,
     setFilingStatus,
+    setTaxYear,
     setFxManualOverride,
     setShowSampleProfiles,
     setOutlookYears,
@@ -102,7 +104,7 @@ export default function Home() {
     handleSwrChange,
   } = useFinancialState();
 
-  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride, taxCredits, filingStatus };
+  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride, taxCredits, filingStatus, taxYear };
   const metrics = computeMetrics(state);
   const runwayDetails = metrics.find(m => m.title === "Financial Runway")?.runwayDetails;
   const financialData = { ...toFinancialData(state), outlookYears };
@@ -307,6 +309,8 @@ export default function Home() {
               jurisdiction={jurisdiction}
               onCountryChange={handleCountryChange}
               onJurisdictionChange={setJurisdiction}
+              taxYear={taxYear}
+              onTaxYearChange={setTaxYear}
             />
             <select
               value={filingStatus}
@@ -458,7 +462,7 @@ export default function Home() {
               </CollapsibleSection>
 
               <CollapsibleSection id="tax-credits" title="Tax Credits" icon="🏷️" summary={taxCredits.length > 0 ? `${taxCredits.length} credit${taxCredits.length !== 1 ? "s" : ""}` : "None"}>
-                <TaxCreditEntry items={taxCredits} onChange={setTaxCredits} country={country} filingStatus={filingStatus} annualIncome={totals.monthlyIncome * 12} />
+                <TaxCreditEntry items={taxCredits} onChange={setTaxCredits} country={country} filingStatus={filingStatus} annualIncome={totals.monthlyIncome * 12} taxYear={taxYear} />
               </CollapsibleSection>
 
               <CollapsibleSection id="property" title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"} dataFlowId="section-property" dataFlowValue={totals.totalPropertyEquity} dataFlowLabel="Property" dataFlowItems={propertyItems}>

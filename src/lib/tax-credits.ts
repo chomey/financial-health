@@ -41,6 +41,13 @@ export interface IncomeLimitThresholds {
   ineligible?: boolean;
 }
 
+/** Per-year overrides for credit values that change with inflation indexing */
+export interface TaxCreditYearOverride {
+  maxAmount?: number;
+  description?: string;
+  incomeLimits?: Partial<Record<FilingStatus, IncomeLimitThresholds>>;
+}
+
 /** A tax credit/deduction category definition */
 export interface TaxCreditCategory {
   /** Display name */
@@ -59,6 +66,8 @@ export interface TaxCreditCategory {
   maxAmount?: number;
   /** If true, only show when filing status is married/common-law */
   requiresSpouse?: boolean;
+  /** Year-specific overrides (e.g., indexed amounts for 2026) */
+  yearOverrides?: Record<number, TaxCreditYearOverride>;
 }
 
 /** A user-entered tax credit/deduction */
@@ -126,11 +135,26 @@ export function getIncomeLimitDescription(
   return null;
 }
 
+/**
+ * Resolve a credit category for a specific tax year by merging yearOverrides.
+ * Returns a new object with overridden fields applied (does not mutate original).
+ */
+function resolveCategoryForYear(category: TaxCreditCategory, year: number): TaxCreditCategory {
+  const overrides = category.yearOverrides?.[year];
+  if (!overrides) return category;
+  return {
+    ...category,
+    ...(overrides.maxAmount !== undefined ? { maxAmount: overrides.maxAmount } : {}),
+    ...(overrides.description !== undefined ? { description: overrides.description } : {}),
+    ...(overrides.incomeLimits !== undefined ? { incomeLimits: overrides.incomeLimits } : {}),
+  };
+}
+
 /** Get all credit categories for a jurisdiction, excluding info-only entries */
-export function getCreditCategories(jurisdiction: "CA" | "US"): TaxCreditCategory[] {
-  return ALL_CREDIT_CATEGORIES.filter(
-    (c) => c.jurisdiction === jurisdiction && !c.infoOnly,
-  );
+export function getCreditCategories(jurisdiction: "CA" | "US", year: number = 2025): TaxCreditCategory[] {
+  return ALL_CREDIT_CATEGORIES
+    .filter((c) => c.jurisdiction === jurisdiction && !c.infoOnly)
+    .map((c) => resolveCategoryForYear(c, year));
 }
 
 /**
@@ -140,27 +164,33 @@ export function getCreditCategories(jurisdiction: "CA" | "US"): TaxCreditCategor
 export function getCreditCategoriesForFilingStatus(
   jurisdiction: "CA" | "US",
   filingStatus: FilingStatus,
+  year: number = 2025,
 ): TaxCreditCategory[] {
   const isMarried =
     filingStatus === "married-common-law" || filingStatus === "married-jointly";
-  return ALL_CREDIT_CATEGORIES.filter(
-    (c) =>
-      c.jurisdiction === jurisdiction &&
-      !c.infoOnly &&
-      (!c.requiresSpouse || isMarried),
-  );
+  return ALL_CREDIT_CATEGORIES
+    .filter(
+      (c) =>
+        c.jurisdiction === jurisdiction &&
+        !c.infoOnly &&
+        (!c.requiresSpouse || isMarried),
+    )
+    .map((c) => resolveCategoryForYear(c, year));
 }
 
 /** Get all credit categories including info-only for a jurisdiction */
-export function getAllCreditCategories(jurisdiction: "CA" | "US"): TaxCreditCategory[] {
-  return ALL_CREDIT_CATEGORIES.filter((c) => c.jurisdiction === jurisdiction);
+export function getAllCreditCategories(jurisdiction: "CA" | "US", year: number = 2025): TaxCreditCategory[] {
+  return ALL_CREDIT_CATEGORIES
+    .filter((c) => c.jurisdiction === jurisdiction)
+    .map((c) => resolveCategoryForYear(c, year));
 }
 
 /** Look up a category definition by name and jurisdiction */
-export function findCreditCategory(name: string, jurisdiction: "CA" | "US"): TaxCreditCategory | undefined {
-  return ALL_CREDIT_CATEGORIES.find(
+export function findCreditCategory(name: string, jurisdiction: "CA" | "US", year: number = 2025): TaxCreditCategory | undefined {
+  const found = ALL_CREDIT_CATEGORIES.find(
     (c) => c.name === name && c.jurisdiction === jurisdiction,
   );
+  return found ? resolveCategoryForYear(found, year) : undefined;
 }
 
 export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
@@ -173,6 +203,12 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "For individuals with a severe and prolonged impairment in mental or physical functions. Worth ~$9,428 federally (plus ~$5,500 supplement for under-18). No income limit — available regardless of income. Unused portion can be transferred to a supporting spouse or family member.",
     incomeLimits: {},
     maxAmount: 9428,
+    yearOverrides: {
+      2026: {
+        maxAmount: 9_683,
+        description: "For individuals with a severe and prolonged impairment in mental or physical functions. Worth ~$9,683 federally (plus ~$5,649 supplement for under-18). No income limit — available regardless of income. Unused portion can be transferred to a supporting spouse or family member.",
+      },
+    },
   },
   {
     name: "Spousal Amount Credit",
@@ -221,6 +257,16 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-common-law": { phaseOutStart: 26805, phaseOutEnd: 43212 },
     },
     maxAmount: 1518,
+    yearOverrides: {
+      2026: {
+        maxAmount: 1_559,
+        description: "Refundable credit for low-income workers. Single: phases out between $24,130 and $33,907. Married/common-law: phases out between $27,530 and $44,380 based on combined family income.",
+        incomeLimits: {
+          single: { phaseOutStart: 24130, phaseOutEnd: 33907 },
+          "married-common-law": { phaseOutStart: 27530, phaseOutEnd: 44380 },
+        },
+      },
+    },
   },
   {
     name: "GST/HST Credit",
@@ -233,6 +279,16 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-common-law": { phaseOutStart: 55286 },
     },
     maxAmount: 519,
+    yearOverrides: {
+      2026: {
+        maxAmount: 533,
+        description: "Quarterly payment to offset the cost of sales tax for low- and moderate-income individuals and families. Single: phases out above ~$44,530. Married/common-law: phases out above ~$56,781 in combined family net income.",
+        incomeLimits: {
+          single: { phaseOutStart: 44530 },
+          "married-common-law": { phaseOutStart: 56781 },
+        },
+      },
+    },
   },
   {
     name: "Canada Child Benefit (CCB)",
@@ -245,6 +301,16 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-common-law": { phaseOutStart: 36502 },
     },
     maxAmount: 7437,
+    yearOverrides: {
+      2026: {
+        maxAmount: 7_638,
+        description: "Monthly tax-free payment for families with children under 18. Based on combined family net income — always uses spousal income when married/common-law. Phases out above $37,487 family net income (rate depends on number of children).",
+        incomeLimits: {
+          single: { phaseOutStart: 37487 },
+          "married-common-law": { phaseOutStart: 37487 },
+        },
+      },
+    },
   },
   {
     name: "Climate Action Incentive",
@@ -325,6 +391,18 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-separately": { ineligible: true },
     },
     maxAmount: 7430,
+    yearOverrides: {
+      2026: {
+        maxAmount: 8_046,
+        description: "Refundable credit for low-to-moderate income workers. Amount varies by income and number of children — up to $8,046 with 3+ children. Phases out: Single/HoH from $18,134 to $58,428 (3+ children), MFJ from $24,888 to $65,858. Not available for Married Filing Separately.",
+        incomeLimits: {
+          single: { phaseOutStart: 18134, phaseOutEnd: 58428 },
+          "head-of-household": { phaseOutStart: 18134, phaseOutEnd: 58428 },
+          "married-jointly": { phaseOutStart: 24888, phaseOutEnd: 65858 },
+          "married-separately": { ineligible: true },
+        },
+      },
+    },
   },
   {
     name: "Child Tax Credit",
@@ -339,6 +417,12 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-separately": { phaseOutStart: 200000 },
     },
     maxAmount: 2000,
+    yearOverrides: {
+      2026: {
+        maxAmount: 2_200,
+        description: "$2,200 per qualifying child under 17. Up to $1,700 is refundable (Additional Child Tax Credit). Phases out $50 per $1,000 of AGI above $200,000 (Single/HoH/MFS) or $400,000 (MFJ). Most families with children under 17 qualify.",
+      },
+    },
   },
   {
     name: "Child and Dependent Care Credit",
@@ -395,6 +479,17 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
       "married-separately": { hardCap: 38250 },
     },
     maxAmount: 2000,
+    yearOverrides: {
+      2026: {
+        description: "Non-refundable credit for low- and moderate-income individuals who contribute to a 401(k), IRA, or other retirement account. Worth 10–50% of contributions up to $2,000 ($4,000 MFJ). Fully ineligible above: $39,500 (Single/MFS), $59,250 (HoH), $79,000 (MFJ).",
+        incomeLimits: {
+          single: { hardCap: 39500 },
+          "head-of-household": { hardCap: 59250 },
+          "married-jointly": { hardCap: 79000 },
+          "married-separately": { hardCap: 39500 },
+        },
+      },
+    },
   },
   {
     name: "Premium Tax Credit",
@@ -446,9 +541,14 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     type: "deduction",
     jurisdiction: "US",
     description:
-      "The standard deduction reduces your taxable income before calculating tax — no receipts needed. For 2024: $14,600 (Single/MFS), $21,900 (Head of Household), $29,200 (Married Filing Jointly). This is your baseline; itemizing deductions is only worthwhile if your deductible expenses exceed this amount.",
+      "The standard deduction reduces your taxable income before calculating tax — no receipts needed. For 2025: $15,000 (Single/MFS), $22,500 (Head of Household), $30,000 (Married Filing Jointly). This is your baseline; itemizing deductions is only worthwhile if your deductible expenses exceed this amount.",
     incomeLimits: {},
     infoOnly: true,
+    yearOverrides: {
+      2026: {
+        description: "The standard deduction reduces your taxable income before calculating tax — no receipts needed. For 2026: $15,420 (Single/MFS), $23,130 (Head of Household), $30,840 (Married Filing Jointly). This is your baseline; itemizing deductions is only worthwhile if your deductible expenses exceed this amount.",
+      },
+    },
   },
   {
     name: "Mortgage Interest Deduction",

@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Tax year selector (2025/2026)
+  {
+    version: 153,
+    title: "Tax year selector (2025/2026)",
+    description: "Added a tax year toggle to the header bar (2025/2026). When switching tax years, all federal tax brackets, basic personal amounts, standard deductions, credit maxAmounts, phase-out thresholds, and descriptions update to reflect that year's inflation-indexed values. Canadian federal brackets use CRA indexation; US federal brackets use IRS adjustments. Provincial/state tables default to 2025 values until officially published. Tax year persists in URL state for sharing.",
+    date: "2026-03-08",
+  },
   // Tax credits applied to displayed tax and cash flow
   {
     version: 152,

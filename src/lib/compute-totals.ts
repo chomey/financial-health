@@ -8,7 +8,7 @@ import type { SupportedCurrency } from "@/lib/currency";
 import { getTaxTreatment } from "@/lib/withdrawal-tax";
 import { computeTax } from "@/lib/tax-engine";
 import type { TaxExplainerDetails, TaxBracketSegment } from "@/components/DataFlowArrows";
-import { getCanadianBrackets, getUSBrackets, calculateCanadianCapitalGainsInclusion, US_CAPITAL_GAINS_2025, type BracketTable } from "@/lib/tax-tables";
+import { getCanadianBrackets, getUSBrackets, getUSCapitalGainsBrackets, calculateCanadianCapitalGainsInclusion, type BracketTable } from "@/lib/tax-tables";
 import { CA_PROVINCES, US_STATES } from "@/components/CountryJurisdictionSelector";
 
 export interface InvestmentIncomeAccount {
@@ -49,6 +49,7 @@ export function computeMonthlyInvestmentReturns(assets: FinancialState["assets"]
 export function computeTotals(state: FinancialState) {
   const homeCurrency = getHomeCurrency(state.country ?? "CA");
   const fxRates = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
+  const taxYear = state.taxYear ?? 2025;
 
   // Helper to convert an item amount to home currency
   const toHome = (amount: number, itemCurrency?: SupportedCurrency) =>
@@ -136,7 +137,7 @@ export function computeTotals(state: FinancialState) {
   let weightedEffectiveRate = 0;
 
   for (const [type, annualAmt] of Object.entries(incomeByType)) {
-    const taxResult = computeTax(annualAmt, type as "employment" | "capital-gains" | "other", country, jurisdiction);
+    const taxResult = computeTax(annualAmt, type as "employment" | "capital-gains" | "other", country, jurisdiction, taxYear);
     totalAnnualTax += taxResult.totalTax;
     totalFederalTax += taxResult.federalTax;
     totalProvincialStateTax += taxResult.provincialStateTax;
@@ -204,6 +205,7 @@ function computeBracketSegments(taxableIncome: number, table: BracketTable): Tax
 export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: number, federalTax: number, provincialStateTax: number, effectiveTaxRate: number, totalTax: number, investmentIncomeAccounts?: InvestmentIncomeAccount[]): TaxExplainerDetails | undefined {
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
+  const taxYear = state.taxYear ?? 2025;
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
 
   // Get jurisdiction label
@@ -219,7 +221,7 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
     let federalBPA: number;
     let provincialBPA: number;
     if (country === "CA") {
-      const { federal, provincial } = getCanadianBrackets(jurisdiction);
+      const { federal, provincial } = getCanadianBrackets(jurisdiction, taxYear);
       referenceBrackets = federal.brackets.map((b) => ({
         min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
       }));
@@ -229,7 +231,7 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
       federalBPA = federal.basicPersonalAmount;
       provincialBPA = provincial.basicPersonalAmount;
     } else {
-      const { federal, state: stateTable } = getUSBrackets(jurisdiction);
+      const { federal, state: stateTable } = getUSBrackets(jurisdiction, taxYear);
       referenceBrackets = federal.brackets.map((b) => ({
         min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
       }));
@@ -268,7 +270,7 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
     .reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency) * 12, 0);
 
   if (country === "CA") {
-    const { federal, provincial } = getCanadianBrackets(jurisdiction);
+    const { federal, provincial } = getCanadianBrackets(jurisdiction, taxYear);
     const otherIncome = grossAnnualIncome - capGainsTotal;
     const taxableIncome = otherIncome + (capGainsTotal > 0 ? calculateCanadianCapitalGainsInclusion(capGainsTotal) : 0);
     brackets = computeBracketSegments(taxableIncome, federal);
@@ -276,10 +278,10 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
     federalBPA = federal.basicPersonalAmount;
     provincialBPA = provincial.basicPersonalAmount;
   } else {
-    const { federal, state: stateTable } = getUSBrackets(jurisdiction);
+    const { federal, state: stateTable } = getUSBrackets(jurisdiction, taxYear);
     if (capGainsTotal > 0 && capGainsTotal >= grossAnnualIncome * 0.99) {
       // Show capital gains brackets
-      brackets = computeBracketSegments(grossAnnualIncome, US_CAPITAL_GAINS_2025);
+      brackets = computeBracketSegments(grossAnnualIncome, getUSCapitalGainsBrackets(taxYear));
       provincialBrackets = computeBracketSegments(Math.max(0, grossAnnualIncome - stateTable.basicPersonalAmount), stateTable);
     } else {
       // Show federal brackets (after standard deduction)
@@ -292,7 +294,7 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
   }
 
   // Compute marginal rate
-  const taxResult = computeTax(grossAnnualIncome, hasCapitalGains ? "capital-gains" : "employment", country, jurisdiction);
+  const taxResult = computeTax(grossAnnualIncome, hasCapitalGains ? "capital-gains" : "employment", country, jurisdiction, taxYear);
 
   return {
     federalTax,
@@ -317,6 +319,21 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
       totalAnnualInterest: investmentIncomeAccounts.reduce((s, a) => s + a.annualInterest, 0),
       accounts: investmentIncomeAccounts,
     } : undefined,
+    taxCreditSummary: (() => {
+      const credits = state.taxCredits ?? [];
+      if (credits.length === 0) return undefined;
+      const deductions = credits.filter((c) => c.type === "deduction").reduce((s, c) => s + c.annualAmount, 0);
+      const nonRefundable = credits.filter((c) => c.type === "non-refundable").reduce((s, c) => s + c.annualAmount, 0);
+      const refundable = credits.filter((c) => c.type === "refundable").reduce((s, c) => s + c.annualAmount, 0);
+      const totalBenefit = Math.min(nonRefundable, taxResult.totalTax) + Math.min(refundable, Math.max(0, taxResult.totalTax - nonRefundable));
+      if (totalBenefit <= 0 && deductions <= 0) return undefined;
+      return {
+        totalBenefit,
+        deductions,
+        rawTax: taxResult.totalTax,
+        credits: credits.map((c) => ({ name: c.category, amount: c.annualAmount, type: c.type })),
+      };
+    })(),
   };
 }
 

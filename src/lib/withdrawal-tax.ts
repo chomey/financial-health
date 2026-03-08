@@ -75,6 +75,7 @@ export function getWithdrawalTaxRate(
   annualWithdrawal: number,
   costBasisPercent: number = 100,
   roiTaxTreatment?: "capital-gains" | "income",
+  year: number = 2025,
 ): WithdrawalTaxResult {
   if (annualWithdrawal <= 0) {
     return { effectiveRate: 0, taxFreeAmount: 0, taxableAmount: 0 };
@@ -94,7 +95,7 @@ export function getWithdrawalTaxRate(
 
     case "tax-deferred": {
       // Full withdrawal is taxed as employment/ordinary income
-      const taxResult = computeTax(annualWithdrawal, "employment", country, jurisdiction);
+      const taxResult = computeTax(annualWithdrawal, "employment", country, jurisdiction, year);
       return {
         effectiveRate: taxResult.effectiveRate,
         taxFreeAmount: 0,
@@ -119,7 +120,7 @@ export function getWithdrawalTaxRate(
       }
 
       const incomeType = roiTaxTreatment === "income" ? "employment" : "capital-gains";
-      const taxResult = computeTax(gainsAmount, incomeType, country, jurisdiction);
+      const taxResult = computeTax(gainsAmount, incomeType, country, jurisdiction, year);
       // Effective rate is relative to the total withdrawal, not just the gains
       const effectiveRate = annualWithdrawal > 0 ? (taxResult.totalTax / annualWithdrawal) : 0;
 

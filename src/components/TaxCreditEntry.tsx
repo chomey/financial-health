@@ -20,6 +20,7 @@ interface TaxCreditEntryProps {
   country: "CA" | "US";
   filingStatus: FilingStatus;
   annualIncome: number;
+  taxYear?: number;
 }
 
 function generateId(): string {
@@ -63,13 +64,15 @@ function EligibilityBadge({
   annualIncome,
   filingStatus,
   country,
+  taxYear = 2025,
 }: {
   category: string;
   annualIncome: number;
   filingStatus: FilingStatus;
   country: "CA" | "US";
+  taxYear?: number;
 }) {
-  const catDef = findCreditCategory(category, country);
+  const catDef = findCreditCategory(category, country, taxYear);
   if (!catDef) return null;
 
   const status = checkIncomeEligibility(catDef, annualIncome, filingStatus);
@@ -113,6 +116,7 @@ export default function TaxCreditEntry({
   country,
   filingStatus,
   annualIncome,
+  taxYear = 2025,
 }: TaxCreditEntryProps) {
   const [credits, setCredits] = useState<TaxCredit[]>(items ?? []);
   const isExternalSync = useRef(false);
@@ -177,7 +181,7 @@ export default function TaxCreditEntry({
     }
   }, [editingId, editingField]);
 
-  const categories = getCreditCategoriesForFilingStatus(country, filingStatus);
+  const categories = getCreditCategoriesForFilingStatus(country, filingStatus, taxYear);
 
   const filteredSuggestions = (query: string): TaxCreditCategory[] => {
     if (!query) return categories;
@@ -200,7 +204,7 @@ export default function TaxCreditEntry({
         prev.map((tc) => {
           if (tc.id !== editingId) return tc;
           if (editingField === "category") {
-            const catDef = findCreditCategory(value, country);
+            const catDef = findCreditCategory(value, country, taxYear);
             return {
               ...tc,
               category: value || tc.category,
@@ -233,7 +237,7 @@ export default function TaxCreditEntry({
   const addCredit = () => {
     if (!newCategory.trim()) return;
     const amount = parseCurrencyInput(newAmount);
-    const catDef = findCreditCategory(newCategory.trim(), country);
+    const catDef = findCreditCategory(newCategory.trim(), country, taxYear);
     setCredits((prev) => [
       ...prev,
       {
@@ -268,7 +272,7 @@ export default function TaxCreditEntry({
 
   // Count how many credits have income eligibility warnings
   const warningCount = credits.filter((tc) => {
-    const catDef = findCreditCategory(tc.category, country);
+    const catDef = findCreditCategory(tc.category, country, taxYear);
     if (!catDef) return false;
     return checkIncomeEligibility(catDef, annualIncome, filingStatus) !== "eligible";
   }).length;
@@ -322,7 +326,7 @@ export default function TaxCreditEntry({
       ) : (
         <div className="space-y-1" role="list" aria-label="Tax credit items">
           {credits.map((tc) => {
-            const catDef = findCreditCategory(tc.category, country);
+            const catDef = findCreditCategory(tc.category, country, taxYear);
             const eligibility = catDef
               ? checkIncomeEligibility(catDef, annualIncome, filingStatus)
               : "eligible";
@@ -433,6 +437,7 @@ export default function TaxCreditEntry({
                     annualIncome={annualIncome}
                     filingStatus={filingStatus}
                     country={country}
+                    taxYear={taxYear}
                   />
                   {catDef && (
                     <span className="text-[11px] text-slate-500" title={catDef.description}>

@@ -164,6 +164,7 @@ interface CompactState {
   fxm?: number; // FX manual override: 1 foreign = X home
   tc?: CompactTaxCredit[]; // tax credits and deductions
   fs?: string; // filing status
+  ty?: number; // tax year (2025 or 2026, omitted when 2025/default)
 }
 
 function toCompact(state: FinancialState): CompactState {
@@ -246,6 +247,7 @@ function toCompact(state: FinancialState): CompactState {
     }));
   }
   if (state.filingStatus) compact.fs = state.filingStatus;
+  if (state.taxYear !== undefined && state.taxYear !== 2025) compact.ty = state.taxYear;
   return compact;
 }
 
@@ -329,6 +331,7 @@ function fromCompact(compact: CompactState): FinancialState {
       type: x.t as "refundable" | "non-refundable" | "deduction",
     })),
     filingStatus: compact.fs as import("@/lib/tax-credits").FilingStatus | undefined,
+    taxYear: compact.ty,
   };
 }
 

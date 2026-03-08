@@ -43,6 +43,21 @@ export const CA_FEDERAL_2025: BracketTable = {
   basicPersonalAmount: 16_129,
 };
 
+/**
+ * 2026 Canadian Federal Tax Brackets (estimated via CRA indexation factor ~2.7%).
+ * These will be validated/corrected in Task 154 when official CRA values are published.
+ */
+export const CA_FEDERAL_2026: BracketTable = {
+  brackets: [
+    { min: 0, max: 58_924, rate: 0.15 },
+    { min: 58_924, max: 117_847, rate: 0.205 },
+    { min: 117_847, max: 162_747, rate: 0.26 },
+    { min: 162_747, max: 225_940, rate: 0.29 },
+    { min: 225_940, max: Infinity, rate: 0.33 },
+  ],
+  basicPersonalAmount: 16_564,
+};
+
 // ─── Provincial / Territorial ─────────────────────────────────────────────────
 
 /** 2025 Alberta */
@@ -216,31 +231,51 @@ const CA_PROVINCIAL_TABLES: Record<string, BracketTable> = {
   YT: CA_YT_2025,
 };
 
+// 2026 provincial tables: reuse 2025 values as placeholder until provinces publish updates.
+// Task 154 will validate and update these with official values.
+const CA_PROVINCIAL_TABLES_2026: Record<string, BracketTable> = { ...CA_PROVINCIAL_TABLES };
+
+const CA_FEDERAL_BY_YEAR: Record<number, BracketTable> = {
+  2025: CA_FEDERAL_2025,
+  2026: CA_FEDERAL_2026,
+};
+
+const CA_PROVINCIAL_BY_YEAR: Record<number, Record<string, BracketTable>> = {
+  2025: CA_PROVINCIAL_TABLES,
+  2026: CA_PROVINCIAL_TABLES_2026,
+};
+
+/** Supported tax years */
+export const SUPPORTED_TAX_YEARS = [2025, 2026] as const;
+export type TaxYear = (typeof SUPPORTED_TAX_YEARS)[number];
+
 /**
  * Get Canadian federal and provincial/territorial tax brackets.
  * @param province - Two-letter province/territory code (e.g., "ON", "BC", "AB")
- * @param year - Tax year (currently only 2025 is supported; defaults to 2025)
+ * @param year - Tax year (2025 or 2026; defaults to 2025)
  * @returns Federal and provincial bracket tables
- * @throws If the province code is not recognized
+ * @throws If the province code is not recognized or year is unsupported
  */
 export function getCanadianBrackets(
   province: string,
   year: number = 2025
 ): { federal: BracketTable; provincial: BracketTable } {
-  if (year !== 2025) {
-    throw new Error(`Tax year ${year} is not supported. Only 2025 brackets are available.`);
+  const federal = CA_FEDERAL_BY_YEAR[year];
+  if (!federal) {
+    throw new Error(`Tax year ${year} is not supported. Supported years: ${SUPPORTED_TAX_YEARS.join(", ")}`);
   }
 
   const code = province.toUpperCase();
-  const provincial = CA_PROVINCIAL_TABLES[code];
+  const provincialTables = CA_PROVINCIAL_BY_YEAR[year] ?? CA_PROVINCIAL_TABLES;
+  const provincial = provincialTables[code];
   if (!provincial) {
     throw new Error(
       `Unknown Canadian province/territory code: "${province}". ` +
-      `Valid codes: ${Object.keys(CA_PROVINCIAL_TABLES).join(", ")}`
+      `Valid codes: ${Object.keys(provincialTables).join(", ")}`
     );
   }
 
-  return { federal: CA_FEDERAL_2025, provincial };
+  return { federal, provincial };
 }
 
 /**
@@ -310,6 +345,35 @@ export const US_FEDERAL_2025: BracketTable = {
     { min: 626_350, max: Infinity, rate: 0.37 },
   ],
   basicPersonalAmount: 15_000,
+};
+
+/**
+ * 2026 US Federal Tax Brackets (Single Filer, estimated ~2.8% inflation adjustment).
+ * These will be validated/corrected in Task 155 when official IRS values are published.
+ */
+export const US_FEDERAL_2026: BracketTable = {
+  brackets: [
+    { min: 0, max: 12_259, rate: 0.10 },
+    { min: 12_259, max: 49_832, rate: 0.12 },
+    { min: 49_832, max: 106_244, rate: 0.22 },
+    { min: 106_244, max: 202_824, rate: 0.24 },
+    { min: 202_824, max: 257_540, rate: 0.32 },
+    { min: 257_540, max: 643_888, rate: 0.35 },
+    { min: 643_888, max: Infinity, rate: 0.37 },
+  ],
+  basicPersonalAmount: 15_420,
+};
+
+/**
+ * 2026 US Long-Term Capital Gains Tax Brackets (Single Filer, estimated).
+ */
+export const US_CAPITAL_GAINS_2026: BracketTable = {
+  brackets: [
+    { min: 0, max: 49_703, rate: 0.00 },
+    { min: 49_703, max: 548_334, rate: 0.15 },
+    { min: 548_334, max: Infinity, rate: 0.20 },
+  ],
+  basicPersonalAmount: 0,
 };
 
 /**
@@ -894,29 +958,57 @@ const US_STATE_TABLES: Record<string, BracketTable> = {
   DC: US_DC_2025,
 };
 
+// 2026 state tables: reuse 2025 values as placeholder until states publish updates.
+// Task 155 will validate and update these with official values.
+const US_STATE_TABLES_2026: Record<string, BracketTable> = { ...US_STATE_TABLES };
+
+const US_FEDERAL_BY_YEAR: Record<number, BracketTable> = {
+  2025: US_FEDERAL_2025,
+  2026: US_FEDERAL_2026,
+};
+
+const US_CAPITAL_GAINS_BY_YEAR: Record<number, BracketTable> = {
+  2025: US_CAPITAL_GAINS_2025,
+  2026: US_CAPITAL_GAINS_2026,
+};
+
+const US_STATE_BY_YEAR: Record<number, Record<string, BracketTable>> = {
+  2025: US_STATE_TABLES,
+  2026: US_STATE_TABLES_2026,
+};
+
 /**
  * Get US federal and state tax brackets.
  * @param state - Two-letter state code (e.g., "CA", "NY", "TX") or "DC"
- * @param year - Tax year (currently only 2025 is supported; defaults to 2025)
+ * @param year - Tax year (2025 or 2026; defaults to 2025)
  * @returns Federal and state bracket tables. States with no income tax return empty bracket arrays.
- * @throws If the state code is not recognized
+ * @throws If the state code is not recognized or year is unsupported
  */
 export function getUSBrackets(
   state: string,
   year: number = 2025
 ): { federal: BracketTable; state: BracketTable } {
-  if (year !== 2025) {
-    throw new Error(`Tax year ${year} is not supported. Only 2025 brackets are available.`);
+  const federal = US_FEDERAL_BY_YEAR[year];
+  if (!federal) {
+    throw new Error(`Tax year ${year} is not supported. Supported years: ${SUPPORTED_TAX_YEARS.join(", ")}`);
   }
 
   const code = state.toUpperCase();
-  const stateTable = US_STATE_TABLES[code];
+  const stateTables = US_STATE_BY_YEAR[year] ?? US_STATE_TABLES;
+  const stateTable = stateTables[code];
   if (stateTable === undefined) {
     throw new Error(
       `Unknown US state code: "${state}". ` +
-      `Valid codes: ${Object.keys(US_STATE_TABLES).join(", ")}`
+      `Valid codes: ${Object.keys(stateTables).join(", ")}`
     );
   }
 
-  return { federal: US_FEDERAL_2025, state: stateTable };
+  return { federal, state: stateTable };
+}
+
+/**
+ * Get US long-term capital gains bracket table for a given tax year.
+ */
+export function getUSCapitalGainsBrackets(year: number = 2025): BracketTable {
+  return US_CAPITAL_GAINS_BY_YEAR[year] ?? US_CAPITAL_GAINS_2025;
 }

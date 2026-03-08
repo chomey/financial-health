@@ -34,6 +34,7 @@ export function useFinancialState() {
   const [fxRates, setFxRates] = useState<FxRates | undefined>(undefined);
   const [taxCredits, setTaxCredits] = useState<TaxCredit[]>(INITIAL_STATE.taxCredits ?? []);
   const [filingStatus, setFilingStatus] = useState<FilingStatus>(INITIAL_STATE.filingStatus ?? getDefaultFilingStatus(INITIAL_STATE.country ?? "CA"));
+  const [taxYear, setTaxYear] = useState<number>(2025);
   const [showSampleProfiles, setShowSampleProfiles] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [safeWithdrawalRate, setSafeWithdrawalRate] = useState(4);
@@ -62,6 +63,7 @@ export function useFinancialState() {
       setFxManualOverride(urlState.fxManualOverride);
       if (urlState.taxCredits) setTaxCredits(urlState.taxCredits);
       if (urlState.filingStatus) setFilingStatus(urlState.filingStatus);
+      if (urlState.taxYear) setTaxYear(urlState.taxYear);
     } else {
       // No saved state — show sample profile picker for new visitors
       setShowSampleProfiles(true);
@@ -108,8 +110,8 @@ export function useFinancialState() {
       isFirstRender.current = false;
       return;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus });
-  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear });
+  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear]);
 
   // Sync computed assets for stocks and property equity (auto-update amounts, preserve ROI & surplusTarget)
   const syncComputedAssets = useCallback(() => {
@@ -247,6 +249,7 @@ export function useFinancialState() {
     fxRates,
     taxCredits,
     filingStatus,
+    taxYear,
     showSampleProfiles,
     showWizard,
     safeWithdrawalRate,
@@ -272,6 +275,7 @@ export function useFinancialState() {
     setFxRates,
     setTaxCredits,
     setFilingStatus,
+    setTaxYear,
     setShowSampleProfiles,
     setShowWizard,
     setSafeWithdrawalRate,

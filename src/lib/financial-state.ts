@@ -75,7 +75,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
 
   // Marginal rate for tax optimization suggestions — use employment income
   const marginalRate = annualEmploymentSalary > 0
-    ? getMarginalRateForIncome(annualEmploymentSalary, country, jurisdiction)
+    ? getMarginalRateForIncome(annualEmploymentSalary, country, jurisdiction, state.taxYear ?? 2025)
     : undefined;
 
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
