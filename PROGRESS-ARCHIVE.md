@@ -2497,3 +2497,10 @@
 - **Tests**: T1: 83 passed, T2: 3 passed, Build: passes
 - **Screenshots**: ![US single categories](screenshots/task-142-us-single-categories.png)
 - **Notes**: MFS ineligibility handled via incomeLimits.
+
+## Task 144: Tax credits impact on dashboard metrics
+- **Date**: 2026-03-07
+- **Files**: `src/components/SnapshotDashboard.tsx`, `src/lib/financial-state.ts`, `src/lib/changelog.ts`, `tests/unit/tax-credit-metrics.test.ts`, `tests/e2e/tax-credit-metrics.spec.ts`
+- **Tests**: T1: 1957 passed (12 new in `tax-credit-metrics.test.ts`), T2: 5 passed (new `tax-credit-metrics.spec.ts`), Build: passes
+- **Screenshots**: ![Monthly boost](screenshots/task-144-credit-monthly-boost.png) ![Tax rate adjusted](screenshots/task-144-tax-rate-adjusted.png) ![Surplus badge](screenshots/task-144-surplus-credit-badge.png) ![Runway adjusted](screenshots/task-144-runway-adjusted.png)
+- **Notes**: Added 3 new fields to `MetricData`: `taxCreditAdjustedRate`, `taxCreditMonthlyBoost`, `taxCreditAdjustedRunway`. Non-refundable credits capped at `totalTaxEstimate` to avoid negative taxes. Adjusted runway only shows if it exceeds base runway by >0.1 mo.
