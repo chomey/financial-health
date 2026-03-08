@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Validate Canadian tax credits/brackets for 2025/2026
+  {
+    version: 154,
+    title: "Corrected Canadian tax credit values for 2025/2026",
+    description: "Updated all Canadian tax credit amounts, phase-out thresholds, and descriptions to match CRA 2025 indexed values. Key corrections: DTC $10,138 (was $9,428), CWB $1,633/$2,813 (was $1,518), CCB $7,997 under-6 / $6,748 ages 6-17 (was $7,437), GST/HST $533 with corrected phase-out range, Canada Caregiver $8,601 (was $7,999), Spousal Amount $2,419 (was $2,359). All 2026 overrides updated with ~2.7% CRA indexation. Climate Action Incentive corrected to not income-tested.",
+    date: "2026-03-08",
+  },
   // Tax year selector (2025/2026)
   {
     version: 153,

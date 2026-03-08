@@ -161,8 +161,8 @@ describe("Tax Credits — income eligibility", () => {
     it("describes phase-out range", () => {
       const cwb = findCreditCategory("Canada Workers Benefit (CWB)", "CA")!;
       const desc = getIncomeLimitDescription(cwb, "single");
-      expect(desc).toContain("23,495");
-      expect(desc).toContain("33,015");
+      expect(desc).toContain("24,975");
+      expect(desc).toContain("35,862");
     });
 
     it("describes hard cap", () => {
@@ -255,37 +255,38 @@ describe("Tax Credits — Canadian categories (Task 141)", () => {
 
     it("CWB uses different thresholds for single vs married", () => {
       const cwb = findCreditCategory("Canada Workers Benefit (CWB)", "CA")!;
-      // single: phaseOutStart 23495, phaseOutEnd 33015
+      // single: phaseOutStart 24975, phaseOutEnd 35862
       expect(checkIncomeEligibility(cwb, 20000, "single")).toBe("eligible");
       expect(checkIncomeEligibility(cwb, 28000, "single")).toBe("reduced");
       expect(checkIncomeEligibility(cwb, 40000, "single")).toBe("ineligible");
-      // married-common-law: phaseOutStart 26805, phaseOutEnd 43212
+      // married-common-law: phaseOutStart 28494, phaseOutEnd 47247
       expect(checkIncomeEligibility(cwb, 25000, "married-common-law")).toBe("eligible");
       expect(checkIncomeEligibility(cwb, 30000, "married-common-law")).toBe("reduced");
       expect(checkIncomeEligibility(cwb, 50000, "married-common-law")).toBe("ineligible");
     });
 
-    it("GST/HST Credit has different thresholds for single vs married", () => {
+    it("GST/HST Credit has phase-out thresholds for single and married", () => {
       const gst = findCreditCategory("GST/HST Credit", "CA")!;
       expect(checkIncomeEligibility(gst, 40000, "single")).toBe("eligible");
-      expect(checkIncomeEligibility(gst, 45000, "single")).toBe("reduced");
+      expect(checkIncomeEligibility(gst, 50000, "single")).toBe("reduced");
+      expect(checkIncomeEligibility(gst, 57000, "single")).toBe("ineligible");
       expect(checkIncomeEligibility(gst, 40000, "married-common-law")).toBe("eligible");
-      expect(checkIncomeEligibility(gst, 60000, "married-common-law")).toBe("reduced");
+      expect(checkIncomeEligibility(gst, 50000, "married-common-law")).toBe("reduced");
     });
 
-    it("Canada Training Credit has a hard cap at $150,473", () => {
+    it("Canada Training Credit has a hard cap at $154,534", () => {
       const ctc = findCreditCategory("Canada Training Credit", "CA")!;
       expect(checkIncomeEligibility(ctc, 100000, "single")).toBe("eligible");
       expect(checkIncomeEligibility(ctc, 160000, "single")).toBe("ineligible");
       expect(checkIncomeEligibility(ctc, 160000, "married-common-law")).toBe("ineligible");
     });
 
-    it("Climate Action Incentive phases out above $68,000", () => {
+    it("Climate Action Incentive is not income-tested", () => {
       const cai = findCreditCategory("Climate Action Incentive", "CA")!;
       expect(cai).toBeDefined();
       expect(checkIncomeEligibility(cai, 60000, "single")).toBe("eligible");
-      expect(checkIncomeEligibility(cai, 70000, "single")).toBe("reduced");
-      expect(checkIncomeEligibility(cai, 70000, "married-common-law")).toBe("reduced");
+      expect(checkIncomeEligibility(cai, 200000, "single")).toBe("eligible");
+      expect(checkIncomeEligibility(cai, 200000, "married-common-law")).toBe("eligible");
     });
 
     it("Moving Expenses Deduction has no income limits", () => {

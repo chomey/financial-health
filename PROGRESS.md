@@ -7,10 +7,21 @@
 -->
 
 ## Summary
-- **Total Tasks**: 153
-- **Completed**: 153
-- **Remaining**: 3
+- **Total Tasks**: 154
+- **Completed**: 154
+- **Remaining**: 2
 - **Last Updated**: 2026-03-08
+
+## Task 154: Validate all Canadian tax credits/brackets for 2025/2026 [@backend] [MATH]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/tax-credits.ts`: Updated all CA credit values to CRA 2025 indexed amounts. DTC $10,138 (was $9,428), Spousal Amount $2,419 (was $2,359), Canada Caregiver $8,601 (was $7,999), CWB $1,633/$2,813 (was $1,518), GST/HST $533 with corrected phase-out range, CCB $7,997/$6,748 (was $7,437), Medical Expense threshold $2,833 (was $2,759), Canada Training Credit cap $154,534 (was $150,473). Added 2026 yearOverrides for Spousal Amount, Canada Caregiver, Medical Expense, and Canada Training Credit. Updated all existing 2026 overrides. Fixed Climate Action Incentive to not be income-tested.
+  - `tests/unit/ca-tax-credit-validation.test.ts`: New — 30 tests validating all corrected CA credit values for both 2025 and 2026.
+  - `tests/unit/tax-credits.test.ts`: Updated existing tests to match corrected values.
+  - `tests/unit/tax-year-selector.test.ts`: Updated existing tests to match corrected values.
+  - `src/lib/changelog.ts`: Added version 154 entry.
+- **Tests**: T1: 2161 passed (122 files), Build: passes
+- **Screenshots**: N/A (backend/data-only task)
 
 ## Task 153: Add tax year selector (2025/2026) with year-specific credit and bracket values [@fullstack] [OPUS]
 - **Date**: 2026-03-08

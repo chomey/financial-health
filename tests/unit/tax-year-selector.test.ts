@@ -139,18 +139,18 @@ describe("tax credits year overrides", () => {
   it("returns base values for 2025", () => {
     const dtc = findCreditCategory("Disability Tax Credit (DTC)", "CA", 2025);
     expect(dtc).toBeDefined();
-    expect(dtc!.maxAmount).toBe(9428);
+    expect(dtc!.maxAmount).toBe(10_138);
   });
 
   it("returns overridden maxAmount for 2026", () => {
     const dtc = findCreditCategory("Disability Tax Credit (DTC)", "CA", 2026);
     expect(dtc).toBeDefined();
-    expect(dtc!.maxAmount).toBe(9683);
+    expect(dtc!.maxAmount).toBe(10_412);
   });
 
   it("returns overridden description for 2026", () => {
     const dtc = findCreditCategory("Disability Tax Credit (DTC)", "CA", 2026);
-    expect(dtc!.description).toContain("$9,683");
+    expect(dtc!.description).toContain("$10,412");
   });
 
   it("CWB has updated phase-out thresholds for 2026", () => {
@@ -164,8 +164,8 @@ describe("tax credits year overrides", () => {
 
   it("CCB has updated phase-out for 2026", () => {
     const ccb2026 = findCreditCategory("Canada Child Benefit (CCB)", "CA", 2026);
-    expect(ccb2026!.maxAmount).toBe(7638);
-    expect(ccb2026!.incomeLimits.single?.phaseOutStart).toBe(37487);
+    expect(ccb2026!.maxAmount).toBe(8_213);
+    expect(ccb2026!.incomeLimits.single?.phaseOutStart).toBe(38_499);
   });
 
   it("US EITC has updated values for 2026", () => {
@@ -188,20 +188,21 @@ describe("tax credits year overrides", () => {
     const cats2026 = getCreditCategories("CA", 2026);
     const dtc2025 = cats2025.find((c) => c.name === "Disability Tax Credit (DTC)");
     const dtc2026 = cats2026.find((c) => c.name === "Disability Tax Credit (DTC)");
-    expect(dtc2025!.maxAmount).toBe(9428);
-    expect(dtc2026!.maxAmount).toBe(9683);
+    expect(dtc2025!.maxAmount).toBe(10_138);
+    expect(dtc2026!.maxAmount).toBe(10_412);
   });
 
   it("getCreditCategoriesForFilingStatus passes year through", () => {
     const cats = getCreditCategoriesForFilingStatus("CA", "single", 2026);
     const cwb = cats.find((c) => c.name === "Canada Workers Benefit (CWB)");
-    expect(cwb!.maxAmount).toBe(1559);
+    expect(cwb!.maxAmount).toBe(1_677);
   });
 
   it("credits without yearOverrides return unchanged for any year", () => {
-    const med2025 = findCreditCategory("Medical Expense Tax Credit", "CA", 2025);
-    const med2026 = findCreditCategory("Medical Expense Tax Credit", "CA", 2026);
-    expect(med2025).toEqual(med2026);
+    // Moving Expenses Deduction has no yearOverrides
+    const mov2025 = findCreditCategory("Moving Expenses Deduction", "CA", 2025);
+    const mov2026 = findCreditCategory("Moving Expenses Deduction", "CA", 2026);
+    expect(mov2025).toEqual(mov2026);
   });
 });
 
