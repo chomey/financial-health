@@ -195,7 +195,7 @@ export default function MobileWizard({ country, onComplete, onSkip }: MobileWiza
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-slate-950"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950"
       data-testid="mobile-wizard"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -203,6 +203,7 @@ export default function MobileWizard({ country, onComplete, onSkip }: MobileWiza
       aria-label="Quick financial setup wizard"
       aria-modal="true"
     >
+      <div className="flex h-full w-full max-w-lg flex-col">
       {/* Header with progress */}
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-center justify-between mb-3">
@@ -383,6 +384,7 @@ export default function MobileWizard({ country, onComplete, onSkip }: MobileWiza
             Next →
           </button>
         )}
+      </div>
       </div>
     </div>
   );

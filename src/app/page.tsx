@@ -444,10 +444,10 @@ export default function Home() {
     } else {
       // No saved state — show sample profile picker for new visitors
       setShowSampleProfiles(true);
-      // Show mobile wizard for new users on mobile viewports (< 768px)
+      // Show guided wizard for new users on any viewport
       try {
         const wizardDone = localStorage.getItem("fhs-wizard-done");
-        if (!wizardDone && window.innerWidth < 768) {
+        if (!wizardDone) {
           setShowWizard(true);
         }
       } catch {
@@ -774,7 +774,7 @@ export default function Home() {
   return (
     <CurrencyProvider currency={homeCurrency}>
     <DataFlowProvider homeCurrency={homeCurrency}>
-    {/* Mobile guided wizard — full-screen for new mobile users */}
+    {/* Guided wizard — full-screen for new users without saved state */}
     {showWizard && (
       <MobileWizard
         country={country}
