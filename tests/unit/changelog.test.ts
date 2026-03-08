@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CHANGELOG, getChangelogByMilestone } from "@/lib/changelog";
 
 describe("changelog data", () => {
-  it("contains entries for completed tasks (141 entries, versions 1-141)", () => {
-    expect(CHANGELOG.length).toBe(141);
+  it("contains entries for completed tasks (142 entries, versions 1-142)", () => {
+    expect(CHANGELOG.length).toBe(142);
   });
 
   it("has unique version numbers", () => {
@@ -11,11 +11,11 @@ describe("changelog data", () => {
     expect(new Set(versions).size).toBe(versions.length);
   });
 
-  it("covers versions 1 through 141", () => {
+  it("covers versions 1 through 142", () => {
     const versions = CHANGELOG.map((e) => e.version).sort((a, b) => a - b);
     expect(versions[0]).toBe(1);
-    expect(versions[versions.length - 1]).toBe(141);
-    for (let i = 1; i <= 141; i++) {
+    expect(versions[versions.length - 1]).toBe(142);
+    for (let i = 1; i <= 142; i++) {
       expect(versions).toContain(i);
     }
   });
@@ -54,14 +54,14 @@ describe("getChangelogByMilestone", () => {
   it("contains all entries across all groups", () => {
     const milestones = getChangelogByMilestone();
     const totalEntries = milestones.reduce((sum, m) => sum + m.entries.length, 0);
-    expect(totalEntries).toBe(141);
+    expect(totalEntries).toBe(142);
   });
 
   it("groups entries correctly by milestone range", () => {
     const milestones = getChangelogByMilestone();
     // Tax Credits & Deductions: 140-145
     expect(milestones[0].milestone).toBe("Tax Credits & Deductions");
-    expect(milestones[0].entries.length).toBe(2); // 140 and 141
+    expect(milestones[0].entries.length).toBe(3); // 140, 141, and 142
     expect(milestones[0].entries.every((e) => e.version >= 140 && e.version <= 145)).toBe(true);
     // UI Polish: 88-139
     expect(milestones[1].milestone).toBe("UI Polish");

@@ -316,7 +316,8 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     name: "Earned Income Tax Credit (EITC)",
     type: "refundable",
     jurisdiction: "US",
-    description: "For low-to-moderate income workers. Amount depends on income and number of children.",
+    description:
+      "Refundable credit for low-to-moderate income workers. Amount varies by income and number of children — up to $7,430 with 3+ children. Phases out: Single/HoH from $17,640 to $56,838 (3+ children), MFJ from $24,210 to $64,268. Not available for Married Filing Separately.",
     incomeLimits: {
       single: { phaseOutStart: 17640, phaseOutEnd: 56838 },
       "head-of-household": { phaseOutStart: 17640, phaseOutEnd: 56838 },
@@ -329,7 +330,8 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     name: "Child Tax Credit",
     type: "refundable",
     jurisdiction: "US",
-    description: "$2,000 per child under 17. Partially refundable.",
+    description:
+      "$2,000 per qualifying child under 17. Up to $1,600 is refundable (Additional Child Tax Credit). Phases out $50 per $1,000 of AGI above $200,000 (Single/HoH/MFS) or $400,000 (MFJ). Most families with children under 17 qualify.",
     incomeLimits: {
       single: { phaseOutStart: 200000 },
       "head-of-household": { phaseOutStart: 200000 },
@@ -339,10 +341,25 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     maxAmount: 2000,
   },
   {
+    name: "Child and Dependent Care Credit",
+    type: "non-refundable",
+    jurisdiction: "US",
+    description:
+      "Credit for child care (children under 13) or dependent care expenses that allow you to work or look for work. Worth 20–35% of up to $3,000 (1 child) or $6,000 (2+ children) in expenses. No hard income cap, but the credit rate drops from 35% to 20% as AGI rises above $43,000. Not available for Married Filing Separately.",
+    incomeLimits: {
+      single: { phaseOutStart: 15000 },
+      "head-of-household": { phaseOutStart: 15000 },
+      "married-jointly": { phaseOutStart: 15000 },
+      "married-separately": { ineligible: true },
+    },
+    maxAmount: 2100,
+  },
+  {
     name: "American Opportunity Tax Credit (AOTC)",
     type: "refundable",
     jurisdiction: "US",
-    description: "Up to $2,500/student for first 4 years of college. 40% refundable.",
+    description:
+      "Up to $2,500 per eligible student for the first 4 years of post-secondary education. 40% is refundable (up to $1,000). Phases out: Single/HoH from $80,000 to $90,000, MFJ from $160,000 to $180,000. Not available for Married Filing Separately.",
     incomeLimits: {
       single: { phaseOutStart: 80000, phaseOutEnd: 90000 },
       "head-of-household": { phaseOutStart: 80000, phaseOutEnd: 90000 },
@@ -355,7 +372,8 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     name: "Lifetime Learning Credit",
     type: "non-refundable",
     jurisdiction: "US",
-    description: "Up to $2,000/year for education expenses.",
+    description:
+      "Up to $2,000 per tax return (20% of up to $10,000) for tuition and fees at eligible institutions. No limit on years of study — great for graduate school or professional development. Phases out: Single/HoH from $80,000 to $90,000, MFJ from $160,000 to $180,000. Not available for Married Filing Separately.",
     incomeLimits: {
       single: { phaseOutStart: 80000, phaseOutEnd: 90000 },
       "head-of-household": { phaseOutStart: 80000, phaseOutEnd: 90000 },
@@ -368,7 +386,8 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     name: "Saver's Credit",
     type: "non-refundable",
     jurisdiction: "US",
-    description: "Up to $1,000/$2,000 for low-income retirement savers.",
+    description:
+      "Non-refundable credit for low- and moderate-income individuals who contribute to a 401(k), IRA, or other retirement account. Worth 10–50% of contributions up to $2,000 ($4,000 MFJ). Fully ineligible above: $38,250 (Single/MFS), $57,375 (HoH), $76,500 (MFJ).",
     incomeLimits: {
       single: { hardCap: 38250 },
       "head-of-household": { hardCap: 57375 },
@@ -378,10 +397,42 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     maxAmount: 2000,
   },
   {
+    name: "Premium Tax Credit",
+    type: "refundable",
+    jurisdiction: "US",
+    description:
+      "Refundable credit that helps eligible individuals and families cover the cost of health insurance premiums purchased through the Marketplace. Amount is based on income relative to the Federal Poverty Level (FPL). Since the ARP 2021 extension, no hard income cap — anyone paying over a percentage of their income for benchmark coverage may qualify.",
+    incomeLimits: {},
+    maxAmount: 0,
+  },
+  {
+    name: "Adoption Credit",
+    type: "non-refundable",
+    jurisdiction: "US",
+    description:
+      "Up to $15,950 (2024) of qualified adoption expenses per eligible child. Non-refundable but can be carried forward up to 5 years. Phases out between $239,230 and $279,230 of modified AGI. Not available for Married Filing Separately.",
+    incomeLimits: {
+      single: { phaseOutStart: 252150, phaseOutEnd: 292150 },
+      "head-of-household": { phaseOutStart: 252150, phaseOutEnd: 292150 },
+      "married-jointly": { phaseOutStart: 252150, phaseOutEnd: 292150 },
+      "married-separately": { ineligible: true },
+    },
+    maxAmount: 15950,
+  },
+  {
+    name: "Residential Clean Energy Credit",
+    type: "non-refundable",
+    jurisdiction: "US",
+    description:
+      "30% of the cost of installing solar panels, solar water heaters, wind turbines, geothermal heat pumps, or battery storage at your home. No income limit. Any unused credit can be carried forward to future tax years.",
+    incomeLimits: {},
+  },
+  {
     name: "Electric Vehicle Credit",
     type: "non-refundable",
     jurisdiction: "US",
-    description: "Up to $7,500 for new qualifying EVs.",
+    description:
+      "Up to $7,500 for new qualifying electric or plug-in hybrid vehicles. Fully ineligible above: $150,000 (Single/MFS), $225,000 (HoH), $300,000 (MFJ). The vehicle must also meet North American assembly and battery sourcing requirements.",
     incomeLimits: {
       single: { hardCap: 150000 },
       "head-of-household": { hardCap: 225000 },
@@ -391,17 +442,40 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     maxAmount: 7500,
   },
   {
-    name: "Residential Clean Energy Credit",
-    type: "non-refundable",
+    name: "Standard Deduction",
+    type: "deduction",
     jurisdiction: "US",
-    description: "30% of costs for solar, wind, or geothermal installations. No income limit.",
+    description:
+      "The standard deduction reduces your taxable income before calculating tax — no receipts needed. For 2024: $14,600 (Single/MFS), $21,900 (Head of Household), $29,200 (Married Filing Jointly). This is your baseline; itemizing deductions is only worthwhile if your deductible expenses exceed this amount.",
     incomeLimits: {},
+    infoOnly: true,
+  },
+  {
+    name: "Mortgage Interest Deduction",
+    type: "deduction",
+    jurisdiction: "US",
+    description:
+      "Interest paid on a mortgage for your primary or secondary home (up to $750,000 of mortgage debt) is deductible if you itemize. Already tracked in your Properties — no need to enter a separate amount here.",
+    incomeLimits: {},
+    infoOnly: true,
+  },
+  {
+    name: "State and Local Tax (SALT) Deduction",
+    type: "deduction",
+    jurisdiction: "US",
+    description:
+      "Deduction for state and local income taxes (or sales tax) plus property taxes. Capped at $10,000 per return — or $5,000 if Married Filing Separately. Only beneficial if you itemize deductions.",
+    incomeLimits: {
+      "married-separately": { hardCap: 5000 },
+    },
+    maxAmount: 10000,
   },
   {
     name: "Student Loan Interest Deduction",
     type: "deduction",
     jurisdiction: "US",
-    description: "Up to $2,500 for student loan interest paid.",
+    description:
+      "Deduct up to $2,500 of student loan interest paid during the year — no itemizing required. Phases out: Single/HoH from $80,000 to $95,000, MFJ from $165,000 to $195,000. Not available for Married Filing Separately.",
     incomeLimits: {
       single: { phaseOutStart: 80000, phaseOutEnd: 95000 },
       "head-of-household": { phaseOutStart: 80000, phaseOutEnd: 95000 },
@@ -411,26 +485,28 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     maxAmount: 2500,
   },
   {
-    name: "SALT Deduction",
+    name: "Charitable Contributions Deduction",
     type: "deduction",
     jurisdiction: "US",
-    description: "State and local tax deduction. Capped at $10,000 ($5,000 if MFS).",
+    description:
+      "Donations to qualifying 501(c)(3) organizations are deductible if you itemize. Cash contributions limited to 60% of AGI; appreciated assets (stocks, property) limited to 30% of AGI. Excess can be carried forward 5 years. No income cap, but only available to itemizers.",
     incomeLimits: {},
-    maxAmount: 10000,
   },
   {
     name: "HSA Deduction",
     type: "deduction",
     jurisdiction: "US",
-    description: "Already tracked in your Assets — no need to enter here.",
+    description:
+      "Contributions to a Health Savings Account (HSA) are tax-deductible (above-the-line). Already tracked in your Assets — no need to enter a separate amount here.",
     incomeLimits: {},
     infoOnly: true,
   },
   {
-    name: "Mortgage Interest Deduction",
-    type: "deduction",
+    name: "SSDI/SSI Benefits",
+    type: "non-refundable",
     jurisdiction: "US",
-    description: "Already tracked in your Properties — no need to enter here.",
+    description:
+      "Social Security Disability Insurance (SSDI) and Supplemental Security Income (SSI) are income programs, not tax credits. If you receive disability benefits, enter them as income in the Income section. Note: SSDI may be partially taxable depending on your combined income.",
     incomeLimits: {},
     infoOnly: true,
   },
