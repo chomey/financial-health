@@ -42,6 +42,9 @@ import { getPortfolioSummary, getAnnualizedReturn } from "@/components/StockEntr
 import type { IncomeItem } from "@/components/IncomeEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
+import TaxCreditEntry from "@/components/TaxCreditEntry";
+import type { TaxCredit } from "@/lib/tax-credits";
+import { type FilingStatus, getDefaultFilingStatus, getFilingStatuses } from "@/lib/tax-credits";
 
 function PrintSnapshotButton() {
   return (
@@ -401,6 +404,8 @@ export default function Home() {
   const [surplusTargetComputedId, setSurplusTargetComputedId] = useState<string | undefined>(undefined);
   const [fxManualOverride, setFxManualOverride] = useState<number | undefined>(undefined);
   const [fxRates, setFxRates] = useState<FxRates | undefined>(undefined);
+  const [taxCredits, setTaxCredits] = useState<TaxCredit[]>(INITIAL_STATE.taxCredits ?? []);
+  const [filingStatus, setFilingStatus] = useState<FilingStatus>(INITIAL_STATE.filingStatus ?? getDefaultFilingStatus(INITIAL_STATE.country ?? "CA"));
   const [showSampleProfiles, setShowSampleProfiles] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [safeWithdrawalRate, setSafeWithdrawalRate] = useState(4);
@@ -425,6 +430,8 @@ export default function Home() {
       setProvincialTaxOverride(urlState.provincialTaxOverride);
       setSurplusTargetComputedId(urlState.surplusTargetComputedId);
       setFxManualOverride(urlState.fxManualOverride);
+      if (urlState.taxCredits) setTaxCredits(urlState.taxCredits);
+      if (urlState.filingStatus) setFilingStatus(urlState.filingStatus);
     } else {
       // No saved state — show sample profile picker for new visitors
       setShowSampleProfiles(true);
@@ -471,8 +478,8 @@ export default function Home() {
       isFirstRender.current = false;
       return;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride });
-  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus });
+  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus]);
 
   // Sync computed assets for stocks and property equity (auto-update amounts, preserve ROI & surplusTarget)
   const syncComputedAssets = useCallback(() => {
@@ -544,7 +551,15 @@ export default function Home() {
     setProvincialTaxOverride(undefined);
     setSurplusTargetComputedId(undefined);
     setFxManualOverride(undefined);
+    setTaxCredits([]);
+    setFilingStatus(getDefaultFilingStatus(s.country ?? "CA"));
     setShowSampleProfiles(false);
+  }, []);
+
+  const handleCountryChange = useCallback((newCountry: "CA" | "US") => {
+    setCountry(newCountry);
+    // Reset filing status to the default for the new country
+    setFilingStatus(getDefaultFilingStatus(newCountry));
   }, []);
 
   const clearAll = useCallback(() => {
@@ -554,6 +569,7 @@ export default function Home() {
     setExpenses([]);
     setProperties([]);
     setStocks([]);
+    setTaxCredits([]);
     setFederalTaxOverride(undefined);
     setProvincialTaxOverride(undefined);
     setSurplusTargetComputedId(undefined);
@@ -611,7 +627,7 @@ export default function Home() {
   const assetItems: SourceMetadataItem[] = assets.filter((a) => !a.computed).map((a) => ({ label: a.category, value: a.amount, currency: a.currency }));
   const debtItems: SourceMetadataItem[] = debts.map((d) => ({ label: d.category, value: d.amount, currency: d.currency }));
   const incomeItems: SourceMetadataItem[] = [
-    ...income.map((i) => ({ label: i.category, value: i.amount })),
+    ...income.map((i) => ({ label: i.category, value: normalizeToMonthly(i.amount, i.frequency) })),
     ...monthlyInvestmentReturns.map((r) => ({ label: `${r.label} returns`, value: Math.round(r.amount) })),
   ];
   const expenseItems: SourceMetadataItem[] = expenses.map((e) => ({ label: e.category, value: e.amount }));
@@ -781,9 +797,22 @@ export default function Home() {
             <CountryJurisdictionSelector
               country={country}
               jurisdiction={jurisdiction}
-              onCountryChange={setCountry}
+              onCountryChange={handleCountryChange}
               onJurisdictionChange={setJurisdiction}
             />
+            <select
+              value={filingStatus}
+              onChange={(e) => setFilingStatus(e.target.value as FilingStatus)}
+              className="min-h-[44px] rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400 sm:min-h-0"
+              aria-label="Filing status"
+              data-testid="filing-status-selector"
+            >
+              {getFilingStatuses(country).map((fs) => (
+                <option key={fs.value} value={fs.value} className="bg-slate-800">
+                  {fs.label}
+                </option>
+              ))}
+            </select>
             <AgeInputHeader age={age} onAgeChange={setAge} />
             <FxRateDisplay
               homeCurrency={homeCurrency}
@@ -914,6 +943,10 @@ export default function Home() {
 
               <CollapsibleSection id="expenses" title="Expenses" icon="🧾" summary={formatCurrencySummary(expenseTotal)} dataFlowId="section-expenses" dataFlowValue={expenseTotal} dataFlowLabel="Expenses" dataFlowItems={expenseItems}>
                 <ExpenseEntry items={expenses} onChange={setExpenses} investmentContributions={totalInvestmentContributions} mortgagePayments={totalMortgagePayments} surplus={monthlySurplus} surplusTargetName={surplusTargetName} federalTax={totals.totalFederalTax / 12} provincialStateTax={totals.totalProvincialStateTax / 12} computedFederalTax={totals.computedFederalTax / 12} computedProvincialStateTax={totals.computedProvincialStateTax / 12} federalTaxOverride={federalTaxOverride !== undefined ? federalTaxOverride / 12 : undefined} provincialTaxOverride={provincialTaxOverride !== undefined ? provincialTaxOverride / 12 : undefined} onFederalTaxOverride={(monthly) => setFederalTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} onProvincialTaxOverride={(monthly) => setProvincialTaxOverride(monthly !== undefined ? monthly * 12 : undefined)} country={country} isUnderwater={monthlySurplus < 0} homeCurrency={homeCurrency} fxRates={effectiveFxRates} />
+              </CollapsibleSection>
+
+              <CollapsibleSection id="tax-credits" title="Tax Credits" icon="🏷️" summary={taxCredits.length > 0 ? `${taxCredits.length} credit${taxCredits.length !== 1 ? "s" : ""}` : "None"}>
+                <TaxCreditEntry items={taxCredits} onChange={setTaxCredits} country={country} filingStatus={filingStatus} annualIncome={totals.monthlyIncome * 12} />
               </CollapsibleSection>
 
               <CollapsibleSection id="property" title="Property" icon="🏠" summary={propertyCount > 0 ? `${propertyCount} propert${propertyCount !== 1 ? "ies" : "y"}` : "None"} dataFlowId="section-property" dataFlowValue={totals.totalPropertyEquity} dataFlowLabel="Property" dataFlowItems={propertyItems}>

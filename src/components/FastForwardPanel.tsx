@@ -12,6 +12,7 @@ import {
   getMonthlyLimit,
 } from "@/lib/scenario";
 import type { Scenario } from "@/lib/projections";
+import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
 
 interface FastForwardPanelProps {
@@ -151,7 +152,7 @@ export default function FastForwardPanel({
   const hasContributions = state.assets.some((a) => (a.monthlyContribution ?? 0) > 0);
   const hasProperties = state.properties.length > 0;
   const hasTaxSheltered = state.assets.some((a) => isTaxSheltered(a.category));
-  const totalMonthlyIncome = state.income.reduce((sum, i) => sum + i.amount, 0);
+  const totalMonthlyIncome = state.income.reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency), 0);
 
   if (!isOpen) {
     return (
