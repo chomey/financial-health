@@ -114,6 +114,6 @@ describe("Insight card data-flow (click-to-explain)", () => {
   it("insight cards with connections have pointer cursor", () => {
     renderWithProvider(INSIGHT_CONNECTIONS);
     const surplusCard = screen.getByTestId("insight-card-surplus-positive");
-    expect(surplusCard.style.cursor).toBe("pointer");
+    expect(surplusCard.className).toContain("cursor-pointer");
   });
 });

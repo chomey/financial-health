@@ -9,11 +9,16 @@ describe("InsightsPanel", () => {
     expect(screen.getByTestId("insights-panel")).toBeInTheDocument();
   });
 
-  it("renders insight cards with mock data", () => {
+  it("renders first 5 insight cards with mock data (collapsed)", () => {
     render(<InsightsPanel />);
     const insights = generateInsights(MOCK_FINANCIAL_DATA);
-    for (const insight of insights) {
+    // First 5 should be visible in collapsed state
+    for (const insight of insights.slice(0, 5)) {
       expect(screen.getByText(insight.message)).toBeInTheDocument();
+    }
+    // If more than 5, the rest should be hidden
+    if (insights.length > 5) {
+      expect(screen.getByTestId("insights-toggle")).toBeInTheDocument();
     }
   });
 

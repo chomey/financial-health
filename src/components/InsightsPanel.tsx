@@ -40,7 +40,7 @@ const INSIGHT_TYPE_SOURCES: Record<InsightType, string[]> = {
   "tax-credits-ineligible": ["section-income"],
 };
 
-function InsightCard({
+function InsightRow({
   insight,
   index,
   connections,
@@ -50,19 +50,19 @@ function InsightCard({
   connections?: DataFlowConnectionDef[];
 }) {
   const [visible, setVisible] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLLIElement>(null);
   const ctx = useOptionalDataFlow();
   const targetId = `insight-${insight.id}`;
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 100 + index * 150);
+    const timer = setTimeout(() => setVisible(true), 50 + index * 60);
     return () => clearTimeout(timer);
   }, [index]);
 
   // Register as a data-flow target
   useEffect(() => {
     if (!ctx) return;
-    ctx.registerTarget(targetId, cardRef);
+    ctx.registerTarget(targetId, rowRef);
     return () => ctx.unregisterTarget(targetId);
   }, [ctx, targetId]);
 
@@ -87,26 +87,27 @@ function InsightCard({
     });
   }, [ctx, connections, targetId, insight.type, insight.message]);
 
+  const isClickable = connections && connections.length > 0;
+
   return (
-    <div
-      ref={cardRef}
-      className={`flex items-start gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 shadow-sm transition-all duration-500 min-w-[220px] max-w-[300px] flex-shrink-0 ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-      }`}
-      role="article"
-      aria-label={insight.message}
+    <li
+      ref={rowRef}
+      className={`flex items-start gap-2 transition-all duration-300 ${
+        visible ? "opacity-100" : "opacity-0"
+      } ${isClickable ? "cursor-pointer hover:bg-white/5 -mx-2 px-2 rounded" : ""}`}
       data-testid={`insight-card-${insight.id}`}
       data-insight-type={insight.type}
       onClick={handleClick}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
-      style={{ cursor: connections && connections.length > 0 ? "pointer" : undefined }}
-      tabIndex={0}
+      tabIndex={isClickable ? 0 : undefined}
+      role="article"
+      aria-label={insight.message}
     >
-      <span className="mt-0.5 text-base flex-shrink-0" aria-hidden="true">
+      <span className="mt-0.5 text-sm flex-shrink-0" aria-hidden="true">
         {insight.icon}
       </span>
       <p className="text-xs leading-relaxed text-slate-300">{insight.message}</p>
-    </div>
+    </li>
   );
 }
 
@@ -118,57 +119,44 @@ export default function InsightsPanel({
   insightConnections?: Record<string, DataFlowConnectionDef[]>;
 }) {
   const insights = generateInsights(data);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
-  const checkScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollRight(el.scrollWidth - el.scrollLeft - el.clientWidth > 10);
-  }, []);
-
-  useEffect(() => {
-    checkScroll();
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", checkScroll, { passive: true });
-    window.addEventListener("resize", checkScroll);
-    return () => {
-      el.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
-    };
-  }, [checkScroll, insights.length]);
+  const [expanded, setExpanded] = useState(false);
 
   if (insights.length === 0) {
     return null;
   }
 
+  const COLLAPSED_COUNT = 5;
+  const showToggle = insights.length > COLLAPSED_COUNT;
+  const visibleInsights = expanded ? insights : insights.slice(0, COLLAPSED_COUNT);
+
   return (
-    <div data-testid="insights-panel">
-      {insights.length > 1 && (
-        <div className="flex items-center justify-between px-1 mb-1">
-          <span className="text-xs text-slate-500">{insights.length} insights</span>
-          {canScrollRight && (
-            <span className="text-xs text-slate-500 animate-pulse">swipe →</span>
-          )}
-        </div>
+    <div
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-4"
+      data-testid="insights-panel"
+    >
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        {insights.length} Insights
+      </h3>
+      <ul className="space-y-2">
+        {visibleInsights.map((insight, i) => (
+          <InsightRow
+            key={insight.id}
+            insight={insight}
+            index={i}
+            connections={insightConnections?.[insight.type]}
+          />
+        ))}
+      </ul>
+      {showToggle && (
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="mt-2 text-xs text-cyan-400 hover:text-cyan-300 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 rounded px-1"
+          data-testid="insights-toggle"
+        >
+          {expanded ? "Show less" : `Show ${insights.length - COLLAPSED_COUNT} more`}
+        </button>
       )}
-      <div className="relative">
-        <div ref={scrollRef} className="flex gap-3 overflow-x-auto py-1 scrollbar-thin">
-          {insights.map((insight, i) => (
-            <InsightCard
-              key={insight.id}
-              insight={insight}
-              index={i}
-              connections={insightConnections?.[insight.type]}
-            />
-          ))}
-        </div>
-        {/* Right fade to indicate more content */}
-        {canScrollRight && (
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-950 to-transparent" />
-        )}
-      </div>
     </div>
   );
 }

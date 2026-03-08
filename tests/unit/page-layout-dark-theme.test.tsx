@@ -22,12 +22,14 @@ describe("InsightsPanel dark theme", () => {
         }}
       />
     );
-    // There should be insight cards with dark glass bg
+    // The insights panel container should have dark glass bg
+    const panel = container.querySelector('[data-testid="insights-panel"]') as HTMLElement;
+    expect(panel).toBeTruthy();
+    expect(panel.className).toContain("bg-white/5");
+    expect(panel.className).toContain("border-white/10");
+    // Individual insight rows should exist
     const cards = container.querySelectorAll('[data-testid^="insight-card-"]');
     expect(cards.length).toBeGreaterThan(0);
-    const firstCard = cards[0] as HTMLElement;
-    expect(firstCard.className).toContain("bg-white/5");
-    expect(firstCard.className).toContain("border-white/10");
   });
 
   it("insight card text uses slate-300", () => {
