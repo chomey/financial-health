@@ -65,7 +65,7 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
 
   it("insight text uses emerald-400 instead of green-600", () => {
     // Insights below the metric value
-    const insightLine = dashboardSrc.match(/text-xs font-medium text-(\w+-\d+)/g) ?? [];
+    const insightLine = dashboardSrc.match(/text-(?:xs|sm) font-medium text-(\w+-\d+)/g) ?? [];
     expect(insightLine.some((cls) => cls.includes("emerald-400"))).toBe(true);
   });
 
