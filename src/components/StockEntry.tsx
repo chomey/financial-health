@@ -383,7 +383,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   });
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm transition-all duration-200 hover:shadow-md hover:border-white/20 hover:-translate-y-0.5 sm:p-4">
+    <div className="rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm transition-all duration-200 sm:p-4">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-base font-semibold text-slate-200">
           <span aria-hidden="true">📈</span>

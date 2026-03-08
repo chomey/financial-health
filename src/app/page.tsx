@@ -941,7 +941,7 @@ export default function Home() {
                   .map((s) => ({ ticker: s.ticker, annualized: getAnnualizedReturn(s) }))
                   .filter((s) => s.annualized !== null) as { ticker: string; annualized: number }[];
                 return (
-                  <ZoomableCard><div className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:border-white/20 hover:-translate-y-0.5" data-testid="portfolio-performance">
+                  <ZoomableCard><div className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
                       <span className="text-lg" aria-hidden="true">📊</span>
