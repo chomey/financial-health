@@ -198,7 +198,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     <div
       ref={cardRef}
       id={`metric-${metric.title.toLowerCase().replace(/\s+/g, "-")}`}
-      className={`relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5 shadow-sm snap-start scroll-mt-24 ${
+      className={`relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-4 shadow-sm snap-start scroll-mt-24 ${
         hasConnections ? "cursor-pointer" : "cursor-default"
       }`}
       role="group"
@@ -213,13 +213,13 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       tabIndex={0}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-medium text-slate-400">{metric.title}</h3>
-        <span className="text-lg" aria-hidden="true">
+        <h3 className="text-sm font-medium text-slate-400">{metric.title}</h3>
+        <span className="text-base" aria-hidden="true">
           {metric.icon}
         </span>
       </div>
       <p
-        className={`mt-1.5 text-3xl font-bold ${valueColor}`}
+        className={`mt-1 text-2xl font-bold ${valueColor}`}
         aria-label={`${metric.title}: ${formatMetricValue(metric.value, metric.format, homeCurrency)}`}
       >
         {formatMetricValue(animatedValue, metric.format, homeCurrency)}

@@ -60,7 +60,7 @@ describe("computeDonutData", () => {
     expect(debtSlice.value).toBe(15000);
   });
 
-  it("includes property equity as asset with isProperty flag", () => {
+  it("equity view: property equity as asset, no mortgage debt", () => {
     const properties = [makeProperty({ id: "p1", name: "Home", value: 500000, mortgage: 300000 })];
     const result = computeDonutData([], [], properties, []);
 
@@ -70,10 +70,27 @@ describe("computeDonutData", () => {
     expect(equitySlice.type).toBe("asset");
     expect(equitySlice.isProperty).toBe(true);
 
+    // Mortgage excluded by default
+    expect(result.slices.find(s => s.name === "Home Mortgage")).toBeUndefined();
+    expect(result.netWorth).toBe(200000);
+  });
+
+  it("gross view: full property value as asset, mortgage as debt", () => {
+    const properties = [makeProperty({ id: "p1", name: "Home", value: 500000, mortgage: 300000 })];
+    const result = computeDonutData([], [], properties, [], true);
+
+    const propSlice = result.slices.find(s => s.name === "Home")!;
+    expect(propSlice).toBeDefined();
+    expect(propSlice.value).toBe(500000);
+    expect(propSlice.isProperty).toBe(true);
+
     const mortgageSlice = result.slices.find(s => s.name === "Home Mortgage")!;
     expect(mortgageSlice).toBeDefined();
     expect(mortgageSlice.value).toBe(300000);
     expect(mortgageSlice.type).toBe("debt");
+
+    // Same net worth either way
+    expect(result.netWorth).toBe(200000);
   });
 
   it("includes stock holdings", () => {
@@ -120,7 +137,7 @@ describe("computeDonutData", () => {
     expect(savingsSlices[0].value).toBe(8000);
   });
 
-  it("handles complex scenario with all types", () => {
+  it("handles complex scenario — equity view (default, no mortgages)", () => {
     const assets = [
       makeAsset({ id: "a1", category: "RRSP", amount: 30000 }),
       makeAsset({ id: "a2", category: "Savings", amount: 10000 }),
@@ -135,11 +152,34 @@ describe("computeDonutData", () => {
     const debtSlices = result.slices.filter(s => s.type === "debt");
 
     expect(assetSlices).toHaveLength(4); // RRSP, Savings, Stocks, Home Equity
+    expect(debtSlices).toHaveLength(1); // Car Loan only (mortgage excluded)
+
+    // Net worth: 30k + 10k + 5k + 150k (equity) - 8k = 187k
+    expect(result.netWorth).toBe(187000);
+    expect(result.totalAssets).toBe(195000);
+    expect(result.totalDebts).toBe(8000);
+  });
+
+  it("handles complex scenario — gross view (with mortgages)", () => {
+    const assets = [
+      makeAsset({ id: "a1", category: "RRSP", amount: 30000 }),
+      makeAsset({ id: "a2", category: "Savings", amount: 10000 }),
+    ];
+    const debts = [makeDebt({ id: "d1", category: "Car Loan", amount: 8000 })];
+    const properties = [makeProperty({ id: "p1", name: "Home", value: 400000, mortgage: 250000 })];
+    const stocks = [makeStock({ id: "s1", ticker: "VFV", shares: 50, lastFetchedPrice: 100 })];
+
+    const result = computeDonutData(assets, debts, properties, stocks, true);
+
+    const assetSlices = result.slices.filter(s => s.type === "asset");
+    const debtSlices = result.slices.filter(s => s.type === "debt");
+
+    expect(assetSlices).toHaveLength(4); // RRSP, Savings, Stocks, Home (full value)
     expect(debtSlices).toHaveLength(2); // Car Loan, Home Mortgage
 
-    // Net worth: 30k + 10k + 5k + 150k (equity) - 8k - 250k = -63k
-    expect(result.netWorth).toBe(-63000);
-    expect(result.totalAssets).toBe(195000);
+    // Same net worth: 30k + 10k + 5k + 400k - 8k - 250k = 187k
+    expect(result.netWorth).toBe(187000);
+    expect(result.totalAssets).toBe(445000);
     expect(result.totalDebts).toBe(258000);
   });
 

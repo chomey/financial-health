@@ -107,18 +107,25 @@ describe("Task 108 — Donut chart composition table", () => {
     expect(netWorth).toBe(20000);
   });
 
-  it("property equity and mortgage both appear as separate slices", () => {
+  it("equity view (default): property equity as asset, no mortgage debt", () => {
     const properties = [makeProperty("p1", "Condo", 500000, 300000)];
-    const { slices } = computeDonutData([], [], properties, []);
+    const { slices, netWorth } = computeDonutData([], [], properties, []);
 
     const equitySlice = slices.find((s) => s.name === "Condo Equity");
-    const mortgageSlice = slices.find((s) => s.name === "Condo Mortgage");
     expect(equitySlice).toBeDefined();
     expect(equitySlice!.value).toBe(200000);
     expect(equitySlice!.isProperty).toBe(true);
-    expect(mortgageSlice).toBeDefined();
-    expect(mortgageSlice!.value).toBe(300000);
-    expect(mortgageSlice!.type).toBe("debt");
+    expect(slices.find((s) => s.name === "Condo Mortgage")).toBeUndefined();
+    expect(netWorth).toBe(200000);
+  });
+
+  it("gross view: full property value + mortgage as debt, same net worth", () => {
+    const properties = [makeProperty("p1", "Condo", 500000, 300000)];
+    const { slices, netWorth } = computeDonutData([], [], properties, [], true);
+
+    expect(slices.find((s) => s.name === "Condo")!.value).toBe(500000);
+    expect(slices.find((s) => s.name === "Condo Mortgage")!.value).toBe(300000);
+    expect(netWorth).toBe(200000);
   });
 });
 

@@ -539,19 +539,25 @@ export default function FinancialFlowchart({
       )}
 
       {/* Attribution */}
-      <div className="mt-4 border-t border-white/5 pt-3">
+      <div className="mt-4 border-t border-white/5 pt-3 space-y-1.5">
         <p className="text-[11px] leading-relaxed text-slate-600">
-          Based on the{" "}
+          Based on{" "}
           {country === "CA" ? (
             <a href={caWikiUrl} target="_blank" rel="noopener noreferrer" className="text-slate-500 underline underline-offset-2 hover:text-slate-300 transition-colors">
-              r/PersonalFinanceCanada Money Steps
+              r/PersonalFinanceCanada
             </a>
           ) : (
             <a href={usWikiUrl} target="_blank" rel="noopener noreferrer" className="text-slate-500 underline underline-offset-2 hover:text-slate-300 transition-colors">
-              r/personalfinance How to handle $
+              r/personalfinance
             </a>
-          )}{" "}
-          community guide. General guidance only — not financial advice.
+          )}
+          . General guidance only — not financial advice.
+        </p>
+        <p className="text-[10px] leading-relaxed text-slate-700">
+          <span className="font-medium text-slate-600">Acknowledgements:</span>{" "}
+          Original steps by <span className="text-slate-600">u/aBoglehead</span>
+          {" · "}Simplified graphic by <span className="text-slate-600">u/brainsturgeon</span>
+          {" · "}Detailed flowchart by <span className="text-slate-600">u/atlasvoid</span>
         </p>
       </div>
     </div>

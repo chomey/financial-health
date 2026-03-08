@@ -32,14 +32,13 @@ describe("App shell layout", () => {
 
   it("renders the phase toggle showing Dashboard as active", () => {
     render(<Home />);
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    expect(screen.getByText("Edit")).toBeInTheDocument();
+    expect(screen.getByText(/Dashboard/)).toBeInTheDocument();
+    expect(screen.getByText(/My Finances/)).toBeInTheDocument();
   });
 
-  it("renders prev/next navigation footer", () => {
+  it("renders all dashboard sections on one page", () => {
     render(<Home />);
-    expect(screen.getByText("← Back")).toBeInTheDocument();
-    expect(screen.getByText("Next →")).toBeInTheDocument();
-    expect(screen.getByText("1 of 9")).toBeInTheDocument();
+    expect(screen.getByText("Welcome! Here's how this works")).toBeInTheDocument();
+    expect(screen.getByTestId("dashboard-panel")).toBeInTheDocument();
   });
 });

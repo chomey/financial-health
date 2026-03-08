@@ -106,7 +106,7 @@ function InsightRow({
       <span className="mt-0.5 text-sm flex-shrink-0" aria-hidden="true">
         {insight.icon}
       </span>
-      <p className="text-xs leading-relaxed text-slate-300">{insight.message}</p>
+      <p className="text-sm leading-relaxed text-slate-300">{insight.message}</p>
     </li>
   );
 }

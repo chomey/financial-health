@@ -70,11 +70,17 @@ export interface DonutSlice {
   isProperty?: boolean;
 }
 
+/**
+ * Two views, same net worth:
+ *   Equity view (showMortgages=false): property equity as asset, no mortgage debt
+ *   Gross view  (showMortgages=true):  full property value as asset, mortgage as debt
+ */
 export function computeDonutData(
   assets: Asset[],
   debts: Debt[],
   properties: Property[],
-  stocks: StockHolding[]
+  stocks: StockHolding[],
+  showMortgages = false,
 ): { slices: DonutSlice[]; netWorth: number; totalAssets: number; totalDebts: number } {
   const slices: DonutSlice[] = [];
 
@@ -93,12 +99,21 @@ export function computeDonutData(
     assetGroups.set("Stocks", (assetGroups.get("Stocks") ?? 0) + totalStocks);
   }
 
-  // Add property equity
+  // Add property: equity-only or full value depending on mode
   for (const prop of properties) {
-    const equity = Math.max(0, prop.value - prop.mortgage);
-    if (equity > 0) {
-      const label = prop.name ? `${prop.name} Equity` : "Property Equity";
-      slices.push({ name: label, value: equity, type: "asset", isProperty: true });
+    if (showMortgages) {
+      // Gross view: full property value as asset
+      if (prop.value > 0) {
+        const label = prop.name || "Property";
+        slices.push({ name: label, value: prop.value, type: "asset", isProperty: true });
+      }
+    } else {
+      // Equity view: only net equity as asset
+      const equity = Math.max(0, prop.value - prop.mortgage);
+      if (equity > 0) {
+        const label = prop.name ? `${prop.name} Equity` : "Property Equity";
+        slices.push({ name: label, value: equity, type: "asset", isProperty: true });
+      }
     }
   }
 
@@ -115,11 +130,13 @@ export function computeDonutData(
     debtGroups.set(debt.category, (debtGroups.get(debt.category) ?? 0) + debt.amount);
   }
 
-  // Add mortgage debts from properties
-  for (const prop of properties) {
-    if (prop.mortgage > 0) {
-      const label = prop.name ? `${prop.name} Mortgage` : "Mortgage";
-      debtGroups.set(label, (debtGroups.get(label) ?? 0) + prop.mortgage);
+  // Mortgages only included in gross view
+  if (showMortgages) {
+    for (const prop of properties) {
+      if (prop.mortgage > 0) {
+        const label = prop.name ? `${prop.name} Mortgage` : "Mortgage";
+        debtGroups.set(label, (debtGroups.get(label) ?? 0) + prop.mortgage);
+      }
     }
   }
 
@@ -186,13 +203,14 @@ export default function NetWorthDonutChart({
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.compact(v);
   const formatFullCurrency = (v: number) => fmt.full(v);
-  const { slices, netWorth, totalAssets, totalDebts } = useMemo(
-    () => computeDonutData(assets, debts, properties, stocks),
-    [assets, debts, properties, stocks]
-  );
-
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [view, setView] = useState<DonutView>("breakdown");
+  const [showMortgages, setShowMortgages] = useState(false);
+
+  const { slices, netWorth, totalAssets, totalDebts } = useMemo(
+    () => computeDonutData(assets, debts, properties, stocks, showMortgages),
+    [assets, debts, properties, stocks, showMortgages]
+  );
 
   const liquidity = useMemo(
     () => computeLiquidityData(assets, properties, stocks),
@@ -241,8 +259,20 @@ export default function NetWorthDonutChart({
       className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5"
       data-testid="donut-chart"
     >
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between gap-2 flex-wrap">
         <h3 className="text-sm font-medium text-slate-400">Net Worth Breakdown</h3>
+        <div className="flex items-center gap-3">
+          {properties.some(p => p.mortgage > 0) && view === "breakdown" && (
+            <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showMortgages}
+                onChange={(e) => setShowMortgages(e.target.checked)}
+                className="rounded border-white/20 bg-white/5 text-violet-500 focus:ring-violet-400/30 h-3.5 w-3.5"
+              />
+              Mortgages
+            </label>
+          )}
         <div className="flex rounded-lg border border-white/10 text-xs">
           <button
             onClick={() => setView("breakdown")}
@@ -266,6 +296,7 @@ export default function NetWorthDonutChart({
           >
             By Liquidity
           </button>
+        </div>
         </div>
       </div>
 

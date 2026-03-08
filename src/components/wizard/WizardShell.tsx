@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { WIZARD_STEPS, type WizardStep, getStepFromURL, updateStepURL } from "@/lib/url-state";
+import { CopyLinkButton, PrintSnapshotButton } from "@/app/_page-helpers";
 import WizardStepper from "./WizardStepper";
 import WelcomeStep from "./steps/WelcomeStep";
 import ProfileStep from "./steps/ProfileStep";
@@ -251,20 +252,41 @@ export default function WizardShell(props: WizardProps) {
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col">
       {/* Header */}
-      <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-sm px-4 py-3 sm:px-6">
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-2 sm:px-6">
         <div className="mx-auto max-w-3xl">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-lg font-bold text-white sm:text-xl">
-              Financial Health Snapshot
-            </h1>
+          {/* Title + phase toggle */}
+          <div className="flex items-center gap-2 mb-1.5">
+            <h1 className="text-sm font-bold text-white sm:text-base">Financial Health</h1>
+            <span className="text-slate-700 select-none">·</span>
+            <span className="rounded-md bg-violet-500/15 px-2 py-1 text-xs font-medium text-violet-300 ring-1 ring-violet-500/30">
+              📝 My Finances
+            </span>
+            <span className="text-slate-600 select-none text-xs">/</span>
             <button
               type="button"
               onClick={props.onFinish}
-              className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+              className="rounded-md px-2 py-1 text-xs font-medium text-slate-400 transition-all duration-150 hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95"
               data-testid="wizard-skip-to-dashboard"
             >
-              Go to Dashboard →
+              📊 Dashboard
             </button>
+            <span className="flex-1" />
+            <a
+              href="/changelog"
+              className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+            >
+              Changelog
+            </a>
+            <a
+              href="https://ko-fi.com/R6R11VMSML"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+            >
+              ☕ Tip
+            </a>
+            <CopyLinkButton />
+            <PrintSnapshotButton />
           </div>
           <WizardStepper
             currentStep={currentStep}
