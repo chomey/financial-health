@@ -254,6 +254,7 @@ export default function Home() {
         setFederalTaxOverride={setFederalTaxOverride}
         setProvincialTaxOverride={setProvincialTaxOverride}
         loadProfile={loadProfile}
+        clearAll={clearAll}
         onFinish={switchToDashboard}
       />
       </CurrencyProvider>

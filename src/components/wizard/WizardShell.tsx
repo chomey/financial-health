@@ -71,6 +71,7 @@ export interface WizardProps {
   setProvincialTaxOverride: (v: number | undefined) => void;
   // Sample profiles
   loadProfile: (profile: SampleProfile) => void;
+  clearAll: () => void;
   // Navigation
   onFinish: () => void;
 }
@@ -111,7 +112,7 @@ export default function WizardShell(props: WizardProps) {
 
   const stepCompletion = useMemo(() => ({
     welcome: true, // landing step, always complete
-    profile: !!(props.country && props.jurisdiction),
+    profile: !!(props.country && props.jurisdiction && props.age),
     property: true, // optional, always "complete"
     assets: props.assets.filter(a => !a.computed).length > 0,
     stocks: true, // optional
@@ -119,7 +120,7 @@ export default function WizardShell(props: WizardProps) {
     income: props.income.length > 0,
     "tax-summary": true, // read-only interstitial, always complete
     expenses: props.expenses.length > 0,
-  }), [props.assets, props.income, props.expenses, props.country, props.jurisdiction]);
+  }), [props.assets, props.income, props.expenses, props.country, props.jurisdiction, props.age]);
 
   // Build FinancialState for tax summary step
   const state: FinancialState = useMemo(() => ({
@@ -155,7 +156,7 @@ export default function WizardShell(props: WizardProps) {
             onTaxYearChange={props.setTaxYear}
             loadProfile={props.loadProfile}
             onProfileLoaded={props.onFinish}
-            onEnterOwn={goNext}
+            onEnterOwn={() => { props.clearAll(); goNext(); }}
           />
         );
       case "profile":
@@ -289,7 +290,8 @@ export default function WizardShell(props: WizardProps) {
           <button
             type="button"
             onClick={goNext}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+            disabled={stepCompletion[currentStep as keyof typeof stepCompletion] === false}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-violet-400 disabled:opacity-40 disabled:cursor-not-allowed ${
               isLast
                 ? "bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm shadow-emerald-500/20"
                 : "bg-violet-600 text-white hover:bg-violet-500"
