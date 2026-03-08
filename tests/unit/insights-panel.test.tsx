@@ -60,6 +60,7 @@ describe("InsightsPanel", () => {
       monthlyExpenses: 4000,
     };
     render(<InsightsPanel data={customData} />);
-    expect(screen.getByText(/\$400,000/)).toBeInTheDocument();
+    // Surplus = $6,000/mo should appear in insights
+    expect(screen.getByText(/\$6,000/)).toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { generateInsights, type FinancialData, type Insight, type InsightType } from "@/lib/insights";
+import { generateInsights, MAX_INSIGHTS, type FinancialData, type Insight, type InsightType } from "@/lib/insights";
 import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections } from "@/components/DataFlowArrows";
 import type { DataFlowConnectionDef } from "@/components/SnapshotDashboard";
 
@@ -118,7 +118,8 @@ export default function InsightsPanel({
   data?: FinancialData;
   insightConnections?: Record<string, DataFlowConnectionDef[]>;
 }) {
-  const insights = generateInsights(data);
+  const allInsights = generateInsights(data);
+  const insights = allInsights.slice(0, MAX_INSIGHTS);
   const [expanded, setExpanded] = useState(false);
 
   if (insights.length === 0) {

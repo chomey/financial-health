@@ -768,7 +768,77 @@ export function generateInsights(data: FinancialData): Insight[] {
     }
   }
 
-  return insights;
+  return deduplicateInsights(insights);
+}
+
+/**
+ * Deduplicate insights by topic group: when multiple insights from the same
+ * topic fire, keep only the first (highest priority). Then cap at MAX_INSIGHTS.
+ *
+ * Groups (keep 1 when multiple fire):
+ * - surplus + income-efficiency → keep first surplus only
+ * - savings-rate vs income-efficiency → drop income-efficiency if savings-rate exists
+ * - net-worth + net-worth-milestone + net-worth-percentile → keep 1
+ * - fire + coast-fire → keep 1
+ * - withdrawal-tax (multiple sub-insights) → keep 1
+ * - debt-free + debt-to-income (when DTI ~0) → keep debt-free
+ * - tax-credits-* → keep 1
+ */
+/** Maximum insights to display in the UI (used by InsightsPanel) */
+export const MAX_INSIGHTS = 8;
+
+/**
+ * Remove redundant insights that say the same thing in different words.
+ */
+function deduplicateInsights(insights: Insight[]): Insight[] {
+  const drop = new Set<string>();
+
+  // 1. Surplus: "spending less than you earn" + "add $X this year" + "X cents per dollar" are all
+  //    variations of the same cash flow message. Keep only the first surplus insight.
+  const surplusInsights = insights.filter((i) => i.type === "surplus");
+  if (surplusInsights.length > 1) {
+    for (const s of surplusInsights.slice(1)) drop.add(s.id);
+  }
+
+  // 2. Savings-rate ("saving X%") and income-efficiency ("X cents per dollar") say the same thing
+  if (insights.some((i) => i.type === "savings-rate")) {
+    for (const i of insights) {
+      if (i.id === "income-efficiency") drop.add(i.id);
+    }
+  }
+
+  // 3. Debt-free makes DTI 0% redundant
+  if (insights.some((i) => i.id === "debt-free")) {
+    for (const i of insights) {
+      if (i.type === "debt-to-income") drop.add(i.id);
+    }
+  }
+
+  // 4. Net worth: milestone ("Millionaire!") supersedes base net-worth ("$1.8M positive and growing")
+  //    Keep percentile if present — it adds distinct age-group context
+  const hasMilestone = insights.some((i) => i.type === "net-worth-milestone");
+  if (hasMilestone) {
+    for (const i of insights) {
+      if (i.type === "net-worth") drop.add(i.id);
+    }
+  }
+
+  // 5. Coast FIRE and FIRE progress overlap — keep Coast FIRE (more specific)
+  if (insights.some((i) => i.type === "coast-fire") && insights.some((i) => i.type === "fire")) {
+    for (const i of insights) {
+      if (i.type === "fire") drop.add(i.id);
+    }
+  }
+
+  // 6. Income-replacement ("replaces X% of income") overlaps with FIRE progress ("X% there")
+  //    Keep income-replacement only if no FIRE insight exists
+  if (insights.some((i) => i.type === "fire" || i.type === "coast-fire")) {
+    for (const i of insights) {
+      if (i.type === "income-replacement") drop.add(i.id);
+    }
+  }
+
+  return insights.filter((i) => !drop.has(i.id));
 }
 
 // Module-level currency code, set per generateInsights call

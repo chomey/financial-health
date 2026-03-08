@@ -132,10 +132,10 @@ describe("generateInsights", () => {
       totalDebts: 200000,
     };
     const insights = generateInsights(data);
-    const nw = insights.find((i) => i.type === "net-worth");
-    expect(nw).toBeDefined();
-    expect(nw!.message).toContain("$300,000");
-    expect(nw!.message).toContain("positive");
+    // With $300k net worth, milestone ($250k) fires and dedup drops base net-worth
+    const milestone = insights.find((i) => i.type === "net-worth-milestone");
+    expect(milestone).toBeDefined();
+    expect(milestone!.message).toContain("$250k");
   });
 
   it("returns only debt-free insight when all values are zero", () => {
