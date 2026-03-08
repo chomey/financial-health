@@ -70,6 +70,10 @@ export interface FinancialData {
   hasStudentLoans?: boolean;
   /** Whether user has child care expenses (for child-related credit suggestions) */
   hasChildCareExpenses?: boolean;
+  /** Total monthly investment returns (from asset ROI). Added to surplus to match metric card. */
+  monthlyInvestmentReturns?: number;
+  /** Outlook years (20/30/40/50) for timeline-scaled insight messages. */
+  outlookYears?: number;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** How many months shorter the runway is due to withdrawal taxes */
@@ -100,7 +104,9 @@ export function generateInsights(data: FinancialData): Insight[] {
   const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses } = data;
 
   const netWorth = totalAssets - totalDebts;
-  const surplus = monthlyIncome - monthlyExpenses;
+  const investmentReturns = data.monthlyInvestmentReturns ?? 0;
+  const surplus = monthlyIncome + investmentReturns - monthlyExpenses;
+  const outlookYears = data.outlookYears ?? 30;
   // Use liquid assets for runway if available, otherwise fall back to totalAssets
   // Use raw expenses (not including investment contributions) to match the metric card
   const runwayAssets = data.liquidAssets ?? totalAssets;
@@ -149,13 +155,16 @@ export function generateInsights(data: FinancialData): Insight[] {
       message: `You're spending less than you earn each month — that ${formatted} surplus is building your future.`,
       icon: "📈",
     });
-    // Annual projection — wealth growth is surplus + investment contributions
+    // Outlook projection — wealth growth is surplus + investment contributions, scaled to outlook period
     // Mortgage payments are excluded since they include interest costs
-    const annualWealthGrowth = (monthlyIncome - rawExpenses - mortgagePayments) * 12;
+    const annualWealthGrowth = (monthlyIncome + investmentReturns - rawExpenses - mortgagePayments) * 12;
+    const outlookGrowth = annualWealthGrowth * outlookYears;
     insights.push({
       id: "surplus-annual",
       type: "surplus",
-      message: `At this pace, you'll add ${formatCurrency(annualWealthGrowth)} to your wealth this year.`,
+      message: outlookYears === 1
+        ? `At this pace, you'll add ${formatCurrency(annualWealthGrowth)} to your wealth this year.`
+        : `At this pace, you'll add ${formatCompact(outlookGrowth)} over ${outlookYears} years (${formatCurrency(annualWealthGrowth)}/yr).`,
       icon: "📈",
     });
   } else if (surplus === 0 && monthlyIncome > 0) {
@@ -322,19 +331,34 @@ export function generateInsights(data: FinancialData): Insight[] {
     }
   }
 
-  // Net worth insight
+  // Net worth insight — with outlook projection
+  // Simple projection: grow current net worth + annual surplus, assuming ~5% real return on assets
+  const annualSurplus = surplus > 0 ? surplus * 12 : 0;
+  const projectedNetWorth = netWorth > 0
+    ? (() => {
+        let projected = netWorth;
+        for (let y = 0; y < outlookYears; y++) {
+          projected = projected * 1.05 + annualSurplus;
+        }
+        return projected;
+      })()
+    : netWorth + annualSurplus * outlookYears;
+  const projectionNote = surplus > 0 && netWorth > 0
+    ? ` On track for ~${formatCompact(projectedNetWorth)} in ${outlookYears} years.`
+    : "";
+
   if (netWorth >= 1_000_000) {
     insights.push({
       id: "networth-positive",
       type: "net-worth",
-      message: `Your net worth is ${formatCompact(netWorth)} — you've reached a major milestone. Compound growth is your biggest advantage now.`,
+      message: `Your net worth is ${formatCompact(netWorth)} — you've reached a major milestone.${projectionNote}`,
       icon: "💰",
     });
   } else if (netWorth > 0) {
     insights.push({
       id: "networth-positive",
       type: "net-worth",
-      message: `Your net worth is ${formatCurrency(netWorth)} — positive and growing.`,
+      message: `Your net worth is ${formatCurrency(netWorth)} — positive and growing.${projectionNote}`,
       icon: "💰",
     });
   } else if (netWorth < 0 && totalAssets > 0) {
@@ -364,7 +388,7 @@ export function generateInsights(data: FinancialData): Insight[] {
     insights.push({
       id: "employer-match",
       type: "employer-match",
-      message: `Your employer match adds ${formatCurrency(data.employerMatchAnnual)}/year in free money — make sure you're contributing enough to get the full match.`,
+      message: `Your employer match adds ${formatCurrency(data.employerMatchAnnual)}/yr in free money — that's ${formatCompact(data.employerMatchAnnual * outlookYears)} over ${outlookYears} years. Make sure you're contributing enough to get the full match.`,
       icon: "🎁",
     });
   }
@@ -435,7 +459,7 @@ export function generateInsights(data: FinancialData): Insight[] {
         insights.push({
           id: "tax-opt-taxable-to-free",
           type: "tax-optimization",
-          message: `You have ${formatCurrency(taxableTotal)} in taxable accounts with gains taxed at your ${marginalPct}% marginal rate. Shifting contributions to your ${taxFreeAccountName} would shelter ~${formatCurrency(Math.round(annualTaxCost))}/year in gains from tax.`,
+          message: `You have ${formatCurrency(taxableTotal)} in taxable accounts with gains taxed at your ${marginalPct}% marginal rate. Shifting contributions to your ${taxFreeAccountName} would shelter ~${formatCurrency(Math.round(annualTaxCost))}/yr in gains from tax — that's ${formatCompact(annualTaxCost * outlookYears)} over ${outlookYears} years.`,
           icon: "💡",
         });
       }
@@ -573,7 +597,7 @@ export function generateInsights(data: FinancialData): Insight[] {
     } else {
       const progressPct = currentNetWorth > 0 ? Math.min(99, Math.round((currentNetWorth / fireNumber) * 100)) : 0;
       const yearsText = data.yearsToFire != null
-        ? ` At your current savings rate, you'll reach it in ~${data.yearsToFire.toFixed(1)} years.`
+        ? ` At your current savings rate, you'll reach it in ~${data.yearsToFire.toFixed(1)} years${data.yearsToFire <= outlookYears ? " (within your outlook)" : ""}.`
         : "";
       insights.push({
         id: "fire-progress",

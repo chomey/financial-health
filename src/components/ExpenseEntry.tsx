@@ -248,7 +248,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   };
 
   return (
-    <div className={`rounded-xl border bg-white/5 backdrop-blur-sm p-3 shadow-sm sm:p-4 ${isUnderwater ? "border-red-500/30 ring-1 ring-red-500/10" : "border-white/10"}`}>
+    <div className={`rounded-xl border bg-white/5 p-3 shadow-sm sm:p-4 ${isUnderwater ? "border-red-500/30 ring-1 ring-red-500/10" : "border-white/10"}`}>
       <div className="mb-2 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-base font-semibold text-slate-200">
           <span aria-hidden="true">🧾</span>
@@ -300,7 +300,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                       filteredSuggestions(editValue).length > 0 && (
                         <div
                           ref={suggestionsRef}
-                          className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
+                          className="absolute left-0 top-full z-50 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
                         >
                           {filteredSuggestions(editValue).map((suggestion) => (
                             <button
@@ -613,7 +613,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               />
               {showNewSuggestions &&
                 filteredSuggestions(newCategory).length > 0 && (
-                  <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
+                  <div className="absolute left-0 top-full z-50 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
                     {filteredSuggestions(newCategory).map((suggestion) => (
                       <button
                         key={suggestion}

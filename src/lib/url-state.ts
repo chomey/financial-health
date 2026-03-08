@@ -440,5 +440,30 @@ export function updateSwrURL(rate: number): void {
   window.history.replaceState(null, "", url.toString());
 }
 
+/** Valid outlook year options */
+export const OUTLOOK_YEAR_OPTIONS = [20, 30, 40, 50] as const;
+export type OutlookYears = (typeof OUTLOOK_YEAR_OPTIONS)[number];
+
+/** Read outlook years from URL params (`oy=<years>`). Defaults to 30. */
+export function getOutlookYearsFromURL(): OutlookYears {
+  if (typeof window === "undefined") return 30;
+  const params = new URLSearchParams(window.location.search);
+  const parsed = parseInt(params.get("oy") ?? "30", 10);
+  if ((OUTLOOK_YEAR_OPTIONS as readonly number[]).includes(parsed)) return parsed as OutlookYears;
+  return 30;
+}
+
+/** Persist outlook years to URL params without affecting the main state param. */
+export function updateOutlookYearsURL(years: OutlookYears): void {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (years === 30) {
+    url.searchParams.delete("oy");
+  } else {
+    url.searchParams.set("oy", String(years));
+  }
+  window.history.replaceState(null, "", url.toString());
+}
+
 // Export for testing
 export { encode85, decode85, toCompact, fromCompact };

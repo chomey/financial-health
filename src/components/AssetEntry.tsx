@@ -343,7 +343,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
   const total = assets.filter((a) => !a.computed).reduce((sum, a) => sum + convertToHome(a.amount, a.currency ?? hc, hc, rates), 0);
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-sm sm:p-4">
+    <div className="rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm sm:p-4">
       <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-200">
         <span aria-hidden="true">📊</span>
         Assets
@@ -408,7 +408,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         filteredGroupedSuggestions(editValue).length > 0 && (
                           <div
                             ref={suggestionsRef}
-                            className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
+                            className="absolute left-0 top-full z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
                           >
                             {filteredGroupedSuggestions(editValue).map((group) => (
                               <div key={group.label}>
@@ -861,7 +861,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
               />
               {showNewSuggestions &&
                 filteredGroupedSuggestions(newCategory).length > 0 && (
-                  <div className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
+                  <div className="absolute left-0 top-full z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
                     {filteredGroupedSuggestions(newCategory).map((group) => (
                       <div key={group.label}>
                         <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500" data-testid="suggestion-group-header">{group.label}</div>

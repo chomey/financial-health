@@ -15,7 +15,7 @@ describe("AssetEntry dark theme", () => {
     const { container } = render(<AssetEntry />);
     const card = container.firstChild as HTMLElement;
     expect(card.className).toContain("bg-white/5");
-    expect(card.className).toContain("backdrop-blur-sm");
+    // backdrop-blur-sm intentionally removed from entry cards to fix z-index stacking
     expect(card.className).toContain("border-white/10");
   });
 

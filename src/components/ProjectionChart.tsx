@@ -23,7 +23,7 @@ import {
   findMonthAtTarget,
 } from "@/lib/projections";
 import type { Scenario, Milestone } from "@/lib/projections";
-import { getInflationFromURL, updateInflationURL } from "@/lib/url-state";
+import { getInflationFromURL, updateInflationURL, getOutlookYearsFromURL, updateOutlookYearsURL, OUTLOOK_YEAR_OPTIONS, type OutlookYears } from "@/lib/url-state";
 import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
 import { buildSummary } from "@/components/RunwayBurndownChart";
 
@@ -33,6 +33,7 @@ interface ProjectionChartProps {
   state: FinancialState;
   runwayDetails?: RunwayExplainerDetails;
   safeWithdrawalRate?: number;
+  onOutlookChange?: (years: OutlookYears) => void;
 }
 
 // formatCurrency and formatFullCurrency defined inside components via useCurrency()
@@ -89,7 +90,12 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   );
 }
 
-const TABLE_MILESTONES = [10, 20, 30, 40, 50];
+function computeTableMilestones(years: number): number[] {
+  if (years <= 20) return [5, 10, 15, 20];
+  if (years <= 30) return [5, 10, 20, 30];
+  if (years <= 40) return [10, 20, 30, 40];
+  return [10, 20, 30, 40, 50];
+}
 
 /** Compute X-axis tick values: every 5 years */
 function computeXTicks(years: number): number[] {
@@ -165,7 +171,7 @@ function MilestoneLabelContent({
   );
 }
 
-export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRate = 4 }: ProjectionChartProps) {
+export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRate = 4, onOutlookChange }: ProjectionChartProps) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.compact(v);
   const formatTableCurrency = (v: number) => fmt.full(v);
@@ -173,6 +179,17 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
   const [legendOpen, setLegendOpen] = useState(false);
   const [mode, setMode] = useState<ChartMode>("keep-earning");
   const currencyCode = getHomeCurrency(state.country ?? "CA");
+
+  // Outlook years state — read from URL on mount
+  const [outlookYears, setOutlookYears] = useState<OutlookYears>(30);
+  useState(() => {
+    setOutlookYears(getOutlookYearsFromURL());
+  });
+  function handleOutlookChange(yrs: OutlookYears) {
+    setOutlookYears(yrs);
+    updateOutlookYearsURL(yrs);
+    onOutlookChange?.(yrs);
+  }
 
   // Inflation adjustment state — read from URL on mount
   const [inflationAdjusted, setInflationAdjusted] = useState(false);
@@ -200,11 +217,11 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
     }
   }
 
-  const years = 50;
+  const years = outlookYears;
 
   const projection = useMemo(
-    () => projectFinances(state, 50, scenario),
-    [state, scenario]
+    () => projectFinances(state, years, scenario),
+    [state, years, scenario]
   );
 
   const displayPoints = useMemo(() => {
@@ -255,7 +272,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
   const currentNetWorth = projection.points[0]?.netWorth ?? 0;
   const fireAlreadyReached = fireNumber > 0 && currentNetWorth >= fireNumber;
 
-  const milestoneYears = TABLE_MILESTONES;
+  const milestoneYears = useMemo(() => computeTableMilestones(years), [years]);
 
   // Summary table: milestone year points from 50-year projection (deflated if inflation enabled)
   const summaryPoints = useMemo(() => {
@@ -296,7 +313,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
     const hasTaxDrag = (runwayDetails.taxDragMonths ?? 0) > 0;
     // Sample at whole-year intervals (every 12 months) so tooltip snaps to integer years
     const data: { year: number; withGrowth: number; withoutGrowth: number; withTax: number }[] = [];
-    for (let yr = 0; yr <= 50; yr++) {
+    for (let yr = 0; yr <= years; yr++) {
       const i = yr * 12;
       const gBal = i < runwayDetails.withGrowth.length ? Math.round(runwayDetails.withGrowth[i]?.totalBalance ?? 0) : 0;
       const nBal = i < runwayDetails.withoutGrowth.length ? Math.round(runwayDetails.withoutGrowth[i]?.totalBalance ?? 0) : 0;
@@ -322,7 +339,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
     const emergencyFund = runwayDetails.monthlyTotal * 6;
 
     return { data, growthZero, noGrowthZero, taxZero, emergencyFund, hasTaxDrag };
-  }, [runwayDetails]);
+  }, [runwayDetails, years]);
 
   return (
     <section
@@ -383,6 +400,29 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           </button>
         </div>
       )}
+
+      {/* Outlook years toggle */}
+      <div className="mb-3 flex flex-wrap items-center gap-3" data-testid="outlook-controls" onClick={(e) => e.stopPropagation()}>
+        <span className="text-xs text-slate-400">Outlook</span>
+        <div className="flex rounded-lg border border-white/10 text-xs">
+          {OUTLOOK_YEAR_OPTIONS.map((opt, i) => (
+            <button
+              key={opt}
+              onClick={() => handleOutlookChange(opt)}
+              className={`px-2.5 py-1 transition-colors duration-150 ${
+                i === 0 ? "rounded-l-lg" : i === OUTLOOK_YEAR_OPTIONS.length - 1 ? "rounded-r-lg" : ""
+              } ${
+                outlookYears === opt
+                  ? "bg-emerald-500/20 text-emerald-400 font-medium"
+                  : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
+              }`}
+              data-testid={`outlook-${opt}yr`}
+            >
+              {opt}yr
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Inflation adjustment toggle — stopPropagation prevents ZoomableCard from opening */}
       <div className="mb-3 flex flex-wrap items-center gap-3" data-testid="inflation-controls" onClick={(e) => e.stopPropagation()}>
@@ -512,7 +552,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             <XAxis
               dataKey="year"
               type="number"
-              domain={[0, 50]}
+              domain={[0, years]}
               tick={{ fontSize: 10, fill: "#94a3b8" }}
               tickFormatter={(v) => `${v}y`}
               ticks={xTicks}
@@ -820,7 +860,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 <XAxis
                   dataKey="year"
                   type="number"
-                  domain={[0, 50]}
+                  domain={[0, years]}
                   tick={{ fontSize: 10, fill: "#94a3b8" }}
                   tickFormatter={(v) => `${v}y`}
                   ticks={xTicks}

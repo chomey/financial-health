@@ -38,7 +38,7 @@ import {
 } from "@/lib/financial-state";
 import { getProfilesForCountry, type SampleProfile } from "@/lib/sample-profiles";
 import MobileWizard, { type WizardResult } from "@/components/MobileWizard";
-import { getStateFromURL, updateURL, getSwrFromURL, updateSwrURL } from "@/lib/url-state";
+import { getStateFromURL, updateURL, getSwrFromURL, updateSwrURL, getOutlookYearsFromURL, type OutlookYears } from "@/lib/url-state";
 import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey, formatCurrencyCompact } from "@/lib/currency";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
 import type { Asset } from "@/components/AssetEntry";
@@ -418,12 +418,14 @@ export default function Home() {
   const [showSampleProfiles, setShowSampleProfiles] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [safeWithdrawalRate, setSafeWithdrawalRate] = useState(4);
+  const [outlookYears, setOutlookYears] = useState<OutlookYears>(30);
   const isFirstRender = useRef(true);
 
   // Restore state from URL after hydration; show sample profiles if no URL state
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setSafeWithdrawalRate(getSwrFromURL());
+    setOutlookYears(getOutlookYearsFromURL());
     const urlState = getStateFromURL();
     if (urlState) {
       setAssets(urlState.assets);
@@ -610,7 +612,7 @@ export default function Home() {
   const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride, taxCredits, filingStatus };
   const metrics = computeMetrics(state);
   const runwayDetails = metrics.find(m => m.title === "Financial Runway")?.runwayDetails;
-  const financialData = toFinancialData(state);
+  const financialData = { ...toFinancialData(state), outlookYears };
   const totals = computeTotals(state);
   const totalInvestmentContributions = assets.filter((a) => !a.computed).reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   const totalMortgagePayments = totals.totalMortgagePayments;
@@ -930,7 +932,7 @@ export default function Home() {
 
         {/* Projection Chart — full-width above the two-column layout */}
         <section id="projections" className="mb-4 sm:mb-6 space-y-3 sm:space-y-4 scroll-mt-16" aria-label="Financial projections">
-          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} /></ZoomableCard>
+          <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} /></ZoomableCard>
           <InsightsPanel data={financialData} insightConnections={insightConnections} />
         </section>
 

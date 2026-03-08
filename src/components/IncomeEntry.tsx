@@ -315,7 +315,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
   };
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-sm sm:p-4">
+    <div className="rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm sm:p-4">
       <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-200">
         <span aria-hidden="true">💰</span>
         Income
@@ -374,7 +374,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
                       filteredSuggestions(editValue, item.incomeType).length > 0 && (
                         <div
                           ref={suggestionsRef}
-                          className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
+                          className="absolute left-0 top-full z-50 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30"
                         >
                           {filteredSuggestions(editValue, item.incomeType).map((suggestion) => (
                             <button
@@ -569,7 +569,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
               />
               {showNewSuggestions &&
                 filteredSuggestions(newCategory, newIncomeType).length > 0 && (
-                  <div className="absolute left-0 top-full z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
+                  <div className="absolute left-0 top-full z-50 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
                     {filteredSuggestions(newCategory, newIncomeType).map((suggestion) => (
                       <button
                         key={suggestion}

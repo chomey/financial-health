@@ -277,7 +277,7 @@ export default function TaxCreditEntry({
   }).length;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 shadow-sm sm:p-4">
+    <div className="rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm sm:p-4">
       <div className="mb-2 flex items-center gap-2">
         <h2 className="flex items-center gap-2 text-base font-semibold text-slate-200">
           <span aria-hidden="true">🏷️</span>
@@ -351,7 +351,7 @@ export default function TaxCreditEntry({
                           aria-label="Edit credit category"
                         />
                         {showSuggestions && filteredSuggestions(editValue).length > 0 && (
-                          <div className="absolute left-0 top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
+                          <div className="absolute left-0 top-full z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
                             {filteredSuggestions(editValue).map((cat) => (
                               <button
                                 key={cat.name}
@@ -473,7 +473,7 @@ export default function TaxCreditEntry({
                 aria-label="New credit category"
               />
               {showNewSuggestions && filteredSuggestions(newCategory).length > 0 && (
-                <div className="absolute left-0 top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
+                <div className="absolute left-0 top-full z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-white/10 bg-slate-800 py-1 shadow-lg shadow-black/30">
                   {filteredSuggestions(newCategory).map((cat) => {
                     const elig = checkIncomeEligibility(cat, annualIncome, filingStatus);
                     return (
