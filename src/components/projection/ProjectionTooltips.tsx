@@ -56,19 +56,22 @@ export function MilestoneLabelContent({
   viewBox,
   value,
   fill = "#10b981",
+  offsetY = 0,
 }: {
   viewBox?: { x: number; y: number; width: number; height: number };
   value?: string;
   fill?: string;
+  offsetY?: number;
 }) {
   if (!viewBox || !value) return null;
   const { x, y } = viewBox;
   const textWidth = value.length * 5.8 + 10;
+  const yPos = y + 6 + offsetY;
   return (
     <g>
       <rect
         x={x + 3}
-        y={y + 6}
+        y={yPos}
         width={textWidth}
         height={15}
         rx={3}
@@ -78,7 +81,7 @@ export function MilestoneLabelContent({
         strokeWidth={0.5}
         strokeOpacity={0.7}
       />
-      <text x={x + 7} y={y + 17} fontSize={10} fill={fill} fontWeight={600}>
+      <text x={x + 7} y={yPos + 11} fontSize={10} fill={fill} fontWeight={600}>
         {value}
       </text>
     </g>

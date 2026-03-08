@@ -197,7 +197,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     <div
       ref={cardRef}
       id={`metric-${metric.title.toLowerCase().replace(/\s+/g, "-")}`}
-      className={`relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-4 shadow-sm snap-start scroll-mt-24 ${
+      className={`relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-4 shadow-sm scroll-mt-24 ${
         hasConnections ? "cursor-pointer" : "cursor-default"
       }`}
       role="group"

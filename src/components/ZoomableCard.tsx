@@ -38,7 +38,12 @@ export default function ZoomableCard({ children }: { children: React.ReactNode }
     <>
       <div
         className="group relative cursor-zoom-in"
-        onClick={open}
+        onClick={(e) => {
+          // Don't zoom when clicking interactive elements inside the card
+          const target = e.target as HTMLElement;
+          if (target.closest("button, a, input, select, label, [role='button'], [role='tab'], [role='checkbox']")) return;
+          open();
+        }}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}

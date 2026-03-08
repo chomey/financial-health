@@ -482,7 +482,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               type="monotone"
               dataKey="assets"
               name="Assets"
-              stroke="#818cf8"
+              stroke="#22d3ee"
               strokeWidth={1.5}
               strokeDasharray="4 4"
               dot={false}
@@ -531,7 +531,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     x={mortgageFreeYear}
                     stroke="#059669"
                     strokeDasharray="6 3"
-                    label={<MilestoneLabelContent value="Mortgage Free" fill="#059669" />}
+                    label={<MilestoneLabelContent value="Mortgage Free" fill="#059669" offsetY={20} />}
                   />
                 )}
               </>

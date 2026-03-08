@@ -27,11 +27,11 @@ describe("ProjectionChart position — full-width above two-column layout", () =
     expect(dashboardSectionMatch![0]).not.toContain("ProjectionChart");
   });
 
-  it("ProjectionChart section appears after the dashboard (insights-first layout)", () => {
+  it("ProjectionChart section appears before the dashboard (projections-first layout)", () => {
     const projectionsIndex = pageSource.indexOf('aria-label="Financial projections"');
     const dashboardIndex = pageSource.indexOf('aria-label="Financial dashboard"');
     expect(projectionsIndex).toBeGreaterThan(-1);
-    expect(projectionsIndex).toBeGreaterThan(dashboardIndex);
+    expect(projectionsIndex).toBeLessThan(dashboardIndex);
   });
 
   it("ProjectionChart component has aria-label for accessibility", () => {

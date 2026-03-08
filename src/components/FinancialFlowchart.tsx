@@ -555,9 +555,9 @@ export default function FinancialFlowchart({
         </p>
         <p className="text-[10px] leading-relaxed text-slate-700">
           <span className="font-medium text-slate-600">Acknowledgements:</span>{" "}
-          Original steps by <span className="text-slate-600">u/aBoglehead</span>
-          {" · "}Simplified graphic by <span className="text-slate-600">u/brainsturgeon</span>
-          {" · "}Detailed flowchart by <span className="text-slate-600">u/atlasvoid</span>
+          Original steps by <a href="https://www.reddit.com/user/aBoglehead" target="_blank" rel="noopener noreferrer" className="text-slate-600 underline underline-offset-2 hover:text-slate-500">u/aBoglehead</a>
+          {" · "}Simplified graphic by <a href="https://www.reddit.com/user/brainsturgeon" target="_blank" rel="noopener noreferrer" className="text-slate-600 underline underline-offset-2 hover:text-slate-500">u/brainsturgeon</a>
+          {" · "}Detailed flowchart by <a href="https://www.reddit.com/user/atlasvoid" target="_blank" rel="noopener noreferrer" className="text-slate-600 underline underline-offset-2 hover:text-slate-500">u/atlasvoid</a>
         </p>
       </div>
     </div>

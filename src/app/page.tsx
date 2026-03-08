@@ -108,13 +108,13 @@ export default function Home() {
 
   // ── Dashboard section definitions (for header stepper scroll-to links) ──
   const DASHBOARD_SECTIONS = useMemo(() => [
+    { id: "projections", icon: "📈", label: "Projections", shortLabel: "Project" },
     { id: "insights", icon: "💡", label: "Insights", shortLabel: "Insights" },
     { id: "metrics", icon: "🎯", label: "Metrics", shortLabel: "Metrics" },
     { id: "roadmap", icon: "🗺️", label: "Flowchart", shortLabel: "Flow" },
     { id: "cashflow", icon: "💸", label: "Cash Flow", shortLabel: "Cash" },
     { id: "breakdowns", icon: "📉", label: "Breakdowns", shortLabel: "Charts" },
     { id: "compare", icon: "📊", label: "Compare", shortLabel: "Compare" },
-    { id: "projections", icon: "📈", label: "Projections", shortLabel: "Project" },
     { id: "scenarios", icon: "🔮", label: "What If", shortLabel: "What If" },
   ] as const, []);
 
@@ -472,6 +472,11 @@ export default function Home() {
             {" "}— everything stays in your browser, nothing is stored.
           </p>
 
+          {/* Projections */}
+          <section id="section-dash-projections" className="scroll-mt-28" aria-label="Financial projections">
+            <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} onMilestonesChange={handleMilestonesChange} /></ZoomableCard>
+          </section>
+
           {/* Insights */}
           <section id="section-dash-insights" className="scroll-mt-28" aria-label="Financial insights">
             <InsightsPanel data={financialData} insightConnections={insightConnections} milestones={projectionMilestones} />
@@ -482,8 +487,8 @@ export default function Home() {
             <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
           </section>
 
-          {/* r/personalfinance Flowchart */}
-          <section id="section-dash-roadmap" className="scroll-mt-28 max-w-3xl mx-auto" aria-label="r/personalfinance flowchart">
+          {/* Flowchart */}
+          <section id="section-dash-roadmap" className="scroll-mt-28" aria-label="r/personalfinance flowchart">
             <FinancialFlowchart
               state={state}
               acknowledged={flowchartAcks}
@@ -496,7 +501,7 @@ export default function Home() {
           </section>
 
           {/* Cash Flow */}
-          <section id="section-dash-cashflow" className="scroll-mt-28 max-w-3xl mx-auto" aria-label="Cash flow">
+          <section id="section-dash-cashflow" className="scroll-mt-28" aria-label="Cash flow">
             <ZoomableCard><CashFlowSankey
               income={income}
               expenses={expenses}
@@ -598,13 +603,8 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Projections */}
-          <section id="section-dash-projections" className="scroll-mt-28 max-w-3xl mx-auto" aria-label="Financial projections">
-            <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} onMilestonesChange={handleMilestonesChange} /></ZoomableCard>
-          </section>
-
           {/* What If */}
-          <section id="section-dash-scenarios" className="scroll-mt-28 max-w-3xl mx-auto" aria-label="Scenario modeling">
+          <section id="section-dash-scenarios" className="scroll-mt-28" aria-label="Scenario modeling">
             <FastForwardPanel state={state} safeWithdrawalRate={safeWithdrawalRate} onSwrChange={handleSwrChange} />
           </section>
 
