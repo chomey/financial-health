@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   getFlowchartSteps,
   getCurrentStepIndex,
@@ -31,73 +32,262 @@ export function computeFlowchartSummary(steps: FlowchartStep[]): {
   };
 }
 
-/** Maps a step status to Tailwind color class for its title text */
 export function getStepTitleColor(status: StepStatus): string {
   if (status === "complete") return "text-emerald-400";
-  if (status === "in-progress") return "text-amber-400";
+  if (status === "in-progress") return "text-amber-300";
   return "text-slate-400";
 }
 
-/** Returns Tailwind class for the vertical connector line below a step circle */
 export function getConnectorColor(status: StepStatus): string {
   return status === "complete" ? "bg-emerald-500/40" : "bg-white/10";
 }
 
-// ── Step circle indicator ──────────────────────────────────────────────────────
+// ── Step circle ──────────────────────────────────────────────────────────────
 
-function StepCircle({ step }: { step: FlowchartStep }) {
+function StepCircle({ step, size = "sm" }: { step: FlowchartStep; size?: "sm" | "lg" }) {
+  const dim = size === "lg" ? "h-10 w-10" : "h-7 w-7";
+  const textSize = size === "lg" ? "text-sm" : "text-xs";
+  const iconSize = size === "lg" ? "h-5 w-5" : "h-3.5 w-3.5";
+
   if (step.status === "complete") {
     return (
-      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/30">
-        <svg
-          className="h-4 w-4 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={3}
-          aria-hidden="true"
-        >
+      <div className={`flex ${dim} flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/30`}>
+        <svg className={`${iconSize} text-white`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3} aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
     );
   }
-
   if (step.status === "in-progress") {
     return (
-      <div
-        className="relative flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-500 shadow-sm shadow-amber-500/30"
-        aria-label="In progress"
-      >
+      <div className={`relative flex ${dim} flex-shrink-0 items-center justify-center rounded-full bg-amber-500 shadow-sm shadow-amber-500/30`} aria-label="In progress">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-30" />
-        <span className="relative text-xs font-bold text-white">{step.stepNumber}</span>
+        <span className={`relative ${textSize} font-bold text-white`}>{step.stepNumber}</span>
       </div>
     );
   }
-
   return (
-    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5">
-      <span className="text-xs font-medium text-slate-500">{step.stepNumber}</span>
+    <div className={`flex ${dim} flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5`}>
+      <span className={`${textSize} font-medium text-slate-500`}>{step.stepNumber}</span>
     </div>
   );
 }
 
-// ── Main component ─────────────────────────────────────────────────────────────
+// ── Detail modal (portal) ────────────────────────────────────────────────────
+
+function StepDetailModal({
+  step,
+  isAcknowledged,
+  isSkipped,
+  onAcknowledge,
+  onSkip,
+  onUndo,
+  onClose,
+}: {
+  step: FlowchartStep;
+  isAcknowledged: boolean;
+  isSkipped: boolean;
+  onAcknowledge: (checked: boolean) => void;
+  onSkip: (checked: boolean) => void;
+  onUndo: () => void;
+  onClose: () => void;
+}) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const isOverridden = isAcknowledged || isSkipped;
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setIsVisible(true));
+    });
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div
+      ref={overlayRef}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-150 ease-out ${isVisible ? "bg-black/50 backdrop-blur-sm" : "bg-transparent"}`}
+      onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
+    >
+      <div
+        className={`relative w-full max-w-md overflow-auto rounded-2xl bg-slate-900 border border-white/10 p-5 shadow-2xl transition-all duration-150 ease-out ${isVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
+      >
+        <button
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          className="absolute right-3 top-3 z-10 rounded-full bg-white/10 p-1.5 text-slate-400 transition-colors duration-150 hover:bg-white/20 hover:text-slate-200"
+          aria-label="Close detail view"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <div className="flex items-start gap-3 mb-3">
+          <StepCircle step={step} size="lg" />
+          <div className="min-w-0 flex-1">
+            <p className={`text-base font-semibold leading-tight ${getStepTitleColor(step.status)}`}>
+              {step.title}
+              {isSkipped && (
+                <span className="ml-1.5 rounded-full bg-slate-700/60 px-1.5 py-0.5 text-[10px] font-normal text-slate-500">N/A</span>
+              )}
+            </p>
+            <p className="mt-1 text-xs text-slate-500">{step.completionHint}</p>
+          </div>
+        </div>
+
+        {step.status !== "complete" && step.progress > 0 && step.progress < 100 && (
+          <div className="mb-3 flex items-center gap-2">
+            <div className="h-1.5 flex-1 rounded-full bg-white/5 overflow-hidden">
+              <div className="h-full rounded-full bg-amber-400 transition-all duration-500" style={{ width: `${step.progress}%` }} />
+            </div>
+            <span className="text-xs font-medium text-amber-400 tabular-nums">{step.progress}%</span>
+          </div>
+        )}
+
+        <div className="text-sm leading-relaxed text-slate-400" data-testid={`step-detail-${step.id}`}>
+          <p>{step.detailText}</p>
+        </div>
+
+        {(step.userAcknowledgeable || step.skippable) && (
+          <div className="mt-3 space-y-2 border-t border-white/10 pt-3">
+            {step.userAcknowledgeable && step.acknowledgeLabel && (
+              <label className="flex cursor-pointer items-start gap-2">
+                <input
+                  type="checkbox"
+                  checked={isAcknowledged}
+                  onChange={(e) => onAcknowledge(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 flex-shrink-0 rounded accent-emerald-500"
+                  data-testid={`ack-checkbox-${step.id}`}
+                />
+                <span className="text-sm text-slate-300">{step.acknowledgeLabel}</span>
+              </label>
+            )}
+            {step.skippable && step.skipLabel && (
+              <label className="flex cursor-pointer items-start gap-2">
+                <input
+                  type="checkbox"
+                  checked={isSkipped}
+                  onChange={(e) => onSkip(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 flex-shrink-0 rounded accent-slate-500"
+                  data-testid={`skip-checkbox-${step.id}`}
+                />
+                <span className="text-sm text-slate-500">{step.skipLabel}</span>
+              </label>
+            )}
+            {isOverridden && (
+              <button
+                type="button"
+                onClick={onUndo}
+                className="text-xs text-slate-500 underline underline-offset-2 hover:text-slate-300 transition-colors"
+                data-testid={`undo-button-${step.id}`}
+              >
+                Undo
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// ── Zig-zag step card (compact, no inline expand) ───────────────────────────
+
+function ZigZagStep({
+  step,
+  isSkipped,
+  onClick,
+}: {
+  step: FlowchartStep;
+  isSkipped: boolean;
+  onClick: () => void;
+}) {
+  const borderColor =
+    step.status === "complete"
+      ? "border-emerald-500/30"
+      : step.status === "in-progress"
+        ? "border-amber-400/30"
+        : "border-white/10";
+  const bgColor =
+    step.status === "in-progress"
+      ? "bg-amber-500/5"
+      : "bg-white/[0.02]";
+
+  return (
+    <button
+      type="button"
+      className={`group flex w-full items-start gap-3 rounded-xl border ${borderColor} ${bgColor} px-3 py-2.5 text-left transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-violet-400`}
+      onClick={onClick}
+      data-testid={`flowchart-step-${step.id}`}
+    >
+      <StepCircle step={step} />
+      <div className="min-w-0 flex-1">
+        <p className={`text-sm font-semibold leading-tight ${getStepTitleColor(step.status)}`}>
+          {step.title}
+          {isSkipped && (
+            <span className="ml-1.5 rounded-full bg-slate-700/60 px-1.5 py-0.5 text-[10px] font-normal text-slate-500">N/A</span>
+          )}
+        </p>
+        <p className="mt-0.5 text-[11px] leading-snug text-slate-500 line-clamp-2">{step.completionHint}</p>
+      </div>
+    </button>
+  );
+}
+
+// ── Connector arrows between rows ────────────────────────────────────────────
+
+function HorizontalConnector({ status }: { status: StepStatus }) {
+  const color = status === "complete" ? "border-emerald-500/40" : "border-white/10";
+  return (
+    <div className={`hidden sm:flex items-center self-center`} aria-hidden="true">
+      <div className={`w-4 lg:w-6 border-t-2 border-dashed ${color}`} />
+    </div>
+  );
+}
+
+function ZigZagTurn({ direction, status }: { direction: "right" | "left"; status: StepStatus }) {
+  const color = status === "complete" ? "border-emerald-500/40" : "border-white/10";
+  // "right" turn: connector drops down from right edge, "left" turn: drops down from left edge
+  return (
+    <div className="hidden sm:flex w-full py-1 sm:py-2" aria-hidden="true">
+      {direction === "right" ? (
+        <div className="ml-auto mr-6 flex flex-col items-end">
+          <div className={`h-4 border-r-2 border-dashed ${color}`} />
+          <div className={`w-[calc(100vw-6rem)] max-w-[calc(100%-3rem)] border-b-2 border-dashed ${color} rounded-br-xl`} style={{ width: "80%" }} />
+          <div className={`h-4 border-l-2 border-dashed ${color} self-start`} />
+        </div>
+      ) : (
+        <div className="ml-6 mr-auto flex flex-col items-start">
+          <div className={`h-4 border-l-2 border-dashed ${color}`} />
+          <div className={`border-b-2 border-dashed ${color} rounded-bl-xl`} style={{ width: "80%" }} />
+          <div className={`h-4 border-r-2 border-dashed ${color} self-end`} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main component ───────────────────────────────────────────────────────────
 
 export default function FinancialFlowchart({ state }: { state: FinancialState }) {
   const [acknowledged, setAcknowledged] = useState<string[]>([]);
   const [skipped, setSkipped] = useState<string[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [detailStep, setDetailStep] = useState<FlowchartStep | null>(null);
 
-  // Load URL state and auto-expand current step on mount
   useEffect(() => {
     const acks = getFlowchartAcksFromURL();
     const skps = getFlowchartSkipsFromURL();
     setAcknowledged(acks);
     setSkipped(skps);
-    const stepsWithOverrides = applyUserOverrides(getFlowchartSteps(state), acks, skps);
-    const idx = getCurrentStepIndex(stepsWithOverrides);
-    setExpandedId(stepsWithOverrides[idx]?.id ?? null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -111,8 +301,8 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
   const country = state.country ?? "CA";
 
   const handleAcknowledge = useCallback(
-    (stepId: string, checked: boolean, wasSkipped: boolean) => {
-      const newSkips = wasSkipped && checked ? skipped.filter((id) => id !== stepId) : skipped;
+    (stepId: string, checked: boolean) => {
+      const newSkips = skipped.filter((id) => id !== stepId);
       const newAcks = checked
         ? [...acknowledged.filter((id) => id !== stepId), stepId]
         : acknowledged.filter((id) => id !== stepId);
@@ -124,9 +314,8 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
   );
 
   const handleSkip = useCallback(
-    (stepId: string, checked: boolean, wasAcknowledged: boolean) => {
-      const newAcks =
-        wasAcknowledged && checked ? acknowledged.filter((id) => id !== stepId) : acknowledged;
+    (stepId: string, checked: boolean) => {
+      const newAcks = acknowledged.filter((id) => id !== stepId);
       const newSkips = checked
         ? [...skipped.filter((id) => id !== stepId), stepId]
         : skipped.filter((id) => id !== stepId);
@@ -148,200 +337,131 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
     [acknowledged, skipped],
   );
 
-  const toggleExpand = useCallback((stepId: string) => {
-    setExpandedId((prev) => (prev === stepId ? null : stepId));
+  const openDetail = useCallback((step: FlowchartStep) => {
+    setDetailStep(step);
   }, []);
+
+  const closeDetail = useCallback(() => {
+    setDetailStep(null);
+  }, []);
+
+  // Split steps into rows for zig-zag: 4 per row on desktop, 2 on mobile
+  // We use a fixed 4-per-row for the zig-zag pattern
+  const COLS = 4;
+  const rows: FlowchartStep[][] = [];
+  for (let i = 0; i < steps.length; i += COLS) {
+    const row = steps.slice(i, i + COLS);
+    // Odd rows (1, 3, ...) are right-to-left, so reverse them
+    if (rows.length % 2 === 1) {
+      rows.push([...row].reverse());
+    } else {
+      rows.push(row);
+    }
+  }
 
   const caWikiUrl = "https://www.reddit.com/r/PersonalFinanceCanada/wiki/money-steps";
   const usWikiUrl = "https://www.reddit.com/r/personalfinance/wiki/commontopics";
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200"
+      className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 shadow-sm transition-all duration-200"
       data-testid="financial-flowchart"
     >
-      {/* Header */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-slate-400">Financial Roadmap</h3>
-          <span className="text-lg" aria-hidden="true">
-            🗺️
+      {/* Header row */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-lg" aria-hidden="true">🗺️</span>
+          <h3 className="text-sm font-medium text-slate-400">Money Steps</h3>
+          <span className="text-lg font-bold text-white ml-1">
+            {completed}<span className="text-slate-500">/{total}</span>
           </span>
         </div>
-        <p className="mt-1 text-2xl font-bold text-white">
-          {completed}
-          <span className="text-slate-400">/{total}</span>
-          <span className="ml-2 text-sm font-normal text-slate-400">steps complete</span>
-        </p>
-        {/* Gradient progress bar */}
-        <div
-          className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/5"
-          role="progressbar"
-          aria-valuenow={percentage}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`Roadmap progress: ${completed} of ${total} steps`}
-        >
+        <div className="flex-1 min-w-[120px] max-w-xs">
           <div
-            className="h-full rounded-full transition-all duration-500 ease-out"
-            style={{
-              width: `${percentage}%`,
-              background:
-                percentage === 100
+            className="h-2 w-full overflow-hidden rounded-full bg-white/5"
+            role="progressbar"
+            aria-valuenow={percentage}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Progress: ${completed} of ${total} steps`}
+          >
+            <div
+              className="h-full rounded-full transition-all duration-500 ease-out"
+              style={{
+                width: `${percentage}%`,
+                background: percentage === 100
                   ? "linear-gradient(to right, #10b981, #34d399)"
                   : "linear-gradient(to right, #10b981, #f59e0b)",
-            }}
-          />
+              }}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Steps list */}
-      <div role="list" aria-label="Financial roadmap steps">
-        {steps.map((step, idx) => {
-          const isExpanded = expandedId === step.id;
-          const isAcknowledged = acknowledged.includes(step.id);
-          const isSkipped = skipped.includes(step.id);
-          const isOverridden = isAcknowledged || isSkipped;
-          const isLast = idx === steps.length - 1;
+      {/* Zig-zag flowchart */}
+      <div role="list" aria-label="Money steps">
+        {rows.map((row, rowIdx) => {
+          const isReversedRow = rowIdx % 2 === 1;
+          // Determine the status of the last step in this row for the turn connector
+          const lastStepInRow = isReversedRow ? row[0] : row[row.length - 1];
+          const isLastRow = rowIdx === rows.length - 1;
 
           return (
-            <div key={step.id} role="listitem" className="relative flex gap-3">
-              {/* Left column: circle + connector line */}
-              <div className="flex flex-col items-center">
-                <StepCircle step={step} />
-                {!isLast && (
-                  <div
-                    className={`mt-0.5 w-0.5 flex-1 ${getConnectorColor(step.status)}`}
-                    style={{ minHeight: "1.5rem" }}
-                    aria-hidden="true"
-                  />
-                )}
-              </div>
-
-              {/* Step content */}
-              <div className={`min-w-0 flex-1 ${isLast ? "pb-0" : "pb-3"}`}>
-                <button
-                  type="button"
-                  className="w-full rounded-lg px-2 py-1 text-left transition-colors duration-150 hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-violet-400 active:bg-white/10"
-                  onClick={() => toggleExpand(step.id)}
-                  aria-expanded={isExpanded}
-                  data-testid={`step-button-${step.id}`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className={`text-sm font-medium leading-tight ${getStepTitleColor(step.status)}`}>
-                        {step.title}
-                        {isSkipped && (
-                          <span className="ml-2 rounded-full bg-slate-700/60 px-1.5 py-0.5 text-xs font-normal text-slate-500">
-                            N/A
-                          </span>
-                        )}
-                      </p>
-                      <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
-                        {step.completionHint}
-                      </p>
-                    </div>
-                    <div className="flex flex-shrink-0 items-center gap-1.5">
-                      {step.status !== "complete" && step.progress > 0 && step.progress < 100 && (
-                        <span className="text-xs font-medium text-amber-400">{step.progress}%</span>
-                      )}
-                      <svg
-                        className={`h-3 w-3 text-slate-600 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        aria-hidden="true"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Expanded detail panel */}
-                {isExpanded && (
-                  <div
-                    className="mt-1.5 space-y-3 rounded-lg border border-white/5 bg-black/20 px-3 py-3 text-xs leading-relaxed text-slate-400"
-                    data-testid={`step-detail-${step.id}`}
-                  >
-                    <p>{step.detailText}</p>
-
-                    {/* User-acknowledgeable checkboxes */}
-                    {(step.userAcknowledgeable || step.skippable) && (
-                      <div className="space-y-2 border-t border-white/10 pt-2">
-                        {step.userAcknowledgeable && step.acknowledgeLabel && (
-                          <label
-                            className="flex cursor-pointer items-start gap-2"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isAcknowledged}
-                              onChange={(e) => {
-                                handleAcknowledge(step.id, e.target.checked, isSkipped);
-                              }}
-                              className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 rounded accent-emerald-500"
-                              data-testid={`ack-checkbox-${step.id}`}
-                            />
-                            <span className="text-slate-300">{step.acknowledgeLabel}</span>
-                          </label>
-                        )}
-                        {step.skippable && step.skipLabel && (
-                          <label
-                            className="flex cursor-pointer items-start gap-2"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isSkipped}
-                              onChange={(e) => {
-                                handleSkip(step.id, e.target.checked, isAcknowledged);
-                              }}
-                              className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 rounded accent-slate-500"
-                              data-testid={`skip-checkbox-${step.id}`}
-                            />
-                            <span className="text-slate-500">{step.skipLabel}</span>
-                          </label>
-                        )}
-                        {isOverridden && (
-                          <button
-                            type="button"
-                            onClick={() => handleUndo(step.id)}
-                            className="text-xs text-slate-500 underline underline-offset-2 transition-colors duration-150 hover:text-slate-300 focus:outline-none focus:ring-1 focus:ring-violet-400"
-                            data-testid={`undo-button-${step.id}`}
-                          >
-                            Undo
-                          </button>
-                        )}
+            <div key={rowIdx}>
+              {/* Row of step cards with horizontal connectors */}
+              <div className="grid gap-2 sm:flex sm:items-stretch sm:gap-0">
+                {row.map((step, colIdx) => {
+                  const isLastInRow = colIdx === row.length - 1;
+                  return (
+                    <div key={step.id} role="listitem" className="flex items-stretch sm:flex-1 min-w-0">
+                      <div className="flex-1 min-w-0">
+                        <ZigZagStep
+                          step={step}
+                          isSkipped={skipped.includes(step.id)}
+                          onClick={() => openDetail(step)}
+                        />
                       </div>
-                    )}
-                  </div>
-                )}
+                      {!isLastInRow && <HorizontalConnector status={step.status} />}
+                    </div>
+                  );
+                })}
               </div>
+
+              {/* Zig-zag turn connector between rows */}
+              {!isLastRow && (
+                <ZigZagTurn
+                  direction={isReversedRow ? "left" : "right"}
+                  status={lastStepInRow.status}
+                />
+              )}
             </div>
           );
         })}
       </div>
 
-      {/* Community credit + disclaimer */}
-      <div className="mt-5 border-t border-white/5 pt-4">
-        <p className="text-xs leading-relaxed text-slate-600">
+      {/* Detail modal */}
+      {detailStep && (
+        <StepDetailModal
+          step={detailStep}
+          isAcknowledged={acknowledged.includes(detailStep.id)}
+          isSkipped={skipped.includes(detailStep.id)}
+          onAcknowledge={(checked) => handleAcknowledge(detailStep.id, checked)}
+          onSkip={(checked) => handleSkip(detailStep.id, checked)}
+          onUndo={() => handleUndo(detailStep.id)}
+          onClose={closeDetail}
+        />
+      )}
+
+      {/* Attribution */}
+      <div className="mt-4 border-t border-white/5 pt-3">
+        <p className="text-[11px] leading-relaxed text-slate-600">
           Based on the{" "}
           {country === "CA" ? (
-            <a
-              href={caWikiUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-500 underline underline-offset-2 transition-colors duration-150 hover:text-slate-300"
-            >
+            <a href={caWikiUrl} target="_blank" rel="noopener noreferrer" className="text-slate-500 underline underline-offset-2 hover:text-slate-300 transition-colors">
               r/PersonalFinanceCanada Money Steps
             </a>
           ) : (
-            <a
-              href={usWikiUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-500 underline underline-offset-2 transition-colors duration-150 hover:text-slate-300"
-            >
+            <a href={usWikiUrl} target="_blank" rel="noopener noreferrer" className="text-slate-500 underline underline-offset-2 hover:text-slate-300 transition-colors">
               r/personalfinance How to handle $
             </a>
           )}{" "}

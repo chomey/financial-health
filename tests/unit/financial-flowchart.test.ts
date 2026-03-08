@@ -84,7 +84,7 @@ describe("getStepTitleColor", () => {
   });
 
   it("returns amber for in-progress steps", () => {
-    expect(getStepTitleColor("in-progress")).toBe("text-amber-400");
+    expect(getStepTitleColor("in-progress")).toBe("text-amber-300");
   });
 
   it("returns slate for upcoming steps", () => {

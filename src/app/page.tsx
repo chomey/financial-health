@@ -345,7 +345,7 @@ export default function Home() {
               { id: "property", icon: "🏠", label: "Property" },
               { id: "stocks", icon: "📊", label: "Stocks" },
               { id: "dashboard", icon: "🎯", label: "Dashboard" },
-              { id: "roadmap", icon: "🗺️", label: "Roadmap" },
+              { id: "roadmap", icon: "🗺️", label: "Money Steps" },
               { id: "scenarios", icon: "🔮", label: "What If" },
             ].map((item) => (
               <button
@@ -428,6 +428,9 @@ export default function Home() {
         <section id="projections" className="mb-4 sm:mb-6 space-y-3 sm:space-y-4 scroll-mt-16" aria-label="Financial projections">
           <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} /></ZoomableCard>
           <InsightsPanel data={financialData} insightConnections={insightConnections} />
+          <section id="roadmap" className="scroll-mt-16" aria-label="Money steps">
+            <FinancialFlowchart state={state} />
+          </section>
         </section>
 
         <div className="grid grid-cols-1 gap-4 sm:gap-8 lg:grid-cols-12">
@@ -556,9 +559,6 @@ export default function Home() {
                 annualIncome={annualIncome}
                 onAgeChange={setAge}
               /></ZoomableCard>
-              <section id="roadmap" className="scroll-mt-16" aria-label="Financial roadmap">
-                <FinancialFlowchart state={state} />
-              </section>
             </div>
           </section>
         </div>
