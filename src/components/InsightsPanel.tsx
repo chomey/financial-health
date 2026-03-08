@@ -34,6 +34,10 @@ const INSIGHT_TYPE_SOURCES: Record<InsightType, string[]> = {
   "coast-fire": ["section-assets", "section-expenses"],
   "net-worth-milestone": ["section-assets", "section-debts"],
   "net-worth-percentile": ["section-assets", "section-debts"],
+  "tax-credits-summary": ["section-income"],
+  "tax-credits-unclaimed": ["section-income"],
+  "tax-credits-refundable": ["section-income"],
+  "tax-credits-ineligible": ["section-income"],
 };
 
 function InsightCard({

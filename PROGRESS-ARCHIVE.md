@@ -2480,3 +2480,20 @@
 - **Tests**: T1: 1839 passed (22 new in `insights-regression.test.ts`), T2+T3: 510 passed (5 new in `insights-regression.spec.ts`)
 - **Screenshots**: ![Young adult](screenshots/task-139-young-adult-insights.png) ![Mid-career](screenshots/task-139-mid-career-all-insights.png) ![High earner](screenshots/task-139-high-earner-insights.png) ![Contrast check](screenshots/task-139-contrast-check.png) ![All five](screenshots/task-139-all-five-insights.png)
 - **Notes**: Full T3 regression — all 510 E2E tests pass. WCAG AA 4.5:1 contrast validated on insight cards. Fixed pre-existing changelog test failure (task 138 added entry but test expected 137). All 5 insight types verified across 3 scenarios.
+
+## Task 140: Tax Credits & Deductions data model, filing status selector, and entry UI
+- **Date**: 2026-03-07
+- **Files**: `src/lib/tax-credits.ts`, `src/lib/financial-state.ts`, `src/components/TaxCreditEntry.tsx`, `src/app/page.tsx`, `tests/unit/tax-credits.test.ts`, `tests/e2e/tax-credits.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: Archived from PROGRESS.md (task 140)
+
+## Task 141: Canadian tax credit categories with income limits and spousal status
+- **Date**: 2026-03-07
+- **Files**: `src/lib/tax-credits.ts`, `tests/unit/tax-credits.test.ts`, `tests/e2e/ca-tax-categories.spec.ts`, `src/lib/changelog.ts`
+- **Tests**: Archived from PROGRESS.md (task 141)
+
+## Task 142: Add US tax credit and deduction categories with income limits and filing status
+- **Date**: 2026-03-07
+- **Files**: `src/lib/tax-credits.ts`, `tests/unit/tax-credits.test.ts`, `tests/e2e/us-tax-categories.spec.ts`, `src/lib/changelog.ts`, `tests/unit/changelog.test.ts`
+- **Tests**: T1: 83 passed, T2: 3 passed, Build: passes
+- **Screenshots**: ![US single categories](screenshots/task-142-us-single-categories.png)
+- **Notes**: MFS ineligibility handled via incomeLimits.

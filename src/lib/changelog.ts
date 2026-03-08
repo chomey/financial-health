@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Tax credit insights with income eligibility awareness
+  {
+    version: 143,
+    title: "Tax credit insights with eligibility awareness",
+    description: "Four new insight types powered by your entered tax credits: tax-credits-summary shows your total credits and how they shift your effective tax rate; tax-credits-unclaimed suggests up to 2 unclaimed credits based on your profile (children, low income, homeowner, student) and income eligibility; tax-credits-refundable flags when your refundable credits exceed your estimated tax, signalling a possible refund; tax-credits-ineligible warns when any entered credits are likely unavailable at your income level or filing status, with an adjusted total. Tone stays encouraging throughout.",
+    date: "2026-03-07",
+  },
   // US tax credit categories with income limits and filing status
   {
     version: 142,
