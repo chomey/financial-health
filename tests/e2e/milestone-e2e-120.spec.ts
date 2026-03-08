@@ -374,7 +374,7 @@ test.describe("Milestone E2E: Financial Intelligence (Tasks 110-119)", () => {
     // All six metric cards should be visible
     const cardIds = [
       "metric-card-net-worth",
-      "metric-card-monthly-surplus",
+      "metric-card-monthly-cash-flow",
       "metric-card-estimated-tax",
       "metric-card-financial-runway",
       "metric-card-debt-to-asset-ratio",

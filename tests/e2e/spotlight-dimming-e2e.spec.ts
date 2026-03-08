@@ -49,14 +49,14 @@ test.describe("Explainer Modal System — Milestone E2E (replaces spotlight dimm
     await captureScreenshot(page, "task-78-net-worth-explainer");
   });
 
-  test("Monthly Surplus explainer shows income and expenses with operators", async ({
+  test("Monthly Cash Flow explainer shows income and expenses with operators", async ({
     page,
   }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.scrollIntoViewIfNeeded();
     await surplusCard.click();
 

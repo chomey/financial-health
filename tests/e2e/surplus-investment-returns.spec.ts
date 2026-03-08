@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-test.describe("Monthly Surplus — investment returns in explainer", () => {
-  test("clicking Monthly Surplus card shows investment returns section", async ({ page }) => {
+test.describe("Monthly Cash Flow — investment returns in explainer", () => {
+  test("clicking Monthly Cash Flow card shows investment returns section", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector('[data-testid="metric-card-monthly-surplus"]');
+    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
 
-    // Click the Monthly Surplus card to open explainer
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    // Click the Monthly Cash Flow card to open explainer
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.click();
 
     await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
@@ -29,9 +29,9 @@ test.describe("Monthly Surplus — investment returns in explainer", () => {
 
   test("investment returns section shows correct format per asset", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector('[data-testid="metric-card-monthly-surplus"]');
+    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
 
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.click();
 
     await expect(page.locator('[data-testid="investment-returns-section"]')).toBeVisible({ timeout: 3000 });
@@ -48,9 +48,9 @@ test.describe("Monthly Surplus — investment returns in explainer", () => {
 
   test("investment returns connection appears in assets source card", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector('[data-testid="metric-card-monthly-surplus"]');
+    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
 
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.click();
 
     await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });

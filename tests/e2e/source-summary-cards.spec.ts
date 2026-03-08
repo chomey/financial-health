@@ -62,10 +62,10 @@ test.describe("Source Summary Cards in Explainer Modal", () => {
     expect(assetsBorderColor).toMatch(/rgb\(16,\s*185,\s*129\)/);
   });
 
-  test("Monthly Surplus explainer shows income and expense cards", async ({ page }) => {
+  test("Monthly Cash Flow explainer shows income and expense cards", async ({ page }) => {
     await page.goto("/");
 
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.scrollIntoViewIfNeeded();
     await surplusCard.click();
 
@@ -133,14 +133,14 @@ test.describe("Source Summary Cards in Explainer Modal", () => {
     await page.locator('[data-testid="explainer-close"]').click();
     await expect(modal).not.toBeVisible();
 
-    // Open Monthly Surplus explainer
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    // Open Monthly Cash Flow explainer
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.scrollIntoViewIfNeeded();
     await surplusCard.click();
 
     modal = page.locator('[data-testid="explainer-modal"]');
     await expect(modal).toBeVisible();
-    await expect(page.locator('[data-testid="explainer-title"]')).toHaveText("Monthly Surplus");
+    await expect(page.locator('[data-testid="explainer-title"]')).toHaveText("Monthly Cash Flow");
 
     // Should show income items, not asset items
     await expect(page.locator('[data-testid="source-summary-section-income"]')).toBeVisible();

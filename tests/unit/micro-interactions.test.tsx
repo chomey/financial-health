@@ -12,7 +12,7 @@ describe("Runway celebratory glow", () => {
   it("shows celebratory glow when runway exceeds 12 months", () => {
     const metrics: MetricData[] = [
       { title: "Net Worth", value: 100000, format: "currency", icon: "💰", tooltip: "test", positive: true },
-      { title: "Monthly Surplus", value: 2000, format: "currency", icon: "📈", tooltip: "test", positive: true },
+      { title: "Monthly Cash Flow", value: 2000, format: "currency", icon: "📈", tooltip: "test", positive: true },
       { title: "Financial Runway", value: 18.5, format: "months", icon: "🛡️", tooltip: "test", positive: true },
       { title: "Debt-to-Asset Ratio", value: 0.5, format: "ratio", icon: "⚖️", tooltip: "test", positive: true },
     ];
@@ -26,7 +26,7 @@ describe("Runway celebratory glow", () => {
   it("shows 'Excellent safety net!' text for runway > 12 months", () => {
     const metrics: MetricData[] = [
       { title: "Net Worth", value: 100000, format: "currency", icon: "💰", tooltip: "test", positive: true },
-      { title: "Monthly Surplus", value: 2000, format: "currency", icon: "📈", tooltip: "test", positive: true },
+      { title: "Monthly Cash Flow", value: 2000, format: "currency", icon: "📈", tooltip: "test", positive: true },
       { title: "Financial Runway", value: 15.0, format: "months", icon: "🛡️", tooltip: "test", positive: true },
       { title: "Debt-to-Asset Ratio", value: 0.5, format: "ratio", icon: "⚖️", tooltip: "test", positive: true },
     ];
@@ -37,7 +37,7 @@ describe("Runway celebratory glow", () => {
   it("does NOT show celebratory glow when runway is below 12 months", () => {
     const metrics: MetricData[] = [
       { title: "Net Worth", value: 50000, format: "currency", icon: "💰", tooltip: "test", positive: true },
-      { title: "Monthly Surplus", value: 1000, format: "currency", icon: "📈", tooltip: "test", positive: true },
+      { title: "Monthly Cash Flow", value: 1000, format: "currency", icon: "📈", tooltip: "test", positive: true },
       { title: "Financial Runway", value: 8.0, format: "months", icon: "🛡️", tooltip: "test", positive: true },
       { title: "Debt-to-Asset Ratio", value: 1.0, format: "ratio", icon: "⚖️", tooltip: "test", positive: false },
     ];
@@ -51,7 +51,7 @@ describe("Runway celebratory glow", () => {
   it("does NOT show glow when runway is exactly 12 months", () => {
     const metrics: MetricData[] = [
       { title: "Net Worth", value: 50000, format: "currency", icon: "💰", tooltip: "test", positive: true },
-      { title: "Monthly Surplus", value: 1000, format: "currency", icon: "📈", tooltip: "test", positive: true },
+      { title: "Monthly Cash Flow", value: 1000, format: "currency", icon: "📈", tooltip: "test", positive: true },
       { title: "Financial Runway", value: 12.0, format: "months", icon: "🛡️", tooltip: "test", positive: true },
       { title: "Debt-to-Asset Ratio", value: 1.0, format: "ratio", icon: "⚖️", tooltip: "test", positive: false },
     ];

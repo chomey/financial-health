@@ -80,7 +80,7 @@ test.describe("Milestone 9: Whiteboard Explainer Modal (Tasks 79-82)", () => {
     });
   });
 
-  test.describe("Monthly Surplus explainer", () => {
+  test.describe("Monthly Cash Flow explainer", () => {
     test("shows income and expense breakdowns with operators", async ({
       page,
     }) => {
@@ -89,7 +89,7 @@ test.describe("Milestone 9: Whiteboard Explainer Modal (Tasks 79-82)", () => {
       await page.waitForLoadState("networkidle");
 
       const surplusCard = page.locator(
-        '[data-testid="metric-card-monthly-surplus"]'
+        '[data-testid="metric-card-monthly-cash-flow"]'
       );
       await surplusCard.scrollIntoViewIfNeeded();
       await surplusCard.click();
@@ -99,7 +99,7 @@ test.describe("Milestone 9: Whiteboard Explainer Modal (Tasks 79-82)", () => {
 
       await expect(
         page.locator('[data-testid="explainer-title"]')
-      ).toHaveText("Monthly Surplus");
+      ).toHaveText("Monthly Cash Flow");
 
       // Income source card
       await expect(
@@ -668,8 +668,8 @@ test.describe("Milestone 9: Whiteboard Explainer Modal (Tasks 79-82)", () => {
           expectedSources: ["section-assets", "section-debts"],
         },
         {
-          id: "monthly-surplus",
-          title: "Monthly Surplus",
+          id: "monthly-cash-flow",
+          title: "Monthly Cash Flow",
           expectedSources: ["section-income", "section-expenses"],
         },
         {

@@ -145,7 +145,7 @@ describe("SnapshotDashboard dataFlowConnections prop", () => {
     const allMetrics: MetricData[] = [
       NET_WORTH_METRIC,
       {
-        title: "Monthly Surplus",
+        title: "Monthly Cash Flow",
         value: 1000,
         format: "currency",
         icon: "📈",
@@ -156,7 +156,7 @@ describe("SnapshotDashboard dataFlowConnections prop", () => {
     renderWithProvider({ "Net Worth": NET_WORTH_CONNECTIONS }, allMetrics);
     // Both cards rendered
     expect(screen.getByTestId("metric-card-net-worth")).toBeInTheDocument();
-    expect(screen.getByTestId("metric-card-monthly-surplus")).toBeInTheDocument();
+    expect(screen.getByTestId("metric-card-monthly-cash-flow")).toBeInTheDocument();
   });
 
   it("works without dataFlowConnections (backward compat)", () => {

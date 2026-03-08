@@ -80,7 +80,7 @@ describe("Formula Validation — Net Worth", () => {
   });
 });
 
-describe("Formula Validation — Monthly Surplus", () => {
+describe("Formula Validation — Monthly Cash Flow", () => {
   it("surplus = afterTaxIncome + investmentReturns - expenses - contributions - mortgage", () => {
     const state = makeState({
       assets: [
@@ -94,7 +94,7 @@ describe("Formula Validation — Monthly Surplus", () => {
     const investmentReturns = computeMonthlyInvestmentReturns(state.assets);
     const totalInvReturns = investmentReturns.reduce((s, r) => s + r.amount, 0);
     const metrics = computeMetrics(state);
-    const surplus = metrics.find((m) => m.title === "Monthly Surplus")!;
+    const surplus = metrics.find((m) => m.title === "Monthly Cash Flow")!;
 
     const expected = totals.monthlyAfterTaxIncome + totalInvReturns - totals.monthlyExpenses - totals.totalMonthlyContributions - totals.totalMortgagePayments;
     expect(surplus.value).toBeCloseTo(expected, 2);

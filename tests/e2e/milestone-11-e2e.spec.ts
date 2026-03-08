@@ -265,7 +265,7 @@ test.describe("Milestone 11: Unified Chart & Final Enhancements (Tasks 97-101)",
       await expect(modal).not.toBeVisible({ timeout: 3000 });
 
       // Test 3: Backdrop click closes modal
-      const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+      const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
       await surplusCard.scrollIntoViewIfNeeded();
       await surplusCard.click();
       await expect(modal).toBeVisible({ timeout: 3000 });

@@ -390,7 +390,7 @@ test.describe("Milestone 10: Explainer & Tax Treatment Enhancements (Tasks 83-96
       await page.waitForLoadState("networkidle");
 
       const surplusCard = page.locator(
-        '[data-testid="metric-card-monthly-surplus"]'
+        '[data-testid="metric-card-monthly-cash-flow"]'
       );
       await surplusCard.scrollIntoViewIfNeeded();
       await surplusCard.click();

@@ -62,7 +62,7 @@ test.describe("setState-during-render fix — onChange fires via useEffect", () 
     // Surplus should reflect the change (higher expenses = lower surplus)
     // Original surplus: 6300 - 2950 = 3350
     // New surplus: 6300 - (2200 + 1200 + 150) = 6300 - 3550 = 2750
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$2,750");
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$2,750");
 
     // No setState-during-render warnings
     const setStateWarnings = consoleWarnings.filter(

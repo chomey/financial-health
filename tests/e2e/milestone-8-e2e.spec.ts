@@ -31,14 +31,14 @@ test.describe("Milestone 8: Data-Flow Visualization (Tasks 69-75) — Click-to-E
     await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
   });
 
-  test("Monthly Surplus card — click shows income and expenses in explainer", async ({
+  test("Monthly Cash Flow card — click shows income and expenses in explainer", async ({
     page,
   }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.scrollIntoViewIfNeeded();
     await surplusCard.click();
 

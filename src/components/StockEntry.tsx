@@ -320,7 +320,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
 
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      commitEdit();
+      (e.target as HTMLElement).blur();
     } else if (e.key === "Escape") {
       setEditingId(null);
       setEditingField(null);

@@ -309,7 +309,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
 
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      commitEdit();
+      (e.target as HTMLElement).blur();
     } else if (e.key === "Escape") {
       setEditingId(null);
       setEditingField(null);

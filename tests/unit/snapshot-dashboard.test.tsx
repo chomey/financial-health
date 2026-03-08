@@ -7,7 +7,7 @@ describe("SnapshotDashboard", () => {
   it("renders all four metric cards", () => {
     render(<SnapshotDashboard />);
     expect(screen.getByText("Net Worth")).toBeInTheDocument();
-    expect(screen.getByText("Monthly Surplus")).toBeInTheDocument();
+    expect(screen.getByText("Monthly Cash Flow")).toBeInTheDocument();
     expect(screen.getByText("Financial Runway")).toBeInTheDocument();
     expect(screen.getByText("Debt-to-Asset Ratio")).toBeInTheDocument();
   });
@@ -28,7 +28,7 @@ describe("SnapshotDashboard", () => {
       screen.getByLabelText("Net Worth: -$229,500")
     ).toBeInTheDocument();
     expect(
-      screen.getByLabelText("Monthly Surplus: $3,350")
+      screen.getByLabelText("Monthly Cash Flow: $3,350")
     ).toBeInTheDocument();
     expect(
       screen.getByLabelText("Financial Runway: 22.2 mo")
@@ -45,7 +45,7 @@ describe("SnapshotDashboard", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows description text for Monthly Surplus without hover", () => {
+  it("shows description text for Monthly Cash Flow without hover", () => {
     render(<SnapshotDashboard />);
     expect(
       screen.getByText(/How much more you earn than you spend/)
@@ -60,7 +60,7 @@ describe("SnapshotDashboard", () => {
 
   it("uses emerald color class for positive metrics (dark theme)", () => {
     render(<SnapshotDashboard />);
-    const surplusValue = screen.getByLabelText("Monthly Surplus: $3,350");
+    const surplusValue = screen.getByLabelText("Monthly Cash Flow: $3,350");
     expect(surplusValue.className).toContain("text-emerald-400");
   });
 
@@ -153,7 +153,7 @@ describe("MOCK_METRICS", () => {
     const titles = MOCK_METRICS.map((m) => m.title);
     expect(titles).toEqual([
       "Net Worth",
-      "Monthly Surplus",
+      "Monthly Cash Flow",
       "Financial Runway",
       "Debt-to-Asset Ratio",
     ]);

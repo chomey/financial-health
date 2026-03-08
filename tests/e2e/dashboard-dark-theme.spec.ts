@@ -25,7 +25,7 @@ test.describe("Task 128: Dashboard metric cards — dark theme", () => {
     await page.waitForSelector('[data-testid="snapshot-dashboard"]');
 
     // Monthly surplus should be positive (cyan)
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await expect(surplusCard).toBeVisible();
 
     // Check that the card renders (visual check via screenshot)
@@ -36,8 +36,8 @@ test.describe("Task 128: Dashboard metric cards — dark theme", () => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="snapshot-dashboard"]');
 
-    // Click a metric card that has connections (Monthly Surplus is likely to have them)
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    // Click a metric card that has connections (Monthly Cash Flow is likely to have them)
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.click();
 
     // Check if modal opens

@@ -571,6 +571,7 @@ export function computeTotals(state: FinancialState) {
   const realAssets = state.assets.filter((a) => !a.computed);
   const totalAssets = realAssets.reduce((sum, a) => sum + toHome(a.amount, a.currency), 0);
   const totalDebts = state.debts.reduce((sum, d) => sum + toHome(d.amount, d.currency), 0);
+  const totalDebtPayments = state.debts.reduce((sum, d) => sum + toHome(d.monthlyPayment ?? 0, d.currency), 0);
   const monthlyIncome = state.income.reduce((sum, i) => sum + toHome(normalizeToMonthly(i.amount, i.frequency), i.currency), 0);
   const monthlyExpenses = state.expenses.reduce((sum, e) => sum + toHome(e.amount, e.currency), 0);
   // Total monthly contributions to investment accounts (comes from income, not double-counted in expenses)
@@ -654,7 +655,7 @@ export function computeTotals(state: FinancialState) {
   const totalTaxEstimate = finalAnnualTax;
 
   // Also export the computed (non-overridden) values so the UI can show defaults
-  return { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase };
+  return { totalAssets, totalDebts, totalDebtPayments, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, totalFederalTax: finalFederalTax, totalProvincialStateTax: finalProvincialStateTax, effectiveTaxRate, computedFederalTax: totalFederalTax, computedProvincialStateTax: totalProvincialStateTax, homeCurrency, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase };
 }
 
 function fmtShort(n: number, currency: SupportedCurrency): string {
@@ -736,7 +737,7 @@ export function computeIncomeReplacementDetails(
 }
 
 export function computeMetrics(state: FinancialState): MetricData[] {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase } = computeTotals(state);
+  const { totalAssets, totalDebts, totalDebtPayments, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase } = computeTotals(state);
   const hc = getHomeCurrency(state.country ?? "CA");
   const $ = (n: number) => fmtShort(n, hc);
 
@@ -747,11 +748,11 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   // Compute estimated monthly investment returns from all assets (real + computed)
   const investmentReturns = computeMonthlyInvestmentReturns(state.assets);
   const totalMonthlyInvestmentReturns = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
-  // Surplus uses after-tax income + investment returns, subtracts expenses, contributions, and mortgage payments
-  const surplus = monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments;
-  // Runway uses liquid assets + stocks (NOT property), divided by total monthly obligations
+  // Surplus uses after-tax income + investment returns, subtracts expenses, contributions, mortgage payments, AND debt payments
+  const surplus = monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments - totalDebtPayments;
+  // Runway uses liquid assets + stocks (NOT property), divided by total monthly obligations (including debt payments)
   const liquidTotal = totalAssets + totalStocks;
-  const monthlyObligations = monthlyExpenses + totalMortgagePayments;
+  const monthlyObligations = monthlyExpenses + totalMortgagePayments + totalDebtPayments;
   const runway = monthlyObligations > 0 ? liquidTotal / monthlyObligations : 0;
 
   // Runway with investment growth: each asset account draws down proportionally, earning its own ROR.
@@ -854,24 +855,31 @@ export function computeMetrics(state: FinancialState): MetricData[] {
   // Build surplus formula: income sources (added) then outflows (subtracted)
   const surplusIncome: string[] = [];
   const surplusOutflow: string[] = [];
-  // List income sources largest-first
-  if (totalMonthlyInvestmentReturns > monthlyAfterTaxIncome) {
+  const monthlyTaxes = monthlyIncome - monthlyAfterTaxIncome;
+  // List income sources largest-first (use gross income, taxes shown as outflow)
+  if (totalMonthlyInvestmentReturns > monthlyIncome) {
     if (totalMonthlyInvestmentReturns > 0) surplusIncome.push(`${$(totalMonthlyInvestmentReturns)} investment returns`);
-    if (monthlyAfterTaxIncome > 0) surplusIncome.push(`${$(monthlyAfterTaxIncome)} after-tax income`);
+    if (monthlyIncome > 0) surplusIncome.push(`${$(monthlyIncome)} gross income`);
   } else {
-    if (monthlyAfterTaxIncome > 0) surplusIncome.push(`${$(monthlyAfterTaxIncome)} after-tax income`);
+    if (monthlyIncome > 0) surplusIncome.push(`${$(monthlyIncome)} gross income`);
     if (totalMonthlyInvestmentReturns > 0) surplusIncome.push(`${$(totalMonthlyInvestmentReturns)} investment returns`);
   }
+  if (monthlyTaxes > 0) surplusOutflow.push(`${$(monthlyTaxes)} taxes`);
   if (monthlyExpenses > 0) surplusOutflow.push(`${$(monthlyExpenses)} expenses`);
   if (totalMonthlyContributions > 0) surplusOutflow.push(`${$(totalMonthlyContributions)} contributions`);
   if (totalMortgagePayments > 0) surplusOutflow.push(`${$(totalMortgagePayments)} mortgage`);
+  if (totalDebtPayments > 0) surplusOutflow.push(`${$(totalDebtPayments)} debt payments`);
   const surplusFormula = [...surplusIncome.length > 0 ? [surplusIncome.join(" + ")] : [], ...surplusOutflow].join(" - ");
   const surplusBreakdown = surplus > 0 && surplusTargetName
     ? `${surplusFormula} → ${$(surplus)}/mo to ${surplusTargetName}`
     : surplusFormula;
 
+  const obligationParts: string[] = [];
+  if (monthlyExpenses > 0) obligationParts.push(`${$(monthlyExpenses)} expenses`);
+  if (totalMortgagePayments > 0) obligationParts.push(`${$(totalMortgagePayments)} mortgage`);
+  if (totalDebtPayments > 0) obligationParts.push(`${$(totalDebtPayments)} debt payments`);
   const runwayBreakdown = monthlyObligations > 0
-    ? `${$(liquidTotal)} liquid / ${$(monthlyObligations)}/mo obligations${totalMortgagePayments > 0 ? ` (${$(monthlyExpenses)} expenses + ${$(totalMortgagePayments)} mortgage)` : ""}`
+    ? `${$(liquidTotal)} liquid / ${$(monthlyObligations)}/mo obligations${obligationParts.length > 1 ? ` (${obligationParts.join(" + ")})` : ""}`
     : undefined;
 
   const ratioBreakdown = totalAllAssets > 0
@@ -895,7 +903,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       valueWithEquity: totalPropertyEquity > 0 ? netWorthWithEquity : undefined,
     },
     {
-      title: "Monthly Surplus",
+      title: "Monthly Cash Flow",
       value: surplus,
       format: "currency",
       icon: "📈",
@@ -960,7 +968,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
 }
 
 export function toFinancialData(state: FinancialState): FinancialData {
-  const { totalAssets, totalDebts, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, homeCurrency } = computeTotals(state);
+  const { totalAssets, totalDebts, totalDebtPayments, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, homeCurrency } = computeTotals(state);
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
@@ -1008,7 +1016,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     totalDebts: totalDebts + totalPropertyMortgage,
     liquidAssets: totalAssets + totalStocks,
     monthlyIncome: monthlyAfterTaxIncome,
-    monthlyExpenses: monthlyExpenses + totalMonthlyContributions + totalMortgagePayments,
+    monthlyExpenses: monthlyExpenses + totalMonthlyContributions + totalMortgagePayments + totalDebtPayments,
     rawMonthlyExpenses: monthlyExpenses,
     monthlyMortgagePayments: totalMortgagePayments,
     debts: state.debts.map((d) => ({
@@ -1033,6 +1041,13 @@ export function toFinancialData(state: FinancialState): FinancialData {
     monthlyHousingCost: monthlyHousingCost > 0 ? monthlyHousingCost : undefined,
     currentAge: state.age,
     monthlySavings: totalMonthlyContributions > 0 ? totalMonthlyContributions : undefined,
+    taxCredits: state.taxCredits,
+    filingStatus: state.filingStatus,
+    isHomeowner: state.properties.length > 0,
+    hasStudentLoans: state.debts.some((d) => d.category.toLowerCase().includes("student")),
+    hasChildCareExpenses: state.expenses.some((e) =>
+      ["child", "daycare", "babysit"].some((k) => e.category.toLowerCase().includes(k)),
+    ),
   };
 }
 
@@ -1120,7 +1135,8 @@ export function computeWithdrawalTaxSummary(
 
   // Compute tax drag: difference between base runway and tax-adjusted runway
   const monthlyObligations = state.expenses.reduce((sum, e) => sum + e.amount, 0) +
-    (state.properties ?? []).reduce((sum, p) => sum + getEffectivePayment(p), 0);
+    (state.properties ?? []).reduce((sum, p) => sum + getEffectivePayment(p), 0) +
+    state.debts.reduce((sum, d) => sum + (d.monthlyPayment ?? 0), 0);
 
   let taxDragMonths = 0;
   if (monthlyObligations > 0 && totalLiquid > 0) {

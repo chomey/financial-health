@@ -10,14 +10,14 @@ test.describe("Snapshot Dashboard", () => {
 
     // Verify all five metric card titles are visible (scoped to group elements)
     await expect(page.locator('[aria-label="Net Worth"] h3')).toBeVisible();
-    await expect(page.locator('[aria-label="Monthly Surplus"] h3')).toBeVisible();
+    await expect(page.locator('[aria-label="Monthly Cash Flow"] h3')).toBeVisible();
     await expect(page.locator('[aria-label="Estimated Tax"] h3')).toBeVisible();
     await expect(page.locator('[aria-label="Financial Runway"] h3')).toBeVisible();
     await expect(page.locator('[aria-label="Debt-to-Asset Ratio"] h3')).toBeVisible();
 
     // Verify animated values are displayed — use metric value aria-labels with regex for dynamic values
     await expect(page.locator('[aria-label^="Net Worth:"]')).toBeVisible();
-    await expect(page.locator('[aria-label^="Monthly Surplus:"]')).toBeVisible();
+    await expect(page.locator('[aria-label^="Monthly Cash Flow:"]')).toBeVisible();
     await expect(page.locator('[aria-label^="Financial Runway:"]')).toBeVisible();
     await expect(page.locator('[aria-label^="Debt-to-Asset Ratio:"]')).toBeVisible();
 
@@ -49,10 +49,10 @@ test.describe("Snapshot Dashboard", () => {
     await captureScreenshot(page, "task-8-dashboard-tooltip");
   });
 
-  test("shows tooltip for Monthly Surplus on hover", async ({ page }) => {
+  test("shows tooltip for Monthly Cash Flow on hover", async ({ page }) => {
     await page.goto("/");
 
-    const card = page.locator('[aria-label="Monthly Surplus"]').first();
+    const card = page.locator('[aria-label="Monthly Cash Flow"]').first();
     await card.hover();
 
     await expect(
@@ -82,7 +82,7 @@ test.describe("Snapshot Dashboard", () => {
     // Wait for count-up
     await page.waitForTimeout(1500);
 
-    const card = page.locator('[aria-label="Monthly Surplus"]').first();
+    const card = page.locator('[aria-label="Monthly Cash Flow"]').first();
     await card.hover();
 
     await captureScreenshot(page, "task-8-dashboard-card-hover");
@@ -92,8 +92,8 @@ test.describe("Snapshot Dashboard", () => {
     await page.goto("/");
     await page.waitForTimeout(1500);
 
-    // Monthly Surplus value should be green (positive metric)
-    const surplusValue = page.locator('[aria-label^="Monthly Surplus:"]');
+    // Monthly Cash Flow value should be green (positive metric)
+    const surplusValue = page.locator('[aria-label^="Monthly Cash Flow:"]');
     await expect(surplusValue).toHaveClass(/text-green-600/);
 
     // Net Worth value should be green (positive value)
@@ -126,8 +126,8 @@ test.describe("Snapshot Dashboard", () => {
     await page.goto("/");
     await page.waitForTimeout(1500);
 
-    // Hover Monthly Surplus card
-    const surplusCard = page.locator('[aria-label="Monthly Surplus"]').first();
+    // Hover Monthly Cash Flow card
+    const surplusCard = page.locator('[aria-label="Monthly Cash Flow"]').first();
     await surplusCard.hover();
 
     const breakdown = surplusCard.locator('[data-testid="metric-breakdown"]');
@@ -150,8 +150,8 @@ test.describe("Snapshot Dashboard", () => {
     await netWorthCard.hover();
     await expect(netWorthCard).toContainText("total assets minus total debts");
 
-    // Move to Monthly Surplus
-    const surplusCard = page.locator('[aria-label="Monthly Surplus"]').first();
+    // Move to Monthly Cash Flow
+    const surplusCard = page.locator('[aria-label="Monthly Cash Flow"]').first();
     await surplusCard.hover();
     await expect(surplusCard).toContainText("How much more you earn");
 

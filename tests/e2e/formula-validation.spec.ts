@@ -62,7 +62,7 @@ test.describe("Formula Validation — Metric Card Consistency", () => {
   test("all five metric cards render with values", async ({ page }) => {
     const cards = [
       "metric-card-net-worth",
-      "metric-card-monthly-surplus",
+      "metric-card-monthly-cash-flow",
       "metric-card-estimated-tax",
       "metric-card-financial-runway",
       "metric-card-debt-to-asset-ratio",

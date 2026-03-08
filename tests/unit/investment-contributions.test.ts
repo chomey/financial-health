@@ -61,7 +61,7 @@ describe("investment contributions in surplus", () => {
       });
       const metrics = computeMetrics(state);
       const totals = computeTotals(state);
-      const surplus = metrics.find((m) => m.title === "Monthly Surplus");
+      const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
       // TFSA $10k @ 5% default = $41.67/mo investment return
       const monthlyReturn = 10000 * 0.05 / 12;
       // surplus = afterTaxIncome + investmentReturns - 2000 - 500
@@ -76,7 +76,7 @@ describe("investment contributions in surplus", () => {
         expenses: [{ id: "e1", category: "Rent", amount: 2000 }],
       });
       const metrics = computeMetrics(state);
-      const surplus = metrics.find((m) => m.title === "Monthly Surplus");
+      const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
       // After-tax income is less than $3000, so surplus is even more negative than -1000
       expect(surplus!.value).toBeLessThan(-1000);
       expect(surplus!.positive).toBe(false);

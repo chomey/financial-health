@@ -141,7 +141,7 @@ describe("financial-state", () => {
 
     it("computes monthly surplus using after-tax income plus investment returns minus expenses", () => {
       const metrics = computeMetrics(INITIAL_STATE);
-      const surplus = metrics.find((m) => m.title === "Monthly Surplus");
+      const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
       expect(surplus).toBeDefined();
       // Surplus includes investment returns from assets with ROI defaults
       expect(surplus!.value).toBeGreaterThan(0);
@@ -156,17 +156,18 @@ describe("financial-state", () => {
       const totals = computeTotals(INITIAL_STATE);
       const investmentReturns = computeMonthlyInvestmentReturns(INITIAL_STATE.assets);
       const totalReturns = investmentReturns.reduce((sum, r) => sum + r.amount, 0);
-      const surplus = metrics.find((m) => m.title === "Monthly Surplus");
+      const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
       expect(surplus!.value).toBeCloseTo(
         totals.monthlyAfterTaxIncome + totalReturns - totals.monthlyExpenses - totals.totalMonthlyContributions,
         2
       );
     });
 
-    it("surplus breakdown mentions after-tax income", () => {
+    it("surplus breakdown mentions gross income and taxes", () => {
       const metrics = computeMetrics(INITIAL_STATE);
-      const surplus = metrics.find((m) => m.title === "Monthly Surplus");
-      expect(surplus!.breakdown).toContain("after-tax income");
+      const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
+      expect(surplus!.breakdown).toContain("gross income");
+      expect(surplus!.breakdown).toContain("taxes");
     });
 
     it("estimated tax metric shows annual tax and effective rate", () => {
@@ -214,7 +215,7 @@ describe("financial-state", () => {
         expenses: [{ id: "e1", category: "Rent", amount: 2000 }],
       };
       const metrics = computeMetrics(state);
-      const surplus = metrics.find((m) => m.title === "Monthly Surplus");
+      const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
       expect(surplus!.positive).toBe(false);
       // After-tax income of $1000/mo ($12k/yr) is less than $1000 due to taxes,
       // so surplus is more negative than -1000
@@ -522,7 +523,7 @@ describe("financial-state", () => {
         jurisdiction: "ON",
       };
       const metrics = computeMetrics(state);
-      const surplus = metrics.find((m) => m.title === "Monthly Surplus");
+      const surplus = metrics.find((m) => m.title === "Monthly Cash Flow");
       // No income, but investment returns of $600/mo - $500 expenses = $100 surplus
       expect(surplus!.value).toBeCloseTo(120000 * 0.06 / 12 - 500, 2);
       expect(surplus!.positive).toBe(true);

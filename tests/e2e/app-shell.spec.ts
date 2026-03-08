@@ -32,7 +32,7 @@ test.describe("App shell layout", () => {
 
     // Dashboard metric cards (scoped to metric group elements)
     await expect(page.locator('[aria-label="Net Worth"] h3')).toBeVisible();
-    await expect(page.locator('[aria-label="Monthly Surplus"] h3')).toBeVisible();
+    await expect(page.locator('[aria-label="Monthly Cash Flow"] h3')).toBeVisible();
     await expect(page.locator('[aria-label="Financial Runway"] h3')).toBeVisible();
     await expect(page.locator('[aria-label="Debt-to-Asset Ratio"] h3')).toBeVisible();
 

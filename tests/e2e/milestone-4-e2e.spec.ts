@@ -83,7 +83,7 @@ test.describe("T3: Milestone 4 — Comprehensive E2E for tax computation feature
       dashboard.getByRole("group", { name: "Net Worth" })
     ).toBeVisible();
     await expect(
-      dashboard.getByRole("group", { name: /Monthly Surplus/ })
+      dashboard.getByRole("group", { name: /Monthly Cash Flow/ })
     ).toBeVisible();
     await expect(
       dashboard.getByRole("group", { name: "Estimated Tax" })
@@ -105,7 +105,7 @@ test.describe("T3: Milestone 4 — Comprehensive E2E for tax computation feature
     // ========================================
     // Step 5: Surplus uses after-tax income (Task 44)
     // ========================================
-    const surplusCard = dashboard.getByRole("group", { name: /Monthly Surplus/ });
+    const surplusCard = dashboard.getByRole("group", { name: /Monthly Cash Flow/ });
     // Surplus tooltip/breakdown should mention after-tax income
     await surplusCard.hover();
     await page.waitForTimeout(500);
