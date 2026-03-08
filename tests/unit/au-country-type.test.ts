@@ -141,17 +141,24 @@ describe("AU country type – tax credits", () => {
 });
 
 describe("AU country type – tax engine", () => {
-  it("computeTax for AU returns zero taxes (stub)", () => {
+  it("computeTax for AU computes real federal tax + Medicare Levy", () => {
     const result = computeTax(80000, "employment", "AU", "NSW", 2025);
-    expect(result.totalTax).toBe(0);
-    expect(result.federalTax).toBe(0);
+    // $80k: 0% on first $18,200 + 16% on $18,200-$45,000 + 30% on $45,000-$80,000
+    // = 0 + 4,288 + 10,500 = $14,788 federal
+    // Medicare: $80k > $32,500 shade-out → full 2% = $1,600
+    // Total: $16,388
+    expect(result.federalTax).toBeCloseTo(14_788, 0);
+    expect(result.totalTax).toBeCloseTo(16_388, 0);
     expect(result.provincialStateTax).toBe(0);
-    expect(result.effectiveRate).toBe(0);
+    expect(result.effectiveRate).toBeCloseTo(16_388 / 80_000, 4);
+    expect(result.afterTaxIncome).toBeCloseTo(63_612, 0);
   });
 
-  it("computeTax for AU returns full income as after-tax income", () => {
-    const result = computeTax(80000, "employment", "AU", "NSW", 2025);
-    expect(result.afterTaxIncome).toBe(80000);
+  it("computeTax for AU with income below tax-free threshold", () => {
+    const result = computeTax(15000, "employment", "AU", "NSW", 2025);
+    expect(result.federalTax).toBe(0);
+    expect(result.totalTax).toBe(0);
+    expect(result.afterTaxIncome).toBe(15000);
   });
 
   it("computeTax for CA still works correctly after AU changes", () => {

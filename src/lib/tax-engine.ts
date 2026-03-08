@@ -11,6 +11,9 @@ import {
   getCanadianBrackets,
   getUSBrackets,
   getUSCapitalGainsBrackets,
+  getAUBrackets,
+  calculateMedicareLevy,
+  AU_MEDICARE_LEVY,
   type BracketTable,
 } from "./tax-tables";
 
@@ -99,15 +102,7 @@ export function computeTax(
   if (country === "CA") {
     return computeCanadianTax(annualIncome, incomeType, jurisdiction, year);
   } else if (country === "AU") {
-    // AU tax engine will be implemented in Task 160; return zeros for now
-    return {
-      federalTax: 0,
-      provincialStateTax: 0,
-      totalTax: 0,
-      effectiveRate: 0,
-      afterTaxIncome: annualIncome,
-      marginalRate: 0,
-    };
+    return computeAUTax(annualIncome, incomeType, jurisdiction, year);
   } else {
     return computeUSTax(annualIncome, incomeType, jurisdiction, year);
   }
@@ -250,4 +245,76 @@ export function getMarginalRateForIncome(
 ): number {
   if (annualIncome <= 0) return 0;
   return computeTax(annualIncome, "employment", country, jurisdiction, year).marginalRate;
+}
+
+/**
+ * Compute Australian tax: federal income tax + Medicare Levy.
+ * Australia has no state/territory income tax.
+ * Capital gains: 50% discount for assets held > 12 months (we assume long-term).
+ */
+function computeAUTax(
+  annualIncome: number,
+  incomeType: IncomeType,
+  jurisdiction: string,
+  year: number = new Date().getFullYear()
+): TaxResult {
+  const { federal } = getAUBrackets(jurisdiction, year);
+
+  let taxableIncome: number;
+  if (incomeType === "capital-gains") {
+    // Australia: 50% CGT discount for assets held > 12 months
+    taxableIncome = annualIncome * 0.5;
+  } else {
+    taxableIncome = annualIncome;
+  }
+
+  // AU uses a 0% first bracket instead of BPA credit, so calculateProgressiveTax
+  // with basicPersonalAmount=0 works correctly (no BPA credit subtracted).
+  let federalTax = 0;
+  for (const bracket of federal.brackets) {
+    if (taxableIncome <= bracket.min) break;
+    const taxableInBracket = Math.min(taxableIncome, bracket.max) - bracket.min;
+    federalTax += taxableInBracket * bracket.rate;
+  }
+  federalTax = Math.max(0, federalTax);
+
+  // Medicare Levy applies to total taxable income (not reduced by CGT discount)
+  // For capital gains, the levy applies to the discounted amount
+  const medicareLevy = calculateMedicareLevy(taxableIncome, year);
+
+  const totalTax = federalTax + medicareLevy;
+  const effectiveRate = annualIncome > 0 ? totalTax / annualIncome : 0;
+  const afterTaxIncome = annualIncome - totalTax;
+
+  // Marginal rate: federal rate at current income level
+  let marginalRate = 0;
+  for (const bracket of federal.brackets) {
+    if (taxableIncome <= bracket.max) {
+      marginalRate = bracket.rate;
+      break;
+    }
+  }
+
+  // Add Medicare Levy to marginal rate if above the shade-out threshold
+  const threshold = year >= 2026 ? AU_MEDICARE_LEVY.singleThreshold2026 : AU_MEDICARE_LEVY.singleThreshold2025;
+  const shadeOut = year >= 2026 ? AU_MEDICARE_LEVY.singleShadeOut2026 : AU_MEDICARE_LEVY.singleShadeOut2025;
+  if (taxableIncome > shadeOut) {
+    marginalRate += AU_MEDICARE_LEVY.rate;
+  } else if (taxableIncome > threshold) {
+    marginalRate += AU_MEDICARE_LEVY.phaseInRate;
+  }
+
+  if (incomeType === "capital-gains") {
+    // Effective marginal rate on capital gains is halved due to 50% discount
+    marginalRate *= 0.5;
+  }
+
+  return {
+    federalTax,
+    provincialStateTax: 0, // No state income tax in Australia
+    totalTax,
+    effectiveRate,
+    afterTaxIncome,
+    marginalRate,
+  };
 }

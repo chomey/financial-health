@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: AU federal income tax brackets
+  {
+    version: 160,
+    title: "Australia: federal income tax & Medicare Levy",
+    description: "Added AU 2024-25 and 2025-26 federal income tax brackets (Stage 3 cuts: 0% up to $18,200, 16% to $45k, 30% to $135k, 37% to $190k, 45% above). Medicare Levy at 2% with low-income phase-in thresholds. 50% CGT discount for capital gains. No state/territory income tax — all AU jurisdictions return identical results.",
+    date: "2026-03-08",
+  },
   // Australia: AU states/territories in CountryJurisdictionSelector
   {
     version: 159,

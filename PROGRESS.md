@@ -8,9 +8,22 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 159
-- **Remaining**: 10
+- **Completed**: 160
+- **Remaining**: 9
 - **Last Updated**: 2026-03-08
+
+## Task 160: AU federal income tax brackets 2025/2026 [@backend] [MATH]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/tax-tables.ts`: Added AU_FEDERAL_2025 and AU_FEDERAL_2026 bracket tables (Stage 3 cuts: 0%/16%/30%/37%/45%). Added AU_MEDICARE_LEVY constants with low-income phase-in thresholds. Added `getAUBrackets()` (returns federal + empty state brackets) and `calculateMedicareLevy()`.
+  - `src/lib/tax-engine.ts`: Replaced AU zero-tax stub with `computeAUTax()`. Handles employment income, capital gains (50% CGT discount), and Medicare Levy marginal rate integration.
+  - `tests/unit/au-tax-brackets.test.ts`: New — 39 tests covering bracket structure, getAUBrackets, Medicare Levy (exempt/phase-in/full), marginal rates at key thresholds, tax amounts at bracket boundaries, capital gains discount, 2026 indexation, and all-jurisdictions parity.
+  - `tests/unit/au-country-type.test.ts`: Updated AU tax engine tests from stub expectations to real calculations.
+  - `tests/unit/changelog.test.ts`: Updated counts (159→160, milestone entries 2→3).
+  - `src/lib/changelog.ts`: Added version 160 entry.
+- **Tests**: T1: 2293 passed (126 files), Build: passes
+- **Screenshots**: N/A (backend/math task)
+- **Notes**: Pre-existing changelog test failure fixed in separate commit. Medicare Levy uses single-filer thresholds (family thresholds deferred — we don't track dependents in the tax engine).
 
 ## Task 159: AU states/territories in CountryJurisdictionSelector [@frontend]
 - **Date**: 2026-03-08
