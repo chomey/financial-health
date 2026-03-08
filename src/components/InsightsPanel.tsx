@@ -118,6 +118,26 @@ export default function InsightsPanel({
   insightConnections?: Record<string, DataFlowConnectionDef[]>;
 }) {
   const insights = generateInsights(data);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollRight(el.scrollWidth - el.scrollLeft - el.clientWidth > 10);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll, insights.length]);
 
   if (insights.length === 0) {
     return null;
@@ -125,15 +145,29 @@ export default function InsightsPanel({
 
   return (
     <div data-testid="insights-panel">
-      <div className="flex gap-3 overflow-x-auto py-1 scrollbar-thin">
-        {insights.map((insight, i) => (
-          <InsightCard
-            key={insight.id}
-            insight={insight}
-            index={i}
-            connections={insightConnections?.[insight.type]}
-          />
-        ))}
+      {insights.length > 1 && (
+        <div className="flex items-center justify-between px-1 mb-1">
+          <span className="text-xs text-slate-500">{insights.length} insights</span>
+          {canScrollRight && (
+            <span className="text-xs text-slate-500 animate-pulse">swipe →</span>
+          )}
+        </div>
+      )}
+      <div className="relative">
+        <div ref={scrollRef} className="flex gap-3 overflow-x-auto py-1 scrollbar-thin">
+          {insights.map((insight, i) => (
+            <InsightCard
+              key={insight.id}
+              insight={insight}
+              index={i}
+              connections={insightConnections?.[insight.type]}
+            />
+          ))}
+        </div>
+        {/* Right fade to indicate more content */}
+        {canScrollRight && (
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-950 to-transparent" />
+        )}
       </div>
     </div>
   );

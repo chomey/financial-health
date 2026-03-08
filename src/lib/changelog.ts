@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Mobile UX improvements
+  {
+    version: 146,
+    title: "Mobile UX polish and wizard landing",
+    description: "The guided setup wizard is now the default landing page for new visitors on all screen sizes. Tightened mobile whitespace across charts, dashboard cards, and entry components. Insights panel now shows a count and 'swipe' hint with a right-edge fade to indicate horizontal scrollability. Removed truncated category names on mobile (they wrap instead). Unified badge spacing and removed inconsistent glow animations from metric cards.",
+    date: "2026-03-07",
+  },
   // Tax credits E2E regression
   {
     version: 145,
@@ -954,7 +961,7 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** Group changelog entries by milestone */
 export function getChangelogByMilestone(): { milestone: string; entries: ChangelogEntry[] }[] {
   const milestones = [
-    { milestone: "Tax Credits & Deductions", range: [140, 145] as const },
+    { milestone: "Tax Credits & Deductions", range: [140, 146] as const },
     { milestone: "UI Polish", range: [88, 139] as const },
     { milestone: "Metric-Specific Explainers", range: [83, 87] as const },
     { milestone: "Whiteboard Explainer Mode", range: [79, 82] as const },
