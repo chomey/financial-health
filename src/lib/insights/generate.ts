@@ -9,6 +9,42 @@ import type { FinancialData, Insight } from "./types";
 import { setInsightCurrency, formatCurrency, formatCompact, _filingStatusLabel } from "./formatting";
 import { getNetWorthMilestone, getAgeGroup } from "./net-worth";
 
+/**
+ * Build a context-aware message for the "tax rate is high" insight.
+ * Checks which tax-advantaged accounts the user already has and suggests
+ * what's missing or encourages maximizing existing ones.
+ */
+function buildTaxRateHighMessage(ratePercent: string, country: "CA" | "US", assetCategories: string[]): string {
+  const cats = assetCategories.map((c) => c.toLowerCase());
+  const prefix = `Your effective tax rate is ${ratePercent}% —`;
+
+  if (country === "CA") {
+    const hasTFSA = cats.some((c) => c.includes("tfsa") || c.includes("fhsa"));
+    const hasRRSP = cats.some((c) => c.includes("rrsp") || c.includes("lira"));
+    if (hasTFSA && hasRRSP) {
+      return `${prefix} you're already using both a TFSA and RRSP. Maximizing contributions to both will continue to shelter your growth and income from tax.`;
+    } else if (hasTFSA) {
+      return `${prefix} you're already using a TFSA. Adding an RRSP can also reduce your taxable income and lower your tax bill.`;
+    } else if (hasRRSP) {
+      return `${prefix} you're already using an RRSP. Adding a TFSA would provide tax-free growth for funds you may need before retirement.`;
+    }
+    return `${prefix} tax-advantaged accounts (TFSA, RRSP) can help reduce your tax burden.`;
+  } else {
+    const has401k = cats.some((c) => c.includes("401k"));
+    const hasRoth = cats.some((c) => c.includes("roth"));
+    const hasIRA = cats.some((c) => c.includes("ira") && !c.includes("roth"));
+    if (has401k && (hasRoth || hasIRA)) {
+      return `${prefix} you're already using tax-advantaged accounts. Maximizing your 401(k) and IRA contributions will further reduce your tax burden.`;
+    } else if (has401k) {
+      return `${prefix} you're already using a 401(k). Adding a Roth IRA could provide additional tax-free growth.`;
+    } else if (hasRoth || hasIRA) {
+      const name = hasRoth ? "Roth IRA" : "IRA";
+      return `${prefix} you're already using a ${name}. If your employer offers a 401(k) match, capturing it first could add free money on top.`;
+    }
+    return `${prefix} tax-advantaged accounts (401(k), Roth IRA) can help reduce your tax burden.`;
+  }
+}
+
 export function generateInsights(data: FinancialData): Insight[] {
   setInsightCurrency(data.homeCurrency ?? "USD");
   const insights: Insight[] = [];
@@ -179,10 +215,11 @@ export function generateInsights(data: FinancialData): Insight[] {
         icon: "🏛️",
       });
     } else if (data.effectiveTaxRate > 0.3) {
+      const taxRateMsg = buildTaxRateHighMessage(ratePercent, data.country ?? "CA", data.assetCategories ?? []);
       insights.push({
         id: "tax-rate-high",
         type: "tax",
-        message: `Your effective tax rate is ${ratePercent}% — tax-advantaged accounts (TFSA, RRSP, 401k) can help reduce your tax burden.`,
+        message: taxRateMsg,
         icon: "🏛️",
       });
     } else if (data.annualTax && data.annualTax > 0) {
@@ -222,10 +259,11 @@ export function generateInsights(data: FinancialData): Insight[] {
           icon: "💡",
         });
       } else if (wt.accountsByTreatment.taxFree.total === 0) {
+        const suggestedFreeAccount = (data.country ?? "CA") === "CA" ? "TFSA" : "Roth IRA";
         insights.push({
           id: "withdrawal-tax-no-free",
           type: "withdrawal-tax",
-          message: `Consider opening a tax-free account (TFSA or Roth IRA) — all your current savings will be taxed on withdrawal.`,
+          message: `Consider opening a ${suggestedFreeAccount} — all your current savings will be taxed on withdrawal.`,
           icon: "💡",
         });
       }
@@ -361,30 +399,45 @@ export function generateInsights(data: FinancialData): Insight[] {
     const taxFreeAccountName = country === "CA" ? "TFSA" : "Roth IRA";
     const taxDeferredAccountName = country === "CA" ? "RRSP" : "401(k)";
 
+    const assetCatLower = (data.assetCategories ?? []).map((c) => c.toLowerCase());
+    const alreadyHasTaxFreeAcct = country === "CA"
+      ? assetCatLower.some((c) => c.includes("tfsa") || c.includes("fhsa"))
+      : assetCatLower.some((c) => c.includes("roth") || c.includes("hsa"));
+    const alreadyHasTaxDeferredAcct = country === "CA"
+      ? assetCatLower.some((c) => c.includes("rrsp") || c.includes("lira"))
+      : assetCatLower.some((c) => c.includes("401k") || (c.includes("ira") && !c.includes("roth")));
+
     // Suggestion 1: Taxable brokerage → tax-free account
     // Annual tax cost on growth = taxable balance × assumed 5% growth × marginalRate
     if (taxableTotal > 0) {
       const annualTaxCost = taxableTotal * 0.05 * marginalRate;
       if (annualTaxCost >= 100) {
         const marginalPct = Math.round(marginalRate * 100);
+        const actionPhrase = alreadyHasTaxFreeAcct
+          ? `Maximizing your ${taxFreeAccountName} contributions`
+          : `Shifting contributions to a ${taxFreeAccountName}`;
         insights.push({
           id: "tax-opt-taxable-to-free",
           type: "tax-optimization",
-          message: `You have ${formatCurrency(taxableTotal)} in taxable accounts with gains taxed at your ${marginalPct}% marginal rate. Shifting contributions to your ${taxFreeAccountName} would shelter ~${formatCurrency(Math.round(annualTaxCost))}/yr in gains from tax — that's ${formatCompact(annualTaxCost * outlookYears)} over ${outlookYears} years.`,
+          message: `You have ${formatCurrency(taxableTotal)} in taxable accounts with gains taxed at your ${marginalPct}% marginal rate. ${actionPhrase} would shelter ~${formatCurrency(Math.round(annualTaxCost))}/yr in gains from tax — that's ${formatCompact(annualTaxCost * outlookYears)} over ${outlookYears} years.`,
           icon: "💡",
         });
       }
     }
 
     // Suggestion 2: RRSP/401(k) contribution deduction
+    // Skip if user has no taxable accounts — nothing to redirect into a tax-deferred vehicle
     // Reference: each $10,000 contributed saves marginalRate × $10,000 in tax
-    if (data.annualEmploymentIncome && data.annualEmploymentIncome > 0 && marginalRate >= 0.25) {
+    if (taxableTotal > 0 && data.annualEmploymentIncome && data.annualEmploymentIncome > 0 && marginalRate >= 0.25) {
       const referenceContribution = 10_000;
       const taxSavings = referenceContribution * marginalRate;
+      const actionPhrase = alreadyHasTaxDeferredAcct
+        ? `increasing your ${taxDeferredAccountName} contributions`
+        : `contributing to a ${taxDeferredAccountName}`;
       insights.push({
         id: "tax-opt-deferred-contribution",
         type: "tax-optimization",
-        message: `Based on your income of ${formatCurrency(data.annualEmploymentIncome)}/year, each $10,000 contributed to your ${taxDeferredAccountName} reduces your tax bill by ~${formatCurrency(Math.round(taxSavings))}. Check your available contribution room.`,
+        message: `Based on your income of ${formatCurrency(data.annualEmploymentIncome)}/year, each $10,000 from ${actionPhrase} reduces your tax bill by ~${formatCurrency(Math.round(taxSavings))}. Check your available contribution room.`,
         icon: "💡",
       });
     }
@@ -392,10 +445,13 @@ export function generateInsights(data: FinancialData): Insight[] {
     // Suggestion 3: Tax-free room — redirect savings from taxable to tax-free
     // Show when taxable savings exceed tax-free savings and there's meaningful taxable exposure
     if (taxableTotal > taxFreeTotal && taxableTotal > 1000 && taxDeferredTotal === 0 && !insights.find((i) => i.id === "tax-opt-taxable-to-free")) {
+      const message = alreadyHasTaxFreeAcct
+        ? `Your ${taxFreeAccountName} has room — contributing there instead of a taxable savings account shelters future growth from tax at no extra cost.`
+        : `Opening a ${taxFreeAccountName} lets you grow your savings tax-free instead of paying tax on gains in your taxable accounts.`;
       insights.push({
         id: "tax-opt-use-tax-free-room",
         type: "tax-optimization",
-        message: `Your ${taxFreeAccountName} has room — contributing there instead of a taxable savings account shelters future growth from tax at no extra cost.`,
+        message,
         icon: "💡",
       });
     }

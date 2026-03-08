@@ -117,6 +117,8 @@ export function toFinancialData(state: FinancialState): FinancialData {
       ["child", "daycare", "babysit"].some((k) => e.category.toLowerCase().includes(k)),
     ),
     monthlyInvestmentReturns: totalMonthlyInvestmentReturns > 0 ? totalMonthlyInvestmentReturns : undefined,
+    assetCategories: state.assets.filter((a) => !a.computed).map((a) => a.category),
+    debtCategories: state.debts.map((d) => d.category),
   };
 }
 

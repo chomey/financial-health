@@ -7,10 +7,24 @@
 -->
 
 ## Summary
-- **Total Tasks**: 147
-- **Completed**: 147
+- **Total Tasks**: 148
+- **Completed**: 148
 - **Remaining**: 0
 - **Last Updated**: 2026-03-08
+
+## Task 148: Make insights context-aware of user's actual accounts
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/insights/types.ts`: Added `assetCategories` and `debtCategories` to `FinancialData`
+  - `src/lib/financial-state.ts`: Populates `assetCategories`/`debtCategories` in `toFinancialData`
+  - `src/lib/insights/generate.ts`: Added `buildTaxRateHighMessage()` helper; updated `tax-rate-high`, `withdrawal-tax-no-free`, `tax-opt-taxable-to-free`, `tax-opt-deferred-contribution`, `tax-opt-use-tax-free-room` insights
+  - `tests/unit/context-aware-insights.test.ts`: 21 unit tests for CA/US/no-accounts/all-accounts mixes
+  - `tests/unit/tax-optimization.test.ts`: Updated 2 tests requiring taxable accounts for deferred contribution insight
+  - `tests/unit/withdrawal-tax-summary.test.ts`: Updated 1 test for country-specific no-free-account message
+  - `tests/e2e/context-aware-insights.spec.ts`: 2 T2 Playwright tests
+- **Tests**: T1: 2006 passed (all), T2: 2 passed, Build: passes
+- **Screenshots**: `task-148-insights-ca-with-tfsa-rrsp.png`, `task-148-insights-panel-default.png`
+- **Notes**: `tax-opt-deferred-contribution` now requires taxableTotal > 0 (skip when user has no taxable accounts). Existing tests updated to add taxable balances where needed.
 
 ## Task 147: Deduplicate computation functions
 - **Date**: 2026-03-08

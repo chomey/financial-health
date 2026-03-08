@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Context-aware insights
+  {
+    version: 148,
+    title: "Context-aware account insights",
+    description: "Insights now reference the user's actual accounts instead of generic lists. The 'high tax rate' insight checks which tax-advantaged accounts you already have (TFSA, RRSP, 401k, Roth IRA) and suggests only what's missing — or encourages maximizing contributions if you have both. Tax optimization insights use 'maximizing your TFSA' vs 'shifting to a TFSA' based on account ownership. The RRSP/401k deduction suggestion only appears when you have taxable accounts to redirect. The no-tax-free-account suggestion correctly recommends TFSA for CA users and Roth IRA for US users. Canadian accounts are never suggested to US users and vice versa.",
+    date: "2026-03-08",
+  },
   // Deduplicate computation functions
   {
     version: 147,

@@ -203,7 +203,7 @@ describe("withdrawal-tax insights", () => {
     const insights = generateInsights(data);
     const noFreeInsight = insights.find((i) => i.id === "withdrawal-tax-no-free");
     expect(noFreeInsight).toBeDefined();
-    expect(noFreeInsight!.message).toContain("tax-free account");
+    expect(noFreeInsight!.message).toMatch(/TFSA|Roth IRA/);
   });
 
   it("generates tax drag insight when drag exceeds 0.5 months", () => {

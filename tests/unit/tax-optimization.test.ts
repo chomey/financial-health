@@ -145,7 +145,7 @@ describe("tax optimization: taxable to tax-free suggestion", () => {
 // Tax optimization insight: RRSP/401k deduction suggestion
 // ---------------------------------------------------------------------------
 describe("tax optimization: tax-deferred contribution suggestion", () => {
-  it("generates RRSP suggestion for CA with high marginal rate", () => {
+  it("generates RRSP suggestion for CA with high marginal rate and taxable accounts", () => {
     const data = makeData({
       marginalRate: 0.43,
       country: "CA",
@@ -156,7 +156,7 @@ describe("tax optimization: tax-deferred contribution suggestion", () => {
         accountsByTreatment: {
           taxFree: { categories: [], total: 0 },
           taxDeferred: { categories: [], total: 0 },
-          taxable: { categories: [], total: 0 },
+          taxable: { categories: ["Savings"], total: 10_000 },
         },
       },
     });
@@ -167,7 +167,7 @@ describe("tax optimization: tax-deferred contribution suggestion", () => {
     expect(suggestion?.message).toContain("$4,300"); // 43% × $10k
   });
 
-  it("generates 401(k) suggestion for US with high marginal rate", () => {
+  it("generates 401(k) suggestion for US with high marginal rate and taxable accounts", () => {
     const data = makeData({
       marginalRate: 0.32,
       country: "US",
@@ -178,7 +178,7 @@ describe("tax optimization: tax-deferred contribution suggestion", () => {
         accountsByTreatment: {
           taxFree: { categories: [], total: 0 },
           taxDeferred: { categories: [], total: 0 },
-          taxable: { categories: [], total: 0 },
+          taxable: { categories: ["Savings"], total: 10_000 },
         },
       },
     });

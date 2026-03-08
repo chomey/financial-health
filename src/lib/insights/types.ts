@@ -62,6 +62,10 @@ export interface FinancialData {
   hasStudentLoans?: boolean;
   /** Whether user has child care expenses (for child-related credit suggestions) */
   hasChildCareExpenses?: boolean;
+  /** Asset category names the user has entered (for context-aware insights) */
+  assetCategories?: string[];
+  /** Debt category names the user has entered (for context-aware insights) */
+  debtCategories?: string[];
   /** Total monthly investment returns (from asset ROI). Added to surplus to match metric card. */
   monthlyInvestmentReturns?: number;
   /** Outlook years (20/30/40/50) for timeline-scaled insight messages. */
