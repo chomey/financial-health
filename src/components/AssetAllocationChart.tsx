@@ -71,6 +71,8 @@ export function computeAllocationByCategory(
   // Group assets by category type
   for (const asset of assets) {
     if (asset.amount <= 0) continue;
+    // Skip computed property equity — properties are added separately below
+    if (asset.id === "_computed_equity") continue;
     const group = getCategoryGroup(asset.category);
     groups.set(group, (groups.get(group) ?? 0) + asset.amount);
   }
@@ -110,6 +112,8 @@ export function computeAllocationByLiquidity(
 
   for (const asset of assets) {
     if (asset.amount <= 0) continue;
+    // Skip computed property equity — properties are added separately below
+    if (asset.id === "_computed_equity") continue;
     if (asset.category === "Vehicle") {
       illiquid += asset.amount;
     } else {

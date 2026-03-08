@@ -28,6 +28,8 @@ export function computeLiquidityData(
 
   for (const asset of assets) {
     if (asset.amount <= 0) continue;
+    // Skip computed property equity — properties are added separately below
+    if (asset.id === "_computed_equity") continue;
     if (asset.category === "Vehicle") {
       illiquid += asset.amount;
     } else {
@@ -80,6 +82,8 @@ export function computeDonutData(
   const assetGroups = new Map<string, number>();
   for (const asset of assets) {
     if (asset.amount <= 0) continue;
+    // Skip computed property equity — properties are added separately below
+    if (asset.id === "_computed_equity") continue;
     assetGroups.set(asset.category, (assetGroups.get(asset.category) ?? 0) + asset.amount);
   }
 
