@@ -375,7 +375,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
             <DataFlowSourceItem key={asset.id} id={`asset:${asset.id}`} label={asset.category} value={asset.amount}>
             <div role="listitem">
               {isFirstComputed && (
-                <div className="mt-1.5 mb-0.5 border-t border-dashed border-white/10 pt-1.5 px-3">
+                <div className="mt-2 mb-1 border-t border-dashed border-white/10 pt-2 px-3">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Auto-computed</span>
                 </div>
               )}
@@ -527,6 +527,10 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
               </div>
 
               {/* Secondary detail fields */}
+              {/* Hide all detail controls for Property Equity — taxable badge, ROI, contribution, cost basis are irrelevant */}
+              {asset.id === "_computed_equity" ? (
+                <div className="pb-0.5" />
+              ) : (
               <div className="flex flex-wrap items-center gap-1.5 pb-1 px-3" data-testid={`asset-details-${asset.id}`}>
                 {/* Tax treatment pill — auto-detected, click to override */}
                 {(() => {
@@ -814,6 +818,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   </span>
                 )}
               </div>
+              )}
 
               {/* Per-asset 10/20/30 year projections */}
               {(() => {

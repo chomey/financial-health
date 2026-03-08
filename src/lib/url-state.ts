@@ -165,6 +165,9 @@ interface CompactState {
   tc?: CompactTaxCredit[]; // tax credits and deductions
   fs?: string; // filing status
   ty?: number; // tax year (2025 or 2026, omitted when 2025/default)
+  fca?: string[]; // flowchart acknowledged step IDs
+  fcs2?: string[]; // flowchart skipped step IDs (fcs2 to avoid collision with old fcs= param)
+  ret?: 1; // retired flag
 }
 
 function toCompact(state: FinancialState): CompactState {
@@ -248,6 +251,9 @@ function toCompact(state: FinancialState): CompactState {
   }
   if (state.filingStatus) compact.fs = state.filingStatus;
   if (state.taxYear !== undefined && state.taxYear !== 2025) compact.ty = state.taxYear;
+  if (state.flowchartAcks && state.flowchartAcks.length > 0) compact.fca = state.flowchartAcks;
+  if (state.flowchartSkips && state.flowchartSkips.length > 0) compact.fcs2 = state.flowchartSkips;
+  if (state.isRetired) compact.ret = 1;
   return compact;
 }
 
@@ -332,6 +338,9 @@ function fromCompact(compact: CompactState): FinancialState {
     })),
     filingStatus: compact.fs as import("@/lib/tax-credits").FilingStatus | undefined,
     taxYear: compact.ty,
+    flowchartAcks: compact.fca,
+    flowchartSkips: compact.fcs2,
+    isRetired: compact.ret === 1 ? true : undefined,
   };
 }
 
@@ -387,7 +396,24 @@ export function getStateFromURL(): FinancialState | null {
   const params = new URLSearchParams(window.location.search);
   const encoded = params.get("s");
   if (!encoded) return null;
-  return decodeState(encoded);
+  const state = decodeState(encoded);
+  if (!state) return null;
+
+  // Backward compat: migrate old fca=/fcs=/fret= params into state
+  const oldAcks = params.get("fca");
+  const oldSkips = params.get("fcs");
+  const oldRetired = params.get("fret");
+  if (oldAcks && (!state.flowchartAcks || state.flowchartAcks.length === 0)) {
+    state.flowchartAcks = oldAcks.split(",").filter(Boolean);
+  }
+  if (oldSkips && (!state.flowchartSkips || state.flowchartSkips.length === 0)) {
+    state.flowchartSkips = oldSkips.split(",").filter(Boolean);
+  }
+  if (oldRetired === "1" && !state.isRetired) {
+    state.isRetired = true;
+  }
+
+  return state;
 }
 
 export function updateURL(state: FinancialState): void {
@@ -395,6 +421,10 @@ export function updateURL(state: FinancialState): void {
   const encoded = encodeState(state);
   const url = new URL(window.location.href);
   url.searchParams.set("s", encoded);
+  // Clean up legacy params now folded into s=
+  url.searchParams.delete("fca");
+  url.searchParams.delete("fcs");
+  url.searchParams.delete("fret");
   window.history.replaceState(null, "", url.toString());
 }
 
@@ -542,6 +572,55 @@ export function updateFlowchartOverridesURL(acknowledged: string[], skipped: str
     url.searchParams.set("fcs", skipped.join(","));
   } else {
     url.searchParams.delete("fcs");
+  }
+  window.history.replaceState(null, "", url.toString());
+}
+
+// ── Wizard step URL helpers ───────────────────────────────────────────────────
+
+export type WizardStep =
+  | "profile"
+  | "property"
+  | "assets"
+  | "stocks"
+  | "debts"
+  | "income"
+  | "tax-summary"
+  | "expenses"
+  | "tax-credits"
+  | "dashboard";
+
+export const WIZARD_STEPS: WizardStep[] = [
+  "profile",
+  "property",
+  "assets",
+  "stocks",
+  "debts",
+  "income",
+  "tax-summary",
+  "expenses",
+  "tax-credits",
+] as const;
+
+const VALID_WIZARD_STEPS = new Set<string>([...WIZARD_STEPS, "dashboard"]);
+
+/** Read wizard step from URL param `step=`. Returns null if absent or invalid. */
+export function getStepFromURL(): WizardStep | null {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get("step");
+  if (!raw || !VALID_WIZARD_STEPS.has(raw)) return null;
+  return raw as WizardStep;
+}
+
+/** Persist wizard step to URL param `step=` without affecting other params. */
+export function updateStepURL(step: WizardStep): void {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (step === "dashboard") {
+    url.searchParams.delete("step");
+  } else {
+    url.searchParams.set("step", step);
   }
   window.history.replaceState(null, "", url.toString());
 }

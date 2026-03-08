@@ -9,6 +9,7 @@ if (typeof window !== "undefined") {
   };
 }
 
+import { useState, useEffect, useCallback } from "react";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import PropertyEntry from "@/components/PropertyEntry";
@@ -36,14 +37,16 @@ import {
   toFinancialData,
 } from "@/lib/financial-state";
 import { getProfilesForCountry } from "@/lib/sample-profiles";
-import MobileWizard from "@/components/MobileWizard";
+import WizardShell from "@/components/wizard/WizardShell";
 import { formatCurrencyCompact } from "@/lib/currency";
+/* MobileWizard is superseded by the new wizard; keeping import for backward compat */
 import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
 import { computeMortgageBreakdown, DEFAULT_INTEREST_RATE } from "@/components/PropertyEntry";
 import { getPortfolioSummary, getAnnualizedReturn } from "@/components/StockEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import TaxCreditEntry from "@/components/TaxCreditEntry";
 import { getFilingStatuses } from "@/lib/tax-credits";
+import { getStepFromURL, updateStepURL, type WizardStep } from "@/lib/url-state";
 import {
   PrintSnapshotButton,
   PrintFooter,
@@ -102,12 +105,39 @@ export default function Home() {
     handleWizardComplete,
     handleWizardSkip,
     handleSwrChange,
+    flowchartAcks,
+    flowchartSkips,
+    isRetired,
+    setFlowchartAcks,
+    setFlowchartSkips,
+    setIsRetired,
   } = useFinancialState();
 
+  // ── Phase routing: wizard vs dashboard ──────────────────────────────────────
+  const [phase, setPhase] = useState<"wizard" | "dashboard" | null>(null);
+
+  useEffect(() => {
+    const urlStep = getStepFromURL();
+    if (urlStep && urlStep !== "dashboard") {
+      setPhase("wizard");
+    } else {
+      setPhase("dashboard");
+    }
+  }, []);
+
+  const switchToDashboard = useCallback(() => {
+    updateStepURL("dashboard" as WizardStep);
+    setPhase("dashboard");
+  }, []);
+
+  const switchToWizard = useCallback(() => {
+    updateStepURL("profile" as WizardStep);
+    setPhase("wizard");
+  }, []);
+
   const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride, taxCredits, filingStatus, taxYear };
-  const metrics = computeMetrics(state);
-  const runwayDetails = metrics.find(m => m.title === "Financial Runway")?.runwayDetails;
-  const financialData = { ...toFinancialData(state), outlookYears };
+
+  // Computed values needed by both wizard and dashboard
   const totals = computeTotals(state);
   const totalInvestmentContributions = assets.filter((a) => !a.computed).reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   const totalMortgagePayments = totals.totalMortgagePayments;
@@ -118,6 +148,65 @@ export default function Home() {
     if ((i.incomeType ?? "employment") !== "employment") return sum;
     return sum + normalizeToMonthly(i.amount, i.frequency) * 12;
   }, 0);
+
+  // ── Render wizard phase ───────────────────────────────────────────────────
+  if (phase === "wizard") {
+    return (
+      <CurrencyProvider currency={homeCurrency}>
+      <WizardShell
+        assets={assets}
+        debts={debts}
+        properties={properties}
+        stocks={stocks}
+        income={income}
+        expenses={expenses}
+        country={country}
+        jurisdiction={jurisdiction}
+        age={age}
+        taxCredits={taxCredits}
+        filingStatus={filingStatus}
+        taxYear={taxYear}
+        homeCurrency={homeCurrency}
+        effectiveFxRates={effectiveFxRates}
+        fxManualOverride={fxManualOverride}
+        federalTaxOverride={federalTaxOverride}
+        provincialTaxOverride={provincialTaxOverride}
+        monthlySurplus={monthlySurplus}
+        annualEmploymentSalary={annualEmploymentSalary}
+        monthlyInvestmentReturns={monthlyInvestmentReturns}
+        totalInvestmentContributions={totalInvestmentContributions}
+        totalMortgagePayments={totalMortgagePayments}
+        surplusTargetComputedId={surplusTargetComputedId}
+        handleAssetsChange={handleAssetsChange}
+        setDebts={setDebts}
+        setProperties={setProperties}
+        setStocks={setStocks}
+        setIncome={setIncome}
+        setExpenses={setExpenses}
+        handleCountryChange={handleCountryChange}
+        setJurisdiction={setJurisdiction}
+        setAge={setAge}
+        setTaxCredits={setTaxCredits}
+        setFilingStatus={setFilingStatus}
+        setTaxYear={setTaxYear}
+        setFxManualOverride={setFxManualOverride}
+        setFederalTaxOverride={setFederalTaxOverride}
+        setProvincialTaxOverride={setProvincialTaxOverride}
+        onFinish={switchToDashboard}
+      />
+      </CurrencyProvider>
+    );
+  }
+
+  // ── Null during initial hydration (avoids flash) ──────────────────────────
+  if (phase === null) {
+    return <div className="min-h-screen bg-slate-950" />;
+  }
+
+  // ── Dashboard phase ───────────────────────────────────────────────────────
+  const metrics = computeMetrics(state);
+  const runwayDetails = metrics.find(m => m.title === "Financial Runway")?.runwayDetails;
+  const financialData = { ...toFinancialData(state), outlookYears };
   const realAssets = assets.filter((a) => !a.computed);
   const surplusTargetName = realAssets.find((a) => a.surplusTarget)?.category ?? realAssets[0]?.category;
 
@@ -271,14 +360,6 @@ export default function Home() {
   return (
     <CurrencyProvider currency={homeCurrency}>
     <DataFlowProvider homeCurrency={homeCurrency}>
-    {/* Guided wizard — full-screen for new users without saved state */}
-    {showWizard && (
-      <MobileWizard
-        country={country}
-        onComplete={handleWizardComplete}
-        onSkip={handleWizardSkip}
-      />
-    )}
     <div className="min-h-screen bg-slate-950">
       <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-sm px-4 py-3 shadow-sm sm:px-6 sm:py-4">
         <div className="mx-auto max-w-7xl space-y-2">
@@ -299,6 +380,14 @@ export default function Home() {
               </p>
             </div>
             <div className="flex-shrink-0 flex items-center gap-2 print:hidden">
+              <button
+                type="button"
+                onClick={switchToWizard}
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-400 shadow-sm transition-all duration-200 hover:border-violet-400/40 hover:bg-white/10 hover:text-violet-300 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95 print:hidden"
+                data-testid="edit-data-wizard"
+              >
+                Edit data
+              </button>
               <CopyLinkButton />
               <PrintSnapshotButton />
             </div>
@@ -433,7 +522,15 @@ export default function Home() {
           <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} onOutlookChange={setOutlookYears} /></ZoomableCard>
           <InsightsPanel data={financialData} insightConnections={insightConnections} />
           <section id="roadmap" className="scroll-mt-16" aria-label="Money steps">
-            <FinancialFlowchart state={state} />
+            <FinancialFlowchart
+              state={state}
+              acknowledged={flowchartAcks}
+              skipped={flowchartSkips}
+              isRetired={isRetired}
+              onAcksChange={setFlowchartAcks}
+              onSkipsChange={setFlowchartSkips}
+              onRetiredChange={setIsRetired}
+            />
           </section>
         </section>
 

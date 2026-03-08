@@ -25,6 +25,9 @@ export interface FinancialState {
   taxCredits?: TaxCredit[]; // tax credits and deductions
   filingStatus?: FilingStatus; // filing status for income limit checks
   taxYear?: number; // tax year for brackets/credits (2025 or 2026, default 2025)
+  flowchartAcks?: string[]; // Money Steps acknowledged step IDs
+  flowchartSkips?: string[]; // Money Steps skipped (N/A) step IDs
+  isRetired?: boolean; // retirement mode flag
 }
 
 export const INITIAL_STATE: FinancialState = {

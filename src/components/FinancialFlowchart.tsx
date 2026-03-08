@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
   getFlowchartSteps,
@@ -12,13 +12,6 @@ import {
   type StepStatus,
   type StepContext,
 } from "@/lib/flowchart-steps";
-import {
-  getFlowchartAcksFromURL,
-  getFlowchartSkipsFromURL,
-  updateFlowchartOverridesURL,
-  getRetiredFromURL,
-  updateRetiredURL,
-} from "@/lib/url-state";
 import type { FinancialState } from "@/lib/financial-types";
 
 // ── Exported pure helpers (used in unit tests) ─────────────────────────────────
@@ -358,20 +351,24 @@ function TimelineStep({
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export default function FinancialFlowchart({ state }: { state: FinancialState }) {
-  const [acknowledged, setAcknowledged] = useState<string[]>([]);
-  const [skipped, setSkipped] = useState<string[]>([]);
+export default function FinancialFlowchart({
+  state,
+  acknowledged,
+  skipped,
+  isRetired,
+  onAcksChange,
+  onSkipsChange,
+  onRetiredChange,
+}: {
+  state: FinancialState;
+  acknowledged: string[];
+  skipped: string[];
+  isRetired: boolean;
+  onAcksChange: (acks: string[]) => void;
+  onSkipsChange: (skips: string[]) => void;
+  onRetiredChange: (retired: boolean) => void;
+}) {
   const [detailStep, setDetailStep] = useState<FlowchartStep | null>(null);
-  const [isRetired, setIsRetired] = useState(false);
-
-  useEffect(() => {
-    const acks = getFlowchartAcksFromURL();
-    const skps = getFlowchartSkipsFromURL();
-    setAcknowledged(acks);
-    setSkipped(skps);
-    setIsRetired(getRetiredFromURL());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const retirementSuggested = useMemo(
     () => !isRetired && detectRetirementHeuristic(state),
@@ -379,9 +376,8 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
   );
 
   const handleRetiredChange = useCallback((checked: boolean) => {
-    setIsRetired(checked);
-    updateRetiredURL(checked);
-  }, []);
+    onRetiredChange(checked);
+  }, [onRetiredChange]);
 
   const baseSteps = useMemo(() => getFlowchartSteps(state, isRetired), [state, isRetired]);
   const steps = useMemo(
@@ -398,11 +394,10 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
       const newAcks = checked
         ? [...acknowledged.filter((id) => id !== stepId), stepId]
         : acknowledged.filter((id) => id !== stepId);
-      setAcknowledged(newAcks);
-      setSkipped(newSkips);
-      updateFlowchartOverridesURL(newAcks, newSkips);
+      onAcksChange(newAcks);
+      onSkipsChange(newSkips);
     },
-    [acknowledged, skipped],
+    [acknowledged, skipped, onAcksChange, onSkipsChange],
   );
 
   const handleSkip = useCallback(
@@ -411,22 +406,20 @@ export default function FinancialFlowchart({ state }: { state: FinancialState })
       const newSkips = checked
         ? [...skipped.filter((id) => id !== stepId), stepId]
         : skipped.filter((id) => id !== stepId);
-      setAcknowledged(newAcks);
-      setSkipped(newSkips);
-      updateFlowchartOverridesURL(newAcks, newSkips);
+      onAcksChange(newAcks);
+      onSkipsChange(newSkips);
     },
-    [acknowledged, skipped],
+    [acknowledged, skipped, onAcksChange, onSkipsChange],
   );
 
   const handleUndo = useCallback(
     (stepId: string) => {
       const newAcks = acknowledged.filter((id) => id !== stepId);
       const newSkips = skipped.filter((id) => id !== stepId);
-      setAcknowledged(newAcks);
-      setSkipped(newSkips);
-      updateFlowchartOverridesURL(newAcks, newSkips);
+      onAcksChange(newAcks);
+      onSkipsChange(newSkips);
     },
-    [acknowledged, skipped],
+    [acknowledged, skipped, onAcksChange, onSkipsChange],
   );
 
   const openDetail = useCallback((step: FlowchartStep) => {
