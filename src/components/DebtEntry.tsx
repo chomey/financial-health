@@ -108,6 +108,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
   const syncDidMount = useRef(false);
+  const lastSentToParent = useRef<Debt[] | null>(null);
 
   // Sync with parent if controlled — intentional external-system sync
   // Skip initial mount since useState already handles the initial value
@@ -116,7 +117,8 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
       syncDidMount.current = true;
       return;
     }
-    if (items !== undefined) {
+    // Skip echo-back: parent passing back the same items we just sent
+    if (items !== undefined && items !== lastSentToParent.current) {
       isExternalSync.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setDebts(items);
@@ -137,6 +139,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
       isExternalSync.current = false;
       return;
     }
+    lastSentToParent.current = debts;
     onChangeRef.current?.(debts);
   }, [debts]);
   const [editingId, setEditingId] = useState<string | null>(null);

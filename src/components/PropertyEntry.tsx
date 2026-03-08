@@ -186,6 +186,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
   const isExternalSync = useRef(false);
   const didMount = useRef(false);
   const syncDidMount = useRef(false);
+  const lastSentToParent = useRef<Property[] | null>(null);
 
   // Sync with parent if controlled
   useEffect(() => {
@@ -193,7 +194,8 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
       syncDidMount.current = true;
       return;
     }
-    if (items !== undefined) {
+    // Skip echo-back: parent passing back the same items we just sent
+    if (items !== undefined && items !== lastSentToParent.current) {
       isExternalSync.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setProperties(items);
@@ -214,6 +216,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
       isExternalSync.current = false;
       return;
     }
+    lastSentToParent.current = properties;
     onChangeRef.current?.(properties);
   }, [properties]);
 
