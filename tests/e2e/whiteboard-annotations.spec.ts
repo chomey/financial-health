@@ -121,10 +121,10 @@ test.describe("Whiteboard SVG Annotations in Explainer Modal", () => {
     await captureScreenshot(page, "task-81-whiteboard-result");
   });
 
-  test("whiteboard modal for Monthly Surplus shows full layout", async ({ page }) => {
+  test("whiteboard modal for Monthly Cash Flow shows full layout", async ({ page }) => {
     await page.goto("/");
 
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.scrollIntoViewIfNeeded();
     await surplusCard.click();
 

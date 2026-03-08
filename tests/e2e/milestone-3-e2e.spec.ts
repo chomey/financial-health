@@ -219,7 +219,7 @@ test.describe("T3: Milestone 3 — Comprehensive E2E for tasks 27-35", () => {
     await expect(incomeTotalEl).toHaveText("$1,258");
 
     // Dashboard surplus should reflect the drastic income reduction
-    const surplusCard = page.getByRole("group", { name: "Monthly Surplus" });
+    const surplusCard = page.getByRole("group", { name: "Monthly Cash Flow" });
     // With annual salary normalized to monthly, surplus will be negative
     await expect(surplusCard).toContainText("-");
 
@@ -411,7 +411,7 @@ test.describe("T3: Milestone 3 — Comprehensive E2E for tasks 27-35", () => {
       dashboard.getByRole("group", { name: "Net Worth" })
     ).toBeVisible();
     await expect(
-      dashboard.getByRole("group", { name: /Monthly Surplus/ })
+      dashboard.getByRole("group", { name: /Monthly Cash Flow/ })
     ).toBeVisible();
 
     // Verify insights panel
@@ -430,7 +430,7 @@ test.describe("T3: Milestone 3 — Comprehensive E2E for tasks 27-35", () => {
     await page.waitForSelector('[data-testid="snapshot-dashboard"]');
 
     // Record initial surplus
-    const surplusCard = page.getByRole("group", { name: "Monthly Surplus" });
+    const surplusCard = page.getByRole("group", { name: "Monthly Cash Flow" });
     const initialSurplus = await surplusCard.textContent();
 
     // Change Salary to annually - drastic income reduction

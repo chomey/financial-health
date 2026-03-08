@@ -32,8 +32,8 @@ test.describe("Tax computation in metrics (Task 44)", () => {
     await page.goto("/");
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
 
-    // Monthly Surplus description should mention "after estimated taxes"
-    const surplusCard = dashboard.getByRole("group", { name: "Monthly Surplus" });
+    // Monthly Cash Flow description should mention "after estimated taxes"
+    const surplusCard = dashboard.getByRole("group", { name: "Monthly Cash Flow" });
     await expect(surplusCard).toBeVisible();
     await expect(surplusCard).toContainText("after estimated taxes");
   });
@@ -42,19 +42,19 @@ test.describe("Tax computation in metrics (Task 44)", () => {
     await page.goto("/");
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
 
-    // Monthly Surplus should be less than pre-tax (6300 - 2950 = 3350)
-    const surplusCard = dashboard.getByRole("group", { name: "Monthly Surplus" });
+    // Monthly Cash Flow should be less than pre-tax (6300 - 2950 = 3350)
+    const surplusCard = dashboard.getByRole("group", { name: "Monthly Cash Flow" });
     await expect(surplusCard).toBeVisible();
 
     // Wait for count-up animation to finish
     await page.waitForTimeout(1500);
 
     // Get the surplus value text
-    const surplusLabel = surplusCard.locator('[aria-label*="Monthly Surplus"]');
+    const surplusLabel = surplusCard.locator('[aria-label*="Monthly Cash Flow"]');
     const labelText = await surplusLabel.getAttribute("aria-label");
     expect(labelText).toBeDefined();
 
-    // Extract dollar value from label like "Monthly Surplus: $2,345"
+    // Extract dollar value from label like "Monthly Cash Flow: $2,345"
     const match = labelText!.match(/\$([0-9,]+)/);
     expect(match).toBeTruthy();
     const surplusValue = parseInt(match![1].replace(/,/g, ""));
@@ -67,7 +67,7 @@ test.describe("Tax computation in metrics (Task 44)", () => {
     await page.goto("/");
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
 
-    // Should now have 5 metric cards: Net Worth, Monthly Surplus, Estimated Tax, Financial Runway, Debt-to-Asset Ratio
+    // Should now have 5 metric cards: Net Worth, Monthly Cash Flow, Estimated Tax, Financial Runway, Debt-to-Asset Ratio
     const cards = dashboard.getByRole("group");
     await expect(cards).toHaveCount(5);
 
@@ -77,7 +77,7 @@ test.describe("Tax computation in metrics (Task 44)", () => {
   test("surplus breakdown shows after-tax income", async ({ page }) => {
     await page.goto("/");
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
-    const surplusCard = dashboard.getByRole("group", { name: "Monthly Surplus" });
+    const surplusCard = dashboard.getByRole("group", { name: "Monthly Cash Flow" });
 
     // Hover to reveal breakdown
     await surplusCard.hover();

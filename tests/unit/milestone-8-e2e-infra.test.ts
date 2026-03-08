@@ -34,9 +34,9 @@ describe("Milestone 8 E2E test infrastructure — Data-Flow Visualization", () =
     expect(content).toContain("section-debts");
   });
 
-  it("covers Monthly Surplus card with source references", () => {
+  it("covers Monthly Cash Flow card with source references", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
-    expect(content).toContain("metric-card-monthly-surplus");
+    expect(content).toContain("metric-card-monthly-cash-flow");
     expect(content).toContain("section-income");
     expect(content).toContain("section-expenses");
   });

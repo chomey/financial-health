@@ -33,7 +33,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
 
     // Verify initial dashboard metrics
     await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$220,500");
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText(
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText(
       "$3,350"
     );
 
@@ -153,8 +153,8 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
 
     // Surplus: (6300 + 1500) - (2950 + 200 + 50) = 7800 - 3200 = 4600
     // Accept a range due to pre-existing onChange timing with rapid-fire additions
-    const surplusLabel = await dashboard.getByLabel(/Monthly Surplus:/).getAttribute("aria-label");
-    expect(surplusLabel).toMatch(/Monthly Surplus: \$[3-5],\d{3}/);
+    const surplusLabel = await dashboard.getByLabel(/Monthly Cash Flow:/).getAttribute("aria-label");
+    expect(surplusLabel).toMatch(/Monthly Cash Flow: \$[3-5],\d{3}/);
 
     await captureScreenshot(page, "task-15-after-income-expenses");
 
@@ -166,7 +166,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
       dashboard.getByRole("group", { name: "Net Worth" })
     ).toBeVisible();
     await expect(
-      dashboard.getByRole("group", { name: "Monthly Surplus" })
+      dashboard.getByRole("group", { name: "Monthly Cash Flow" })
     ).toBeVisible();
     await expect(
       dashboard.getByRole("group", { name: "Financial Runway" })
@@ -259,8 +259,8 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
     // Accept either value due to pre-existing onChange timing issue
     const netWorthAfterReload = await dashboardAfterReload.getByLabel(/Net Worth:/).getAttribute("aria-label");
     expect(netWorthAfterReload).toMatch(/Net Worth: \$(225,500|230,500)/);
-    const surplusAfterReload = await dashboardAfterReload.getByLabel(/Monthly Surplus:/).getAttribute("aria-label");
-    expect(surplusAfterReload).toMatch(/Monthly Surplus: \$[3-5],\d{3}/);
+    const surplusAfterReload = await dashboardAfterReload.getByLabel(/Monthly Cash Flow:/).getAttribute("aria-label");
+    expect(surplusAfterReload).toMatch(/Monthly Cash Flow: \$[3-5],\d{3}/);
 
     await captureScreenshot(page, "task-15-after-reload");
 
@@ -282,7 +282,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
 
     // Verify surplus updated: (10000 + 800) - 2950 = 7850
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText(
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText(
       "$7,850"
     );
 
@@ -300,7 +300,7 @@ test.describe("T3: Milestone — Comprehensive end-to-end user journey", () => {
 
     // Verify dashboard still shows the updated surplus
     const dashboardAfter = page.locator('[data-testid="snapshot-dashboard"]');
-    await expect(dashboardAfter.getByLabel(/Monthly Surplus:/)).toContainText(
+    await expect(dashboardAfter.getByLabel(/Monthly Cash Flow:/)).toContainText(
       "$7,850"
     );
   });

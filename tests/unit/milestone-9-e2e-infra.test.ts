@@ -30,7 +30,7 @@ describe("Milestone 9 E2E test infrastructure — Whiteboard Explainer Modal", (
   it("covers all five metric cards", () => {
     const content = fs.readFileSync(e2eTestPath, "utf-8");
     expect(content).toContain("metric-card-net-worth");
-    expect(content).toContain("metric-card-monthly-surplus");
+    expect(content).toContain("metric-card-monthly-cash-flow");
     expect(content).toContain("metric-card-estimated-tax");
     expect(content).toContain("metric-card-financial-runway");
     expect(content).toContain("metric-card-debt-to-asset-ratio");

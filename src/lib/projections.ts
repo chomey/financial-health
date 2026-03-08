@@ -56,12 +56,12 @@ export function projectFinances(
 
   // Initial values — surplus uses after-tax income, excludes investment contributions and mortgage payments
   // (both are handled per-item in the projection loop to track individual balances).
-  const { monthlyAfterTaxIncome, monthlyExpenses, totalMonthlyContributions, totalMortgagePayments } = computeTotals(state);
-  const baseSurplus = monthlyAfterTaxIncome - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments;
-  // True drawdown: income can't meaningfully cover expenses + mortgage (retirement/drawdown scenario).
+  const { monthlyAfterTaxIncome, monthlyExpenses, totalMonthlyContributions, totalMortgagePayments, totalDebtPayments } = computeTotals(state);
+  const baseSurplus = monthlyAfterTaxIncome - monthlyExpenses - totalMonthlyContributions - totalMortgagePayments - totalDebtPayments;
+  // True drawdown: income can't meaningfully cover expenses + mortgage + debt payments (retirement/drawdown scenario).
   // Only trigger drawdown when there's a meaningful shortfall (> $50/mo threshold to
   // avoid triggering on small tax rounding when gross income ≈ expenses).
-  const expenseShortfall = monthlyExpenses + totalMortgagePayments - monthlyAfterTaxIncome;
+  const expenseShortfall = monthlyExpenses + totalMortgagePayments + totalDebtPayments - monthlyAfterTaxIncome;
   const DRAWDOWN_THRESHOLD = 50;
   const isDrawdown = expenseShortfall > DRAWDOWN_THRESHOLD;
   const monthlyDrawdown = isDrawdown ? expenseShortfall : 0;

@@ -267,7 +267,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
 
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      commitEdit();
+      (e.target as HTMLElement).blur();
     } else if (e.key === "Escape") {
       setEditingId(null);
       setEditingField(null);

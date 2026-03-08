@@ -105,8 +105,8 @@ test.describe("Income frequency support", () => {
   test("dashboard metrics update when frequency changes", async ({ page }) => {
     await page.goto("/");
 
-    // Record the initial Monthly Surplus value
-    const surplusCard = page.getByRole("group", { name: "Monthly Surplus" });
+    // Record the initial Monthly Cash Flow value
+    const surplusCard = page.getByRole("group", { name: "Monthly Cash Flow" });
     const initialSurplus = await surplusCard.textContent();
 
     // Change Salary to annually (drastically reduces monthly income)
@@ -117,7 +117,7 @@ test.describe("Income frequency support", () => {
     await page.waitForTimeout(300);
 
     // Monthly surplus should have changed
-    const surplusCardAfter = page.getByRole("group", { name: "Monthly Surplus" });
+    const surplusCardAfter = page.getByRole("group", { name: "Monthly Cash Flow" });
     const newSurplus = await surplusCardAfter.textContent();
     expect(newSurplus).not.toEqual(initialSurplus);
 

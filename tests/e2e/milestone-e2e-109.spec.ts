@@ -295,7 +295,7 @@ test.describe("Milestone E2E: UI Polish & Formula Validation", () => {
   });
 
   test("monthly surplus card renders with value", async ({ page }) => {
-    const card = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const card = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await expect(card).toBeVisible();
     const text = await card.textContent();
     expect(text).toMatch(/\$/);
@@ -319,7 +319,7 @@ test.describe("Milestone E2E: UI Polish & Formula Validation", () => {
     // All five metric cards should be visible
     const cardIds = [
       "metric-card-net-worth",
-      "metric-card-monthly-surplus",
+      "metric-card-monthly-cash-flow",
       "metric-card-estimated-tax",
       "metric-card-financial-runway",
       "metric-card-debt-to-asset-ratio",

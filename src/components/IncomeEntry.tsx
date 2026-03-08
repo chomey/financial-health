@@ -236,7 +236,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
 
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      commitEdit();
+      (e.target as HTMLElement).blur();
     } else if (e.key === "Escape") {
       setEditingId(null);
       setEditingField(null);

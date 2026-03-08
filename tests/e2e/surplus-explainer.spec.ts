@@ -16,9 +16,9 @@ function buildSurplusStateUrl(): string {
 test.describe("Task 125: surplus explainer virtual source IDs", () => {
   test("surplus explainer shows 'Contributions' card, not 'Assets'", async ({ page }) => {
     await page.goto(buildSurplusStateUrl());
-    await page.waitForSelector('[data-testid="metric-card-monthly-surplus"]');
+    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
 
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.scrollIntoViewIfNeeded();
     await surplusCard.click();
 
@@ -44,9 +44,9 @@ test.describe("Task 125: surplus explainer virtual source IDs", () => {
     page,
   }) => {
     await page.goto(buildSurplusStateUrl());
-    await page.waitForSelector('[data-testid="metric-card-monthly-surplus"]');
+    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
 
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.scrollIntoViewIfNeeded();
     await surplusCard.click();
 
@@ -63,9 +63,9 @@ test.describe("Task 125: surplus explainer virtual source IDs", () => {
 
   test("surplus explainer shows Income, Expenses, and Contributions source cards", async ({ page }) => {
     await page.goto(buildSurplusStateUrl());
-    await page.waitForSelector('[data-testid="metric-card-monthly-surplus"]');
+    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
 
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-surplus"]');
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
     await surplusCard.scrollIntoViewIfNeeded();
     await surplusCard.click();
 

@@ -11,7 +11,7 @@ test.describe("T3: Full end-to-end user journey", () => {
     // --- Step 1: Verify initial state loaded correctly ---
     await expect(page.getByText("Financial Health Snapshot")).toBeVisible();
     await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$220,500");
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$3,350");
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$3,350");
     await captureScreenshot(page, "task-10-e2e-initial-state");
 
     // --- Step 2: Add an asset and verify dashboard updates ---
@@ -46,7 +46,7 @@ test.describe("T3: Full end-to-end user journey", () => {
     await page.getByLabel("Confirm add income").click();
 
     // Surplus: (6300 + 2000) - 2950 = 5350
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$5,350");
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$5,350");
 
     // --- Step 5: Add an expense and verify surplus + runway update ---
     const expenseSection = page.locator("section", { has: page.getByText("Expenses") }).first();
@@ -56,7 +56,7 @@ test.describe("T3: Full end-to-end user journey", () => {
     await page.getByLabel("Confirm add expense").click();
 
     // Surplus: (8300) - (2950 + 200) = 5150
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$5,150");
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$5,150");
 
     // --- Step 6: Edit an existing amount (inline edit) ---
     const incomeList = page.getByRole("list", { name: "Income items" });
@@ -87,7 +87,7 @@ test.describe("T3: Full end-to-end user journey", () => {
     // First dismiss any tooltip by moving mouse away
     await page.mouse.move(0, 0);
     await expect(dashboard.getByRole("group", { name: "Net Worth" })).toBeVisible();
-    await expect(dashboard.getByRole("group", { name: "Monthly Surplus" })).toBeVisible();
+    await expect(dashboard.getByRole("group", { name: "Monthly Cash Flow" })).toBeVisible();
     await expect(dashboard.getByRole("group", { name: "Financial Runway" })).toBeVisible();
     await expect(dashboard.getByRole("group", { name: "Debt-to-Asset Ratio" })).toBeVisible();
 

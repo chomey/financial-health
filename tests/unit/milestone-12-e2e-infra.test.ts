@@ -83,7 +83,7 @@ describe("Milestone 12 E2E test infrastructure — UI Polish & Formula Validatio
     expect(content).toContain("metric-card-net-worth");
     expect(content).toContain("metric-card-estimated-tax");
     expect(content).toContain("metric-card-financial-runway");
-    expect(content).toContain("metric-card-monthly-surplus");
+    expect(content).toContain("metric-card-monthly-cash-flow");
     expect(content).toContain("metric-card-debt-to-asset-ratio");
     expect(content).toContain("explainer-result-section");
     expect(content).toContain("explainer-summary");

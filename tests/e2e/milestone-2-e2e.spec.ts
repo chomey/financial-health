@@ -292,7 +292,7 @@ test.describe("T3: Milestone 2 — Comprehensive E2E for features from tasks 22-
     // Verify dashboard metrics are present
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
     await expect(dashboard.getByRole("group", { name: "Net Worth" })).toBeVisible();
-    await expect(dashboard.getByRole("group", { name: "Monthly Surplus" })).toBeVisible();
+    await expect(dashboard.getByRole("group", { name: "Monthly Cash Flow" })).toBeVisible();
     await expect(dashboard.getByRole("group", { name: "Financial Runway" })).toBeVisible();
     await expect(dashboard.getByRole("group", { name: "Debt-to-Asset Ratio" })).toBeVisible();
 

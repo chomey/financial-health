@@ -76,21 +76,22 @@ describe("surplus uses after-tax income", () => {
     expect(monthlyAfterTaxIncome).toBeLessThan(monthlyIncome);
 
     const metrics = computeMetrics(state);
-    const surplusMetric = metrics.find((m) => m.title === "Monthly Surplus");
+    const surplusMetric = metrics.find((m) => m.title === "Monthly Cash Flow");
     // Surplus should be based on after-tax, not gross
     const grossSurplus = monthlyIncome - 2000;
     expect(surplusMetric!.value).toBeLessThan(grossSurplus);
   });
 
-  it("surplus breakdown mentions after-tax income", () => {
+  it("surplus breakdown mentions gross income and taxes", () => {
     const state = makeState({
       assets: [{ id: "a1", category: "Savings", amount: 10000 }],
       income: [{ id: "i1", category: "Salary", amount: 5000 }],
       expenses: [{ id: "e1", category: "Rent", amount: 2000 }],
     });
     const metrics = computeMetrics(state);
-    const surplusMetric = metrics.find((m) => m.title === "Monthly Surplus");
-    expect(surplusMetric!.breakdown).toContain("after-tax income");
+    const surplusMetric = metrics.find((m) => m.title === "Monthly Cash Flow");
+    expect(surplusMetric!.breakdown).toContain("gross income");
+    expect(surplusMetric!.breakdown).toContain("taxes");
   });
 });
 

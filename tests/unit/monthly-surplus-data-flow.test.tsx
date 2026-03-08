@@ -18,7 +18,7 @@ import SnapshotDashboard, {
 import { DataFlowProvider } from "@/components/DataFlowArrows";
 
 const SURPLUS_METRIC: MetricData = {
-  title: "Monthly Surplus",
+  title: "Monthly Cash Flow",
   value: 3350,
   format: "currency",
   icon: "📈",
@@ -48,15 +48,15 @@ function renderWithProvider(
   );
 }
 
-describe("Monthly Surplus data-flow connections", () => {
-  it("renders the Monthly Surplus metric card with data-testid", () => {
-    renderWithProvider({ "Monthly Surplus": SURPLUS_CONNECTIONS });
-    expect(screen.getByTestId("metric-card-monthly-surplus")).toBeInTheDocument();
+describe("Monthly Cash Flow data-flow connections", () => {
+  it("renders the Monthly Cash Flow metric card with data-testid", () => {
+    renderWithProvider({ "Monthly Cash Flow": SURPLUS_CONNECTIONS });
+    expect(screen.getByTestId("metric-card-monthly-cash-flow")).toBeInTheDocument();
   });
 
   it("renders metric card without connections when none provided", () => {
     renderWithProvider();
-    const card = screen.getByTestId("metric-card-monthly-surplus");
+    const card = screen.getByTestId("metric-card-monthly-cash-flow");
     expect(card).toBeInTheDocument();
   });
 
@@ -93,8 +93,8 @@ describe("Monthly Surplus data-flow connections", () => {
       { sourceId: "section-income", label: "+$5k", value: 5000, sign: "positive" },
       { sourceId: "section-expenses", label: "-$0", value: 0, sign: "negative" },
     ];
-    renderWithProvider({ "Monthly Surplus": connections });
-    const card = screen.getByTestId("metric-card-monthly-surplus");
+    renderWithProvider({ "Monthly Cash Flow": connections });
+    const card = screen.getByTestId("metric-card-monthly-cash-flow");
     expect(card).toBeInTheDocument();
   });
 
@@ -103,8 +103,8 @@ describe("Monthly Surplus data-flow connections", () => {
       { sourceId: "section-income", label: "+$5k", value: 5000, sign: "positive" },
       { sourceId: "section-expenses", label: "-$1.2k", value: 1200, sign: "negative" },
     ];
-    renderWithProvider({ "Monthly Surplus": noContribConnections });
-    expect(screen.getByTestId("metric-card-monthly-surplus")).toBeInTheDocument();
+    renderWithProvider({ "Monthly Cash Flow": noContribConnections });
+    expect(screen.getByTestId("metric-card-monthly-cash-flow")).toBeInTheDocument();
   });
 
   it("mortgage connection is optional (only when > 0)", () => {
@@ -113,23 +113,23 @@ describe("Monthly Surplus data-flow connections", () => {
       { sourceId: "section-expenses", label: "-$1.2k", value: 1200, sign: "negative" },
       { sourceId: "section-assets", label: "contributions -$350", value: 350, sign: "negative" },
     ];
-    renderWithProvider({ "Monthly Surplus": noMortgageConnections });
-    expect(screen.getByTestId("metric-card-monthly-surplus")).toBeInTheDocument();
+    renderWithProvider({ "Monthly Cash Flow": noMortgageConnections });
+    expect(screen.getByTestId("metric-card-monthly-cash-flow")).toBeInTheDocument();
   });
 });
 
-describe("Monthly Surplus MetricCard hover interactions", () => {
+describe("Monthly Cash Flow MetricCard hover interactions", () => {
   it("shows breakdown text on hover", () => {
-    renderWithProvider({ "Monthly Surplus": SURPLUS_CONNECTIONS });
-    const card = screen.getByTestId("metric-card-monthly-surplus");
+    renderWithProvider({ "Monthly Cash Flow": SURPLUS_CONNECTIONS });
+    const card = screen.getByTestId("metric-card-monthly-cash-flow");
     fireEvent.mouseEnter(card);
     expect(screen.getByTestId("metric-breakdown")).toBeInTheDocument();
     expect(screen.getByTestId("metric-breakdown").className).toContain("opacity-100");
   });
 
   it("hides breakdown on mouse leave", () => {
-    renderWithProvider({ "Monthly Surplus": SURPLUS_CONNECTIONS });
-    const card = screen.getByTestId("metric-card-monthly-surplus");
+    renderWithProvider({ "Monthly Cash Flow": SURPLUS_CONNECTIONS });
+    const card = screen.getByTestId("metric-card-monthly-cash-flow");
     fireEvent.mouseEnter(card);
     fireEvent.mouseLeave(card);
     const breakdown = screen.getByTestId("metric-breakdown");
@@ -137,15 +137,15 @@ describe("Monthly Surplus MetricCard hover interactions", () => {
   });
 
   it("activates breakdown on focus (keyboard)", () => {
-    renderWithProvider({ "Monthly Surplus": SURPLUS_CONNECTIONS });
-    const card = screen.getByTestId("metric-card-monthly-surplus");
+    renderWithProvider({ "Monthly Cash Flow": SURPLUS_CONNECTIONS });
+    const card = screen.getByTestId("metric-card-monthly-cash-flow");
     fireEvent.focus(card);
     const breakdown = screen.getByTestId("metric-breakdown");
     expect(breakdown.className).toContain("opacity-100");
   });
 });
 
-describe("Monthly Surplus formula clarity", () => {
+describe("Monthly Cash Flow formula clarity", () => {
   it("has exactly one positive source (income)", () => {
     const positive = SURPLUS_CONNECTIONS.filter((c) => c.sign === "positive");
     expect(positive).toHaveLength(1);

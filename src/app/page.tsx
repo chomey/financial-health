@@ -598,7 +598,7 @@ export default function Home() {
   const homeCurrency = getHomeCurrency(country);
   const foreignCurrency = getForeignCurrency(homeCurrency);
   const effectiveFxRates = getEffectiveFxRates(homeCurrency, fxManualOverride, fxRates);
-  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride };
+  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride, taxCredits, filingStatus };
   const metrics = computeMetrics(state);
   const runwayDetails = metrics.find(m => m.title === "Financial Runway")?.runwayDetails;
   const financialData = toFinancialData(state);
@@ -607,7 +607,7 @@ export default function Home() {
   const totalMortgagePayments = totals.totalMortgagePayments;
   const monthlyInvestmentReturns = computeMonthlyInvestmentReturns(assets);
   const totalMonthlyInvestmentReturns = monthlyInvestmentReturns.reduce((sum, r) => sum + r.amount, 0);
-  const monthlySurplus = totals.monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - totals.monthlyExpenses - totals.totalMonthlyContributions - totalMortgagePayments;
+  const monthlySurplus = totals.monthlyAfterTaxIncome + totalMonthlyInvestmentReturns - totals.monthlyExpenses - totals.totalMonthlyContributions - totalMortgagePayments - totals.totalDebtPayments;
   const annualEmploymentSalary = income.reduce((sum, i) => {
     if ((i.incomeType ?? "employment") !== "employment") return sum;
     return sum + normalizeToMonthly(i.amount, i.frequency) * 12;
@@ -647,7 +647,8 @@ export default function Home() {
     { sourceId: "section-debts", label: fmtLabel(-totals.totalDebts), value: totals.totalDebts, sign: "negative" },
   ];
 
-  const incomeAndReturnsTotal = totals.monthlyAfterTaxIncome + totalMonthlyInvestmentReturns;
+  const incomeAndReturnsTotal = totals.monthlyIncome + totalMonthlyInvestmentReturns;
+  const monthlyTaxes = totals.monthlyIncome - totals.monthlyAfterTaxIncome;
 
   // Compute mortgage principal/interest breakdown for explainer
   const mortgageItems: { label: string; value: number }[] = [];
@@ -668,9 +669,11 @@ export default function Home() {
 
   const monthlySurplusConnections: DataFlowConnectionDef[] = [
     { sourceId: "section-income", label: fmtLabel(incomeAndReturnsTotal), value: incomeAndReturnsTotal, sign: "positive" },
+    ...(monthlyTaxes > 0 ? [{ sourceId: "virtual-taxes", label: `taxes ${fmtLabel(-monthlyTaxes)}`, value: monthlyTaxes, sign: "negative" as const }] : []),
     { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
     ...(totals.totalMonthlyContributions > 0 ? [{ sourceId: "virtual-contributions", label: `contributions ${fmtLabel(-totals.totalMonthlyContributions)}`, value: totals.totalMonthlyContributions, sign: "negative" as const }] : []),
     ...(totalMortgagePayments > 0 ? [{ sourceId: "virtual-mortgage", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const, items: mortgageItems.length > 0 ? mortgageItems : undefined }] : []),
+    ...(totals.totalDebtPayments > 0 ? [{ sourceId: "section-debts", label: `debt payments ${fmtLabel(-totals.totalDebtPayments)}`, value: totals.totalDebtPayments, sign: "negative" as const }] : []),
   ];
 
   // Estimated Tax: green arrow from income showing gross income, label with effective rate + annual tax
@@ -684,6 +687,7 @@ export default function Home() {
     { sourceId: "section-stocks", label: fmtLabel(totals.totalStocks), value: totals.totalStocks, sign: "positive" },
     { sourceId: "section-expenses", label: fmtLabel(-totals.monthlyExpenses), value: totals.monthlyExpenses, sign: "negative" },
     ...(totalMortgagePayments > 0 ? [{ sourceId: "section-property", label: `mortgage ${fmtLabel(-totalMortgagePayments)}`, value: totalMortgagePayments, sign: "negative" as const }] : []),
+    ...(totals.totalDebtPayments > 0 ? [{ sourceId: "section-debts", label: `debt payments ${fmtLabel(-totals.totalDebtPayments)}`, value: totals.totalDebtPayments, sign: "negative" as const }] : []),
   ];
 
   // Debt-to-Asset Ratio: all assets (green) vs all debts (red)
@@ -703,7 +707,7 @@ export default function Home() {
 
   const dataFlowConnections: Record<string, DataFlowConnectionDef[]> = {
     "Net Worth": netWorthConnections,
-    "Monthly Surplus": monthlySurplusConnections,
+    "Monthly Cash Flow": monthlySurplusConnections,
     "Estimated Tax": estimatedTaxConnections,
     "Financial Runway": financialRunwayConnections,
     "Debt-to-Asset Ratio": debtToAssetConnections,
@@ -753,7 +757,7 @@ export default function Home() {
   const benchmarkNetWorth = totals.totalAssets + totals.totalStocks + totals.totalPropertyEquity - totals.totalDebts;
   // Savings rate includes surplus + investment contributions (which are a form of saving)
   const benchmarkSavingsRate = totals.monthlyAfterTaxIncome > 0 ? (monthlySurplus + totals.totalMonthlyContributions) / totals.monthlyAfterTaxIncome : 0;
-  const benchmarkMonthlyObligations = totals.monthlyExpenses + totals.totalMortgagePayments;
+  const benchmarkMonthlyObligations = totals.monthlyExpenses + totals.totalMortgagePayments + totals.totalDebtPayments;
   const benchmarkEmergencyMonths = benchmarkMonthlyObligations > 0 ? (totals.totalAssets + totals.totalStocks) / benchmarkMonthlyObligations : 0;
   const annualIncome = totals.monthlyIncome * 12;
   const benchmarkDebtToIncome = annualIncome > 0 ? (debtTotal + totals.totalPropertyMortgage) / annualIncome : 0;

@@ -14,8 +14,8 @@ test.describe("Shared state — live dashboard updates", () => {
     // Net Worth: 65500 + 170000 - 15000 = 220500
     await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$220,500");
 
-    // Monthly Surplus: 6300 - 2950 = 3350
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$3,350");
+    // Monthly Cash Flow: 6300 - 2950 = 3350
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$3,350");
 
     await captureScreenshot(page, "task-10-dashboard-initial");
   });
@@ -65,7 +65,7 @@ test.describe("Shared state — live dashboard updates", () => {
     await page.getByLabel("Edit amount for Salary").press("Enter");
 
     // Surplus should update: (8000 + 800) - 2950 = 5850
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$5,850");
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$5,850");
 
     await captureScreenshot(page, "task-10-income-edit-updates-surplus");
   });
@@ -81,7 +81,7 @@ test.describe("Shared state — live dashboard updates", () => {
     await page.getByLabel("Confirm add expense").click();
 
     // Surplus should drop: 6300 - (2950+50) = 3300
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$3,300");
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$3,300");
 
     await captureScreenshot(page, "task-10-expense-updates-dashboard");
   });
@@ -129,7 +129,7 @@ test.describe("Shared state — live dashboard updates", () => {
     await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$230,500");
 
     // Surplus: (6300 + 1000) - 2950 = 4350
-    await expect(dashboard.getByLabel(/Monthly Surplus:/)).toContainText("$4,350");
+    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$4,350");
 
     await captureScreenshot(page, "task-10-multi-edit-dashboard");
   });

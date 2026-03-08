@@ -35,7 +35,7 @@ const MOCK_METRICS: MetricData[] = [
     positive: false,
   },
   {
-    title: "Monthly Surplus",
+    title: "Monthly Cash Flow",
     value: 3350,
     format: "currency",
     icon: "📈",
@@ -94,7 +94,7 @@ export type { MetricData };
 // Map metric titles to insight types for matching
 const METRIC_TO_INSIGHT_TYPES: Record<string, InsightType[]> = {
   "Net Worth": ["net-worth"],
-  "Monthly Surplus": ["surplus", "savings-rate"],
+  "Monthly Cash Flow": ["surplus", "savings-rate"],
   "Estimated Tax": ["tax"],
   "Financial Runway": ["runway", "withdrawal-tax"],
   "Debt-to-Asset Ratio": ["debt-interest", "debt-to-income"],
@@ -197,9 +197,9 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     metric.format === "months" &&
     metric.value > 12;
 
-  // Warning glow for negative Monthly Surplus (underwater)
+  // Warning glow for negative Monthly Cash Flow (underwater)
   const isUnderwaterWarning =
-    metric.title === "Monthly Surplus" && metric.value < 0;
+    metric.title === "Monthly Cash Flow" && metric.value < 0;
 
   const hasConnections = connections && connections.length > 0;
 

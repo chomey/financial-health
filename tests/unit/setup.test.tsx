@@ -49,7 +49,7 @@ describe("App shell layout", () => {
     render(<Home />);
     // Use role-based queries to scope to the metric cards (avoid ambiguity with chart legend)
     expect(screen.getByRole("group", { name: "Net Worth" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Monthly Surplus" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Monthly Cash Flow" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Financial Runway" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Debt-to-Asset Ratio" })).toBeInTheDocument();
   });
@@ -58,7 +58,7 @@ describe("App shell layout", () => {
     render(<Home />);
     // Each metric card has a group role with the metric title as label
     expect(screen.getByRole("group", { name: "Net Worth" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Monthly Surplus" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Monthly Cash Flow" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Financial Runway" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Debt-to-Asset Ratio" })).toBeInTheDocument();
   });

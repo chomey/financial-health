@@ -28,7 +28,7 @@ test.describe("Investment contributions in expenses", () => {
     await page.goto("/");
 
     // Initial surplus: $6,300 - $2,950 = $3,350
-    const surplusCard = page.getByLabel(/Monthly Surplus:/);
+    const surplusCard = page.getByLabel(/Monthly Cash Flow:/);
     await expect(surplusCard).toContainText("$3,350");
 
     // Add a $500 contribution to Savings Account

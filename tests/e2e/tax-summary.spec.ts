@@ -65,7 +65,7 @@ test.describe("Tax summary insights and projections (Task 45)", () => {
 
     // Verify all five cards exist
     await expect(dashboard.getByRole("group", { name: "Net Worth" })).toBeVisible();
-    await expect(dashboard.getByRole("group", { name: "Monthly Surplus" })).toBeVisible();
+    await expect(dashboard.getByRole("group", { name: "Monthly Cash Flow" })).toBeVisible();
     await expect(dashboard.getByRole("group", { name: "Estimated Tax" })).toBeVisible();
     await expect(dashboard.getByRole("group", { name: "Financial Runway" })).toBeVisible();
     await expect(dashboard.getByRole("group", { name: "Debt-to-Asset Ratio" })).toBeVisible();
