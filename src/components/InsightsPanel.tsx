@@ -90,7 +90,7 @@ function InsightCard({
   return (
     <div
       ref={cardRef}
-      className={`flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 px-5 py-4 shadow-sm transition-all duration-500 min-w-[280px] max-w-[360px] flex-shrink-0 ${
+      className={`flex items-start gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 shadow-sm transition-all duration-500 min-w-[220px] max-w-[300px] flex-shrink-0 ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
       }`}
       role="article"
@@ -102,10 +102,10 @@ function InsightCard({
       style={{ cursor: connections && connections.length > 0 ? "pointer" : undefined }}
       tabIndex={0}
     >
-      <span className="mt-0.5 text-xl flex-shrink-0" aria-hidden="true">
+      <span className="mt-0.5 text-base flex-shrink-0" aria-hidden="true">
         {insight.icon}
       </span>
-      <p className="text-sm leading-relaxed text-slate-300">{insight.message}</p>
+      <p className="text-xs leading-relaxed text-slate-300">{insight.message}</p>
     </div>
   );
 }
