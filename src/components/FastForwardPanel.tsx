@@ -183,7 +183,7 @@ export default function FastForwardPanel({
 
   return (
     <section
-      className="rounded-xl border border-white/10 bg-white/5 p-4 shadow-sm sm:p-6"
+      className="rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm sm:p-6"
       data-testid="fast-forward-panel"
       aria-label="Fast Forward scenario modeling"
     >

@@ -34,7 +34,7 @@ interface D3SankeyLink {
 
 const CHART_WIDTH = 700;
 const CHART_HEIGHT = 400;
-const CHART_PADDING = { top: 10, right: 120, bottom: 10, left: 120 };
+const CHART_PADDING = { top: 10, right: 90, bottom: 10, left: 90 };
 
 interface CashFlowSankeyProps {
   income: CashFlowInput["income"];

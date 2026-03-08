@@ -192,7 +192,7 @@ export default function NetWorthWaterfallChart({
   if (data.length <= 1) {
     return (
       <div
-        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 text-center"
+        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5 text-center"
         data-testid="waterfall-chart"
       >
         <p className="text-sm text-slate-400">
@@ -207,7 +207,7 @@ export default function NetWorthWaterfallChart({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5"
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5"
       data-testid="waterfall-chart"
     >
       <h3 className="mb-3 text-sm font-medium text-slate-400">

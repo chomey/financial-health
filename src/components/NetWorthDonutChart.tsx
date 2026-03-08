@@ -212,7 +212,7 @@ export default function NetWorthDonutChart({
   if (slices.length === 0) {
     return (
       <div
-        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 text-center"
+        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5 text-center"
         data-testid="donut-chart"
       >
         <p className="text-sm text-slate-400">
@@ -234,7 +234,7 @@ export default function NetWorthDonutChart({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5"
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5"
       data-testid="donut-chart"
     >
       <div className="mb-3 flex items-center justify-between">

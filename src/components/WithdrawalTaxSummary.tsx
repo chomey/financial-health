@@ -60,7 +60,7 @@ export default function WithdrawalTaxSummary({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm transition-all duration-200"
+      className="rounded-xl border border-white/10 bg-white/5 p-3 sm:p-5 shadow-sm transition-all duration-200"
       data-testid="withdrawal-tax-summary"
     >
       <div className="flex items-center justify-between">

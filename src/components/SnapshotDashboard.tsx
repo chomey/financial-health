@@ -199,7 +199,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
   return (
     <div
       ref={cardRef}
-      className={`relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 shadow-sm ${
+      className={`relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5 shadow-sm ${
         hasConnections ? "cursor-pointer" : "cursor-default"
       }`}
       role="group"
@@ -358,7 +358,7 @@ export default function SnapshotDashboard({ metrics, financialData, homeCurrency
   }
 
   return (
-    <div className="space-y-4" data-testid="snapshot-dashboard">
+    <div className="space-y-3 sm:space-y-4" data-testid="snapshot-dashboard">
       {displayMetrics.map((metric) => (
         <MetricCard
           key={metric.title}

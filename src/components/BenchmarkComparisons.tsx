@@ -150,7 +150,7 @@ export default function BenchmarkComparisons({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm"
+      className="rounded-xl border border-white/10 bg-white/5 p-3 sm:p-5 shadow-sm"
       data-testid="benchmark-comparisons"
     >
       <div className="flex items-center justify-between mb-4">

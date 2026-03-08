@@ -868,7 +868,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-8">
         {/* Welcome explainer for first-time visitors */}
         <WelcomeBanner />
 
@@ -929,12 +929,12 @@ export default function Home() {
         )}
 
         {/* Projection Chart — full-width above the two-column layout */}
-        <section id="projections" className="mb-6 space-y-4 scroll-mt-16" aria-label="Financial projections">
+        <section id="projections" className="mb-4 sm:mb-6 space-y-3 sm:space-y-4 scroll-mt-16" aria-label="Financial projections">
           <ZoomableCard><ProjectionChart state={state} runwayDetails={runwayDetails ?? undefined} safeWithdrawalRate={safeWithdrawalRate} /></ZoomableCard>
           <InsightsPanel data={financialData} insightConnections={insightConnections} />
         </section>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-4 sm:gap-8 lg:grid-cols-12">
           {/* Entry Panel — left side on desktop, top on mobile */}
           <section
             className="lg:col-span-7 print:hidden"
@@ -979,7 +979,7 @@ export default function Home() {
             data-testid="dashboard-panel"
             aria-label="Financial dashboard"
           >
-            <div className="lg:sticky lg:top-8 overflow-visible space-y-6">
+            <div className="lg:sticky lg:top-8 overflow-visible space-y-3 sm:space-y-6">
               <SnapshotDashboard metrics={metrics} financialData={financialData} homeCurrency={homeCurrency} dataFlowConnections={dataFlowConnections} />
               {stocks.length > 0 && (() => {
                 const portfolio = getPortfolioSummary(stocks);

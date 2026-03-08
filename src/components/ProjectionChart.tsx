@@ -326,11 +326,11 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
   return (
     <section
-      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 sm:p-6"
+      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-6"
       data-testid="projection-chart"
       aria-label="Financial projection"
     >
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-3 sm:mb-4 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
         <h3 className="text-lg font-semibold text-slate-200">
           Financial Projection
         </h3>
@@ -358,7 +358,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
       {/* Mode tabs */}
       {runwayDetails && (
-        <div className="mb-4 flex gap-1" data-testid="chart-mode-tabs">
+        <div className="mb-3 sm:mb-4 flex gap-1" data-testid="chart-mode-tabs">
           <button
             onClick={(e) => { e.stopPropagation(); setMode("keep-earning"); }}
             className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
@@ -435,7 +435,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
       {mode === "keep-earning" && (<>
       {/* Summary table: dynamic milestone year projections */}
-      <div className="mb-4" data-testid="projection-summary-table">
+      <div className="mb-3 sm:mb-4" data-testid="projection-summary-table">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
@@ -507,20 +507,20 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
       <div className="h-64 sm:h-80" data-testid="projection-chart-container">
         <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
-          <LineChart data={chartData} margin={{ top: 10, right: 10, bottom: 5, left: 10 }}>
+          <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis
               dataKey="year"
               type="number"
               domain={[0, 50]}
-              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tick={{ fontSize: 10, fill: "#94a3b8" }}
               tickFormatter={(v) => `${v}y`}
               ticks={xTicks}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tick={{ fontSize: 10, fill: "#94a3b8" }}
               tickFormatter={formatCurrency}
-              width={75}
+              width={55}
             />
             <Tooltip content={<CustomTooltip />} />
 
@@ -815,19 +815,20 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
           <div className="h-72 sm:h-80 w-full" data-testid="burndown-chart-container">
             <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
-              <LineChart data={burndownData.data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+              <LineChart data={burndownData.data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                 <XAxis
                   dataKey="year"
                   type="number"
                   domain={[0, 50]}
-                  tick={{ fontSize: 11, fill: "#94a3b8" }}
+                  tick={{ fontSize: 10, fill: "#94a3b8" }}
                   tickFormatter={(v) => `${v}y`}
                   ticks={xTicks}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: "#94a3b8" }}
+                  tick={{ fontSize: 10, fill: "#94a3b8" }}
                   tickFormatter={formatCurrency}
+                  width={55}
                 />
                 <Tooltip content={<BurndownTooltip />} />
 
