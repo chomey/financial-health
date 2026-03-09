@@ -8,13 +8,25 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 167
-- **Remaining**: 2
+- **Completed**: 168
+- **Remaining**: 1
 - **Last Updated**: 2026-03-08
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 168: Reorder wizard steps [@fullstack]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/url-state.ts`: Changed `WIZARD_STEPS` order from welcome→profile→property→stocks→assets→debts→income→expenses→tax-summary to welcome→profile→income→expenses→debts→property→assets→stocks→tax-summary.
+  - `src/lib/changelog.ts`: Added version 168 entry.
+  - `tests/unit/wizard-step-order.test.ts`: New — 11 tests verifying the new step order via index comparisons and exact array match.
+  - `tests/unit/changelog.test.ts`: Updated version counts 167→168, AU milestone count 10→11.
+  - `tests/e2e/wizard-step-order.spec.ts`: New — 5 E2E tests: DOM order matches expected order, clicking income/expenses/debts/assets tabs makes them active.
+- **Tests**: T1: 2514 passed (132 files), T2: 5 passed, Build: passes
+- **Screenshots**: task-168-wizard-step-order, task-168-income-step-active, task-168-expenses-step-active, task-168-debts-step-active, task-168-assets-step-active
+- **Notes**: `STEP_META` in WizardStepper is a Record (no ordering) — step display order is driven by `WIZARD_STEPS` array alone. Investment returns display in IncomeStep is guarded by `totalReturns > 0` so it correctly shows nothing when income is entered before assets. Further display movement is handled in Task 171.
 
 ## Task 167: AU currency formatting and FX rates [@fullstack]
 - **Date**: 2026-03-08

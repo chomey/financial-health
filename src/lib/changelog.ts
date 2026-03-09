@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Wizard step reorder
+  {
+    version: 168,
+    title: "Wizard: Reordered steps to match natural financial thinking",
+    description: "Changed wizard step order from Welcome → Profile → Property → Stocks → Assets → Debts → Income → Expenses → Tax Summary to Welcome → Profile → Income → Expenses → Debts → Property → Assets → Stocks → Tax Summary. The new order follows how people naturally think about finances: income first, then expenses, then debts, then property (biggest asset), then other assets/investments, then stocks (most advanced), then tax summary as a computed review.",
+    date: "2026-03-08",
+  },
   // Australia: AU currency formatting and FX rates
   {
     version: 167,

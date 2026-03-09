@@ -598,12 +598,12 @@ export type WizardStep =
 export const WIZARD_STEPS: WizardStep[] = [
   "welcome",
   "profile",
-  "property",
-  "stocks",
-  "assets",
-  "debts",
   "income",
   "expenses",
+  "debts",
+  "property",
+  "assets",
+  "stocks",
   "tax-summary",
 ] as const;
 
