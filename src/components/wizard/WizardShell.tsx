@@ -111,12 +111,12 @@ export default function WizardShell(props: WizardProps) {
     welcome: true, // landing step, always complete
     profile: !!(props.country && props.jurisdiction),
     property: true, // optional, always "complete"
-    assets: props.assets.filter(a => !a.computed).length > 0,
+    assets: true, // optional
     stocks: true, // optional
     debts: true, // optional
-    income: props.income.length > 0,
+    income: true, // optional — retirees or dependents may have no income
     "tax-summary": true, // read-only interstitial, always complete
-    expenses: props.expenses.length > 0,
+    expenses: true, // optional
   }), [props.assets, props.income, props.expenses, props.country, props.jurisdiction]);
 
   // Build FinancialState for tax summary step

@@ -225,7 +225,7 @@ export function useFinancialState() {
   }, []);
 
   const clearAll = useCallback(() => {
-    setAssets([]);
+    setAssets([{ id: `a${Date.now()}`, category: "Checking", amount: 0 }]);
     setDebts([]);
     setIncome([]);
     setExpenses([]);
