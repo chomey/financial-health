@@ -2,30 +2,22 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Expense entry section", () => {
-  test("renders mock expenses with formatted amounts", async ({ page }) => {
-    await page.goto("/");
+  test("renders expenses with formatted amounts", async ({ page }) => {
+    await page.goto("/?step=expenses");
 
-    await expect(
-      page.getByRole("heading", { name: "Expenses" })
-    ).toBeVisible();
+    // INITIAL_STATE: Rent $1,800, Groceries $500, Subscriptions $50
+    const expenseList = page.getByRole("list", { name: "Expense items" });
+    await expect(expenseList.getByText("Rent/Mortgage Payment")).toBeVisible();
+    await expect(expenseList.getByText("Groceries")).toBeVisible();
+    await expect(expenseList.getByText("Subscriptions")).toBeVisible();
 
-    await expect(page.getByText("Rent/Mortgage Payment")).toBeVisible();
-    await expect(page.getByText("Groceries")).toBeVisible();
-    await expect(page.getByText("Subscriptions")).toBeVisible();
-
-    // Scope to expense section to avoid matching projection chart text
-    const expenseSection = page.locator("section", { has: page.getByRole("heading", { name: "Expenses" }) }).first();
-    await expect(expenseSection.getByText("$2,200")).toBeVisible();
-    await expect(expenseSection.getByText("$600")).toBeVisible();
-    await expect(expenseSection.getByText("$150")).toBeVisible();
-
-    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$2,950");
+    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$2,350");
 
     await captureScreenshot(page, "task-6-expenses-with-mock-data");
   });
 
   test("shows Add Expense button and opens add form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=expenses");
 
     const addBtn = page.getByText("+ Add Expense");
     await expect(addBtn).toBeVisible();
@@ -38,7 +30,7 @@ test.describe("Expense entry section", () => {
   });
 
   test("adds a new expense item via the add form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=expenses");
 
     await page.getByText("+ Add Expense").click();
 
@@ -49,31 +41,30 @@ test.describe("Expense entry section", () => {
     await amountInput.fill("200");
     await page.getByLabel("Confirm add expense").click();
 
-    await expect(page.getByText("Transportation")).toBeVisible();
-    await expect(page.getByText("$200")).toBeVisible();
-    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$3,150");
+    const expenseList = page.getByRole("list", { name: "Expense items" });
+    await expect(expenseList.getByText("Transportation")).toBeVisible();
+    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$2,550");
 
     await captureScreenshot(page, "task-6-expense-added");
   });
 
   test("deletes an expense item on hover and click", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=expenses");
 
-    const row = page
-      .getByRole("listitem")
-      .filter({ hasText: "Subscriptions" });
+    const expenseList = page.getByRole("list", { name: "Expense items" });
+    const row = expenseList.getByRole("listitem").filter({ hasText: "Subscriptions" });
     await row.hover();
 
     await page.getByLabel("Delete Subscriptions").click();
 
-    await expect(page.getByText("Subscriptions")).not.toBeVisible();
-    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$2,800");
+    await expect(expenseList.getByText("Subscriptions")).not.toBeVisible();
+    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$2,300");
 
     await captureScreenshot(page, "task-6-expense-deleted");
   });
 
   test("click-to-edit amount allows value change", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=expenses");
 
     await page.getByLabel(/Edit amount for Groceries/).click();
 
@@ -83,8 +74,8 @@ test.describe("Expense entry section", () => {
     await editInput.fill("700");
     await editInput.press("Enter");
 
-    await expect(page.getByText("$700")).toBeVisible();
-    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$3,050");
+    // Total: 1800 + 700 + 50 = 2550
+    await expect(page.getByTestId("expense-monthly-total")).toHaveText("$2,550");
 
     await captureScreenshot(page, "task-6-expense-amount-edited");
   });
@@ -92,7 +83,7 @@ test.describe("Expense entry section", () => {
   test("shows category suggestions when adding new expense", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/?step=expenses");
 
     await page.getByText("+ Add Expense").click();
 

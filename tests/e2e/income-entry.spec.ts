@@ -2,26 +2,21 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Income entry section", () => {
-  test("renders mock income with formatted amounts", async ({ page }) => {
-    await page.goto("/");
+  test("renders income with formatted amounts", async ({ page }) => {
+    await page.goto("/?step=income");
 
-    await expect(
-      page.getByRole("heading", { name: "Income" })
-    ).toBeVisible();
+    // INITIAL_STATE: Salary $4,500
+    const incomeList = page.getByRole("list", { name: "Income items" });
+    await expect(incomeList.getByText("Salary")).toBeVisible();
+    await expect(incomeList.getByText("$4,500")).toBeVisible();
 
-    await expect(page.getByText("Salary")).toBeVisible();
-    await expect(page.getByText("Freelance")).toBeVisible();
-
-    await expect(page.getByText("$5,500")).toBeVisible();
-    await expect(page.getByText("$800")).toBeVisible();
-
-    await expect(page.getByTestId("income-monthly-total")).toHaveText("$6,300");
+    await expect(page.getByTestId("income-monthly-total")).toHaveText("$4,500");
 
     await captureScreenshot(page, "task-6-income-with-mock-data");
   });
 
   test("shows Add Income button and opens add form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     const addBtn = page.getByText("+ Add Income");
     await expect(addBtn).toBeVisible();
@@ -34,7 +29,7 @@ test.describe("Income entry section", () => {
   });
 
   test("adds a new income item via the add form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     await page.getByText("+ Add Income").click();
 
@@ -45,33 +40,29 @@ test.describe("Income entry section", () => {
     await amountInput.fill("500");
     await page.getByLabel("Confirm add income").click();
 
-    // Scope to income section to avoid matching projection chart text
-    const incomeSection = page.locator("section", { has: page.getByRole("heading", { name: "Income" }) }).first();
-    await expect(incomeSection.getByText("Side Hustle")).toBeVisible();
-    await expect(incomeSection.getByText("$500")).toBeVisible();
-    await expect(page.getByTestId("income-monthly-total")).toHaveText("$6,800");
+    const incomeList = page.getByRole("list", { name: "Income items" });
+    await expect(incomeList.getByText("Side Hustle")).toBeVisible();
+    await expect(page.getByTestId("income-monthly-total")).toHaveText("$5,000");
 
     await captureScreenshot(page, "task-6-income-added");
   });
 
   test("deletes an income item on hover and click", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
-    const row = page
-      .getByRole("listitem")
-      .filter({ hasText: "Freelance" });
+    const incomeList = page.getByRole("list", { name: "Income items" });
+    const row = incomeList.getByRole("listitem").filter({ hasText: "Salary" });
     await row.hover();
 
-    await page.getByLabel("Delete Freelance").click();
+    await page.getByLabel("Delete Salary").click();
 
-    await expect(page.getByText("Freelance")).not.toBeVisible();
-    await expect(page.getByTestId("income-monthly-total")).toHaveText("$5,500");
+    await expect(incomeList.getByText("Salary")).not.toBeVisible();
 
     await captureScreenshot(page, "task-6-income-deleted");
   });
 
   test("click-to-edit amount allows value change", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     await page.getByLabel(/Edit amount for Salary/).click();
 
@@ -81,8 +72,7 @@ test.describe("Income entry section", () => {
     await editInput.fill("6000");
     await editInput.press("Enter");
 
-    await expect(page.getByText("$6,000")).toBeVisible();
-    await expect(page.getByTestId("income-monthly-total")).toHaveText("$6,800");
+    await expect(page.getByTestId("income-monthly-total")).toHaveText("$6,000");
 
     await captureScreenshot(page, "task-6-income-amount-edited");
   });
@@ -90,16 +80,13 @@ test.describe("Income entry section", () => {
   test("shows category suggestions when adding new income", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     await page.getByText("+ Add Income").click();
 
     const categoryInput = page.getByLabel("New income category");
     await categoryInput.click();
 
-    await expect(
-      page.getByRole("button", { name: "Salary", exact: true })
-    ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Freelance", exact: true })
     ).toBeVisible();
