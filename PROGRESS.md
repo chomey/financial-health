@@ -8,11 +8,19 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 171
-- **Remaining**: 13
-- **Last Updated**: 2026-03-08
+- **Completed**: 172
+- **Remaining**: 12
+- **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 173: AU E2E tests and regression [@qa] [E2E] [MILESTONE]
+- **Date**: 2026-03-09
+- **Files**:
+  - `tests/e2e/au-e2e.spec.ts`: New — 18 E2E tests covering AU full flow (3 profiles → dashboard), AUD currency display (country button, FX rate, currency badges), Money Steps (AU steps present, CA/US absent), Tax Summary step (Financial Summary with effective rate), Super accounts in assets step (all 3 profiles), CA regression (Money Steps, sample profile, default country/jurisdiction), US regression (Money Steps, country cycle).
+  - `tests/unit/au-url-state.test.ts`: New — 13 unit tests covering AU sample profile URL state round-trip (country preserved, super accounts, HECS-HELP debt, properties, ASX stocks, URL-safe length, no plaintext sensitive data).
+- **Tests**: T1: 2606 passed (136 files), T2: 18 passed, Build: passes
+- **Screenshots**: task-173-au-young-professional-dashboard, task-173-au-mid-career-family-dashboard, task-173-au-pre-retiree-dashboard, task-173-au-country-selected, task-173-au-fx-display-aud, task-173-au-currency-badge-aud, task-173-au-money-steps, task-173-au-tax-summary, task-173-au-pre-retiree-tax-summary, task-173-au-super-in-assets, task-173-au-mid-career-assets, task-173-au-pre-retiree-super-assets, task-173-regression-ca-money-steps, task-173-regression-ca-fresh-grad-dashboard, task-173-regression-us-money-steps, task-173-regression-country-cycle
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

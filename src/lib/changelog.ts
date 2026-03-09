@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 175,
+    title: "AU E2E tests and regression",
+    description: "Full Playwright E2E test suite for AU flow: select country, load sample profiles, verify AUD values on dashboard, Money Steps with AU-specific steps, tax summary, and super accounts in assets. Regression tests confirm CA and US flows unaffected. Unit tests verify AU sample profile URL state round-trip.",
+    date: "2026-03-09",
+  },
+  {
     version: 174,
     title: "Account type descriptions in AssetEntry",
     description: "Added short descriptions for all known account types in AssetEntry. CA: TFSA, RRSP, RESP, FHSA, LIRA. US: 401k, Roth 401k, IRA, Roth IRA, 529, HSA. AU: Super (Accumulation), Super (Pension Phase), First Home Super Saver. Descriptions appear below each item name in the category dropdown and below the selected category name in view mode, matching the tax credit description style.",
