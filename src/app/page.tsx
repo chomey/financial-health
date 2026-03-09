@@ -168,15 +168,28 @@ export default function Home() {
 
   useEffect(() => {
     const urlStep = getStepFromURL();
+    const hasState = new URLSearchParams(window.location.search).has("s");
     if (urlStep && urlStep !== "dashboard") {
       setPhase("wizard");
-    } else if (urlStep === "dashboard" || new URLSearchParams(window.location.search).has("s")) {
+    } else if (urlStep === "dashboard" || hasState) {
       // Explicit dashboard step or has saved state → dashboard
       setPhase("dashboard");
     } else {
-      // Fresh visit with no state → wizard
-      setPhase("wizard");
-      updateStepURL("welcome" as WizardStep);
+      // No step, no state — show wizard only for genuine first-time visitors
+      // (tests and returning users without state go straight to dashboard)
+      let isFirstVisit = false;
+      try {
+        isFirstVisit = !localStorage.getItem("fhs-visited");
+        localStorage.setItem("fhs-visited", "1");
+      } catch {
+        // localStorage unavailable — default to dashboard
+      }
+      if (isFirstVisit) {
+        setPhase("wizard");
+        updateStepURL("welcome" as WizardStep);
+      } else {
+        setPhase("dashboard");
+      }
     }
   }, []);
 

@@ -416,6 +416,10 @@ esac
 WORKTREE_BASE="${SCRIPT_DIR}/.worktrees"
 MAIN_BRANCH=$(git -C "$SCRIPT_DIR" rev-parse --abbrev-ref HEAD)
 
+# Pull latest from remote before starting
+print "${DIM}Pulling latest from origin/${MAIN_BRANCH}...${NC}"
+git -C "$SCRIPT_DIR" pull --rebase origin "$MAIN_BRANCH" 2>/dev/null || true
+
 # cleanup_worktree — removes a worktree and its branch
 cleanup_worktree() {
   local wt_path="$1" branch_name="$2"
@@ -519,9 +523,35 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   fi
   print ""
 
-  # Run Claude inside the worktree
+  # Run Claude inside the worktree (45-minute timeout per task)
   local claude_exit=0
-  (cd "$wt_path" && claude --print --dangerously-skip-permissions --model "$model" "$prompt") || claude_exit=$?
+  local TASK_TIMEOUT=2700  # 45 minutes
+  local claude_pid
+  (cd "$wt_path" && claude --print --dangerously-skip-permissions --model "$model" "$prompt") &
+  claude_pid=$!
+
+  # Monitor with timeout — check every 10 seconds
+  local elapsed=0
+  while kill -0 "$claude_pid" 2>/dev/null; do
+    if [[ $elapsed -ge $TASK_TIMEOUT ]]; then
+      print ""
+      print "${RED}  ✗ Task timed out after $((TASK_TIMEOUT / 60)) minutes. Killing...${NC}"
+      kill -TERM "$claude_pid" 2>/dev/null
+      sleep 2
+      kill -9 "$claude_pid" 2>/dev/null || true
+      wait "$claude_pid" 2>/dev/null || true
+      TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
+      ITER_TIMES+=($(($(date +%s) - ITER_START)))
+      ITER_MODELS+=("$model")
+      ITER_TAGS+=("$task_tag")
+      ITER_TITLES+=("${task_title} ${RED}(timed out)${NC}")
+      cleanup_worktree "$wt_path" "$branch_name"
+      continue 2  # continue outer for loop
+    fi
+    sleep 10
+    elapsed=$((elapsed + 10))
+  done
+  wait "$claude_pid" 2>/dev/null || claude_exit=$?
 
   # If interrupted (Ctrl+C), clean up worktree and exit
   if [[ $INTERRUPTED -eq 1 || $claude_exit -eq 130 ]]; then

@@ -7,14 +7,32 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
+  timeout: 15_000, // 15s per test (default 30s is too slow for 700+ tests)
+  globalTimeout: 10 * 60_000, // 10 minutes max for the entire suite
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
+    actionTimeout: 10_000, // 10s per action (click, fill, etc.)
   },
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        // Pre-set localStorage so tests bypass the first-visit wizard
+        storageState: {
+          cookies: [],
+          origins: [
+            {
+              origin: "http://localhost:3000",
+              localStorage: [
+                { name: "fhs-visited", value: "1" },
+                { name: "fhs-wizard-done", value: "1" },
+              ],
+            },
+          ],
+        },
+      },
     },
   ],
   webServer: {
