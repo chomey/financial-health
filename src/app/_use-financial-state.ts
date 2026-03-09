@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { INITIAL_STATE } from "@/lib/financial-state";
+import type { AppMode } from "@/lib/ModeContext";
 import { getStateFromURL, updateURL, getSwrFromURL, updateSwrURL, getOutlookYearsFromURL, type OutlookYears } from "@/lib/url-state";
 import { getHomeCurrency, getForeignCurrency, getEffectiveFxRates, fxPairKey } from "@/lib/currency";
 import type { FxRates } from "@/lib/currency";
@@ -38,6 +39,7 @@ export function useFinancialState() {
   const [flowchartAcks, setFlowchartAcks] = useState<string[]>([]);
   const [flowchartSkips, setFlowchartSkips] = useState<string[]>([]);
   const [isRetired, setIsRetired] = useState(false);
+  const [mode, setMode] = useState<AppMode>("simple");
   const [showSampleProfiles, setShowSampleProfiles] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [safeWithdrawalRate, setSafeWithdrawalRate] = useState(4);
@@ -70,6 +72,7 @@ export function useFinancialState() {
       if (urlState.flowchartAcks) setFlowchartAcks(urlState.flowchartAcks);
       if (urlState.flowchartSkips) setFlowchartSkips(urlState.flowchartSkips);
       if (urlState.isRetired) setIsRetired(true);
+      if (urlState.mode) setMode(urlState.mode);
     } else {
       // No saved state — show sample profile picker for new visitors
       setShowSampleProfiles(true);
@@ -116,8 +119,8 @@ export function useFinancialState() {
       isFirstRender.current = false;
       return;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, isRetired: isRetired || undefined });
-  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, isRetired]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, isRetired: isRetired || undefined, mode });
+  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, isRetired, mode]);
 
   // Sync computed assets for stocks and property equity (auto-update amounts, preserve ROI & surplusTarget)
   const syncComputedAssets = useCallback(() => {
@@ -283,6 +286,7 @@ export function useFinancialState() {
     flowchartAcks,
     flowchartSkips,
     isRetired,
+    mode,
     showSampleProfiles,
     showWizard,
     safeWithdrawalRate,
@@ -312,6 +316,7 @@ export function useFinancialState() {
     setFlowchartAcks,
     setFlowchartSkips,
     setIsRetired,
+    setMode,
     setShowSampleProfiles,
     setShowWizard,
     setSafeWithdrawalRate,

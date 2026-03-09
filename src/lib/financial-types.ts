@@ -28,6 +28,7 @@ export interface FinancialState {
   flowchartAcks?: string[]; // Money Steps acknowledged step IDs
   flowchartSkips?: string[]; // Money Steps skipped (N/A) step IDs
   isRetired?: boolean; // retirement mode flag
+  mode?: "simple" | "advanced"; // UI complexity mode (default: "simple")
 }
 
 export const INITIAL_STATE: FinancialState = {

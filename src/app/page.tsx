@@ -25,6 +25,7 @@ import FinancialFlowchart from "@/components/FinancialFlowchart";
 import ZoomableCard from "@/components/ZoomableCard";
 import { DataFlowProvider } from "@/components/DataFlowArrows";
 import { CurrencyProvider } from "@/lib/CurrencyContext";
+import { ModeProvider } from "@/lib/ModeContext";
 import {
   computeMetrics,
   computeTotals,
@@ -99,9 +100,11 @@ export default function Home() {
     flowchartAcks,
     flowchartSkips,
     isRetired,
+    mode,
     setFlowchartAcks,
     setFlowchartSkips,
     setIsRetired,
+    setMode,
   } = useFinancialState();
 
   // ── Phase routing: wizard vs dashboard ──────────────────────────────────────
@@ -229,6 +232,7 @@ export default function Home() {
   // ── Render wizard phase ───────────────────────────────────────────────────
   if (phase === "wizard") {
     return (
+      <ModeProvider mode={mode} setMode={setMode}>
       <CurrencyProvider currency={homeCurrency}>
       <WizardShell
         assets={assets}
@@ -271,6 +275,7 @@ export default function Home() {
         onFinish={switchToDashboard}
       />
       </CurrencyProvider>
+      </ModeProvider>
     );
   }
 
@@ -431,6 +436,7 @@ export default function Home() {
   const benchmarkDebtToIncome = annualIncome > 0 ? (debtTotal + totals.totalPropertyMortgage) / annualIncome : 0;
 
   return (
+    <ModeProvider mode={mode} setMode={setMode}>
     <CurrencyProvider currency={homeCurrency}>
     <DataFlowProvider homeCurrency={homeCurrency}>
     <div className="min-h-screen bg-slate-950 flex flex-col">
@@ -697,5 +703,6 @@ export default function Home() {
     </div>
     </DataFlowProvider>
     </CurrencyProvider>
+    </ModeProvider>
   );
 }

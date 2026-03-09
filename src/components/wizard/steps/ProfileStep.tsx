@@ -6,6 +6,7 @@ import HelpTip from "@/components/HelpTip";
 import { getFilingStatuses } from "@/lib/tax-credits";
 import type { FilingStatus } from "@/lib/tax-credits";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
+import { useModeContext } from "@/lib/ModeContext";
 
 export default function ProfileStep({
   country,
@@ -40,6 +41,7 @@ export default function ProfileStep({
   onTaxYearChange: (y: number) => void;
   onFxManualOverrideChange: (v: number | undefined) => void;
 }) {
+  const { mode, setMode } = useModeContext();
   return (
     <div className="space-y-6">
       <div>
@@ -47,6 +49,44 @@ export default function ProfileStep({
         <p className="mt-1 text-sm text-slate-400">
           Tell us about yourself so we can tailor tax calculations and financial benchmarks.
         </p>
+      </div>
+
+      {/* Mode selector */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5">
+        <div className="mb-3 flex items-center gap-1.5">
+          <span className="text-sm font-medium text-slate-300">Detail Level</span>
+          <HelpTip text="Simple mode shows only the most important fields. Advanced mode unlocks all options including tax credits, individual stocks, ROI settings, and more." />
+        </div>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setMode("simple")}
+            className={`flex-1 rounded-xl border px-4 py-3 text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+              mode === "simple"
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:bg-white/10 hover:text-slate-200"
+            }`}
+            aria-pressed={mode === "simple"}
+            data-testid="profile-mode-simple"
+          >
+            <div className="text-sm font-semibold">Simple</div>
+            <div className="mt-0.5 text-xs opacity-75">Essential fields only — done in minutes</div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("advanced")}
+            className={`flex-1 rounded-xl border px-4 py-3 text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+              mode === "advanced"
+                ? "border-violet-500/40 bg-violet-500/10 text-violet-300"
+                : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:bg-white/10 hover:text-slate-200"
+            }`}
+            aria-pressed={mode === "advanced"}
+            data-testid="profile-mode-advanced"
+          >
+            <div className="text-sm font-semibold">Advanced</div>
+            <div className="mt-0.5 text-xs opacity-75">Full detail — tax credits, stocks, ROI &amp; more</div>
+          </button>
+        </div>
       </div>
 
       {/* Country, Region, Tax, Filing */}

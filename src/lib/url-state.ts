@@ -171,6 +171,7 @@ interface CompactState {
   fca?: string[]; // flowchart acknowledged step IDs
   fcs2?: string[]; // flowchart skipped step IDs (fcs2 to avoid collision with old fcs= param)
   ret?: 1; // retired flag
+  mo?: string; // mode ("advanced" only; omitted when simple/default)
 }
 
 function toCompact(state: FinancialState): CompactState {
@@ -259,6 +260,7 @@ function toCompact(state: FinancialState): CompactState {
   if (state.flowchartAcks && state.flowchartAcks.length > 0) compact.fca = state.flowchartAcks;
   if (state.flowchartSkips && state.flowchartSkips.length > 0) compact.fcs2 = state.flowchartSkips;
   if (state.isRetired) compact.ret = 1;
+  if (state.mode && state.mode !== "simple") compact.mo = state.mode;
   return compact;
 }
 
@@ -348,6 +350,7 @@ function fromCompact(compact: CompactState): FinancialState {
     flowchartAcks: compact.fca,
     flowchartSkips: compact.fcs2,
     isRetired: compact.ret === 1 ? true : undefined,
+    mode: compact.mo as "simple" | "advanced" | undefined,
   };
 }
 

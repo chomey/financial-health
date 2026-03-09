@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useOptionalDataFlow, type SourceMetadataItem } from "@/components/DataFlowArrows";
 import { formatCurrencyCompact } from "@/lib/currency";
+import { useModeContext } from "@/lib/ModeContext";
 
 export function PrintSnapshotButton() {
   return (
@@ -28,6 +29,41 @@ export function PrintSnapshotButton() {
         />
       </svg>
     </button>
+  );
+}
+
+/** Simple/Advanced mode toggle pill, reads from ModeContext. */
+export function ModeToggle() {
+  const { mode, setMode } = useModeContext();
+  return (
+    <div className="inline-flex rounded-lg border border-white/10 text-xs" data-testid="mode-toggle">
+      <button
+        type="button"
+        onClick={() => setMode("simple")}
+        className={`rounded-l-lg px-2 py-1 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+          mode === "simple"
+            ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-inset ring-emerald-500/30"
+            : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
+        }`}
+        aria-pressed={mode === "simple"}
+        data-testid="mode-toggle-simple"
+      >
+        Simple
+      </button>
+      <button
+        type="button"
+        onClick={() => setMode("advanced")}
+        className={`rounded-r-lg px-2 py-1 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+          mode === "advanced"
+            ? "bg-violet-500/15 text-violet-300 ring-1 ring-inset ring-violet-500/30"
+            : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
+        }`}
+        aria-pressed={mode === "advanced"}
+        data-testid="mode-toggle-advanced"
+      >
+        Advanced
+      </button>
+    </div>
   );
 }
 
@@ -108,6 +144,7 @@ export function AppHeader({
               </>
             )}
           </div>
+          <ModeToggle />
           <span className="flex-1" />
           <a
             href="/changelog"

@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 176,
+    title: "Simple / Advanced mode toggle",
+    description: "Added a Simple/Advanced mode toggle to the AppHeader (visible on every page) and to the ProfileStep wizard. Mode is persisted in the URL state blob so it survives reloads and sharing. A ModeProvider/useModeContext React context lets any component read the current mode. New users start in Simple mode by default. Data is never lost when switching modes — advanced fields remain in state, they are only hidden in Simple mode. Future tasks will use this flag to progressively hide advanced fields.",
+    date: "2026-03-09",
+  },
+  {
     version: 175,
     title: "Yearly and one-time expense frequency support",
     description: "Added frequency field to ExpenseEntry (Monthly, Yearly, One-time). Yearly and one-time expenses are divided by 12 for all monthly calculations (cash flow, runway, FIRE number, Sankey, expense breakdown). Yearly expenses show '$X/yr → $Y/mo' format; one-time shows '$X once → $Y/mo'. Frequency persists in URL state. All computations (compute-totals, flowchart-steps, financial-state, sankey-data) updated to normalize expense amounts.",

@@ -15,7 +15,7 @@
 
 ## Simple vs Advanced Mode
 
-- [ ] Task 176: Add mode toggle and persist in URL state — Add a `mode` field to FinancialState and CompactState (`"simple"` | `"advanced"`, default `"simple"`). Add a toggle switch to the ProfileStep (and the AppHeader for easy access from dashboard). Persist in the `s=` URL blob. Create a React context `useModeContext()` that any component can read. When mode changes, no data is lost — advanced fields are just hidden, their values remain in state. New users start in simple mode. [@fullstack]
+- [x] Task 176: Add mode toggle and persist in URL state — Add a `mode` field to FinancialState and CompactState (`"simple"` | `"advanced"`, default `"simple"`). Add a toggle switch to the ProfileStep (and the AppHeader for easy access from dashboard). Persist in the `s=` URL blob. Create a React context `useModeContext()` that any component can read. When mode changes, no data is lost — advanced fields are just hidden, their values remain in state. New users start in simple mode. [@fullstack]
 
 - [ ] Task 177: Simplify wizard steps in simple mode — In simple mode, reduce the wizard to 6 steps: Welcome → Profile → Income → Expenses → Assets → Summary. **Hide entirely**: Debts step (fold into a single "Monthly debt payments" field in Expenses), Property step (fold into a single "Home value" and "Mortgage balance" in Assets), Stocks step (most people don't track individual stocks), Tax Credits step (hidden from Expenses). Update WIZARD_STEPS to be dynamic based on mode. The "Summary" step replaces Tax Summary with a friendlier name. Advanced mode keeps all 9 steps. [@fullstack]
 

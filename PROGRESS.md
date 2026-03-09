@@ -14,6 +14,22 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
+## Task 176: Add mode toggle and persist in URL state [@fullstack]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/lib/financial-types.ts`: Added `mode?: "simple" | "advanced"` to `FinancialState`
+  - `src/lib/url-state.ts`: Added `mo?` to `CompactState`, serialize (omit when simple/default), deserialize into `mode` field
+  - `src/lib/ModeContext.tsx`: New — `AppMode` type, `ModeProvider`, `useModeContext()` hook
+  - `src/app/_use-financial-state.ts`: Added `mode`/`setMode` state, restore from URL, include in `updateURL`
+  - `src/app/_page-helpers.tsx`: Added `ModeToggle` component and import; wired into `AppHeader` between phase toggle and right-side buttons
+  - `src/components/wizard/steps/ProfileStep.tsx`: Added mode selector card with Simple/Advanced buttons using `useModeContext()`
+  - `src/app/page.tsx`: Import `ModeProvider`, destructure `mode`/`setMode`, wrap both wizard and dashboard returns
+  - `src/lib/changelog.ts`: Added version 176 entry
+  - `tests/unit/mode-toggle.test.tsx`: New — 8 unit tests covering ModeContext render/interaction/error and URL round-trip (simple omitted, advanced persisted, field isolation)
+  - `tests/e2e/mode-toggle.spec.ts`: New — 5 E2E tests covering default simple mode, switching to advanced, URL persistence on reload, ProfileStep buttons, data preserved on mode switch
+- **Tests**: T1: 2632 passed (138 files), T2: 5 passed, Build: passes
+- **Screenshots**: task-176-mode-toggle-default-simple, task-176-mode-toggle-advanced-active, task-176-mode-toggle-persists-url, task-176-mode-toggle-data-preserved, task-176-mode-toggle-profile-step
+
 ## Task 175: Support yearly/one-time expenses [@fullstack]
 - **Date**: 2026-03-09
 - **Files**:
