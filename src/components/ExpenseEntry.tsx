@@ -6,6 +6,8 @@ import { useCurrency } from "@/lib/CurrencyContext";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import type { SupportedCurrency, FxRates } from "@/lib/currency";
 import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
+import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
+import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 
 export interface ExpenseItem {
   id: string;
@@ -36,16 +38,6 @@ const MOCK_EXPENSES: ExpenseItem[] = [
   { id: "e3", category: "Subscriptions", amount: 150 },
 ];
 
-function generateId(): string {
-  return `e${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-function parseCurrencyInput(value: string): number {
-  const cleaned = value.replace(/[^0-9.-]/g, "");
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
-}
-
 interface ExpenseEntryProps {
   items?: ExpenseItem[];
   onChange?: (items: ExpenseItem[]) => void;
@@ -70,61 +62,17 @@ interface ExpenseEntryProps {
 export default function ExpenseEntry({ items: controlledItems, onChange, investmentContributions = 0, mortgagePayments = 0, surplus = 0, surplusTargetName, federalTax = 0, provincialStateTax = 0, computedFederalTax, computedProvincialStateTax, federalTaxOverride, provincialTaxOverride, onFederalTaxOverride, onProvincialTaxOverride, country = "CA", isUnderwater = false, homeCurrency, fxRates }: ExpenseEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
-  const [items, setItems] = useState<ExpenseItem[]>(controlledItems ?? MOCK_EXPENSES);
-  const isExternalSync = useRef(false);
-  const didMount = useRef(false);
-  const syncDidMount = useRef(false);
-  const lastSentToParent = useRef<ExpenseItem[] | null>(null);
+  const [items, setItems] = useControlledArray(controlledItems, MOCK_EXPENSES, onChange);
 
-  // Sync with parent if controlled — intentional external-system sync
-  // Skip initial mount since useState already handles the initial value
-  useEffect(() => {
-    if (!syncDidMount.current) {
-      syncDidMount.current = true;
-      return;
-    }
-    // Skip echo-back: parent passing back the same items we just sent
-    if (controlledItems !== undefined && controlledItems !== lastSentToParent.current) {
-      isExternalSync.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setItems(controlledItems);
-    }
-  }, [controlledItems]);
-
-  // Notify parent of internal changes via useEffect (not during render)
-  const onChangeRef = useRef(onChange);
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
-  useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
-    }
-    if (isExternalSync.current) {
-      isExternalSync.current = false;
-      return;
-    }
-    lastSentToParent.current = items;
-    onChangeRef.current?.(items);
-  }, [items]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingField, setEditingField] = useState<
-    "category" | "amount" | null
-  >(null);
-  const [editValue, setEditValue] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [addingNew, setAddingNew] = useState(false);
-  const [newCategory, setNewCategory] = useState("");
-  const [newAmount, setNewAmount] = useState("");
-  const [showNewSuggestions, setShowNewSuggestions] = useState(false);
+  type ExpenseField = "category" | "amount";
+  const edit = useEditState<ExpenseField>(["category"]);
+  const { editingId, editingField, editValue, showSuggestions, inputRef, startEdit, clearEdit, setEditValue, setShowSuggestions, handleEditKeyDown } = edit;
+  const addNew = useAddNew();
+  const { addingNew, newCategory, newAmount, showNewSuggestions, newCategoryRef, newAmountRef, setAddingNew, setNewCategory, setNewAmount, setShowNewSuggestions, resetNew, handleNewKeyDown } = addNew;
   const [animatingTotal, setAnimatingTotal] = useState(false);
   const [editingTax, setEditingTax] = useState<"federal" | "provincial" | null>(null);
   const [editTaxValue, setEditTaxValue] = useState("");
   const taxInputRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const newCategoryRef = useRef<HTMLInputElement>(null);
-  const newAmountRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -142,37 +90,11 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
   };
 
   useEffect(() => {
-    if (addingNew && newCategoryRef.current) {
-      newCategoryRef.current.focus();
-    }
-  }, [addingNew]);
-
-  useEffect(() => {
-    if (editingId && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [editingId, editingField]);
-
-  useEffect(() => {
     if (editingTax && taxInputRef.current) {
       taxInputRef.current.focus();
       taxInputRef.current.select();
     }
   }, [editingTax]);
-
-  const startEdit = (
-    id: string,
-    field: "category" | "amount",
-    currentValue: string
-  ) => {
-    setEditingId(id);
-    setEditingField(field);
-    setEditValue(currentValue);
-    if (field === "category") {
-      setShowSuggestions(true);
-    }
-  };
 
   const commitEdit = (overrideValue?: string) => {
     const value = overrideValue ?? editValue;
@@ -188,20 +110,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
         })
       );
     }
-    setEditingId(null);
-    setEditingField(null);
-    setEditValue("");
-    setShowSuggestions(false);
-  };
-
-  const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      (e.target as HTMLElement).blur();
-    } else if (e.key === "Escape") {
-      setEditingId(null);
-      setEditingField(null);
-      setShowSuggestions(false);
-    }
+    clearEdit();
   };
 
   const deleteItem = (id: string) => {
@@ -215,30 +124,9 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
     triggerTotalAnimation();
     setItems((prev) => [
       ...prev,
-      { id: generateId(), category: newCategory.trim(), amount },
+      { id: generateId("e"), category: newCategory.trim(), amount },
     ]);
-    setNewCategory("");
-    setNewAmount("");
-    setAddingNew(false);
-    setShowNewSuggestions(false);
-  };
-
-  const handleNewKeyDown = (
-    e: React.KeyboardEvent,
-    field: "category" | "amount"
-  ) => {
-    if (e.key === "Enter") {
-      if (field === "category" && newAmountRef.current) {
-        newAmountRef.current.focus();
-      } else {
-        addItem();
-      }
-    } else if (e.key === "Escape") {
-      setAddingNew(false);
-      setNewCategory("");
-      setNewAmount("");
-      setShowNewSuggestions(false);
-    }
+    resetNew();
   };
 
   const filteredSuggestions = (query: string) => {
@@ -348,8 +236,9 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                     <input
                       ref={inputRef}
                       type="text"
+                      inputMode="decimal"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                       onBlur={() => commitEdit()}
                       onKeyDown={handleEditKeyDown}
                       className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
@@ -429,8 +318,9 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               <input
                 ref={taxInputRef}
                 type="text"
+                inputMode="decimal"
                 value={editTaxValue}
-                onChange={(e) => setEditTaxValue(e.target.value)}
+                onChange={(e) => setEditTaxValue(formatNumericInput(e.target.value))}
                 onBlur={() => {
                   const val = parseCurrencyInput(editTaxValue);
                   // Empty or 0 = reset to auto
@@ -453,7 +343,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                 type="button"
                 onClick={() => {
                   setEditingTax("federal");
-                  setEditTaxValue(String(Math.round(federalTax)));
+                  setEditTaxValue(formatNumericInput(String(Math.round(federalTax))));
                 }}
                 className="text-right rounded px-2 py-1 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                 aria-label={`Edit federal tax, currently ${formatCurrency(federalTax)}/mo`}
@@ -485,8 +375,9 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               <input
                 ref={taxInputRef}
                 type="text"
+                inputMode="decimal"
                 value={editTaxValue}
-                onChange={(e) => setEditTaxValue(e.target.value)}
+                onChange={(e) => setEditTaxValue(formatNumericInput(e.target.value))}
                 onBlur={() => {
                   const val = parseCurrencyInput(editTaxValue);
                   if (!editTaxValue.trim() || val === 0) {
@@ -508,7 +399,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                 type="button"
                 onClick={() => {
                   setEditingTax("provincial");
-                  setEditTaxValue(String(Math.round(provincialStateTax)));
+                  setEditTaxValue(formatNumericInput(String(Math.round(provincialStateTax))));
                 }}
                 className="text-right rounded px-2 py-1 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                 aria-label={`Edit ${provStateLabel.toLowerCase()} tax, currently ${formatCurrency(provincialStateTax)}/mo`}
@@ -607,7 +498,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
                 onBlur={() => {
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
-                onKeyDown={(e) => handleNewKeyDown(e, "category")}
+                onKeyDown={(e) => handleNewKeyDown(e, "category", addItem)}
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New expense category"
               />
@@ -636,10 +527,11 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               <input
                 ref={newAmountRef}
                 type="text"
+                inputMode="decimal"
                 placeholder="$0"
                 value={newAmount}
-                onChange={(e) => setNewAmount(e.target.value)}
-                onKeyDown={(e) => handleNewKeyDown(e, "amount")}
+                onChange={(e) => setNewAmount(formatNumericInput(e.target.value))}
+                onKeyDown={(e) => handleNewKeyDown(e, "amount", addItem)}
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New expense amount"
               />
@@ -653,12 +545,7 @@ export default function ExpenseEntry({ items: controlledItems, onChange, investm
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setAddingNew(false);
-                  setNewCategory("");
-                  setNewAmount("");
-                  setShowNewSuggestions(false);
-                }}
+                onClick={resetNew}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/10"
                 aria-label="Cancel adding expense"
               >

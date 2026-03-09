@@ -210,7 +210,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
   const surplusInfo = useMemo(() => {
     const totals = computeTotals(state);
     const income = totals.monthlyAfterTaxIncome;
-    const expenses = totals.monthlyExpenses;
+    const expenses = totals.monthlyExpenses + totals.totalMortgagePayments + totals.totalDebtPayments;
     const contributions = totals.totalMonthlyContributions;
     const surplus = income - expenses - contributions;
     return { income, expenses, contributions, surplus };

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
+import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
+import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 
 export interface Property {
   id: string;
@@ -160,17 +162,7 @@ const MOCK_PROPERTIES: Property[] = [
   { id: "p1", name: "Home", value: 450000, mortgage: 280000 },
 ];
 
-function generateId(): string {
-  return `p${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
 // formatCurrency defined inside component via useCurrency()
-
-function parseCurrencyInput(value: string): number {
-  const cleaned = value.replace(/[^0-9.-]/g, "");
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
-}
 
 interface PropertyEntryProps {
   items?: Property[];
@@ -182,78 +174,19 @@ interface PropertyEntryProps {
 export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }: PropertyEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
-  const [properties, setProperties] = useState<Property[]>(items ?? MOCK_PROPERTIES);
-  const isExternalSync = useRef(false);
-  const didMount = useRef(false);
-  const syncDidMount = useRef(false);
-  const lastSentToParent = useRef<Property[] | null>(null);
-
-  // Sync with parent if controlled
-  useEffect(() => {
-    if (!syncDidMount.current) {
-      syncDidMount.current = true;
-      return;
-    }
-    // Skip echo-back: parent passing back the same items we just sent
-    if (items !== undefined && items !== lastSentToParent.current) {
-      isExternalSync.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setProperties(items);
-    }
-  }, [items]);
-
-  // Notify parent of internal changes via useEffect (not during render)
-  const onChangeRef = useRef(onChange);
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
-  useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
-    }
-    if (isExternalSync.current) {
-      isExternalSync.current = false;
-      return;
-    }
-    lastSentToParent.current = properties;
-    onChangeRef.current?.(properties);
-  }, [properties]);
+  const [properties, setProperties] = useControlledArray(items, MOCK_PROPERTIES, onChange);
 
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingField, setEditingField] = useState<"name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | "yearPurchased" | "appreciation" | null>(null);
-  const [editValue, setEditValue] = useState("");
-  const [addingNew, setAddingNew] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [newValue, setNewValue] = useState("");
+  type PropertyField = "name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | "yearPurchased" | "appreciation";
+  const edit = useEditState<PropertyField>(["name"]);
+  const { editingId, editingField, editValue, inputRef, startEdit, clearEdit, setEditValue, handleEditKeyDown } = edit;
+  const addNew = useAddNew();
+  const { addingNew, newCategory: newName, newAmount: newValue, newCategoryRef: newNameRef, newAmountRef: newValueRef, setAddingNew, setNewCategory: setNewName, setNewAmount: setNewValue, resetNew } = addNew;
   const [newMortgage, setNewMortgage] = useState("");
   const [newInterestRate, setNewInterestRate] = useState("");
   const [newMonthlyPayment, setNewMonthlyPayment] = useState("");
   const [newAmortization, setNewAmortization] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const newNameRef = useRef<HTMLInputElement>(null);
-  const newValueRef = useRef<HTMLInputElement>(null);
   const newMortgageRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (addingNew && newNameRef.current) {
-      newNameRef.current.focus();
-    }
-  }, [addingNew]);
-
-  useEffect(() => {
-    if (editingId && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [editingId, editingField]);
-
-  const startEdit = (id: string, field: "name" | "value" | "mortgage" | "interestRate" | "monthlyPayment" | "amortizationYears" | "yearPurchased" | "appreciation", currentValue: string) => {
-    setEditingId(id);
-    setEditingField(field);
-    setEditValue(currentValue);
-  };
 
   /** Recalculate monthly payment from mortgage factors */
   const recalcPayment = (p: Property): Property => {
@@ -305,29 +238,26 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
         })
       );
     }
-    setEditingId(null);
-    setEditingField(null);
-    setEditValue("");
-  };
-
-  const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      (e.target as HTMLElement).blur();
-    } else if (e.key === "Escape") {
-      setEditingId(null);
-      setEditingField(null);
-    }
+    clearEdit();
   };
 
   const deleteProperty = (id: string) => {
     setProperties((prev) => prev.filter((p) => p.id !== id));
   };
 
+  const resetPropertyNew = () => {
+    resetNew();
+    setNewMortgage("");
+    setNewInterestRate("");
+    setNewMonthlyPayment("");
+    setNewAmortization("");
+  };
+
   const addProperty = () => {
     if (!newName.trim()) return;
     const value = parseCurrencyInput(newValue);
     const mortgage = parseCurrencyInput(newMortgage);
-    const newProp: Property = { id: generateId(), name: newName.trim(), value, mortgage };
+    const newProp: Property = { id: generateId("p"), name: newName.trim(), value, mortgage };
     const rate = parseFloat(newInterestRate);
     if (!isNaN(rate)) newProp.interestRate = rate;
     const payment = parseCurrencyInput(newMonthlyPayment);
@@ -338,13 +268,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
     const defaultAp = getDefaultAppreciation(newName.trim());
     if (defaultAp !== undefined) newProp.appreciation = defaultAp;
     setProperties((prev) => [...prev, newProp]);
-    setNewName("");
-    setNewValue("");
-    setNewMortgage("");
-    setNewInterestRate("");
-    setNewMonthlyPayment("");
-    setNewAmortization("");
-    setAddingNew(false);
+    resetPropertyNew();
   };
 
   const handleNewKeyDown = (e: React.KeyboardEvent, field: string) => {
@@ -357,13 +281,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
         addProperty();
       }
     } else if (e.key === "Escape") {
-      setAddingNew(false);
-      setNewName("");
-      setNewValue("");
-      setNewMortgage("");
-      setNewInterestRate("");
-      setNewMonthlyPayment("");
-      setNewAmortization("");
+      resetPropertyNew();
     }
   };
 
@@ -472,8 +390,9 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                       <input
                         ref={inputRef}
                         type="text"
+                        inputMode="decimal"
                         value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
+                        onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
                         className="mt-0.5 w-full rounded-md border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
@@ -498,8 +417,9 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                       <input
                         ref={inputRef}
                         type="text"
+                        inputMode="decimal"
                         value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
+                        onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
                         className="mt-0.5 w-full rounded-md border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
@@ -554,8 +474,9 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           <input
                             ref={inputRef}
                             type="text"
+                            inputMode="decimal"
                             value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
+                            onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                             onBlur={commitEdit}
                             onKeyDown={handleEditKeyDown}
                             className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
@@ -583,8 +504,9 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           <input
                             ref={inputRef}
                             type="text"
+                            inputMode="decimal"
                             value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
+                            onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                             onBlur={commitEdit}
                             onKeyDown={handleEditKeyDown}
                             className="w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
@@ -618,8 +540,9 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           <input
                             ref={inputRef}
                             type="text"
+                            inputMode="decimal"
                             value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
+                            onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                             onBlur={commitEdit}
                             onKeyDown={handleEditKeyDown}
                             className="w-16 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
@@ -649,8 +572,9 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             <input
                               ref={inputRef}
                               type="text"
+                              inputMode="decimal"
                               value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
+                              onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                               onBlur={commitEdit}
                               onKeyDown={handleEditKeyDown}
                               className="w-16 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
@@ -684,8 +608,9 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             <input
                               ref={inputRef}
                               type="text"
+                              inputMode="decimal"
                               value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
+                              onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                               onBlur={commitEdit}
                               onKeyDown={handleEditKeyDown}
                               className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
@@ -840,9 +765,10 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
               <input
                 ref={newValueRef}
                 type="text"
+                inputMode="decimal"
                 placeholder="Value ($)"
                 value={newValue}
-                onChange={(e) => setNewValue(e.target.value)}
+                onChange={(e) => setNewValue(formatNumericInput(e.target.value))}
                 onKeyDown={(e) => handleNewKeyDown(e, "value")}
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New property value"
@@ -850,9 +776,10 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
               <input
                 ref={newMortgageRef}
                 type="text"
+                inputMode="decimal"
                 placeholder="Mortgage ($)"
                 value={newMortgage}
-                onChange={(e) => setNewMortgage(e.target.value)}
+                onChange={(e) => setNewMortgage(formatNumericInput(e.target.value))}
                 onKeyDown={(e) => handleNewKeyDown(e, "mortgage")}
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New property mortgage"
@@ -869,15 +796,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setAddingNew(false);
-                  setNewName("");
-                  setNewValue("");
-                  setNewMortgage("");
-                  setNewInterestRate("");
-                  setNewMonthlyPayment("");
-                  setNewAmortization("");
-                }}
+                onClick={resetPropertyNew}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/10"
                 aria-label="Cancel adding property"
               >

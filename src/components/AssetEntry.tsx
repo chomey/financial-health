@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
 import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { getTaxTreatment, type TaxTreatment } from "@/lib/withdrawal-tax";
+import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
+import { generateId, useEditState, useAddNew } from "@/lib/entry-hooks";
 
 export type RoiTaxTreatment = "capital-gains" | "income";
 
@@ -166,10 +168,6 @@ const MOCK_ASSETS: Asset[] = [
   { id: "a3", category: "Brokerage", amount: 18500 },
 ];
 
-function generateId(): string {
-  return `a${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
 /** Project an asset's value at year milestones using compound growth + contributions */
 function projectAssetValue(amount: number, annualRoi: number, monthlyContribution: number, years: number): number {
   const monthlyRate = annualRoi / 100 / 12;
@@ -181,12 +179,6 @@ function projectAssetValue(amount: number, annualRoi: number, monthlyContributio
 }
 
 // formatCurrency and formatCompact defined inside component via useCurrency()
-
-function parseCurrencyInput(value: string): number {
-  const cleaned = value.replace(/[^0-9.-]/g, "");
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
-}
 
 interface AssetEntryProps {
   items?: Asset[];
@@ -207,46 +199,13 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
     const next = typeof updater === "function" ? updater(assets) : updater;
     onChange?.(next);
   }, [assets, onChange]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingField, setEditingField] = useState<
-    "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent" | "employerMatchPct" | "employerMatchCap" | null
-  >(null);
-  const [editValue, setEditValue] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [addingNew, setAddingNew] = useState(false);
-  const [newCategory, setNewCategory] = useState("");
-  const [newAmount, setNewAmount] = useState("");
-  const [showNewSuggestions, setShowNewSuggestions] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const newCategoryRef = useRef<HTMLInputElement>(null);
-  const newAmountRef = useRef<HTMLInputElement>(null);
+
+  type AssetField = "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent" | "employerMatchPct" | "employerMatchCap";
+  const edit = useEditState<AssetField>(["category"]);
+  const { editingId, editingField, editValue, showSuggestions, inputRef, startEdit, clearEdit, setEditValue, setShowSuggestions, handleEditKeyDown } = edit;
+  const addNew = useAddNew();
+  const { addingNew, newCategory, newAmount, showNewSuggestions, newCategoryRef, newAmountRef, setAddingNew, setNewCategory, setNewAmount, setShowNewSuggestions, resetNew, handleNewKeyDown } = addNew;
   const suggestionsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (addingNew && newCategoryRef.current) {
-      newCategoryRef.current.focus();
-    }
-  }, [addingNew]);
-
-  useEffect(() => {
-    if (editingId && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [editingId, editingField]);
-
-  const startEdit = (
-    id: string,
-    field: "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent" | "employerMatchPct" | "employerMatchCap",
-    currentValue: string
-  ) => {
-    setEditingId(id);
-    setEditingField(field);
-    setEditValue(currentValue);
-    if (field === "category") {
-      setShowSuggestions(true);
-    }
-  };
 
   const commitEdit = (overrideValue?: string) => {
     const value = overrideValue ?? editValue;
@@ -283,20 +242,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
         })
       );
     }
-    setEditingId(null);
-    setEditingField(null);
-    setEditValue("");
-    setShowSuggestions(false);
-  };
-
-  const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      (e.target as HTMLElement).blur();
-    } else if (e.key === "Escape") {
-      setEditingId(null);
-      setEditingField(null);
-      setShowSuggestions(false);
-    }
+    clearEdit();
   };
 
   const deleteAsset = (id: string) => {
@@ -317,31 +263,10 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
       const isFirst = prev.length === 0;
       return [
         ...prev,
-        { id: generateId(), category: newCategory.trim(), amount, surplusTarget: isFirst ? true : undefined },
+        { id: generateId("a"), category: newCategory.trim(), amount, surplusTarget: isFirst ? true : undefined },
       ];
     });
-    setNewCategory("");
-    setNewAmount("");
-    setAddingNew(false);
-    setShowNewSuggestions(false);
-  };
-
-  const handleNewKeyDown = (
-    e: React.KeyboardEvent,
-    field: "category" | "amount"
-  ) => {
-    if (e.key === "Enter") {
-      if (field === "category" && newAmountRef.current) {
-        newAmountRef.current.focus();
-      } else {
-        addAsset();
-      }
-    } else if (e.key === "Escape") {
-      setAddingNew(false);
-      setNewCategory("");
-      setNewAmount("");
-      setShowNewSuggestions(false);
-    }
+    resetNew();
   };
 
   const filteredSuggestions = (query: string) => {
@@ -498,8 +423,9 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       <input
                         ref={inputRef}
                         type="text"
+                        inputMode="decimal"
                         value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
+                        onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={() => commitEdit()}
                         onKeyDown={handleEditKeyDown}
                         className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
@@ -597,8 +523,9 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   <input
                     ref={inputRef}
                     type="text"
+                    inputMode="decimal"
                     value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
+                    onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
@@ -686,8 +613,9 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   <input
                     ref={inputRef}
                     type="text"
+                    inputMode="decimal"
                     value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
+                    onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
@@ -731,8 +659,9 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         <input
                           ref={inputRef}
                           type="text"
+                          inputMode="decimal"
                           value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
+                          onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                           onBlur={() => commitEdit()}
                           onKeyDown={handleEditKeyDown}
                           className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
@@ -759,8 +688,9 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         <input
                           ref={inputRef}
                           type="text"
+                          inputMode="decimal"
                           value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
+                          onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                           onBlur={() => commitEdit()}
                           onKeyDown={handleEditKeyDown}
                           className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
@@ -801,8 +731,9 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     <input
                       ref={inputRef}
                       type="text"
+                      inputMode="decimal"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                       onBlur={() => commitEdit()}
                       onKeyDown={handleEditKeyDown}
                       className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
@@ -913,7 +844,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 onBlur={() => {
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
-                onKeyDown={(e) => handleNewKeyDown(e, "category")}
+                onKeyDown={(e) => handleNewKeyDown(e, "category", addAsset)}
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New asset category"
               />
@@ -950,10 +881,11 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
               <input
                 ref={newAmountRef}
                 type="text"
+                inputMode="decimal"
                 placeholder="$0"
                 value={newAmount}
-                onChange={(e) => setNewAmount(e.target.value)}
-                onKeyDown={(e) => handleNewKeyDown(e, "amount")}
+                onChange={(e) => setNewAmount(formatNumericInput(e.target.value))}
+                onKeyDown={(e) => handleNewKeyDown(e, "amount", addAsset)}
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New asset amount"
               />
@@ -967,12 +899,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setAddingNew(false);
-                  setNewCategory("");
-                  setNewAmount("");
-                  setShowNewSuggestions(false);
-                }}
+                onClick={resetNew}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
                 aria-label="Cancel adding asset"
               >

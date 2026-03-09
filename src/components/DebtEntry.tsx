@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { calculateDebtPayoff, formatPayoffCurrency } from "@/lib/debt-payoff";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import { useCurrency } from "@/lib/CurrencyContext";
 import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
+import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
+import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 
 export interface Debt {
   id: string;
@@ -84,16 +86,6 @@ const MOCK_DEBTS: Debt[] = [
   { id: "d1", category: "Car Loan", amount: 15000 },
 ];
 
-function generateId(): string {
-  return `d${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-function parseCurrencyInput(value: string): number {
-  const cleaned = value.replace(/[^0-9.-]/g, "");
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
-}
-
 interface DebtEntryProps {
   items?: Debt[];
   onChange?: (items: Debt[]) => void;
@@ -104,84 +96,14 @@ interface DebtEntryProps {
 export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: DebtEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
-  const [debts, setDebts] = useState<Debt[]>(items ?? MOCK_DEBTS);
-  const isExternalSync = useRef(false);
-  const didMount = useRef(false);
-  const syncDidMount = useRef(false);
-  const lastSentToParent = useRef<Debt[] | null>(null);
+  const [debts, setDebts] = useControlledArray(items, MOCK_DEBTS, onChange);
 
-  // Sync with parent if controlled — intentional external-system sync
-  // Skip initial mount since useState already handles the initial value
-  useEffect(() => {
-    if (!syncDidMount.current) {
-      syncDidMount.current = true;
-      return;
-    }
-    // Skip echo-back: parent passing back the same items we just sent
-    if (items !== undefined && items !== lastSentToParent.current) {
-      isExternalSync.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDebts(items);
-    }
-  }, [items]);
-
-  // Notify parent of internal changes via useEffect (not during render)
-  const onChangeRef = useRef(onChange);
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
-  useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
-    }
-    if (isExternalSync.current) {
-      isExternalSync.current = false;
-      return;
-    }
-    lastSentToParent.current = debts;
-    onChangeRef.current?.(debts);
-  }, [debts]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingField, setEditingField] = useState<
-    "category" | "amount" | "interestRate" | "monthlyPayment" | null
-  >(null);
-  const [editValue, setEditValue] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [addingNew, setAddingNew] = useState(false);
-  const [newCategory, setNewCategory] = useState("");
-  const [newAmount, setNewAmount] = useState("");
-  const [showNewSuggestions, setShowNewSuggestions] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const newCategoryRef = useRef<HTMLInputElement>(null);
-  const newAmountRef = useRef<HTMLInputElement>(null);
+  type DebtField = "category" | "amount" | "interestRate" | "monthlyPayment";
+  const edit = useEditState<DebtField>(["category"]);
+  const { editingId, editingField, editValue, showSuggestions, inputRef, startEdit, clearEdit, setEditValue, setShowSuggestions, handleEditKeyDown } = edit;
+  const addNew = useAddNew();
+  const { addingNew, newCategory, newAmount, showNewSuggestions, newCategoryRef, newAmountRef, setAddingNew, setNewCategory, setNewAmount, setShowNewSuggestions, resetNew, handleNewKeyDown } = addNew;
   const suggestionsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (addingNew && newCategoryRef.current) {
-      newCategoryRef.current.focus();
-    }
-  }, [addingNew]);
-
-  useEffect(() => {
-    if (editingId && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [editingId, editingField]);
-
-  const startEdit = (
-    id: string,
-    field: "category" | "amount" | "interestRate" | "monthlyPayment",
-    currentValue: string
-  ) => {
-    setEditingId(id);
-    setEditingField(field);
-    setEditValue(currentValue);
-    if (field === "category") {
-      setShowSuggestions(true);
-    }
-  };
 
   const commitEdit = (overrideValue?: string) => {
     const value = overrideValue ?? editValue;
@@ -204,20 +126,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
         })
       );
     }
-    setEditingId(null);
-    setEditingField(null);
-    setEditValue("");
-    setShowSuggestions(false);
-  };
-
-  const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      (e.target as HTMLElement).blur();
-    } else if (e.key === "Escape") {
-      setEditingId(null);
-      setEditingField(null);
-      setShowSuggestions(false);
-    }
+    clearEdit();
   };
 
   const deleteDebt = (id: string) => {
@@ -229,30 +138,9 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
     const amount = parseCurrencyInput(newAmount);
     setDebts((prev) => [
       ...prev,
-      { id: generateId(), category: newCategory.trim(), amount },
+      { id: generateId("d"), category: newCategory.trim(), amount },
     ]);
-    setNewCategory("");
-    setNewAmount("");
-    setAddingNew(false);
-    setShowNewSuggestions(false);
-  };
-
-  const handleNewKeyDown = (
-    e: React.KeyboardEvent,
-    field: "category" | "amount"
-  ) => {
-    if (e.key === "Enter") {
-      if (field === "category" && newAmountRef.current) {
-        newAmountRef.current.focus();
-      } else {
-        addDebt();
-      }
-    } else if (e.key === "Escape") {
-      setAddingNew(false);
-      setNewCategory("");
-      setNewAmount("");
-      setShowNewSuggestions(false);
-    }
+    resetNew();
   };
 
   const filteredSuggestions = (query: string) => {
@@ -392,8 +280,9 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     <input
                       ref={inputRef}
                       type="text"
+                      inputMode="decimal"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                       onBlur={() => commitEdit()}
                       onKeyDown={handleEditKeyDown}
                       className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
@@ -443,8 +332,9 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   <input
                     ref={inputRef}
                     type="text"
+                    inputMode="decimal"
                     value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
+                    onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
@@ -476,8 +366,9 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   <input
                     ref={inputRef}
                     type="text"
+                    inputMode="decimal"
                     value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
+                    onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
                     className="w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
@@ -555,7 +446,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                 onBlur={() => {
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
-                onKeyDown={(e) => handleNewKeyDown(e, "category")}
+                onKeyDown={(e) => handleNewKeyDown(e, "category", addDebt)}
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New debt category"
               />
@@ -592,10 +483,11 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
               <input
                 ref={newAmountRef}
                 type="text"
+                inputMode="decimal"
                 placeholder="$0"
                 value={newAmount}
-                onChange={(e) => setNewAmount(e.target.value)}
-                onKeyDown={(e) => handleNewKeyDown(e, "amount")}
+                onChange={(e) => setNewAmount(formatNumericInput(e.target.value))}
+                onKeyDown={(e) => handleNewKeyDown(e, "amount", addDebt)}
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New debt amount"
               />
@@ -609,12 +501,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setAddingNew(false);
-                  setNewCategory("");
-                  setNewAmount("");
-                  setShowNewSuggestions(false);
-                }}
+                onClick={resetNew}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
                 aria-label="Cancel adding debt"
               >

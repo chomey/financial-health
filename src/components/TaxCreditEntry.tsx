@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import type { TaxCredit } from "@/lib/tax-credits";
 import {
   type FilingStatus,
@@ -11,6 +11,8 @@ import {
   getIncomeLimitDescription,
 } from "@/lib/tax-credits";
 import { formatCurrency as canonicalFormatCurrency } from "@/lib/currency";
+import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
+import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 
 export type { TaxCredit } from "@/lib/tax-credits";
 
@@ -21,16 +23,6 @@ interface TaxCreditEntryProps {
   filingStatus: FilingStatus;
   annualIncome: number;
   taxYear?: number;
-}
-
-function generateId(): string {
-  return `tc${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-function parseCurrencyInput(value: string): number {
-  const cleaned = value.replace(/[^0-9.-]/g, "");
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
 }
 
 function formatCurrency(value: number): string {
@@ -118,68 +110,14 @@ export default function TaxCreditEntry({
   annualIncome,
   taxYear = new Date().getFullYear(),
 }: TaxCreditEntryProps) {
-  const [credits, setCredits] = useState<TaxCredit[]>(items ?? []);
-  const isExternalSync = useRef(false);
-  const didMount = useRef(false);
-  const syncDidMount = useRef(false);
-  const lastSentToParent = useRef<TaxCredit[] | null>(null);
+  const [credits, setCredits] = useControlledArray(items, [], onChange);
 
-  // Sync with parent
-  useEffect(() => {
-    if (!syncDidMount.current) {
-      syncDidMount.current = true;
-      return;
-    }
-    // Skip echo-back: parent passing back the same items we just sent
-    if (items !== undefined && items !== lastSentToParent.current) {
-      isExternalSync.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCredits(items);
-    }
-  }, [items]);
-
-  const onChangeRef = useRef(onChange);
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
-  useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
-    }
-    if (isExternalSync.current) {
-      isExternalSync.current = false;
-      return;
-    }
-    lastSentToParent.current = credits;
-    onChangeRef.current?.(credits);
-  }, [credits]);
-
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingField, setEditingField] = useState<"category" | "amount" | null>(null);
-  const [editValue, setEditValue] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [addingNew, setAddingNew] = useState(false);
-  const [newCategory, setNewCategory] = useState("");
-  const [newAmount, setNewAmount] = useState("");
-  const [showNewSuggestions, setShowNewSuggestions] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const newCategoryRef = useRef<HTMLInputElement>(null);
-  const newAmountRef = useRef<HTMLInputElement>(null);
+  type TaxCreditField = "category" | "amount";
+  const edit = useEditState<TaxCreditField>(["category"]);
+  const { editingId, editingField, editValue, showSuggestions, inputRef, startEdit, clearEdit, setEditValue, setShowSuggestions, handleEditKeyDown } = edit;
+  const addNew = useAddNew();
+  const { addingNew, newCategory, newAmount, showNewSuggestions, newCategoryRef, newAmountRef, setAddingNew, setNewCategory, setNewAmount, setShowNewSuggestions, resetNew, handleNewKeyDown } = addNew;
   const [showInfoTooltip, setShowInfoTooltip] = useState(false);
-
-  useEffect(() => {
-    if (addingNew && newCategoryRef.current) {
-      newCategoryRef.current.focus();
-    }
-  }, [addingNew]);
-
-  useEffect(() => {
-    if (editingId && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [editingId, editingField]);
 
   const categories = getCreditCategoriesForFilingStatus(country, filingStatus, taxYear);
 
@@ -188,13 +126,6 @@ export default function TaxCreditEntry({
     return categories.filter((c) =>
       c.name.toLowerCase().includes(query.toLowerCase()),
     );
-  };
-
-  const startEdit = (id: string, field: "category" | "amount", currentValue: string) => {
-    setEditingId(id);
-    setEditingField(field);
-    setEditValue(currentValue);
-    if (field === "category") setShowSuggestions(true);
   };
 
   const commitEdit = (overrideValue?: string) => {
@@ -224,19 +155,7 @@ export default function TaxCreditEntry({
         }),
       );
     }
-    setEditingId(null);
-    setEditingField(null);
-    setEditValue("");
-    setShowSuggestions(false);
-  };
-
-  const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") (e.target as HTMLElement).blur();
-    else if (e.key === "Escape") {
-      setEditingId(null);
-      setEditingField(null);
-      setShowSuggestions(false);
-    }
+    clearEdit();
   };
 
   const deleteCredit = (id: string) => {
@@ -253,31 +172,13 @@ export default function TaxCreditEntry({
     setCredits((prev) => [
       ...prev,
       {
-        id: generateId(),
+        id: generateId("tc"),
         category: newCategory.trim(),
         annualAmount: amount,
         type: catDef?.type ?? "non-refundable",
       },
     ]);
-    setNewCategory("");
-    setNewAmount("");
-    setAddingNew(false);
-    setShowNewSuggestions(false);
-  };
-
-  const handleNewKeyDown = (e: React.KeyboardEvent, field: "category" | "amount") => {
-    if (e.key === "Enter") {
-      if (field === "category" && newAmountRef.current) {
-        newAmountRef.current.focus();
-      } else {
-        addCredit();
-      }
-    } else if (e.key === "Escape") {
-      setAddingNew(false);
-      setNewCategory("");
-      setNewAmount("");
-      setShowNewSuggestions(false);
-    }
+    resetNew();
   };
 
   const total = credits.reduce((sum, tc) => sum + tc.annualAmount, 0);
@@ -440,8 +341,9 @@ export default function TaxCreditEntry({
                       <input
                         ref={inputRef}
                         type="text"
+                        inputMode="decimal"
                         value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
+                        onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={() => commitEdit()}
                         onKeyDown={handleEditKeyDown}
                         className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
@@ -519,7 +421,7 @@ export default function TaxCreditEntry({
                 }}
                 onFocus={() => setShowNewSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowNewSuggestions(false), 150)}
-                onKeyDown={(e) => handleNewKeyDown(e, "category")}
+                onKeyDown={(e) => handleNewKeyDown(e, "category", addCredit)}
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New credit category"
               />
@@ -590,10 +492,11 @@ export default function TaxCreditEntry({
                 <input
                   ref={newAmountRef}
                   type="text"
+                  inputMode="decimal"
                   placeholder="$/year"
                   value={newAmount}
-                  onChange={(e) => setNewAmount(e.target.value)}
-                  onKeyDown={(e) => handleNewKeyDown(e, "amount")}
+                  onChange={(e) => setNewAmount(formatNumericInput(e.target.value))}
+                  onKeyDown={(e) => handleNewKeyDown(e, "amount", addCredit)}
                   className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                   aria-label="New credit annual amount"
                 />
@@ -608,12 +511,7 @@ export default function TaxCreditEntry({
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setAddingNew(false);
-                  setNewCategory("");
-                  setNewAmount("");
-                  setShowNewSuggestions(false);
-                }}
+                onClick={resetNew}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
                 aria-label="Cancel adding credit"
               >

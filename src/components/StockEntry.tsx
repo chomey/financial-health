@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
 import { getTickerName, resolveTickerName } from "@/lib/ticker-names";
+import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
+import { generateId, useEditState, useAddNew } from "@/lib/entry-hooks";
 
 export interface StockHolding {
   id: string;
@@ -73,16 +75,6 @@ export function getPortfolioSummary(stocks: StockHolding[]): PortfolioSummary {
   const totalGainLoss = totalCostBasis > 0 ? totalValue - totalCostBasis : 0;
   const overallReturnPct = totalCostBasis > 0 ? (totalGainLoss / totalCostBasis) * 100 : 0;
   return { totalValue, totalCostBasis, totalGainLoss, overallReturnPct };
-}
-
-function generateId(): string {
-  return `s${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-function parseCurrencyInput(value: string): number {
-  const cleaned = value.replace(/[^0-9.-]/g, "");
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
 }
 
 interface StockEntryProps {
@@ -162,19 +154,13 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   }, [stocks]);
 
   const [sortBy, setSortBy] = useState<"alpha" | "position" | "returnPct" | "returnAbs">("alpha");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingField, setEditingField] = useState<
-    "ticker" | "shares" | "costBasis" | "purchaseDate" | null
-  >(null);
-  const [editValue, setEditValue] = useState("");
-  const [addingNew, setAddingNew] = useState(false);
-  const [newTicker, setNewTicker] = useState("");
-  const [newShares, setNewShares] = useState("");
+  type StockField = "ticker" | "shares" | "costBasis" | "purchaseDate";
+  const edit = useEditState<StockField>(["ticker", "purchaseDate"]);
+  const { editingId, editingField, editValue, inputRef, startEdit, clearEdit, setEditValue, handleEditKeyDown } = edit;
+  const addNew = useAddNew();
+  const { addingNew, newCategory: newTicker, newAmount: newShares, newCategoryRef: newTickerRef, newAmountRef: newSharesRef, setAddingNew, setNewCategory: setNewTicker, setNewAmount: setNewShares, resetNew, handleNewKeyDown } = addNew;
   const [fetchingPrices, setFetchingPrices] = useState<Set<string>>(new Set());
   const [resolvedNames, setResolvedNames] = useState<Record<string, string>>({});
-  const inputRef = useRef<HTMLInputElement>(null);
-  const newTickerRef = useRef<HTMLInputElement>(null);
-  const newSharesRef = useRef<HTMLInputElement>(null);
 
   // Resolve ticker names (static first, then async fallback)
   useEffect(() => {
@@ -201,19 +187,6 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stocks.map((s) => s.ticker).join(",")]);
-
-  useEffect(() => {
-    if (addingNew && newTickerRef.current) {
-      newTickerRef.current.focus();
-    }
-  }, [addingNew]);
-
-  useEffect(() => {
-    if (editingId && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [editingId, editingField]);
 
   // Fetch price for a single stock
   const fetchPrice = useCallback(async (stockId: string, ticker: string) => {
@@ -278,16 +251,6 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
     }
   }, [stocks, fetchPrice]);
 
-  const startEdit = (
-    id: string,
-    field: "ticker" | "shares" | "costBasis" | "purchaseDate",
-    currentValue: string
-  ) => {
-    setEditingId(id);
-    setEditingField(field);
-    setEditValue(currentValue);
-  };
-
   const commitEdit = () => {
     if (editingId && editingField) {
       setStocks((prev) =>
@@ -316,18 +279,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
         fetchPrice(editingId, editValue.trim());
       }
     }
-    setEditingId(null);
-    setEditingField(null);
-    setEditValue("");
-  };
-
-  const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      (e.target as HTMLElement).blur();
-    } else if (e.key === "Escape") {
-      setEditingId(null);
-      setEditingField(null);
-    }
+    clearEdit();
   };
 
   const deleteStock = (id: string) => {
@@ -337,7 +289,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
   const addStock = () => {
     if (!newTicker.trim()) return;
     const shares = parseCurrencyInput(newShares) || 0;
-    const id = generateId();
+    const id = generateId("s");
     const stock: StockHolding = {
       id,
       ticker: newTicker.toUpperCase().trim(),
@@ -345,26 +297,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
     };
     setStocks((prev) => [...prev, stock]);
     fetchPrice(id, newTicker.trim());
-    setNewTicker("");
-    setNewShares("");
-    setAddingNew(false);
-  };
-
-  const handleNewKeyDown = (
-    e: React.KeyboardEvent,
-    field: "ticker" | "shares"
-  ) => {
-    if (e.key === "Enter") {
-      if (field === "ticker" && newSharesRef.current) {
-        newSharesRef.current.focus();
-      } else {
-        addStock();
-      }
-    } else if (e.key === "Escape") {
-      setAddingNew(false);
-      setNewTicker("");
-      setNewShares("");
-    }
+    resetNew();
   };
 
   const total = stocks.reduce((sum, s) => sum + getStockValue(s), 0);
@@ -532,8 +465,9 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                       <input
                         ref={inputRef}
                         type="text"
+                        inputMode="decimal"
                         value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
+                        onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
                         className="w-20 rounded-md border border-violet-400/40 bg-slate-800 px-2 py-1 text-right text-sm text-slate-200 outline-none ring-2 ring-violet-400/20 transition-all duration-200"
@@ -579,8 +513,9 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                     <input
                       ref={inputRef}
                       type="text"
+                      inputMode="decimal"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                       onBlur={commitEdit}
                       onKeyDown={handleEditKeyDown}
                       className="w-24 rounded border border-violet-400/40 bg-slate-800 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-violet-400/20"
@@ -694,17 +629,18 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
               placeholder="Ticker (e.g. AAPL)"
               value={newTicker}
               onChange={(e) => setNewTicker(e.target.value.toUpperCase())}
-              onKeyDown={(e) => handleNewKeyDown(e, "ticker")}
+              onKeyDown={(e) => handleNewKeyDown(e, "category", addStock)}
               className="w-full rounded-md border border-violet-400/40 bg-slate-800 px-3 py-2 text-base font-mono uppercase text-slate-200 outline-none ring-2 ring-violet-400/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
               aria-label="New stock ticker"
             />
             <input
               ref={newSharesRef}
               type="text"
+              inputMode="decimal"
               placeholder="Shares"
               value={newShares}
-              onChange={(e) => setNewShares(e.target.value)}
-              onKeyDown={(e) => handleNewKeyDown(e, "shares")}
+              onChange={(e) => setNewShares(formatNumericInput(e.target.value))}
+              onKeyDown={(e) => handleNewKeyDown(e, "amount", addStock)}
               className="w-full rounded-md border border-violet-400/40 bg-slate-800 px-3 py-2 text-right text-base text-slate-200 outline-none ring-2 ring-violet-400/20 transition-all duration-200 sm:w-20 sm:px-2 sm:py-1 sm:text-sm"
               aria-label="Number of shares"
             />
@@ -719,11 +655,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setAddingNew(false);
-                  setNewTicker("");
-                  setNewShares("");
-                }}
+                onClick={resetNew}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
                 aria-label="Cancel adding stock"
               >
