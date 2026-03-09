@@ -38,6 +38,11 @@ const INSIGHT_TYPE_SOURCES: Record<InsightType, string[]> = {
   "tax-credits-unclaimed": ["section-income"],
   "tax-credits-refundable": ["section-income"],
   "tax-credits-ineligible": ["section-income"],
+  "au-super": ["section-assets", "section-income"],
+  "au-hecs-help": ["section-debts", "section-income"],
+  "au-fhss": ["section-assets"],
+  "au-franking": ["section-income"],
+  "au-mls": ["section-income", "section-expenses"],
 };
 
 function InsightRow({

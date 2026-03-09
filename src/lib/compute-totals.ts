@@ -8,8 +8,8 @@ import type { SupportedCurrency } from "@/lib/currency";
 import { getTaxTreatment } from "@/lib/withdrawal-tax";
 import { computeTax } from "@/lib/tax-engine";
 import type { TaxExplainerDetails, TaxBracketSegment } from "@/components/DataFlowArrows";
-import { getCanadianBrackets, getUSBrackets, getUSCapitalGainsBrackets, calculateCanadianCapitalGainsInclusion, type BracketTable } from "@/lib/tax-tables";
-import { CA_PROVINCES, US_STATES } from "@/components/CountryJurisdictionSelector";
+import { getCanadianBrackets, getUSBrackets, getAUBrackets, getUSCapitalGainsBrackets, calculateCanadianCapitalGainsInclusion, type BracketTable } from "@/lib/tax-tables";
+import { CA_PROVINCES, US_STATES, AU_STATES_TERRITORIES } from "@/components/CountryJurisdictionSelector";
 
 export interface InvestmentIncomeAccount {
   label: string;
@@ -212,9 +212,9 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
 
   // Get jurisdiction label
-  const jurisdictions = country === "CA" ? CA_PROVINCES : US_STATES;
+  const jurisdictions = country === "CA" ? CA_PROVINCES : country === "AU" ? AU_STATES_TERRITORIES : US_STATES;
   const jurisdictionLabel = jurisdictions.find((j) => j.code === jurisdiction)?.name ?? jurisdiction;
-  const jurisdictionType = country === "CA" ? "Provincial" as const : "State" as const;
+  const jurisdictionType = country === "CA" ? "Provincial" as const : country === "AU" ? "State" as const : "State" as const;
 
   // Zero income: return details with empty bracket amounts so the explainer
   // can still show the jurisdiction's tax bracket structure for reference
@@ -233,6 +233,16 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
       }));
       federalBPA = federal.basicPersonalAmount;
       provincialBPA = provincial.basicPersonalAmount;
+    } else if (country === "AU") {
+      const { federal, state: stateTable } = getAUBrackets(jurisdiction, taxYear);
+      referenceBrackets = federal.brackets.map((b) => ({
+        min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
+      }));
+      provincialReferenceBrackets = stateTable.brackets.map((b) => ({
+        min: b.min, max: b.max, rate: b.rate, amountInBracket: 0, taxInBracket: 0,
+      }));
+      federalBPA = federal.basicPersonalAmount;
+      provincialBPA = stateTable.basicPersonalAmount;
     } else {
       const { federal, state: stateTable } = getUSBrackets(jurisdiction, taxYear);
       referenceBrackets = federal.brackets.map((b) => ({
@@ -280,6 +290,12 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
     provincialBrackets = computeBracketSegments(taxableIncome, provincial);
     federalBPA = federal.basicPersonalAmount;
     provincialBPA = provincial.basicPersonalAmount;
+  } else if (country === "AU") {
+    const { federal, state: stateTable } = getAUBrackets(jurisdiction, taxYear);
+    brackets = computeBracketSegments(grossAnnualIncome, federal);
+    provincialBrackets = computeBracketSegments(0, stateTable); // No state income tax in AU
+    federalBPA = federal.basicPersonalAmount;
+    provincialBPA = stateTable.basicPersonalAmount;
   } else {
     const { federal, state: stateTable } = getUSBrackets(jurisdiction, taxYear);
     if (capGainsTotal > 0 && capGainsTotal >= grossAnnualIncome * 0.99) {

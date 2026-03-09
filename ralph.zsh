@@ -312,7 +312,7 @@ START_TIME=$(date +%s)
 START_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
 print "${BLUE}╔══════════════════════════════════════╗${NC}"
-print "${BLUE}║       🚌 Ralph Loop v2.0 🚌          ║${NC}"
+print "${BLUE}║     🚌 Ralph Loop v3.0 (worktree) 🚌  ║${NC}"
 print "${BLUE}║  \"I'm helping!\" - Ralph Wiggum       ║${NC}"
 print "${BLUE}╚══════════════════════════════════════╝${NC}"
 print ""
@@ -412,7 +412,20 @@ case "$confirm" in
     ;;
 esac
 
-# Run Claude for each task
+# Worktree base directory (sibling to the repo)
+WORKTREE_BASE="${SCRIPT_DIR}/.worktrees"
+MAIN_BRANCH=$(git -C "$SCRIPT_DIR" rev-parse --abbrev-ref HEAD)
+
+# cleanup_worktree — removes a worktree and its branch
+cleanup_worktree() {
+  local wt_path="$1" branch_name="$2"
+  if [[ -d "$wt_path" ]]; then
+    git -C "$SCRIPT_DIR" worktree remove --force "$wt_path" 2>/dev/null || rm -rf "$wt_path"
+  fi
+  git -C "$SCRIPT_DIR" branch -D "$branch_name" 2>/dev/null || true
+}
+
+# Run Claude for each task (in isolated worktrees)
 for ((i = 1; i <= TASK_COUNT; i++)); do
   # Bail out if interrupted between iterations
   [[ $INTERRUPTED -eq 1 ]] && { print_summary; exit 130; }
@@ -429,6 +442,11 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   task_title=$(extract_task_title "$next_task")
   task_tag=$(extract_agent_tag "$next_task")
 
+  # Extract task number for branch naming
+  local task_num
+  task_num=$(echo "$next_task" | grep -oE 'Task [0-9]+' | grep -oE '[0-9]+')
+  task_num=${task_num:-$i}
+
   print ""
   print "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
   print "${YELLOW}  [${i}/${TASK_COUNT}]  ${task_title}${NC}"
@@ -436,8 +454,20 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   print "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
   print ""
 
-  # Build the prompt from PROMPT.md
-  prompt=$(cat "$PROMPT_FILE")
+  # ─── Worktree setup ──────────────────────────────────────────────────────
+  local branch_name="ralph/task-${task_num}"
+  local wt_path="${WORKTREE_BASE}/task-${task_num}"
+
+  # Clean up any leftover worktree from a previous failed run
+  cleanup_worktree "$wt_path" "$branch_name"
+
+  mkdir -p "$WORKTREE_BASE"
+  print "  ${DIM}▸ Creating worktree: ${wt_path}${NC}"
+  git -C "$SCRIPT_DIR" worktree add -b "$branch_name" "$wt_path" "$MAIN_BRANCH" 2>/dev/null
+
+  # Build the prompt from PROMPT.md (read from worktree copy)
+  local wt_prompt_file="${wt_path}/PROMPT.md"
+  prompt=$(cat "$wt_prompt_file")
 
   # Pick model: Opus for tasks needing deep reasoning, Sonnet for everything else
   if echo "$next_task" | grep -qiE '\[OPUS\]|\[MATH\]'; then
@@ -451,13 +481,14 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   fi
   print ""
 
-  # Run Claude with the prompt, passing project context via CLAUDE.md
+  # Run Claude inside the worktree
   local claude_exit=0
-  claude --print --dangerously-skip-permissions --model "$model" "$prompt" || claude_exit=$?
+  (cd "$wt_path" && claude --print --dangerously-skip-permissions --model "$model" "$prompt") || claude_exit=$?
 
-  # If interrupted (Ctrl+C), exit immediately — don't retry
+  # If interrupted (Ctrl+C), clean up worktree and exit
   if [[ $INTERRUPTED -eq 1 || $claude_exit -eq 130 ]]; then
     INTERRUPTED=1
+    cleanup_worktree "$wt_path" "$branch_name"
     ITER_TIMES+=($(($(date +%s) - ITER_START)))
     ITER_MODELS+=("$model")
     ITER_TAGS+=("$task_tag")
@@ -474,9 +505,10 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
     # Retry once for transient failures
     print "${YELLOW}  Retrying in 5 seconds...${NC}"
     sleep 5
-    claude --print --dangerously-skip-permissions --model "$model" "$prompt" || {
+    (cd "$wt_path" && claude --print --dangerously-skip-permissions --model "$model" "$prompt") || {
       # Check again for interrupt during retry
       if [[ $INTERRUPTED -eq 1 ]]; then
+        cleanup_worktree "$wt_path" "$branch_name"
         print_summary
         exit 130
       fi
@@ -486,17 +518,20 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
       ITER_MODELS+=("$model")
       ITER_TAGS+=("$task_tag")
       ITER_TITLES+=("${task_title} ${RED}(FAILED)${NC}")
+      cleanup_worktree "$wt_path" "$branch_name"
       print_summary
       exit 1
     }
   fi
 
-  # Detect stuck task: if the same task is still unchecked, warn
-  local after_completed
-  after_completed=$(grep -c '^\- \[x\]' "$TASKS_FILE" 2>/dev/null || true)
-  after_completed=${after_completed:-0}
+  # ─── Merge worktree back to main branch ────────────────────────────────
+  # Check if the worktree branch has any commits beyond main
+  local wt_tasks_file="${wt_path}/TASKS.md"
+  local wt_after_completed
+  wt_after_completed=$(grep -c '^\- \[x\]' "$wt_tasks_file" 2>/dev/null || true)
+  wt_after_completed=${wt_after_completed:-0}
 
-  if [[ "$after_completed" -le "$before_completed" ]]; then
+  if [[ "$wt_after_completed" -le "$before_completed" ]]; then
     print ""
     print "${RED}  ⚠ Warning: Task may not have been marked complete!${NC}"
     print "${RED}    '${task_title}' is still unchecked in TASKS.md${NC}"
@@ -505,6 +540,37 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   else
     TASKS_COMPLETED_THIS_RUN=$((TASKS_COMPLETED_THIS_RUN + 1))
   fi
+
+  # Merge the worktree branch into main
+  local has_new_commits
+  has_new_commits=$(git -C "$SCRIPT_DIR" log "${MAIN_BRANCH}..${branch_name}" --oneline 2>/dev/null | head -1)
+
+  if [[ -n "$has_new_commits" ]]; then
+    print ""
+    print "  ${DIM}▸ Merging ${branch_name} → ${MAIN_BRANCH}${NC}"
+    local merge_exit=0
+    git -C "$SCRIPT_DIR" merge "$branch_name" --no-edit || merge_exit=$?
+
+    if [[ $merge_exit -ne 0 ]]; then
+      print "${RED}  ✗ Merge conflict! Aborting merge. Worktree preserved at: ${wt_path}${NC}"
+      print "${YELLOW}    Resolve manually: cd ${SCRIPT_DIR} && git merge ${branch_name}${NC}"
+      git -C "$SCRIPT_DIR" merge --abort 2>/dev/null || true
+      # Don't clean up worktree so user can inspect
+      TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
+      ITER_TIMES+=($(($(date +%s) - ITER_START)))
+      ITER_MODELS+=("$model")
+      ITER_TAGS+=("$task_tag")
+      ITER_TITLES+=("${task_title} ${RED}(merge conflict)${NC}")
+      print_summary
+      exit 1
+    fi
+    print "  ${GREEN}▸ Merged successfully${NC}"
+  else
+    print "  ${DIM}▸ No new commits on ${branch_name}, skipping merge${NC}"
+  fi
+
+  # Clean up worktree
+  cleanup_worktree "$wt_path" "$branch_name"
 
   # Auto-archive if files have grown too large
   archive_progress
@@ -540,6 +606,11 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
     sleep 2
   fi
 done
+
+# ─── Clean up worktree directory if empty ──────────────────────────────────
+if [[ -d "$WORKTREE_BASE" ]] && [[ -z "$(ls -A "$WORKTREE_BASE" 2>/dev/null)" ]]; then
+  rmdir "$WORKTREE_BASE" 2>/dev/null || true
+fi
 
 # ─── Final summary ──────────────────────────────────────────────────────────
 print_summary

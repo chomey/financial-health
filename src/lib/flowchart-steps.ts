@@ -173,6 +173,8 @@ export function detectRetirementHeuristic(state: FinancialState): boolean {
 interface InferredData {
   hasIncome: boolean;
   hasExpenses: boolean;
+  monthlyIncome: number;
+  monthlyInvestmentReturns: number;
   liquidAssets: number;
   cashAssets: number;
   monthlyExpenses: number;
@@ -193,6 +195,11 @@ function inferData(state: FinancialState, isRetired: boolean): InferredData {
   const liquidAssets = getLiquidAssets(state);
   const cashAssets = getCashAssets(state);
 
+  // Monthly returns from assets with ROI (interest, dividends, capital gains)
+  const monthlyInvestmentReturns = state.assets
+    .filter((a) => !a.computed && (a.roi ?? 0) > 0)
+    .reduce((sum, a) => sum + (a.amount * (a.roi! / 100)) / 12, 0);
+
   const assetCategories = state.assets.filter((a) => !a.computed).map((a) => a.category);
 
   const highInterestDebts = state.debts
@@ -203,9 +210,13 @@ function inferData(state: FinancialState, isRetired: boolean): InferredData {
     .filter((d) => d.interestRate !== undefined && d.interestRate >= 4 && d.interestRate <= 8)
     .map((d) => ({ category: d.category, amount: d.amount, rate: d.interestRate! }));
 
+  const totalMonthlyIncome = monthlyIncome + monthlyInvestmentReturns;
+
   return {
-    hasIncome: state.income.length > 0 && monthlyIncome > 0,
+    hasIncome: totalMonthlyIncome > 0,
     hasExpenses: state.expenses.length > 0 && monthlyExpenses > 0,
+    monthlyIncome: totalMonthlyIncome,
+    monthlyInvestmentReturns,
     liquidAssets,
     cashAssets,
     monthlyExpenses,
@@ -217,6 +228,43 @@ function inferData(state: FinancialState, isRetired: boolean): InferredData {
     moderateInterestDebts,
     isRetired,
   };
+}
+
+/** Build a personalized budget detail paragraph based on the user's actual income/expense data. */
+function buildBudgetDetailText(d: InferredData): string {
+  const { monthlyIncome, monthlyExpenses, monthlyMortgage, monthlyDebtPayments, hasIncome, hasExpenses } = d;
+  const totalOutflows = monthlyExpenses + monthlyMortgage + monthlyDebtPayments;
+  const surplus = monthlyIncome - totalOutflows;
+
+  if (!hasIncome && !hasExpenses) {
+    return "Start by listing all income sources and essential expenses (housing, food, utilities, transportation, insurance). Create a spending plan that covers necessities first. The 50/30/20 rule (50% needs, 30% wants, 20% savings/debt) is a common starting point. Knowing your cash flow is the foundation of every financial decision.";
+  }
+
+  const fmt = (n: number) => `$${Math.round(Math.abs(n)).toLocaleString()}`;
+  const parts: string[] = [];
+
+  if (hasIncome && hasExpenses) {
+    parts.push(`You're bringing in ${fmt(monthlyIncome)}/mo and spending ${fmt(totalOutflows)}/mo.`);
+    if (surplus > 0) {
+      const savingsRate = Math.round((surplus / monthlyIncome) * 100);
+      parts.push(`That leaves ${fmt(surplus)}/mo (${savingsRate}% savings rate) to put toward your goals.`);
+      if (savingsRate >= 20) {
+        parts.push("You're meeting or exceeding the 20% savings benchmark — great work.");
+      } else {
+        parts.push(`The 50/30/20 rule suggests saving at least 20% — you're at ${savingsRate}%. Look for expenses you can trim.`);
+      }
+    } else if (surplus === 0) {
+      parts.push("You're spending exactly what you earn. Look for areas to trim so you can start building savings.");
+    } else {
+      parts.push(`You're spending ${fmt(-surplus)}/mo more than you earn. Focus on closing this gap before other goals.`);
+    }
+  } else if (hasIncome) {
+    parts.push(`You're earning ${fmt(monthlyIncome)}/mo. Add your expenses to see your full cash flow picture.`);
+  } else {
+    parts.push(`You're spending ${fmt(totalOutflows)}/mo. Add your income to see how much you can save.`);
+  }
+
+  return parts.join(" ");
 }
 
 // ── CA step definitions ───────────────────────────────────────────────────────
@@ -267,8 +315,7 @@ function buildCASteps(d: InferredData): RawStep[] {
                 ? "Expenses tracked — living on savings/investments."
                 : "Expenses entered, but no income yet."
               : "Enter your income and expenses to begin.",
-      detailText:
-        "List all income sources and essential expenses (housing, food, utilities, transportation, insurance). Create a spending plan that covers necessities first. Knowing your monthly cash flow is the foundation of every financial decision that follows.",
+      detailText: buildBudgetDetailText(d),
       progress: (isRetired ? d.hasExpenses : d.hasIncome && d.hasExpenses) ? 100 : d.hasIncome || d.hasExpenses ? 50 : 0,
       isComplete: isRetired ? d.hasExpenses : d.hasIncome && d.hasExpenses,
     },
@@ -443,8 +490,7 @@ function buildUSSteps(d: InferredData): RawStep[] {
                 ? "Expenses tracked — living on savings/investments."
                 : "Expenses entered, but no income yet."
               : "Enter your income and expenses to begin.",
-      detailText:
-        "List all income sources and essential expenses (housing, food, utilities, transportation, insurance). Create a spending plan that covers necessities first. The 50/30/20 rule (50% needs, 30% wants, 20% savings/debt) is a common starting point. Knowing your cash flow is the foundation of every financial decision.",
+      detailText: buildBudgetDetailText(d),
       progress: (isRetired ? d.hasExpenses : d.hasIncome && d.hasExpenses) ? 100 : d.hasIncome || d.hasExpenses ? 50 : 0,
       isComplete: isRetired ? d.hasExpenses : d.hasIncome && d.hasExpenses,
     },
@@ -613,8 +659,7 @@ function buildAUSteps(d: InferredData): RawStep[] {
                 ? "Expenses tracked — living on savings/investments."
                 : "Expenses entered, but no income yet."
               : "Enter your income and expenses to begin.",
-      detailText:
-        "List all income sources and essential expenses (housing, food, utilities, transport, insurance). Create a spending plan that covers necessities first. Apps like YNAB, PocketBook, or your bank's budgeting tools are popular with Australians. Knowing your monthly cash flow is the foundation of every financial decision that follows.",
+      detailText: buildBudgetDetailText(d),
       progress: (isRetired ? d.hasExpenses : d.hasIncome && d.hasExpenses) ? 100 : d.hasIncome || d.hasExpenses ? 50 : 0,
       isComplete: isRetired ? d.hasExpenses : d.hasIncome && d.hasExpenses,
     },
@@ -863,12 +908,25 @@ export function getStepContext(stepId: string, state: FinancialState): StepConte
           amount: normalizeToMonthly(i.amount, i.frequency ?? "monthly"),
           detail: "/mo",
         })),
+      ];
+      // Add investment returns from assets with ROI
+      const investmentReturns = state.assets
+        .filter((a) => !a.computed && (a.roi ?? 0) > 0)
+        .reduce((sum, a) => sum + (a.amount * (a.roi! / 100)) / 12, 0);
+      if (investmentReturns > 0) {
+        items.push({
+          label: "Investment returns",
+          amount: Math.round(investmentReturns),
+          detail: "/mo",
+        });
+      }
+      items.push(
         ...state.expenses.map((e) => ({
           label: e.category || "Expense",
           amount: -e.amount,
           detail: "/mo",
         })),
-      ];
+      );
       if (items.length === 0) return null;
       return { heading: "Your income & expenses", items };
     }
