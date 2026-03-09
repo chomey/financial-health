@@ -14,6 +14,7 @@ import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
+import HelpTip from "@/components/HelpTip";
 
 export type DonutView = "breakdown" | "liquidity";
 
@@ -261,6 +262,7 @@ export default function NetWorthDonutChart({
     >
       <div className="mb-3 flex items-center justify-between gap-2 flex-wrap">
         <h3 className="text-sm font-medium text-slate-400">Net Worth Breakdown</h3>
+        <HelpTip text="Toggle 'By Type' to see asset categories, or 'Liquidity' to see how quickly you could access your money. Liquid = cash/stocks, Illiquid = property/locked accounts." />
         <div className="flex items-center gap-3">
         <div className="flex rounded-lg border border-white/10 text-xs">
           <button

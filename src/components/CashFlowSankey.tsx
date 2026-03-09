@@ -14,6 +14,7 @@ import {
   type CashFlowInput,
 } from "@/lib/sankey-data";
 import { useCurrency } from "@/lib/CurrencyContext";
+import HelpTip from "@/components/HelpTip";
 
 interface D3SankeyNode extends SankeyNode {
   x0?: number;
@@ -257,6 +258,7 @@ export default function CashFlowSankey({
         <div className="flex items-center gap-2">
           <span aria-hidden="true">🌊</span>
           <h3 className="text-sm font-semibold text-slate-200">Cash Flow</h3>
+          <HelpTip text="Shows how your money flows from income sources through taxes, expenses, investments, and debt payments. Width of each band is proportional to the dollar amount." />
         </div>
         <svg
           className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${

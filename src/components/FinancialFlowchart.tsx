@@ -226,6 +226,21 @@ function StepDetailModal({
           <p>{step.detailText}</p>
         </div>
 
+        {/* Glossary terms for this step */}
+        {STEP_GLOSSARY[step.id] && (
+          <div className="mt-3 rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2.5">
+            <p className="text-xs font-medium text-slate-500 mb-1.5">Key terms</p>
+            <div className="space-y-1.5">
+              {STEP_GLOSSARY[step.id].map((g) => (
+                <div key={g.term}>
+                  <span className="text-xs font-medium text-violet-400">{g.term}</span>
+                  <span className="text-xs text-slate-500"> — {g.definition}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {context && <StepContextSection context={context} />}
 
         {(step.userAcknowledgeable || step.skippable) && (
@@ -271,6 +286,69 @@ function StepDetailModal({
     document.body,
   );
 }
+
+// ── Step glossary — contextual term definitions for money steps ──────────────
+
+const STEP_GLOSSARY: Record<string, { term: string; definition: string }[]> = {
+  "budget": [
+    { term: "Budget", definition: "A plan for how you'll spend each month. Track income minus expenses to know where your money goes." },
+  ],
+  "employer-match": [
+    { term: "Employer match", definition: "Free money from your employer — they contribute to your retirement account when you do. Usually a % of your salary up to a cap." },
+  ],
+  "high-interest-debt": [
+    { term: "High-interest debt", definition: "Debt with interest rates above ~7% (credit cards, payday loans). Paying these off gives a guaranteed 'return' equal to the interest rate." },
+  ],
+  "emergency-fund": [
+    { term: "Emergency fund", definition: "3–6 months of expenses in a liquid, accessible account (savings or HISA). Protects you from unexpected costs without going into debt." },
+    { term: "Liquid", definition: "Money you can access quickly (within days) without penalties. Cash, savings accounts, and HISAs are liquid; property and locked retirement accounts are not." },
+  ],
+  "tfsa": [
+    { term: "TFSA", definition: "Tax-Free Savings Account (Canada). Contributions aren't tax-deductible, but all growth and withdrawals are completely tax-free. $7,000/yr limit (2024)." },
+  ],
+  "rrsp": [
+    { term: "RRSP", definition: "Registered Retirement Savings Plan (Canada). Contributions reduce your taxable income now, but withdrawals in retirement are taxed as income." },
+    { term: "Tax-deferred", definition: "You don't pay tax on contributions or growth until you withdraw the money — ideally in retirement when your income (and tax rate) is lower." },
+  ],
+  "resp": [
+    { term: "RESP", definition: "Registered Education Savings Plan (Canada). Government adds 20% grant (CESG) on first $2,500/yr contributed per child, up to $7,200 lifetime." },
+    { term: "CESG", definition: "Canada Education Savings Grant — the government matches 20% of your RESP contributions, up to $500/year per child." },
+  ],
+  "fhsa": [
+    { term: "FHSA", definition: "First Home Savings Account (Canada). Tax-deductible contributions AND tax-free withdrawals for your first home. $8,000/yr, $40,000 lifetime." },
+  ],
+  "401k": [
+    { term: "401(k)", definition: "US employer-sponsored retirement plan. Pre-tax contributions lower your taxable income. Taxed on withdrawal in retirement." },
+    { term: "Roth 401(k)", definition: "After-tax contributions, but all growth and withdrawals are tax-free in retirement. Good if you expect higher taxes later." },
+  ],
+  "roth-ira": [
+    { term: "Roth IRA", definition: "Individual retirement account (US). After-tax contributions, tax-free growth and withdrawals. $7,000/yr limit (2024). Income limits apply." },
+    { term: "Tax-free growth", definition: "Investment gains inside the account are never taxed — not when they grow, not when you withdraw them." },
+  ],
+  "ira": [
+    { term: "Traditional IRA", definition: "Individual retirement account (US). Contributions may be tax-deductible. Growth is tax-deferred. Taxed on withdrawal." },
+  ],
+  "hsa": [
+    { term: "HSA", definition: "Health Savings Account (US). Triple tax advantage: tax-deductible contributions, tax-free growth, tax-free withdrawals for medical expenses." },
+  ],
+  "529": [
+    { term: "529 Plan", definition: "US education savings. Tax-free growth and withdrawals for qualified education expenses. State tax benefits vary." },
+  ],
+  "super": [
+    { term: "Superannuation", definition: "Australia's mandatory retirement savings. Employer contributes 11.5% of your salary. Taxed at only 15% inside the fund." },
+    { term: "Salary sacrifice", definition: "Voluntarily diverting pre-tax salary into super. Contributions are taxed at 15% instead of your marginal rate." },
+  ],
+  "moderate-interest-debt": [
+    { term: "Moderate-interest debt", definition: "Debt with 4–7% interest (car loans, student loans). Worth paying down, but less urgent than credit card debt." },
+  ],
+  "low-interest-debt": [
+    { term: "Low-interest debt", definition: "Debt below ~4% (some mortgages, subsidized student loans). Often better to invest surplus money than accelerate repayment." },
+  ],
+  "invest-taxable": [
+    { term: "Taxable brokerage", definition: "A regular investment account with no tax advantages. You pay capital gains tax when you sell, but there are no contribution limits or withdrawal restrictions." },
+    { term: "Capital gains", definition: "Profit from selling an investment for more than you paid. Taxed at a lower rate than regular income in most countries." },
+  ],
+};
 
 // ── Timeline step row (compact) ──────────────────────────────────────────────
 

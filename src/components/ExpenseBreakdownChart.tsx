@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
+import HelpTip from "@/components/HelpTip";
 
 // Vivid, saturated cyberpunk colors for expense categories
 const COLORS = [
@@ -193,9 +194,10 @@ export default function ExpenseBreakdownChart({
       className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5"
       data-testid="expense-breakdown-chart"
     >
-      <h3 className="mb-3 text-sm font-medium text-slate-400">
-        Spending Breakdown
-      </h3>
+      <div className="mb-3 flex items-center gap-1.5">
+        <h3 className="text-sm font-medium text-slate-400">Spending Breakdown</h3>
+        <HelpTip text="Your monthly outflows broken down by category. Includes taxes, investment contributions, and mortgage payments alongside discretionary spending." />
+      </div>
 
       {/* Income vs Expenses comparison bar */}
       {incomeForComparison > 0 && (

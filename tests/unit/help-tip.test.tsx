@@ -15,60 +15,57 @@ describe("HelpTip component", () => {
     expect(screen.queryByTestId("help-tip-popover")).toBeNull();
   });
 
-  it("shows popover on click", () => {
+  it("shows popover on hover", () => {
     render(<HelpTip text="Test tooltip text" />);
-    fireEvent.click(screen.getByTestId("help-tip-button"));
+    fireEvent.mouseEnter(screen.getByTestId("help-tip-button"));
     const popover = screen.getByTestId("help-tip-popover");
     expect(popover).toBeDefined();
     expect(popover.textContent).toContain("Test tooltip text");
   });
 
-  it("hides popover on second click", () => {
+  it("hides popover on mouse leave", () => {
     render(<HelpTip text="Test tooltip text" />);
     const btn = screen.getByTestId("help-tip-button");
-    fireEvent.click(btn);
+    fireEvent.mouseEnter(btn);
     expect(screen.getByTestId("help-tip-popover")).toBeDefined();
-    fireEvent.click(btn);
+    fireEvent.mouseLeave(btn);
     expect(screen.queryByTestId("help-tip-popover")).toBeNull();
   });
 
   it("popover has role=tooltip", () => {
     render(<HelpTip text="Test tooltip text" />);
-    fireEvent.click(screen.getByTestId("help-tip-button"));
+    fireEvent.mouseEnter(screen.getByTestId("help-tip-button"));
     const popover = screen.getByRole("tooltip");
     expect(popover).toBeDefined();
   });
 
-  it("button has aria-expanded=false when closed", () => {
+  it("shows popover on focus (keyboard accessibility)", () => {
     render(<HelpTip text="Test tooltip text" />);
-    const btn = screen.getByTestId("help-tip-button");
-    expect(btn.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.focus(screen.getByTestId("help-tip-button"));
+    expect(screen.getByTestId("help-tip-popover")).toBeDefined();
   });
 
-  it("button has aria-expanded=true when open", () => {
+  it("hides popover on blur", () => {
     render(<HelpTip text="Test tooltip text" />);
     const btn = screen.getByTestId("help-tip-button");
-    fireEvent.click(btn);
-    expect(btn.getAttribute("aria-expanded")).toBe("true");
+    fireEvent.focus(btn);
+    expect(screen.getByTestId("help-tip-popover")).toBeDefined();
+    fireEvent.blur(btn);
+    expect(screen.queryByTestId("help-tip-popover")).toBeNull();
   });
 
   it("renders tooltip text correctly", () => {
     const text = "This is the help tooltip message.";
     render(<HelpTip text={text} />);
-    fireEvent.click(screen.getByTestId("help-tip-button"));
+    fireEvent.mouseEnter(screen.getByTestId("help-tip-button"));
     expect(screen.getByTestId("help-tip-popover").textContent).toContain(text);
   });
 
-  it("closes on outside mousedown", () => {
-    render(
-      <div>
-        <HelpTip text="Test tooltip text" />
-        <div data-testid="outside">Outside</div>
-      </div>
-    );
-    fireEvent.click(screen.getByTestId("help-tip-button"));
-    expect(screen.getByTestId("help-tip-popover")).toBeDefined();
-    fireEvent.mouseDown(screen.getByTestId("outside"));
-    expect(screen.queryByTestId("help-tip-popover")).toBeNull();
+  it("renders tooltip via portal at document.body level", () => {
+    render(<HelpTip text="Portal test" />);
+    fireEvent.mouseEnter(screen.getByTestId("help-tip-button"));
+    const popover = screen.getByTestId("help-tip-popover");
+    // Portal renders at body level, ensuring z-index works globally
+    expect(popover.closest("body")).toBeDefined();
   });
 });

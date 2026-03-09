@@ -319,6 +319,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       positive: debtToAssetRatio <= 1,
       breakdown: ratioBreakdown,
       ratioWithoutMortgage: totalPropertyMortgage > 0 ? parseFloat(debtToAssetWithoutMortgage.toFixed(2)) : undefined,
+      helpText: "Total debts ÷ total assets. Below 1.0 means you own more than you owe. Mortgage debt is normal — check the 'without mortgage' figure too.",
     },
     ...(monthlyAfterTaxIncome > 0 ? [(() => {
       const liquidInvested = totalAssets + totalStocks;

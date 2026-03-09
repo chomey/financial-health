@@ -14,6 +14,7 @@ import {
 import type { Scenario } from "@/lib/projections";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
+import HelpTip from "@/components/HelpTip";
 
 interface FastForwardPanelProps {
   state: FinancialState;
@@ -191,6 +192,7 @@ export default function FastForwardPanel({
         <div className="flex items-center gap-2">
           <span aria-hidden="true">⏩</span>
           <h3 className="text-lg font-semibold text-slate-200">Fast Forward</h3>
+          <HelpTip text="Model 'what if' scenarios by adjusting income, contributions, debts, or adding a windfall. Compare the projected outcome against your current trajectory." />
         </div>
         <div className="flex items-center gap-2">
           {hasModifications && (

@@ -7,6 +7,7 @@ import {
   type BenchmarkComparison,
 } from "@/lib/benchmarks";
 import { useCurrency } from "@/lib/CurrencyContext";
+import HelpTip from "@/components/HelpTip";
 
 interface BenchmarkComparisonsProps {
   age?: number;
@@ -143,6 +144,7 @@ export default function BenchmarkComparisons({
         <div className="flex items-center gap-2">
           <span className="text-lg" aria-hidden="true">📊</span>
           <h3 className="text-base font-semibold text-slate-200">How You Compare</h3>
+          <HelpTip text="Compares your metrics against the median for your age group and the national average. Sources: Statistics Canada SFS 2023, Federal Reserve SCF 2022, ABS 2021-22." />
           {age && <span className="text-xs text-slate-500">Age {age}</span>}
         </div>
         <button

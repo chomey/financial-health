@@ -11,6 +11,8 @@
  *   Net worth:        ≤0 → 0, ≥3× annual income → 25 (or 25 if no income but positive NW)
  */
 
+import HelpTip from "@/components/HelpTip";
+
 export interface FinancialHealthScoreProps {
   savingsRate: number; // 0–1 fraction
   emergencyMonths: number;
@@ -152,7 +154,10 @@ export default function FinancialHealthScore(props: FinancialHealthScoreProps) {
       data-testid="financial-health-score"
     >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-semibold text-slate-200">Financial Health Score</h3>
+        <div className="flex items-center gap-1.5">
+          <h3 className="text-base font-semibold text-slate-200">Financial Health Score</h3>
+          <HelpTip text="Composite 0–100 score based on four pillars: savings rate (target 20%+), emergency fund (target 6+ months), debt-to-income ratio (lower is better), and net worth relative to income." />
+        </div>
         <span className="text-lg" aria-hidden="true">🏥</span>
       </div>
 
