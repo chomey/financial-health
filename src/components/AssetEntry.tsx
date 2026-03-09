@@ -42,6 +42,32 @@ const CATEGORY_SUGGESTIONS = {
   ],
 };
 
+/** Short descriptions for known account types */
+export const ACCOUNT_TYPE_DESCRIPTIONS: Record<string, string> = {
+  // Canada
+  "TFSA": "Tax-free growth and withdrawals, $7,000/yr contribution room",
+  "RRSP": "Tax-deferred, contributions reduce taxable income, taxed on withdrawal",
+  "RESP": "Education savings, government grants up to $7,200 lifetime",
+  "FHSA": "Tax-free first home savings, $8,000/yr limit",
+  "LIRA": "Locked-in retirement, from employer pension, withdrawal restrictions",
+  // USA
+  "401k": "Employer-sponsored, pre-tax contributions, taxed on withdrawal",
+  "Roth 401k": "After-tax contributions, tax-free growth and withdrawals",
+  "IRA": "Individual retirement, pre-tax, $7,000/yr limit",
+  "Roth IRA": "After-tax, tax-free growth, $7,000/yr limit, income limits apply",
+  "529": "Education savings, tax-free for qualified expenses",
+  "HSA": "Triple tax advantage for medical expenses, $4,300/yr single",
+  // Australia
+  "Super (Accumulation)": "Employer contributions + salary sacrifice, 15% tax on earnings, preserved until age 60",
+  "Super (Pension Phase)": "Tax-free earnings and withdrawals after 60",
+  "First Home Super Saver": "Withdraw up to $50,000 of voluntary super contributions for first home",
+};
+
+/** Get the description for a known account type */
+export function getAccountTypeDescription(category: string): string | undefined {
+  return ACCOUNT_TYPE_DESCRIPTIONS[category];
+}
+
 /** Set of CA-specific asset category names */
 export const CA_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.CA);
 /** Set of US-specific asset category names */
@@ -365,10 +391,15 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                                     }}
                                     className="w-full px-3 py-1.5 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300"
                                   >
-                                    {getAssetCategoryFlag(suggestion) && (
-                                      <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
+                                    <div>
+                                      {getAssetCategoryFlag(suggestion) && (
+                                        <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
+                                      )}
+                                      {suggestion}
+                                    </div>
+                                    {getAccountTypeDescription(suggestion) && (
+                                      <div className="text-[11px] text-slate-500 mt-0.5">{getAccountTypeDescription(suggestion)}</div>
                                     )}
-                                    {suggestion}
                                   </button>
                                 ))}
                               </div>
@@ -391,10 +422,15 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                       aria-label={`Edit category for ${asset.category}`}
                     >
-                      {getAssetCategoryFlag(asset.category) && (
-                        <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(asset.category)}</span>
+                      <div>
+                        {getAssetCategoryFlag(asset.category) && (
+                          <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(asset.category)}</span>
+                        )}
+                        {asset.category}
+                      </div>
+                      {getAccountTypeDescription(asset.category) && (
+                        <div className="text-[11px] text-slate-500 mt-0.5 font-normal">{getAccountTypeDescription(asset.category)}</div>
                       )}
-                      {asset.category}
                     </button>
                     )
                   )}
@@ -867,10 +903,15 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                             }}
                             className="w-full px-3 py-2 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300 sm:py-1.5"
                           >
-                            {getAssetCategoryFlag(suggestion) && (
-                              <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
+                            <div>
+                              {getAssetCategoryFlag(suggestion) && (
+                                <span className="mr-1" aria-hidden="true">{getAssetCategoryFlag(suggestion)}</span>
+                              )}
+                              {suggestion}
+                            </div>
+                            {getAccountTypeDescription(suggestion) && (
+                              <div className="text-[11px] text-slate-500 mt-0.5">{getAccountTypeDescription(suggestion)}</div>
                             )}
-                            {suggestion}
                           </button>
                         ))}
                       </div>

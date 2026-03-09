@@ -8,13 +8,23 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 170
-- **Remaining**: 14
+- **Completed**: 171
+- **Remaining**: 13
 - **Last Updated**: 2026-03-08
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 174: Add descriptions for asset account types [@frontend]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/components/AssetEntry.tsx`: Added `ACCOUNT_TYPE_DESCRIPTIONS` map (16 account types: CA, US, AU), `getAccountTypeDescription()` helper, descriptions shown in suggestion dropdowns (both edit and add-new forms), and below selected category name in view mode.
+  - `src/lib/changelog.ts`: Added version 174 entry.
+  - `tests/unit/asset-type-descriptions.test.ts`: New — 9 unit tests verifying descriptions map completeness and helper function behavior.
+  - `tests/e2e/asset-type-descriptions.spec.ts`: New — 4 E2E tests verifying descriptions appear in dropdown and view mode. Screenshots captured.
+- **Tests**: T1: 9 new passed, T2: 4 passed, Build: passes
+- **Screenshots**: task-174-tfsa-description-dropdown, task-174-roth-ira-description-dropdown, task-174-tfsa-description-view-mode, task-174-super-description-dropdown
 
 ## Task 170: Add contextual help to dashboard metric cards [@frontend]
 - **Date**: 2026-03-08
