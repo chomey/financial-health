@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // AU unit tests and validation
+  {
+    version: 172,
+    title: "AU unit tests and validation",
+    description: "Added comprehensive unit tests validating AU tax brackets, Medicare Levy, super contribution limits, LITO phase-out, and franking credit gross-up. All three AU sample profiles (young professional, mid-career family, pre-retiree) validated with computeTotals: correct AUD currency, positive income/expenses/tax, 0 provincial tax, and reasonable effective rates. Country switching CA→AU→US verified to preserve all financial data. Pre-existing E2E failures in au-sample-profiles.spec.ts and au-currency.spec.ts fixed by using /?step=welcome to force wizard mode.",
+    date: "2026-03-08",
+  },
   // Asset account type descriptions
   {
     version: 174,

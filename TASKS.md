@@ -40,5 +40,5 @@
 
 ## Australia Country Support (continued)
 
-- [ ] Task 172: AU unit tests and validation — Add comprehensive unit tests for AU tax brackets (verify marginal rates at key thresholds), Medicare Levy calculations, super contribution limits, AU tax offsets (LITO phase-out), franking credit gross-up, and AU-specific Money Steps inference. Validate all AU sample profiles produce reasonable dashboard metrics. Test country switching CA→AU→US preserves/resets state correctly. [@qa]
+- [x] Task 172: AU unit tests and validation — Add comprehensive unit tests for AU tax brackets (verify marginal rates at key thresholds), Medicare Levy calculations, super contribution limits, AU tax offsets (LITO phase-out), franking credit gross-up, and AU-specific Money Steps inference. Validate all AU sample profiles produce reasonable dashboard metrics. Test country switching CA→AU→US preserves/resets state correctly. [@qa]
 - [ ] Task 173: AU E2E tests and regression — Full Playwright E2E test suite for AU flow: select AU country, pick AU sample profile, verify dashboard shows AUD values, verify Money Steps show AU-specific steps, verify tax summary uses AU brackets, verify super accounts appear in assets. Run full regression to ensure CA/US flows are unaffected by AU additions. [@qa] [E2E] [MILESTONE]

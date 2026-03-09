@@ -8,9 +8,21 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 170
-- **Remaining**: 14
+- **Completed**: 171
+- **Remaining**: 13
 - **Last Updated**: 2026-03-08
+
+## Task 172: AU unit tests and validation [@qa]
+- **Date**: 2026-03-08
+- **Files**:
+  - `tests/unit/au-validation.test.ts`: New — 57 tests covering AU sample profile dashboard metrics (computeTotals on all 3 AU profiles: currency, income, expenses, assets, debts, equity, tax, effective rate, net worth), country switching CA→AU→US data preservation, super contribution limits, and franking credit gross-up calculations.
+  - `tests/e2e/au-validation.spec.ts`: New — 5 T2 screenshot tests for AU profile dashboards and country switching.
+  - `tests/e2e/au-sample-profiles.spec.ts`: Fixed pre-existing failures — use `/?step=welcome` to force wizard mode.
+  - `tests/e2e/au-currency.spec.ts`: Fixed pre-existing failures — use `/?step=welcome` in gotoAUProfileStep.
+  - `src/lib/changelog.ts`: Added version 172 entry.
+- **Tests**: T1: 2593 passed (135 files), T2: 5 passed, Build: passes
+- **Screenshots**: task-172-au-young-professional-dashboard.png, task-172-au-pre-retiree-dashboard.png, task-172-au-mid-career-family-dashboard.png, task-172-au-country-switch.png, task-172-country-cycle-us.png
+- **Notes**: Pre-existing E2E failures in au-sample-profiles.spec.ts and au-currency.spec.ts fixed by using `/?step=welcome` (forces wizard mode, bypassing fhs-visited localStorage check). `effectiveTaxRate` in AU profiles reflects bracket tax only (not Medicare Levy), so ranges are 15–22% / 22–28% / 24–32% rather than full combined rates.
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
