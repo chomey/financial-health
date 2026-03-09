@@ -425,6 +425,29 @@ cleanup_worktree() {
   git -C "$SCRIPT_DIR" branch -D "$branch_name" 2>/dev/null || true
 }
 
+# ─── Cleanup leftover worktrees/branches from previous failed runs ──────────
+git -C "$SCRIPT_DIR" worktree prune 2>/dev/null || true
+if [[ -d "$WORKTREE_BASE" ]]; then
+  for wt_dir in "$WORKTREE_BASE"/task-*; do
+    [[ -d "$wt_dir" ]] || continue
+    local leftover_num
+    leftover_num=$(basename "$wt_dir" | sed 's/task-//')
+    local leftover_branch="ralph/task-${leftover_num}"
+    print "${DIM}  Cleaning up leftover worktree: ${wt_dir}${NC}"
+    cleanup_worktree "$wt_dir" "$leftover_branch"
+  done
+fi
+# Also clean any orphaned ralph/* branches with no matching worktree
+for orphan_branch in $(git -C "$SCRIPT_DIR" branch --list 'ralph/task-*' 2>/dev/null | sed 's/^[* ]*//' ); do
+  local orphan_num
+  orphan_num=$(echo "$orphan_branch" | sed 's|ralph/task-||')
+  local orphan_wt="${WORKTREE_BASE}/task-${orphan_num}"
+  if [[ ! -d "$orphan_wt" ]]; then
+    print "${DIM}  Cleaning up orphaned branch: ${orphan_branch}${NC}"
+    git -C "$SCRIPT_DIR" branch -D "$orphan_branch" 2>/dev/null || true
+  fi
+done
+
 # Run Claude for each task (in isolated worktrees)
 for ((i = 1; i <= TASK_COUNT; i++)); do
   # Bail out if interrupted between iterations
@@ -463,7 +486,22 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
 
   mkdir -p "$WORKTREE_BASE"
   print "  ${DIM}▸ Creating worktree: ${wt_path}${NC}"
-  git -C "$SCRIPT_DIR" worktree add -b "$branch_name" "$wt_path" "$MAIN_BRANCH" 2>/dev/null
+  local wt_create_exit=0
+  git -C "$SCRIPT_DIR" worktree add -b "$branch_name" "$wt_path" "$MAIN_BRANCH" 2>&1 || wt_create_exit=$?
+  if [[ $wt_create_exit -ne 0 ]]; then
+    print "${RED}  ✗ Failed to create worktree for ${branch_name}. Attempting cleanup and retry...${NC}"
+    cleanup_worktree "$wt_path" "$branch_name"
+    git -C "$SCRIPT_DIR" worktree prune 2>/dev/null || true
+    git -C "$SCRIPT_DIR" worktree add -b "$branch_name" "$wt_path" "$MAIN_BRANCH" 2>&1 || {
+      print "${RED}  ✗ Retry failed. Skipping task.${NC}"
+      TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
+      ITER_TIMES+=($(($(date +%s) - ITER_START)))
+      ITER_MODELS+=("unknown")
+      ITER_TAGS+=("$task_tag")
+      ITER_TITLES+=("${task_title} ${RED}(worktree failed)${NC}")
+      continue
+    }
+  fi
 
   # Build the prompt from PROMPT.md (read from worktree copy)
   local wt_prompt_file="${wt_path}/PROMPT.md"
