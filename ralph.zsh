@@ -548,14 +548,29 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   if [[ -n "$has_new_commits" ]]; then
     print ""
     print "  ${DIM}▸ Merging ${branch_name} → ${MAIN_BRANCH}${NC}"
+
+    # Stash any uncommitted local changes on main before merging
+    local did_stash=0
+    local stash_output
+    stash_output=$(git -C "$SCRIPT_DIR" stash push -u -m "ralph: auto-stash before merging ${branch_name}" 2>&1)
+    if [[ "$stash_output" != *"No local changes"* ]]; then
+      did_stash=1
+      print "  ${DIM}▸ Stashed local changes${NC}"
+    fi
+
     local merge_exit=0
     git -C "$SCRIPT_DIR" merge "$branch_name" --no-edit || merge_exit=$?
 
     if [[ $merge_exit -ne 0 ]]; then
-      print "${RED}  ✗ Merge conflict! Aborting merge. Worktree preserved at: ${wt_path}${NC}"
-      print "${YELLOW}    Resolve manually: cd ${SCRIPT_DIR} && git merge ${branch_name}${NC}"
+      print "${RED}  ✗ Merge conflict! Aborting merge.${NC}"
       git -C "$SCRIPT_DIR" merge --abort 2>/dev/null || true
-      # Don't clean up worktree so user can inspect
+      # Restore stash before bailing
+      if [[ $did_stash -eq 1 ]]; then
+        git -C "$SCRIPT_DIR" stash pop 2>/dev/null || true
+        print "  ${DIM}▸ Restored stashed changes${NC}"
+      fi
+      print "${RED}  Worktree preserved at: ${wt_path}${NC}"
+      print "${YELLOW}    Resolve manually: cd ${SCRIPT_DIR} && git merge ${branch_name}${NC}"
       TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
       ITER_TIMES+=($(($(date +%s) - ITER_START)))
       ITER_MODELS+=("$model")
@@ -565,6 +580,18 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
       exit 1
     fi
     print "  ${GREEN}▸ Merged successfully${NC}"
+
+    # Restore stashed changes on top of the merge
+    if [[ $did_stash -eq 1 ]]; then
+      local pop_exit=0
+      git -C "$SCRIPT_DIR" stash pop 2>/dev/null || pop_exit=$?
+      if [[ $pop_exit -ne 0 ]]; then
+        print "${YELLOW}  ⚠ Stash pop had conflicts — local changes preserved in stash${NC}"
+        print "${YELLOW}    Run: git stash pop && resolve conflicts${NC}"
+      else
+        print "  ${DIM}▸ Restored stashed changes${NC}"
+      fi
+    fi
   else
     print "  ${DIM}▸ No new commits on ${branch_name}, skipping merge${NC}"
   fi
