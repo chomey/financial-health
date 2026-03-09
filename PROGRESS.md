@@ -8,13 +8,29 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 168
-- **Remaining**: 1
+- **Completed**: 169
+- **Remaining**: 0
 - **Last Updated**: 2026-03-08
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 169: Add contextual help tooltips to wizard inputs [@frontend]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/components/HelpTip.tsx`: New — reusable ? icon button with click-to-toggle popover, outside-click to close.
+  - `src/components/wizard/steps/ProfileStep.tsx`: Added HelpTip to Tax Year, Filing Status, Exchange Rate labels.
+  - `src/components/IncomeEntry.tsx`: Added HelpTip next to Frequency and Income Type selects in add-new form.
+  - `src/components/AssetEntry.tsx`: Added HelpTip to Tax Treatment, ROI, Reinvest Returns, Employer Match, Cost Basis %, and Surplus Target fields. Removed old CSS-only tooltip from Cost Basis % badge.
+  - `src/components/DebtEntry.tsx`: Added HelpTip next to Interest Rate badge.
+  - `src/components/PropertyEntry.tsx`: Added HelpTip next to Amortization and Appreciation badges.
+  - `src/lib/changelog.ts`: Added version 169 entry.
+  - `tests/unit/help-tip.test.tsx`: New — 9 unit tests covering click-to-open, click-to-close, aria-expanded, role=tooltip, outside-click-to-close.
+  - `tests/e2e/help-tip.spec.ts`: New — 7 E2E tests verifying HelpTip presence and behavior across Profile, Income, Assets, Debts, and Property steps.
+- **Tests**: T1: 2523 passed (133 files), T2: 7 passed, Build: passes
+- **Screenshots**: task-169-profile-help-tips, task-169-profile-help-tip-open, task-169-income-add-form-help-tips, task-169-assets-help-tips, task-169-debts-help-tips, task-169-debts-interest-help-tip, task-169-property-step
+- **Notes**: TaxCreditEntry already had an info button (ℹ icon) with a detailed explanation — HelpTip not added there to avoid redundancy. Property step has no items in initial state so HelpTips only appear when properties are added. All tooltip texts are 1–2 sentences as specified.
 
 ## Task 168: Reorder wizard steps [@fullstack]
 - **Date**: 2026-03-08

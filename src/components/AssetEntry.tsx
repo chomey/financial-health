@@ -8,6 +8,7 @@ import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { getTaxTreatment, type TaxTreatment } from "@/lib/withdrawal-tax";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useEditState, useAddNew } from "@/lib/entry-hooks";
+import HelpTip from "@/components/HelpTip";
 
 export type RoiTaxTreatment = "capital-gains" | "income";
 
@@ -509,6 +510,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     </button>
                   );
                 })()}
+                <HelpTip text="How withdrawals are taxed — auto-detected from account type, click pill to override." />
 
                 {/* ROI badge/editor */}
                 {editingId === asset.id && editingField === "roi" ? (
@@ -525,23 +527,26 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     placeholder="e.g. 7"
                   />
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => startEdit(asset.id, "roi", String(asset.roi ?? ""))}
-                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
-                      hasRoi
-                        ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
-                        : displayRoi !== undefined
-                          ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
-                          : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
-                    }`}
-                    aria-label={`Edit ROI for ${asset.category}${displayRoi !== undefined ? `, currently ${displayRoi}%` : ""}`}
-                    data-testid={`roi-badge-${asset.id}`}
-                  >
-                    {displayRoi !== undefined
-                      ? `${displayRoi}% ROI${!hasRoi ? " (suggested)" : ""}`
-                      : isComputed ? "Set estimated return %" : "Annual return %"}
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => startEdit(asset.id, "roi", String(asset.roi ?? ""))}
+                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                        hasRoi
+                          ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
+                          : displayRoi !== undefined
+                            ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
+                            : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                      }`}
+                      aria-label={`Edit ROI for ${asset.category}${displayRoi !== undefined ? `, currently ${displayRoi}%` : ""}`}
+                      data-testid={`roi-badge-${asset.id}`}
+                    >
+                      {displayRoi !== undefined
+                        ? `${displayRoi}% ROI${!hasRoi ? " (suggested)" : ""}`
+                        : isComputed ? "Set estimated return %" : "Annual return %"}
+                    </button>
+                    <HelpTip text="Expected annual return on this account, used to project future growth." />
+                  </>
                 )}
 
                 {/* ROI tax treatment toggle — only when ROI > 0 and not tax-sheltered */}
@@ -578,25 +583,28 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   const effectiveReinvest = asset.reinvestReturns ?? getDefaultReinvest(asset.category);
                   const isExplicit = asset.reinvestReturns !== undefined;
                   return (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        updateAssets(assets.map((a) =>
-                          a.id === asset.id ? { ...a, reinvestReturns: !effectiveReinvest } : a
-                        ));
-                      }}
-                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
-                        isExplicit
-                          ? effectiveReinvest
-                            ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                            : "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
-                          : "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
-                      }`}
-                      aria-label={`Toggle reinvest returns for ${asset.category}, currently ${effectiveReinvest ? "reinvesting" : "paying out"}`}
-                      data-testid={`reinvest-toggle-${asset.id}`}
-                    >
-                      {effectiveReinvest ? "Reinvesting" : "Payout"}
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateAssets(assets.map((a) =>
+                            a.id === asset.id ? { ...a, reinvestReturns: !effectiveReinvest } : a
+                          ));
+                        }}
+                        className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                          isExplicit
+                            ? effectiveReinvest
+                              ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                              : "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
+                            : "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
+                        }`}
+                        aria-label={`Toggle reinvest returns for ${asset.category}, currently ${effectiveReinvest ? "reinvesting" : "paying out"}`}
+                        data-testid={`reinvest-toggle-${asset.id}`}
+                      >
+                        {effectiveReinvest ? "Reinvesting" : "Payout"}
+                      </button>
+                      <HelpTip text="Reinvesting compounds returns into the balance; Payout counts returns as monthly income." />
+                    </>
                   );
                 })()}
 
@@ -646,6 +654,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     : 0;
                   return (
                     <div className="flex flex-wrap items-center gap-1" data-testid={`employer-match-section-${asset.id}`}>
+                      <HelpTip text="Your employer matches a % of your contributions up to a salary cap." />
                       {/* Match % badge */}
                       {editingId === asset.id && editingField === "employerMatchPct" ? (
                         <input
@@ -733,25 +742,24 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       placeholder="e.g. 80"
                     />
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => startEdit(asset.id, "costBasisPercent", String(asset.costBasisPercent ?? ""))}
-                      className={`group/cb relative rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
-                        asset.costBasisPercent !== undefined && asset.costBasisPercent < 100
-                          ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
-                          : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
-                      }`}
-                      aria-label={`Edit cost basis percent for ${asset.category}${asset.costBasisPercent !== undefined ? `, currently ${asset.costBasisPercent}%` : ""}`}
-                      data-testid={`cost-basis-badge-${asset.id}`}
-                    >
-                      {asset.costBasisPercent !== undefined && asset.costBasisPercent < 100
-                        ? `${asset.costBasisPercent}% cost basis`
-                        : "Cost basis %"}
-                      <span className="pointer-events-none absolute left-1/2 bottom-full z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded bg-stone-800 px-2 py-1 text-[10px] text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover/cb:opacity-100">
-                        % of balance that is original contributions (not gains).
-                        <br />Gains above cost basis are subject to capital gains tax on withdrawal.
-                      </span>
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => startEdit(asset.id, "costBasisPercent", String(asset.costBasisPercent ?? ""))}
+                        className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                          asset.costBasisPercent !== undefined && asset.costBasisPercent < 100
+                            ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                            : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                        }`}
+                        aria-label={`Edit cost basis percent for ${asset.category}${asset.costBasisPercent !== undefined ? `, currently ${asset.costBasisPercent}%` : ""}`}
+                        data-testid={`cost-basis-badge-${asset.id}`}
+                      >
+                        {asset.costBasisPercent !== undefined && asset.costBasisPercent < 100
+                          ? `${asset.costBasisPercent}% cost basis`
+                          : "Cost basis %"}
+                      </button>
+                      <HelpTip text="% of balance that is original contributions. Gains above cost basis are taxed on withdrawal." />
+                    </>
                   )
                 )}
 
@@ -788,6 +796,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   />
                   Surplus goes here
                 </label>
+                <HelpTip text="Monthly leftover cash after all expenses is deposited into this account." />
                 {asset.surplusTarget && monthlySurplus > 0 && (
                   <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-xs text-amber-400" data-testid={`surplus-amount-${asset.id}`}>
                     +{formatCurrency(monthlySurplus)}/mo surplus

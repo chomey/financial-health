@@ -8,6 +8,7 @@ import type { SupportedCurrency, FxRates } from "@/lib/currency";
 import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
+import HelpTip from "@/components/HelpTip";
 
 export type IncomeFrequency = "monthly" | "weekly" | "biweekly" | "quarterly" | "semi-annually" | "annually";
 
@@ -457,32 +458,38 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New income amount"
               />
-              <select
-                value={newFrequency}
-                onChange={(e) => setNewFrequency(e.target.value as IncomeFrequency)}
-                className="min-h-[44px] sm:min-h-0 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-2 text-xs text-slate-300 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:py-1 cursor-pointer"
-                aria-label="New income frequency"
-                data-testid="new-income-frequency"
-              >
-                {(Object.keys(FREQUENCY_LABELS) as IncomeFrequency[]).map((freq) => (
-                  <option key={freq} value={freq}>
-                    {FREQUENCY_LABELS[freq]}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={newIncomeType}
-                onChange={(e) => setNewIncomeType(e.target.value as IncomeType)}
-                className="min-h-[44px] sm:min-h-0 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-2 text-xs text-slate-300 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:py-1 cursor-pointer"
-                aria-label="New income type"
-                data-testid="new-income-type"
-              >
-                {(Object.keys(INCOME_TYPE_LABELS) as IncomeType[]).map((type) => (
-                  <option key={type} value={type}>
-                    {INCOME_TYPE_LABELS[type]}
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center gap-1">
+                <select
+                  value={newFrequency}
+                  onChange={(e) => setNewFrequency(e.target.value as IncomeFrequency)}
+                  className="min-h-[44px] sm:min-h-0 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-2 text-xs text-slate-300 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:py-1 cursor-pointer"
+                  aria-label="New income frequency"
+                  data-testid="new-income-frequency"
+                >
+                  {(Object.keys(FREQUENCY_LABELS) as IncomeFrequency[]).map((freq) => (
+                    <option key={freq} value={freq}>
+                      {FREQUENCY_LABELS[freq]}
+                    </option>
+                  ))}
+                </select>
+                <HelpTip text="How often you receive this income — converted to monthly for calculations." />
+              </div>
+              <div className="flex items-center gap-1">
+                <select
+                  value={newIncomeType}
+                  onChange={(e) => setNewIncomeType(e.target.value as IncomeType)}
+                  className="min-h-[44px] sm:min-h-0 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-2 text-xs text-slate-300 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:py-1 cursor-pointer"
+                  aria-label="New income type"
+                  data-testid="new-income-type"
+                >
+                  {(Object.keys(INCOME_TYPE_LABELS) as IncomeType[]).map((type) => (
+                    <option key={type} value={type}>
+                      {INCOME_TYPE_LABELS[type]}
+                    </option>
+                  ))}
+                </select>
+                <HelpTip text="Employment income is fully taxed; capital gains rates are lower." />
+              </div>
               <button
                 type="button"
                 onClick={addItem}

@@ -6,6 +6,7 @@ import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
+import HelpTip from "@/components/HelpTip";
 
 export interface Property {
   id: string;
@@ -550,6 +551,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             placeholder="e.g. 25"
                           />
                         ) : (
+                          <>
                           <button
                             type="button"
                             onClick={() => startEdit(property.id, "amortizationYears", String(property.amortizationYears ?? ""))}
@@ -563,6 +565,8 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           >
                             {hasAmort ? `${amortYears}yr term` : "Term years"}
                           </button>
+                          <HelpTip text="Total years of the original mortgage term — used to estimate remaining payments." />
+                          </>
                         )}
 
                         {/* Year purchased */}
@@ -618,27 +622,30 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                               placeholder="e.g. 3 or -15"
                             />
                           ) : (
-                            <button
-                              type="button"
-                              onClick={() => startEdit(property.id, "appreciation", String(property.appreciation ?? ""))}
-                              className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
-                                hasAppreciation
-                                  ? isNegative
-                                    ? "bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
-                                    : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => startEdit(property.id, "appreciation", String(property.appreciation ?? ""))}
+                                className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
+                                  hasAppreciation
+                                    ? isNegative
+                                      ? "bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+                                      : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                                    : defaultAp !== undefined
+                                      ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
+                                      : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                                }`}
+                                aria-label={`Edit appreciation rate for ${property.name}${hasAppreciation ? `, currently ${property.appreciation}%` : ""}`}
+                                data-testid={`appreciation-edit-${property.id}`}
+                              >
+                                {hasAppreciation
+                                  ? `${property.appreciation! >= 0 ? "+" : ""}${property.appreciation}%/yr`
                                   : defaultAp !== undefined
-                                    ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
-                                    : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
-                              }`}
-                              aria-label={`Edit appreciation rate for ${property.name}${hasAppreciation ? `, currently ${property.appreciation}%` : ""}`}
-                              data-testid={`appreciation-edit-${property.id}`}
-                            >
-                              {hasAppreciation
-                                ? `${property.appreciation! >= 0 ? "+" : ""}${property.appreciation}%/yr`
-                                : defaultAp !== undefined
-                                  ? `${defaultAp >= 0 ? "+" : ""}${defaultAp}%/yr (suggested)`
-                                  : "Appreciation %"}
-                            </button>
+                                    ? `${defaultAp >= 0 ? "+" : ""}${defaultAp}%/yr (suggested)`
+                                    : "Appreciation %"}
+                              </button>
+                              <HelpTip text="Expected annual property value change. Use negative % for depreciating assets like vehicles." />
+                            </>
                           );
                         })()}
                       </div>
