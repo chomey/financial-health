@@ -672,6 +672,12 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   archive_progress || print "${YELLOW}  ⚠ archive_progress failed (non-fatal)${NC}"
   archive_tasks || print "${YELLOW}  ⚠ archive_tasks failed (non-fatal)${NC}"
 
+  # Commit archive changes so they don't cause stash conflicts on next iteration
+  if ! git -C "$SCRIPT_DIR" diff --quiet PROGRESS.md PROGRESS-ARCHIVE.md TASKS.md TASKS-ARCHIVE.md 2>/dev/null; then
+    git -C "$SCRIPT_DIR" add PROGRESS.md PROGRESS-ARCHIVE.md TASKS.md TASKS-ARCHIVE.md 2>/dev/null
+    git -C "$SCRIPT_DIR" commit -m "ralph: archive old progress/task entries" --no-verify 2>/dev/null || true
+  fi
+
   # Iteration timing
   ITER_END=$(date +%s)
   ITER_ELAPSED=$((ITER_END - ITER_START))

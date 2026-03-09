@@ -2645,3 +2645,76 @@
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+## Task 179: Simplify IncomeEntry in simple mode [@frontend]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/components/IncomeEntry.tsx`: Added `useModeContext` import; in simple mode hides income type selector (for existing items and new-item form), currency override badge (CurrencyBadge), and HelpTip tooltips; frequency dropdown remains visible in both modes
+  - `tests/unit/income-entry-simple-mode.test.tsx`: 8 unit tests — verify hidden/visible fields per mode, add form behavior
+  - `tests/e2e/income-entry-simple-mode.spec.ts`: 3 Playwright tests — simple mode hides income type, advanced shows it, add form works in simple mode
+  - `src/lib/changelog.ts`: Added version 179 entry
+- **Tests**: T1: 2666 passed (141 files), T2: 3 passed, Build: passes
+- **Screenshots**: task-179-income-entry-simple-mode, task-179-income-entry-advanced-mode, task-179-income-entry-simple-add
+
+## Task 178: Simplify AssetEntry in simple mode [@frontend]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/components/AssetEntry.tsx`: Added `useModeContext` import; in simple mode hides ROI badge/editor, tax treatment pill, ROI tax treatment toggle, reinvest returns toggle, monthly contribution, employer match section, cost basis badge, unrealized gains badge, surplus target radio, per-asset projections, currency override badge, and all computed assets
+  - `tests/test-utils.tsx`: Added `ModeProvider` + `mode` option to `customRender` so unit tests can render in specific modes
+  - `tests/unit/asset-entry-simple-mode.test.tsx`: 15 unit tests — verify hidden fields in simple mode, visible fields in advanced mode
+  - `tests/e2e/asset-entry-simple-mode.spec.ts`: 3 Playwright tests — simple mode hides advanced fields, advanced mode toggle shows all fields, add asset still works
+  - `src/lib/changelog.ts`: Added version 178 entry
+- **Tests**: T1: 2658 passed (140 files), T2: 3 passed, Build: passes
+- **Screenshots**: task-178-asset-entry-simple-mode, task-178-asset-entry-advanced-mode, task-178-asset-entry-simple-add
+
+## Task 177: Simplify wizard steps in simple mode [@fullstack]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/lib/url-state.ts`: Added `SIMPLE_WIZARD_STEPS` (6 steps), `ADVANCED_WIZARD_STEPS` (9 steps), `getWizardSteps(mode)` helper; `WIZARD_STEPS` kept as backward-compat alias for `ADVANCED_WIZARD_STEPS`
+  - `src/components/wizard/WizardStepper.tsx`: Added `steps` and `mode` props (default to advanced); renders only the provided steps; `tax-summary` shows "Summary" label in simple mode
+  - `src/components/wizard/WizardShell.tsx`: Imports `useModeContext`, computes `activeSteps = getWizardSteps(mode)`, passes to WizardStepper; navigation and footer counter use `activeSteps.length`; URL step redirect to `welcome` if step not in current mode
+  - `src/lib/changelog.ts`: Added version 177 entry
+  - `tests/unit/wizard-steps-mode.test.ts`: 11 unit tests for `getWizardSteps`, step counts, step inclusion/exclusion, backward-compat alias
+  - `tests/e2e/wizard-steps-mode.spec.ts`: 7 Playwright tests: simple/advanced step visibility, footer counters, stepper labels, mode-switch preserves step position
+- **Tests**: T1: 2643 passed (139 files), T2: 7 passed, Build: passes
+- **Screenshots**: task-177-wizard-steps-simple-mode, task-177-wizard-steps-advanced-mode, task-177-wizard-steps-mode-switch-preserves-step
+
+## Task 176: Add mode toggle and persist in URL state [@fullstack]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/lib/financial-types.ts`: Added `mode?: "simple" | "advanced"` to `FinancialState`
+  - `src/lib/url-state.ts`: Added `mo?` to `CompactState`, serialize (omit when simple/default), deserialize into `mode` field
+  - `src/lib/ModeContext.tsx`: New — `AppMode` type, `ModeProvider`, `useModeContext()` hook
+  - `src/app/_use-financial-state.ts`: Added `mode`/`setMode` state, restore from URL, include in `updateURL`
+  - `src/app/_page-helpers.tsx`: Added `ModeToggle` component and import; wired into `AppHeader` between phase toggle and right-side buttons
+  - `src/components/wizard/steps/ProfileStep.tsx`: Added mode selector card with Simple/Advanced buttons using `useModeContext()`
+  - `src/app/page.tsx`: Import `ModeProvider`, destructure `mode`/`setMode`, wrap both wizard and dashboard returns
+  - `src/lib/changelog.ts`: Added version 176 entry
+  - `tests/unit/mode-toggle.test.tsx`: New — 8 unit tests covering ModeContext render/interaction/error and URL round-trip (simple omitted, advanced persisted, field isolation)
+  - `tests/e2e/mode-toggle.spec.ts`: New — 5 E2E tests covering default simple mode, switching to advanced, URL persistence on reload, ProfileStep buttons, data preserved on mode switch
+- **Tests**: T1: 2632 passed (138 files), T2: 5 passed, Build: passes
+- **Screenshots**: task-176-mode-toggle-default-simple, task-176-mode-toggle-advanced-active, task-176-mode-toggle-persists-url, task-176-mode-toggle-data-preserved, task-176-mode-toggle-profile-step
+
+## Task 175: Support yearly/one-time expenses [@fullstack]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/components/ExpenseEntry.tsx`: Added `ExpenseFrequency` type (`"monthly" | "yearly" | "one-time"`), `normalizeExpenseToMonthly()` export, `frequency` field on `ExpenseItem`, frequency dropdown on each item (testid `expense-frequency-${id}`), frequency dropdown in add form (`new-expense-frequency`), updated amount display (shows `$X/yr → $Y/mo` for yearly, `$X once → $Y/mo` for one-time), updated total calculation.
+  - `src/lib/url-state.ts`: Added `f?` field to `CompactExpense`, serialize/deserialize frequency (omit when monthly).
+  - `src/lib/compute-totals.ts`: Import and use `normalizeExpenseToMonthly` for monthly expenses.
+  - `src/lib/flowchart-steps.ts`: Import and use `normalizeExpenseToMonthly` in `getRawMonthlyExpenses`, `detectRetirementHeuristic`, and budget detail items.
+  - `src/lib/financial-state.ts`: Import and use `normalizeExpenseToMonthly` for rent detection and withdrawal tax calculations.
+  - `src/lib/sankey-data.ts`: Import and use `normalizeExpenseToMonthly` for Sankey diagram expense nodes.
+  - `src/app/page.tsx`: Import and use `normalizeExpenseToMonthly` for expense items display.
+  - `src/components/ExpenseBreakdownChart.tsx`: Import and use `normalizeExpenseToMonthly` in `computeExpenseBreakdown` and manual expenses calculation.
+  - `src/lib/changelog.ts`: Updated version 175 entry.
+  - `tests/unit/expense-frequency.test.tsx`: New — 18 unit tests covering `normalizeExpenseToMonthly`, frequency UI display, total normalization, dropdown interactions, and integration calculations.
+  - `tests/e2e/expense-frequency.spec.ts`: New — 7 E2E tests covering default dropdowns, yearly frequency update, label display, add form frequency selector, add yearly/one-time expenses, URL state persistence.
+- **Tests**: T1: 2624 passed (137 files), T2: 7 passed, Build: passes
+- **Screenshots**: task-175-expense-frequency-defaults, task-175-expense-yearly-frequency, task-175-expense-yearly-label, task-175-add-form-with-frequency, task-175-add-yearly-expense, task-175-add-one-time-expense, task-175-expense-frequency-persists
+
+## Task 173: AU E2E tests and regression [@qa] [E2E] [MILESTONE]
+- **Date**: 2026-03-09
+- **Files**:
+  - `tests/e2e/au-e2e.spec.ts`: New — 18 E2E tests covering AU full flow (3 profiles → dashboard), AUD currency display (country button, FX rate, currency badges), Money Steps (AU steps present, CA/US absent), Tax Summary step (Financial Summary with effective rate), Super accounts in assets step (all 3 profiles), CA regression (Money Steps, sample profile, default country/jurisdiction), US regression (Money Steps, country cycle).
+  - `tests/unit/au-url-state.test.ts`: New — 13 unit tests covering AU sample profile URL state round-trip (country preserved, super accounts, HECS-HELP debt, properties, ASX stocks, URL-safe length, no plaintext sensitive data).
+- **Tests**: T1: 2606 passed (136 files), T2: 18 passed, Build: passes
+- **Screenshots**: task-173-au-young-professional-dashboard, task-173-au-mid-career-family-dashboard, task-173-au-pre-retiree-dashboard, task-173-au-country-selected, task-173-au-fx-display-aud, task-173-au-currency-badge-aud, task-173-au-money-steps, task-173-au-tax-summary, task-173-au-pre-retiree-tax-summary, task-173-au-super-in-assets, task-173-au-mid-career-assets, task-173-au-pre-retiree-super-assets, task-173-regression-ca-money-steps, task-173-regression-ca-fresh-grad-dashboard, task-173-regression-us-money-steps, task-173-regression-country-cycle
