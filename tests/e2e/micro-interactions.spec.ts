@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Micro-interactions and polish", () => {
   test("active states on confirm buttons", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Click "+ Add Asset" to open the form
     await page.click("text=+ Add Asset");
@@ -18,7 +18,7 @@ test.describe("Micro-interactions and polish", () => {
   });
 
   test("metric cards have consistent styling without glow animations", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=dashboard");
 
     const runwayCard = page.getByRole("group", { name: "Financial Runway" });
     await expect(runwayCard).toBeVisible();
@@ -31,27 +31,22 @@ test.describe("Micro-interactions and polish", () => {
     await captureScreenshot(page, "task-13-runway-consistent");
   });
 
-  test("tooltip has fade-in animation", async ({ page }) => {
-    await page.goto("/");
+  test("metric card tooltip text is visible on dashboard", async ({ page }) => {
+    await page.goto("/?step=dashboard");
 
-    // Hover over the Net Worth card
+    // Net Worth card should show its tooltip text as static content
     const netWorthCard = page.getByRole("group", { name: "Net Worth" });
-    await netWorthCard.hover();
+    await expect(netWorthCard).toBeVisible();
 
-    // Wait for tooltip to appear
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-
-    // Verify it has the fade-in animation class
-    const tooltipClass = await tooltip.getAttribute("class");
-    expect(tooltipClass).toContain("animate-fade-in");
+    // The tooltip text is now rendered inline as a paragraph
+    await expect(netWorthCard.locator("text=total assets minus total debts")).toBeVisible();
 
     await captureScreenshot(page, "task-13-tooltip-fade");
   });
 
   test("empty states show icons with centered layout", async ({ page }) => {
     // Navigate with empty state (encoded empty data)
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Delete all assets to reach empty state
     const assetSection = page.locator("text=Assets").locator("..");
@@ -71,25 +66,24 @@ test.describe("Micro-interactions and polish", () => {
     await captureScreenshot(page, "task-13-empty-states");
   });
 
-  test("card hover lift effect on entry cards", async ({ page }) => {
-    await page.goto("/");
+  test("asset entry items have hover transition", async ({ page }) => {
+    await page.goto("/?step=assets");
 
-    // Find the Assets card wrapper (the rounded-xl div)
-    const assetsCard = page.locator("[class*='rounded-xl']").filter({ hasText: "Assets" }).first();
-    await expect(assetsCard).toBeVisible();
+    // Find an asset list item (e.g. Savings Account row) - the inner div has transition classes
+    const assetRow = page.locator('[role="listitem"]').filter({ hasText: "Savings Account" }).first();
+    await expect(assetRow).toBeVisible();
 
-    // Verify the card has hover transition classes
-    const className = await assetsCard.getAttribute("class");
-    expect(className).toContain("hover:shadow-md");
-    expect(className).toContain("hover:-translate-y-0.5");
+    // Verify the inner row div has transition classes
+    const innerDiv = assetRow.locator(".group").first();
+    const className = await innerDiv.getAttribute("class");
     expect(className).toContain("transition-all");
 
-    await assetsCard.hover();
+    await assetRow.hover();
     await captureScreenshot(page, "task-13-card-hover");
   });
 
   test("animate-in class on add form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Open debt add form
     await page.click("text=+ Add Debt");

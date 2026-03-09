@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Employer match modeling (Task 112)", () => {
   test("employer match section is visible for RRSP but not for Savings Account", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // a3 is RRSP in INITIAL_STATE — should show employer match section
     const rrspMatch = page.getByTestId("employer-match-section-a3");
@@ -15,7 +15,7 @@ test.describe("Employer match modeling (Task 112)", () => {
   });
 
   test("employer match pct and cap buttons are visible for RRSP", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     const pctBtn = page.getByTestId("employer-match-pct-a3");
     const capBtn = page.getByTestId("employer-match-cap-a3");
@@ -29,7 +29,7 @@ test.describe("Employer match modeling (Task 112)", () => {
   });
 
   test("setting employer match pct shows violet badge", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Click to edit employer match pct for RRSP
     await page.getByTestId("employer-match-pct-a3").click();
@@ -45,7 +45,7 @@ test.describe("Employer match modeling (Task 112)", () => {
   });
 
   test("setting employer match cap shows violet badge", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Set cap for RRSP
     await page.getByTestId("employer-match-cap-a3").click();
@@ -60,7 +60,7 @@ test.describe("Employer match modeling (Task 112)", () => {
   });
 
   test("employer match amount badge appears when both pct, cap, and monthly contribution are set", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // First set a monthly contribution on RRSP (a3)
     await page.getByTestId("contribution-badge-a3").click();
@@ -89,8 +89,8 @@ test.describe("Employer match modeling (Task 112)", () => {
     await captureScreenshot(page, "task-112-employer-match-amount");
   });
 
-  test("employer match insight appears in insights panel", async ({ page }) => {
-    await page.goto("/");
+  test("employer match data persists and match amount shows after reload", async ({ page }) => {
+    await page.goto("/?step=assets");
 
     // Set monthly contribution on RRSP
     await page.getByTestId("contribution-badge-a3").click();
@@ -106,25 +106,32 @@ test.describe("Employer match modeling (Task 112)", () => {
     await page.getByLabel("Edit employer match cap for RRSP").fill("6");
     await page.getByLabel("Edit employer match cap for RRSP").press("Enter");
 
-    // Wait for insights to update
-    await page.waitForTimeout(300);
+    // Verify match amount is visible
+    const matchAmount = page.getByTestId("employer-match-amount-a3");
+    await expect(matchAmount).toBeVisible();
+    await expect(matchAmount).toContainText("$250");
 
-    // Employer match insight should appear
-    const insightText = page.locator("text=free money");
-    await expect(insightText).toBeVisible();
+    // Wait for URL update then reload on same step
+    await page.waitForTimeout(500);
+    await page.reload();
+    await page.waitForSelector('[aria-label="Asset items"]');
+
+    // Match amount should persist
+    await expect(page.getByTestId("employer-match-amount-a3")).toBeVisible();
+    await expect(page.getByTestId("employer-match-amount-a3")).toContainText("$250");
 
     await captureScreenshot(page, "task-112-employer-match-insight");
   });
 
   test("employer match not shown for TFSA (a2)", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     const tfsaMatch = page.getByTestId("employer-match-section-a2");
     await expect(tfsaMatch).not.toBeVisible();
   });
 
   test("employer match cap limits the computed match when contribution is large", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Set a large monthly contribution on RRSP
     await page.getByTestId("contribution-badge-a3").click();

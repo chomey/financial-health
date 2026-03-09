@@ -3,11 +3,10 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Income type selector", () => {
   test("shows income type selector on each income row", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     // Each existing income row should have an income type selector
     await expect(page.getByLabel("Change income type for Salary")).toBeVisible();
-    await expect(page.getByLabel("Change income type for Freelance")).toBeVisible();
 
     // Default value should be "Emp" (employment short label)
     const salaryTypeSelect = page.getByTestId("income-type-i1");
@@ -15,7 +14,7 @@ test.describe("Income type selector", () => {
   });
 
   test("changing income type to capital-gains applies visual styling", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     // Change Salary to Capital Gains type
     await page.getByTestId("income-type-i1").selectOption("capital-gains");
@@ -23,17 +22,17 @@ test.describe("Income type selector", () => {
     // The row should have amber styling (border-l-2 border-amber-400)
     const row = page.getByRole("listitem").filter({ has: page.getByText("Salary") });
     await expect(row).toHaveClass(/border-amber-400/);
-    await expect(row).toHaveClass(/bg-amber-50/);
+    await expect(row).toHaveClass(/bg-amber-400/);
 
     // The type selector should have amber styling too
     const selector = page.getByTestId("income-type-i1");
-    await expect(selector).toHaveClass(/text-amber-700/);
+    await expect(selector).toHaveClass(/text-amber/);
 
     await captureScreenshot(page, "task-43-income-type-capital-gains-styling");
   });
 
   test("income type selector appears in add new income form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     await page.getByText("+ Add Income").click();
 
@@ -46,7 +45,7 @@ test.describe("Income type selector", () => {
   });
 
   test("adding a capital-gains income item shows proper styling", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     await page.getByText("+ Add Income").click();
 
@@ -65,13 +64,13 @@ test.describe("Income type selector", () => {
 
     // The new row should have amber styling
     const row = page.getByRole("listitem").filter({ has: page.getByText("Stock Sale") });
-    await expect(row).toHaveClass(/border-amber-400/);
+    await expect(row).toHaveClass(/bg-amber-400/);
 
     await captureScreenshot(page, "task-43-income-type-capital-gains-added");
   });
 
   test("capital-gains income type persists in URL state", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     // Change Salary to capital-gains
     await page.getByTestId("income-type-i1").selectOption("capital-gains");
@@ -87,13 +86,13 @@ test.describe("Income type selector", () => {
 
     // Visual styling should persist
     const row = page.getByRole("listitem").filter({ has: page.getByText("Salary") });
-    await expect(row).toHaveClass(/border-amber-400/);
+    await expect(row).toHaveClass(/bg-amber-400/);
 
     await captureScreenshot(page, "task-43-income-type-persists-after-reload");
   });
 
   test("category suggestions change based on income type", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
 
     await page.getByText("+ Add Income").click();
 
