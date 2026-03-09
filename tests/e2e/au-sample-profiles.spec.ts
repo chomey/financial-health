@@ -3,7 +3,8 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("AU Sample profiles (Task 165)", () => {
   test("switching to AU in wizard shows AU profile cards", async ({ page }) => {
-    await page.goto("/");
+    // Use /?step=welcome to force wizard mode (bypasses fhs-visited localStorage flag)
+    await page.goto("/?step=welcome");
 
     // Click AU country button in wizard welcome step
     await page.getByTestId("country-au").click();
@@ -17,7 +18,7 @@ test.describe("AU Sample profiles (Task 165)", () => {
   });
 
   test("loading AU young professional profile navigates to dashboard", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
 
     await page.getByTestId("country-au").click();
     await page.getByTestId("sample-profile-au-young-professional").click();
@@ -29,7 +30,7 @@ test.describe("AU Sample profiles (Task 165)", () => {
   });
 
   test("loading AU mid-career family profile navigates to dashboard", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
 
     await page.getByTestId("country-au").click();
     await page.getByTestId("sample-profile-au-mid-career-family").click();
@@ -40,7 +41,7 @@ test.describe("AU Sample profiles (Task 165)", () => {
   });
 
   test("loading AU pre-retiree profile navigates to dashboard", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
 
     await page.getByTestId("country-au").click();
     await page.getByTestId("sample-profile-au-pre-retiree").click();
@@ -51,7 +52,7 @@ test.describe("AU Sample profiles (Task 165)", () => {
   });
 
   test("AU profiles show correct highlight text in cards", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
 
     await page.getByTestId("country-au").click();
 
@@ -68,7 +69,7 @@ test.describe("AU Sample profiles (Task 165)", () => {
   });
 
   test("CA profiles are shown by default, not AU", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
 
     // Default is CA — should see CA profile cards, not AU
     await expect(page.getByTestId("sample-profile-fresh-grad")).toBeVisible();

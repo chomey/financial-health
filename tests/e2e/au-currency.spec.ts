@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-/** Navigate to "/" and get to the profile step with AU selected */
+/** Navigate to wizard welcome step with AU selected, then go to profile step */
 async function gotoAUProfileStep(page: import("@playwright/test").Page) {
-  await page.goto("/");
+  // Use /?step=welcome to force wizard mode (bypasses fhs-visited localStorage flag)
+  await page.goto("/?step=welcome");
   await page.waitForSelector("[data-testid='country-jurisdiction-selector']");
   await page.getByTestId("country-au").click();
   await page.waitForTimeout(200);
@@ -55,8 +56,8 @@ test.describe("AU currency formatting", () => {
   });
 
   test("switching CA to AU updates FX display currencies", async ({ page }) => {
-    // Start on CA profile step
-    await page.goto("/");
+    // Start on CA profile step via wizard
+    await page.goto("/?step=welcome");
     await page.waitForSelector("[data-testid='country-jurisdiction-selector']");
     await page.getByTestId("wizard-step-profile").click();
     await page.waitForTimeout(300);
@@ -78,7 +79,7 @@ test.describe("AU currency formatting", () => {
   });
 
   test("AU currency badge shows AUD on assets step", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
     await page.waitForSelector("[data-testid='country-jurisdiction-selector']");
     await page.getByTestId("country-au").click();
     await page.waitForTimeout(200);
