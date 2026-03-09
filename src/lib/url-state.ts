@@ -601,7 +601,16 @@ export type WizardStep =
   | "tax-credits"
   | "dashboard";
 
-export const WIZARD_STEPS: WizardStep[] = [
+export const SIMPLE_WIZARD_STEPS: WizardStep[] = [
+  "welcome",
+  "profile",
+  "income",
+  "expenses",
+  "assets",
+  "tax-summary",
+] as const;
+
+export const ADVANCED_WIZARD_STEPS: WizardStep[] = [
   "welcome",
   "profile",
   "income",
@@ -613,7 +622,15 @@ export const WIZARD_STEPS: WizardStep[] = [
   "tax-summary",
 ] as const;
 
-const VALID_WIZARD_STEPS = new Set<string>([...WIZARD_STEPS, "dashboard", "tax-credits"]);
+/** Returns the wizard steps for the given mode. */
+export function getWizardSteps(mode: "simple" | "advanced"): WizardStep[] {
+  return mode === "simple" ? SIMPLE_WIZARD_STEPS : ADVANCED_WIZARD_STEPS;
+}
+
+/** @deprecated Use getWizardSteps(mode) — kept for backward compatibility */
+export const WIZARD_STEPS = ADVANCED_WIZARD_STEPS;
+
+const VALID_WIZARD_STEPS = new Set<string>([...ADVANCED_WIZARD_STEPS, "dashboard", "tax-credits"]);
 
 /** Read wizard step from URL param `step=`. Returns null if absent or invalid. */
 export function getStepFromURL(): WizardStep | null {

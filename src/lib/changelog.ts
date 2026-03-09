@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 177,
+    title: "Simple mode wizard — 6-step flow",
+    description: "In Simple mode the wizard is trimmed to 6 steps: Welcome → Profile → Income → Expenses → Assets → Summary. Debts, Property, and Stocks steps are hidden (data is preserved in state). The Tax Summary step is relabelled 'Summary' in Simple mode. Advanced mode retains all 9 steps. WIZARD_STEPS is now dynamic via getWizardSteps(mode); WizardStepper and WizardShell consume the active step list from ModeContext.",
+    date: "2026-03-09",
+  },
+  {
     version: 176,
     title: "Simple / Advanced mode toggle",
     description: "Added a Simple/Advanced mode toggle to the AppHeader (visible on every page) and to the ProfileStep wizard. Mode is persisted in the URL state blob so it survives reloads and sharing. A ModeProvider/useModeContext React context lets any component read the current mode. New users start in Simple mode by default. Data is never lost when switching modes — advanced fields remain in state, they are only hidden in Simple mode. Future tasks will use this flag to progressively hide advanced fields.",

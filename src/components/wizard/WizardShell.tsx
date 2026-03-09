@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { WIZARD_STEPS, type WizardStep, getStepFromURL, updateStepURL } from "@/lib/url-state";
+import { getWizardSteps, type WizardStep, getStepFromURL, updateStepURL } from "@/lib/url-state";
+import { useModeContext } from "@/lib/ModeContext";
 import { getForeignCurrency } from "@/lib/currency";
 import { AppHeader } from "@/app/_page-helpers";
 import WizardStepper from "./WizardStepper";
@@ -74,14 +75,21 @@ export interface WizardProps {
 }
 
 export default function WizardShell(props: WizardProps) {
+  const { mode } = useModeContext();
+  const activeSteps = useMemo(() => getWizardSteps(mode), [mode]);
   const [currentStep, setCurrentStep] = useState<WizardStep>("welcome");
 
   useEffect(() => {
     const urlStep = getStepFromURL();
     if (urlStep && urlStep !== "dashboard") {
-      setCurrentStep(urlStep);
+      // If the step isn't in the current mode's steps, redirect to welcome
+      if (activeSteps.includes(urlStep as WizardStep)) {
+        setCurrentStep(urlStep);
+      } else {
+        setCurrentStep("welcome");
+      }
     }
-  }, []);
+  }, [activeSteps]);
 
   const navigateTo = useCallback((step: WizardStep) => {
     setCurrentStep(step);
@@ -89,23 +97,23 @@ export default function WizardShell(props: WizardProps) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const currentIdx = WIZARD_STEPS.indexOf(currentStep);
+  const currentIdx = activeSteps.indexOf(currentStep);
   const isFirst = currentIdx === 0;
-  const isLast = currentIdx === WIZARD_STEPS.length - 1;
+  const isLast = currentIdx === activeSteps.length - 1;
 
   const goNext = useCallback(() => {
     if (isLast) {
       props.onFinish();
     } else {
-      navigateTo(WIZARD_STEPS[currentIdx + 1]);
+      navigateTo(activeSteps[currentIdx + 1]);
     }
-  }, [currentIdx, isLast, navigateTo, props]);
+  }, [activeSteps, currentIdx, isLast, navigateTo, props]);
 
   const goPrev = useCallback(() => {
     if (!isFirst) {
-      navigateTo(WIZARD_STEPS[currentIdx - 1]);
+      navigateTo(activeSteps[currentIdx - 1]);
     }
-  }, [currentIdx, isFirst, navigateTo]);
+  }, [activeSteps, currentIdx, isFirst, navigateTo]);
 
   const stepCompletion = useMemo(() => ({
     welcome: true, // landing step, always complete
@@ -253,6 +261,8 @@ export default function WizardShell(props: WizardProps) {
             currentStep={currentStep}
             onStepChange={navigateTo}
             stepCompletion={stepCompletion}
+            steps={activeSteps}
+            mode={mode}
           />
       </AppHeader>
 
@@ -276,7 +286,7 @@ export default function WizardShell(props: WizardProps) {
             ← Back
           </button>
           <span className="text-xs text-slate-600 tabular-nums">
-            {currentIdx + 1} of {WIZARD_STEPS.length}
+            {currentIdx + 1} of {activeSteps.length}
           </span>
           <button
             type="button"

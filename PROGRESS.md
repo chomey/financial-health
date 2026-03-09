@@ -8,11 +8,23 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 173
-- **Remaining**: 11
+- **Completed**: 174
+- **Remaining**: 10
 - **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 177: Simplify wizard steps in simple mode [@fullstack]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/lib/url-state.ts`: Added `SIMPLE_WIZARD_STEPS` (6 steps), `ADVANCED_WIZARD_STEPS` (9 steps), `getWizardSteps(mode)` helper; `WIZARD_STEPS` kept as backward-compat alias for `ADVANCED_WIZARD_STEPS`
+  - `src/components/wizard/WizardStepper.tsx`: Added `steps` and `mode` props (default to advanced); renders only the provided steps; `tax-summary` shows "Summary" label in simple mode
+  - `src/components/wizard/WizardShell.tsx`: Imports `useModeContext`, computes `activeSteps = getWizardSteps(mode)`, passes to WizardStepper; navigation and footer counter use `activeSteps.length`; URL step redirect to `welcome` if step not in current mode
+  - `src/lib/changelog.ts`: Added version 177 entry
+  - `tests/unit/wizard-steps-mode.test.ts`: 11 unit tests for `getWizardSteps`, step counts, step inclusion/exclusion, backward-compat alias
+  - `tests/e2e/wizard-steps-mode.spec.ts`: 7 Playwright tests: simple/advanced step visibility, footer counters, stepper labels, mode-switch preserves step position
+- **Tests**: T1: 2643 passed (139 files), T2: 7 passed, Build: passes
+- **Screenshots**: task-177-wizard-steps-simple-mode, task-177-wizard-steps-advanced-mode, task-177-wizard-steps-mode-switch-preserves-step
 
 ## Task 176: Add mode toggle and persist in URL state [@fullstack]
 - **Date**: 2026-03-09

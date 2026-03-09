@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { WIZARD_STEPS, type WizardStep } from "@/lib/url-state";
+import { ADVANCED_WIZARD_STEPS, type WizardStep } from "@/lib/url-state";
+import type { AppMode } from "@/lib/ModeContext";
 
-const STEP_META: Record<string, { icon: string; label: string; shortLabel: string }> = {
+const STEP_META: Record<string, { icon: string; label: string; shortLabel: string; simpleLabel?: string; simpleShort?: string }> = {
   welcome: { icon: "👋", label: "Welcome", shortLabel: "Start" },
   profile: { icon: "👤", label: "Profile", shortLabel: "Profile" },
   property: { icon: "🏠", label: "Properties", shortLabel: "Property" },
@@ -11,7 +12,7 @@ const STEP_META: Record<string, { icon: string; label: string; shortLabel: strin
   stocks: { icon: "📊", label: "Stocks", shortLabel: "Stocks" },
   debts: { icon: "💳", label: "Debts", shortLabel: "Debts" },
   income: { icon: "💵", label: "Income", shortLabel: "Income" },
-  "tax-summary": { icon: "📋", label: "Tax Summary", shortLabel: "Tax" },
+  "tax-summary": { icon: "📋", label: "Tax Summary", shortLabel: "Tax", simpleLabel: "Summary", simpleShort: "Summary" },
   expenses: { icon: "🧾", label: "Expenses & Credits", shortLabel: "Expenses" },
 };
 
@@ -19,12 +20,16 @@ export default function WizardStepper({
   currentStep,
   onStepChange,
   stepCompletion,
+  steps = ADVANCED_WIZARD_STEPS,
+  mode = "advanced",
 }: {
   currentStep: WizardStep;
   onStepChange: (step: WizardStep) => void;
   stepCompletion: Record<string, boolean>;
+  steps?: WizardStep[];
+  mode?: AppMode;
 }) {
-  const currentIdx = WIZARD_STEPS.indexOf(currentStep);
+  const currentIdx = steps.indexOf(currentStep);
   const activeRef = useRef<HTMLButtonElement>(null);
 
   // Auto-scroll the active step into view (centered) when step changes
@@ -35,11 +40,13 @@ export default function WizardStepper({
   return (
     <nav className="w-full overflow-x-auto scrollbar-hide" aria-label="Wizard steps" style={{ scrollbarWidth: "none" }}>
       <ol className="flex items-center gap-0 px-4 py-0.5">
-        {WIZARD_STEPS.map((step, idx) => {
+        {steps.map((step, idx) => {
           const meta = STEP_META[step];
           const isCurrent = step === currentStep;
           const isComplete = stepCompletion[step] ?? false;
           const isPast = idx < currentIdx;
+          const label = (mode === "simple" && meta.simpleLabel) ? meta.simpleLabel : meta.label;
+          const shortLabel = (mode === "simple" && meta.simpleShort) ? meta.simpleShort : meta.shortLabel;
 
           return (
             <li key={step} className="flex items-center">
@@ -56,10 +63,10 @@ export default function WizardStepper({
                 data-testid={`wizard-step-${step}`}
               >
                 <span className="text-sm" aria-hidden="true">{meta.icon}</span>
-                <span className="hidden sm:inline">{meta.label}</span>
-                <span className="sm:hidden">{meta.shortLabel}</span>
+                <span className="hidden sm:inline">{label}</span>
+                <span className="sm:hidden">{shortLabel}</span>
               </button>
-              {idx < WIZARD_STEPS.length - 1 && (
+              {idx < steps.length - 1 && (
                 <div
                   className="mx-0.5 h-px w-4 bg-white/10"
                   aria-hidden="true"
