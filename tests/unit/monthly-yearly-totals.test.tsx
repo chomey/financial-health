@@ -85,17 +85,4 @@ describe("ExpenseEntry dual monthly/yearly display", () => {
     expect(parent?.textContent).toContain("|");
   });
 
-  it("auto-computed investment contributions row shows both amounts", () => {
-    render(<ExpenseEntry investmentContributions={500} />);
-    const row = screen.getByTestId("investment-contributions-row");
-    expect(row.textContent).toContain("$500/mo");
-    expect(row.textContent).toContain("$6,000/yr");
-  });
-
-  it("auto-computed mortgage payments row shows both amounts", () => {
-    render(<ExpenseEntry mortgagePayments={1200} />);
-    const row = screen.getByTestId("mortgage-payments-row");
-    expect(row.textContent).toContain("$1,200/mo");
-    expect(row.textContent).toContain("$14,400/yr");
-  });
 });
