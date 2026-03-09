@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 184,
+    title: "Simple/Advanced mode E2E tests",
+    description: "Comprehensive E2E test suite covering mode toggle URL persistence, simple mode field hiding (wizard steps, asset ROI/tax badges, income types), advanced mode full visibility, data preservation across mode switches (assets, income, debts round-trip), dashboard section counts and upgrade banner, and quick-start profile loading for all 6 country/tenure combinations (CA/US/AU renters and homeowners).",
+    date: "2026-03-09",
+  },
+  {
     version: 183,
     title: "Simple mode — quick-start profiles and welcome step",
     description: "In Simple mode, the Welcome step shows a new tagline: 'Get a quick snapshot of your financial health in under 2 minutes.' Two quick-start sample profiles are now available per country (CA, US, AU): 'Renter with salary' (income, rent, basic expenses, savings account) and 'Homeowner with mortgage' (income, expenses, home + mortgage via _simple_home, savings + retirement account). Quick-start profiles use only simple-mode fields — no stocks, no cost basis, no employer match, no tax credits. In Advanced mode, the original 3 detailed sample profiles are shown as before.",

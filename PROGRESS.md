@@ -8,11 +8,19 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 183
-- **Remaining**: 1
+- **Completed**: 184
+- **Remaining**: 0
 - **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 184: Simple/advanced mode E2E tests [@qa] [E2E]
+- **Date**: 2026-03-09
+- **Files**:
+  - `tests/e2e/simple-advanced-mode-e2e.spec.ts`: New — 21 tests covering mode toggle URL persistence, simple mode wizard step hiding, advanced mode all-fields visibility, data preservation across mode switches (assets, income, debts), simple/advanced dashboard sections, and all 6 quick-start profiles (CA/US/AU renter + homeowner).
+- **Tests**: T1: 2710 passed (145 files), T2: 21 passed, T3: 693 passed (full regression), Build: passes
+- **Screenshots**: task-184-simple-mode-persists-url, task-184-data-preserved-after-mode-switch, task-184-debts-preserved-through-simple, task-184-simple-dashboard-sections, task-184-advanced-dashboard-sections, task-184-ca-renter-dashboard, task-184-ca-homeowner-dashboard, task-184-us-renter-dashboard, task-184-us-homeowner-dashboard, task-184-au-renter-dashboard, task-184-au-homeowner-dashboard
+- **Notes**: All 184 tasks complete. Full regression green — 693 E2E tests pass.
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08
