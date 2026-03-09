@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 const fxCache = new Map<string, { rate: number; timestamp: string; expiry: number }>();
 const CACHE_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
 
-const VALID_CURRENCIES = new Set(["CAD", "USD"]);
+const VALID_CURRENCIES = new Set(["CAD", "USD", "AUD"]);
 
 export async function GET(request: NextRequest) {
   const from = request.nextUrl.searchParams.get("from")?.toUpperCase();
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   if (!from || !to || !VALID_CURRENCIES.has(from) || !VALID_CURRENCIES.has(to)) {
     return NextResponse.json(
-      { error: "Invalid currency. Supported: CAD, USD" },
+      { error: "Invalid currency. Supported: CAD, USD, AUD" },
       { status: 400 },
     );
   }

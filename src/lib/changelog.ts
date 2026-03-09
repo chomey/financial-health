@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: AU currency formatting and FX rates
+  {
+    version: 167,
+    title: "Australia: AUD currency formatting and FX rates",
+    description: "Added AUD to the FX rate API route (previously only CAD and USD were accepted). Fixed WizardShell ProfileStep passing incorrect foreignCurrency for AU users (was hardcoded CAD for non-CAD home, now uses getForeignCurrency() which returns USD for AUD). FxRateDisplay now correctly shows '1 USD = X AUD' for AU users. FALLBACK_RATES already included all AUD pairs. formatCurrencyCompact already handled AU$ prefix for foreign AUD amounts.",
+    date: "2026-03-08",
+  },
   // Australia: AU insights and encouragement text
   {
     version: 166,

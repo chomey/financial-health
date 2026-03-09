@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { WIZARD_STEPS, type WizardStep, getStepFromURL, updateStepURL } from "@/lib/url-state";
+import { getForeignCurrency } from "@/lib/currency";
 import { AppHeader } from "@/app/_page-helpers";
 import WizardStepper from "./WizardStepper";
 import WelcomeStep from "./steps/WelcomeStep";
@@ -168,7 +169,7 @@ export default function WizardShell(props: WizardProps) {
             filingStatus={props.filingStatus}
             taxYear={props.taxYear}
             homeCurrency={props.homeCurrency}
-            foreignCurrency={props.homeCurrency === "CAD" ? "USD" : "CAD"}
+            foreignCurrency={getForeignCurrency(props.homeCurrency)}
             effectiveFxRates={props.effectiveFxRates}
             fxManualOverride={props.fxManualOverride}
             onCountryChange={props.handleCountryChange}

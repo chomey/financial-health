@@ -19,6 +19,9 @@ describe("currency", () => {
     it("returns USD for US", () => {
       expect(getHomeCurrency("US")).toBe("USD");
     });
+    it("returns AUD for AU", () => {
+      expect(getHomeCurrency("AU")).toBe("AUD");
+    });
   });
 
   describe("getForeignCurrency", () => {
@@ -27,6 +30,9 @@ describe("currency", () => {
     });
     it("returns CAD when home is USD", () => {
       expect(getForeignCurrency("USD")).toBe("CAD");
+    });
+    it("returns USD when home is AUD", () => {
+      expect(getForeignCurrency("AUD")).toBe("USD");
     });
   });
 
@@ -63,6 +69,24 @@ describe("currency", () => {
       // Temporarily test with a hypothetical pair that has no fallback
       expect(convertToHome(1000, "CAD", "CAD", emptyRates)).toBe(1000);
     });
+
+    it("converts USD to AUD using provided rates", () => {
+      const audRates: FxRates = { USD_AUD: 1.59, AUD_USD: 0.63 };
+      expect(convertToHome(1000, "USD", "AUD", audRates)).toBeCloseTo(1590, 0);
+    });
+
+    it("converts AUD to USD using provided rates", () => {
+      const audRates: FxRates = { USD_AUD: 1.59, AUD_USD: 0.63 };
+      expect(convertToHome(1000, "AUD", "USD", audRates)).toBeCloseTo(630, 0);
+    });
+
+    it("falls back to FALLBACK_RATES for AUD_USD", () => {
+      expect(convertToHome(1000, "AUD", "USD", {})).toBeCloseTo(630, 0);
+    });
+
+    it("falls back to FALLBACK_RATES for AUD_CAD", () => {
+      expect(convertToHome(1000, "AUD", "CAD", {})).toBeCloseTo(870, 0);
+    });
   });
 
   describe("formatCurrency", () => {
@@ -98,6 +122,16 @@ describe("currency", () => {
     it("formats with plain $ for home currency", () => {
       expect(formatCurrencyCompact(1_200_000, "USD", "USD")).toBe("$1.2M");
       expect(formatCurrencyCompact(1_200_000, "CAD", "CAD")).toBe("$1.2M");
+    });
+
+    it("formats AUD home currency with plain $", () => {
+      expect(formatCurrencyCompact(1_200_000, "AUD", "AUD")).toBe("$1.2M");
+      expect(formatCurrencyCompact(55_000, "AUD", "AUD")).toBe("$55k");
+    });
+
+    it("formats AUD as foreign with AU$ prefix", () => {
+      expect(formatCurrencyCompact(1_200_000, "AUD", "USD")).toBe("AU$1.2M");
+      expect(formatCurrencyCompact(55_000, "AUD", "CAD")).toBe("AU$55k");
     });
 
     it("formats with prefix for foreign currency", () => {
@@ -156,6 +190,35 @@ describe("currency", () => {
       const rates = getEffectiveFxRates("USD", 0.73);
       expect(rates["CAD_USD"]).toBe(0.73);
       expect(rates["USD_CAD"]).toBeCloseTo(1 / 0.73, 5);
+    });
+
+    it("uses manual override for AUD home", () => {
+      const rates = getEffectiveFxRates("AUD", 1.59);
+      expect(rates["USD_AUD"]).toBe(1.59);
+      expect(rates["AUD_USD"]).toBeCloseTo(1 / 1.59, 5);
+    });
+
+    it("falls back to hardcoded rates for AUD", () => {
+      const rates = getEffectiveFxRates("AUD");
+      expect(rates["AUD_USD"]).toBe(FALLBACK_RATES["AUD_USD"]);
+      expect(rates["USD_AUD"]).toBe(FALLBACK_RATES["USD_AUD"]);
+    });
+  });
+
+  describe("FALLBACK_RATES completeness", () => {
+    it("includes all AUD pairs", () => {
+      expect(FALLBACK_RATES["AUD_USD"]).toBeGreaterThan(0);
+      expect(FALLBACK_RATES["USD_AUD"]).toBeGreaterThan(0);
+      expect(FALLBACK_RATES["AUD_CAD"]).toBeGreaterThan(0);
+      expect(FALLBACK_RATES["CAD_AUD"]).toBeGreaterThan(0);
+    });
+
+    it("AUD_USD and USD_AUD are reciprocals", () => {
+      expect(FALLBACK_RATES["AUD_USD"] * FALLBACK_RATES["USD_AUD"]).toBeCloseTo(1, 2);
+    });
+
+    it("AUD_CAD and CAD_AUD are reciprocals", () => {
+      expect(FALLBACK_RATES["AUD_CAD"] * FALLBACK_RATES["CAD_AUD"]).toBeCloseTo(1, 2);
     });
   });
 });

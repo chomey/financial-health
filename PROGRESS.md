@@ -8,22 +8,26 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 166
-- **Remaining**: 3
+- **Completed**: 167
+- **Remaining**: 2
 - **Last Updated**: 2026-03-08
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 166: AU insights and encouragement text [@backend]
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 167: AU currency formatting and FX rates [@fullstack]
 - **Date**: 2026-03-08
 - **Files**:
-  - `src/lib/insights/types.ts`: Added 5 new InsightType literals: `"au-super"`, `"au-hecs-help"`, `"au-fhss"`, `"au-franking"`, `"au-mls"`.
-  - `src/lib/insights/generate.ts`: (1) `buildTaxRateHighMessage` — AU branch with salary-sacrifice/concessional cap language; (2) withdrawal-tax no-free message uses AU super terminology instead of TFSA/Roth IRA; (3) tax optimization account names use `Super (Pension Phase)` / `Super (Accumulation)` for AU; (4) salary-sacrifice deduction insight with 15% fund tax vs marginal rate; (5) unclaimed credits AU branch (LITO, Super Co-contribution, Franking Credits, PHI Rebate); (6) New AU-specific insights block: super guarantee check, HECS-HELP repayment, FHSS eligibility, franking credits suggestion, MLS avoidance.
-  - `src/lib/changelog.ts`: Added version 166 entry.
-  - `tests/unit/au-insights.test.ts`: New — 33 tests covering all 5 AU insight types, CA/US regression, deduplication pass-through.
-- **Tests**: T1: 2490 passed (131 files), Build: passes
-- **Screenshots**: N/A (backend task)
-- **Notes**: Super Guarantee rate 11.5% (2024-25) consistent with flowchart-steps.ts and task description. Unclaimed credits only fire when user has already entered ≥1 tax credit (matches existing CA/US behavior). MLS threshold $93k singles (2025-26). HECS-HELP repayment threshold $54,435 (2025-26).
+  - `src/app/api/fx-rate/route.ts`: Added "AUD" to VALID_CURRENCIES set; updated error message to list all three currencies.
+  - `src/components/wizard/WizardShell.tsx`: Fixed ProfileStep receiving wrong `foreignCurrency` — replaced hardcoded `homeCurrency === "CAD" ? "USD" : "CAD"` with `getForeignCurrency(homeCurrency)`. AU users now correctly see "1 USD = X AUD" in FxRateDisplay.
+  - `tests/unit/currency.test.ts`: Added tests for `getHomeCurrency("AU")`, `getForeignCurrency("AUD")`, AUD convertToHome (live rates + fallback), AUD formatCurrencyCompact (home and foreign), AUD getEffectiveFxRates, and FALLBACK_RATES reciprocal validation.
+  - `tests/unit/changelog.test.ts`: Updated version counts 166→167 and AU milestone count 9→10.
+  - `tests/e2e/au-currency.spec.ts`: New — 5 E2E tests: AU FX display shows USD/AUD on profile step, rate value button clickable, manual override shows custom badge, CA→AU switch updates display, AUD badge appears on assets step.
+  - `src/lib/changelog.ts`: Added version 167 entry.
+- **Tests**: T1: 2503 passed (131 files), T2: 5 passed, Build: passes
+- **Screenshots**: task-167-au-fx-display, task-167-au-fx-rate-value, task-167-au-fx-manual-override, task-167-ca-to-au-fx-switch, task-167-au-currency-badge-assets
+- **Notes**: The core currency formatting (AU$, fallback rates, getEffectiveFxRates for AUD) was already correct — the main bugs were: (1) FX API route rejected AUD requests, (2) WizardShell hardcoded foreignCurrency logic excluded AUD correctly showing USD as AU's foreign pair. Pre-existing changelog test failure from task 166 fixed in separate commit.
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08
