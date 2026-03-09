@@ -21,7 +21,7 @@
 
 - [x] Task 178: Simplify AssetEntry in simple mode — In simple mode, show only: category dropdown, amount. Hide: ROI (use smart defaults silently), tax treatment pill, cost basis %, employer match fields, reinvest returns toggle, monthly contribution, surplus target checkbox, currency override badge. The "AUTO-COMPUTED" section for property equity and stocks is hidden (since those steps don't exist in simple mode). All hidden field values are preserved in state — switching to advanced reveals them. [@frontend]
 
-- [ ] Task 179: Simplify IncomeEntry in simple mode — In simple mode, show only: category, amount, frequency dropdown. Hide: income type selector (default to "employment"), currency override badge, HelpTip tooltips. Frequency stays visible because it's critical for accurate monthly calculations. [@frontend]
+- [x] Task 179: Simplify IncomeEntry in simple mode — In simple mode, show only: category, amount, frequency dropdown. Hide: income type selector (default to "employment"), currency override badge, HelpTip tooltips. Frequency stays visible because it's critical for accurate monthly calculations. [@frontend]
 
 - [ ] Task 180: Simplify DebtEntry and fold into Expenses in simple mode — In simple mode, the Debts wizard step is hidden. Instead, add a "Debt Payments" subsection at the bottom of ExpenseEntry that shows a single input: "Monthly debt payments (credit cards, loans, etc.)". This single number maps to a single debt item in state with category "Debt Payments". When switching to advanced mode, the user can break this into individual debts with interest rates. In advanced mode, DebtEntry works as-is with all fields (interest rate, monthly payment, category). [@fullstack]
 

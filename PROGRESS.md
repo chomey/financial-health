@@ -8,11 +8,21 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 175
-- **Remaining**: 9
+- **Completed**: 176
+- **Remaining**: 8
 - **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 179: Simplify IncomeEntry in simple mode [@frontend]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/components/IncomeEntry.tsx`: Added `useModeContext` import; in simple mode hides income type selector (for existing items and new-item form), currency override badge (CurrencyBadge), and HelpTip tooltips; frequency dropdown remains visible in both modes
+  - `tests/unit/income-entry-simple-mode.test.tsx`: 8 unit tests — verify hidden/visible fields per mode, add form behavior
+  - `tests/e2e/income-entry-simple-mode.spec.ts`: 3 Playwright tests — simple mode hides income type, advanced shows it, add form works in simple mode
+  - `src/lib/changelog.ts`: Added version 179 entry
+- **Tests**: T1: 2666 passed (141 files), T2: 3 passed, Build: passes
+- **Screenshots**: task-179-income-entry-simple-mode, task-179-income-entry-advanced-mode, task-179-income-entry-simple-add
 
 ## Task 178: Simplify AssetEntry in simple mode [@frontend]
 - **Date**: 2026-03-09

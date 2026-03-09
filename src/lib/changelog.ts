@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 179,
+    title: "Simple mode — streamlined IncomeEntry",
+    description: "In Simple mode, IncomeEntry shows only category, amount, and frequency dropdown per income item. Hidden: income type selector (defaults to 'employment'), currency override badge, HelpTip tooltips. All hidden field values are preserved in state — switching to Advanced reveals them. Frequency remains visible in both modes since it's critical for accurate monthly calculations.",
+    date: "2026-03-09",
+  },
+  {
     version: 178,
     title: "Simple mode — streamlined AssetEntry",
     description: "In Simple mode, AssetEntry shows only the category and amount for each asset. Hidden fields (ROI, tax treatment pill, ROI tax treatment, reinvest returns toggle, monthly contribution, employer match, cost basis, unrealized gains, surplus target, per-asset projections, currency override badge) remain in state and reappear when switching to Advanced mode. Computed auto-assets (property equity) are hidden in Simple mode since the Property step doesn't exist. test-utils updated to provide ModeProvider to all unit tests via a new 'mode' render option.",

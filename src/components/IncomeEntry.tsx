@@ -9,6 +9,7 @@ import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 import HelpTip from "@/components/HelpTip";
+import { useModeContext } from "@/lib/ModeContext";
 
 export type IncomeFrequency = "monthly" | "weekly" | "biweekly" | "quarterly" | "semi-annually" | "annually";
 
@@ -114,6 +115,8 @@ interface IncomeEntryProps {
 export default function IncomeEntry({ items: controlledItems, onChange, homeCurrency, fxRates }: IncomeEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
+  const { mode } = useModeContext();
+  const isSimple = mode === "simple";
   const [items, setItems] = useControlledArray(controlledItems, MOCK_INCOME, onChange);
 
   type IncomeField = "category" | "amount";
@@ -292,7 +295,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
 
                 {/* Amount + Currency */}
                 <div className="flex items-center gap-1 ml-auto">
-                  {homeCurrency && fxRates && (
+                  {homeCurrency && fxRates && !isSimple && (
                     <span data-testid={`income-details-${item.id}`}>
                       <CurrencyBadge
                         currency={item.currency}
@@ -355,6 +358,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                 </select>
 
                 {/* Income type selector */}
+                {!isSimple && (
                 <select
                   value={item.incomeType ?? "employment"}
                   onChange={(e) => changeIncomeType(item.id, e.target.value as IncomeType)}
@@ -372,6 +376,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                     </option>
                   ))}
                 </select>
+                )}
                 </div>
               </div>
 
@@ -472,8 +477,9 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                     </option>
                   ))}
                 </select>
-                <HelpTip text="How often you receive this income — converted to monthly for calculations." />
+                {!isSimple && <HelpTip text="How often you receive this income — converted to monthly for calculations." />}
               </div>
+              {!isSimple && (
               <div className="flex items-center gap-1">
                 <select
                   value={newIncomeType}
@@ -490,6 +496,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                 </select>
                 <HelpTip text="Employment income is fully taxed; capital gains rates are lower." />
               </div>
+              )}
               <button
                 type="button"
                 onClick={addItem}
