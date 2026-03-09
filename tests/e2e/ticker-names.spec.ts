@@ -3,8 +3,8 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Ticker Names Display", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Financial Health Snapshot" })).toBeVisible();
+    await page.goto("/?step=stocks");
+    await expect(page.getByRole("heading", { name: "Stocks & Equity" }).first()).toBeVisible();
   });
 
   test("shows company name below known ticker after adding stock", async ({ page }) => {
@@ -15,7 +15,7 @@ test.describe("Ticker Names Display", () => {
     await page.click('[aria-label="Confirm add stock"]');
 
     // Wait for AAPL to appear
-    await expect(page.locator("text=AAPL")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit ticker for AAPL" })).toBeVisible();
 
     // Verify Apple company name appears below the ticker
     const tickerNameEl = page.locator('[data-testid^="ticker-name-"]').first();
@@ -57,7 +57,7 @@ test.describe("Ticker Names Display", () => {
     await page.click('[aria-label="Confirm add stock"]');
 
     // ZZZZZ should appear but no company name subtitle
-    await expect(page.locator("text=ZZZZZ")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit ticker for ZZZZZ" })).toBeVisible();
 
     // Wait a moment for any async resolution to complete
     await page.waitForTimeout(1000);
@@ -75,7 +75,7 @@ test.describe("Ticker Names Display", () => {
     await page.click('[aria-label="Confirm add stock"]');
 
     // Wait for the ticker to appear
-    await expect(page.locator("text=TSLA")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit ticker for TSLA" })).toBeVisible();
 
     // Verify Tesla name appears in the stock entry
     const tickerNameEl = page.locator('[data-testid^="ticker-name-"]').first();
