@@ -3,8 +3,8 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Stock ROI performance tracking", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await expect(page.locator("text=Financial Health Snapshot")).toBeVisible();
+    await page.goto("/?step=stocks");
+    await expect(page.getByRole("heading", { name: "Stocks & Equity" }).first()).toBeVisible();
   });
 
   test("shows purchase date button on stock with cost basis", async ({ page }) => {
@@ -15,7 +15,7 @@ test.describe("Stock ROI performance tracking", () => {
     await page.click('[aria-label="Confirm add stock"]');
 
     // Wait for the stock to appear
-    await expect(page.locator("text=AAPL")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit ticker for AAPL" })).toBeVisible();
 
     // Set cost basis
     const costBasisBtn = page.getByRole("button", { name: /cost basis/i }).first();
@@ -37,7 +37,7 @@ test.describe("Stock ROI performance tracking", () => {
     await page.fill('[aria-label="Number of shares"]', "5");
     await page.click('[aria-label="Confirm add stock"]');
 
-    await expect(page.locator("text=MSFT")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit ticker for MSFT" })).toBeVisible();
 
     // Set cost basis
     const costBasisBtn = page.getByRole("button", { name: /cost basis/i }).first();
@@ -47,7 +47,7 @@ test.describe("Stock ROI performance tracking", () => {
     await costBasisInput.press("Enter");
 
     // Wait for basis to be set
-    await expect(page.locator("text=Basis: $100.00")).toBeVisible();
+    await expect(page.locator("text=Basis: $100")).toBeVisible();
 
     // Set purchase date (1 year ago)
     const oneYearAgo = new Date();
@@ -77,7 +77,7 @@ test.describe("Stock ROI performance tracking", () => {
     await page.fill('[aria-label="Number of shares"]', "10");
     await page.click('[aria-label="Confirm add stock"]');
 
-    await expect(page.locator("text=GOOG")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit ticker for GOOG" })).toBeVisible();
 
     // Set cost basis
     const costBasisBtn = page.getByRole("button", { name: /cost basis/i }).first();
@@ -101,9 +101,10 @@ test.describe("Stock ROI performance tracking", () => {
     await page.fill('[aria-label="Number of shares"]', "5");
     await page.click('[aria-label="Confirm add stock"]');
 
-    await expect(page.locator("text=TSLA")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit ticker for TSLA" })).toBeVisible();
 
-    // Wait for dashboard update
+    // Navigate to dashboard
+    await page.getByTestId("wizard-skip-to-dashboard").click();
     await page.waitForTimeout(500);
 
     // Portfolio Performance card should appear in dashboard
@@ -120,7 +121,7 @@ test.describe("Stock ROI performance tracking", () => {
     await page.fill('[aria-label="Number of shares"]', "3");
     await page.click('[aria-label="Confirm add stock"]');
 
-    await expect(page.locator("text=AMZN")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit ticker for AMZN" })).toBeVisible();
 
     // Set cost basis
     const costBasisBtn = page.getByRole("button", { name: /cost basis/i }).first();
@@ -128,7 +129,7 @@ test.describe("Stock ROI performance tracking", () => {
     const costBasisInput = page.locator('[aria-label*="Edit cost basis for AMZN"]');
     await costBasisInput.fill("120");
     await costBasisInput.press("Enter");
-    await expect(page.locator("text=Basis: $120.00")).toBeVisible();
+    await expect(page.locator("text=Basis: $120")).toBeVisible();
 
     // Set purchase date
     const purchaseDateBtn = page.getByRole("button", { name: /purchase date/i });
@@ -142,11 +143,11 @@ test.describe("Stock ROI performance tracking", () => {
 
     // Reload page
     await page.reload();
-    await expect(page.locator("text=Financial Health Snapshot")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Stocks & Equity" }).first()).toBeVisible();
 
     // Verify stock persisted with purchase date
-    await expect(page.locator("text=AMZN")).toBeVisible();
-    await expect(page.locator("text=Basis: $120.00")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit ticker for AMZN" })).toBeVisible();
+    await expect(page.locator("text=Basis: $120")).toBeVisible();
     await expect(page.locator("text=Bought:")).toBeVisible();
 
     await captureScreenshot(page, "task-54-purchase-date-persisted");
