@@ -465,9 +465,9 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   task_title=$(extract_task_title "$next_task")
   task_tag=$(extract_agent_tag "$next_task")
 
-  # Extract task number for branch naming
+  # Extract task number for branch naming (head -1: only the FIRST "Task NNN", not references to other tasks)
   local task_num
-  task_num=$(echo "$next_task" | grep -oE 'Task [0-9]+' | grep -oE '[0-9]+')
+  task_num=$(echo "$next_task" | grep -oE 'Task [0-9]+' | head -1 | grep -oE '[0-9]+')
   task_num=${task_num:-$i}
 
   print ""
@@ -493,13 +493,13 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
     cleanup_worktree "$wt_path" "$branch_name"
     git -C "$SCRIPT_DIR" worktree prune 2>/dev/null || true
     git -C "$SCRIPT_DIR" worktree add -b "$branch_name" "$wt_path" "$MAIN_BRANCH" 2>&1 || {
-      print "${RED}  ✗ Retry failed. Skipping task.${NC}"
+      print "${RED}  ✗ Retry failed. Stopping loop.${NC}"
       TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
       ITER_TIMES+=($(($(date +%s) - ITER_START)))
       ITER_MODELS+=("unknown")
       ITER_TAGS+=("$task_tag")
       ITER_TITLES+=("${task_title} ${RED}(worktree failed)${NC}")
-      continue
+      break
     }
   fi
 
