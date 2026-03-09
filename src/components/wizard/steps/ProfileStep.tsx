@@ -2,6 +2,7 @@
 
 import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
 import FxRateDisplay from "@/components/FxRateDisplay";
+import HelpTip from "@/components/HelpTip";
 import { getFilingStatuses } from "@/lib/tax-credits";
 import type { FilingStatus } from "@/lib/tax-credits";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
@@ -51,7 +52,10 @@ export default function ProfileStep({
       {/* Country, Region, Tax, Filing */}
       <div className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">Tax Year</label>
+          <div className="mb-2 flex items-center gap-1.5">
+            <span className="text-sm font-medium text-slate-300">Tax Year</span>
+            <HelpTip text="Which tax year to use for estimating your taxes." />
+          </div>
           <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
             <button
               type="button"
@@ -111,8 +115,12 @@ export default function ProfileStep({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">Filing Status</label>
+          <div className="mb-2 flex items-center gap-1.5">
+            <label className="text-sm font-medium text-slate-300" htmlFor="filing-status-select">Filing Status</label>
+            <HelpTip text="Affects tax bracket thresholds and deduction amounts." />
+          </div>
           <select
+            id="filing-status-select"
             value={filingStatus}
             onChange={(e) => onFilingStatusChange(e.target.value as FilingStatus)}
             className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
@@ -127,7 +135,10 @@ export default function ProfileStep({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">Exchange Rate</label>
+          <div className="mb-2 flex items-center gap-1.5">
+            <span className="text-sm font-medium text-slate-300">Exchange Rate</span>
+            <HelpTip text="Used to convert foreign-currency holdings to your home currency." />
+          </div>
           <FxRateDisplay
             homeCurrency={homeCurrency}
             foreignCurrency={foreignCurrency}

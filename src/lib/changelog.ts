@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Contextual help tooltips
+  {
+    version: 169,
+    title: "Contextual help tooltips for wizard fields",
+    description: "Added a reusable HelpTip component (? icon with click-to-toggle popover) for explaining non-obvious wizard fields. Applied to: Profile — Tax Year, Filing Status, Exchange Rate. Income — Frequency and Income Type in the add-new form. Assets — Tax Treatment, ROI, Reinvest Returns, Employer Match, Cost Basis %, and Surplus Target. Debts — Interest Rate. Property — Amortization (term years) and Appreciation rate. Mobile: tap to toggle. Desktop: click to show/hide. Outside click closes the popover.",
+    date: "2026-03-08",
+  },
   // Wizard step reorder
   {
     version: 168,

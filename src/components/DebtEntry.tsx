@@ -8,6 +8,7 @@ import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
+import HelpTip from "@/components/HelpTip";
 
 export interface Debt {
   id: string;
@@ -342,23 +343,26 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     placeholder="e.g. 19.9"
                   />
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => startEdit(debt.id, "interestRate", String(debt.interestRate ?? ""))}
-                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
-                      hasInterest
-                        ? "bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
-                        : displayInterest !== undefined
-                          ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
-                          : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
-                    }`}
-                    aria-label={`Edit interest rate for ${debt.category}${displayInterest !== undefined ? `, currently ${displayInterest}%` : ""}`}
-                    data-testid={`interest-badge-${debt.id}`}
-                  >
-                    {displayInterest !== undefined
-                      ? `${displayInterest}% APR${!hasInterest ? " (suggested)" : ""}`
-                      : "Interest rate %"}
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => startEdit(debt.id, "interestRate", String(debt.interestRate ?? ""))}
+                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                        hasInterest
+                          ? "bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+                          : displayInterest !== undefined
+                            ? "bg-slate-800/60 text-slate-500 hover:bg-slate-700 hover:text-slate-400"
+                            : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
+                      }`}
+                      aria-label={`Edit interest rate for ${debt.category}${displayInterest !== undefined ? `, currently ${displayInterest}%` : ""}`}
+                      data-testid={`interest-badge-${debt.id}`}
+                    >
+                      {displayInterest !== undefined
+                        ? `${displayInterest}% APR${!hasInterest ? " (suggested)" : ""}`
+                        : "Interest rate %"}
+                    </button>
+                    <HelpTip text="Annual percentage rate on this debt — used to calculate your payoff timeline and total interest." />
+                  </>
                 )}
 
                 {/* Monthly payment badge/editor */}
