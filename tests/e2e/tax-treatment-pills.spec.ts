@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Tax treatment pills", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
     await page.waitForSelector("[data-testid='asset-empty-state'], [role='list'][aria-label='Asset items']");
   });
 

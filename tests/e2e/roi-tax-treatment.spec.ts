@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("ROI tax treatment toggle on asset entries", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
     await page.waitForSelector('[aria-label="Asset items"]');
   });
 

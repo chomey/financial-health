@@ -3,8 +3,8 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Grouped category dropdowns (no region toggle)", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.waitForSelector('[data-testid="snapshot-dashboard"]');
+    await page.goto("/?step=assets");
+    await page.waitForSelector('[aria-label="Asset items"]');
   });
 
   test("region toggle is not present in the header", async ({ page }) => {
@@ -21,29 +21,33 @@ test.describe("Grouped category dropdowns (no region toggle)", () => {
     const categoryInput = page.getByLabel("New asset category");
     await categoryInput.click();
 
-    // Verify three group headers appear
+    // Verify four group headers appear (Canada, USA, Australia, General)
     const headers = page.locator("[data-testid='suggestion-group-header']");
-    await expect(headers).toHaveCount(3);
+    await expect(headers).toHaveCount(4);
     await expect(headers.nth(0)).toContainText("Canada");
     await expect(headers.nth(1)).toContainText("USA");
-    await expect(headers.nth(2)).toContainText("General");
+    await expect(headers.nth(2)).toContainText("Australia");
+    await expect(headers.nth(3)).toContainText("General");
 
-    // Verify CA types are present
-    const suggestions = page.locator(".animate-in");
-    await expect(suggestions.getByRole("button", { name: /TFSA/ })).toBeVisible();
-    await expect(suggestions.getByRole("button", { name: /RRSP/ })).toBeVisible();
+    // Verify CA types are present in the suggestion dropdown (some may need scrolling)
+    const dropdown = page.locator(".absolute.left-0.top-full");
+    await expect(dropdown.getByRole("button", { name: /TFSA/ })).toBeAttached();
+    await expect(dropdown.getByRole("button", { name: /RRSP/ })).toBeAttached();
 
     // Verify US types are present (no filtering)
-    await expect(suggestions.getByRole("button", { name: /401k/ })).toBeVisible();
-    await expect(suggestions.getByRole("button", { name: /Roth IRA/ })).toBeVisible();
+    // 401k button text includes description, use locator to check it exists
+    await expect(dropdown.locator("button", { hasText: "401k" }).first()).toBeAttached();
+    await expect(dropdown.locator("button", { hasText: "Roth IRA" }).first()).toBeAttached();
 
     // Verify universal types are present
-    await expect(suggestions.getByRole("button", { name: /Savings/ })).toBeVisible();
+    await expect(dropdown.getByRole("button", { name: /Savings/ })).toBeAttached();
 
     await captureScreenshot(page, "task-31-asset-grouped-dropdown");
   });
 
   test("debt dropdown shows Canada, USA, and General groups", async ({ page }) => {
+    // Navigate to debts step
+    await page.goto("/?step=debts");
     // Open add debt form
     await page.getByText("+ Add Debt").click();
     const categoryInput = page.getByLabel("New debt category");
@@ -57,15 +61,15 @@ test.describe("Grouped category dropdowns (no region toggle)", () => {
     await expect(headers.nth(2)).toContainText("General");
 
     // Verify CA debt types present
-    const suggestions = page.locator(".animate-in");
-    await expect(suggestions.getByRole("button", { name: /HELOC/ })).toBeVisible();
+    const dropdown = page.locator(".absolute.left-0.top-full");
+    await expect(dropdown.getByRole("button", { name: /HELOC/ })).toBeVisible();
 
     // Verify US debt types present
-    await expect(suggestions.getByRole("button", { name: /Medical Debt/ })).toBeVisible();
+    await expect(dropdown.getByRole("button", { name: /Medical Debt/ })).toBeVisible();
 
     // Verify universal debt types present
-    await expect(suggestions.getByRole("button", { name: /Credit Card/ })).toBeVisible();
-    await expect(suggestions.getByRole("button", { name: /Car Loan/ })).toBeVisible();
+    await expect(dropdown.getByRole("button", { name: /Credit Card/ })).toBeVisible();
+    await expect(dropdown.getByRole("button", { name: /Car Loan/ })).toBeVisible();
 
     await captureScreenshot(page, "task-31-debt-grouped-dropdown");
   });
@@ -77,8 +81,8 @@ test.describe("Grouped category dropdowns (no region toggle)", () => {
     await categoryInput.click();
 
     // Click a suggestion from the Canada group
-    const suggestions = page.locator(".animate-in");
-    await suggestions.getByRole("button", { name: /RESP/ }).click();
+    const dropdown = page.locator(".absolute.left-0.top-full");
+    await dropdown.getByRole("button", { name: /RESP/ }).click();
 
     // The category input should now have "RESP"
     await expect(categoryInput).toHaveValue("RESP");

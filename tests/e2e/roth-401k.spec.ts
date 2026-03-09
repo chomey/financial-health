@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Roth 401k category", () => {
   test("Roth 401k appears in category suggestions when adding an asset", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Open add asset form
     await page.getByText("+ Add Asset").click();
@@ -19,7 +19,7 @@ test.describe("Roth 401k category", () => {
   });
 
   test("can add a Roth 401k asset and it shows US flag", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     await page.getByText("+ Add Asset").click();
 
@@ -40,7 +40,7 @@ test.describe("Roth 401k category", () => {
   });
 
   test("Roth 401k shows 7% suggested ROI and hides tax treatment toggle", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Add a Roth 401k asset
     await page.getByText("+ Add Asset").click();
