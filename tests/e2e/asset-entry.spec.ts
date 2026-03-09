@@ -2,32 +2,29 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Asset entry section", () => {
-  test("renders mock assets with formatted amounts", async ({ page }) => {
-    await page.goto("/");
+  test("renders assets with formatted amounts", async ({ page }) => {
+    await page.goto("/?step=assets");
 
-    // Check the heading
-    await expect(
-      page.getByRole("heading", { name: "Assets" })
-    ).toBeVisible();
+    const assetList = page.getByRole("list", { name: "Asset items" });
 
-    // Check mock data rows
-    await expect(page.getByText("Savings Account")).toBeVisible();
-    await expect(page.getByText("TFSA")).toBeVisible();
-    await expect(page.getByText("Brokerage")).toBeVisible();
+    // Check mock data rows (INITIAL_STATE defaults)
+    await expect(assetList.getByText("Savings Account")).toBeVisible();
+    await expect(assetList.getByText("TFSA")).toBeVisible();
+    await expect(assetList.getByText("RRSP")).toBeVisible();
 
     // Check formatted amounts
-    await expect(page.getByText("$12,000")).toBeVisible();
-    await expect(page.getByText("$35,000")).toBeVisible();
-    await expect(page.getByText("$18,500")).toBeVisible();
+    await expect(assetList.getByText("$5,000")).toBeVisible();
+    await expect(assetList.getByText("$22,000")).toBeVisible();
+    await expect(assetList.getByText("$28,000")).toBeVisible();
 
     // Check total
-    await expect(page.getByText("Total: $65,500")).toBeVisible();
+    await expect(page.getByText("Total: $55,000")).toBeVisible();
 
     await captureScreenshot(page, "task-4-assets-with-mock-data");
   });
 
   test("shows Add Asset button and opens add form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     const addBtn = page.getByText("+ Add Asset");
     await expect(addBtn).toBeVisible();
@@ -41,7 +38,7 @@ test.describe("Asset entry section", () => {
   });
 
   test("adds a new asset via the add form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     await page.getByText("+ Add Asset").click();
 
@@ -53,30 +50,31 @@ test.describe("Asset entry section", () => {
     await page.getByLabel("Confirm add asset").click();
 
     // New asset should appear
-    await expect(page.getByText("Emergency Fund")).toBeVisible();
-    await expect(page.getByText("$5,000")).toBeVisible();
+    await expect(page.getByRole("list", { name: "Asset items" }).getByText("Emergency Fund")).toBeVisible();
 
-    // Total should update
-    await expect(page.getByText("Total: $70,500")).toBeVisible();
+    // Total should update (5000 + 22000 + 28000 + 5000 = 60000)
+    await expect(page.getByText("Total: $60,000")).toBeVisible();
 
     await captureScreenshot(page, "task-4-asset-added");
   });
 
   test("deletes an asset on hover and click", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
+
+    const assetList = page.getByRole("list", { name: "Asset items" });
 
     // Hover over the Savings Account row to reveal the delete button
-    const row = page.getByRole("listitem").filter({ hasText: "Savings Account" });
+    const row = assetList.getByRole("listitem").filter({ hasText: "Savings Account" });
     await row.hover();
 
     const deleteBtn = page.getByLabel("Delete Savings Account");
     await deleteBtn.click();
 
-    // Should be gone
-    await expect(page.getByText("Savings Account")).not.toBeVisible();
+    // Should be gone from the asset list
+    await expect(assetList.getByText("Savings Account")).not.toBeVisible();
 
-    // Total should update
-    await expect(page.getByText("Total: $53,500")).toBeVisible();
+    // Total should update (22000 + 28000 = 50000)
+    await expect(page.getByText("Total: $50,000")).toBeVisible();
 
     await captureScreenshot(page, "task-4-asset-deleted");
   });
@@ -84,7 +82,7 @@ test.describe("Asset entry section", () => {
   test("click-to-edit category shows input with suggestions", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     await page.getByLabel("Edit category for TFSA").click();
 
@@ -96,7 +94,7 @@ test.describe("Asset entry section", () => {
   });
 
   test("click-to-edit amount allows value change", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     await page.getByLabel(/Edit amount for TFSA/).click();
 
@@ -110,8 +108,8 @@ test.describe("Asset entry section", () => {
     // Should show updated value
     await expect(page.getByText("$40,000")).toBeVisible();
 
-    // Total should update (12000 + 40000 + 18500 = 70500)
-    await expect(page.getByText("Total: $70,500")).toBeVisible();
+    // Total should update (5000 + 40000 + 28000 = 73000)
+    await expect(page.getByText("Total: $73,000")).toBeVisible();
 
     await captureScreenshot(page, "task-4-amount-edited");
   });
@@ -119,22 +117,19 @@ test.describe("Asset entry section", () => {
   test("shows category suggestions when adding new asset", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     await page.getByText("+ Add Asset").click();
 
     const categoryInput = page.getByLabel("New asset category");
     await categoryInput.click();
 
-    // Should show suggestions dropdown with known categories
-    await expect(page.getByRole("button", { name: "RRSP" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "401k" })).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Savings", exact: true })
-    ).toBeVisible();
+    // Should show suggestions dropdown with known categories (buttons include descriptions)
+    await expect(page.getByRole("button", { name: /^RRSP Tax-deferred/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^401k/ })).toBeVisible();
 
     // Select a suggestion
-    await page.getByRole("button", { name: "RRSP" }).click();
+    await page.getByRole("button", { name: /^RRSP Tax-deferred/ }).click();
 
     // Category input should have the suggestion value
     await expect(categoryInput).toHaveValue("RRSP");
