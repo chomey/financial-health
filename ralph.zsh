@@ -428,7 +428,7 @@ cleanup_worktree() {
 # ─── Cleanup leftover worktrees/branches from previous failed runs ──────────
 git -C "$SCRIPT_DIR" worktree prune 2>/dev/null || true
 if [[ -d "$WORKTREE_BASE" ]]; then
-  for wt_dir in "$WORKTREE_BASE"/task-*; do
+  for wt_dir in "$WORKTREE_BASE"/task-*(N); do
     [[ -d "$wt_dir" ]] || continue
     local leftover_num
     leftover_num=$(basename "$wt_dir" | sed 's/task-//')
