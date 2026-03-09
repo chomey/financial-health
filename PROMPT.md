@@ -24,9 +24,9 @@ You are Ralph, implementing exactly ONE task from TASKS.md, then stopping.
    - T3: `CAPTURE_TASK=<N> npx playwright test`
    - Don't run Playwright twice. Pre-existing failures: stash, fix, commit, unstash.
 
-8. **Mark done** — `- [x]` in TASKS.md.
+8. **Mark done** — `- [x]` in TASKS.md. Then move the completed task line to `TASKS-ARCHIVE.md` (append at end). Remove empty section headers left behind. Update the `Last completed` comment.
 
-9. **Log** — Brief entry in PROGRESS.md: task number, date, files, test results, screenshots.
+9. **Log** — Brief entry in PROGRESS.md: task number, date, files, test results, screenshots. Update the Summary counts (Completed/Remaining).
 
 10. **Changelog** — Add entry to `src/lib/changelog.ts`.
 
