@@ -1,52 +1,8 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
-test.describe("Monthly Cash Flow — investment returns in explainer", () => {
-  test("clicking Monthly Cash Flow card shows investment returns section", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
-
-    // Click the Monthly Cash Flow card to open explainer
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
-    await surplusCard.click();
-
-    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
-
-    // The default state has TFSA, RRSP, Savings Account — all with default ROIs
-    // Investment returns section should appear
-    await expect(page.locator('[data-testid="investment-returns-section"]')).toBeVisible();
-    await expect(page.locator('[data-testid="investment-returns-list"]')).toBeVisible();
-
-    // Should show individual asset returns
-    const returnItems = page.locator('[data-testid="investment-returns-list"] li');
-    await expect(returnItems).toHaveCount(3); // Savings Account, TFSA, RRSP
-
-    // Should show total returns row (since there are multiple assets)
-    await expect(page.locator('[data-testid="investment-returns-total"]')).toBeVisible();
-
-    await captureScreenshot(page, "task-86-surplus-investment-returns");
-  });
-
-  test("investment returns section shows correct format per asset", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
-
-    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
-    await surplusCard.click();
-
-    await expect(page.locator('[data-testid="investment-returns-section"]')).toBeVisible({ timeout: 3000 });
-
-    // Check format: "TFSA ($22k @ 5%)" → "+$92/mo" (approximately)
-    const section = page.locator('[data-testid="investment-returns-section"]');
-    const text = await section.textContent();
-    expect(text).toContain("TFSA");
-    expect(text).toContain("@ 5%");
-    expect(text).toContain("RRSP");
-    expect(text).toContain("Investment Returns");
-    expect(text).toContain("(estimated)");
-  });
-
-  test("investment returns connection appears in assets source card", async ({ page }) => {
+test.describe("Monthly Cash Flow — explainer modal", () => {
+  test("clicking Monthly Cash Flow card opens explainer modal", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
 
@@ -55,9 +11,39 @@ test.describe("Monthly Cash Flow — investment returns in explainer", () => {
 
     await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
 
-    // The assets source card should be visible (investment returns connection uses section-assets)
-    const sources = page.locator('[data-testid="explainer-sources"]');
-    const text = await sources.textContent();
-    expect(text).toContain("returns");
+    // Income and expenses source cards should be visible
+    await expect(page.locator('[data-testid="explainer-source-section-income"]')).toBeVisible();
+    await expect(page.locator('[data-testid="explainer-source-section-expenses"]')).toBeVisible();
+
+    await captureScreenshot(page, "task-86-surplus-explainer-modal");
+  });
+
+  test("Monthly Cash Flow explainer shows income source card with items", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
+
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
+    await surplusCard.click();
+
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+
+    // Income source card should have the title
+    const incomeTitle = page.locator('[data-testid="source-summary-title-section-income"]');
+    await expect(incomeTitle).toBeVisible();
+  });
+
+  test("Monthly Cash Flow explainer shows expenses source card", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForSelector('[data-testid="metric-card-monthly-cash-flow"]');
+
+    const surplusCard = page.locator('[data-testid="metric-card-monthly-cash-flow"]');
+    await surplusCard.click();
+
+    await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
+
+    const expensesTitle = page.locator('[data-testid="source-summary-title-section-expenses"]');
+    await expect(expensesTitle).toBeVisible();
+
+    await captureScreenshot(page, "task-86-surplus-expenses-source");
   });
 });

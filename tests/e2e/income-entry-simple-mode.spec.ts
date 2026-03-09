@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { captureScreenshot } from "./helpers";
+import { captureScreenshot, setSimpleMode } from "./helpers";
 
 test.describe("IncomeEntry in simple mode", () => {
   test("hides income type selector in simple mode (default)", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=income");
     await page.waitForLoadState("networkidle");
 
@@ -34,6 +35,7 @@ test.describe("IncomeEntry in simple mode", () => {
   });
 
   test("simple mode add income form hides income type", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=income");
     await page.waitForLoadState("networkidle");
 

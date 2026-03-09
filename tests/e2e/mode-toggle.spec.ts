@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { captureScreenshot } from "./helpers";
+import { captureScreenshot, setSimpleMode } from "./helpers";
 
 test.describe("Mode toggle", () => {
   test("defaults to simple mode — AppHeader shows Simple active", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=dashboard");
     await page.waitForLoadState("networkidle");
 
@@ -54,6 +55,7 @@ test.describe("Mode toggle", () => {
   });
 
   test("switching mode does not lose financial data — URL contains state", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=dashboard");
     await page.waitForLoadState("networkidle");
 
@@ -69,7 +71,7 @@ test.describe("Mode toggle", () => {
   });
 
   test("ProfileStep shows mode selector with Simple/Advanced buttons", async ({ page }) => {
-    // Navigate directly to profile step in wizard
+    await setSimpleMode(page);
     await page.goto("/?step=profile");
     await page.waitForLoadState("networkidle");
 

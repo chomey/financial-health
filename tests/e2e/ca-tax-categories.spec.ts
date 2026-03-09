@@ -3,43 +3,21 @@ import { captureScreenshot } from "./helpers";
 
 /**
  * Task 141: Canadian tax credit categories with income limits and spousal status
- * Verifies that:
- * - Full CA category list is present in the suggestions dropdown
- * - Spousal Amount Credit is hidden for single filers, shown for married/common-law
- * - Income eligibility indicators work correctly for CA-specific thresholds
  */
 test.describe("Task 141: Canadian Tax Credit Categories", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-  });
-
   test("CA credit suggestions include all new categories for single filers", async ({ page }) => {
-    // Ensure we're on CA (default)
-    const caButton = page.locator('[data-testid="country-ca"]');
-    if (await caButton.isVisible()) {
-      await caButton.click();
-    }
+    // Navigate to expenses step (tax credits are part of expenses step now)
+    await page.goto("/?step=expenses");
+    await page.waitForFunction(() => window.location.search.includes("s="));
 
-    // Open the Tax Credits section and add a new credit
-    const taxHeader = page.getByText("Tax Credits", { exact: false }).first();
-    await taxHeader.click();
-
-    const addButton = page.locator('[data-testid="add-tax-credit"]').or(
-      page.getByRole("button", { name: /Add Credit/i }),
-    );
-    await addButton.click();
+    // Scroll to tax credits section and click add credit
+    const addCreditBtn = page.getByText("+ Add Credit");
+    await addCreditBtn.scrollIntoViewIfNeeded();
+    await addCreditBtn.click();
 
     // Click on the category input to trigger suggestions
-    const categoryInput = page.locator('[data-testid="tax-credit-category-input"]').or(
-      page.locator('input[placeholder*="category"], input[placeholder*="Credit"]'),
-    ).first();
+    const categoryInput = page.getByLabel("New credit category");
     await categoryInput.click();
-
-    // Should see the full list of CA categories
-    const suggestions = page.locator('[data-testid="tax-credit-suggestions"]').or(
-      page.locator('[role="listbox"]'),
-    );
 
     // Verify core CA categories appear
     await expect(page.getByText("Disability Tax Credit (DTC)")).toBeVisible();
@@ -47,7 +25,7 @@ test.describe("Task 141: Canadian Tax Credit Categories", () => {
     await expect(page.getByText("GST/HST Credit")).toBeVisible();
     await expect(page.getByText("Canada Child Benefit (CCB)")).toBeVisible();
 
-    // Verify new categories from Task 141 appear
+    // Verify categories from Task 141
     await expect(page.getByText("Home Accessibility Tax Credit")).toBeVisible();
     await expect(page.getByText("Climate Action Incentive")).toBeVisible();
     await expect(page.getByText("Moving Expenses Deduction")).toBeVisible();
@@ -62,29 +40,25 @@ test.describe("Task 141: Canadian Tax Credit Categories", () => {
   });
 
   test("Spousal Amount Credit appears when filing status is Married/Common-Law", async ({ page }) => {
-    // Ensure we're on CA
-    const caButton = page.locator('[data-testid="country-ca"]');
-    if (await caButton.isVisible()) {
-      await caButton.click();
-    }
+    // Set filing status on profile step first
+    await page.goto("/?step=profile");
+    await page.waitForFunction(() => window.location.search.includes("s="));
 
-    // Switch filing status to married-common-law
-    const filingSelector = page.locator('[data-testid="filing-status-selector"]');
+    const filingSelector = page.getByTestId("wizard-filing-status");
     await filingSelector.selectOption("married-common-law");
+    await page.waitForTimeout(300);
 
-    // Open tax credits and add a credit
-    const taxHeader = page.getByText("Tax Credits", { exact: false }).first();
-    await taxHeader.click();
+    // Navigate to expenses step (tax credits are here)
+    const url = page.url();
+    await page.goto(url.replace(/step=profile/, "step=expenses"));
+    await page.waitForTimeout(300);
 
-    const addButton = page.locator('[data-testid="add-tax-credit"]').or(
-      page.getByRole("button", { name: /Add Credit/i }),
-    );
-    await addButton.click();
+    // Add a credit
+    const addCreditBtn = page.getByText("+ Add Credit");
+    await addCreditBtn.scrollIntoViewIfNeeded();
+    await addCreditBtn.click();
 
-    // Click category input
-    const categoryInput = page.locator('[data-testid="tax-credit-category-input"]').or(
-      page.locator('input[placeholder*="category"], input[placeholder*="Credit"]'),
-    ).first();
+    const categoryInput = page.getByLabel("New credit category");
     await categoryInput.click();
 
     // Spousal Amount Credit should now be visible
@@ -94,25 +68,16 @@ test.describe("Task 141: Canadian Tax Credit Categories", () => {
   });
 
   test("CA category descriptions are informative", async ({ page }) => {
-    // Ensure we're on CA
-    const caButton = page.locator('[data-testid="country-ca"]');
-    if (await caButton.isVisible()) {
-      await caButton.click();
-    }
+    // Navigate to expenses step
+    await page.goto("/?step=expenses");
+    await page.waitForFunction(() => window.location.search.includes("s="));
 
-    // Open tax credits and add a new credit
-    const taxHeader = page.getByText("Tax Credits", { exact: false }).first();
-    await taxHeader.click();
+    // Add a credit
+    const addCreditBtn = page.getByText("+ Add Credit");
+    await addCreditBtn.scrollIntoViewIfNeeded();
+    await addCreditBtn.click();
 
-    const addButton = page.locator('[data-testid="add-tax-credit"]').or(
-      page.getByRole("button", { name: /Add Credit/i }),
-    );
-    await addButton.click();
-
-    // Select "Moving Expenses Deduction" from suggestions
-    const categoryInput = page.locator('[data-testid="tax-credit-category-input"]').or(
-      page.locator('input[placeholder*="category"], input[placeholder*="Credit"]'),
-    ).first();
+    const categoryInput = page.getByLabel("New credit category");
     await categoryInput.click();
     await categoryInput.fill("Moving");
 

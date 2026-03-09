@@ -3,7 +3,8 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Withdrawal Tax Runway", () => {
   test("shows tax drag in burndown summary with large RRSP balance", async ({ page }) => {
-    await page.goto("/");
+    // Navigate to assets step to edit RRSP amount
+    await page.goto("/?step=assets");
 
     // Default state has Savings ($5k), TFSA ($22k), RRSP ($28k)
     // Increase RRSP to $200k to make tax impact significant
@@ -13,8 +14,13 @@ test.describe("Withdrawal Tax Runway", () => {
     await editInput.fill("200000");
     await editInput.press("Enter");
 
-    // Wait for dashboard metrics to recalculate with animation
-    await page.waitForTimeout(1500);
+    // Wait for URL state update
+    await page.waitForTimeout(500);
+
+    // Navigate to dashboard to check burndown
+    const stateUrl = page.url();
+    const dashUrl = stateUrl.replace(/step=assets&?/, "").replace(/&$/, "");
+    await page.goto(dashUrl);
 
     // Switch to Income Stops mode to see burndown
     const chart = page.locator('[data-testid="projection-chart"]');
@@ -30,22 +36,26 @@ test.describe("Withdrawal Tax Runway", () => {
   });
 
   test("no tax drag in summary when only tax-free accounts", async ({ page }) => {
-    await page.goto("/");
+    // Navigate to assets step to modify assets
+    await page.goto("/?step=assets");
 
     // Delete RRSP (tax-deferred) and Savings Account (taxable)
-    // Scope to the assets section to avoid matching chart legend items
-    const assetsSection = page.locator('#assets');
-    const rrspRow = assetsSection.getByRole("listitem").filter({ hasText: "RRSP" });
+    const rrspRow = page.getByRole("listitem").filter({ hasText: "RRSP" });
     await rrspRow.scrollIntoViewIfNeeded();
     await rrspRow.hover();
     await page.getByLabel("Delete RRSP").click();
     await page.waitForTimeout(500);
 
-    const savingsRow = assetsSection.getByRole("listitem").filter({ hasText: "Savings Account" });
+    const savingsRow = page.getByRole("listitem").filter({ hasText: "Savings Account" });
     await savingsRow.scrollIntoViewIfNeeded();
     await savingsRow.hover();
     await page.getByLabel("Delete Savings Account").click();
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(500);
+
+    // Navigate to dashboard
+    const stateUrl = page.url();
+    const dashUrl = stateUrl.replace(/step=assets&?/, "").replace(/&$/, "");
+    await page.goto(dashUrl);
 
     // Switch to Income Stops mode
     const chart = page.locator('[data-testid="projection-chart"]');

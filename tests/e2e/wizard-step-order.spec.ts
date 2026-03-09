@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Wizard step order (Task 168)", () => {
   test("stepper shows all 9 steps in correct DOM order", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=income");
     await page.waitForSelector("[data-testid='wizard-step-income']");
 
     // Get all step testIds in DOM order
@@ -29,7 +29,7 @@ test.describe("Wizard step order (Task 168)", () => {
   });
 
   test("clicking income tab shows income as the active step", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
     await page.waitForSelector("[data-testid='wizard-step-income']");
 
     await page.getByTestId("wizard-step-income").click();
@@ -41,7 +41,7 @@ test.describe("Wizard step order (Task 168)", () => {
   });
 
   test("clicking expenses tab shows expenses as the active step", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
     await page.waitForSelector("[data-testid='wizard-step-expenses']");
 
     await page.getByTestId("wizard-step-expenses").click();
@@ -53,7 +53,7 @@ test.describe("Wizard step order (Task 168)", () => {
   });
 
   test("clicking debts tab shows debts as the active step", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
     await page.waitForSelector("[data-testid='wizard-step-debts']");
 
     await page.getByTestId("wizard-step-debts").click();
@@ -65,7 +65,7 @@ test.describe("Wizard step order (Task 168)", () => {
   });
 
   test("clicking assets tab shows assets as the active step", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=welcome");
     await page.waitForSelector("[data-testid='wizard-step-assets']");
 
     await page.getByTestId("wizard-step-assets").click();

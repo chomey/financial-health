@@ -2,45 +2,35 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 /**
- * Task 142: US tax credit and deduction categories with income limits and filing status
- * Verifies that:
- * - Full US category list is present in the suggestions dropdown
- * - All new US categories (Child and Dependent Care, Premium Tax Credit, Adoption Credit,
- *   Charitable Contributions) are present
- * - Info-only entries (Standard Deduction, HSA, Mortgage, SSDI) are excluded from the picker
- * - Filing status filtering works for US (MFS marks some credits ineligible)
+ * Task 142: US tax credit and deduction categories
  */
 test.describe("Task 142: US Tax Credit Categories", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-  });
+  async function switchToUS(page: import("@playwright/test").Page) {
+    // Set country to US on profile step
+    await page.goto("/?step=profile");
+    await page.waitForFunction(() => window.location.search.includes("s="));
+    await page.getByTestId("country-us").click();
+    await page.waitForTimeout(300);
+    return page.url();
+  }
 
   test("US credit suggestions include all categories for single filers", async ({ page }) => {
-    // Switch to US
-    const usButton = page.locator('[data-testid="country-us"]');
-    if (await usButton.isVisible()) {
-      await usButton.click();
-      await page.waitForLoadState("networkidle");
-    }
+    const profileUrl = await switchToUS(page);
 
-    // Open the Tax Credits section and add a new credit
-    const taxHeader = page.getByText("Tax Credits", { exact: false }).first();
-    await taxHeader.click();
+    // Navigate to expenses step (tax credits are here)
+    await page.goto(profileUrl.replace(/step=profile/, "step=expenses"));
+    await page.waitForTimeout(300);
 
-    const addButton = page
-      .locator('[data-testid="add-tax-credit"]')
-      .or(page.getByRole("button", { name: /Add Credit/i }));
-    await addButton.click();
+    // Click add credit
+    const addCreditBtn = page.getByText("+ Add Credit");
+    await addCreditBtn.scrollIntoViewIfNeeded();
+    await addCreditBtn.click();
 
     // Click on the category input to trigger suggestions
-    const categoryInput = page
-      .locator('[data-testid="tax-credit-category-input"]')
-      .or(page.locator('input[placeholder*="category"], input[placeholder*="Credit"]'))
-      .first();
+    const categoryInput = page.getByLabel("New credit category");
     await categoryInput.click();
 
-    // Verify core US categories from Task 140/141 appear
+    // Verify core US categories
     await expect(page.getByText("Earned Income Tax Credit (EITC)").first()).toBeVisible();
     await expect(page.getByText("Child Tax Credit").first()).toBeVisible();
     await expect(page.getByText("American Opportunity Tax Credit (AOTC)").first()).toBeVisible();
@@ -48,7 +38,7 @@ test.describe("Task 142: US Tax Credit Categories", () => {
     await expect(page.getByText("Electric Vehicle Credit").first()).toBeVisible();
     await expect(page.getByText("Residential Clean Energy Credit").first()).toBeVisible();
 
-    // Verify new categories from Task 142 appear
+    // Verify categories from Task 142
     await expect(page.getByText("Child and Dependent Care Credit").first()).toBeVisible();
     await expect(page.getByText("Premium Tax Credit").first()).toBeVisible();
     await expect(page.getByText("Adoption Credit").first()).toBeVisible();
@@ -64,31 +54,26 @@ test.describe("Task 142: US Tax Credit Categories", () => {
   });
 
   test("US credit suggestions work for married-jointly filers", async ({ page }) => {
-    // Switch to US
-    const usButton = page.locator('[data-testid="country-us"]');
-    if (await usButton.isVisible()) {
-      await usButton.click();
-      await page.waitForLoadState("networkidle");
-    }
+    // Set country to US and filing status on profile step
+    await page.goto("/?step=profile");
+    await page.waitForFunction(() => window.location.search.includes("s="));
+    await page.getByTestId("country-us").click();
+    await page.waitForTimeout(300);
 
-    // Switch filing status to married-jointly
-    const filingSelector = page.locator('[data-testid="filing-status-selector"]');
+    const filingSelector = page.getByTestId("wizard-filing-status");
     await filingSelector.selectOption("married-jointly");
+    await page.waitForTimeout(300);
 
-    // Open tax credits and add a credit
-    const taxHeader = page.getByText("Tax Credits", { exact: false }).first();
-    await taxHeader.click();
+    // Navigate to expenses step
+    const url = page.url();
+    await page.goto(url.replace(/step=profile/, "step=expenses"));
+    await page.waitForTimeout(300);
 
-    const addButton = page
-      .locator('[data-testid="add-tax-credit"]')
-      .or(page.getByRole("button", { name: /Add Credit/i }));
-    await addButton.click();
+    const addCreditBtn = page.getByText("+ Add Credit");
+    await addCreditBtn.scrollIntoViewIfNeeded();
+    await addCreditBtn.click();
 
-    // Click category input
-    const categoryInput = page
-      .locator('[data-testid="tax-credit-category-input"]')
-      .or(page.locator('input[placeholder*="category"], input[placeholder*="Credit"]'))
-      .first();
+    const categoryInput = page.getByLabel("New credit category");
     await categoryInput.click();
 
     // All standard credits should appear for MFJ
@@ -101,27 +86,17 @@ test.describe("Task 142: US Tax Credit Categories", () => {
   });
 
   test("US credit description is informative for Adoption Credit", async ({ page }) => {
-    // Switch to US
-    const usButton = page.locator('[data-testid="country-us"]');
-    if (await usButton.isVisible()) {
-      await usButton.click();
-      await page.waitForLoadState("networkidle");
-    }
+    const profileUrl = await switchToUS(page);
 
-    // Open tax credits and add a new credit
-    const taxHeader = page.getByText("Tax Credits", { exact: false }).first();
-    await taxHeader.click();
+    // Navigate to expenses step
+    await page.goto(profileUrl.replace(/step=profile/, "step=expenses"));
+    await page.waitForTimeout(300);
 
-    const addButton = page
-      .locator('[data-testid="add-tax-credit"]')
-      .or(page.getByRole("button", { name: /Add Credit/i }));
-    await addButton.click();
+    const addCreditBtn = page.getByText("+ Add Credit");
+    await addCreditBtn.scrollIntoViewIfNeeded();
+    await addCreditBtn.click();
 
-    // Search for Adoption Credit
-    const categoryInput = page
-      .locator('[data-testid="tax-credit-category-input"]')
-      .or(page.locator('input[placeholder*="category"], input[placeholder*="Credit"]'))
-      .first();
+    const categoryInput = page.getByLabel("New credit category");
     await categoryInput.click();
     await categoryInput.fill("Adoption");
 

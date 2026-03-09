@@ -1,8 +1,9 @@
 import { expect } from "@playwright/test";
-import { test, captureScreenshot } from "./helpers";
+import { test, captureScreenshot, setSimpleMode } from "./helpers";
 
 test.describe("WelcomeStep — simple mode", () => {
   test("simple mode shows quick snapshot tagline", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=welcome");
     await page.waitForLoadState("networkidle");
 
@@ -28,6 +29,7 @@ test.describe("WelcomeStep — simple mode", () => {
   });
 
   test("simple mode shows ca-renter and ca-homeowner quick-start profiles", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=welcome");
     await page.waitForLoadState("networkidle");
 
@@ -56,6 +58,7 @@ test.describe("WelcomeStep — simple mode", () => {
   });
 
   test("clicking ca-renter quick-start profile loads data and navigates forward", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=welcome");
     await page.waitForLoadState("networkidle");
 
@@ -70,6 +73,7 @@ test.describe("WelcomeStep — simple mode", () => {
   });
 
   test("clicking ca-homeowner quick-start profile loads data", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=welcome");
     await page.waitForLoadState("networkidle");
 

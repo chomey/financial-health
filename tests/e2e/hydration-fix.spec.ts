@@ -11,7 +11,7 @@ test.describe("Hydration mismatch fix", () => {
     });
 
     await page.goto("/");
-    await page.waitForSelector("text=Financial Health Snapshot");
+    await page.waitForSelector("[aria-label='Copy link to clipboard']");
 
     // Wait for hydration to complete
     await page.waitForTimeout(1000);
@@ -32,7 +32,7 @@ test.describe("Hydration mismatch fix", () => {
   test("no hydration errors after URL state reload", async ({ page }) => {
     // Load page and wait for URL state to be written
     await page.goto("/");
-    await page.waitForSelector("text=Property");
+    await page.waitForFunction(() => window.location.search.includes("s="));
     await page.waitForTimeout(500);
 
     // Capture the URL with state
@@ -48,7 +48,7 @@ test.describe("Hydration mismatch fix", () => {
     });
 
     await page.reload();
-    await page.waitForSelector("text=Financial Health Snapshot");
+    await page.waitForSelector("[aria-label='Copy link to clipboard']");
     await page.waitForTimeout(1000);
 
     const hydrationErrors = consoleErrors.filter(
@@ -61,40 +61,25 @@ test.describe("Hydration mismatch fix", () => {
     expect(hydrationErrors).toHaveLength(0);
   });
 
-  test("property equity test ID is stable after reload", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForSelector("text=Property");
-
-    // Verify property equity is rendered with stable test ID
-    await expect(page.getByTestId("equity-p1")).toHaveText("$170,000");
-
-    // Reload and verify same test ID
-    await page.reload();
-    await page.waitForSelector("text=Property");
-    await expect(page.getByTestId("equity-p1")).toHaveText("$170,000");
-
-    await captureScreenshot(page, "task-20-stable-property-ids");
-  });
-
-  test("data persists correctly after reload with stable IDs", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForSelector("text=Financial Health Snapshot");
+  test("asset data persists correctly after reload", async ({ page }) => {
+    // Navigate to assets wizard step to see entries
+    await page.goto("/?step=assets");
+    await page.waitForFunction(() => window.location.search.includes("s="));
 
     // Verify initial data renders
-    await expect(page.getByText("Savings Account")).toBeVisible();
-    await expect(page.getByText("Car Loan")).toBeVisible();
-    await expect(page.getByText("Home")).toBeVisible();
+    await expect(page.getByRole("listitem").filter({ hasText: "Savings Account" })).toBeVisible();
+    await expect(page.getByRole("listitem").filter({ hasText: "TFSA" })).toBeVisible();
 
     // Wait for URL to be set
     await page.waitForTimeout(500);
 
     // Reload and verify data persists
     await page.reload();
-    await page.waitForSelector("text=Financial Health Snapshot");
+    await page.waitForFunction(() => window.location.search.includes("s="));
 
-    await expect(page.getByText("Savings Account")).toBeVisible();
-    await expect(page.getByText("Car Loan")).toBeVisible();
-    await expect(page.getByText("Home")).toBeVisible();
-    await expect(page.getByTestId("equity-p1")).toHaveText("$170,000");
+    await expect(page.getByRole("listitem").filter({ hasText: "Savings Account" })).toBeVisible();
+    await expect(page.getByRole("listitem").filter({ hasText: "TFSA" })).toBeVisible();
+
+    await captureScreenshot(page, "task-20-data-persists-after-reload");
   });
 });

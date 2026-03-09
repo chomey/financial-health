@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { captureScreenshot } from "./helpers";
+import { captureScreenshot, setSimpleMode } from "./helpers";
 
 test.describe("ExpenseEntry simple mode debt payments", () => {
   test("shows Debt Payments subsection in simple mode expenses step", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=expenses");
     await page.waitForLoadState("networkidle");
 
@@ -28,6 +29,7 @@ test.describe("ExpenseEntry simple mode debt payments", () => {
   });
 
   test("can enter monthly debt payments in simple mode", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=expenses");
     await page.waitForLoadState("networkidle");
 

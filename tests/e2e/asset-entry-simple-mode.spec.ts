@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { captureScreenshot } from "./helpers";
+import { captureScreenshot, setSimpleMode } from "./helpers";
 
 test.describe("AssetEntry in simple mode", () => {
   test("hides advanced detail fields in simple mode (default)", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=assets");
     await page.waitForLoadState("networkidle");
 
@@ -48,6 +49,7 @@ test.describe("AssetEntry in simple mode", () => {
   });
 
   test("simple mode total and Add Asset still work", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=assets");
     await page.waitForLoadState("networkidle");
 

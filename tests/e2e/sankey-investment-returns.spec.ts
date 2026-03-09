@@ -4,24 +4,19 @@ import { captureScreenshot } from "./helpers";
 test.describe("Cash Flow Sankey — Investment Interest Income", () => {
   test("shows investment interest income node for income-type assets", async ({ page }) => {
     await page.goto("/");
-    // Default mock data has "Savings Account" with $12,000 at 2% ROI → income type
-    // Expand the Sankey
-    const toggle = page.getByTestId("cash-flow-toggle");
-    await toggle.click();
+    // Sankey is expanded by default
     await expect(page.getByTestId("sankey-chart")).toBeVisible();
 
-    // Look for investment interest income node label
+    // Look for investment return node label (shows account name)
     const interestLabel = page.getByTestId("sankey-label-inv-return-0");
     await expect(interestLabel).toBeVisible();
-    await expect(interestLabel).toContainText("interest");
+    await expect(interestLabel).toContainText("Savings Account");
 
     await captureScreenshot(page, "task-105-sankey-investment-returns");
   });
 
   test("shows Interest Income legend entry when investment returns present", async ({ page }) => {
     await page.goto("/");
-    const toggle = page.getByTestId("cash-flow-toggle");
-    await toggle.click();
     await expect(page.getByTestId("sankey-chart")).toBeVisible();
 
     const legendEntry = page.getByTestId("sankey-legend-investment-income");
@@ -33,8 +28,6 @@ test.describe("Cash Flow Sankey — Investment Interest Income", () => {
 
   test("investment-income node has teal color distinct from employment income", async ({ page }) => {
     await page.goto("/");
-    const toggle = page.getByTestId("cash-flow-toggle");
-    await toggle.click();
     await expect(page.getByTestId("sankey-chart")).toBeVisible();
 
     // Check that the investment-income node rect exists with the correct fill color

@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { captureScreenshot } from "./helpers";
+import { captureScreenshot, setSimpleMode } from "./helpers";
 
 test.describe("AssetEntry simple mode home section", () => {
   test("shows Home subsection in simple mode assets step", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=assets");
     await page.waitForLoadState("networkidle");
 
@@ -27,6 +28,7 @@ test.describe("AssetEntry simple mode home section", () => {
   });
 
   test("can enter home value in simple mode", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=assets");
     await page.waitForLoadState("networkidle");
 

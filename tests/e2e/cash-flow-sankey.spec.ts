@@ -2,19 +2,18 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Cash Flow Sankey Diagram", () => {
-  test("renders collapsible section in dashboard", async ({ page }) => {
+  test("renders section in dashboard expanded by default", async ({ page }) => {
     await page.goto("/");
     const sankey = page.getByTestId("cash-flow-sankey");
     await expect(sankey).toBeVisible();
-    // Should be collapsed by default
+    // Should be expanded by default
     const toggle = page.getByTestId("cash-flow-toggle");
-    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
   });
 
-  test("expands to show Sankey chart on click", async ({ page }) => {
+  test("shows Sankey chart when expanded", async ({ page }) => {
     await page.goto("/");
     const toggle = page.getByTestId("cash-flow-toggle");
-    await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
     // Should show the chart with default data (has income)
     const chart = page.getByTestId("sankey-chart");
@@ -24,7 +23,7 @@ test.describe("Cash Flow Sankey Diagram", () => {
 
   test("shows SVG with income and expense nodes", async ({ page }) => {
     await page.goto("/");
-    await page.getByTestId("cash-flow-toggle").click();
+    // Chart is expanded by default
     // Check for income node (Salary from default data)
     const salaryLabel = page.getByTestId("sankey-label-income-i1");
     await expect(salaryLabel).toBeVisible();
@@ -36,7 +35,6 @@ test.describe("Cash Flow Sankey Diagram", () => {
 
   test("shows tooltip on link hover", async ({ page }) => {
     await page.goto("/");
-    await page.getByTestId("cash-flow-toggle").click();
     // Hover over the after-tax pool node
     const poolNode = page.getByTestId("sankey-node-after-tax");
     await poolNode.hover();
@@ -48,7 +46,6 @@ test.describe("Cash Flow Sankey Diagram", () => {
 
   test("shows legend with flow categories", async ({ page }) => {
     await page.goto("/");
-    await page.getByTestId("cash-flow-toggle").click();
     const legend = page.getByTestId("sankey-legend");
     await expect(legend).toBeVisible();
     await expect(legend.getByText("Income", { exact: true })).toBeVisible();
@@ -57,10 +54,9 @@ test.describe("Cash Flow Sankey Diagram", () => {
     await expect(legend.getByText("Surplus", { exact: true })).toBeVisible();
   });
 
-  test("collapses back when toggle is clicked again", async ({ page }) => {
+  test("collapses when toggle is clicked", async ({ page }) => {
     await page.goto("/");
     const toggle = page.getByTestId("cash-flow-toggle");
-    await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
@@ -68,10 +64,10 @@ test.describe("Cash Flow Sankey Diagram", () => {
     await expect(page.getByTestId("sankey-chart")).not.toBeVisible();
   });
 
-  test("positioned in dashboard column after waterfall chart", async ({ page }) => {
+  test("positioned in dashboard cashflow section", async ({ page }) => {
     await page.goto("/");
-    const dashboard = page.getByRole("region", { name: "Financial dashboard" });
-    const sankey = dashboard.getByTestId("cash-flow-sankey");
+    const cashflowSection = page.locator("#section-dash-cashflow");
+    const sankey = cashflowSection.getByTestId("cash-flow-sankey");
     await expect(sankey).toBeVisible();
   });
 });

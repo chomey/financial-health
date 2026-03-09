@@ -6,7 +6,6 @@ test.describe("URL State Persistence", () => {
     await page.goto("/");
     const copyButton = page.getByRole("button", { name: "Copy link to clipboard" });
     await expect(copyButton).toBeVisible();
-    await expect(copyButton).toContainText("Copy Link");
     await captureScreenshot(page, "task-11-copy-link-button");
   });
 
@@ -15,16 +14,17 @@ test.describe("URL State Persistence", () => {
     await page.goto("/");
     const copyButton = page.getByRole("button", { name: "Copy link to clipboard" });
     await copyButton.click();
-    await expect(copyButton).toContainText("Copied!");
+    // Icon-only button shows checkmark SVG after copy (no text)
+    await expect(copyButton.locator("svg.text-emerald-500")).toBeVisible();
     await captureScreenshot(page, "task-11-copied-feedback");
-    // After 2s, should revert to "Copy Link"
+    // After 2s, should revert to link icon
     await page.waitForTimeout(2500);
-    await expect(copyButton).toContainText("Copy Link");
+    await expect(copyButton.locator("svg.text-emerald-500")).not.toBeVisible();
   });
 
   test("URL updates with s= param when state changes", async ({ page }) => {
-    await page.goto("/");
-    // Wait for initial URL state to be set
+    // Navigate to the assets wizard step to add an asset
+    await page.goto("/?step=assets");
     await page.waitForFunction(() => window.location.search.includes("s="));
     const initialUrl = page.url();
     expect(initialUrl).toContain("s=");
@@ -47,8 +47,8 @@ test.describe("URL State Persistence", () => {
   });
 
   test("state persists across page reload", async ({ page }) => {
-    await page.goto("/");
-    // Wait for initial state
+    // Navigate to assets wizard step
+    await page.goto("/?step=assets");
     await page.waitForFunction(() => window.location.search.includes("s="));
 
     // Add a custom asset
@@ -74,8 +74,8 @@ test.describe("URL State Persistence", () => {
   });
 
   test("state restores from shared URL", async ({ page }) => {
-    // First, load the app and capture the URL with state
-    await page.goto("/");
+    // Load the assets wizard step and capture URL with state
+    await page.goto("/?step=assets");
     await page.waitForFunction(() => window.location.search.includes("s="));
     const stateUrl = page.url();
 
@@ -85,45 +85,45 @@ test.describe("URL State Persistence", () => {
     // Navigate to the URL with state param
     await page.goto(stateUrl);
 
-    // Verify all initial mock data is present
-    await expect(page.getByText("Savings Account")).toBeVisible();
-    await expect(page.getByText("TFSA")).toBeVisible();
-    await expect(page.getByText("Brokerage")).toBeVisible();
+    // Verify initial assets are present on the assets step (use listitem to avoid description matches)
+    await expect(page.getByRole("listitem").filter({ hasText: "Savings Account" })).toBeVisible();
+    await expect(page.getByRole("listitem").filter({ hasText: "TFSA" })).toBeVisible();
+    await expect(page.getByRole("listitem").filter({ hasText: "RRSP" })).toBeVisible();
     await captureScreenshot(page, "task-11-state-from-shared-url");
   });
 
   test("dashboard metrics preserved after reload", async ({ page }) => {
-    await page.goto("/");
+    // Navigate to debts wizard step to delete a debt
+    await page.goto("/?step=debts");
     await page.waitForFunction(() => window.location.search.includes("s="));
 
     // Delete Car Loan debt to change metrics
-    const row = page.getByRole("listitem").filter({ hasText: "Car Loan" });
+    const row = page.getByRole("listitem").filter({ hasText: /^Car Loan/ });
     await row.hover();
     await page.getByLabel("Delete Car Loan").click();
 
-    // Verify Car Loan is gone
-    await expect(page.getByText("Car Loan")).not.toBeVisible();
+    // Verify Car Loan entry is gone (use listitem to avoid matching description text)
+    await expect(page.getByRole("listitem").filter({ hasText: /^Car Loan/ })).not.toBeVisible();
 
     // Wait for URL update
     await page.waitForTimeout(500);
     const urlAfterDelete = page.url();
 
-    // Reload
+    // Reload on the debts step
     await page.goto(urlAfterDelete);
 
-    // Car Loan should still be gone after reload
-    await expect(page.getByText("Car Loan")).not.toBeVisible();
+    // Car Loan entry should still be gone after reload
+    await expect(page.getByRole("listitem").filter({ hasText: /^Car Loan/ })).not.toBeVisible();
 
-    // Mortgage should remain
-    await expect(page.getByRole("heading", { name: "Debts" })).toBeVisible();
+    // Page should still be on the debts step
+    await expect(page.getByText("+ Add Debt")).toBeVisible();
     await captureScreenshot(page, "task-11-metrics-after-reload");
   });
 
   test("empty state works without s= param", async ({ page }) => {
     // Navigate to root without any state param
     await page.goto("/");
-    // The app should load with default mock data (INITIAL_STATE)
-    await expect(page.getByText("Savings Account")).toBeVisible();
-    await expect(page.getByText("Financial Health Snapshot")).toBeVisible();
+    // The app should load and show the dashboard with the copy link button
+    await expect(page.getByRole("button", { name: "Copy link to clipboard" })).toBeVisible();
   });
 });

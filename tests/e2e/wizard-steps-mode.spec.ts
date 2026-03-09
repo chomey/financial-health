@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { captureScreenshot } from "./helpers";
+import { captureScreenshot, setSimpleMode } from "./helpers";
 
 test.describe("Wizard steps — simple vs advanced mode", () => {
   test("simple mode shows 6 steps in wizard stepper", async ({ page }) => {
     // Default is simple mode
+    await setSimpleMode(page);
     await page.goto("/?step=welcome");
     await page.waitForLoadState("networkidle");
 
@@ -46,6 +47,7 @@ test.describe("Wizard steps — simple vs advanced mode", () => {
   });
 
   test("simple mode shows '1 of 6' in footer counter", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=welcome");
     await page.waitForLoadState("networkidle");
 
@@ -62,6 +64,7 @@ test.describe("Wizard steps — simple vs advanced mode", () => {
   });
 
   test("tax-summary step shows 'Summary' label in simple mode stepper", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=welcome");
     await page.waitForLoadState("networkidle");
 
@@ -85,6 +88,7 @@ test.describe("Wizard steps — simple vs advanced mode", () => {
   });
 
   test("switching from simple to advanced preserves current step navigation", async ({ page }) => {
+    await setSimpleMode(page);
     await page.goto("/?step=profile");
     await page.waitForLoadState("networkidle");
 

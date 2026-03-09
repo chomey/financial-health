@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Asset ROI and monthly contribution", () => {
   test("shows suggested ROI badges for known account types", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // TFSA should show 5% ROI (suggested)
     const tfsaRoi = page.getByTestId("roi-badge-a2");
@@ -14,15 +14,15 @@ test.describe("Asset ROI and monthly contribution", () => {
     const savingsRoi = page.getByTestId("roi-badge-a1");
     await expect(savingsRoi).toContainText("2% ROI (suggested)");
 
-    // Brokerage should show 7% ROI (suggested)
-    const brokerageRoi = page.getByTestId("roi-badge-a3");
-    await expect(brokerageRoi).toContainText("7% ROI (suggested)");
+    // RRSP should show 5% ROI (suggested)
+    const rrspRoi = page.getByTestId("roi-badge-a3");
+    await expect(rrspRoi).toContainText("5% ROI (suggested)");
 
     await captureScreenshot(page, "task-22-roi-suggested-badges");
   });
 
   test("shows monthly contribution placeholder", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     const contributionBadge = page.getByTestId("contribution-badge-a1");
     await expect(contributionBadge).toBeVisible();
@@ -30,7 +30,7 @@ test.describe("Asset ROI and monthly contribution", () => {
   });
 
   test("allows editing ROI by clicking the badge", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Click the TFSA ROI badge
     await page.getByTestId("roi-badge-a2").click();
@@ -51,7 +51,7 @@ test.describe("Asset ROI and monthly contribution", () => {
   });
 
   test("allows editing monthly contribution by clicking the badge", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Click the TFSA contribution badge
     await page.getByTestId("contribution-badge-a2").click();
@@ -71,7 +71,7 @@ test.describe("Asset ROI and monthly contribution", () => {
   });
 
   test("ROI persists in URL state after reload", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Set ROI on TFSA
     await page.getByTestId("roi-badge-a2").click();
@@ -94,7 +94,7 @@ test.describe("Asset ROI and monthly contribution", () => {
   });
 
   test("monthly contribution persists in URL state after reload", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // Set contribution on TFSA
     await page.getByTestId("contribution-badge-a2").click();
@@ -118,7 +118,7 @@ test.describe("Asset ROI and monthly contribution", () => {
   });
 
   test("detail fields appear for all default assets", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
 
     // All three default assets should have detail rows
     await expect(page.getByTestId("asset-details-a1")).toBeVisible();
