@@ -9,6 +9,7 @@ import { getTaxTreatment, type TaxTreatment } from "@/lib/withdrawal-tax";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useEditState, useAddNew } from "@/lib/entry-hooks";
 import HelpTip from "@/components/HelpTip";
+import { useModeContext } from "@/lib/ModeContext";
 
 export type RoiTaxTreatment = "capital-gains" | "income";
 
@@ -221,6 +222,8 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
   const formatCurrency = (v: number) => fmt.full(v);
   const formatCompact = (v: number) => fmt.compact(v);
   const assets = items ?? MOCK_ASSETS;
+  const { mode } = useModeContext();
+  const isSimple = mode === "simple";
 
   const updateAssets = useCallback((updater: Asset[] | ((prev: Asset[]) => Asset[])) => {
     const next = typeof updater === "function" ? updater(assets) : updater;
@@ -338,7 +341,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
         </div>
       ) : (
         <div className="space-y-0" role="list" aria-label="Asset items">
-          {[...assets.filter((a) => !a.computed), ...assets.filter((a) => a.computed)].map((asset) => {
+          {[...assets.filter((a) => !a.computed), ...assets.filter((a) => a.computed)].filter((a) => !(isSimple && a.computed)).map((asset) => {
             const defaultRoi = getDefaultRoi(asset.category);
             const displayRoi = asset.roi ?? defaultRoi;
             const hasRoi = asset.roi !== undefined;
@@ -437,7 +440,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
 
                   {/* Amount + Currency */}
                   <div className="flex items-center gap-1">
-                    {homeCurrency && fxRates && !isComputed && (
+                    {homeCurrency && fxRates && !isComputed && !isSimple && (
                       <CurrencyBadge
                         currency={asset.currency}
                         homeCurrency={homeCurrency}
@@ -507,7 +510,8 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
 
               {/* Secondary detail fields */}
               {/* Hide all detail controls for Property Equity — taxable badge, ROI, contribution, cost basis are irrelevant */}
-              {asset.id === "_computed_equity" ? (
+              {/* In simple mode, hide all secondary detail fields */}
+              {isSimple ? null : asset.id === "_computed_equity" ? (
                 <div className="pb-0.5" />
               ) : (
               <div className="flex flex-wrap items-center gap-1.5 pb-1 px-3" data-testid={`asset-details-${asset.id}`}>
@@ -841,8 +845,8 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
               </div>
               )}
 
-              {/* Per-asset 10/20/30 year projections */}
-              {(() => {
+              {/* Per-asset 10/20/30 year projections — hidden in simple mode */}
+              {!isSimple && (() => {
                 const matchContrib = (asset.employerMatchPct && asset.employerMatchCap && asset.monthlyContribution)
                   ? computeEmployerMatchMonthly(asset.monthlyContribution, asset.employerMatchPct, asset.employerMatchCap, annualEmploymentSalary)
                   : 0;

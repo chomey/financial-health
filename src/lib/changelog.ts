@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 178,
+    title: "Simple mode — streamlined AssetEntry",
+    description: "In Simple mode, AssetEntry shows only the category and amount for each asset. Hidden fields (ROI, tax treatment pill, ROI tax treatment, reinvest returns toggle, monthly contribution, employer match, cost basis, unrealized gains, surplus target, per-asset projections, currency override badge) remain in state and reappear when switching to Advanced mode. Computed auto-assets (property equity) are hidden in Simple mode since the Property step doesn't exist. test-utils updated to provide ModeProvider to all unit tests via a new 'mode' render option.",
+    date: "2026-03-09",
+  },
+  {
     version: 177,
     title: "Simple mode wizard — 6-step flow",
     description: "In Simple mode the wizard is trimmed to 6 steps: Welcome → Profile → Income → Expenses → Assets → Summary. Debts, Property, and Stocks steps are hidden (data is preserved in state). The Tax Summary step is relabelled 'Summary' in Simple mode. Advanced mode retains all 9 steps. WIZARD_STEPS is now dynamic via getWizardSteps(mode); WizardStepper and WizardShell consume the active step list from ModeContext.",

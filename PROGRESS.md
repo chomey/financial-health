@@ -8,11 +8,22 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 174
-- **Remaining**: 10
+- **Completed**: 175
+- **Remaining**: 9
 - **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 178: Simplify AssetEntry in simple mode [@frontend]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/components/AssetEntry.tsx`: Added `useModeContext` import; in simple mode hides ROI badge/editor, tax treatment pill, ROI tax treatment toggle, reinvest returns toggle, monthly contribution, employer match section, cost basis badge, unrealized gains badge, surplus target radio, per-asset projections, currency override badge, and all computed assets
+  - `tests/test-utils.tsx`: Added `ModeProvider` + `mode` option to `customRender` so unit tests can render in specific modes
+  - `tests/unit/asset-entry-simple-mode.test.tsx`: 15 unit tests — verify hidden fields in simple mode, visible fields in advanced mode
+  - `tests/e2e/asset-entry-simple-mode.spec.ts`: 3 Playwright tests — simple mode hides advanced fields, advanced mode toggle shows all fields, add asset still works
+  - `src/lib/changelog.ts`: Added version 178 entry
+- **Tests**: T1: 2658 passed (140 files), T2: 3 passed, Build: passes
+- **Screenshots**: task-178-asset-entry-simple-mode, task-178-asset-entry-advanced-mode, task-178-asset-entry-simple-add
 
 ## Task 177: Simplify wizard steps in simple mode [@fullstack]
 - **Date**: 2026-03-09
