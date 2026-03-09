@@ -85,7 +85,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost" | "coast-fire" | "net-worth-milestone" | "net-worth-percentile" | "tax-credits-summary" | "tax-credits-unclaimed" | "tax-credits-refundable" | "tax-credits-ineligible";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost" | "coast-fire" | "net-worth-milestone" | "net-worth-percentile" | "tax-credits-summary" | "tax-credits-unclaimed" | "tax-credits-refundable" | "tax-credits-ineligible" | "au-super" | "au-hecs-help" | "au-fhss" | "au-franking" | "au-mls";
 
 export interface Insight {
   id: string;

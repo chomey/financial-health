@@ -29,6 +29,12 @@ function buildTaxRateHighMessage(ratePercent: string, country: "CA" | "US" | "AU
       return `${prefix} you're already using an RRSP. Adding a TFSA would provide tax-free growth for funds you may need before retirement.`;
     }
     return `${prefix} tax-advantaged accounts (TFSA, RRSP) can help reduce your tax burden.`;
+  } else if (country === "AU") {
+    const hasSuper = cats.some((c) => c.includes("super") || c.includes("pension phase") || c.includes("fhss") || c.includes("first home super"));
+    if (hasSuper) {
+      return `${prefix} salary sacrificing additional amounts into super can reduce your taxable income. Concessional contributions (up to $30,000/yr cap) are taxed at just 15% inside the fund — well below most marginal rates.`;
+    }
+    return `${prefix} super contributions (up to the $30,000/yr concessional cap) are taxed at just 15% inside the fund. Consider topping up your super through salary sacrifice to reduce your taxable income.`;
   } else {
     const has401k = cats.some((c) => c.includes("401k"));
     const hasRoth = cats.some((c) => c.includes("roth"));
@@ -259,11 +265,14 @@ export function generateInsights(data: FinancialData): Insight[] {
           icon: "💡",
         });
       } else if (wt.accountsByTreatment.taxFree.total === 0) {
-        const suggestedFreeAccount = (data.country ?? "CA") === "CA" ? "TFSA" : "Roth IRA";
+        const wtCountry = data.country ?? "CA";
+        const wtMessage = wtCountry === "AU"
+          ? `All your current savings will be taxed on withdrawal. Contributing to super means fund earnings are taxed at just 15%, and withdrawals after 60 (pension phase) are completely tax-free.`
+          : `Consider opening a ${wtCountry === "CA" ? "TFSA" : "Roth IRA"} — all your current savings will be taxed on withdrawal.`;
         insights.push({
           id: "withdrawal-tax-no-free",
           type: "withdrawal-tax",
-          message: `Consider opening a ${suggestedFreeAccount} — all your current savings will be taxed on withdrawal.`,
+          message: wtMessage,
           icon: "💡",
         });
       }
@@ -342,6 +351,83 @@ export function generateInsights(data: FinancialData): Insight[] {
     });
   }
 
+  // AU-specific insights: super guarantee, HECS-HELP, FHSS, franking credits, MLS
+  if ((data.country ?? "CA") === "AU") {
+    const auAssetCats = (data.assetCategories ?? []).map((c) => c.toLowerCase());
+    const auDebtCats = (data.debtCategories ?? []).map((c) => c.toLowerCase());
+    const auAnnualIncome = (data.monthlyGrossIncome ?? 0) * 12;
+    const auEmploymentIncome = data.annualEmploymentIncome ?? 0;
+
+    // Super guarantee check — 11.5% of salary (2024-25 rate)
+    if (auEmploymentIncome > 0) {
+      const hasSuperAcct = auAssetCats.some((c) => c.includes("super") || c.includes("pension phase") || c.includes("fhss"));
+      const expectedGuarantee = auEmploymentIncome * 0.115;
+      const employerContrib = data.employerMatchAnnual ?? 0;
+      if (!hasSuperAcct) {
+        insights.push({
+          id: "au-super-missing",
+          type: "au-super",
+          message: `Your employer must contribute 11.5% of your salary (${formatCurrency(expectedGuarantee)}/yr) to your super as the Super Guarantee. Make sure you've nominated a fund — and add your super account to track your balance.`,
+          icon: "🦘",
+        });
+      } else if (employerContrib > 0 && employerContrib < expectedGuarantee * 0.9) {
+        insights.push({
+          id: "au-super-guarantee",
+          type: "au-super",
+          message: `Your employer should be contributing ${formatCurrency(expectedGuarantee)}/yr (11.5% Super Guarantee) to your super. Check your latest super statement to confirm the full amount is being paid.`,
+          icon: "🦘",
+        });
+      }
+    }
+
+    // HECS-HELP compulsory repayment threshold (2025-26: $54,435)
+    const hasHECS = auDebtCats.some((c) => c.includes("hecs") || c.includes("help"));
+    if (hasHECS && auEmploymentIncome >= 54_435) {
+      insights.push({
+        id: "au-hecs-repayment",
+        type: "au-hecs-help",
+        message: `Your HECS-HELP repayments are automatically deducted via PAYG at your income level. Unlike regular interest, HECS-HELP is indexed to CPI — voluntary early repayments don't save you interest, they just reduce the balance before the annual indexation date (June 1). Check your MyGov account for your current balance.`,
+        icon: "🎓",
+      });
+    }
+
+    // FHSS eligibility — user is not a homeowner, has income, no FHSS account
+    if (!data.isHomeowner && auEmploymentIncome > 0) {
+      const hasFHSS = auAssetCats.some((c) => c.includes("fhss") || c.includes("first home super"));
+      if (!hasFHSS) {
+        insights.push({
+          id: "au-fhss",
+          type: "au-fhss",
+          message: `Saving for your first home? The First Home Super Saver (FHSS) scheme lets you voluntarily contribute up to $15,000/yr ($50,000 lifetime cap) into super at a 15% tax rate, then withdraw it for a deposit — a great deal if your marginal rate is above 15%.`,
+          icon: "🏠",
+        });
+      }
+    }
+
+    // Franking credits — user has taxable investments but hasn't claimed franking credits
+    const taxableBalance = data.withdrawalTax?.accountsByTreatment.taxable.total ?? 0;
+    const hasFrankingClaim = (data.taxCredits ?? []).some((c) => c.category.toLowerCase().includes("franking"));
+    if (taxableBalance > 10_000 && !hasFrankingClaim) {
+      insights.push({
+        id: "au-franking",
+        type: "au-franking",
+        message: `Australian shares often pay franked dividends — the attached franking credits represent company tax already paid at 30%. You include the grossed-up dividend in your taxable income and claim the credit as an offset. If the credits exceed your tax liability, the ATO refunds the difference. Track these in the Tax Credits section.`,
+        icon: "📋",
+      });
+    }
+
+    // Medicare Levy Surcharge avoidance — income > $93,000, no private health insurance rebate claimed
+    const hasPHI = (data.taxCredits ?? []).some((c) => c.category.toLowerCase().includes("private health"));
+    if (auAnnualIncome >= 93_000 && !hasPHI) {
+      insights.push({
+        id: "au-mls",
+        type: "au-mls",
+        message: `At your income level, you may be liable for the Medicare Levy Surcharge (MLS) of 1–1.5% (up to ${formatCurrency(Math.round(auAnnualIncome * 0.015))}/yr) if you don't hold private hospital cover. Basic hospital cover typically costs less than the surcharge — worth comparing. Add a Private Health Insurance Rebate in Tax Credits if you have cover.`,
+        icon: "🏥",
+      });
+    }
+  }
+
   // Debt payoff strategy comparison — shown when user has 2+ debts with interest & payments
   if (data.debts && data.debts.length >= 2) {
     const debtsForStrategy = data.debts
@@ -396,16 +482,20 @@ export function generateInsights(data: FinancialData): Insight[] {
     const taxDeferredTotal = wt.accountsByTreatment.taxDeferred.total;
     const marginalRate = data.marginalRate;
     const country = data.country ?? "CA";
-    const taxFreeAccountName = country === "CA" ? "TFSA" : "Roth IRA";
-    const taxDeferredAccountName = country === "CA" ? "RRSP" : "401(k)";
+    const taxFreeAccountName = country === "CA" ? "TFSA" : country === "AU" ? "Super (Pension Phase)" : "Roth IRA";
+    const taxDeferredAccountName = country === "CA" ? "RRSP" : country === "AU" ? "Super (Accumulation)" : "401(k)";
 
     const assetCatLower = (data.assetCategories ?? []).map((c) => c.toLowerCase());
     const alreadyHasTaxFreeAcct = country === "CA"
       ? assetCatLower.some((c) => c.includes("tfsa") || c.includes("fhsa"))
-      : assetCatLower.some((c) => c.includes("roth") || c.includes("hsa"));
+      : country === "AU"
+        ? assetCatLower.some((c) => c.includes("pension phase") || c.includes("fhss") || c.includes("first home super"))
+        : assetCatLower.some((c) => c.includes("roth") || c.includes("hsa"));
     const alreadyHasTaxDeferredAcct = country === "CA"
       ? assetCatLower.some((c) => c.includes("rrsp") || c.includes("lira"))
-      : assetCatLower.some((c) => c.includes("401k") || (c.includes("ira") && !c.includes("roth")));
+      : country === "AU"
+        ? assetCatLower.some((c) => c.includes("super") && c.includes("accumulation"))
+        : assetCatLower.some((c) => c.includes("401k") || (c.includes("ira") && !c.includes("roth")));
 
     // Suggestion 1: Taxable brokerage → tax-free account
     // Annual tax cost on growth = taxable balance × assumed 5% growth × marginalRate
@@ -425,19 +515,29 @@ export function generateInsights(data: FinancialData): Insight[] {
       }
     }
 
-    // Suggestion 2: RRSP/401(k) contribution deduction
+    // Suggestion 2: RRSP/401(k)/super salary sacrifice contribution deduction
     // Skip if user has no taxable accounts — nothing to redirect into a tax-deferred vehicle
-    // Reference: each $10,000 contributed saves marginalRate × $10,000 in tax
+    // AU: salary sacrifice taxed at 15% in fund vs marginal rate = net saving of (marginalRate - 0.15) per dollar
     if (taxableTotal > 0 && data.annualEmploymentIncome && data.annualEmploymentIncome > 0 && marginalRate >= 0.25) {
       const referenceContribution = 10_000;
-      const taxSavings = referenceContribution * marginalRate;
-      const actionPhrase = alreadyHasTaxDeferredAcct
-        ? `increasing your ${taxDeferredAccountName} contributions`
-        : `contributing to a ${taxDeferredAccountName}`;
+      let deductionInsightMessage: string;
+      if (country === "AU") {
+        const netSaving = referenceContribution * (marginalRate - 0.15);
+        const actionPhrase = alreadyHasTaxDeferredAcct
+          ? `salary sacrificing additional amounts into super`
+          : `salary sacrificing into super`;
+        deductionInsightMessage = `Each $10,000 from ${actionPhrase} is taxed at 15% inside the fund instead of your ${Math.round(marginalRate * 100)}% marginal rate — a net saving of ~${formatCurrency(Math.round(netSaving))} per $10,000. The concessional cap is $30,000/yr (including your employer's Super Guarantee).`;
+      } else {
+        const taxSavings = referenceContribution * marginalRate;
+        const actionPhrase = alreadyHasTaxDeferredAcct
+          ? `increasing your ${taxDeferredAccountName} contributions`
+          : `contributing to a ${taxDeferredAccountName}`;
+        deductionInsightMessage = `Based on your income of ${formatCurrency(data.annualEmploymentIncome)}/year, each $10,000 from ${actionPhrase} reduces your tax bill by ~${formatCurrency(Math.round(taxSavings))}. Check your available contribution room.`;
+      }
       insights.push({
         id: "tax-opt-deferred-contribution",
         type: "tax-optimization",
-        message: `Based on your income of ${formatCurrency(data.annualEmploymentIncome)}/year, each $10,000 from ${actionPhrase} reduces your tax bill by ~${formatCurrency(Math.round(taxSavings))}. Check your available contribution room.`,
+        message: deductionInsightMessage,
         icon: "💡",
       });
     }
@@ -663,6 +763,19 @@ export function generateInsights(data: FinancialData): Insight[] {
         }
         if (data.hasStudentLoans && !claimed.has("Canada Training Credit") && eligible("Canada Training Credit")) {
           suggestions.push({ name: "Canada Training Credit", maxAmount: 250 });
+        }
+      } else if (country === "AU") {
+        if (annualGrossIncome > 0 && annualGrossIncome < 66_667 && !claimed.has("Low Income Tax Offset (LITO)") && eligible("Low Income Tax Offset (LITO)")) {
+          suggestions.push({ name: "Low Income Tax Offset (LITO)", maxAmount: 700 });
+        }
+        if (annualGrossIncome > 0 && annualGrossIncome < 60_400 && !claimed.has("Super Co-contribution") && eligible("Super Co-contribution")) {
+          suggestions.push({ name: "Super Co-contribution", maxAmount: 500 });
+        }
+        if (!claimed.has("Franking Credits") && eligible("Franking Credits")) {
+          suggestions.push({ name: "Franking Credits" });
+        }
+        if (annualGrossIncome > 0 && annualGrossIncome >= 93_000 && !claimed.has("Private Health Insurance Rebate") && eligible("Private Health Insurance Rebate")) {
+          suggestions.push({ name: "Private Health Insurance Rebate" });
         }
       } else {
         if (data.hasChildCareExpenses && !claimed.has("Child Tax Credit") && eligible("Child Tax Credit")) {

@@ -8,25 +8,22 @@
 
 ## Summary
 - **Total Tasks**: 169
-- **Completed**: 165
-- **Remaining**: 4
+- **Completed**: 166
+- **Remaining**: 3
 - **Last Updated**: 2026-03-08
 
-## Task 165: AU sample profiles [@frontend]
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 166: AU insights and encouragement text [@backend]
 - **Date**: 2026-03-08
 - **Files**:
-  - `src/lib/sample-profiles.ts`: Added `AU_SAMPLE_PROFILES` (3 profiles). Updated `getProfilesForCountry` to return AU profiles for "AU" instead of falling back to CA.
-  - `src/lib/changelog.ts`: Added version 165 entry.
-  - `tests/unit/sample-profiles.test.ts`: Added AU profile tests (13 new tests); updated `getProfilesForCountry` tests for AU. Updated changelog.test.ts count 164→165.
-  - `tests/unit/changelog.test.ts`: Updated counts from 164 to 165.
-  - `tests/e2e/au-sample-profiles.spec.ts`: New — 6 E2E tests covering AU country toggle, profile card display, profile loading navigation, highlight text.
-- **Tests**: T1: 2457 passed (130 files), T2: 6 passed, Build: passes
-- **Screenshots**: task-165-au-profiles-wizard.png, task-165-au-young-professional-dashboard.png, task-165-au-mid-career-family-dashboard.png, task-165-au-pre-retiree-dashboard.png, task-165-au-profile-cards.png
-- **Notes**: AU profiles: (1) Young professional Sydney — Super Accumulation, HECS-HELP $35k, VAS.AX/VGS.AX; (2) Mid-career Melbourne — salary sacrifice $1,650/mo super, mortgage $950k property, A200.AX/NDQ.AX; (3) Pre-retiree Brisbane — $420k Super, paid-off home + investment property, CBA.AX/BHP.AX/WES.AX.
-
-<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
-
-<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+  - `src/lib/insights/types.ts`: Added 5 new InsightType literals: `"au-super"`, `"au-hecs-help"`, `"au-fhss"`, `"au-franking"`, `"au-mls"`.
+  - `src/lib/insights/generate.ts`: (1) `buildTaxRateHighMessage` — AU branch with salary-sacrifice/concessional cap language; (2) withdrawal-tax no-free message uses AU super terminology instead of TFSA/Roth IRA; (3) tax optimization account names use `Super (Pension Phase)` / `Super (Accumulation)` for AU; (4) salary-sacrifice deduction insight with 15% fund tax vs marginal rate; (5) unclaimed credits AU branch (LITO, Super Co-contribution, Franking Credits, PHI Rebate); (6) New AU-specific insights block: super guarantee check, HECS-HELP repayment, FHSS eligibility, franking credits suggestion, MLS avoidance.
+  - `src/lib/changelog.ts`: Added version 166 entry.
+  - `tests/unit/au-insights.test.ts`: New — 33 tests covering all 5 AU insight types, CA/US regression, deduplication pass-through.
+- **Tests**: T1: 2490 passed (131 files), Build: passes
+- **Screenshots**: N/A (backend task)
+- **Notes**: Super Guarantee rate 11.5% (2024-25) consistent with flowchart-steps.ts and task description. Unclaimed credits only fire when user has already entered ≥1 tax credit (matches existing CA/US behavior). MLS threshold $93k singles (2025-26). HECS-HELP repayment threshold $54,435 (2025-26).
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

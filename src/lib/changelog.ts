@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Australia: AU insights and encouragement text
+  {
+    version: 166,
+    title: "Australia: AU-specific insights",
+    description: "Added 5 AU-specific insights: (1) Super Guarantee check — warns when employer contributes below 11.5% or super account is missing; (2) HECS-HELP repayment — explains CPI indexation and PAYG deductions above $54,435 threshold; (3) FHSS eligibility — suggests First Home Super Saver scheme to non-homeowners; (4) Franking credits — recommends tracking franking credits when AU taxable investments exceed $10k; (5) MLS avoidance — warns about Medicare Levy Surcharge above $93k income with no private hospital cover. Updated buildTaxRateHighMessage with AU salary-sacrifice language, tax optimization section uses Super account names, withdrawal-tax no-free message uses AU super terminology, and unclaimed credits suggest LITO, Super Co-contribution, and Franking Credits for AU users.",
+    date: "2026-03-08",
+  },
   // Australia: AU sample profiles
   {
     version: 165,
