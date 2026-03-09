@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Country and Jurisdiction Selector", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=profile");
     // Wait for hydration
     await page.waitForSelector("[data-testid='country-jurisdiction-selector']");
   });

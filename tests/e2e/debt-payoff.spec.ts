@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Debt payoff timeline display", () => {
   test("shows payoff info when interest rate and payment are set", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Set interest rate on Car Loan (d1)
     await page.getByTestId("interest-badge-d1").click();
@@ -25,14 +25,14 @@ test.describe("Debt payoff timeline display", () => {
   });
 
   test("shows warning when payment doesn't cover interest", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Set high interest rate on Car Loan
     await page.getByTestId("interest-badge-d1").click();
     await page.getByLabel("Edit interest rate for Car Loan").fill("50");
     await page.getByLabel("Edit interest rate for Car Loan").press("Enter");
 
-    // Set tiny monthly payment ($100 won't cover interest on $15,000 at 50%)
+    // Set tiny monthly payment ($100 won't cover interest on $5,000 at 50%)
     await page.getByTestId("debt-payment-badge-d1").click();
     await page.getByLabel("Edit monthly payment for Car Loan").fill("100");
     await page.getByLabel("Edit monthly payment for Car Loan").press("Enter");
@@ -46,7 +46,7 @@ test.describe("Debt payoff timeline display", () => {
   });
 
   test("no payoff info when only interest rate is set (no payment)", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Car Loan has suggested 6% APR but no payment set by default
     // Payoff info should not appear
@@ -55,7 +55,7 @@ test.describe("Debt payoff timeline display", () => {
   });
 
   test("payoff info uses suggested rate when no explicit rate set", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Don't set interest rate (Car Loan has 6% suggested default)
     // Set monthly payment

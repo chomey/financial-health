@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Debt interest rate and monthly payment", () => {
   test("shows suggested interest rate badge for Car Loan", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Car Loan should show 6% APR (suggested)
     const interestBadge = page.getByTestId("interest-badge-d1");
@@ -14,7 +14,7 @@ test.describe("Debt interest rate and monthly payment", () => {
   });
 
   test("shows monthly payment placeholder", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     const paymentBadge = page.getByTestId("debt-payment-badge-d1");
     await expect(paymentBadge).toBeVisible();
@@ -22,7 +22,7 @@ test.describe("Debt interest rate and monthly payment", () => {
   });
 
   test("allows editing interest rate by clicking the badge", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Click the Car Loan interest badge
     await page.getByTestId("interest-badge-d1").click();
@@ -43,7 +43,7 @@ test.describe("Debt interest rate and monthly payment", () => {
   });
 
   test("allows editing monthly payment by clicking the badge", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Click the payment badge
     await page.getByTestId("debt-payment-badge-d1").click();
@@ -63,7 +63,7 @@ test.describe("Debt interest rate and monthly payment", () => {
   });
 
   test("interest rate persists in URL state after reload", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Set interest rate on Car Loan
     await page.getByTestId("interest-badge-d1").click();
@@ -86,7 +86,7 @@ test.describe("Debt interest rate and monthly payment", () => {
   });
 
   test("monthly payment persists in URL state after reload", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Set payment on Car Loan
     await page.getByTestId("debt-payment-badge-d1").click();
@@ -110,7 +110,7 @@ test.describe("Debt interest rate and monthly payment", () => {
   });
 
   test("detail fields appear for default debt", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Default Car Loan should have detail row
     await expect(page.getByTestId("debt-details-d1")).toBeVisible();
