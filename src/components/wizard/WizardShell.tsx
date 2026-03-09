@@ -202,6 +202,8 @@ export default function WizardShell(props: WizardProps) {
             homeCurrency={props.homeCurrency}
             fxRates={props.effectiveFxRates}
             annualEmploymentSalary={props.annualEmploymentSalary}
+            properties={props.properties}
+            onPropertiesChange={props.setProperties}
           />
         );
       case "stocks":

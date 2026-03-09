@@ -10,6 +10,10 @@ import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useEditState, useAddNew } from "@/lib/entry-hooks";
 import HelpTip from "@/components/HelpTip";
 import { useModeContext } from "@/lib/ModeContext";
+import type { Property } from "@/components/PropertyEntry";
+
+/** ID for the single property created in simple mode */
+export const SIMPLE_HOME_ID = "_simple_home";
 
 export type RoiTaxTreatment = "capital-gains" | "income";
 
@@ -215,9 +219,11 @@ interface AssetEntryProps {
   homeCurrency?: import("@/lib/currency").SupportedCurrency;
   fxRates?: import("@/lib/currency").FxRates;
   annualEmploymentSalary?: number;
+  properties?: Property[];
+  onPropertiesChange?: (properties: Property[]) => void;
 }
 
-export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCurrency, fxRates, annualEmploymentSalary = 0 }: AssetEntryProps = {}) {
+export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCurrency, fxRates, annualEmploymentSalary = 0, properties, onPropertiesChange }: AssetEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
   const formatCompact = (v: number) => fmt.compact(v);
@@ -229,6 +235,34 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
     const next = typeof updater === "function" ? updater(assets) : updater;
     onChange?.(next);
   }, [assets, onChange]);
+
+  // Simple mode: home value and mortgage balance fields
+  const [editingHomeField, setEditingHomeField] = useState<"value" | "mortgage" | null>(null);
+  const [homeFieldInput, setHomeFieldInput] = useState("");
+  const homeValueInputRef = useRef<HTMLInputElement>(null);
+  const mortgageInputRef = useRef<HTMLInputElement>(null);
+  const simpleHome = (properties ?? []).find((p) => p.id === SIMPLE_HOME_ID);
+  const simpleHomeValue = simpleHome?.value ?? 0;
+  const simpleHomeMortgage = simpleHome?.mortgage ?? 0;
+
+  const handleSimpleHomeChange = (field: "value" | "mortgage", amount: number) => {
+    if (!onPropertiesChange) return;
+    const propList = properties ?? [];
+    const newValue = field === "value" ? amount : simpleHomeValue;
+    const newMortgage = field === "mortgage" ? amount : simpleHomeMortgage;
+    if (newValue <= 0 && newMortgage <= 0) {
+      onPropertiesChange(propList.filter((p) => p.id !== SIMPLE_HOME_ID));
+    } else if (simpleHome) {
+      onPropertiesChange(propList.map((p) => p.id === SIMPLE_HOME_ID ? { ...p, value: newValue, mortgage: newMortgage } : p));
+    } else {
+      onPropertiesChange([...propList, { id: SIMPLE_HOME_ID, name: "Primary Residence", value: newValue, mortgage: newMortgage }]);
+    }
+  };
+
+  const commitHomeField = (field: "value" | "mortgage") => {
+    handleSimpleHomeChange(field, parseCurrencyInput(homeFieldInput));
+    setEditingHomeField(null);
+  };
 
   type AssetField = "category" | "amount" | "roi" | "monthlyContribution" | "costBasisPercent" | "employerMatchPct" | "employerMatchCap";
   const edit = useEditState<AssetField>(["category"]);
@@ -327,6 +361,91 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
         <span aria-hidden="true">📊</span>
         Assets
       </h2>
+
+      {/* Simple mode: Home value and Mortgage balance subsection */}
+      {isSimple && onPropertiesChange && (
+        <div className="mb-3 border-b border-white/10 pb-3" data-testid="simple-home-section">
+          <div className="flex items-center justify-between px-2 mb-2">
+            <div>
+              <div className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
+                <span aria-hidden="true">🏠</span>
+                Home
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">Optional — leave blank if renting</p>
+            </div>
+          </div>
+          {/* Home value row */}
+          <div className="flex items-center justify-between px-2 py-1">
+            <span className="text-sm text-slate-400">Home value</span>
+            {editingHomeField === "value" ? (
+              <input
+                ref={homeValueInputRef}
+                type="text"
+                inputMode="decimal"
+                value={homeFieldInput}
+                onChange={(e) => setHomeFieldInput(formatNumericInput(e.target.value))}
+                onBlur={() => commitHomeField("value")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); commitHomeField("value"); }
+                  if (e.key === "Escape") { setEditingHomeField(null); }
+                }}
+                className="w-32 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                aria-label="Home value"
+                data-testid="simple-home-value-input"
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setHomeFieldInput(simpleHomeValue > 0 ? String(simpleHomeValue) : "");
+                  setEditingHomeField("value");
+                  setTimeout(() => homeValueInputRef.current?.focus(), 0);
+                }}
+                className="w-32 text-right text-sm font-medium text-emerald-400 rounded px-2 py-1 transition-colors duration-150 hover:bg-emerald-400/10 hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                aria-label={`Edit home value, currently ${formatCurrency(simpleHomeValue)}`}
+                data-testid="simple-home-value"
+              >
+                {simpleHomeValue > 0 ? formatCurrency(simpleHomeValue) : "$0"}
+              </button>
+            )}
+          </div>
+          {/* Mortgage balance row */}
+          <div className="flex items-center justify-between px-2 py-1">
+            <span className="text-sm text-slate-400">Mortgage balance</span>
+            {editingHomeField === "mortgage" ? (
+              <input
+                ref={mortgageInputRef}
+                type="text"
+                inputMode="decimal"
+                value={homeFieldInput}
+                onChange={(e) => setHomeFieldInput(formatNumericInput(e.target.value))}
+                onBlur={() => commitHomeField("mortgage")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); commitHomeField("mortgage"); }
+                  if (e.key === "Escape") { setEditingHomeField(null); }
+                }}
+                className="w-32 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                aria-label="Mortgage balance"
+                data-testid="simple-mortgage-input"
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setHomeFieldInput(simpleHomeMortgage > 0 ? String(simpleHomeMortgage) : "");
+                  setEditingHomeField("mortgage");
+                  setTimeout(() => mortgageInputRef.current?.focus(), 0);
+                }}
+                className="w-32 text-right text-sm font-medium text-rose-400 rounded px-2 py-1 transition-colors duration-150 hover:bg-rose-400/10 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                aria-label={`Edit mortgage balance, currently ${formatCurrency(simpleHomeMortgage)}`}
+                data-testid="simple-mortgage-value"
+              >
+                {simpleHomeMortgage > 0 ? formatCurrency(simpleHomeMortgage) : "$0"}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {assets.length === 0 && !addingNew ? (
         <div className="flex flex-col items-center py-4 text-center" data-testid="asset-empty-state">

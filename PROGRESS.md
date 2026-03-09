@@ -8,11 +8,23 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 177
-- **Remaining**: 7
+- **Completed**: 178
+- **Remaining**: 6
 - **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 181: Simplify PropertyEntry and fold into Assets in simple mode [@fullstack]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/components/AssetEntry.tsx`: Added `Property` type import and `SIMPLE_HOME_ID` export; added `properties` and `onPropertiesChange` props; added simple mode "Home" subsection at top with inline-editable "Home value" and "Mortgage balance" fields; maps to a single `_simple_home` Property item in state
+  - `src/components/wizard/steps/AssetsStep.tsx`: Added `properties` and `onPropertiesChange` optional props; passed them through to `AssetEntry`
+  - `src/components/wizard/WizardShell.tsx`: Passed `properties={props.properties}` and `onPropertiesChange={props.setProperties}` to `AssetsStep`
+  - `tests/unit/asset-entry-simple-home.test.tsx`: 10 unit tests — visibility per mode, amount display, upsert/update/remove via onPropertiesChange, preserve non-simple properties
+  - `tests/e2e/asset-entry-simple-home.spec.ts`: 3 Playwright tests — section visible in simple, hidden in advanced, can enter home value
+  - `src/lib/changelog.ts`: Added version 181 entry
+- **Tests**: T1: 2686 passed (143 files), T2: 3 passed, Build: passes
+- **Screenshots**: task-181-asset-simple-home-section, task-181-asset-advanced-mode-no-home-section, task-181-asset-simple-home-value-entered
 
 ## Task 180: Simplify DebtEntry and fold into Expenses in simple mode [@fullstack]
 - **Date**: 2026-03-09

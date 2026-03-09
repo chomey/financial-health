@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 181,
+    title: "Simple mode — home value and mortgage folded into Assets",
+    description: "In Simple mode, the Property wizard step is hidden. AssetEntry now shows a 'Home' subsection at the top with two optional inline-editable fields: 'Home value' and 'Mortgage balance'. These map to a single Property item in state with id '_simple_home' and name 'Primary Residence'. When both fields are cleared, the property is removed. All values are preserved in state — switching to Advanced reveals the full PropertyEntry with all fields. AssetsStep and WizardShell updated to pass properties/onPropertiesChange to AssetEntry.",
+    date: "2026-03-09",
+  },
+  {
     version: 180,
     title: "Simple mode — debt payments folded into Expenses",
     description: "In Simple mode, the Debts wizard step is hidden. ExpenseEntry now shows a 'Debt Payments' subsection at the bottom: a single inline-editable amount for monthly debt payments (credit cards, loans, etc.). This maps to a Debt item in state with category 'Debt Payments' and monthlyPayment set to the entered value. In Advanced mode, DebtEntry works as-is with all fields. ExpensesStep and WizardShell updated to pass debts/onDebtsChange to ExpenseEntry.",

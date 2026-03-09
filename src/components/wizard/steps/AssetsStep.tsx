@@ -2,6 +2,7 @@
 
 import AssetEntry from "@/components/AssetEntry";
 import type { Asset } from "@/components/AssetEntry";
+import type { Property } from "@/components/PropertyEntry";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
 
 export default function AssetsStep({
@@ -11,6 +12,8 @@ export default function AssetsStep({
   homeCurrency,
   fxRates,
   annualEmploymentSalary,
+  properties,
+  onPropertiesChange,
 }: {
   items: Asset[];
   onChange: (items: Asset[]) => void;
@@ -18,6 +21,8 @@ export default function AssetsStep({
   homeCurrency: SupportedCurrency;
   fxRates: FxRates;
   annualEmploymentSalary: number;
+  properties?: Property[];
+  onPropertiesChange?: (properties: Property[]) => void;
 }) {
   return (
     <div className="space-y-4">
@@ -27,7 +32,7 @@ export default function AssetsStep({
           Savings accounts, investments, retirement accounts (TFSA, RRSP, 401k, etc.)
         </p>
       </div>
-      <AssetEntry items={items} onChange={onChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={fxRates} annualEmploymentSalary={annualEmploymentSalary} />
+      <AssetEntry items={items} onChange={onChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={fxRates} annualEmploymentSalary={annualEmploymentSalary} properties={properties} onPropertiesChange={onPropertiesChange} />
     </div>
   );
 }
