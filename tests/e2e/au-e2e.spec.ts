@@ -113,40 +113,86 @@ test.describe("AU E2E: Dashboard shows AUD values", () => {
 
 // ── AU Money Steps ────────────────────────────────────────────────────────────
 
-test.describe("AU E2E: Money Steps show AU-specific steps", () => {
-  test("AU Money Steps includes AU-specific steps and excludes CA/US steps", async ({
-    page,
-  }) => {
+test.describe("AU E2E: Money Steps — all steps per jurisdiction", () => {
+  const AU_STEPS = [
+    "au-budget", "au-emergency-fund", "au-super-guarantee", "au-high-debt",
+    "au-salary-sacrifice", "au-fhss", "au-moderate-debt", "au-etf-invest",
+    "au-nonconcessional-super", "au-lifestyle-giving",
+  ];
+  const CA_STEPS = [
+    "ca-budget", "ca-starter-ef", "ca-employer-match", "ca-high-debt",
+    "ca-full-ef", "ca-tfsa", "ca-rrsp", "ca-moderate-debt",
+    "ca-resp-fhsa", "ca-taxable",
+  ];
+  const US_STEPS = [
+    "us-budget", "us-starter-ef", "us-employer-match", "us-high-debt",
+    "us-full-ef", "us-hsa", "us-ira", "us-401k",
+    "us-moderate-debt", "us-taxable",
+  ];
+
+  test("AU profile shows all 10 AU steps", async ({ page }) => {
     test.setTimeout(60000);
     await loadAUProfile(page);
 
     const flowchart = page.locator('[data-testid="financial-flowchart"]');
-    // Wait for AU steps to render (state propagation)
     await expect(
-      flowchart.locator('[data-testid="flowchart-step-au-super-guarantee"]')
+      flowchart.locator('[data-testid="flowchart-step-au-budget"]')
     ).toBeVisible({ timeout: 10000 });
 
-    // Verify AU steps present
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-au-salary-sacrifice"]')
-    ).toBeVisible();
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-au-etf-invest"]')
-    ).toBeVisible();
-
-    // 10 AU steps total
-    const stepButtons = flowchart.locator('[data-testid^="flowchart-step-"]');
-    await expect(stepButtons).toHaveCount(10);
-
-    // CA and US steps should NOT be present
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-ca-tfsa"]')
-    ).not.toBeVisible();
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-us-ira"]')
-    ).not.toBeVisible();
+    for (const step of AU_STEPS) {
+      await expect(
+        flowchart.locator(`[data-testid="flowchart-step-${step}"]`),
+        `AU step "${step}" should be visible`
+      ).toBeVisible();
+    }
+    await expect(flowchart.locator('[data-testid^="flowchart-step-"]')).toHaveCount(10);
 
     await captureScreenshot(page, "task-173-au-money-steps");
+  });
+
+  test("CA default shows all 10 CA steps", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.goto("/?step=dashboard");
+    await page.waitForSelector('[data-testid="snapshot-dashboard"]');
+
+    const flowchart = page.locator('[data-testid="financial-flowchart"]');
+    await expect(
+      flowchart.locator('[data-testid="flowchart-step-ca-budget"]')
+    ).toBeVisible({ timeout: 10000 });
+
+    for (const step of CA_STEPS) {
+      await expect(
+        flowchart.locator(`[data-testid="flowchart-step-${step}"]`),
+        `CA step "${step}" should be visible`
+      ).toBeVisible();
+    }
+    await expect(flowchart.locator('[data-testid^="flowchart-step-"]')).toHaveCount(10);
+
+    await captureScreenshot(page, "task-173-ca-money-steps");
+  });
+
+  test("US profile shows all 10 US steps", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.goto("/?step=welcome");
+    await page.getByTestId("country-us").click();
+    await page.getByTestId("sample-profile-fresh-grad-us").click();
+    await page.waitForFunction(() => window.location.search.includes("s="));
+    await page.waitForSelector('[data-testid="snapshot-dashboard"]');
+
+    const flowchart = page.locator('[data-testid="financial-flowchart"]');
+    await expect(
+      flowchart.locator('[data-testid="flowchart-step-us-budget"]')
+    ).toBeVisible({ timeout: 10000 });
+
+    for (const step of US_STEPS) {
+      await expect(
+        flowchart.locator(`[data-testid="flowchart-step-${step}"]`),
+        `US step "${step}" should be visible`
+      ).toBeVisible();
+    }
+    await expect(flowchart.locator('[data-testid^="flowchart-step-"]')).toHaveCount(10);
+
+    await captureScreenshot(page, "task-173-us-money-steps");
   });
 });
 
@@ -220,33 +266,7 @@ test.describe("AU E2E: Super accounts appear in assets wizard step", () => {
 
 // ── Regression: CA flow unaffected by AU additions ───────────────────────────
 
-test.describe("Regression: CA flow unaffected by AU additions", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem("fhs-wizard-done", "1");
-    });
-  });
-
-  test("CA default Money Steps shows CA steps, not AU or US", async ({
-    page,
-  }) => {
-    test.setTimeout(60000);
-    await page.goto("/?step=dashboard");
-    await page.waitForSelector('[data-testid="snapshot-dashboard"]');
-
-    const flowchart = page.locator('[data-testid="financial-flowchart"]');
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-ca-tfsa"]')
-    ).toBeVisible({ timeout: 10000 });
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-ca-rrsp"]')
-    ).toBeVisible();
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-au-super-guarantee"]')
-    ).not.toBeVisible();
-    await captureScreenshot(page, "task-173-regression-ca-money-steps");
-  });
-
+test.describe("Regression: CA and US flows unaffected by AU additions", () => {
   test("CA sample profile (fresh-grad) still loads correctly", async ({
     page,
   }) => {
@@ -263,51 +283,13 @@ test.describe("Regression: CA flow unaffected by AU additions", () => {
     await captureScreenshot(page, "task-173-regression-ca-fresh-grad-dashboard");
   });
 
-  test("CA is still the default country (not AU)", async ({ page }) => {
+  test("CA is still the default country with Ontario jurisdiction", async ({ page }) => {
     await page.goto("/?step=profile");
     await page.waitForSelector("[data-testid='country-jurisdiction-selector']");
 
-    const caBtn = page.getByTestId("country-ca");
-    await expect(caBtn).toHaveAttribute("aria-pressed", "true");
-
-    const auBtn = page.getByTestId("country-au");
-    await expect(auBtn).toHaveAttribute("aria-pressed", "false");
-  });
-
-  test("CA jurisdiction shows Ontario by default", async ({ page }) => {
-    await page.goto("/?step=profile");
-    await page.waitForSelector("[data-testid='country-jurisdiction-selector']");
-
-    const jurisdictionSelect = page.getByTestId("jurisdiction-select");
-    await expect(jurisdictionSelect).toHaveValue("ON");
-  });
-});
-
-// ── Regression: US flow unaffected by AU additions ───────────────────────────
-
-test.describe("Regression: US flow unaffected by AU additions", () => {
-  test("US Money Steps shows US steps, not AU or CA", async ({ page }) => {
-    test.setTimeout(60000);
-    await page.goto("/?step=welcome");
-    await page.getByTestId("country-us").click();
-    await page.getByTestId("sample-profile-fresh-grad-us").click();
-    await page.waitForFunction(() => window.location.search.includes("s="));
-    await page.waitForSelector('[data-testid="snapshot-dashboard"]');
-
-    const flowchart = page.locator('[data-testid="financial-flowchart"]');
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-us-ira"]')
-    ).toBeVisible({ timeout: 10000 });
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-us-401k"]')
-    ).toBeVisible();
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-au-super-guarantee"]')
-    ).not.toBeVisible();
-    await expect(
-      flowchart.locator('[data-testid="flowchart-step-ca-tfsa"]')
-    ).not.toBeVisible();
-    await captureScreenshot(page, "task-173-regression-us-money-steps");
+    await expect(page.getByTestId("country-ca")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("country-au")).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByTestId("jurisdiction-select")).toHaveValue("ON");
   });
 
   test("CA→AU→US country cycle all show correct profile cards", async ({
