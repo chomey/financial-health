@@ -135,7 +135,6 @@ describe("Milestone 13 E2E test infrastructure — Financial Intelligence (Tasks
   it("related feature E2E test files from tasks 110-119 exist", () => {
     const featureTests = [
       "inflation-toggle.spec.ts",
-      // age-benchmarks.spec.ts removed — AgeInputHeader removed from UI
       "employer-match.spec.ts",
       "sample-profiles.spec.ts",
       "print-snapshot.spec.ts",
