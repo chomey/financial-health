@@ -3,7 +3,7 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Cost basis percent on taxable assets", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=assets");
     await page.waitForSelector('[aria-label="Asset items"]');
   });
 
