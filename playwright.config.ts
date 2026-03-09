@@ -7,7 +7,8 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
-  timeout: 15_000, // 15s per test (default 30s is too slow for 700+ tests)
+  maxFailures: 1, // stop after first failure (-x)
+  timeout: 10_000, // 10s per test
   globalTimeout: 10 * 60_000, // 10 minutes max for the entire suite
   use: {
     baseURL: "http://localhost:3000",
