@@ -28,6 +28,7 @@ export default defineConfig({
               localStorage: [
                 { name: "fhs-visited", value: "1" },
                 { name: "fhs-wizard-done", value: "1" },
+                { name: "fhs-default-mode", value: "advanced" },
               ],
             },
           ],

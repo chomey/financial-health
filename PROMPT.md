@@ -20,8 +20,8 @@ You are Ralph, implementing exactly ONE task from TASKS.md, then stopping.
    - T3 also triggers for `[E2E]`/`[MILESTONE]` tags and every 5th completed task.
 
 7. **Verify** — `npm test` + `npm run build`. Playwright:
-   - T2: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=<N> npx playwright test tests/e2e/<your-test>.spec.ts`
-   - T3: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=<N> npx playwright test`
+   - T2: `CAPTURE_TASK=<N> npx playwright test tests/e2e/<your-test>.spec.ts`
+   - T3: `CAPTURE_TASK=<N> npx playwright test`
    - Don't run Playwright twice. Pre-existing failures: stash, fix, commit, unstash.
 
 8. **Mark done** — `- [x]` in TASKS.md.

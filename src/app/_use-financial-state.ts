@@ -51,6 +51,11 @@ export function useFinancialState() {
   useEffect(() => {
     setSafeWithdrawalRate(getSwrFromURL());
     setOutlookYears(getOutlookYearsFromURL());
+    // Read default mode from localStorage (set by Playwright for tests, or user preference)
+    try {
+      const storedMode = localStorage.getItem("fhs-default-mode");
+      if (storedMode === "advanced" || storedMode === "simple") setMode(storedMode);
+    } catch { /* SSR or private browsing */ }
     const urlState = getStateFromURL();
     if (urlState) {
       setAssets(urlState.assets);

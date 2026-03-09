@@ -56,7 +56,7 @@ Sonnet by default. These tags force Opus via `ralph.zsh`:
 2. Read PROGRESS.md for recent context
 3. Complete exactly ONE task
 4. **Write tests** — T1 (unit) always required. T2 (Playwright) for `[@frontend]`, `[@fullstack]`, `[@qa]`. T3 (full E2E) for `[@qa]`, `[E2E]`/`[MILESTONE]` tags, and every 5th task.
-5. **Run tests/build in one pass** — `npm test` + `npm run build`. T2: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=<N> npx playwright test tests/e2e/<your-test>.spec.ts`. T3: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=<N> npx playwright test`. Do NOT run Playwright twice. Pre-existing test failures: `git stash`, fix, commit `ralph: fix pre-existing test failure during task [N]`, `git stash pop`.
+5. **Run tests/build in one pass** — `npm test` + `npm run build`. T2: `CAPTURE_TASK=<N> npx playwright test tests/e2e/<your-test>.spec.ts`. T3: `CAPTURE_TASK=<N> npx playwright test`. Do NOT run Playwright twice. Pre-existing test failures: `git stash`, fix, commit `ralph: fix pre-existing test failure during task [N]`, `git stash pop`.
 6. Mark task done (`- [x]`) in TASKS.md
 7. Log in PROGRESS.md (one entry: task number, date, files, test results, screenshots)
 8. Update `src/lib/changelog.ts`
@@ -65,7 +65,7 @@ Sonnet by default. These tags force Opus via `ralph.zsh`:
 
 ## Screenshots & Git LFS
 - `.gitattributes` must track `*.png`, `*.jpg`, `*.jpeg`, `*.gif`, `*.webp`, `*.svg` via Git LFS
-- Screenshots committed with each task. `CAPTURE_TASK=<N>` scopes writes to current task only.
+- Screenshots committed with each task. `CAPTURE_TASK=<N>` enables capture for that task only; without it, `captureScreenshot()` is a no-op.
 - T3/regression tasks: report "all tests pass", don't duplicate screenshots.
 
 ## Important Notes
