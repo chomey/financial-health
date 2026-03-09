@@ -8,11 +8,25 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 178
-- **Remaining**: 6
+- **Completed**: 179
+- **Remaining**: 5
 - **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 182: Simplify dashboard in simple mode [@frontend]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/app/page.tsx`: Made `DASHBOARD_SECTIONS` mode-aware (4 sections in simple, 8 in advanced); renamed "Metrics" → "Overview" in simple mode; wrapped cashflow, breakdowns, compare, scenarios sections with `mode !== "simple"` conditionals; added upgrade banner at bottom in simple mode
+  - `src/lib/ModeContext.tsx`: Added `useOptionalModeContext()` hook (returns "advanced" default when not in provider — avoids breaking existing tests)
+  - `src/components/SnapshotDashboard.tsx`: Uses `useOptionalModeContext`; filters to only Net Worth, Monthly Cash Flow, Financial Runway in simple mode; uses `sm:grid-cols-3` layout in simple mode
+  - `src/components/InsightsPanel.tsx`: Uses `useOptionalModeContext`; caps at 4 insights in simple mode; filters out "fire" and "income-replacement" insight types in simple mode
+  - `src/components/ProjectionChart.tsx`: Uses `useOptionalModeContext`; locks scenario to "moderate" in simple mode via `useEffect`; hides scenario toggle buttons in simple mode
+  - `tests/unit/simple-mode-dashboard.test.tsx`: 7 unit tests — 3 metrics in simple, all in advanced, grid classes, InsightsPanel caps
+  - `tests/e2e/simple-mode-dashboard.spec.ts`: 6 Playwright tests — 4 nav sections, 8 nav sections, hidden sections, 3-metric overview, upgrade banner, banner switches mode
+  - `src/lib/changelog.ts`: Added version 182 entry
+- **Tests**: T1: 2693 passed (144 files), T2: 6 passed, Build: passes
+- **Screenshots**: task-182-simple-mode-dashboard-stepper, task-182-advanced-mode-dashboard-stepper, task-182-simple-mode-overview-3-metrics, task-182-simple-mode-upgrade-banner
 
 ## Task 181: Simplify PropertyEntry and fold into Assets in simple mode [@fullstack]
 - **Date**: 2026-03-09

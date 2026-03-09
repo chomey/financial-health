@@ -32,3 +32,9 @@ export function useModeContext(): ModeContextValue {
   if (!ctx) throw new Error("useModeContext must be used within a ModeProvider");
   return ctx;
 }
+
+/** Returns the mode context value if available, or a default "advanced" value if not wrapped in a ModeProvider. */
+export function useOptionalModeContext(): ModeContextValue {
+  const ctx = useContext(ModeContext);
+  return ctx ?? { mode: "advanced", setMode: () => {} };
+}

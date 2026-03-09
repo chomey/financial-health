@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 182,
+    title: "Simple mode — focused dashboard with 4 sections",
+    description: "In Simple mode, the dashboard shows only 4 sections: Projection (locked to moderate scenario), Insights (capped at 4, FIRE/income-replacement types hidden), Overview (Net Worth, Monthly Cash Flow, Financial Runway in a 3-column layout), and Money Steps. Cash Flow Sankey, Breakdowns, Compare/Benchmarks, and What If scenarios are hidden. A banner at the bottom invites users to switch to Advanced mode for all 8 sections. The header stepper also shows only 4 navigation items. In Advanced mode, all 8 sections and full functionality remain unchanged.",
+    date: "2026-03-09",
+  },
+  {
     version: 181,
     title: "Simple mode — home value and mortgage folded into Assets",
     description: "In Simple mode, the Property wizard step is hidden. AssetEntry now shows a 'Home' subsection at the top with two optional inline-editable fields: 'Home value' and 'Mortgage balance'. These map to a single Property item in state with id '_simple_home' and name 'Primary Residence'. When both fields are cleared, the property is removed. All values are preserved in state — switching to Advanced reveals the full PropertyEntry with all fields. AssetsStep and WizardShell updated to pass properties/onPropertiesChange to AssetEntry.",

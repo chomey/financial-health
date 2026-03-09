@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { generateInsights, type FinancialData, type InsightType } from "@/lib/insights";
 import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type ActiveTargetMeta, type TaxExplainerDetails, type RunwayExplainerDetails, type IncomeReplacementExplainerDetails } from "@/components/DataFlowArrows";
+import { useOptionalModeContext } from "@/lib/ModeContext";
 import HelpTip from "@/components/HelpTip";
 
 interface MetricData {
@@ -307,8 +308,14 @@ interface SnapshotDashboardProps {
   dataFlowConnections?: Record<string, DataFlowConnectionDef[]>;
 }
 
+const SIMPLE_MODE_METRICS = new Set(["Net Worth", "Monthly Cash Flow", "Financial Runway"]);
+
 export default function SnapshotDashboard({ metrics, financialData, homeCurrency, dataFlowConnections }: SnapshotDashboardProps = {}) {
-  const displayMetrics = metrics ?? MOCK_METRICS;
+  const { mode } = useOptionalModeContext();
+  const allMetrics = metrics ?? MOCK_METRICS;
+  const displayMetrics = mode === "simple"
+    ? allMetrics.filter((m) => SIMPLE_MODE_METRICS.has(m.title))
+    : allMetrics;
 
   // Generate insights and map to metric cards
   const insightsByMetric = new Map<string, string[]>();
@@ -324,7 +331,10 @@ export default function SnapshotDashboard({ metrics, financialData, homeCurrency
   }
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2" data-testid="snapshot-dashboard">
+    <div
+      className={`grid grid-cols-1 gap-3 sm:gap-4 ${mode === "simple" ? "sm:grid-cols-3" : "lg:grid-cols-2"}`}
+      data-testid="snapshot-dashboard"
+    >
       {displayMetrics.map((metric) => (
         <MetricCard
           key={metric.title}

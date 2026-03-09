@@ -43,15 +43,22 @@ import {
   MilestoneLabelContent,
 } from "@/components/projection/ProjectionTooltips";
 import HelpTip from "@/components/HelpTip";
+import { useOptionalModeContext } from "@/lib/ModeContext";
 
 export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRate = 4, onOutlookChange, onMilestonesChange }: ProjectionChartProps) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.compact(v);
   const formatTableCurrency = (v: number) => fmt.full(v);
+  const { mode: appMode } = useOptionalModeContext();
   const [scenario, setScenario] = useState<Scenario>("moderate");
   const [legendOpen, setLegendOpen] = useState(false);
   const [mode, setMode] = useState<ChartMode>("keep-earning");
   const currencyCode = getHomeCurrency(state.country ?? "CA");
+
+  // In simple mode, lock scenario to "moderate"
+  useEffect(() => {
+    if (appMode === "simple") setScenario("moderate");
+  }, [appMode]);
 
   // Outlook years state — read from URL on mount
   const [outlookYears, setOutlookYears] = useState<OutlookYears>(10);
@@ -264,7 +271,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           </h3>
           <HelpTip text="Moderate scenario uses your entered ROI values as-is. Conservative is 30% lower, Optimistic 30% higher. Toggle inflation adjustment to see real (purchasing-power) values." />
         </div>
-        {mode === "keep-earning" && (
+        {mode === "keep-earning" && appMode !== "simple" && (
           <div className="flex items-center gap-2">
             {(Object.keys(SCENARIO_LABELS) as Scenario[]).map((s) => (
               <button

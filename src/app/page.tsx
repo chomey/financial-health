@@ -111,16 +111,19 @@ export default function Home() {
   const [phase, setPhase] = useState<"wizard" | "dashboard" | null>(null);
 
   // ── Dashboard section definitions (for header stepper scroll-to links) ──
-  const DASHBOARD_SECTIONS = useMemo(() => [
-    { id: "projections", icon: "📈", label: "Projections", shortLabel: "Project" },
-    { id: "insights", icon: "💡", label: "Insights", shortLabel: "Insights" },
-    { id: "metrics", icon: "🎯", label: "Metrics", shortLabel: "Metrics" },
-    { id: "roadmap", icon: "🗺️", label: "Money Steps", shortLabel: "Steps" },
-    { id: "cashflow", icon: "💸", label: "Cash Flow", shortLabel: "Cash" },
-    { id: "breakdowns", icon: "📉", label: "Breakdowns", shortLabel: "Charts" },
-    { id: "compare", icon: "📊", label: "Compare", shortLabel: "Compare" },
-    { id: "scenarios", icon: "🔮", label: "What If", shortLabel: "What If" },
-  ] as const, []);
+  const DASHBOARD_SECTIONS = useMemo(() => {
+    const allSections = [
+      { id: "projections", icon: "📈", label: "Projections", shortLabel: "Project" },
+      { id: "insights", icon: "💡", label: "Insights", shortLabel: "Insights" },
+      { id: "metrics", icon: "🎯", label: mode === "simple" ? "Overview" : "Metrics", shortLabel: mode === "simple" ? "Overview" : "Metrics" },
+      { id: "roadmap", icon: "🗺️", label: "Money Steps", shortLabel: "Steps" },
+      { id: "cashflow", icon: "💸", label: "Cash Flow", shortLabel: "Cash" },
+      { id: "breakdowns", icon: "📉", label: "Breakdowns", shortLabel: "Charts" },
+      { id: "compare", icon: "📊", label: "Compare", shortLabel: "Compare" },
+      { id: "scenarios", icon: "🔮", label: "What If", shortLabel: "What If" },
+    ];
+    return mode === "simple" ? allSections.slice(0, 4) : allSections;
+  }, [mode]);
 
   // Track which section is visible for highlighting the stepper
   const stepperNavRef = useRef<HTMLElement>(null);
@@ -518,7 +521,7 @@ export default function Home() {
           </section>
 
           {/* Cash Flow */}
-          <section id="section-dash-cashflow" className="scroll-mt-28" aria-label="Cash flow">
+          {mode !== "simple" && <section id="section-dash-cashflow" className="scroll-mt-28" aria-label="Cash flow">
             <ZoomableCard><CashFlowSankey
               income={income}
               expenses={expenses}
@@ -537,10 +540,10 @@ export default function Home() {
                 })
                 .map((r) => ({ label: r.label, monthlyAmount: r.amount }))}
             /></ZoomableCard>
-          </section>
+          </section>}
 
           {/* Breakdowns (2-col) */}
-          <section id="section-dash-breakdowns" className="scroll-mt-28" aria-label="Expense and net worth breakdowns">
+          {mode !== "simple" && <section id="section-dash-breakdowns" className="scroll-mt-28" aria-label="Expense and net worth breakdowns">
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <ZoomableCard><ExpenseBreakdownChart
                 expenses={expenses}
@@ -558,10 +561,10 @@ export default function Home() {
                 stocks={stocks}
               /></ZoomableCard>
             </div>
-          </section>
+          </section>}
 
           {/* Compare (2-col) */}
-          <section id="section-dash-compare" className="scroll-mt-28" aria-label="Comparisons and benchmarks">
+          {mode !== "simple" && <section id="section-dash-compare" className="scroll-mt-28" aria-label="Comparisons and benchmarks">
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <ZoomableCard><FinancialHealthScore
                 savingsRate={benchmarkSavingsRate}
@@ -690,12 +693,29 @@ export default function Home() {
                 </div></ZoomableCard>
               );
             })()}
-          </section>
+          </section>}
 
           {/* What If */}
-          <section id="section-dash-scenarios" className="scroll-mt-28" aria-label="Scenario modeling">
+          {mode !== "simple" && <section id="section-dash-scenarios" className="scroll-mt-28" aria-label="Scenario modeling">
             <FastForwardPanel state={state} safeWithdrawalRate={safeWithdrawalRate} onSwrChange={handleSwrChange} />
-          </section>
+          </section>}
+
+          {/* Simple mode: upgrade banner */}
+          {mode === "simple" && (
+            <div className="mt-2 rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 text-center" data-testid="simple-mode-upgrade-banner">
+              <p className="text-sm text-slate-400">
+                Want more detail?{" "}
+                <button
+                  type="button"
+                  onClick={() => setMode("advanced")}
+                  className="text-violet-400 hover:text-violet-300 transition-colors underline underline-offset-2"
+                >
+                  Switch to Advanced mode
+                </button>
+                {" "}to unlock all 8 sections.
+              </p>
+            </div>
+          )}
 
         </div>
         <PrintFooter />

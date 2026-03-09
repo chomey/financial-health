@@ -5,6 +5,9 @@ import { generateInsights, MAX_INSIGHTS, type FinancialData, type Insight, type 
 import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections } from "@/components/DataFlowArrows";
 import type { DataFlowConnectionDef } from "@/components/SnapshotDashboard";
 import HelpTip from "@/components/HelpTip";
+import { useOptionalModeContext } from "@/lib/ModeContext";
+
+const SIMPLE_MODE_HIDDEN_TYPES = new Set<InsightType>(["fire", "income-replacement"]);
 
 // Mock financial data matching the existing entry component mock values
 const MOCK_FINANCIAL_DATA: FinancialData = {
@@ -132,8 +135,11 @@ export default function InsightsPanel({
   insightConnections?: Record<string, DataFlowConnectionDef[]>;
   milestones?: ProjectionMilestoneDisplay[];
 }) {
+  const { mode } = useOptionalModeContext();
   const allInsights = generateInsights(data);
-  const insights = allInsights.slice(0, MAX_INSIGHTS);
+  const insights = mode === "simple"
+    ? allInsights.filter((i) => !SIMPLE_MODE_HIDDEN_TYPES.has(i.type)).slice(0, 4)
+    : allInsights.slice(0, MAX_INSIGHTS);
   const hasMilestones = milestones && milestones.length > 0;
 
   if (insights.length === 0 && !hasMilestones) {
