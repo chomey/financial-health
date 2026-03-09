@@ -382,7 +382,7 @@ print "${BLUE}━━━━━━━━━━━━━━━━━━━━━━
 print ""
 
 # Extract next N uncompleted tasks
-grep '^\- \[ \]' "$TASKS_FILE" | head -n "$TASK_COUNT" | while IFS= read -r task; do
+grep '^\- \[ \]' "$TASKS_FILE" | sort -t' ' -k4 -n | head -n "$TASK_COUNT" | while IFS= read -r task; do
   local title=$(extract_task_title "$task")
   local tag=$(extract_agent_tag "$task")
   local model_hint=""
@@ -438,7 +438,7 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   before_completed=${before_completed:-0}
 
   # Get current task info
-  next_task=$(grep '^\- \[ \]' "$TASKS_FILE" | head -n 1)
+  next_task=$(grep '^\- \[ \]' "$TASKS_FILE" | sort -t' ' -k4 -n | head -n 1)
   task_title=$(extract_task_title "$next_task")
   task_tag=$(extract_agent_tag "$next_task")
 

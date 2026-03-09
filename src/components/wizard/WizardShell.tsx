@@ -23,7 +23,6 @@ import type { IncomeItem } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
 import type { TaxCredit, FilingStatus } from "@/lib/tax-credits";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
-import type { MonthlyInvestmentReturn } from "@/lib/financial-state";
 import type { FinancialState } from "@/lib/financial-types";
 import type { SampleProfile } from "@/lib/sample-profiles";
 
@@ -49,9 +48,6 @@ export interface WizardProps {
   // Computed
   monthlySurplus: number;
   annualEmploymentSalary: number;
-  monthlyInvestmentReturns: MonthlyInvestmentReturn[];
-  totalInvestmentContributions: number;
-  totalMortgagePayments: number;
   // For building FinancialState for tax computation
   surplusTargetComputedId: string | undefined;
   // Setters
@@ -221,7 +217,6 @@ export default function WizardShell(props: WizardProps) {
           <IncomeStep
             items={props.income}
             onChange={props.setIncome}
-            investmentReturns={props.monthlyInvestmentReturns}
             homeCurrency={props.homeCurrency}
             fxRates={props.effectiveFxRates}
           />
@@ -236,11 +231,6 @@ export default function WizardShell(props: WizardProps) {
           <ExpensesStep
             items={props.expenses}
             onChange={props.setExpenses}
-            investmentContributions={props.totalInvestmentContributions}
-            mortgagePayments={props.totalMortgagePayments}
-            surplus={props.monthlySurplus}
-            surplusTargetName={props.assets.filter(a => !a.computed).find(a => a.surplusTarget)?.category ?? props.assets.filter(a => !a.computed)[0]?.category}
-            state={state}
             homeCurrency={props.homeCurrency}
             fxRates={props.effectiveFxRates}
             taxCredits={props.taxCredits}

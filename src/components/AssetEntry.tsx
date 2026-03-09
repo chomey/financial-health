@@ -311,23 +311,15 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
         </div>
       ) : (
         <div className="space-y-0" role="list" aria-label="Asset items">
-          {/* Regular assets first, computed assets at the bottom */}
-          {[...assets.filter((a) => !a.computed), ...assets.filter((a) => a.computed)].map((asset, idx, sortedAssets) => {
+          {[...assets.filter((a) => !a.computed), ...assets.filter((a) => a.computed)].map((asset) => {
             const defaultRoi = getDefaultRoi(asset.category);
             const displayRoi = asset.roi ?? defaultRoi;
             const hasRoi = asset.roi !== undefined;
             const hasContribution = asset.monthlyContribution !== undefined && asset.monthlyContribution > 0;
             const isComputed = asset.computed === true;
-            // Show separator before first computed asset
-            const isFirstComputed = isComputed && (idx === 0 || !sortedAssets[idx - 1].computed);
             return (
             <DataFlowSourceItem key={asset.id} id={`asset:${asset.id}`} label={asset.category} value={asset.amount}>
             <div role="listitem">
-              {isFirstComputed && (
-                <div className="mt-2 mb-1 border-t border-dashed border-white/10 pt-2 px-3">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Auto-computed</span>
-                </div>
-              )}
               <div
                 className={`group flex items-center justify-between rounded-lg px-3 transition-all duration-200 ${isComputed ? "py-0.5 bg-slate-800/60 border border-dashed border-white/10 rounded-md mx-1" : "py-0.5 hover:bg-white/5"}`}
               >

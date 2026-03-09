@@ -159,7 +159,9 @@ export default function Home() {
     if (active) {
       const navRect = nav.getBoundingClientRect();
       const btnRect = active.getBoundingClientRect();
-      const scrollLeft = active.offsetLeft - navRect.width / 2 + btnRect.width / 2;
+      // Use getBoundingClientRect for accurate position regardless of nesting
+      const offsetFromNav = btnRect.left - navRect.left + nav.scrollLeft;
+      const scrollLeft = offsetFromNav - navRect.width / 2 + btnRect.width / 2;
       nav.scrollTo({ left: scrollLeft, behavior: "smooth" });
     }
   }, [visibleSection]);
@@ -234,9 +236,6 @@ export default function Home() {
         provincialTaxOverride={provincialTaxOverride}
         monthlySurplus={monthlySurplus}
         annualEmploymentSalary={annualEmploymentSalary}
-        monthlyInvestmentReturns={monthlyInvestmentReturns}
-        totalInvestmentContributions={totalInvestmentContributions}
-        totalMortgagePayments={totalMortgagePayments}
         surplusTargetComputedId={surplusTargetComputedId}
         handleAssetsChange={handleAssetsChange}
         setDebts={setDebts}

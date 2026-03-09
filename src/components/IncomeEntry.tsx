@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
-import type { MonthlyInvestmentReturn } from "@/lib/financial-state";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import type { SupportedCurrency, FxRates } from "@/lib/currency";
 import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
@@ -107,12 +106,11 @@ const MOCK_INCOME: IncomeItem[] = [
 interface IncomeEntryProps {
   items?: IncomeItem[];
   onChange?: (items: IncomeItem[]) => void;
-  investmentReturns?: MonthlyInvestmentReturn[];
   homeCurrency?: SupportedCurrency;
   fxRates?: FxRates;
 }
 
-export default function IncomeEntry({ items: controlledItems, onChange, investmentReturns = [], homeCurrency, fxRates }: IncomeEntryProps = {}) {
+export default function IncomeEntry({ items: controlledItems, onChange, homeCurrency, fxRates }: IncomeEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
   const [items, setItems] = useControlledArray(controlledItems, MOCK_INCOME, onChange);
@@ -130,8 +128,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
 
   const hc = homeCurrency ?? "CAD";
   const rates = fxRates ?? FALLBACK_RATES;
-  const payoutReturnsTotal = investmentReturns.filter((r) => !r.reinvest).reduce((sum, r) => sum + r.amount, 0);
-  const total = items.reduce((sum, item) => sum + convertToHome(normalizeToMonthly(item.amount, item.frequency), item.currency ?? hc, hc, rates), 0) + payoutReturnsTotal;
+  const total = items.reduce((sum, item) => sum + convertToHome(normalizeToMonthly(item.amount, item.frequency), item.currency ?? hc, hc, rates), 0);
 
   const triggerTotalAnimation = () => {
     if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
@@ -208,7 +205,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
         Income
       </h2>
 
-      {items.length === 0 && !addingNew && investmentReturns.length === 0 && (
+      {items.length === 0 && !addingNew && (
         <div className="flex flex-col items-center py-4 text-center" data-testid="income-empty-state">
           <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-400">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -404,34 +401,6 @@ export default function IncomeEntry({ items: controlledItems, onChange, investme
         </div>
       )}
 
-      {/* Auto-computed investment returns */}
-      {investmentReturns.length > 0 && (
-        <div data-testid="investment-returns-auto-section">
-          <div className="mt-1.5 mb-0.5 border-t border-dashed border-white/10 pt-1.5 px-3">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Auto-computed</span>
-          </div>
-          <div className="space-y-0.5 mx-1">
-          {investmentReturns.map((r) => (
-            <div
-              key={r.label}
-              className="flex items-center justify-between rounded-md px-3 py-1 bg-slate-800/60 border border-dashed border-white/10"
-              data-testid="investment-return-row"
-            >
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs text-slate-400">{r.label} returns</span>
-                <span className={`inline-flex items-center rounded-full px-1 py-0 text-[8px] font-medium uppercase tracking-wide ${r.reinvest ? "bg-emerald-500/10 text-emerald-500" : "bg-slate-700/40 text-slate-500"}`} title={r.reinvest ? "Returns are reinvested into the account" : "Returns are paid out as income"}>
-                  {r.reinvest ? "reinvesting" : "payout"}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-xs font-medium text-emerald-400">{formatCurrency(r.amount)}/mo</span>
-                <span className="text-[10px] text-slate-500 ml-1.5">{formatCurrency(r.amount * 12)}/yr</span>
-              </div>
-            </div>
-          ))}
-          </div>
-        </div>
-      )}
 
       {/* Add new income row */}
       {addingNew && (

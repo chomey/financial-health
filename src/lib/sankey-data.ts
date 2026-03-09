@@ -81,12 +81,7 @@ export function buildSankeyData(input: CashFlowInput): SankeyData {
     nodes.push({ id: nodeId, label: item.label, type: "investment-income", value: item.monthlyAmount });
   }
 
-  // Tax node (combined federal + provincial)
-  if (totalTax > 0) {
-    nodes.push({ id: "taxes", label: "Taxes", type: "tax", value: totalTax });
-  }
-
-  // After-tax income pool
+  // After-tax income pool (placed before tax node so expenses render above taxes in diagram)
   const afterTax = totalGrossIncome - totalTax;
   nodes.push({ id: "after-tax", label: "After-Tax Income", type: "pool", value: afterTax });
 
@@ -163,6 +158,11 @@ export function buildSankeyData(input: CashFlowInput): SankeyData {
       links.push({ source: "after-tax", target: "mortgage", value: amount });
       allocated += amount;
     }
+  }
+
+  // Tax node (combined federal + provincial) — placed after expenses so it renders lower in the diagram
+  if (totalTax > 0) {
+    nodes.push({ id: "taxes", label: "Taxes", type: "tax", value: totalTax });
   }
 
   // Surplus (remaining after-tax income)

@@ -74,10 +74,10 @@ function CashFlowTable({
 
   // Outflows: group by target type from the pool
   const outflowTypes: { title: string; type: string; color: string }[] = [
-    { title: "Taxes", type: "tax", color: SANKEY_COLORS.tax },
     { title: "Expenses", type: "expense", color: SANKEY_COLORS.expense },
     { title: "Investments", type: "investment", color: SANKEY_COLORS.investment },
     { title: "Debt & Mortgage", type: "debt", color: SANKEY_COLORS.debt },
+    { title: "Taxes", type: "tax", color: SANKEY_COLORS.tax },
     { title: "Surplus", type: "surplus", color: SANKEY_COLORS.surplus },
   ];
 
@@ -424,13 +424,6 @@ export default function CashFlowSankey({
                 <span className="flex items-center gap-1">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
-                    style={{ backgroundColor: SANKEY_COLORS.tax }}
-                  />
-                  Taxes
-                </span>
-                <span className="flex items-center gap-1">
-                  <span
-                    className="inline-block h-2 w-2 rounded-full"
                     style={{ backgroundColor: SANKEY_COLORS.expense }}
                   />
                   Expenses
@@ -441,6 +434,13 @@ export default function CashFlowSankey({
                     style={{ backgroundColor: SANKEY_COLORS.investment }}
                   />
                   Investments
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="inline-block h-2 w-2 rounded-full"
+                    style={{ backgroundColor: SANKEY_COLORS.tax }}
+                  />
+                  Taxes
                 </span>
                 <span className="flex items-center gap-1">
                   <span

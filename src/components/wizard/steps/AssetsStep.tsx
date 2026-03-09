@@ -19,8 +19,6 @@ export default function AssetsStep({
   fxRates: FxRates;
   annualEmploymentSalary: number;
 }) {
-  const computedCount = items.filter(a => a.computed).length;
-
   return (
     <div className="space-y-4">
       <div>
@@ -28,11 +26,6 @@ export default function AssetsStep({
         <p className="mt-1 text-sm text-slate-400">
           Savings accounts, investments, retirement accounts (TFSA, RRSP, 401k, etc.)
         </p>
-        {computedCount > 0 && (
-          <p className="mt-1.5 text-xs text-emerald-400/70">
-            {computedCount} auto-calculated from your properties and stocks.
-          </p>
-        )}
       </div>
       <AssetEntry items={items} onChange={onChange} monthlySurplus={monthlySurplus} homeCurrency={homeCurrency} fxRates={fxRates} annualEmploymentSalary={annualEmploymentSalary} />
     </div>
