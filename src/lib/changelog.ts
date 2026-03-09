@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 180,
+    title: "Simple mode — debt payments folded into Expenses",
+    description: "In Simple mode, the Debts wizard step is hidden. ExpenseEntry now shows a 'Debt Payments' subsection at the bottom: a single inline-editable amount for monthly debt payments (credit cards, loans, etc.). This maps to a Debt item in state with category 'Debt Payments' and monthlyPayment set to the entered value. In Advanced mode, DebtEntry works as-is with all fields. ExpensesStep and WizardShell updated to pass debts/onDebtsChange to ExpenseEntry.",
+    date: "2026-03-09",
+  },
+  {
     version: 179,
     title: "Simple mode — streamlined IncomeEntry",
     description: "In Simple mode, IncomeEntry shows only category, amount, and frequency dropdown per income item. Hidden: income type selector (defaults to 'employment'), currency override badge, HelpTip tooltips. All hidden field values are preserved in state — switching to Advanced reveals them. Frequency remains visible in both modes since it's critical for accurate monthly calculations.",

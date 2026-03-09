@@ -5,6 +5,7 @@ import type { ExpenseItem } from "@/components/ExpenseEntry";
 import TaxCreditEntry from "@/components/TaxCreditEntry";
 import type { TaxCredit, FilingStatus } from "@/lib/tax-credits";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
+import type { Debt } from "@/components/DebtEntry";
 
 export default function ExpensesStep({
   items,
@@ -17,6 +18,8 @@ export default function ExpensesStep({
   filingStatus,
   annualIncome,
   taxYear,
+  debts,
+  onDebtsChange,
 }: {
   items: ExpenseItem[];
   onChange: (items: ExpenseItem[]) => void;
@@ -28,6 +31,8 @@ export default function ExpensesStep({
   filingStatus: FilingStatus;
   annualIncome: number;
   taxYear: number;
+  debts?: Debt[];
+  onDebtsChange?: (debts: Debt[]) => void;
 }) {
   return (
     <div className="space-y-4">
@@ -42,6 +47,8 @@ export default function ExpensesStep({
         onChange={onChange}
         homeCurrency={homeCurrency}
         fxRates={fxRates}
+        debts={debts}
+        onDebtsChange={onDebtsChange}
       />
       <TaxCreditEntry
         items={taxCredits}

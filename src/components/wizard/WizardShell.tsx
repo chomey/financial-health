@@ -247,6 +247,8 @@ export default function WizardShell(props: WizardProps) {
             filingStatus={props.filingStatus}
             annualIncome={props.income.reduce((sum, i) => sum + (i.amount ?? 0), 0) * 12}
             taxYear={props.taxYear}
+            debts={props.debts}
+            onDebtsChange={props.setDebts}
           />
         );
       default:

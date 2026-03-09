@@ -8,11 +8,23 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 176
-- **Remaining**: 8
+- **Completed**: 177
+- **Remaining**: 7
 - **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 180: Simplify DebtEntry and fold into Expenses in simple mode [@fullstack]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/components/ExpenseEntry.tsx`: Added `useModeContext` import; added `Debt` type import and `SIMPLE_DEBT_CATEGORY` export; added `debts` and `onDebtsChange` props; added simple mode "Debt Payments" subsection with inline editable amount (stores to Debt item with `monthlyPayment` field, `amount=0`)
+  - `src/components/wizard/steps/ExpensesStep.tsx`: Added `debts` and `onDebtsChange` optional props; passed them through to `ExpenseEntry`
+  - `src/components/wizard/WizardShell.tsx`: Passed `debts={props.debts}` and `onDebtsChange={props.setDebts}` to `ExpensesStep`
+  - `tests/unit/expense-entry-simple-debt.test.tsx`: 10 unit tests — visibility per mode, amount display, upsert/update/remove via onDebtsChange
+  - `tests/e2e/expense-entry-simple-debt.spec.ts`: 3 Playwright tests — section visible in simple, hidden in advanced, can enter amount
+  - `src/lib/changelog.ts`: Added version 180 entry
+- **Tests**: T1: 2676 passed (142 files), T2: 3 passed, Build: passes
+- **Screenshots**: task-180-expense-simple-debt-section, task-180-expense-advanced-mode-no-debt-section, task-180-expense-simple-debt-entered
 
 ## Task 179: Simplify IncomeEntry in simple mode [@frontend]
 - **Date**: 2026-03-09

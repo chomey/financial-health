@@ -3,11 +3,15 @@
 import { useState, useRef } from "react";
 import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
+import { useModeContext } from "@/lib/ModeContext";
 import CurrencyBadge from "@/components/CurrencyBadge";
 import type { SupportedCurrency, FxRates } from "@/lib/currency";
 import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
+import type { Debt } from "@/components/DebtEntry";
+
+export const SIMPLE_DEBT_CATEGORY = "Debt Payments";
 
 export type ExpenseFrequency = "monthly" | "yearly" | "one-time";
 
@@ -63,11 +67,14 @@ interface ExpenseEntryProps {
   onChange?: (items: ExpenseItem[]) => void;
   homeCurrency?: SupportedCurrency;
   fxRates?: FxRates;
+  debts?: Debt[];
+  onDebtsChange?: (debts: Debt[]) => void;
 }
 
-export default function ExpenseEntry({ items: controlledItems, onChange, homeCurrency, fxRates }: ExpenseEntryProps = {}) {
+export default function ExpenseEntry({ items: controlledItems, onChange, homeCurrency, fxRates, debts, onDebtsChange }: ExpenseEntryProps = {}) {
   const fmt = useCurrency();
   const formatCurrency = (v: number) => fmt.full(v);
+  const { mode } = useModeContext();
   const [items, setItems] = useControlledArray(controlledItems, MOCK_EXPENSES, onChange);
 
   type ExpenseField = "category" | "amount";
@@ -79,6 +86,30 @@ export default function ExpenseEntry({ items: controlledItems, onChange, homeCur
   const [newFrequency, setNewFrequency] = useState<ExpenseFrequency>("monthly");
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Simple mode: single "Debt Payments" entry
+  const [editingSimpleDebt, setEditingSimpleDebt] = useState(false);
+  const [simpleDebtValue, setSimpleDebtValue] = useState("");
+  const simpleDebtInputRef = useRef<HTMLInputElement>(null);
+  const simpleDebt = (debts ?? []).find((d) => d.category === SIMPLE_DEBT_CATEGORY);
+  const simpleDebtAmount = simpleDebt?.monthlyPayment ?? 0;
+
+  const handleSimpleDebtChange = (amount: number) => {
+    if (!onDebtsChange) return;
+    const debtList = debts ?? [];
+    if (amount <= 0) {
+      onDebtsChange(debtList.filter((d) => d.category !== SIMPLE_DEBT_CATEGORY));
+    } else if (simpleDebt) {
+      onDebtsChange(debtList.map((d) => d.category === SIMPLE_DEBT_CATEGORY ? { ...d, monthlyPayment: amount } : d));
+    } else {
+      onDebtsChange([...debtList, { id: generateId("d"), category: SIMPLE_DEBT_CATEGORY, amount: 0, monthlyPayment: amount }]);
+    }
+  };
+
+  const commitSimpleDebt = () => {
+    handleSimpleDebtChange(parseCurrencyInput(simpleDebtValue));
+    setEditingSimpleDebt(false);
+  };
 
   const hc = homeCurrency ?? "CAD";
   const rates = fxRates ?? FALLBACK_RATES;
@@ -419,6 +450,52 @@ export default function ExpenseEntry({ items: controlledItems, onChange, homeCur
                 </svg>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Simple mode: Debt Payments subsection */}
+      {mode === "simple" && onDebtsChange && (
+        <div className="mt-3 border-t border-white/10 pt-3" data-testid="simple-debt-payments-section">
+          <div className="flex items-center justify-between px-2">
+            <div>
+              <div className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
+                <span aria-hidden="true">💳</span>
+                Debt Payments
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">Monthly total — credit cards, loans, etc.</p>
+            </div>
+            {editingSimpleDebt ? (
+              <input
+                ref={simpleDebtInputRef}
+                type="text"
+                inputMode="decimal"
+                value={simpleDebtValue}
+                onChange={(e) => setSimpleDebtValue(formatNumericInput(e.target.value))}
+                onBlur={commitSimpleDebt}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") commitSimpleDebt();
+                  if (e.key === "Escape") setEditingSimpleDebt(false);
+                }}
+                className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                aria-label="Monthly debt payments amount"
+                data-testid="simple-debt-input"
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setSimpleDebtValue(simpleDebtAmount > 0 ? String(simpleDebtAmount) : "");
+                  setEditingSimpleDebt(true);
+                  setTimeout(() => simpleDebtInputRef.current?.focus(), 0);
+                }}
+                className="w-28 text-right text-sm font-medium text-rose-400 rounded px-2 py-1 transition-colors duration-150 hover:bg-rose-400/10 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                aria-label={`Edit monthly debt payments, currently ${formatCurrency(simpleDebtAmount)}`}
+                data-testid="simple-debt-amount"
+              >
+                {simpleDebtAmount > 0 ? `${formatCurrency(simpleDebtAmount)}/mo` : "$0/mo"}
+              </button>
+            )}
           </div>
         </div>
       )}
