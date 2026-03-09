@@ -8,11 +8,22 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 179
-- **Remaining**: 5
+- **Completed**: 180
+- **Remaining**: 4
 - **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 183: Update sample profiles and welcome step for simple mode [@frontend]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/lib/sample-profiles.ts`: Added `QUICK_START_CA_PROFILES`, `QUICK_START_US_PROFILES`, `QUICK_START_AU_PROFILES` (2 profiles each: "Renter with salary" and "Homeowner with mortgage") with simple-mode-only fields (no stocks, no costBasis, no employerMatch); homeowner profiles use `_simple_home` property ID; added `getQuickStartProfilesForCountry()` function
+  - `src/components/wizard/steps/WelcomeStep.tsx`: Added `useModeContext` and `getQuickStartProfilesForCountry` imports; in simple mode shows tagline "Get a quick snapshot of your financial health in under 2 minutes." and quick-start profiles; in advanced mode shows standard tagline and existing advanced sample profiles; added `data-testid="welcome-tagline"` to tagline element
+  - `tests/unit/welcome-step-simple-mode.test.tsx`: 14 unit tests — quick-start profile counts/IDs per country, no stocks/costBasis/employerMatch, homeowner _simple_home property, WelcomeStep tagline per mode, profile buttons visible per mode, loadProfile called correctly
+  - `tests/e2e/welcome-step-simple-mode.spec.ts`: 6 Playwright tests — simple/advanced taglines, quick-start profiles visible/hidden per mode, loading ca-renter/ca-homeowner profiles
+  - `src/lib/changelog.ts`: Added version 183 entry
+- **Tests**: T1: 2710 passed (145 files), T2: 6 passed, Build: passes
+- **Screenshots**: task-183-welcome-simple-mode-tagline, task-183-welcome-advanced-mode-tagline, task-183-welcome-simple-quick-start-profiles, task-183-welcome-ca-renter-loaded, task-183-welcome-ca-homeowner-loaded
 
 ## Task 182: Simplify dashboard in simple mode [@frontend]
 - **Date**: 2026-03-09

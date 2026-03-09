@@ -1,7 +1,8 @@
 "use client";
 
-import { getProfilesForCountry, type SampleProfile } from "@/lib/sample-profiles";
+import { getProfilesForCountry, getQuickStartProfilesForCountry, type SampleProfile } from "@/lib/sample-profiles";
 import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
+import { useModeContext } from "@/lib/ModeContext";
 
 export default function WelcomeStep({
   country,
@@ -24,14 +25,19 @@ export default function WelcomeStep({
   onProfileLoaded: () => void;
   onEnterOwn: () => void;
 }) {
-  const profiles = getProfilesForCountry(country);
+  const { mode } = useModeContext();
+  const profiles = mode === "simple"
+    ? getQuickStartProfilesForCountry(country)
+    : getProfilesForCountry(country);
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold text-white">Get Started</h2>
-        <p className="mt-1 text-sm text-slate-400">
-          Choose your country and region, then pick a sample profile or enter your own numbers.
+        <p className="mt-1 text-sm text-slate-400" data-testid="welcome-tagline">
+          {mode === "simple"
+            ? "Get a quick snapshot of your financial health in under 2 minutes."
+            : "Choose your country and region, then pick a sample profile or enter your own numbers."}
         </p>
       </div>
 

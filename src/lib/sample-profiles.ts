@@ -454,3 +454,204 @@ export function getProfilesForCountry(country: "CA" | "US" | "AU"): SampleProfil
   if (country === "AU") return AU_SAMPLE_PROFILES;
   return SAMPLE_PROFILES;
 }
+
+// ── Quick-start profiles (simple mode only) ────────────────────────────────
+// No stocks, no cost basis, no employer match, no tax credits, minimal fields
+
+export const QUICK_START_CA_PROFILES: SampleProfile[] = [
+  {
+    id: "ca-renter",
+    name: "Renter with salary",
+    emoji: "🏢",
+    description: "Salary income, renting, building your savings",
+    highlights: ["$55k salary", "Renting", "TFSA savings"],
+    state: {
+      country: "CA",
+      jurisdiction: "ON",
+      age: 30,
+      income: [
+        { id: "i1", category: "Salary", amount: 4583, frequency: "monthly" },
+      ],
+      expenses: [
+        { id: "e1", category: "Rent/Mortgage Payment", amount: 1500 },
+        { id: "e2", category: "Groceries", amount: 400 },
+        { id: "e3", category: "Transportation", amount: 200 },
+        { id: "e4", category: "Utilities", amount: 120 },
+        { id: "e5", category: "Phone", amount: 60 },
+      ],
+      assets: [
+        { id: "a1", category: "TFSA", amount: 8000 },
+        { id: "a2", category: "Savings Account", amount: 3000, surplusTarget: true },
+      ],
+      debts: [],
+      properties: [],
+      stocks: [],
+    },
+  },
+  {
+    id: "ca-homeowner",
+    name: "Homeowner with mortgage",
+    emoji: "🏡",
+    description: "Own a home, saving for retirement",
+    highlights: ["$80k salary", "Home + mortgage", "RRSP growing"],
+    state: {
+      country: "CA",
+      jurisdiction: "ON",
+      age: 38,
+      income: [
+        { id: "i1", category: "Salary", amount: 6667, frequency: "monthly" },
+      ],
+      expenses: [
+        { id: "e1", category: "Groceries", amount: 600 },
+        { id: "e2", category: "Transportation", amount: 300 },
+        { id: "e3", category: "Utilities", amount: 180 },
+        { id: "e4", category: "Insurance", amount: 200 },
+        { id: "e5", category: "Phone", amount: 80 },
+      ],
+      assets: [
+        { id: "a1", category: "RRSP", amount: 35000 },
+        { id: "a2", category: "TFSA", amount: 15000 },
+        { id: "a3", category: "Savings Account", amount: 10000, surplusTarget: true },
+      ],
+      debts: [],
+      properties: [
+        { id: "_simple_home", name: "Primary Residence", value: 600000, mortgage: 400000 },
+      ],
+      stocks: [],
+    },
+  },
+];
+
+export const QUICK_START_US_PROFILES: SampleProfile[] = [
+  {
+    id: "us-renter",
+    name: "Renter with salary",
+    emoji: "🏢",
+    description: "Salary income, renting, building your savings",
+    highlights: ["$58k salary", "Renting", "Roth IRA savings"],
+    state: {
+      country: "US",
+      jurisdiction: "TX",
+      age: 30,
+      income: [
+        { id: "i1", category: "Salary", amount: 4833, frequency: "monthly" },
+      ],
+      expenses: [
+        { id: "e1", category: "Rent/Mortgage Payment", amount: 1400 },
+        { id: "e2", category: "Groceries", amount: 400 },
+        { id: "e3", category: "Transportation", amount: 200 },
+        { id: "e4", category: "Utilities", amount: 110 },
+        { id: "e5", category: "Phone", amount: 55 },
+      ],
+      assets: [
+        { id: "a1", category: "Roth IRA", amount: 9000 },
+        { id: "a2", category: "Savings Account", amount: 4000, surplusTarget: true },
+      ],
+      debts: [],
+      properties: [],
+      stocks: [],
+    },
+  },
+  {
+    id: "us-homeowner",
+    name: "Homeowner with mortgage",
+    emoji: "🏡",
+    description: "Own a home, saving for retirement",
+    highlights: ["$85k salary", "Home + mortgage", "401k growing"],
+    state: {
+      country: "US",
+      jurisdiction: "TX",
+      age: 38,
+      income: [
+        { id: "i1", category: "Salary", amount: 7083, frequency: "monthly" },
+      ],
+      expenses: [
+        { id: "e1", category: "Groceries", amount: 650 },
+        { id: "e2", category: "Transportation", amount: 350 },
+        { id: "e3", category: "Utilities", amount: 200 },
+        { id: "e4", category: "Insurance", amount: 250 },
+        { id: "e5", category: "Phone", amount: 80 },
+      ],
+      assets: [
+        { id: "a1", category: "401k", amount: 40000 },
+        { id: "a2", category: "Roth IRA", amount: 15000 },
+        { id: "a3", category: "Savings Account", amount: 12000, surplusTarget: true },
+      ],
+      debts: [],
+      properties: [
+        { id: "_simple_home", name: "Primary Residence", value: 420000, mortgage: 300000 },
+      ],
+      stocks: [],
+    },
+  },
+];
+
+export const QUICK_START_AU_PROFILES: SampleProfile[] = [
+  {
+    id: "au-renter",
+    name: "Renter with salary",
+    emoji: "🏢",
+    description: "Salary income, renting, building your savings",
+    highlights: ["$70k salary", "Renting", "Super building"],
+    state: {
+      country: "AU",
+      jurisdiction: "NSW",
+      age: 30,
+      income: [
+        { id: "i1", category: "Salary", amount: 5833, frequency: "monthly" },
+      ],
+      expenses: [
+        { id: "e1", category: "Rent/Mortgage Payment", amount: 2000 },
+        { id: "e2", category: "Groceries", amount: 450 },
+        { id: "e3", category: "Transportation", amount: 180 },
+        { id: "e4", category: "Utilities", amount: 120 },
+        { id: "e5", category: "Phone", amount: 70 },
+      ],
+      assets: [
+        { id: "a1", category: "Super (Accumulation)", amount: 20000 },
+        { id: "a2", category: "Savings Account", amount: 5000, surplusTarget: true },
+      ],
+      debts: [],
+      properties: [],
+      stocks: [],
+    },
+  },
+  {
+    id: "au-homeowner",
+    name: "Homeowner with mortgage",
+    emoji: "🏡",
+    description: "Own a home, building super for retirement",
+    highlights: ["$95k salary", "Home + mortgage", "Super growing"],
+    state: {
+      country: "AU",
+      jurisdiction: "VIC",
+      age: 38,
+      income: [
+        { id: "i1", category: "Salary", amount: 7917, frequency: "monthly" },
+      ],
+      expenses: [
+        { id: "e1", category: "Groceries", amount: 700 },
+        { id: "e2", category: "Transportation", amount: 300 },
+        { id: "e3", category: "Utilities", amount: 200 },
+        { id: "e4", category: "Insurance", amount: 220 },
+        { id: "e5", category: "Phone", amount: 80 },
+      ],
+      assets: [
+        { id: "a1", category: "Super (Accumulation)", amount: 75000 },
+        { id: "a2", category: "Savings Account", amount: 15000, surplusTarget: true },
+      ],
+      debts: [],
+      properties: [
+        { id: "_simple_home", name: "Primary Residence", value: 850000, mortgage: 550000 },
+      ],
+      stocks: [],
+    },
+  },
+];
+
+/** Get the quick-start profiles (simple mode) for the given country */
+export function getQuickStartProfilesForCountry(country: "CA" | "US" | "AU"): SampleProfile[] {
+  if (country === "US") return QUICK_START_US_PROFILES;
+  if (country === "AU") return QUICK_START_AU_PROFILES;
+  return QUICK_START_CA_PROFILES;
+}

@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 183,
+    title: "Simple mode — quick-start profiles and welcome step",
+    description: "In Simple mode, the Welcome step shows a new tagline: 'Get a quick snapshot of your financial health in under 2 minutes.' Two quick-start sample profiles are now available per country (CA, US, AU): 'Renter with salary' (income, rent, basic expenses, savings account) and 'Homeowner with mortgage' (income, expenses, home + mortgage via _simple_home, savings + retirement account). Quick-start profiles use only simple-mode fields — no stocks, no cost basis, no employer match, no tax credits. In Advanced mode, the original 3 detailed sample profiles are shown as before.",
+    date: "2026-03-09",
+  },
+  {
     version: 182,
     title: "Simple mode — focused dashboard with 4 sections",
     description: "In Simple mode, the dashboard shows only 4 sections: Projection (locked to moderate scenario), Insights (capped at 4, FIRE/income-replacement types hidden), Overview (Net Worth, Monthly Cash Flow, Financial Runway in a 3-column layout), and Money Steps. Cash Flow Sankey, Breakdowns, Compare/Benchmarks, and What If scenarios are hidden. A banner at the bottom invites users to switch to Advanced mode for all 8 sections. The header stepper also shows only 4 navigation items. In Advanced mode, all 8 sections and full functionality remain unchanged.",
