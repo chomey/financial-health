@@ -7,14 +7,29 @@
 -->
 
 ## Summary
-- **Total Tasks**: 169
-- **Completed**: 169
-- **Remaining**: 0
+- **Total Tasks**: 184
+- **Completed**: 170
+- **Remaining**: 14
 - **Last Updated**: 2026-03-08
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 170: Add contextual help to dashboard metric cards [@frontend]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/components/SnapshotDashboard.tsx`: Added `helpText?: string` to `MetricData` interface; added `HelpTip` next to metric title when `helpText` is set; added `helpText` to 3 mock metrics (Net Worth, Monthly Cash Flow, Financial Runway).
+  - `src/lib/compute-metrics.ts`: Added `helpText` to Net Worth, Monthly Cash Flow, Estimated Tax, Financial Runway, and Income Replacement metrics.
+  - `src/components/ProjectionChart.tsx`: Added `HelpTip` next to "Financial Projection" heading (explains Moderate scenario); added FIRE legend item with `HelpTip` explaining the 4% rule.
+  - `src/components/FinancialFlowchart.tsx`: Added `HelpTip` next to "Money Steps" heading with country-specific subreddit reference.
+  - `src/components/InsightsPanel.tsx`: Added `HelpTip` inline next to FIRE milestone items explaining the 4% rule.
+  - `src/lib/changelog.ts`: Added version 170 entry.
+  - `tests/unit/dashboard-help-tips.test.ts`: New — 7 unit tests verifying `helpText` presence and content on computed metrics.
+  - `tests/e2e/dashboard-help-tips.spec.ts`: New — 5 E2E tests verifying HelpTip presence on dashboard cards, projection chart, and money steps.
+- **Tests**: T1: 7 new passed (2519+ total), T2: 5 passed, Build: passes
+- **Screenshots**: task-170-dashboard-metric-cards, task-170-dashboard-help-tip-open, task-170-projection-chart-help-tip, task-170-money-steps-help-tip, task-170-net-worth-help-tip
+- **Notes**: Benchmark Comparisons already has a well-designed expandable info button showing source attribution (DATA_SOURCES per country). No HelpTip added there to avoid redundancy. Pre-existing test failures in changelog.test.ts and investment-returns-income.test.tsx are unrelated to this task.
 
 ## Task 169: Add contextual help tooltips to wizard inputs [@frontend]
 - **Date**: 2026-03-08

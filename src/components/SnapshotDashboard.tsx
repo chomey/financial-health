@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { generateInsights, type FinancialData, type InsightType } from "@/lib/insights";
 import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections, type ActiveTargetMeta, type TaxExplainerDetails, type RunwayExplainerDetails, type IncomeReplacementExplainerDetails } from "@/components/DataFlowArrows";
+import HelpTip from "@/components/HelpTip";
 
 interface MetricData {
   title: string;
@@ -22,6 +23,7 @@ interface MetricData {
   investmentReturns?: import("@/lib/financial-state").MonthlyInvestmentReturn[]; // per-asset monthly ROI for surplus explainer
   incomeReplacementDetails?: IncomeReplacementExplainerDetails; // detailed income replacement breakdown for explainer
   taxCreditsApplied?: boolean; // whether tax credits are factored into the displayed tax
+  helpText?: string; // contextual help shown via HelpTip icon next to title
 }
 
 // Mock values based on existing entry component mock data
@@ -34,6 +36,7 @@ const MOCK_METRICS: MetricData[] = [
     tooltip:
       "Your total assets minus total debts. This is a snapshot — it changes as you pay down debts and grow savings.",
     positive: false,
+    helpText: "Assets − debts − mortgage balance. Liquid net worth excludes property equity, which is shown separately below.",
   },
   {
     title: "Monthly Cash Flow",
@@ -43,6 +46,7 @@ const MOCK_METRICS: MetricData[] = [
     tooltip:
       "How much more you earn than you spend each month. A positive surplus means you're building wealth.",
     positive: true,
+    helpText: "After-tax income minus all expenses, debt payments, and monthly contributions. Positive means you have money left to invest or save.",
   },
   {
     title: "Financial Runway",
@@ -52,6 +56,7 @@ const MOCK_METRICS: MetricData[] = [
     tooltip:
       "How many months your liquid assets could cover your expenses. 3–6 months is a solid emergency fund.",
     positive: true,
+    helpText: "Months your liquid savings could cover all expenses if income stopped today. Based on liquid assets — not property equity.",
   },
   {
     title: "Debt-to-Asset Ratio",
@@ -208,7 +213,10 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       tabIndex={0}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-slate-400">{metric.title}</h3>
+        <div className="flex items-center gap-1.5">
+          <h3 className="text-sm font-medium text-slate-400">{metric.title}</h3>
+          {metric.helpText && <HelpTip text={metric.helpText} />}
+        </div>
         <span className="text-base" aria-hidden="true">
           {metric.icon}
         </span>

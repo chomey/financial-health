@@ -265,6 +265,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       positive: netWorth >= 0,
       breakdown: netWorthBreakdown,
       valueWithEquity: totalPropertyEquity > 0 ? netWorthWithEquity : undefined,
+      helpText: "Assets − debts − mortgage balance. Liquid net worth excludes property equity, which is shown separately below.",
     },
     {
       title: "Monthly Cash Flow",
@@ -276,6 +277,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       positive: surplus > 0,
       breakdown: surplusBreakdown,
       investmentReturns: investmentReturns.length > 0 ? investmentReturns : undefined,
+      helpText: "After-tax income minus all expenses, debt payments, and monthly contributions. Positive means you have money left to invest or save.",
     },
     {
       title: "Estimated Tax",
@@ -291,6 +293,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       effectiveRate: effectiveTaxRate,
       taxDetails: buildTaxExplainerDetails(state, totalTaxableBase, totalFederalTax, totalProvincialStateTax, effectiveTaxRate, totalTaxEstimate, investmentIncomeAccounts),
       taxCreditsApplied: hasActiveCredits,
+      helpText: "Effective rate = total tax ÷ gross income. Marginal rate is what you'd pay on the next dollar earned — always higher than effective.",
     },
     {
       title: "Financial Runway",
@@ -304,6 +307,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
       runwayWithGrowth,
       runwayAfterTax,
       runwayDetails: buildRunwayExplainerDetails(detailedBuckets, monthlyObligations, monthlyExpenses, totalMortgagePayments, runway, runwayWithGrowth, runwayAfterTax, country, jurisdiction),
+      helpText: "Months your liquid savings could cover all expenses if income stopped today. Based on liquid assets — not property equity.",
     },
     {
       title: "Debt-to-Asset Ratio",
@@ -329,6 +333,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
         positive: incomeReplacementDetails.incomeReplacementPct >= 100,
         breakdown: incomeReplacementDetails.currentTierLabel,
         incomeReplacementDetails,
+        helpText: "% of monthly income your portfolio could sustainably replace using the 4% safe withdrawal rate. 100% = financial independence.",
       };
     })()] : []),
   ];

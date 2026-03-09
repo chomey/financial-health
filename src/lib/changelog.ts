@@ -6,6 +6,13 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  // Dashboard metric card help tips
+  {
+    version: 170,
+    title: "Contextual help icons on dashboard metric cards",
+    description: "Added HelpTip (? icon) to dashboard metric cards and sections explaining derived values. Net Worth: explains assets − debts formula. Monthly Cash Flow: explains after-tax income minus expenses. Estimated Tax: explains effective vs marginal rate. Financial Runway: explains liquid assets basis. Income Replacement: explains the 4% safe withdrawal rate. Financial Projection heading: explains Moderate scenario vs Conservative/Optimistic. Money Steps heading: explains the community wiki methodology with country-specific subreddit reference. FIRE legend: explains the 4% rule and savings target (25× annual expenses). FIRE milestone in InsightsPanel: shows HelpTip for the 4% rule inline. Benchmark Comparisons already had a well-designed info button for source attribution.",
+    date: "2026-03-08",
+  },
   // Contextual help tooltips
   {
     version: 169,

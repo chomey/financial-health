@@ -42,6 +42,7 @@ import {
   BurndownTooltip,
   MilestoneLabelContent,
 } from "@/components/projection/ProjectionTooltips";
+import HelpTip from "@/components/HelpTip";
 
 export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRate = 4, onOutlookChange, onMilestonesChange }: ProjectionChartProps) {
   const fmt = useCurrency();
@@ -257,9 +258,12 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       aria-label="Financial projection"
     >
       <div className="mb-3 sm:mb-4 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-        <h3 className="text-lg font-semibold text-slate-200">
-          Financial Projection
-        </h3>
+        <div className="flex items-center gap-1.5">
+          <h3 className="text-lg font-semibold text-slate-200">
+            Financial Projection
+          </h3>
+          <HelpTip text="Moderate scenario uses your entered ROI values as-is. Conservative is 30% lower, Optimistic 30% higher. Toggle inflation adjustment to see real (purchasing-power) values." />
+        </div>
         {mode === "keep-earning" && (
           <div className="flex items-center gap-2">
             {(Object.keys(SCENARIO_LABELS) as Scenario[]).map((s) => (
@@ -604,6 +608,13 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           <span className="flex items-center gap-1" data-testid="mortgage-burndown-legend">
             <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-orange-400" />
             Mortgage
+          </span>
+        )}
+        {fireNumber > 0 && (
+          <span className="flex items-center gap-1" data-testid="fire-legend">
+            <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-amber-400" />
+            🔥 FIRE
+            <HelpTip text={`Portfolio size where ${safeWithdrawalRate}% annual withdrawals cover all expenses. The 4% rule means saving ${Math.round(100 / safeWithdrawalRate)}× your annual expenses.`} />
           </span>
         )}
       </div>

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import HelpTip from "@/components/HelpTip";
 import {
   getFlowchartSteps,
   getCurrentStepIndex,
@@ -443,6 +444,7 @@ export default function FinancialFlowchart({
         <div className="flex items-center gap-2">
           <span className="text-lg" aria-hidden="true">🗺️</span>
           <h3 className="text-sm font-medium text-slate-400">Money Steps</h3>
+          <HelpTip text={`A prioritized financial checklist from the ${country === "CA" ? "r/PersonalFinanceCanada" : country === "AU" ? "r/AusFinance" : "r/personalfinance"} community wiki. Work through steps in order for maximum impact.`} />
           <span className="text-lg font-bold text-white ml-1">
             {completed}<span className="text-slate-500">/{total}</span>
           </span>

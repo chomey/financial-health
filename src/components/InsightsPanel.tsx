@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { generateInsights, MAX_INSIGHTS, type FinancialData, type Insight, type InsightType } from "@/lib/insights";
 import { useOptionalDataFlow, type ActiveConnection, prioritizeConnections } from "@/components/DataFlowArrows";
 import type { DataFlowConnectionDef } from "@/components/SnapshotDashboard";
+import HelpTip from "@/components/HelpTip";
 
 // Mock financial data matching the existing entry component mock values
 const MOCK_FINANCIAL_DATA: FinancialData = {
@@ -150,8 +151,11 @@ export default function InsightsPanel({
       {hasMilestones && (
         <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1" data-testid="projection-milestones">
           {milestones.map((m, i) => (
-            <span key={i} className={`text-xs font-medium ${milestoneColorMap[m.color]}`}>
+            <span key={i} className={`inline-flex items-center gap-1 text-xs font-medium ${milestoneColorMap[m.color]}`}>
               {m.icon} {m.text}
+              {m.text.startsWith("FIRE") && (
+                <HelpTip text="The 4% rule: if you withdraw 4% of your portfolio annually, it historically lasts 30+ years. FIRE number = 25× annual expenses." />
+              )}
             </span>
           ))}
         </div>
