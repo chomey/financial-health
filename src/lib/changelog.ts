@@ -6,581 +6,498 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
-  // Asset account type descriptions
   {
     version: 174,
     title: "Account type descriptions in AssetEntry",
     description: "Added short descriptions for all known account types in AssetEntry. CA: TFSA, RRSP, RESP, FHSA, LIRA. US: 401k, Roth 401k, IRA, Roth IRA, 529, HSA. AU: Super (Accumulation), Super (Pension Phase), First Home Super Saver. Descriptions appear below each item name in the category dropdown and below the selected category name in view mode, matching the tax credit description style.",
     date: "2026-03-08",
   },
-  // AU unit tests and validation
   {
     version: 172,
     title: "AU unit tests and validation",
     description: "Added comprehensive unit tests validating AU tax brackets, Medicare Levy, super contribution limits, LITO phase-out, and franking credit gross-up. All three AU sample profiles (young professional, mid-career family, pre-retiree) validated with computeTotals: correct AUD currency, positive income/expenses/tax, 0 provincial tax, and reasonable effective rates. Country switching CA→AU→US verified to preserve all financial data. Pre-existing E2E failures in au-sample-profiles.spec.ts and au-currency.spec.ts fixed by using /?step=welcome to force wizard mode.",
     date: "2026-03-08",
   },
-  // Dashboard metric card help tips
   {
     version: 170,
     title: "Contextual help icons on dashboard metric cards",
     description: "Added HelpTip (? icon) to dashboard metric cards and sections explaining derived values. Net Worth: explains assets − debts formula. Monthly Cash Flow: explains after-tax income minus expenses. Estimated Tax: explains effective vs marginal rate. Financial Runway: explains liquid assets basis. Income Replacement: explains the 4% safe withdrawal rate. Financial Projection heading: explains Moderate scenario vs Conservative/Optimistic. Money Steps heading: explains the community wiki methodology with country-specific subreddit reference. FIRE legend: explains the 4% rule and savings target (25× annual expenses). FIRE milestone in InsightsPanel: shows HelpTip for the 4% rule inline. Benchmark Comparisons already had a well-designed info button for source attribution.",
     date: "2026-03-08",
   },
-  // Contextual help tooltips
   {
     version: 169,
     title: "Contextual help tooltips for wizard fields",
     description: "Added a reusable HelpTip component (? icon with click-to-toggle popover) for explaining non-obvious wizard fields. Applied to: Profile — Tax Year, Filing Status, Exchange Rate. Income — Frequency and Income Type in the add-new form. Assets — Tax Treatment, ROI, Reinvest Returns, Employer Match, Cost Basis %, and Surplus Target. Debts — Interest Rate. Property — Amortization (term years) and Appreciation rate. Mobile: tap to toggle. Desktop: click to show/hide. Outside click closes the popover.",
     date: "2026-03-08",
   },
-  // Wizard step reorder
   {
     version: 168,
     title: "Wizard: Reordered steps to match natural financial thinking",
     description: "Changed wizard step order from Welcome → Profile → Property → Stocks → Assets → Debts → Income → Expenses → Tax Summary to Welcome → Profile → Income → Expenses → Debts → Property → Assets → Stocks → Tax Summary. The new order follows how people naturally think about finances: income first, then expenses, then debts, then property (biggest asset), then other assets/investments, then stocks (most advanced), then tax summary as a computed review.",
     date: "2026-03-08",
   },
-  // Australia: AU currency formatting and FX rates
   {
     version: 167,
     title: "Australia: AUD currency formatting and FX rates",
     description: "Added AUD to the FX rate API route (previously only CAD and USD were accepted). Fixed WizardShell ProfileStep passing incorrect foreignCurrency for AU users (was hardcoded CAD for non-CAD home, now uses getForeignCurrency() which returns USD for AUD). FxRateDisplay now correctly shows '1 USD = X AUD' for AU users. FALLBACK_RATES already included all AUD pairs. formatCurrencyCompact already handled AU$ prefix for foreign AUD amounts.",
     date: "2026-03-08",
   },
-  // Australia: AU insights and encouragement text
   {
     version: 166,
     title: "Australia: AU-specific insights",
     description: "Added 5 AU-specific insights: (1) Super Guarantee check — warns when employer contributes below 11.5% or super account is missing; (2) HECS-HELP repayment — explains CPI indexation and PAYG deductions above $54,435 threshold; (3) FHSS eligibility — suggests First Home Super Saver scheme to non-homeowners; (4) Franking credits — recommends tracking franking credits when AU taxable investments exceed $10k; (5) MLS avoidance — warns about Medicare Levy Surcharge above $93k income with no private hospital cover. Updated buildTaxRateHighMessage with AU salary-sacrifice language, tax optimization section uses Super account names, withdrawal-tax no-free message uses AU super terminology, and unclaimed credits suggest LITO, Super Co-contribution, and Franking Credits for AU users.",
     date: "2026-03-08",
   },
-  // Australia: AU sample profiles
   {
     version: 165,
     title: "Australia: sample profiles",
     description: "Added 3 Australian sample profiles: (1) Young professional in Sydney — Super (Accumulation), HECS-HELP debt, VAS.AX/VGS.AX ETFs; (2) Mid-career family in Melbourne — salary sacrifice to super, mortgage, A200.AX/NDQ.AX portfolio; (3) Pre-retiree in Brisbane — large Super, paid-off primary home plus investment property, CBA.AX/BHP.AX/WES.AX franking credit stocks. getProfilesForCountry now returns AU profiles for country=AU.",
     date: "2026-03-08",
   },
-  // Australia: AU benchmarks
   {
     version: 164,
     title: "Australia: age-group benchmarks",
     description: "Added Australian benchmarks for 6 age groups (18–24 through 65+) using ABS Household Income and Wealth 2021-22 data. Covers median net worth, savings rate, debt-to-income ratio, emergency fund months, and median income in AUD. AU national average net worth $672,800. Updated getBenchmarksForCountry and getNationalAverage to return AU-specific data.",
     date: "2026-03-08",
   },
-  // Australia: AU Money Steps flowchart
   {
     version: 163,
     title: "Australia: Money Steps flowchart",
     description: "Added AU-specific Money Steps following r/AusFinance conventions: (1) Budget & Essentials, (2) Emergency Fund (3–6 months, no $1k starter), (3) Employer Super Guarantee (11.5%), (4) High-Interest Debt, (5) Salary Sacrifice to Super (concessional cap $30k), (6) FHSS scheme (skippable), (7) Moderate-Interest Debt, (8) ETF Investing via ASX, (9) Non-Concessional Super ($120k cap), (10) Lifestyle & Giving. Full step context (getStepContext) and user override support for all AU steps.",
     date: "2026-03-08",
   },
-  // Australia: AU tax credits and offsets
   {
     version: 162,
     title: "Australia: tax credits and offsets",
     description: "Added AU tax offsets and credits: Low Income Tax Offset (LITO, up to $700), Senior Australians and Pensioners Tax Offset (SAPTO, up to $2,230), Medicare Levy Surcharge info, Private Health Insurance Rebate tiers, Franking Credits (dividend imputation, refundable), Zone Tax Offset, Super Co-contribution, and Spouse Super Tax Offset. Added AU filing statuses: single and married/de facto. LMITO excluded (expired June 2022).",
     date: "2026-03-08",
   },
-  // Australia: AU superannuation account types
   {
     version: 161,
     title: "Australia: superannuation account types",
     description: "Added AU financial vehicles: Super (Accumulation), Super (Pension Phase), and First Home Super Saver. Default 7% ROI for balanced super funds. Contribution limits: concessional $30k/yr, non-concessional $120k/yr, FHSS $15k/yr. Tax treatment: pension phase tax-free after 60, accumulation at flat 15% on earnings, FHSS at marginal rate minus 30% offset. Super (Accumulation) eligible for employer match (super guarantee).",
     date: "2026-03-08",
   },
-  // Australia: AU federal income tax brackets
   {
     version: 160,
     title: "Australia: federal income tax & Medicare Levy",
     description: "Added AU 2024-25 and 2025-26 federal income tax brackets (Stage 3 cuts: 0% up to $18,200, 16% to $45k, 30% to $135k, 37% to $190k, 45% above). Medicare Levy at 2% with low-income phase-in thresholds. 50% CGT discount for capital gains. No state/territory income tax — all AU jurisdictions return identical results.",
     date: "2026-03-08",
   },
-  // Australia: AU states/territories in CountryJurisdictionSelector
   {
     version: 159,
     title: "Australia: states and territories selector",
     description: "Added 🇦🇺 AU button to the country toggle. Added all 8 Australian states and territories (NSW, VIC, QLD, SA, WA, TAS, NT, ACT) to the jurisdiction dropdown. Switching to AU resets jurisdiction to NSW. Switching away from AU resets to the default for the target country.",
     date: "2026-03-08",
   },
-  // Australia: widen country type to CA | US | AU
   {
     version: 158,
     title: "Australia country support: type foundation",
     description: "Widened every 'CA' | 'US' union type to 'CA' | 'US' | 'AU' across the codebase. Added 'AUD' to SupportedCurrency. getHomeCurrency('AU') returns 'AUD'. Added AUD↔CAD and AUD↔USD fallback FX rates. getForeignCurrency for AUD returns USD as the primary foreign. Tax engine returns a zero-tax stub for AU (full implementation in Task 160). All existing CA/US code paths are unchanged.",
     date: "2026-03-08",
   },
-  // Wizard UX overhaul, compact entry panels, tax credit improvements
   {
     version: 157,
     title: "Wizard welcome step, compact panels, tax credit UX",
     description: "Fresh visits now open the wizard with a dedicated Welcome step showing sample profiles — clicking one goes straight to the dashboard. Added 'Enter your own' path into the profile form. Tax credits merged into the Expenses step. Fixed-amount credits (DTC, CWB, GST/HST, CCB, EITC, etc.) now show read-only amounts or discrete option dropdowns instead of free-text inputs. All entry panels (assets, debts, income, expenses, stocks, properties, tax credits) tightened to compact row spacing.",
     date: "2026-03-08",
   },
-  // Retirement-aware Money Steps
   {
     version: 156,
     title: "Retirement-aware Money Steps",
     description: "Added an 'I'm retired' toggle to the Money Steps panel. When enabled, employer match steps auto-complete with a 'Retired' hint, tax-advantaged contribution steps (TFSA, RRSP, HSA, IRA, 401k) become skippable, and the Budget step completes with expenses alone — showing 'Expenses tracked — living on savings/investments' instead of 'no income yet'. A heuristic auto-suggests retirement mode when all income is non-employment and either runway exceeds 20 years or investment returns exceed monthly expenses. The retired flag persists in URL state as fret=1.",
     date: "2026-03-08",
   },
-  // Validate US tax credits/brackets for 2025/2026
   {
     version: 155,
     title: "Corrected US tax credit values for 2025/2026",
     description: "Updated all US tax credit amounts, phase-out thresholds, and descriptions to match IRS 2025 values (Rev. Proc. 2024-40). Key corrections: EITC $8,046 (was $7,430), CTC refundable portion $1,700 (was $1,600), Adoption Credit $17,280 with phase-out $259k-$299k (was $15,950/$252k-$292k), Saver's Credit limits $39,500/$59,250/$79,000 (were $38,250/$57,375/$76,500), Student Loan Interest phase-out $85k-$100k single (was $80k-$95k). All 2026 overrides re-estimated with ~2.8% inflation indexing.",
     date: "2026-03-08",
   },
-  // Validate Canadian tax credits/brackets for 2025/2026
   {
     version: 154,
     title: "Corrected Canadian tax credit values for 2025/2026",
     description: "Updated all Canadian tax credit amounts, phase-out thresholds, and descriptions to match CRA 2025 indexed values. Key corrections: DTC $10,138 (was $9,428), CWB $1,633/$2,813 (was $1,518), CCB $7,997 under-6 / $6,748 ages 6-17 (was $7,437), GST/HST $533 with corrected phase-out range, Canada Caregiver $8,601 (was $7,999), Spousal Amount $2,419 (was $2,359). All 2026 overrides updated with ~2.7% CRA indexation. Climate Action Incentive corrected to not income-tested.",
     date: "2026-03-08",
   },
-  // Tax year selector (2025/2026)
   {
     version: 153,
     title: "Tax year selector (2025/2026)",
     description: "Added a tax year toggle to the header bar (2025/2026). When switching tax years, all federal tax brackets, basic personal amounts, standard deductions, credit maxAmounts, phase-out thresholds, and descriptions update to reflect that year's inflation-indexed values. Canadian federal brackets use CRA indexation; US federal brackets use IRS adjustments. Provincial/state tables default to 2025 values until officially published. Tax year persists in URL state for sharing.",
     date: "2026-03-08",
   },
-  // Tax credits applied to displayed tax and cash flow
   {
     version: 152,
     title: "Tax credits now reduce displayed tax and cash flow",
     description: "Tax credits (non-refundable, refundable) and deductions are now applied directly to the displayed Estimated Tax value and Monthly Cash Flow surplus. Previously, credits were computed but only shown as secondary indicators — the primary tax and surplus numbers ignored them. Non-refundable credits reduce tax (capped at $0), refundable credits can reduce to $0, and deductions reduce taxable income before bracket computation. The 'Tax Credits Applied' badge appears when credits are active.",
     date: "2026-03-08",
   },
-  // Financial roadmap E2E regression
   {
     version: 151,
     title: "Financial roadmap E2E regression",
     description: "Full Playwright regression suite for the financial roadmap feature (Tasks 149–150). Covers all 8 key scenarios: CA default (10 steps, budget complete, TFSA/RRSP detected), US mode switch (401k/HSA/IRA steps replace CA steps, community credit updates), employer match acknowledgement with URL fca= persistence and reload, HSA skip with N/A badge and fcs= URL param, undo acknowledgement (step reverts, URL cleared), adding high-interest debt triggers step in-progress state, adding savings to complete 3-month emergency fund, and progress bar live updates. Screenshots captured for CA and US roadmaps. Also adds unit tests validating the step inference logic for all regression scenarios.",
     date: "2026-03-08",
   },
-  // Financial roadmap visual component
   {
     version: 150,
     title: "Financial roadmap visual component",
     description: "Added FinancialFlowchart.tsx: an interactive vertical flowchart rendering the 10-step CA or US financial roadmap from Task 149. Each step shows a colour-coded circle (green checkmark when complete, amber pulse when in-progress, grey when upcoming) with vertical connector lines. Steps are click-to-expand with full detail text. User-acknowledgeable steps (employer match, RESP/FHSA, taxable investing) have checkboxes; skippable steps show a skip checkbox. Acknowledged/skipped steps show an Undo button. A gradient progress bar at the top tracks X/N steps complete. The current step auto-expands on load. Acknowledge/skip state persists in URL via fca= and fcs= params (from Task 149 helpers). Wired into page.tsx in the right dashboard column with a Roadmap nav link. Community credit links to r/PersonalFinanceCanada and r/personalfinance wikis. Includes disclaimer: general guidance, not financial advice.",
     date: "2026-03-08",
   },
-  // Financial roadmap inference engine
   {
     version: 149,
     title: "Financial roadmap step definitions and inference engine",
     description: "Added src/lib/flowchart-steps.ts with full 10-step roadmap definitions for both CA (r/PersonalFinanceCanada Money Steps: budget, starter EF, employer RRSP match, high-interest debt, full EF, TFSA, RRSP, moderate debt, RESP/FHSA, taxable investing) and US (r/personalfinance How to handle $: budget, starter EF, 401k match, high-interest debt, full EF, HSA, IRA/Roth IRA, 401k, moderate debt, taxable investing). Inference engine computes completion status and progress from FinancialState: budget from income/expense presence, emergency fund from liquid assets vs monthly obligations, debt steps from interest rate thresholds (>8% high, 4–8% moderate), account steps from asset category keywords. Steps that can't be inferred are userAcknowledgeable (employer match, RESP/FHSA, taxable investing) with optional skipLabel. URL persistence helpers added to url-state.ts: getFlowchartAcksFromURL(), getFlowchartSkipsFromURL(), updateFlowchartOverridesURL() using fca= and fcs= params.",
     date: "2026-03-08",
   },
-  // Context-aware insights
   {
     version: 148,
     title: "Context-aware account insights",
     description: "Insights now reference the user's actual accounts instead of generic lists. The 'high tax rate' insight checks which tax-advantaged accounts you already have (TFSA, RRSP, 401k, Roth IRA) and suggests only what's missing — or encourages maximizing contributions if you have both. Tax optimization insights use 'maximizing your TFSA' vs 'shifting to a TFSA' based on account ownership. The RRSP/401k deduction suggestion only appears when you have taxable accounts to redirect. The no-tax-free-account suggestion correctly recommends TFSA for CA users and Roth IRA for US users. Canadian accounts are never suggested to US users and vice versa.",
     date: "2026-03-08",
   },
-  // Deduplicate computation functions
   {
     version: 147,
     title: "Deduplicate computation functions",
     description: "Consolidated duplicate calculations into single sources of truth. Added computeFireNumber(), computeMonthlyObligations(), and computeSurplus() to compute-totals.ts. Replaced 4 independent formatCurrency implementations (insights/formatting.ts, NetWorthWaterfallChart, TaxCreditEntry, _page-helpers) with delegations to the canonical currency.ts module. compute-metrics.ts and financial-state.ts now use the shared helpers instead of inline formulas.",
     date: "2026-03-08",
   },
-  // Large file splits for Claude efficiency
   {
     version: 146,
     title: "Codebase modularization: split large files",
     description: "Factored 800+ line files into focused modules. page.tsx (1078→572 lines): extracted helper components (PrintButton, CopyLink, AgeInput, WelcomeBanner, CollapsibleSection) into _page-helpers.tsx and state management into useFinancialState hook. insights.ts (941→2 lines): split into insights/ folder with types.ts, formatting.ts, net-worth.ts, generate.ts, and index.ts barrel. ProjectionChart.tsx (949→820 lines): extracted tooltip components to projection/ProjectionTooltips.tsx and utility constants/functions to projection/ProjectionUtils.ts. Added reusable useInlineEdit hook in src/hooks/. All public APIs preserved via barrel re-exports. All 1966 tests pass.",
     date: "2026-03-08",
   },
-  // Tax credits E2E regression
   {
     version: 145,
     title: "Tax credits E2E regression",
     description: "Full Playwright regression test covering the complete tax credits feature across CA and US: credit entry, category swapping on country switch, all four insight types, dashboard metric updates (effective tax rate, monthly cash flow, runway), and URL state round-trip persistence. Confirms the entire tax credits pipeline works end-to-end.",
     date: "2026-03-07",
   },
-  // Tax credits impact on dashboard metrics
   {
     version: 144,
     title: "Tax credits impact on dashboard metrics",
     description: "Tax credits now visibly affect three dashboard metrics. Estimated Tax shows your effective rate before and after credits (e.g. '22.5% → 18.2%') with a 'Tax Credits Applied' badge. Monthly Cash Flow shows a '+$X/mo from tax credits' line for refundable credits. Financial Runway shows an adjusted runway factoring in both refundable credits (treated as income) and non-refundable credits (reduced tax burden). All credit indicators include a 'Tax Credits Applied' badge so you know why the metric changed.",
     date: "2026-03-07",
   },
-  // Tax credit insights with income eligibility awareness
   {
     version: 143,
     title: "Tax credit insights with eligibility awareness",
     description: "Four new insight types powered by your entered tax credits: tax-credits-summary shows your total credits and how they shift your effective tax rate; tax-credits-unclaimed suggests up to 2 unclaimed credits based on your profile (children, low income, homeowner, student) and income eligibility; tax-credits-refundable flags when your refundable credits exceed your estimated tax, signalling a possible refund; tax-credits-ineligible warns when any entered credits are likely unavailable at your income level or filing status, with an adjusted total. Tone stays encouraging throughout.",
     date: "2026-03-07",
   },
-  // US tax credit categories with income limits and filing status
   {
     version: 142,
     title: "Full US tax credit category list",
     description: "Added 13 US credit/deduction categories with per-filing-status income limits: Child and Dependent Care Credit, Premium Tax Credit, Adoption Credit, Standard Deduction (info baseline), State and Local Tax (SALT) Deduction, Charitable Contributions Deduction, and SSDI/SSI Benefits (info). Updated descriptions for all existing US credits (EITC, Child Tax Credit, AOTC, Lifetime Learning, Saver's Credit, EV Credit, Clean Energy, Student Loan Interest) with plain-English income limit explanations.",
     date: "2026-03-07",
   },
-  // Canadian tax credit categories with income limits and spousal status
   {
     version: 141,
     title: "Full Canadian tax credit category list",
     description: "Added 15 Canadian credit and deduction categories to the Tax Credits entry: DTC, Spousal Amount, Canada Caregiver, Medical Expense, Home Accessibility, CWB, GST/HST, CCB, Climate Action Incentive, Canada Training, Moving Expenses, Child Care, RRSP (info), Union & Professional Dues, and Northern Residents Deduction. Each includes per-filing-status income limits. Spousal Amount Credit is hidden for single filers and shown only for married/common-law. Introduced getCreditCategoriesForFilingStatus() to filter spouse-only credits based on filing status.",
     date: "2026-03-07",
   },
-  // Tax credits entry UI, filing status selector, and data model
   {
     version: 140,
     title: "Tax Credits & Deductions entry UI",
     description: "New TaxCreditEntry component with jurisdiction-filtered categories, income eligibility badges (reduced/ineligible), refundable/non-refundable/deduction type badges, and info tooltip. Filing status selector in header (US: single/MFJ/MFS/HoH, CA: single/married-common-law). Tax credits and filing status persisted in URL state with compact encoding. Per-filing-status income limits with phase-out, hard cap, and ineligible indicators.",
     date: "2026-03-07",
   },
-  // New insights E2E regression
   {
     version: 139,
     title: "New insights E2E regression",
     description: "Full Playwright regression test verifying all 5 new insight types (debt-to-income, housing cost, Coast FIRE, net worth milestones, age-based percentile) render correctly across 3 scenarios: young adult with student debt, mid-career homeowner, and high earner. Includes WCAG AA contrast ratio validation ensuring 4.5:1 minimum on all insight cards.",
     date: "2026-03-07",
   },
-  // Net worth milestones and age-based percentile insight
   {
     version: 138,
     title: "Net worth milestones and age-based percentile insight",
     description: "Two new insights: (1) Net worth milestones celebrate crossing key thresholds from $0 to $10M+, with motivating messages at each level — including the famous Charlie Munger quote at $100k. (2) Age-based percentile compares your net worth to Federal Reserve SCF 2022 medians by age group (Under 35: $39k, 35–44: $135k, 45–54: $247k, 55–64: $364k, 65–74: $410k, 75+: $335k). Tone is encouraging regardless of where you stand. Requires entering your age for the percentile insight.",
     date: "2026-03-07",
   },
-  // Coast FIRE age calculation and insight
   {
     version: 137,
     title: "Coast FIRE age calculation and insight",
     description: "New Coast FIRE insight that calculates when your existing investments, compounding at ~5% real return, will grow to cover retirement expenses by age 65 without additional contributions. If you've already hit Coast FIRE, it celebrates the milestone. If not, it shows how many more years of saving are needed. Includes educational explanation of what Coast FIRE means and why it's motivating. Requires entering your age via the age input.",
     date: "2026-03-07",
   },
-  // Housing cost ratio insight
   {
     version: 136,
     title: "Housing cost ratio insight with 30% rule explanation",
     description: "New insight type showing your housing cost ratio — monthly rent or mortgage payment divided by gross monthly income. Four tiers: Well within budget (<25%), Right at the sweet spot (25–30%), Above the 30% rule (31–40%), and Cost-burdened (40%+). Each tier explains why the 30% guideline matters: financial planners and HUD use it as the benchmark — spending more limits savings capacity and emergency preparedness. Mortgage payments from PropertyEntry take priority; falls back to rent expense category.",
     date: "2026-03-07",
   },
-  // Debt-to-income ratio insight
   {
     version: 135,
     title: "Debt-to-income ratio insight with educational explainer",
     description: "New insight type showing your debt-to-income (DTI) ratio — total monthly debt payments divided by gross monthly income. Four tiers: Excellent (<20%), Good (20–35%), Moderate (36–43%), and High (44%+). Each tier explains why DTI matters: lenders use it to decide mortgage approvals, credit card limits, and loan rates. A lower DTI means better terms and more financial flexibility. Appears on the Debt-to-Asset Ratio metric card.",
     date: "2026-03-07",
   },
-  // Visual theme E2E regression
   {
     version: 134,
     title: "Visual theme E2E regression — WCAG AA contrast verification",
     description: "Full Playwright regression test verifying the cyberpunk theme renders correctly across all major views: dashboard metric cards, entry panels with inputs, explainer modal, projection chart, and mobile responsive layout. Includes WCAG AA contrast ratio verification ensuring all text/background color pairs meet 4.5:1 for normal text and 3:1 for large text. All 485 E2E tests pass.",
     date: "2026-03-07",
   },
-  // Income Replacement explainer modal
   {
     version: 133,
     title: "Income Replacement metric — clickable explainer with 4% rule breakdown",
     description: "The Income Replacement metric card is now clickable. Clicking opens a detailed explainer showing: formula breakdown (total invested assets × 4% ÷ 12 vs monthly income), progress through tiers (Early stage → Building momentum → Strong position → Nearly independent → Financially independent), per-account contribution to the sustainable withdrawal, how much more is needed to reach the next tier, and an educational explanation of the 4% Safe Withdrawal Rate rule.",
     date: "2026-03-07",
   },
-  // Show company/fund names for stock tickers
   {
     version: 132,
     title: "Show company/fund names for stock tickers",
     description: "Added a static map of 550+ ticker symbols to company/fund names (S&P 500, popular ETFs, Canadian stocks/ETFs, Vanguard/Fidelity mutual funds). Company names display as subtle text below ticker symbols in the stock entry view and as parenthetical labels in explainer modal source cards. Unknown tickers attempt an async Yahoo Finance lookup with session-level caching. Graceful fallback — if lookup fails, nothing is shown.",
     date: "2026-03-07",
   },
-  // Page layout and remaining UI dark theme
   {
     version: 131,
     title: "Page layout, header, and remaining UI — dark cyberpunk theme",
     description: "Final dark theme pass across all remaining components. Page background slate-950, header bg-slate-900/80 with backdrop-blur glass effect, nav bg-slate-950/90. Print styles in globals.css override back to white-on-light for printing. All stone-* colors replaced with slate equivalents. Positive/negative convention consistent everywhere: emerald-400 positive, rose-400 negative. FastForwardPanel sliders updated to vivid accents. MobileWizard, StockEntry, ZoomableCard, FxRateDisplay, CurrencyBadge, WithdrawalTaxSummary, InsightsPanel, BenchmarkComparisons, CountryJurisdictionSelector all updated to glass card pattern.",
     date: "2026-03-07",
   },
-  // Charts dark theme
   {
     version: 130,
     title: "Charts and projection panel — dark cyberpunk theme",
     description: "Applied dark cyberpunk palette to all chart components: NetWorthDonutChart, ExpenseBreakdownChart, ProjectionChart, NetWorthWaterfallChart. Dark glass-effect cards (bg-white/5 backdrop-blur border-white/10). Recharts color arrays updated to vivid saturated colors: cyan-400, violet-400, emerald-400, amber-400, blue-400, pink-400. Grid lines now use rgba(255,255,255,0.05) for subtle contrast. Axis labels in slate-400. Projection chart net worth line glows with a CSS drop-shadow filter. Positive values emerald-400, negative red-400. Summary tables use white/5 row dividers with slate text. FIRE callout uses amber-400 accent.",
     date: "2026-03-07",
   },
-  // Entry panels dark theme
   {
     version: 129,
     title: "Entry panels — dark cyberpunk theme",
     description: "Applied the soft cyberpunk palette to all entry panel components: AssetEntry, DebtEntry, IncomeEntry, ExpenseEntry, PropertyEntry. Dark glass-effect cards (bg-white/5 backdrop-blur), border-white/10 card borders, cyan-500/50 inputs with slate-900 backgrounds, emerald-400 for positive/asset/income amounts, rose-400 for debt/expense amounts. Vivid accent glows on hover/focus. 'Add' buttons use bright cyan accent. Auto-computed rows have a distinct dark badge style. Section footers use white/10 dividers and cyan 'Add' buttons.",
     date: "2026-03-07",
   },
-  // Dashboard and explainer modal dark theme
   {
     version: 128,
     title: "Metric cards and explainer modal — dark theme",
     description: "Applied the soft cyberpunk palette to SnapshotDashboard metric cards: glass-effect dark backgrounds (bg-white/5 backdrop-blur), cyan-400 for positive values, rose-400 for negative, slate text for labels. Explainer modal now uses dark slate-800 background. Tax bracket bars use a muted cyan→violet→rose color progression on dark containers, with consistently readable light text. Source summary cards, connector lines, and investment returns section all updated to the new palette.",
     date: "2026-03-07",
   },
-  // Visual theme overhaul — soft cyberpunk palette
   {
     version: 127,
     title: "Soft cyberpunk theme tokens",
     description: "Replaced the green/stone Tailwind theme with a soft cyberpunk palette: dark slate-900 background, muted cyan for positive metrics, violet for info/links, rose for warnings. Added semantic accent CSS custom properties (--accent-positive, --accent-negative, --accent-info, --accent-highlight, --accent-muted, --accent-surface, --accent-border). Legacy green/stone/blue tokens remapped to new palette for gradual migration. Glow animations updated to use cyan/rose accents.",
     date: "2026-03-07",
   },
-  // Show both monthly and yearly totals on Income and Expenses
   {
     version: 126,
     title: "Dual monthly/yearly totals on Income & Expenses",
     description: "Income and Expense sections now always show both monthly and yearly amounts. Each item displays its primary amount with frequency suffix (e.g. $5,500/mo) and a secondary converted amount ($66,000/yr). Section footers show 'Monthly: $X | Yearly: $Y'. The monthly/yearly toggle in Expenses has been removed.",
     date: "2026-03-07",
   },
-  // Fix surplus explainer showing Assets instead of Contributions
   {
     version: 125,
     title: "Fix surplus explainer: Contributions card",
     description: "The Monthly Surplus explainer modal now correctly shows a 'Contributions' card (with your monthly contribution amount) instead of incorrectly showing the full 'Assets' section card. The fix uses virtual source IDs (virtual-contributions, virtual-mortgage) so the explainer displays the right label and value without pulling in unrelated section metadata.",
     date: "2026-03-07",
   },
-  // Foreign currency support for income and expense entries
   {
     version: 124,
     title: "Foreign currency income & expenses",
     description: "Income and expense items now support a CAD/USD currency toggle, matching the existing behaviour on assets and debts. Each row shows a compact currency badge that can be clicked to mark the amount as foreign currency. When toggled, the converted home-currency equivalent is shown inline. Section totals and all downstream calculations (tax, surplus, net worth) automatically convert foreign amounts using the live FX rate.",
     date: "2026-03-07",
   },
-  // Mortgage burndown line on projection chart
   {
     version: 123,
     title: "Mortgage burndown line on projection chart",
     description: "The Financial Projection chart now includes a dedicated mortgage burndown line (dashed orange) that shows how your mortgage balance declines over time alongside Net Worth, Assets, and Debts. The line coincides with the Mortgage Free milestone marker when the balance reaches $0. A Mortgage legend entry appears in the chart legend when a mortgage is present.",
     date: "2026-03-07",
   },
-  // Fix projection chart label clipping
   {
     version: 122,
     title: "Projection chart label clipping fixed",
     description: "Y-axis currency labels no longer show unnecessary decimal zeros (e.g. '$105M' instead of '$105.0M'), reducing label width and preventing clipping. The left chart margin and Y-axis width have been increased to comfortably accommodate currency labels with CA$/US$ prefixes. Milestone annotation labels (Consumer Debt Free, Mortgage Free) are now rendered as SVG pills just inside the chart boundary instead of being clipped at the top edge.",
     date: "2026-03-07",
   },
-  // Auto-display investment returns in Income section
   {
     version: 121,
     title: "Investment returns in Income section",
     description: "Auto-computed investment returns now appear as read-only line items in the Income section, below manually entered income sources. Each asset with a non-zero ROI contributes a '{category} returns' row with an 'auto' badge showing its monthly return amount. Investment returns are included in the Monthly Total, giving a complete picture of monthly cash flow from all sources.",
     date: "2026-03-07",
   },
-  // Milestone E2E: Financial Intelligence
   {
     version: 120,
     title: "Milestone E2E: Financial Intelligence",
     description: "Comprehensive end-to-end test suite covering all financial intelligence features from tasks 110-119: inflation-adjusted projections, age-based benchmarks, employer match modeling, sample profiles, print layout, mobile wizard, debt payoff strategies, FIRE milestone, tax optimization suggestions, and income replacement ratio. Full regression test across the entire application.",
     date: "2026-03-06",
   },
-  // Income replacement ratio metric
   {
     version: 119,
     title: "Income replacement ratio",
     description: "Added an Income Replacement metric card showing what percentage of your monthly income your investment portfolio could sustainably replace using the 4% withdrawal rule. The formula is (total invested assets × 4% / 12) ÷ monthly after-tax income. A progress bar visualizes your journey from Early stage (< 25%) through Building momentum (25–50%), Strong position (50–75%), Nearly independent (75–100%), to Financially independent (100%+). An insight card in the insights panel provides an encouraging, tier-specific message about your progress toward financial independence.",
     date: "2026-03-06",
   },
-  // Tax optimization suggestions
   {
     version: 118,
     title: "Tax optimization suggestions",
     description: "Added smart tax optimization insights that analyze your account mix and suggest actionable improvements. Three suggestions appear when relevant: (1) If you hold taxable brokerage assets, the insight shows how much you'd save annually by shifting contributions to a TFSA or Roth IRA instead. (2) For higher-income earners, it shows the approximate tax savings from maximizing RRSP or 401(k) contributions using your marginal rate. (3) When taxable savings exceed tax-free savings, it nudges you to redirect contributions into your TFSA or Roth IRA. All suggestions only appear when the annual savings exceed $100 — no noise for minor optimizations.",
     date: "2026-03-06",
   },
-  // FIRE number milestone
   {
     version: 117,
     title: "FIRE number milestone",
     description: "Added Financial Independence, Retire Early (FIRE) number to the projection chart. The FIRE number is calculated as annual living expenses divided by your safe withdrawal rate (default 4%). A golden reference line on the chart marks this target, and a callout shows how many years until you reach financial independence at your current savings rate. The Fast Forward panel now includes a withdrawal rate slider (3–5%) so you can model conservative or aggressive scenarios. A new insight celebrates when you've already hit your FIRE number, or shows your current progress toward it.",
     date: "2026-03-06",
   },
-  // Debt payoff strategy comparison
   {
     version: 116,
     title: "Debt payoff strategy comparison",
     description: "Added avalanche vs snowball vs current debt payoff strategy comparison. When you have 2 or more debts with interest rates and monthly payments, the insights panel now shows how much interest and time you could save by switching strategies. The avalanche method (highest-rate debt first) minimizes total interest paid; the snowball method (smallest balance first) builds momentum by eliminating debts faster. The insight shows the best strategy for your situation and how long until you're debt-free at current payments.",
     date: "2026-03-06",
   },
-  // Mobile guided wizard
   {
     version: 115,
     title: "Mobile guided wizard entry mode",
     description: "Added a full-screen step-by-step wizard for mobile visitors (< 768px) with no existing data. The 4-step flow collects income, expenses, savings & investments, and debts — each with large touch targets and quick-pick preset buttons. A progress bar shows current position; swipe left/right or tap Next/Back to navigate. Tapping 'See my snapshot' populates all entry fields and transitions to the dashboard. A localStorage flag ensures returning users skip the wizard and go straight to their data. Skip button is always available.",
     date: "2026-03-06",
   },
-  // Print/PDF export
   {
     version: 114,
     title: "Print/PDF snapshot export",
     description: "Added a 'Print' button in the header that triggers the browser's print dialog, enabling one-click Save as PDF. In print mode, CSS @media print rules hide all entry panels, navigation, and interactive elements, leaving a clean layout of metric cards, the projection chart, and the insights panel. A print-only footer shows the snapshot URL and generation date, so the exported PDF is self-contained and shareable. Charts render at fixed heights to avoid collapsing in print.",
     date: "2026-03-06",
   },
-  // Preset sample profiles for new users
   {
     version: 113,
     title: "Sample profiles for new users",
     description: "Added a 'Start with a sample profile' banner that appears for first-time visitors (no URL state). Three clickable profiles populate all entry fields instantly: Fresh grad (age 25, student loan, TFSA), Mid-career family (age 38, mortgage, RRSP/TFSA), and Pre-retirement (age 58, large registered accounts, near debt-free). US equivalents (Roth IRA, 401k) are shown automatically when country is set to US. A 'Clear all' button resets to a blank state. Loading a profile updates the URL, so the snapshot is immediately bookmarkable.",
     date: "2026-03-06",
   },
-  // Employer match modeling for registered accounts
   {
     version: 112,
     title: "Employer match modeling for registered accounts",
     description: "Added optional employer match fields to RRSP, 401k, and Roth 401k asset entries: match percentage (e.g., 50% = employer matches half your contributions) and salary cap percentage (e.g., 6% = match is capped at 6% of annual salary). The projection engine adds employer match as additional monthly contributions. A new insight celebrates the employer match: 'Your employer match adds $X/year in free money — make sure you're contributing enough to get the full match.' All settings persist in URL state.",
     date: "2026-03-06",
   },
-  // Age input and personalized benchmarks
   {
     version: 111,
     title: "Age input and personalized benchmarks",
     description: "Added an optional age field to the header (next to country/jurisdiction selector). When provided, all benchmark comparisons show personalized age-group medians with actual dollar amounts: 'Your net worth of $X is above/below the median of $Y for ages 35–44.' Each metric now displays an estimated percentile within the age group using a lognormal distribution model. Age is stored in the URL state and persists across sessions.",
     date: "2026-03-06",
   },
-  // Inflation-adjusted projection toggle
   {
     version: 110,
     title: "Inflation-adjusted projection (real vs nominal)",
     description: "Added an 'Adjust for inflation' toggle to the Financial Projection chart. When enabled, all future values — chart data, 50-year summary table, and milestones — are deflated to today's purchasing power using a configurable annual inflation rate (default 2.5%). An info tooltip explains what 'today's dollars' means. Toggle state and rate are stored in URL params (ia=1&ir=2.5) so shared links preserve the setting.",
     date: "2026-03-06",
   },
-  // Milestone E2E: UI polish and formula validation
   {
     version: 109,
     title: "Milestone E2E: UI polish and formula validation",
     description: "Comprehensive end-to-end test covering tax bracket tiered fill bars, full-format currency in explainer modals, net worth donut chart segments, Cash Flow Sankey investment income nodes, Fast Forward scenario options, and metric card consistency with explainer breakdowns.",
     date: "2026-03-06",
   },
-  // Consistent currency formatting and composition tables on charts
   {
     version: 108,
     title: "Full currency in charts and composition tables",
     description: "Fixed currency formatting inconsistencies across all charts. Net worth donut chart center label now shows full formatted currency (e.g., CA$1,234,567) instead of compact notation. Removed duplicate recharts legend from Asset Allocation chart — the composition table below is the single source of truth. Projection chart milestone tables now show full currency values for precise reading.",
     date: "2026-03-06",
   },
-  // Formula validation and projection bug fix
   {
     version: 107,
     title: "Formula validation and projection fix",
     description: "Comprehensive audit of all financial formulas. Fixed a bug where the projection chart did not subtract mortgage payments from the surplus, causing projected asset growth to be overstated for users with mortgages. Added 26 formula validation tests covering Net Worth, Monthly Surplus, Estimated Tax, Financial Runway, Debt-to-Asset Ratio, projection accumulation, and Cash Flow Sankey flow balance.",
     date: "2026-03-06",
   },
-  // Enhanced Fast Forward what-if scenarios
   {
     version: 106,
     title: "Enhanced Fast Forward what-if scenarios",
     description: "Added powerful new scenario options: 'What if I retired today?' zeros all income and shows how long savings last. 'Max tax-sheltered accounts' auto-calculates contribution limits for TFSA, RRSP, 401k, IRA, etc. 'Downsize housing' slider converts property equity to liquid savings. 'ROI adjustment' slider models different market conditions. Quick-pick preset buttons for Conservative, Aggressive Saver, and Early Retirement scenarios.",
     date: "2026-03-06",
   },
-  // Investment interest income in Cash Flow Sankey
   {
     version: 105,
     title: "Investment interest income in Cash Flow Sankey",
     description: "The Cash Flow Sankey diagram now includes investment interest income as separate income source nodes. Only accounts with income-type ROI tax treatment (Savings, GIC, HISA, etc.) are shown — capital gains and tax-sheltered accounts are excluded since they aren't realized cash flow. Interest income nodes appear in teal to visually distinguish from employment income.",
     date: "2026-03-06",
   },
-  // Net worth donut chart
   {
     version: 104,
     title: "Net worth donut chart",
     description: "Replaced the waterfall bar chart with a donut/pie chart for net worth breakdown. Assets shown as colored segments in the outer ring, debts in an inner ring. Property equity uses a hatched pattern to distinguish illiquid from liquid assets. Center label shows net worth total. Compact legend below with all segments.",
     date: "2026-03-06",
   },
-  // Full currency formatting in explainer modals
   {
     version: 103,
     title: "Full currency formatting in explainer modals",
     description: "Explainer modal totals and item rows now show full formatted currency (e.g., CA$12,476,711) instead of abbreviated values like $12477k. Items in a foreign currency display the currency code (e.g., USD). All explainer content — tax brackets, runway obligations, withdrawal order — uses proper Intl.NumberFormat with the correct currency code.",
     date: "2026-03-06",
   },
-  // Tax bracket redesign
   {
     version: 102,
     title: "Tiered fill bar tax bracket visualization",
     description: "Replaced the flat stacked bracket bar and table with a tiered waterfall visualization. Each tax bracket is shown as a horizontal bar filled proportionally to income in that bracket, stacked vertically with lowest bracket at bottom. Filled brackets use a green-to-teal color gradient; unfilled brackets above your income show as dashed gray outlines. Both federal and provincial/state brackets are shown separately with subtotals. The visualization replaces both the old stacked bar and the bracket table.",
     date: "2026-03-06",
   },
-  // Milestone E2E: unified chart and enhancements
   {
     version: 101,
     title: "Milestone E2E: unified chart and final enhancements",
     description: "Comprehensive E2E test suite covering the unified projection/burndown chart with mode tabs, 50-year projections with 40yr/50yr columns, dual federal/provincial bracket tables, investment income tax in the explainer, merged withdrawal tax in Financial Runway, $0 income tax explainer, ROI tax treatment toggle, scrollable source summary cards, and all modal close mechanisms. Full multi-step journey test across all features.",
     date: "2026-03-06",
   },
-  // Investment return taxes in Estimated Tax
   {
     version: 100,
     title: "Investment interest income included in tax estimate",
     description: "Interest income from taxable savings accounts (Savings, GIC, HISA, etc.) is now included in the Estimated Tax calculation. Tax-free (TFSA, Roth IRA) and tax-deferred (RRSP, 401k) accounts are excluded. Capital gains ROI is not taxed annually. The tax explainer modal now shows a per-account breakdown of investment interest income with a note explaining the rules.",
     date: "2026-03-06",
   },
-  // Always 50 years, X-axis in years, 40/50yr columns
   {
     version: 99,
     title: "50-year unified chart with consistent year axis",
     description: "Removed the 10/20/30 year timeline selector — the chart now always projects 50 years. Both 'Keep Earning' and 'Income Stops' modes share the same X-axis in years (0–50). Summary and per-asset tables now show 40yr and 50yr columns. If savings run out before 50 years in Income Stops mode, the line stays at $0 for the remainder.",
     date: "2026-03-06",
   },
-  // Unified multi-mode chart
   {
     version: 98,
     title: "Unified projection and burndown chart",
     description: "Merged the projection chart and runway burndown into a single multi-mode chart with 'Keep Earning' and 'Income Stops' tabs. Keep Earning shows net worth growth projections with scenario toggles. Income Stops shows how long savings last if income stops. Added income/expense surplus subtitle to the projection view.",
     date: "2026-03-06",
   },
-  // After-tax runway + merge withdrawal tax into runway
   {
     version: 97,
     title: "After-tax runway and merged withdrawal tax impact",
     description: "Financial Runway metric card now shows after-tax runway sub-line. Standalone Withdrawal Tax Impact card removed from sidebar — its content (tax treatment breakdown bar, account groupings, suggested withdrawal order with disclaimer, tax drag summary) is now consolidated into the Financial Runway explainer modal.",
     date: "2026-03-06",
   },
-  // Dual Federal + Provincial/State Bracket Tables
   {
     version: 96,
     title: "Federal and provincial/state bracket tables in tax explainer",
     description: "The tax explainer now shows both federal and provincial/state bracket tables side by side, each with range, rate, and tax amount columns. Subtotals appear under each table. Zero-income mode shows bracket ranges and rates with dashes for tax amounts. Includes comprehensive milestone E2E tests.",
     date: "2026-03-06",
   },
-  // Withdrawal Pills Overflow Fix
   {
     version: 95,
     title: "Fix withdrawal order pills overflowing container",
     description: "Withdrawal order pills now wrap to multiple lines instead of overflowing their container when there are many accounts. Long account names are truncated with ellipsis at 150px max width. Applied to both the Withdrawal Tax Summary card and the Runway Burndown chart.",
     date: "2026-03-06",
   },
-  // Smart Tax Classification
   {
     version: 94,
     title: "Smart tax treatment classification with overrides",
     description: "Tax treatment is now auto-detected using keyword matching instead of exact name lookups. Custom account names like 'BP 401k' or 'Company RRSP' are correctly classified. Each asset shows a colored pill (green=tax-free, rose=tax-deferred, amber=taxable) that can be clicked to override the auto-detected classification. Overrides persist in URL state.",
     date: "2026-03-06",
   },
-  // New Account Category
   {
     version: 93,
     title: "Roth 401k support",
     description: "Added Roth 401k as a distinct US asset category. It appears in the category suggestions after 401k, defaults to 7% ROI, is classified as tax-free for withdrawal modeling, and the ROI tax treatment toggle is hidden since growth is tax-free.",
     date: "2026-03-06",
   },
-  // Chart Clarity
   {
     version: 92,
     title: "Simplified runway burndown chart",
     description: "Redesigned the runway burndown chart for clarity. Replaced confusing stacked per-account areas with 2-3 simple lines: solid green for 'With investment growth', dashed gray for 'Without growth', and amber for 'After withdrawal taxes' (only when tax drag > 0). Added milestone markers where each scenario hits $0, a 6-month emergency fund threshold line, a plain-English summary sentence above the chart, a clean legend, and a compact starting balances row below.",
     date: "2026-03-06",
   },
-  // Tax Treatment Enhancements
   {
     version: 91,
     title: "Asset ROI tax treatment toggle",
     description: "Added a toggle on asset entries to specify whether investment returns are taxed as capital gains or interest income. Savings-type accounts (Savings, GIC, HISA, Money Market) default to interest income; investment accounts default to capital gains. Tax-sheltered accounts (TFSA, Roth IRA, FHSA, HSA) hide the toggle since ROI is tax-free. The setting affects withdrawal tax simulations and persists in URL state.",
     date: "2026-03-06",
   },
-  // UI Polish (Milestone 12)
   {
     version: 90,
     title: "Runway burndown chart moved to main page",
@@ -605,7 +522,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     description: "Source summary cards in explainer modals now show all items instead of truncating at 5 with '+N more'. Long item lists scroll vertically within a 200px container with a thin stone-colored scrollbar. The total row is sticky at the bottom with a subtle shadow separator so it stays visible while scrolling. Cards have increased padding and larger total font, and the explainer modal is wider (max-w-xl) for more breathing room.",
     date: "2026-03-06",
   },
-  // Metric-Specific Explainers (Milestone 11)
   {
     version: 86,
     title: "Asset ROI included in Monthly Surplus calculation and explainer",
@@ -624,14 +540,12 @@ export const CHANGELOG: ChangelogEntry[] = [
     description: "Clicking the Estimated Tax metric card now opens a tax-specific explainer modal with a horizontal stacked bar showing income by tax bracket (colored segments from light to deep green), federal and provincial/state tax breakdown with jurisdiction name, effective vs marginal rate comparison, capital gains section (CA inclusion rates or US bracket rates) when applicable, and a Gross → Tax → After-tax income flow summary.",
     date: "2026-03-06",
   },
-  // SVG Refinements
   {
     version: 83,
     title: "Smoother hand-drawn SVG circles and lines",
     description: "Replaced the jittery 24-segment quadratic bezier ovals with smooth 4-curve cubic bezier ovals (one per quadrant) that look like a confident teacher circling something with a single fluid pen stroke. Reduced line jitter from max 4px to 2.5px for gentler curves. Jitter amplitude now scales with oval size (1-2px for small, 2-3px for large).",
     date: "2026-03-06",
   },
-  // Whiteboard Explainer Mode (Milestone 10)
   {
     version: 82,
     title: "E2E test for whiteboard explainer modal",
@@ -656,7 +570,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     description: "Complete overhaul of data-flow visualization: removed hover-triggered spotlight/dimming system (SpotlightOverlay, FormulaBar, full-page overlay, data-dataflow-highlighted CSS). Replaced with click-triggered whiteboard explainer modal that opens when clicking any metric card or insight card. Modal shows metric title, value, source summary cards with colored left borders (green positive, red negative), hand-drawn SVG oval annotations around values, arithmetic operators between sources, and a sum bar with result. Hand-drawn SVG utilities (handDrawnOval, handDrawnLine) create wobbly organic paths. Modal animates in/out with scale+fade. Closes on Escape, X button, or backdrop click. Added 'click to explain' hint on metric cards.",
     date: "2026-03-05",
   },
-  // Spotlight Dimming System (Milestone 9)
   {
     version: 78,
     title: "E2E test for spotlight dimming system",
@@ -669,7 +582,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     description: "Replaced SVG arrow overlay with a spotlight dimming system: a dark backdrop dims the page while source sections and the active metric card rise above it with colored borders and shadows. Added FormulaBar component showing color-coded computation terms as pills (green positive, red negative, bold result). Added activeTargetMeta to DataFlowContext for formula display. Mobile formula bar fixed at bottom of viewport. Removed all SVG geometry functions, arrow animations, and particle effects.",
     date: "2026-03-05",
   },
-  // Data Flow Visualization (Milestone 8)
   {
     version: 76,
     title: "Full E2E test for data-flow arrow visualization",
@@ -718,7 +630,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     description: "New DataFlowArrows component with a full-viewport SVG overlay that renders animated flowing arrows between source and target elements. Includes DataFlowContext for registering sources and targets, cubic bezier path calculation, CSS stroke-dasharray animations, green/red color coding for positive/negative contributions, and scroll/resize recalculation.",
     date: "2026-03-05",
   },
-  // Withdrawal Tax Modeling (Milestone 7)
   {
     version: 68,
     title: "Full E2E test for withdrawal tax features",
@@ -761,7 +672,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     description: "New /changelog page displaying version history grouped by milestone with all completed tasks.",
     date: "2026-03-05",
   },
-  // Multi-Currency Support (Milestone 6)
   {
     version: 61,
     title: "Multi-currency E2E tests",
@@ -799,7 +709,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: "2026-03-05",
   },
 
-  // Kubera-Inspired Visualizations (Milestone 5)
   {
     version: 55,
     title: "Visualization E2E tests",
@@ -849,7 +758,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: "2026-02-28",
   },
 
-  // Tax Computation & Property Enhancements (Milestone 4)
   {
     version: 47,
     title: "Property appreciation/depreciation",
@@ -917,7 +825,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: "2026-02-27",
   },
 
-  // Feature Enhancements (Milestone 3)
   {
     version: 36,
     title: "Feature enhancements E2E tests",
@@ -979,7 +886,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: "2026-02-27",
   },
 
-  // Core Features & Projections (Milestone 2)
   {
     version: 26,
     title: "New features E2E tests",
@@ -1047,7 +953,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: "2026-02-27",
   },
 
-  // Foundation & Initial Build (Milestone 1)
   {
     version: 15,
     title: "Full E2E test suite",

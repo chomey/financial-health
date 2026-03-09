@@ -17,8 +17,6 @@ export { computeMetrics, computeIncomeReplacementDetails } from "@/lib/compute-m
 // Runway simulation
 export { simulateRunwayTimeSeries } from "@/lib/runway-simulation";
 
-// --- Functions that remain here (not worth splitting further) ---
-
 import type { FinancialState } from "@/lib/financial-types";
 import type { FinancialData } from "@/lib/insights";
 import { normalizeToMonthly } from "@/components/IncomeEntry";

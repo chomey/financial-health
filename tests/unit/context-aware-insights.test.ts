@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { generateInsights, type FinancialData } from "@/lib/insights";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function makeData(overrides: Partial<FinancialData> = {}): FinancialData {
   return {
     totalAssets: 80_000,
@@ -29,9 +26,6 @@ function withWithdrawalTax(
   };
 }
 
-// ---------------------------------------------------------------------------
-// assetCategories / debtCategories populated in toFinancialData
-// ---------------------------------------------------------------------------
 describe("FinancialData assetCategories / debtCategories", () => {
   it("assetCategories and debtCategories are present in FinancialData type", () => {
     const data: FinancialData = makeData({
@@ -43,9 +37,6 @@ describe("FinancialData assetCategories / debtCategories", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// tax-rate-high insight — context-aware by country and existing accounts
-// ---------------------------------------------------------------------------
 describe("tax-rate-high insight: CA context-aware", () => {
   const highTaxBase = makeData({
     effectiveTaxRate: 0.35,
@@ -157,9 +148,6 @@ describe("tax-rate-high insight: US context-aware", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// withdrawal-tax-no-free: country-specific suggestion
-// ---------------------------------------------------------------------------
 describe("withdrawal-tax-no-free: country-specific", () => {
   it("suggests TFSA for CA user with no tax-free accounts", () => {
     const data = makeData({
@@ -202,9 +190,6 @@ describe("withdrawal-tax-no-free: country-specific", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// tax-opt-taxable-to-free: uses "maximizing" when user already has account
-// ---------------------------------------------------------------------------
 describe("tax-opt-taxable-to-free: context-aware action phrase", () => {
   it('says "Maximizing your TFSA" when CA user already has a TFSA', () => {
     const data = makeData({
@@ -264,9 +249,6 @@ describe("tax-opt-taxable-to-free: context-aware action phrase", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// tax-opt-deferred-contribution: context-aware + requires taxable accounts
-// ---------------------------------------------------------------------------
 describe("tax-opt-deferred-contribution: context-aware", () => {
   it("skips RRSP suggestion when user has no taxable accounts (CA)", () => {
     const data = makeData({
@@ -367,9 +349,6 @@ describe("tax-opt-deferred-contribution: context-aware", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// tax-opt-use-tax-free-room: context-aware message
-// ---------------------------------------------------------------------------
 describe("tax-opt-use-tax-free-room: context-aware", () => {
   it("says 'Your TFSA has room' when user already has a TFSA (CA)", () => {
     const data = makeData({

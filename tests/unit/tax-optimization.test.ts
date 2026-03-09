@@ -2,9 +2,6 @@ import { describe, it, expect } from "vitest";
 import { generateInsights, type FinancialData } from "@/lib/insights";
 import { getMarginalRateForIncome } from "@/lib/tax-engine";
 
-// ---------------------------------------------------------------------------
-// Helper to build a minimal FinancialData for tax optimization tests
-// ---------------------------------------------------------------------------
 function makeData(overrides: Partial<FinancialData> = {}): FinancialData {
   return {
     totalAssets: 100_000,
@@ -15,9 +12,6 @@ function makeData(overrides: Partial<FinancialData> = {}): FinancialData {
   };
 }
 
-// ---------------------------------------------------------------------------
-// getMarginalRateForIncome helper
-// ---------------------------------------------------------------------------
 describe("getMarginalRateForIncome", () => {
   it("returns 0 for zero income", () => {
     expect(getMarginalRateForIncome(0, "CA", "ON")).toBe(0);
@@ -52,9 +46,6 @@ describe("getMarginalRateForIncome", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Tax optimization insight: taxable → tax-free suggestion
-// ---------------------------------------------------------------------------
 describe("tax optimization: taxable to tax-free suggestion", () => {
   it("generates suggestion when taxable balance is large enough", () => {
     // $100k taxable × 5% growth × 40% marginal = $2000/year savings → should show
@@ -141,9 +132,6 @@ describe("tax optimization: taxable to tax-free suggestion", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Tax optimization insight: RRSP/401k deduction suggestion
-// ---------------------------------------------------------------------------
 describe("tax optimization: tax-deferred contribution suggestion", () => {
   it("generates RRSP suggestion for CA with high marginal rate and taxable accounts", () => {
     const data = makeData({
@@ -230,9 +218,6 @@ describe("tax optimization: tax-deferred contribution suggestion", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Tax optimization insight: tax-free room suggestion
-// ---------------------------------------------------------------------------
 describe("tax optimization: use tax-free room suggestion", () => {
   it("generates suggestion when taxable > tax-free and no deferred accounts", () => {
     // Use small taxable balance so taxable-to-free suggestion ($1500×5%×20%=$15 < $100) does NOT fire,
@@ -299,9 +284,6 @@ describe("tax optimization: use tax-free room suggestion", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// No suggestions when marginalRate is missing or zero
-// ---------------------------------------------------------------------------
 describe("tax optimization: no suggestions without marginal rate", () => {
   it("generates no tax-optimization insights when marginalRate is undefined", () => {
     const data = makeData({

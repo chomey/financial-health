@@ -86,7 +86,6 @@ function EligibilityBadge({
     );
   }
 
-  // ineligible
   const threshold = limits?.hardCap ?? limits?.phaseOutEnd;
   const ineligibleByStatus = limits?.ineligible;
   return (
