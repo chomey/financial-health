@@ -2,29 +2,22 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Debt entry section", () => {
-  test("renders mock debts with formatted amounts", async ({ page }) => {
-    await page.goto("/");
+  test("renders debts with formatted amounts", async ({ page }) => {
+    await page.goto("/?step=debts");
 
-    // Check the heading
-    await expect(
-      page.getByRole("heading", { name: "Debts" })
-    ).toBeVisible();
-
-    // Check mock data rows
-    await expect(page.getByText("Car Loan")).toBeVisible();
-
-    // Check formatted amounts (scoped to list item to avoid matching total)
+    // Check mock data rows (INITIAL_STATE: Car Loan $5,000)
     const debtsList = page.getByRole("list", { name: "Debt items" });
-    await expect(debtsList.getByRole("listitem").filter({ hasText: "Car Loan" })).toContainText("$15,000");
+    await expect(debtsList.getByText("Car Loan")).toBeVisible();
+    await expect(debtsList.getByRole("listitem").filter({ hasText: "Car Loan" })).toContainText("$5,000");
 
     // Check total
-    await expect(page.getByText("Total: $15,000")).toBeVisible();
+    await expect(page.getByText("Total: $5,000")).toBeVisible();
 
     await captureScreenshot(page, "task-5-debts-with-mock-data");
   });
 
   test("shows Add Debt button and opens add form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     const addBtn = page.getByText("+ Add Debt");
     await expect(addBtn).toBeVisible();
@@ -38,7 +31,7 @@ test.describe("Debt entry section", () => {
   });
 
   test("adds a new debt via the add form", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     await page.getByText("+ Add Debt").click();
 
@@ -50,29 +43,29 @@ test.describe("Debt entry section", () => {
     await page.getByLabel("Confirm add debt").click();
 
     // New debt should appear
-    await expect(page.getByText("Student Loan")).toBeVisible();
-    await expect(page.getByText("$25,000")).toBeVisible();
+    const debtsList = page.getByRole("list", { name: "Debt items" });
+    await expect(debtsList.getByText("Student Loan")).toBeVisible();
+    await expect(debtsList.getByText("$25,000")).toBeVisible();
 
-    // Total should update
-    await expect(page.getByText("Total: $40,000")).toBeVisible();
+    // Total should update (5000 + 25000 = 30000)
+    await expect(page.getByText("Total: $30,000")).toBeVisible();
 
     await captureScreenshot(page, "task-5-debt-added");
   });
 
   test("deletes a debt on hover and click", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     // Hover over the Car Loan row to reveal the delete button
-    const row = page
-      .getByRole("listitem")
-      .filter({ hasText: "Car Loan" });
+    const debtsList = page.getByRole("list", { name: "Debt items" });
+    const row = debtsList.getByRole("listitem").filter({ hasText: "Car Loan" });
     await row.hover();
 
     const deleteBtn = page.getByLabel("Delete Car Loan");
     await deleteBtn.click();
 
     // Should be gone
-    await expect(page.getByText("Car Loan")).not.toBeVisible();
+    await expect(debtsList.getByText("Car Loan")).not.toBeVisible();
 
     // Total should update (no debts remain)
     await expect(page.getByText("Total: $0")).toBeVisible();
@@ -83,7 +76,7 @@ test.describe("Debt entry section", () => {
   test("click-to-edit category shows input with suggestions", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     await page.getByLabel("Edit category for Car Loan").click();
 
@@ -95,7 +88,7 @@ test.describe("Debt entry section", () => {
   });
 
   test("click-to-edit amount allows value change", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     await page.getByLabel(/Edit amount for Car Loan/).click();
 
@@ -103,16 +96,16 @@ test.describe("Debt entry section", () => {
     await expect(editInput).toBeVisible();
 
     // Clear and type new value
-    await editInput.fill("12000");
+    await editInput.fill("3000");
     await editInput.press("Enter");
 
-    // Should show updated value in the debt section
+    // Should show updated value
     await expect(
-      page.getByLabel(/Edit amount for Car Loan, currently \$12,000/)
+      page.getByLabel(/Edit amount for Car Loan, currently \$3,000/)
     ).toBeVisible();
 
-    // Total should update (only Car Loan edited to 12000)
-    await expect(page.getByText("Total: $12,000")).toBeVisible();
+    // Total should update
+    await expect(page.getByText("Total: $3,000")).toBeVisible();
 
     await captureScreenshot(page, "task-5-debt-amount-edited");
   });
@@ -120,7 +113,7 @@ test.describe("Debt entry section", () => {
   test("shows category suggestions when adding new debt", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/?step=debts");
 
     await page.getByText("+ Add Debt").click();
 
