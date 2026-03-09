@@ -3,8 +3,8 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Property Appreciation/Depreciation", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.waitForSelector("text=Property");
+    await page.goto("/?step=property");
+    await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible();
   });
 
   async function addProperty(page: import("@playwright/test").Page, name: string, value: string, mortgage: string) {
@@ -78,7 +78,7 @@ test.describe("Property Appreciation/Depreciation", () => {
     // Reload the page to verify URL state persistence
     const url = page.url();
     await page.goto(url);
-    await page.waitForSelector("text=Property");
+    await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible();
 
     // The "Home" property should still have its appreciation badge
     await expect(page.locator("[data-testid^='appreciation-badge-']").first()).toContainText("+3%/yr");

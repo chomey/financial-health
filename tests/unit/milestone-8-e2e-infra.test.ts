@@ -71,7 +71,7 @@ describe("Milestone 8 E2E test infrastructure — Data-Flow Visualization", () =
   it("all data-flow feature test files exist", () => {
     const featureTests = [
       "data-flow-arrows.spec.ts",
-      "data-flow-sources.spec.ts",
+      // data-flow-sources.spec.ts removed — section-level sources removed from UI
       "net-worth-data-flow.spec.ts",
       "monthly-surplus-data-flow.spec.ts",
       "remaining-metric-data-flow.spec.ts",

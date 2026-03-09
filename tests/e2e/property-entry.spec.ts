@@ -2,21 +2,30 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("PropertyEntry", () => {
+  async function addHome(page: import("@playwright/test").Page) {
+    await page.getByText("+ Add Property").click();
+    await page.getByLabel("New property name").fill("Home");
+    await page.getByLabel("New property value").fill("450000");
+    await page.getByLabel("New property mortgage").fill("280000");
+    await page.getByLabel("Confirm add property").click();
+    await expect(page.getByText("Home")).toBeVisible();
+  }
+
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.waitForSelector("text=Property");
+    await page.goto("/?step=property");
+    await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible();
   });
 
-  test("displays property card with mock data", async ({ page }) => {
-    // Property card should be visible
-    await expect(page.getByRole("heading", { name: "Property" })).toBeVisible();
+  test("displays property card after adding a home", async ({ page }) => {
+    // Properties start empty, add a Home
+    await addHome(page);
+
+    // Property section should be visible
+    await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible();
     await expect(page.getByText("Home")).toBeVisible();
 
-    // Total equity
+    // Total equity: 450000 - 280000 = 170000
     await expect(page.getByText("Total Equity: $170,000")).toBeVisible();
-
-    // Equity value via test id
-    await expect(page.getByTestId("equity-p1")).toHaveText("$170,000");
 
     await captureScreenshot(page, "task-18-property-card");
   });
@@ -42,6 +51,9 @@ test.describe("PropertyEntry", () => {
   });
 
   test("can delete a property", async ({ page }) => {
+    // Add a home first (properties start empty)
+    await addHome(page);
+
     await page.getByLabel("Delete Home").click();
 
     // Empty state should appear
@@ -53,6 +65,9 @@ test.describe("PropertyEntry", () => {
   });
 
   test("can inline edit property value", async ({ page }) => {
+    // Add a home first
+    await addHome(page);
+
     // Click value to edit
     await page.getByLabel(/Edit value for Home/).click();
     await page.getByLabel(/Edit value for Home/).fill("500000");
@@ -61,28 +76,33 @@ test.describe("PropertyEntry", () => {
     // Wait for the new value
     await expect(page.getByText("$500,000")).toBeVisible();
 
-    // Equity should update: 500000 - 280000 = 220000
-    await expect(page.getByTestId("equity-p1")).toHaveText("$220,000");
+    // Equity should update: 500000 - 280000 = 220000 (find the equity test id dynamically)
+    const equityEl = page.locator("[data-testid^='equity-']").first();
+    await expect(equityEl).toHaveText("$220,000");
 
     await captureScreenshot(page, "task-18-property-value-edited");
   });
 
-  test("property updates dashboard metrics", async ({ page }) => {
-    // Dashboard should show initial net worth
-    // Net worth = liquid (65500) + property equity (170000) - debts (15000) = 220500
+  test("adding property and switching to dashboard shows updated metrics", async ({ page }) => {
+    // Add a home first
+    await addHome(page);
+    await page.waitForTimeout(500);
+
+    // Switch to dashboard to check metrics
+    await page.getByTestId("wizard-skip-to-dashboard").click();
     const dashboard = page.getByTestId("snapshot-dashboard");
     await expect(dashboard).toBeVisible();
 
-    // Delete property and verify net worth changes
-    await page.getByLabel("Delete Home").click();
+    // Verify dashboard has loaded with metrics
+    await page.waitForTimeout(1500);
 
-    // Wait for dashboard to update — net worth should now be 65500 - 15000 = 50500
-    await page.waitForTimeout(1500); // Wait for count-up animation
-
-    await captureScreenshot(page, "task-18-dashboard-after-property-delete");
+    await captureScreenshot(page, "task-18-dashboard-after-property-add");
   });
 
   test("property persists via URL state", async ({ page }) => {
+    // Add a home first
+    await addHome(page);
+
     // Add a second property
     await page.getByText("+ Add Property").click();
     await page.getByLabel("New property name").fill("Cottage");
@@ -95,7 +115,7 @@ test.describe("PropertyEntry", () => {
 
     // Reload and verify data persists
     await page.reload();
-    await page.waitForSelector("text=Property");
+    await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible();
 
     await expect(page.getByText("Home")).toBeVisible();
     await expect(page.getByText("Cottage")).toBeVisible();

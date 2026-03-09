@@ -6,18 +6,18 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
-  // AU unit tests and validation
-  {
-    version: 172,
-    title: "AU unit tests and validation",
-    description: "Added comprehensive unit tests validating AU tax brackets, Medicare Levy, super contribution limits, LITO phase-out, and franking credit gross-up. All three AU sample profiles (young professional, mid-career family, pre-retiree) validated with computeTotals: correct AUD currency, positive income/expenses/tax, 0 provincial tax, and reasonable effective rates. Country switching CA→AU→US verified to preserve all financial data. Pre-existing E2E failures in au-sample-profiles.spec.ts and au-currency.spec.ts fixed by using /?step=welcome to force wizard mode.",
-    date: "2026-03-08",
-  },
   // Asset account type descriptions
   {
     version: 174,
     title: "Account type descriptions in AssetEntry",
     description: "Added short descriptions for all known account types in AssetEntry. CA: TFSA, RRSP, RESP, FHSA, LIRA. US: 401k, Roth 401k, IRA, Roth IRA, 529, HSA. AU: Super (Accumulation), Super (Pension Phase), First Home Super Saver. Descriptions appear below each item name in the category dropdown and below the selected category name in view mode, matching the tax credit description style.",
+    date: "2026-03-08",
+  },
+  // AU unit tests and validation
+  {
+    version: 172,
+    title: "AU unit tests and validation",
+    description: "Added comprehensive unit tests validating AU tax brackets, Medicare Levy, super contribution limits, LITO phase-out, and franking credit gross-up. All three AU sample profiles (young professional, mid-career family, pre-retiree) validated with computeTotals: correct AUD currency, positive income/expenses/tax, 0 provincial tax, and reasonable effective rates. Country switching CA→AU→US verified to preserve all financial data. Pre-existing E2E failures in au-sample-profiles.spec.ts and au-currency.spec.ts fixed by using /?step=welcome to force wizard mode.",
     date: "2026-03-08",
   },
   // Dashboard metric card help tips

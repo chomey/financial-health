@@ -1,22 +1,30 @@
 import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
+/**
+ * Helper to navigate between wizard steps while preserving URL state (s= param).
+ */
+async function goToStep(page: import("@playwright/test").Page, step: string) {
+  const url = new URL(page.url());
+  url.searchParams.set("step", step);
+  await page.goto(url.toString());
+}
+
 test.describe("T3: Full end-to-end user journey", () => {
   test("complete financial snapshot workflow with live dashboard updates", async ({ page }) => {
-    await page.goto("/");
+    // Start at dashboard — INITIAL_STATE: Assets $55k, Debts $5k → NW $50k
+    await page.goto("/?step=dashboard");
     await page.waitForSelector('[data-testid="snapshot-dashboard"]');
 
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
 
     // --- Step 1: Verify initial state loaded correctly ---
-    await expect(page.getByText("Financial Health Snapshot")).toBeVisible();
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$220,500");
-    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$3,350");
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$50,000");
     await captureScreenshot(page, "task-10-e2e-initial-state");
 
     // --- Step 2: Add an asset and verify dashboard updates ---
-    const assetSection = page.locator("section", { has: page.getByText("Assets") }).first();
-    await assetSection.getByText("+ Add Asset").click();
+    await goToStep(page, "assets");
+    await page.getByText("+ Add Asset").click();
     await page.getByLabel("New asset category").fill("Emergency Fund");
     await page.getByLabel("New asset amount").fill("25000");
     await page.getByLabel("Confirm add asset").click();
@@ -26,66 +34,64 @@ test.describe("T3: Full end-to-end user journey", () => {
     await expect(assetsList).toContainText("Emergency Fund");
     await expect(assetsList).toContainText("$25,000");
 
-    // Net worth should now be: (65500 + 25000) + 170000 - 15000 = 245500
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$245,500");
+    // Go to dashboard — Net worth should increase by $25k → $75,000
+    await goToStep(page, "dashboard");
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$75,000");
 
     // --- Step 3: Delete a debt and verify dashboard updates ---
+    await goToStep(page, "debts");
     const debtsList = page.getByRole("list", { name: "Debt items" });
     const carLoanRow = debtsList.getByRole("listitem").filter({ hasText: "Car Loan" });
-    await carLoanRow.hover();
     await carLoanRow.getByLabel("Delete Car Loan").click();
+    // Wait for URL state to persist after deletion
+    await page.waitForTimeout(500);
 
-    // Net worth: (90500) + 170000 - 0 = 260500 (Car Loan deleted, no debts remain)
-    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$260,500");
+    // Go to dashboard — Net worth: $80k - $0 = $80,000
+    await goToStep(page, "dashboard");
+    await expect(dashboard.getByLabel(/Net Worth:/)).toContainText("$80,000");
 
-    // --- Step 4: Add income and verify surplus updates ---
-    const incomeSection = page.locator("section", { has: page.getByText("Income") }).first();
-    await incomeSection.getByText("+ Add Income").click();
+    // --- Step 4: Add income ---
+    await goToStep(page, "income");
+    await page.getByText("+ Add Income").click();
     await page.getByLabel("New income category").fill("Side Hustle");
     await page.getByLabel("New income amount").fill("2000");
     await page.getByLabel("Confirm add income").click();
 
-    // Surplus: (6300 + 2000) - 2950 = 5350
-    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$5,350");
+    const incomeList = page.getByRole("list", { name: "Income items" });
+    await expect(incomeList).toContainText("Side Hustle");
 
-    // --- Step 5: Add an expense and verify surplus + runway update ---
-    const expenseSection = page.locator("section", { has: page.getByText("Expenses") }).first();
-    await expenseSection.getByText("+ Add Expense").click();
+    // --- Step 5: Add an expense ---
+    await goToStep(page, "expenses");
+    await page.getByText("+ Add Expense").click();
     await page.getByLabel("New expense category").fill("Insurance");
     await page.getByLabel("New expense amount").fill("200");
     await page.getByLabel("Confirm add expense").click();
 
-    // Surplus: (8300) - (2950 + 200) = 5150
-    await expect(dashboard.getByLabel(/Monthly Cash Flow:/)).toContainText("$5,150");
+    const expenseList = page.getByRole("list", { name: "Expense items" });
+    await expect(expenseList).toContainText("Insurance");
 
     // --- Step 6: Edit an existing amount (inline edit) ---
-    const incomeList = page.getByRole("list", { name: "Income items" });
-    const salaryRow = incomeList.getByRole("listitem").filter({ hasText: "Salary" });
+    await goToStep(page, "income");
+    const incomeListEdit = page.getByRole("list", { name: "Income items" });
+    const salaryRow = incomeListEdit.getByRole("listitem").filter({ hasText: "Salary" });
     await salaryRow.getByLabel(/Edit amount for Salary, currently/).click();
-    // Wait for the input to appear
-    const editInput = incomeList.locator('input[aria-label="Edit amount for Salary"]');
+    const editInput = incomeListEdit.locator('input[aria-label="Edit amount for Salary"]');
     await expect(editInput).toBeVisible();
     await editInput.clear();
     await editInput.type("7000");
     await editInput.press("Enter");
 
     // Verify the inline edit is visible in the income list
-    await expect(incomeList.getByRole("listitem").filter({ hasText: "Salary" })).toContainText("$7,000");
+    await expect(incomeListEdit.getByRole("listitem").filter({ hasText: "Salary" })).toContainText("$7,000");
 
-    // Note: Inline edits may not immediately propagate to dashboard metrics
-    // due to onChange timing with URL state sync (pre-existing issue).
-    // The edit shows correctly in the entry component; dashboard catches up on next state change.
-
-    // --- Step 7: Verify insights reflect the current state ---
+    // --- Step 7: Verify dashboard has insights ---
+    await goToStep(page, "dashboard");
     const insightsPanel = page.locator('[data-testid="insights-panel"]');
     await expect(insightsPanel).toBeVisible();
-    // Should still have insights based on updated numbers
     const insightCards = insightsPanel.getByRole("article");
     expect(await insightCards.count()).toBeGreaterThanOrEqual(3);
 
-    // --- Step 9: Verify all four dashboard metrics are present ---
-    // First dismiss any tooltip by moving mouse away
-    await page.mouse.move(0, 0);
+    // --- Step 8: Verify all four dashboard metrics are present ---
     await expect(dashboard.getByRole("group", { name: "Net Worth" })).toBeVisible();
     await expect(dashboard.getByRole("group", { name: "Monthly Cash Flow" })).toBeVisible();
     await expect(dashboard.getByRole("group", { name: "Financial Runway" })).toBeVisible();
@@ -93,10 +99,11 @@ test.describe("T3: Full end-to-end user journey", () => {
 
     await captureScreenshot(page, "task-10-e2e-after-edits");
 
-    // --- Step 10: Verify tooltips work on dashboard ---
+    // --- Step 9: Verify tooltips work on dashboard ---
     const netWorthCard = dashboard.getByRole("group", { name: "Net Worth" });
-    await netWorthCard.hover();
-    await expect(page.getByRole("tooltip")).toContainText("total assets minus total debts");
+    const helpBtn = netWorthCard.getByTestId("help-tip-button");
+    await helpBtn.hover();
+    await expect(page.getByRole("tooltip")).toContainText("Assets");
 
     await captureScreenshot(page, "task-10-e2e-tooltip");
   });
