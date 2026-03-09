@@ -110,6 +110,34 @@ test.describe("Tax Credits & Deductions Entry", () => {
     await captureScreenshot(page, "task-140-url-persistence");
   });
 
+  test("can add a fixed-amount credit (DTC) via amount options dropdown", async ({ page }) => {
+    await page.getByRole("button", { name: /Add Credit/i }).click();
+
+    // Type to find DTC
+    const categoryInput = page.getByLabel("New credit category");
+    await categoryInput.fill("Disability");
+    await page.getByText("Disability Tax Credit (DTC)").click();
+
+    // DTC has fixedAmount with amountOptions — should show a select dropdown, not a text input
+    const amountSelect = page.getByLabel("Select credit amount");
+    await expect(amountSelect).toBeVisible();
+
+    // Select the Adult option
+    // Select the first option (Adult 18+)
+    const options = await amountSelect.locator("option").allTextContents();
+    expect(options.length).toBeGreaterThanOrEqual(2);
+    // Just use the default first option which should be Adult
+
+    // Click Add
+    await page.getByRole("button", { name: /Confirm add credit/i }).click();
+
+    // Credit should appear in the list
+    await expect(page.getByText("Disability Tax Credit (DTC)")).toBeVisible();
+    await expect(page.getByText("Non-refundable").first()).toBeVisible();
+
+    await captureScreenshot(page, "task-140-dtc-fixed-amount-added");
+  });
+
   test("filing status selector is visible on profile step", async ({ page }) => {
     await page.goto("/?step=profile");
 
