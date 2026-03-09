@@ -35,7 +35,7 @@
 
 ## Expense Frequency Support
 
-- [ ] Task 175: Support yearly/one-time expenses — Add a frequency field to expenses (Monthly default, Yearly, One-time). Yearly expenses (e.g., vacation, insurance premiums, annual subscriptions) are divided by 12 for monthly calculations. One-time expenses are amortized over 12 months for cash flow but shown separately in the expense breakdown. Update ExpenseEntry UI with a frequency dropdown, update expense types in financial-types.ts, update computeTotals to handle frequency conversion, update runway/projection calculations, and update the budget detail text in flowchart-steps.ts. Show the annual amount alongside the monthly equivalent (e.g., "$3,600/yr → $300/mo"). [@fullstack]
+- [x] Task 175: Support yearly/one-time expenses — Add a frequency field to expenses (Monthly default, Yearly, One-time). Yearly expenses (e.g., vacation, insurance premiums, annual subscriptions) are divided by 12 for monthly calculations. One-time expenses are amortized over 12 months for cash flow but shown separately in the expense breakdown. Update ExpenseEntry UI with a frequency dropdown, update expense types in financial-types.ts, update computeTotals to handle frequency conversion, update runway/projection calculations, and update the budget detail text in flowchart-steps.ts. Show the annual amount alongside the monthly equivalent (e.g., "$3,600/yr → $300/mo"). [@fullstack]
 
 ## Australia Country Support (continued)
 

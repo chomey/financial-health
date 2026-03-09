@@ -20,6 +20,7 @@ export { simulateRunwayTimeSeries } from "@/lib/runway-simulation";
 import type { FinancialState } from "@/lib/financial-types";
 import type { FinancialData } from "@/lib/insights";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
+import { normalizeExpenseToMonthly } from "@/components/ExpenseEntry";
 import { getEffectivePayment } from "@/components/PropertyEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { getDefaultRoi, computeEmployerMatchMonthly } from "@/components/AssetEntry";
@@ -64,7 +65,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
   const fxRatesForHousing = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
   const rentExpense = state.expenses
     .filter((e) => e.category.toLowerCase().includes("rent"))
-    .reduce((sum, e) => sum + convertToHome(e.amount, e.currency ?? homeCurrency, homeCurrency, fxRatesForHousing), 0);
+    .reduce((sum, e) => sum + convertToHome(normalizeExpenseToMonthly(e.amount, e.frequency), e.currency ?? homeCurrency, homeCurrency, fxRatesForHousing), 0);
   const monthlyHousingCost = totalMortgagePayments > 0 ? totalMortgagePayments : rentExpense;
 
   // Income replacement ratio: % of monthly after-tax income sustainable by portfolio via 4% rule
@@ -204,7 +205,7 @@ export function computeWithdrawalTaxSummary(
   if (taxDeferred.categories.length > 0) withdrawalOrder.push(...taxDeferred.categories);
 
   // Compute tax drag: difference between base runway and tax-adjusted runway
-  const rawExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
+  const rawExpenses = state.expenses.reduce((sum, e) => sum + normalizeExpenseToMonthly(e.amount, e.frequency), 0);
   const rawMortgage = (state.properties ?? []).reduce((sum, p) => sum + getEffectivePayment(p), 0);
   const rawDebtPayments = state.debts.reduce((sum, d) => sum + (d.monthlyPayment ?? 0), 0);
   const monthlyObligations = computeMonthlyObligations(rawExpenses, rawMortgage, rawDebtPayments);

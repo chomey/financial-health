@@ -126,6 +126,7 @@ interface CompactIncome {
 interface CompactExpense {
   c: string;
   a: number;
+  f?: string; // frequency (omitted when "monthly" / default)
   cu?: string; // currency (omitted when home currency)
 }
 interface CompactProperty {
@@ -208,6 +209,7 @@ function toCompact(state: FinancialState): CompactState {
     }),
     e: state.expenses.map((x) => {
       const ce: CompactExpense = { c: x.category, a: x.amount };
+      if (x.frequency && x.frequency !== "monthly") ce.f = x.frequency;
       if (x.currency && x.currency !== homeCurrency) ce.cu = x.currency;
       return ce;
     }),
@@ -298,7 +300,8 @@ function fromCompact(compact: CompactState): FinancialState {
       return item;
     }),
     expenses: compact.e.map((x, i) => {
-      const item: { id: string; category: string; amount: number; currency?: SupportedCurrency } = { id: `e${i + 1}`, category: x.c, amount: x.a };
+      const item: { id: string; category: string; amount: number; frequency?: import("@/components/ExpenseEntry").ExpenseFrequency; currency?: SupportedCurrency } = { id: `e${i + 1}`, category: x.c, amount: x.a };
+      if (x.f) item.frequency = x.f as import("@/components/ExpenseEntry").ExpenseFrequency;
       if (x.cu) item.currency = x.cu as SupportedCurrency;
       return item;
     }),

@@ -9,10 +9,30 @@ import { convertToHome, FALLBACK_RATES } from "@/lib/currency";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 
+export type ExpenseFrequency = "monthly" | "yearly" | "one-time";
+
+const EXPENSE_FREQUENCY_SHORT_LABELS: Record<ExpenseFrequency, string> = {
+  monthly: "/mo",
+  yearly: "/yr",
+  "one-time": "once",
+};
+
+export function normalizeExpenseToMonthly(amount: number, frequency: ExpenseFrequency = "monthly"): number {
+  switch (frequency) {
+    case "yearly":
+    case "one-time":
+      return amount / 12;
+    case "monthly":
+    default:
+      return amount;
+  }
+}
+
 export interface ExpenseItem {
   id: string;
   category: string;
   amount: number;
+  frequency?: ExpenseFrequency;
   currency?: SupportedCurrency;
 }
 
@@ -56,12 +76,13 @@ export default function ExpenseEntry({ items: controlledItems, onChange, homeCur
   const addNew = useAddNew();
   const { addingNew, newCategory, newAmount, showNewSuggestions, newCategoryRef, newAmountRef, setAddingNew, setNewCategory, setNewAmount, setShowNewSuggestions, resetNew, handleNewKeyDown } = addNew;
   const [animatingTotal, setAnimatingTotal] = useState(false);
+  const [newFrequency, setNewFrequency] = useState<ExpenseFrequency>("monthly");
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const hc = homeCurrency ?? "CAD";
   const rates = fxRates ?? FALLBACK_RATES;
-  const total = items.reduce((sum, item) => sum + convertToHome(item.amount, item.currency ?? hc, hc, rates), 0);
+  const total = items.reduce((sum, item) => sum + convertToHome(normalizeExpenseToMonthly(item.amount, item.frequency), item.currency ?? hc, hc, rates), 0);
 
   const triggerTotalAnimation = () => {
     if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
@@ -96,11 +117,22 @@ export default function ExpenseEntry({ items: controlledItems, onChange, homeCur
     if (!newCategory.trim()) return;
     const amount = parseCurrencyInput(newAmount);
     triggerTotalAnimation();
-    setItems((prev) => [
-      ...prev,
-      { id: generateId("e"), category: newCategory.trim(), amount },
-    ]);
+    const newItem: ExpenseItem = { id: generateId("e"), category: newCategory.trim(), amount };
+    if (newFrequency !== "monthly") newItem.frequency = newFrequency;
+    setItems((prev) => [...prev, newItem]);
+    setNewFrequency("monthly");
     resetNew();
+  };
+
+  const changeFrequency = (id: string, frequency: ExpenseFrequency) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== id) return item;
+        const updated = { ...item, frequency: frequency === "monthly" ? undefined : frequency };
+        if (frequency === "monthly") delete updated.frequency;
+        return updated;
+      })
+    );
   };
 
   const filteredSuggestions = (query: string) => {
@@ -137,7 +169,9 @@ export default function ExpenseEntry({ items: controlledItems, onChange, homeCur
             <div
               className="group flex items-center justify-between rounded-lg px-3 py-0.5 transition-colors duration-150 hover:bg-white/5"
             >
-              <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
+              <div className="flex flex-1 flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-3 min-w-0">
+                {/* Row 1: Category + Amount */}
+                <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                 {/* Category */}
                 {editingId === item.id && editingField === "category" ? (
                   <div className="relative flex-1 min-w-0">
@@ -194,12 +228,12 @@ export default function ExpenseEntry({ items: controlledItems, onChange, homeCur
                 )}
 
                 {/* Amount + Currency */}
-                <div className="flex items-center gap-1" data-testid={`expense-details-${item.id}`}>
+                <div className="flex items-center gap-1 ml-auto" data-testid={`expense-details-${item.id}`}>
                   {homeCurrency && fxRates && (
                     <CurrencyBadge
                       currency={item.currency}
                       homeCurrency={homeCurrency}
-                      amount={item.amount}
+                      amount={normalizeExpenseToMonthly(item.amount, item.frequency)}
                       fxRates={fxRates}
                       onCurrencyChange={(cu) => {
                         setItems((prev) => prev.map((e) => e.id === item.id ? { ...e, currency: cu } : e));
@@ -227,10 +261,37 @@ export default function ExpenseEntry({ items: controlledItems, onChange, homeCur
                       className="min-w-[7rem] min-h-[44px] sm:min-h-0 text-right rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-rose-400/10 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
                       aria-label={`Edit amount for ${item.category}, currently ${formatCurrency(item.amount)}`}
                     >
-                      <div className="text-sm font-medium text-rose-400">{formatCurrency(item.amount)}/mo</div>
-                      <div className="text-xs text-slate-500">{formatCurrency(item.amount * 12)}/yr</div>
+                      {(item.frequency ?? "monthly") === "monthly" ? (
+                        <>
+                          <div className="text-sm font-medium text-rose-400">{formatCurrency(item.amount)}/mo</div>
+                          <div className="text-xs text-slate-500">{formatCurrency(item.amount * 12)}/yr</div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-sm font-medium text-rose-400">{formatCurrency(item.amount)}{EXPENSE_FREQUENCY_SHORT_LABELS[item.frequency!]}</div>
+                          <div className="text-xs text-slate-500">{formatCurrency(normalizeExpenseToMonthly(item.amount, item.frequency))}/mo</div>
+                        </>
+                      )}
                     </button>
                   )}
+                </div>
+                </div>
+
+                {/* Row 2: Frequency dropdown */}
+                <div className="flex items-center gap-1.5 sm:gap-1 pb-1 sm:pb-0">
+                  <select
+                    value={item.frequency ?? "monthly"}
+                    onChange={(e) => changeFrequency(item.id, e.target.value as ExpenseFrequency)}
+                    className="w-auto min-h-[44px] sm:min-h-0 rounded-md border border-white/10 bg-slate-800 px-1.5 py-1 text-xs text-slate-400 transition-all duration-150 hover:border-cyan-500/30 hover:bg-cyan-500/5 hover:text-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 cursor-pointer"
+                    aria-label={`Change frequency for ${item.category}`}
+                    data-testid={`expense-frequency-${item.id}`}
+                  >
+                    {(Object.keys(EXPENSE_FREQUENCY_SHORT_LABELS) as ExpenseFrequency[]).map((freq) => (
+                      <option key={freq} value={freq}>
+                        {freq === "monthly" ? "/mo" : freq === "yearly" ? "/yr" : "once"}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -317,6 +378,19 @@ export default function ExpenseEntry({ items: controlledItems, onChange, homeCur
                 className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New expense amount"
               />
+              <select
+                value={newFrequency}
+                onChange={(e) => setNewFrequency(e.target.value as ExpenseFrequency)}
+                className="rounded-md border border-cyan-500/50 bg-slate-900 px-1.5 py-2 text-sm text-slate-300 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 cursor-pointer sm:py-1"
+                aria-label="New expense frequency"
+                data-testid="new-expense-frequency"
+              >
+                {(Object.keys(EXPENSE_FREQUENCY_SHORT_LABELS) as ExpenseFrequency[]).map((freq) => (
+                  <option key={freq} value={freq}>
+                    {freq === "monthly" ? "/mo" : freq === "yearly" ? "/yr" : "once"}
+                  </option>
+                ))}
+              </select>
               <button
                 type="button"
                 onClick={addItem}

@@ -1,5 +1,6 @@
 import type { FinancialState } from "@/lib/financial-types";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
+import { normalizeExpenseToMonthly } from "@/components/ExpenseEntry";
 import { getEffectivePayment } from "@/components/PropertyEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { getDefaultRoi, getDefaultRoiTaxTreatment, getDefaultReinvest } from "@/components/AssetEntry";
@@ -64,7 +65,7 @@ export function computeTotals(state: FinancialState) {
   const totalDebts = state.debts.reduce((sum, d) => sum + toHome(d.amount, d.currency), 0);
   const totalDebtPayments = state.debts.reduce((sum, d) => sum + toHome(d.monthlyPayment ?? 0, d.currency), 0);
   const monthlyIncome = state.income.reduce((sum, i) => sum + toHome(normalizeToMonthly(i.amount, i.frequency), i.currency), 0);
-  const monthlyExpenses = state.expenses.reduce((sum, e) => sum + toHome(e.amount, e.currency), 0);
+  const monthlyExpenses = state.expenses.reduce((sum, e) => sum + toHome(normalizeExpenseToMonthly(e.amount, e.frequency), e.currency), 0);
   // Total monthly contributions to investment accounts (comes from income, not double-counted in expenses)
   const totalMonthlyContributions = realAssets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
   // Properties: equity = value - mortgage. Counts toward net worth but NOT runway (illiquid).

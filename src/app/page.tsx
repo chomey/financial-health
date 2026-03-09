@@ -38,6 +38,7 @@ import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";
 import { computeMortgageBreakdown, DEFAULT_INTEREST_RATE } from "@/components/PropertyEntry";
 import { getPortfolioSummary, getAnnualizedReturn, getStockValue, getStockGainLoss } from "@/components/StockEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
+import { normalizeExpenseToMonthly } from "@/components/ExpenseEntry";
 // getFilingStatuses moved to wizard-only
 import { getStepFromURL, updateStepURL, type WizardStep } from "@/lib/url-state";
 import {
@@ -297,7 +298,7 @@ export default function Home() {
   const propertyEquityItems = properties.filter((p) => p.value > p.mortgage).map((p) => ({ label: p.name || "Property", value: Math.max(0, p.value - p.mortgage) }));
   const debtItems = debts.filter((d) => d.amount > 0).map((d) => ({ label: d.category, value: d.amount }));
   const incomeItems = income.filter((i) => i.amount > 0).map((i) => ({ label: i.category, value: normalizeToMonthly(i.amount, i.frequency) }));
-  const expenseItems = expenses.filter((e) => e.amount > 0).map((e) => ({ label: e.category, value: e.amount }));
+  const expenseItems = expenses.filter((e) => e.amount > 0).map((e) => ({ label: e.category, value: normalizeExpenseToMonthly(e.amount, e.frequency) }));
   const debtPaymentItems = debts.filter((d) => (d.monthlyPayment ?? 0) > 0).map((d) => ({ label: d.category, value: d.monthlyPayment! }));
 
   const netWorthConnections: DataFlowConnectionDef[] = [

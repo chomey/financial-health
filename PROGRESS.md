@@ -8,11 +8,28 @@
 
 ## Summary
 - **Total Tasks**: 184
-- **Completed**: 172
-- **Remaining**: 12
+- **Completed**: 173
+- **Remaining**: 11
 - **Last Updated**: 2026-03-09
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 175: Support yearly/one-time expenses [@fullstack]
+- **Date**: 2026-03-09
+- **Files**:
+  - `src/components/ExpenseEntry.tsx`: Added `ExpenseFrequency` type (`"monthly" | "yearly" | "one-time"`), `normalizeExpenseToMonthly()` export, `frequency` field on `ExpenseItem`, frequency dropdown on each item (testid `expense-frequency-${id}`), frequency dropdown in add form (`new-expense-frequency`), updated amount display (shows `$X/yr → $Y/mo` for yearly, `$X once → $Y/mo` for one-time), updated total calculation.
+  - `src/lib/url-state.ts`: Added `f?` field to `CompactExpense`, serialize/deserialize frequency (omit when monthly).
+  - `src/lib/compute-totals.ts`: Import and use `normalizeExpenseToMonthly` for monthly expenses.
+  - `src/lib/flowchart-steps.ts`: Import and use `normalizeExpenseToMonthly` in `getRawMonthlyExpenses`, `detectRetirementHeuristic`, and budget detail items.
+  - `src/lib/financial-state.ts`: Import and use `normalizeExpenseToMonthly` for rent detection and withdrawal tax calculations.
+  - `src/lib/sankey-data.ts`: Import and use `normalizeExpenseToMonthly` for Sankey diagram expense nodes.
+  - `src/app/page.tsx`: Import and use `normalizeExpenseToMonthly` for expense items display.
+  - `src/components/ExpenseBreakdownChart.tsx`: Import and use `normalizeExpenseToMonthly` in `computeExpenseBreakdown` and manual expenses calculation.
+  - `src/lib/changelog.ts`: Updated version 175 entry.
+  - `tests/unit/expense-frequency.test.tsx`: New — 18 unit tests covering `normalizeExpenseToMonthly`, frequency UI display, total normalization, dropdown interactions, and integration calculations.
+  - `tests/e2e/expense-frequency.spec.ts`: New — 7 E2E tests covering default dropdowns, yearly frequency update, label display, add form frequency selector, add yearly/one-time expenses, URL state persistence.
+- **Tests**: T1: 2624 passed (137 files), T2: 7 passed, Build: passes
+- **Screenshots**: task-175-expense-frequency-defaults, task-175-expense-yearly-frequency, task-175-expense-yearly-label, task-175-add-form-with-frequency, task-175-add-yearly-expense, task-175-add-one-time-expense, task-175-expense-frequency-persists
 
 ## Task 173: AU E2E tests and regression [@qa] [E2E] [MILESTONE]
 - **Date**: 2026-03-09

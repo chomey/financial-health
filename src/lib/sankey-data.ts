@@ -7,6 +7,7 @@
 import type { IncomeItem } from "@/components/IncomeEntry";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
+import { normalizeExpenseToMonthly } from "@/components/ExpenseEntry";
 
 export interface SankeyNode {
   id: string;
@@ -132,9 +133,10 @@ export function buildSankeyData(input: CashFlowInput): SankeyData {
   const expenseItems = input.expenses.filter((e) => e.amount > 0);
   for (const expense of expenseItems) {
     const nodeId = `expense-${expense.id}`;
-    const amount = Math.min(expense.amount, afterTax - allocated);
+    const monthlyAmount = normalizeExpenseToMonthly(expense.amount, expense.frequency);
+    const amount = Math.min(monthlyAmount, afterTax - allocated);
     if (amount > 0) {
-      nodes.push({ id: nodeId, label: expense.category || "Expense", type: "expense", value: expense.amount });
+      nodes.push({ id: nodeId, label: expense.category || "Expense", type: "expense", value: monthlyAmount });
       links.push({ source: "after-tax", target: nodeId, value: amount });
       allocated += amount;
     }

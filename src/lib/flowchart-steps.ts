@@ -13,6 +13,7 @@
 
 import type { FinancialState } from "@/lib/financial-types";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
+import { normalizeExpenseToMonthly } from "@/components/ExpenseEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { getEffectivePayment } from "@/components/PropertyEntry";
 import { getTaxTreatment } from "@/lib/withdrawal-tax";
@@ -108,7 +109,7 @@ function getCashAssetItems(state: FinancialState): Array<{ category: string; amo
 }
 
 function getRawMonthlyExpenses(state: FinancialState): number {
-  return state.expenses.reduce((sum, e) => sum + e.amount, 0);
+  return state.expenses.reduce((sum, e) => sum + normalizeExpenseToMonthly(e.amount, e.frequency), 0);
 }
 
 function getMonthlyMortgage(state: FinancialState): number {
@@ -149,7 +150,7 @@ export function detectRetirementHeuristic(state: FinancialState): boolean {
   );
   if (hasEmploymentIncome) return false;
 
-  const monthlyExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
+  const monthlyExpenses = state.expenses.reduce((sum, e) => sum + normalizeExpenseToMonthly(e.amount, e.frequency), 0);
   if (monthlyExpenses === 0) return false;
 
   // Rough 20-year runway check (without growth)
@@ -923,7 +924,7 @@ export function getStepContext(stepId: string, state: FinancialState): StepConte
       items.push(
         ...state.expenses.map((e) => ({
           label: e.category || "Expense",
-          amount: -e.amount,
+          amount: -normalizeExpenseToMonthly(e.amount, e.frequency),
           detail: "/mo",
         })),
       );

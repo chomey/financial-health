@@ -8,8 +8,8 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     version: 175,
-    title: "AU E2E tests and regression",
-    description: "Full Playwright E2E test suite for AU flow: select country, load sample profiles, verify AUD values on dashboard, Money Steps with AU-specific steps, tax summary, and super accounts in assets. Regression tests confirm CA and US flows unaffected. Unit tests verify AU sample profile URL state round-trip.",
+    title: "Yearly and one-time expense frequency support",
+    description: "Added frequency field to ExpenseEntry (Monthly, Yearly, One-time). Yearly and one-time expenses are divided by 12 for all monthly calculations (cash flow, runway, FIRE number, Sankey, expense breakdown). Yearly expenses show '$X/yr → $Y/mo' format; one-time shows '$X once → $Y/mo'. Frequency persists in URL state. All computations (compute-totals, flowchart-steps, financial-state, sankey-data) updated to normalize expense amounts.",
     date: "2026-03-09",
   },
   {

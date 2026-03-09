@@ -12,6 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
+import { normalizeExpenseToMonthly } from "@/components/ExpenseEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
 import HelpTip from "@/components/HelpTip";
 
@@ -50,7 +51,7 @@ export function computeExpenseBreakdown(
     if (exp.amount <= 0) continue;
     slices.push({
       name: exp.category,
-      value: exp.amount,
+      value: normalizeExpenseToMonthly(exp.amount, exp.frequency),
       percentage: 0, // computed after totalling
       isAuto: false,
     });
@@ -166,7 +167,7 @@ export default function ExpenseBreakdownChart({
   // This is what's actually available for day-to-day expenses
   const spendingPower = Math.max(0, monthlyAfterTaxIncome - investmentContributions - mortgagePayments);
   // Manual expenses only (what the user actually spends on day-to-day)
-  const manualExpenses = expenses.reduce((s, e) => s + (e.amount > 0 ? e.amount : 0), 0);
+  const manualExpenses = expenses.reduce((s, e) => s + (e.amount > 0 ? normalizeExpenseToMonthly(e.amount, e.frequency) : 0), 0);
 
   const INFLATION_RATE = 0.03; // 3% annual inflation
 
