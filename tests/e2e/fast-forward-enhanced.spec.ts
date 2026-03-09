@@ -3,11 +3,11 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Fast Forward Enhanced Scenarios", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-    // Expand the Fast Forward panel
-    await page.getByTestId("fast-forward-toggle").click();
-    await expect(page.getByTestId("fast-forward-panel")).toBeVisible();
+    await page.goto("/?step=dashboard");
+    // Fast forward panel starts open on dashboard
+    const panel = page.getByTestId("fast-forward-panel");
+    await panel.scrollIntoViewIfNeeded();
+    await expect(panel).toBeVisible();
   });
 
   test("shows scenario preset buttons", async ({ page }) => {
