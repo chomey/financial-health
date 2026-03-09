@@ -12,20 +12,6 @@
 - **Remaining**: 7
 - **Last Updated**: 2026-03-09
 
-## Task 180: Simplify DebtEntry and fold into Expenses in simple mode [@fullstack]
-- **Date**: 2026-03-09
-- **Files**:
-  - `src/components/ExpenseEntry.tsx`: Added `SIMPLE_DEBT_CATEGORY = "Debt Payments"` constant, `debts`/`onDebtsChange` props, simple-mode "Debt Payments" subsection (inline-editable single amount input), `handleSimpleDebtChange`/`commitSimpleDebt` handlers
-  - `src/components/wizard/steps/ExpensesStep.tsx`: Added `debts`/`onDebtsChange` optional props, passed to `ExpenseEntry`
-  - `src/components/wizard/WizardShell.tsx`: Already passes `debts`/`setDebts` to `ExpensesStep`
-  - `src/lib/changelog.ts`: Added version 180 entry
-  - `tests/unit/expense-entry-simple-debt.test.tsx`: 9 unit tests covering show/hide logic, display, create/update/delete debt via subsection
-  - `tests/e2e/expense-entry-simple-debt.spec.ts`: 3 Playwright tests — section visibility in simple/advanced mode, entering amount
-- **Tests**: T1: 2710 passed (145 files), T2: 3 passed. Build: passes
-- **Screenshots**: task-180-expense-simple-debt-section.png, task-180-expense-simple-debt-entered.png, task-180-expense-advanced-mode-no-debt-section.png
-
-<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
-
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]

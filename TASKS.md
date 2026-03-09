@@ -11,8 +11,6 @@
 
 ## Simple vs Advanced Mode
 
-- [x] Task 180: Simplify DebtEntry and fold into Expenses in simple mode — In simple mode, the Debts wizard step is hidden. Instead, add a "Debt Payments" subsection at the bottom of ExpenseEntry that shows a single input: "Monthly debt payments (credit cards, loans, etc.)". This single number maps to a single debt item in state with category "Debt Payments". When switching to advanced mode, the user can break this into individual debts with interest rates. In advanced mode, DebtEntry works as-is with all fields (interest rate, monthly payment, category). [@fullstack]
-
 - [ ] Task 184: Simple/advanced mode E2E tests — Test mode toggle persists in URL, test simple mode hides correct wizard steps and fields, test advanced mode shows all fields, test switching modes preserves data (enter data in advanced → switch to simple → switch back → data still there), test simple mode dashboard shows correct subset of sections. Test both new quick-start profiles load correctly. [@qa] [E2E]
 
 ## Expense Frequency Support
