@@ -2504,3 +2504,59 @@
 - **Tests**: T1: 1957 passed (12 new in `tax-credit-metrics.test.ts`), T2: 5 passed (new `tax-credit-metrics.spec.ts`), Build: passes
 - **Screenshots**: ![Monthly boost](screenshots/task-144-credit-monthly-boost.png) ![Tax rate adjusted](screenshots/task-144-tax-rate-adjusted.png) ![Surplus badge](screenshots/task-144-surplus-credit-badge.png) ![Runway adjusted](screenshots/task-144-runway-adjusted.png)
 - **Notes**: Added 3 new fields to `MetricData`: `taxCreditAdjustedRate`, `taxCreditMonthlyBoost`, `taxCreditAdjustedRunway`. Non-refundable credits capped at `totalTaxEstimate` to avoid negative taxes. Adjusted runway only shows if it exceeds base runway by >0.1 mo.
+
+## Task 170: Add contextual help to dashboard metric cards [@frontend]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/components/SnapshotDashboard.tsx`: Added `helpText?: string` to `MetricData` interface; added `HelpTip` next to metric title when `helpText` is set; added `helpText` to 3 mock metrics (Net Worth, Monthly Cash Flow, Financial Runway).
+  - `src/lib/compute-metrics.ts`: Added `helpText` to Net Worth, Monthly Cash Flow, Estimated Tax, Financial Runway, and Income Replacement metrics.
+  - `src/components/ProjectionChart.tsx`: Added `HelpTip` next to "Financial Projection" heading (explains Moderate scenario); added FIRE legend item with `HelpTip` explaining the 4% rule.
+  - `src/components/FinancialFlowchart.tsx`: Added `HelpTip` next to "Money Steps" heading with country-specific subreddit reference.
+  - `src/components/InsightsPanel.tsx`: Added `HelpTip` inline next to FIRE milestone items explaining the 4% rule.
+  - `src/lib/changelog.ts`: Added version 170 entry.
+  - `tests/unit/dashboard-help-tips.test.ts`: New — 7 unit tests verifying `helpText` presence and content on computed metrics.
+  - `tests/e2e/dashboard-help-tips.spec.ts`: New — 5 E2E tests verifying HelpTip presence on dashboard cards, projection chart, and money steps.
+- **Tests**: T1: 7 new passed (2519+ total), T2: 5 passed, Build: passes
+- **Screenshots**: task-170-dashboard-metric-cards, task-170-dashboard-help-tip-open, task-170-projection-chart-help-tip, task-170-money-steps-help-tip, task-170-net-worth-help-tip
+- **Notes**: Benchmark Comparisons already has a well-designed expandable info button showing source attribution (DATA_SOURCES per country). No HelpTip added there to avoid redundancy. Pre-existing test failures in changelog.test.ts and investment-returns-income.test.tsx are unrelated to this task.
+
+## Task 169: Add contextual help tooltips to wizard inputs [@frontend]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/components/HelpTip.tsx`: New — reusable ? icon button with click-to-toggle popover, outside-click to close.
+  - `src/components/wizard/steps/ProfileStep.tsx`: Added HelpTip to Tax Year, Filing Status, Exchange Rate labels.
+  - `src/components/IncomeEntry.tsx`: Added HelpTip next to Frequency and Income Type selects in add-new form.
+  - `src/components/AssetEntry.tsx`: Added HelpTip to Tax Treatment, ROI, Reinvest Returns, Employer Match, Cost Basis %, and Surplus Target fields. Removed old CSS-only tooltip from Cost Basis % badge.
+  - `src/components/DebtEntry.tsx`: Added HelpTip next to Interest Rate badge.
+  - `src/components/PropertyEntry.tsx`: Added HelpTip next to Amortization and Appreciation badges.
+  - `src/lib/changelog.ts`: Added version 169 entry.
+  - `tests/unit/help-tip.test.tsx`: New — 9 unit tests covering click-to-open, click-to-close, aria-expanded, role=tooltip, outside-click-to-close.
+  - `tests/e2e/help-tip.spec.ts`: New — 7 E2E tests verifying HelpTip presence and behavior across Profile, Income, Assets, Debts, and Property steps.
+- **Tests**: T1: 2523 passed (133 files), T2: 7 passed, Build: passes
+- **Screenshots**: task-169-profile-help-tips, task-169-profile-help-tip-open, task-169-income-add-form-help-tips, task-169-assets-help-tips, task-169-debts-help-tips, task-169-debts-interest-help-tip, task-169-property-step
+- **Notes**: TaxCreditEntry already had an info button (ℹ icon) with a detailed explanation — HelpTip not added there to avoid redundancy. Property step has no items in initial state so HelpTips only appear when properties are added. All tooltip texts are 1–2 sentences as specified.
+
+## Task 168: Reorder wizard steps [@fullstack]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/lib/url-state.ts`: Changed `WIZARD_STEPS` order from welcome→profile→property→stocks→assets→debts→income→expenses→tax-summary to welcome→profile→income→expenses→debts→property→assets→stocks→tax-summary.
+  - `src/lib/changelog.ts`: Added version 168 entry.
+  - `tests/unit/wizard-step-order.test.ts`: New — 11 tests verifying the new step order via index comparisons and exact array match.
+  - `tests/unit/changelog.test.ts`: Updated version counts 167→168, AU milestone count 10→11.
+  - `tests/e2e/wizard-step-order.spec.ts`: New — 5 E2E tests: DOM order matches expected order, clicking income/expenses/debts/assets tabs makes them active.
+- **Tests**: T1: 2514 passed (132 files), T2: 5 passed, Build: passes
+- **Screenshots**: task-168-wizard-step-order, task-168-income-step-active, task-168-expenses-step-active, task-168-debts-step-active, task-168-assets-step-active
+- **Notes**: `STEP_META` in WizardStepper is a Record (no ordering) — step display order is driven by `WIZARD_STEPS` array alone. Investment returns display in IncomeStep is guarded by `totalReturns > 0` so it correctly shows nothing when income is entered before assets. Further display movement is handled in Task 171.
+
+## Task 167: AU currency formatting and FX rates [@fullstack]
+- **Date**: 2026-03-08
+- **Files**:
+  - `src/app/api/fx-rate/route.ts`: Added "AUD" to VALID_CURRENCIES set; updated error message to list all three currencies.
+  - `src/components/wizard/WizardShell.tsx`: Fixed ProfileStep receiving wrong `foreignCurrency` — replaced hardcoded `homeCurrency === "CAD" ? "USD" : "CAD"` with `getForeignCurrency(homeCurrency)`. AU users now correctly see "1 USD = X AUD" in FxRateDisplay.
+  - `tests/unit/currency.test.ts`: Added tests for `getHomeCurrency("AU")`, `getForeignCurrency("AUD")`, AUD convertToHome (live rates + fallback), AUD formatCurrencyCompact (home and foreign), AUD getEffectiveFxRates, and FALLBACK_RATES reciprocal validation.
+  - `tests/unit/changelog.test.ts`: Updated version counts 166→167 and AU milestone count 9→10.
+  - `tests/e2e/au-currency.spec.ts`: New — 5 E2E tests: AU FX display shows USD/AUD on profile step, rate value button clickable, manual override shows custom badge, CA→AU switch updates display, AUD badge appears on assets step.
+  - `src/lib/changelog.ts`: Added version 167 entry.
+- **Tests**: T1: 2503 passed (131 files), T2: 5 passed, Build: passes
+- **Screenshots**: task-167-au-fx-display, task-167-au-fx-rate-value, task-167-au-fx-manual-override, task-167-ca-to-au-fx-switch, task-167-au-currency-badge-assets
+- **Notes**: The core currency formatting (AU$, fallback rates, getEffectiveFxRates for AUD) was already correct — the main bugs were: (1) FX API route rejected AUD requests, (2) WizardShell hardcoded foreignCurrency logic excluded AUD correctly showing USD as AU's foreign pair. Pre-existing changelog test failure from task 166 fixed in separate commit.

@@ -621,13 +621,14 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
 
     # Restore stashed changes on top of the merge
     if [[ $did_stash -eq 1 ]]; then
-      local pop_exit=0
-      git -C "$SCRIPT_DIR" stash pop 2>/dev/null || pop_exit=$?
-      if [[ $pop_exit -ne 0 ]]; then
-        print "${YELLOW}  ⚠ Stash pop had conflicts — local changes preserved in stash${NC}"
-        print "${YELLOW}    Run: git stash pop && resolve conflicts${NC}"
-      else
+      if git -C "$SCRIPT_DIR" stash pop 2>&1; then
         print "  ${DIM}▸ Restored stashed changes${NC}"
+      else
+        # Stash pop conflict — resolve by accepting merged version and dropping stash
+        print "${YELLOW}  ⚠ Stash pop had conflicts — accepting merged versions${NC}"
+        git -C "$SCRIPT_DIR" checkout --theirs . 2>/dev/null || true
+        git -C "$SCRIPT_DIR" reset HEAD 2>/dev/null || true
+        git -C "$SCRIPT_DIR" stash drop 2>/dev/null || true
       fi
     fi
   else
@@ -637,9 +638,9 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   # Clean up worktree
   cleanup_worktree "$wt_path" "$branch_name"
 
-  # Auto-archive if files have grown too large
-  archive_progress
-  archive_tasks
+  # Auto-archive if files have grown too large (non-fatal)
+  archive_progress || print "${YELLOW}  ⚠ archive_progress failed (non-fatal)${NC}"
+  archive_tasks || print "${YELLOW}  ⚠ archive_tasks failed (non-fatal)${NC}"
 
   # Iteration timing
   ITER_END=$(date +%s)
