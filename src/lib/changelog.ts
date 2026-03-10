@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 185,
+    title: "Auto-complete taxable investing flowchart step",
+    description: "The 'Taxable Investing & Goals' step in the CA and US financial flowcharts now auto-completes when you have stocks or taxable/non-registered investment holdings (brokerage, ETF, index fund, etc.). No more manually checking the obvious. The acknowledge checkbox only appears when no taxable holdings are detected.",
+    date: "2026-03-09",
+  },
+  {
     version: 184,
     title: "Simple/Advanced mode E2E tests",
     description: "Comprehensive E2E test suite covering mode toggle URL persistence, simple mode field hiding (wizard steps, asset ROI/tax badges, income types), advanced mode full visibility, data preservation across mode switches (assets, income, debts round-trip), dashboard section counts and upgrade banner, and quick-start profile loading for all 6 country/tenure combinations (CA/US/AU renters and homeowners).",

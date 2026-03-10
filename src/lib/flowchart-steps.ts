@@ -58,6 +58,7 @@ const US_401K_KEYWORDS = ["401k", "roth 401k", "403b", "457b", "457"];
 const AU_SUPER_KEYWORDS = ["super", "superannuation"];
 const AU_FHSS_KEYWORDS = ["fhss", "first home super saver"];
 const AU_ETF_KEYWORDS = ["etf", "brokerage", "index fund", "shares", "asx", "investment"];
+const TAXABLE_INVESTING_KEYWORDS = ["brokerage", "taxable", "non-registered", "investment", "index fund", "etf", "mutual fund"];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -185,6 +186,7 @@ interface InferredData {
   assetCategories: string[];
   highInterestDebts: Array<{ category: string; amount: number; rate: number }>;
   moderateInterestDebts: Array<{ category: string; amount: number; rate: number }>;
+  hasStocks: boolean;
   isRetired: boolean;
 }
 
@@ -227,6 +229,7 @@ function inferData(state: FinancialState, isRetired: boolean): InferredData {
     assetCategories,
     highInterestDebts,
     moderateInterestDebts,
+    hasStocks: (state.stocks ?? []).length > 0,
     isRetired,
   };
 }
@@ -285,7 +288,7 @@ interface RawStep {
 }
 
 function buildCASteps(d: InferredData): RawStep[] {
-  const { cashAssets, monthlyObligations, assetCategories, highInterestDebts, moderateInterestDebts, isRetired } = d;
+  const { cashAssets, monthlyObligations, assetCategories, highInterestDebts, moderateInterestDebts, hasStocks, isRetired } = d;
 
   const starterTarget = 1000;
   const fullEFTarget = monthlyObligations > 0 ? monthlyObligations * 3 : 0;
@@ -293,6 +296,7 @@ function buildCASteps(d: InferredData): RawStep[] {
   const hasTFSA = hasAccount(assetCategories, CA_TAX_FREE_KEYWORDS);
   const hasRRSP = hasAccount(assetCategories, CA_TAX_DEFERRED_KEYWORDS);
   const hasRESP_FHSA = hasAccount(assetCategories, CA_RESP_FHSA_KEYWORDS);
+  const hasTaxableHoldings = hasStocks || hasAccount(assetCategories, TAXABLE_INVESTING_KEYWORDS);
 
   const starterProgress = Math.round(clamp((cashAssets / starterTarget) * 100, 0, 100));
   const fullEFProgress =
@@ -446,12 +450,14 @@ function buildCASteps(d: InferredData): RawStep[] {
       title: "Taxable Investing & Goals",
       description:
         "Invest in a taxable brokerage account for additional wealth building and specific goals.",
-      completionHint: "Invest surplus cash in a diversified portfolio.",
+      completionHint: hasTaxableHoldings
+        ? "You have taxable / non-registered holdings."
+        : "Invest surplus cash in a diversified portfolio.",
       detailText:
         "Once tax-advantaged accounts are maximized and high-interest debt is cleared, invest your surplus in a taxable brokerage account. Index ETFs (e.g., XEQT, VEQT, XBAL) offer low-cost, globally diversified exposure. Consider your asset location strategy — hold foreign equity in RRSP for withholding tax efficiency.",
-      progress: 0,
-      isComplete: false,
-      userAcknowledgeable: true,
+      progress: hasTaxableHoldings ? 100 : 0,
+      isComplete: hasTaxableHoldings,
+      userAcknowledgeable: !hasTaxableHoldings,
       acknowledgeLabel: "I'm investing in a taxable account or working toward a specific goal",
     },
   ];
@@ -460,7 +466,7 @@ function buildCASteps(d: InferredData): RawStep[] {
 // ── US step definitions ───────────────────────────────────────────────────────
 
 function buildUSSteps(d: InferredData): RawStep[] {
-  const { cashAssets, monthlyObligations, assetCategories, highInterestDebts, moderateInterestDebts, isRetired } = d;
+  const { cashAssets, monthlyObligations, assetCategories, highInterestDebts, moderateInterestDebts, hasStocks, isRetired } = d;
 
   const starterTarget = 1000;
   const fullEFTarget = monthlyObligations > 0 ? monthlyObligations * 3 : 0;
@@ -468,6 +474,7 @@ function buildUSSteps(d: InferredData): RawStep[] {
   const hasHSA = hasAccount(assetCategories, US_HSA_KEYWORDS);
   const hasIRA = hasAccount(assetCategories, US_IRA_KEYWORDS);
   const has401k = hasAccount(assetCategories, US_401K_KEYWORDS);
+  const hasTaxableHoldings = hasStocks || hasAccount(assetCategories, TAXABLE_INVESTING_KEYWORDS);
 
   const starterProgress = Math.round(clamp((cashAssets / starterTarget) * 100, 0, 100));
   const fullEFProgress =
@@ -620,12 +627,14 @@ function buildUSSteps(d: InferredData): RawStep[] {
       title: "Taxable Investing & Goals",
       description:
         "Invest in a taxable brokerage account for additional wealth building and specific financial goals.",
-      completionHint: "Invest surplus cash in a diversified portfolio.",
+      completionHint: hasTaxableHoldings
+        ? "You have taxable / non-registered holdings."
+        : "Invest surplus cash in a diversified portfolio.",
       detailText:
         "Once tax-advantaged accounts are maxed and high-interest debt is cleared, invest your surplus in a taxable brokerage. Index funds (e.g., VTI, VXUS, VOO) offer low-cost, diversified exposure. Tax-loss harvesting and asset location strategies can improve after-tax returns. Consider I-bonds, real estate, or other goal-specific vehicles depending on your timeline.",
-      progress: 0,
-      isComplete: false,
-      userAcknowledgeable: true,
+      progress: hasTaxableHoldings ? 100 : 0,
+      isComplete: hasTaxableHoldings,
+      userAcknowledgeable: !hasTaxableHoldings,
       acknowledgeLabel: "I'm investing in a taxable account or working toward a specific goal",
     },
   ];
