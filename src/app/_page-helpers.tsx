@@ -74,6 +74,7 @@ export function ModeToggle() {
 export function ResetButton() {
   const handleReset = useCallback(() => {
     if (window.confirm("This will erase all your data and start fresh. Are you sure?")) {
+      try { localStorage.removeItem("fhs-visited"); } catch { /* noop */ }
       window.location.href = window.location.pathname;
     }
   }, []);
