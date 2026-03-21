@@ -8,11 +8,21 @@
 
 ## Summary
 - **Total Tasks**: 195
-- **Completed**: 188
-- **Remaining**: 7
+- **Completed**: 189
+- **Remaining**: 6
 - **Last Updated**: 2026-03-20
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 189: Government retirement income estimator (AU) [@fullstack] [MATH]
+- **Date**: 2026-03-20
+- **Files**:
+  - `src/lib/government-retirement.ts`: Added AU Age Pension constants (single $1,116.30/fn, couple $841.40/fn each), preservation age 60, pension age 67, `AuPensionPreset` type, `getAuPensionPresetAmount`, `fortnightlyToMonthly` helpers.
+  - `src/components/GovernmentRetirementInput.tsx`: Added `AgePensionInput` component with single/couple/custom presets. Fortnightly display with monthly conversion in summary. Updated main component to render AU input.
+  - `tests/unit/government-retirement-au.test.ts`: New — 18 tests covering constants, presets, fortnightly-to-monthly conversion, computeMonthlyGovernmentIncome for AU, FIRE number reduction, toFinancialData, URL round-trip.
+  - `tests/e2e/government-retirement-au.spec.ts`: New — 3 tests covering AU pension rendering, single preset, URL persistence.
+- **Tests**: T1: 2778 passed (149 files), T2: 3 passed (Playwright), Build: passes
+- **Screenshots**: `task-189-au-pension-default.png`, `task-189-au-pension-single.png`
 
 ## Task 188: Government retirement income estimator (US) [@fullstack] [MATH]
 - **Date**: 2026-03-20

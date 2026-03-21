@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 189,
+    title: "Government retirement income estimator (Australia)",
+    description: "Estimate your Age Pension in the Profile section (advanced mode, AU only). Choose single ($1,116/fortnight) or couple ($841/fortnight each) full pension presets, or enter a custom amount. Amounts display in fortnightly with monthly equivalents. Like the Canadian and US estimators, Age Pension income reduces your FIRE number. Also exports Super preservation age (60) and Age Pension age (67) constants for future use.",
+    date: "2026-03-20",
+  },
+  {
     version: 188,
     title: "Government retirement income estimator (US)",
     description: "Estimate your Social Security benefits in the Profile section (advanced mode, US only). Choose from presets based on claiming age: average ($1,976/mo), or maximum at age 62 ($2,710), 67 ($3,822), or 70 ($4,873) — plus a custom option. Like the Canadian estimator, Social Security income reduces your FIRE number since your portfolio only needs to cover the gap.",
