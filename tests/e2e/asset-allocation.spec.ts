@@ -50,10 +50,10 @@ test.describe("Asset Allocation (via Donut Chart)", () => {
     await expect(chart.getByText("TFSA").first()).toBeVisible();
   });
 
-  test("chart is positioned in the dashboard section", async ({ page }) => {
+  test("chart is positioned in the breakdowns section", async ({ page }) => {
     await page.goto("/");
-    const dashboard = page.locator('[aria-label="Financial dashboard"]');
-    const chart = dashboard.locator('[data-testid="donut-chart"]');
+    const breakdowns = page.locator('[aria-label="Expense and net worth breakdowns"]');
+    const chart = breakdowns.locator('[data-testid="donut-chart"]');
     await expect(chart).toBeVisible();
   });
 });
