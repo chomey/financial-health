@@ -31,6 +31,7 @@ import { getMarginalRateForIncome } from "@/lib/tax-engine";
 import { computeTotals, computeMonthlyInvestmentReturns, computeFireNumber, computeMonthlyObligations } from "@/lib/compute-totals";
 import { simulateRunwayWithGrowth, simulateRunwayWithTax } from "@/lib/runway-simulation";
 import { computeMonthlyGovernmentIncome } from "@/lib/government-retirement";
+import { getRmdSummaries } from "@/lib/required-minimum-distributions";
 import type { Asset } from "@/components/AssetEntry";
 
 export function toFinancialData(state: FinancialState): FinancialData {
@@ -124,6 +125,11 @@ export function toFinancialData(state: FinancialState): FinancialData {
     monthlyInvestmentReturns: payoutInvestmentReturns > 0 ? payoutInvestmentReturns : undefined,
     assetCategories: state.assets.filter((a) => !a.computed).map((a) => a.category),
     debtCategories: state.debts.map((d) => d.category),
+    rmdSummaries: state.age ? (() => {
+      const accounts = state.assets.filter((a) => !a.computed && a.amount > 0).map((a) => ({ category: a.category, amount: a.amount }));
+      const summaries = getRmdSummaries(accounts, state.age!, country);
+      return summaries.length > 0 ? summaries : undefined;
+    })() : undefined,
   };
 }
 

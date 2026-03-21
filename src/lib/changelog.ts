@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 192,
+    title: "RRIF/RMD required minimum distributions",
+    description: "Added required minimum distribution modeling for Canada (RRIF minimums from age 71, using CRA prescribed factors) and US (RMDs from age 73, using IRS Uniform Lifetime Table). When your age triggers RMDs, an insight shows the required annual withdrawal per account with percentage and dollar amounts. For ages 65-72, a preview insight warns that forced withdrawals are coming. AU has no equivalent forced withdrawal mechanism.",
+    date: "2026-03-21",
+  },
+  {
     version: 191,
     title: "Early withdrawal penalty warnings",
     description: "The Withdrawal Tax Impact panel now shows warnings when your age means early withdrawal penalties apply. US: 10% penalty on 401k/IRA/Roth IRA earnings before age 59½. Canada: RRSP withholding tax warning before 65. Australia: Super preservation age 60 restriction. Each warning shows the penalty percentage, the rule, and when you'll be penalty-free. Also wired the WithdrawalTaxSummary panel into the Breakdowns section.",

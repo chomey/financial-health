@@ -47,6 +47,7 @@ const INSIGHT_TYPE_SOURCES: Record<InsightType, string[]> = {
   "au-fhss": ["section-assets"],
   "au-franking": ["section-income"],
   "au-mls": ["section-income", "section-expenses"],
+  "rmd": ["section-assets"],
 };
 
 function InsightRow({

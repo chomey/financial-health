@@ -8,11 +8,24 @@
 
 ## Summary
 - **Total Tasks**: 195
-- **Completed**: 191
-- **Remaining**: 4
+- **Completed**: 192
+- **Remaining**: 3
 - **Last Updated**: 2026-03-20
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 192: RRIF/RMD required minimum distributions [@fullstack] [MATH]
+- **Date**: 2026-03-21
+- **Files**:
+  - `src/lib/required-minimum-distributions.ts`: New — US RMD Uniform Lifetime Table (ages 73-120), CA RRIF minimum withdrawal table (ages 71-95+). Functions: `getUsRmdPercent`, `getCaRrifPercent`, `computeRequiredMinimumDistribution`, `getRmdSummaries`. Constants: `US_RMD_START_AGE=73`, `CA_RRIF_CONVERSION_AGE=71`.
+  - `src/lib/financial-state.ts`: `toFinancialData` computes RMD summaries from user's age and asset categories. Passes to FinancialData.
+  - `src/lib/insights/types.ts`: Added `rmdSummaries` to FinancialData, `"rmd"` to InsightType.
+  - `src/lib/insights/generate.ts`: RMD insight showing required annual withdrawals with per-account breakdowns. "Upcoming" variant for ages 65-72 (CA) or 65-72 (US) with tax-deferred accounts.
+  - `src/components/InsightsPanel.tsx`: Added "rmd" to insight-section mapping.
+  - `tests/unit/required-minimum-distributions.test.ts`: New — 25 tests covering US RMD, CA RRIF, computeRMD, summaries, toFinancialData.
+  - `tests/e2e/required-minimum-distributions.spec.ts`: New — 2 tests.
+- **Tests**: T1: 2831 passed (152 files), T2: 2 passed (Playwright), Build: passes
+- **Screenshots**: `task-192-rmd-ca-75.png`, `task-192-no-rmd-ca-40.png`
 
 ## Task 191: Early withdrawal penalty warnings [@fullstack] [MATH]
 - **Date**: 2026-03-21

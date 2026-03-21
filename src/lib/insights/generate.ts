@@ -875,6 +875,37 @@ export function generateInsights(data: FinancialData): Insight[] {
     }
   }
 
+  // RMD/RRIF insight
+  if (data.rmdSummaries && data.rmdSummaries.length > 0) {
+    const totalAnnual = data.rmdSummaries.reduce((sum, s) => sum + s.annualMinimum, 0);
+    const accountList = data.rmdSummaries.map((s) => `${s.category} (${s.percent.toFixed(1)}% = ${formatCurrency(s.annualMinimum)}/yr)`).join(", ");
+    const ruleName = data.rmdSummaries[0].ruleName;
+    const marginalWithRmd = data.marginalRate ?? 0;
+
+    insights.push({
+      id: "rmd-required",
+      type: "rmd",
+      message: `${ruleName} applies: you must withdraw at least ${formatCurrency(totalAnnual)}/year from ${accountList}. These forced withdrawals are taxed as income${marginalWithRmd > 0.3 ? " — at your marginal rate this adds significant tax. Consider Roth conversions or spending down these accounts earlier." : "."}`,
+      icon: "📋",
+    });
+  } else if (data.currentAge && data.currentAge >= 65) {
+    const country = data.country ?? "CA";
+    const rmdAge = country === "US" ? 73 : country === "CA" ? 71 : null;
+    if (rmdAge && data.currentAge < rmdAge) {
+      const yearsUntil = rmdAge - data.currentAge;
+      const ruleName = country === "US" ? "RMD" : "RRIF minimum withdrawal";
+      const hasTaxDeferred = data.withdrawalTax?.accountsByTreatment?.taxDeferred?.total && data.withdrawalTax.accountsByTreatment.taxDeferred.total > 0;
+      if (hasTaxDeferred) {
+        insights.push({
+          id: "rmd-upcoming",
+          type: "rmd",
+          message: `${ruleName}s start at age ${rmdAge} — that's ${yearsUntil} year${yearsUntil !== 1 ? "s" : ""} away. Consider whether strategic withdrawals or Roth conversions now could reduce your future forced withdrawals.`,
+          icon: "📋",
+        });
+      }
+    }
+  }
+
   return deduplicateInsights(insights);
 }
 

@@ -2,12 +2,10 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 191. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 192. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Retirement Planning
-
-- [ ] Task 192: RRIF/RMD required minimum distributions — Model forced withdrawals: RRSP→RRIF conversion at 71 (CA) and RMD from 401k/IRA at 73 (US). Add minimum withdrawal percentages by age. Show in projections when user's age + projection year crosses threshold. Add insight when RMDs would push user into a higher tax bracket. [@fullstack] [MATH]
 
 - [ ] Task 193: Retirement readiness score — Compute a 0-100 retirement readiness score combining: income replacement ratio, emergency runway, government benefit eligibility, debt-free-by-retirement likelihood, and tax diversification (mix of tax-free/deferred/taxable accounts). Show as a prominent metric in the dashboard with tier labels (Getting Started / Building / On Track / Strong / Retirement Ready). [@fullstack]
 

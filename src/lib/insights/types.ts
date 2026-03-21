@@ -74,6 +74,8 @@ export interface FinancialData {
   monthlyInvestmentReturns?: number;
   /** Outlook years (20/30/40/50) for timeline-scaled insight messages. */
   outlookYears?: number;
+  /** Required minimum distribution summaries (RMD/RRIF) */
+  rmdSummaries?: import("@/lib/required-minimum-distributions").RmdSummary[];
   /** Withdrawal tax impact data */
   withdrawalTax?: {
     /** Early withdrawal penalties based on user's current age */
@@ -91,7 +93,7 @@ export interface FinancialData {
   };
 }
 
-export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost" | "coast-fire" | "net-worth-milestone" | "net-worth-percentile" | "tax-credits-summary" | "tax-credits-unclaimed" | "tax-credits-refundable" | "tax-credits-ineligible" | "au-super" | "au-hecs-help" | "au-fhss" | "au-franking" | "au-mls";
+export type InsightType = "runway" | "surplus" | "net-worth" | "savings-rate" | "debt-interest" | "tax" | "withdrawal-tax" | "employer-match" | "debt-strategy" | "fire" | "tax-optimization" | "income-replacement" | "debt-to-income" | "housing-cost" | "coast-fire" | "net-worth-milestone" | "net-worth-percentile" | "tax-credits-summary" | "tax-credits-unclaimed" | "tax-credits-refundable" | "tax-credits-ineligible" | "au-super" | "au-hecs-help" | "au-fhss" | "au-franking" | "au-mls" | "rmd";
 
 export interface Insight {
   id: string;
