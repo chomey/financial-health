@@ -6,7 +6,7 @@ test.describe("Data Flow — Explainer Modal", () => {
     page,
   }) => {
     await page.goto("/");
-    await expect(page.locator("h1")).toContainText("Financial Health Snapshot");
+    await page.waitForSelector('[data-testid="dashboard-panel"]', { timeout: 15000 });
 
     // No explainer modal should be visible initially
     await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible();

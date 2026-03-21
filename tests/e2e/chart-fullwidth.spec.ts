@@ -13,14 +13,14 @@ test.describe("ProjectionChart full-width layout", () => {
     const chart = page.getByTestId("projection-chart");
     await expect(chart).toBeVisible();
 
-    // Verify the projections section appears before the entry and dashboard sections
+    // Verify the projections section appears before the dashboard section
     const projectionsBB = await projectionsSection.boundingBox();
-    const entrySection = page.locator('section[aria-label="Financial data entry"]');
-    const entryBB = await entrySection.boundingBox();
+    const dashboardSection = page.locator('section[aria-label="Financial dashboard"]');
+    const dashBB = await dashboardSection.boundingBox();
 
     expect(projectionsBB).not.toBeNull();
-    expect(entryBB).not.toBeNull();
-    expect(projectionsBB!.y).toBeLessThan(entryBB!.y);
+    expect(dashBB).not.toBeNull();
+    expect(projectionsBB!.y).toBeLessThan(dashBB!.y);
 
     await captureScreenshot(page, "task-33-chart-fullwidth");
   });

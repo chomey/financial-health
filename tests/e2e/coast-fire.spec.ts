@@ -2,24 +2,15 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Coast FIRE insight", () => {
-  async function setAge(page: import("@playwright/test").Page, age: string) {
-    const addAgeBtn = page.getByTestId("add-age-button").first();
-    if (await addAgeBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await addAgeBtn.click();
-      await page.waitForTimeout(300);
-    } else {
-      // Age display already exists, click to edit
-      const ageDisplay = page.getByTestId("age-display").first();
-      if (await ageDisplay.isVisible({ timeout: 1000 }).catch(() => false)) {
-        await ageDisplay.click();
-        await page.waitForTimeout(300);
-      }
-    }
-    const ageInput = page.getByTestId("age-input").first();
-    await expect(ageInput).toBeVisible({ timeout: 3000 });
-    await ageInput.fill(age);
-    await ageInput.press("Enter");
+  async function setAgeViaWizard(page: import("@playwright/test").Page, age: string) {
+    await page.goto("/?step=profile");
+    await page.waitForSelector('[data-testid="wizard-step-profile"]');
+    await page.getByTestId("wizard-age-input").fill(age);
     await page.waitForTimeout(500);
+    const params = new URL(page.url());
+    params.searchParams.delete("step");
+    await page.goto(params.toString());
+    await page.waitForSelector('[data-testid="insights-panel"]', { timeout: 15000 });
   }
 
   async function addLargeAsset(page: import("@playwright/test").Page) {
@@ -30,13 +21,16 @@ test.describe("Coast FIRE insight", () => {
     await page.waitForTimeout(500);
   }
 
-  test("shows coast-fire insight when age is set with default state", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForSelector('[data-testid="insights-panel"]');
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("fhs-wizard-done", "1");
+      localStorage.setItem("fhs-default-mode", "advanced");
+      localStorage.setItem("fhs-visited", "1");
+    });
+  });
 
-    // Set age — insights panel should render without errors
-    await setAge(page, "30");
-    await page.waitForTimeout(1000);
+  test("shows coast-fire insight when age is set with default state", async ({ page }) => {
+    await setAgeViaWizard(page, "30");
 
     const insightsPanel = page.locator('[data-testid="insights-panel"]');
     await expect(insightsPanel).toBeVisible();
