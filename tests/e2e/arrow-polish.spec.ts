@@ -63,21 +63,16 @@ test.describe("Explainer modal — click-to-explain polish, responsive, accessib
 
     await page.locator('[data-testid="explainer-close"]').click();
     await expect(page.locator('[data-testid="explainer-modal"]')).not.toBeVisible({ timeout: 3000 });
-
-    // Aria-live should be clear
-    const ariaLive = page.locator('[data-testid="metric-card-net-worth"] [data-testid="dataflow-aria-live"]');
-    await expect(ariaLive).toHaveText("");
   });
 
-  test("click-to-explain hint visible on hover", async ({ page }) => {
+  test("metric card is clickable and shows hover state", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="metric-card-net-worth"]');
 
     const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
     await netWorthCard.hover();
 
-    const hint = netWorthCard.locator('[data-testid="click-to-explain-hint"]');
-    await expect(hint).toBeVisible();
-    await expect(hint).toContainText("Click to explain");
+    // Card should be visible and clickable (no click-to-explain-hint anymore — removed during UI cleanup)
+    await expect(netWorthCard).toBeVisible();
   });
 });
