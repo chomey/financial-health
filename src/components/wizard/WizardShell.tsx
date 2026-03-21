@@ -39,6 +39,7 @@ export interface WizardProps {
   jurisdiction: string;
   age: number | undefined;
   retirementAge: number;
+  governmentRetirementIncome: import("@/lib/financial-types").GovernmentRetirementIncome | undefined;
   taxCredits: TaxCredit[];
   filingStatus: FilingStatus;
   taxYear: number;
@@ -63,6 +64,7 @@ export interface WizardProps {
   setJurisdiction: (j: string) => void;
   setAge: (age: number | undefined) => void;
   setRetirementAge: (age: number) => void;
+  setGovernmentRetirementIncome: (v: import("@/lib/financial-types").GovernmentRetirementIncome | undefined) => void;
   setTaxCredits: (credits: TaxCredit[]) => void;
   setFilingStatus: (fs: FilingStatus) => void;
   setTaxYear: (y: number) => void;
@@ -181,8 +183,10 @@ export default function WizardShell(props: WizardProps) {
             onCountryChange={props.handleCountryChange}
             onJurisdictionChange={props.setJurisdiction}
             retirementAge={props.retirementAge}
+            governmentRetirementIncome={props.governmentRetirementIncome}
             onAgeChange={props.setAge}
             onRetirementAgeChange={props.setRetirementAge}
+            onGovernmentRetirementIncomeChange={props.setGovernmentRetirementIncome}
             onFilingStatusChange={props.setFilingStatus}
             onTaxYearChange={props.setTaxYear}
             onFxManualOverrideChange={props.setFxManualOverride}

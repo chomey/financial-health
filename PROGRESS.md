@@ -8,11 +8,31 @@
 
 ## Summary
 - **Total Tasks**: 195
-- **Completed**: 186
-- **Remaining**: 9
+- **Completed**: 187
+- **Remaining**: 8
 - **Last Updated**: 2026-03-20
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 187: Government retirement income estimator (CA) [@fullstack] [MATH]
+- **Date**: 2026-03-20
+- **Files**:
+  - `src/lib/financial-types.ts`: Added `GovernmentRetirementIncome` interface (cppMonthly, oasMonthly, ssMonthly, agePensionFortnightly) and field to FinancialState.
+  - `src/lib/government-retirement.ts`: New — CPP/OAS constants (2025 amounts), preset helpers, `computeMonthlyGovernmentIncome` for CA/US/AU.
+  - `src/lib/compute-totals.ts`: `computeFireNumber` now accepts optional `monthlyGovernmentIncome` parameter to reduce FIRE number.
+  - `src/lib/financial-state.ts`: `toFinancialData` computes government income and passes to FIRE number. `computeCoastFireAge` accepts government income. Added `monthlyGovernmentRetirementIncome` to output.
+  - `src/lib/url-state.ts`: Added `gri` compact key for government retirement income serialization.
+  - `src/lib/insights/types.ts`: Added `monthlyGovernmentRetirementIncome` to FinancialData.
+  - `src/lib/insights/generate.ts`: Coast FIRE insight passes government income to calculation.
+  - `src/components/GovernmentRetirementInput.tsx`: New — CPP/OAS preset selector (none/average/max/custom for CPP, none/full/custom for OAS) with summary display.
+  - `src/components/wizard/steps/ProfileStep.tsx`: Added government retirement input for CA users in advanced mode.
+  - `src/components/wizard/WizardShell.tsx`: Added government retirement income props.
+  - `src/app/_use-financial-state.ts`: Added `governmentRetirementIncome`/`setGovernmentRetirementIncome` state, URL restore/persist.
+  - `src/app/page.tsx`: Wired government retirement income through state and WizardShell.
+  - `tests/unit/government-retirement-ca.test.ts`: New — 22 tests covering presets, FIRE number reduction, Coast FIRE, toFinancialData, URL round-trip.
+  - `tests/e2e/government-retirement-ca.spec.ts`: New — 4 tests covering CPP/OAS rendering, preset selection, summary, URL persistence.
+- **Tests**: T1: 2744 passed (147 files), T2: 4 passed (Playwright), Build: passes
+- **Screenshots**: `task-187-gov-income-default.png`, `task-187-cpp-average.png`, `task-187-cpp-oas-combined.png`
 
 ## Task 186: Retirement age input [@fullstack]
 - **Date**: 2026-03-20

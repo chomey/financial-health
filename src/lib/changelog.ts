@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 187,
+    title: "Government retirement income estimator (Canada)",
+    description: "Estimate your CPP and OAS benefits in the Profile section (advanced mode, CA only). Choose from presets — CPP average ($817/mo), CPP max ($1,365/mo), or custom — plus OAS full ($728/mo) or custom. Government income reduces your FIRE number: if CPP+OAS will cover $1,500/mo of expenses, your portfolio needs to cover that much less. Coast FIRE calculations also factor in expected government income. Data persists in your shareable URL.",
+    date: "2026-03-20",
+  },
+  {
     version: 186,
     title: "Retirement age input",
     description: "Set your target retirement age in the Profile section (default: 65). Coast FIRE and FIRE calculations now use your chosen retirement age instead of always assuming 65. The retirement age persists in your shareable URL — non-default values are encoded, while 65 is omitted to keep URLs compact. When your current age is set, a 'years away' indicator shows how far you are from your target.",

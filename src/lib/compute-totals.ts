@@ -364,11 +364,13 @@ export function fmtShort(n: number, currency: SupportedCurrency): string {
 // --- Consolidated computation helpers ---
 
 /**
- * FIRE number: annual living expenses / 4% safe withdrawal rate.
+ * FIRE number: (annual living expenses - annual government retirement income) / 4% safe withdrawal rate.
+ * Government income in retirement reduces how much your portfolio needs to cover.
  * Single source of truth used by toFinancialData and computeCoastFireAge.
  */
-export function computeFireNumber(monthlyExpenses: number): number | undefined {
-  return monthlyExpenses > 0 ? (monthlyExpenses * 12) / 0.04 : undefined;
+export function computeFireNumber(monthlyExpenses: number, monthlyGovernmentIncome: number = 0): number | undefined {
+  const netMonthlyNeed = Math.max(0, monthlyExpenses - monthlyGovernmentIncome);
+  return netMonthlyNeed > 0 ? (netMonthlyNeed * 12) / 0.04 : undefined;
 }
 
 /**

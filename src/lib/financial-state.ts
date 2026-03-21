@@ -30,6 +30,7 @@ import { getTaxTreatment } from "@/lib/withdrawal-tax";
 import { getMarginalRateForIncome } from "@/lib/tax-engine";
 import { computeTotals, computeMonthlyInvestmentReturns, computeFireNumber, computeMonthlyObligations } from "@/lib/compute-totals";
 import { simulateRunwayWithGrowth, simulateRunwayWithTax } from "@/lib/runway-simulation";
+import { computeMonthlyGovernmentIncome } from "@/lib/government-retirement";
 import type { Asset } from "@/components/AssetEntry";
 
 export function toFinancialData(state: FinancialState): FinancialData {
@@ -55,8 +56,9 @@ export function toFinancialData(state: FinancialState): FinancialData {
       return sum + computeEmployerMatchMonthly(a.monthlyContribution, a.employerMatchPct, a.employerMatchCap, annualEmploymentSalary) * 12;
     }, 0);
 
-  // FIRE number: annual living expenses / 4% SWR — use raw monthly expenses (excludes contributions/mortgage)
-  const fireNumber = computeFireNumber(monthlyExpenses);
+  // FIRE number: (annual expenses - government income) / 4% SWR
+  const monthlyGovIncome = computeMonthlyGovernmentIncome(country, state.governmentRetirementIncome);
+  const fireNumber = computeFireNumber(monthlyExpenses, monthlyGovIncome);
 
   // Monthly debt payments: sum of minimum debt payments + mortgage payments
   const monthlyDebtPayments = state.debts.reduce((sum, d) => sum + (d.monthlyPayment ?? 0), 0) + totalMortgagePayments;
@@ -110,6 +112,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     monthlyHousingCost: monthlyHousingCost > 0 ? monthlyHousingCost : undefined,
     currentAge: state.age,
     retirementAge: state.retirementAge ?? 65,
+    monthlyGovernmentRetirementIncome: monthlyGovIncome > 0 ? monthlyGovIncome : undefined,
     monthlySavings: totalMonthlyContributions > 0 ? totalMonthlyContributions : undefined,
     taxCredits: state.taxCredits,
     filingStatus: state.filingStatus,
@@ -136,11 +139,12 @@ export function computeCoastFireAge(
   targetAge: number = 65,
   realReturn: number = 0.05,
   monthlySavings: number = 0,
+  monthlyGovernmentIncome: number = 0,
 ): number | null {
   if (currentAge >= targetAge || annualExpenses <= 0 || currentInvested <= 0) return null;
 
-  // FIRE number: annual expenses / 4% SWR
-  const fireNumber = computeFireNumber(annualExpenses / 12)!;
+  // FIRE number: (annual expenses - government income) / 4% SWR
+  const fireNumber = computeFireNumber(annualExpenses / 12, monthlyGovernmentIncome)!;
   const monthlyReturn = Math.pow(1 + realReturn, 1 / 12) - 1;
 
   // Simulate year by year: grow portfolio with contributions, check if coasting

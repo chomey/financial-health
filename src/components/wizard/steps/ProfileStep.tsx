@@ -2,10 +2,12 @@
 
 import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
 import FxRateDisplay from "@/components/FxRateDisplay";
+import GovernmentRetirementInput from "@/components/GovernmentRetirementInput";
 import HelpTip from "@/components/HelpTip";
 import { getFilingStatuses } from "@/lib/tax-credits";
 import type { FilingStatus } from "@/lib/tax-credits";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
+import type { GovernmentRetirementIncome } from "@/lib/financial-types";
 import { useModeContext } from "@/lib/ModeContext";
 
 export default function ProfileStep({
@@ -25,12 +27,15 @@ export default function ProfileStep({
   onRetirementAgeChange,
   onFilingStatusChange,
   onTaxYearChange,
+  governmentRetirementIncome,
+  onGovernmentRetirementIncomeChange,
   onFxManualOverrideChange,
 }: {
   country: "CA" | "US" | "AU";
   jurisdiction: string;
   age: number | undefined;
   retirementAge: number;
+  governmentRetirementIncome: GovernmentRetirementIncome | undefined;
   filingStatus: FilingStatus;
   taxYear: number;
   homeCurrency: SupportedCurrency;
@@ -41,6 +46,7 @@ export default function ProfileStep({
   onJurisdictionChange: (j: string) => void;
   onAgeChange: (a: number | undefined) => void;
   onRetirementAgeChange: (a: number) => void;
+  onGovernmentRetirementIncomeChange: (v: GovernmentRetirementIncome | undefined) => void;
   onFilingStatusChange: (fs: FilingStatus) => void;
   onTaxYearChange: (y: number) => void;
   onFxManualOverrideChange: (v: number | undefined) => void;
@@ -174,6 +180,14 @@ export default function ProfileStep({
           />
           <p className="mt-1 text-xs text-slate-500">Used for FIRE and Coast FIRE calculations. Default: 65.</p>
         </div>
+
+        {mode !== "simple" && (
+          <GovernmentRetirementInput
+            country={country}
+            value={governmentRetirementIncome}
+            onChange={onGovernmentRetirementIncomeChange}
+          />
+        )}
 
         <div>
           <div className="mb-2 flex items-center gap-1.5">

@@ -17,6 +17,7 @@ import type { TaxCredit } from "@/lib/tax-credits";
 import { type FilingStatus, getDefaultFilingStatus } from "@/lib/tax-credits";
 import type { SampleProfile } from "@/lib/sample-profiles";
 import type { WizardResult } from "@/components/MobileWizard";
+import type { GovernmentRetirementIncome } from "@/lib/financial-types";
 
 export function useFinancialState() {
   const [assets, setAssets] = useState<Asset[]>(INITIAL_STATE.assets);
@@ -39,6 +40,7 @@ export function useFinancialState() {
   const [flowchartAcks, setFlowchartAcks] = useState<string[]>([]);
   const [flowchartSkips, setFlowchartSkips] = useState<string[]>([]);
   const [retirementAge, setRetirementAge] = useState<number>(65);
+  const [governmentRetirementIncome, setGovernmentRetirementIncome] = useState<GovernmentRetirementIncome | undefined>(undefined);
   const [isRetired, setIsRetired] = useState(false);
   const [mode, setMode] = useState<AppMode>("simple");
   const [showSampleProfiles, setShowSampleProfiles] = useState(false);
@@ -78,6 +80,7 @@ export function useFinancialState() {
       if (urlState.flowchartAcks) setFlowchartAcks(urlState.flowchartAcks);
       if (urlState.flowchartSkips) setFlowchartSkips(urlState.flowchartSkips);
       if (urlState.retirementAge !== undefined) setRetirementAge(urlState.retirementAge);
+      if (urlState.governmentRetirementIncome) setGovernmentRetirementIncome(urlState.governmentRetirementIncome);
       if (urlState.isRetired) setIsRetired(true);
       if (urlState.mode) setMode(urlState.mode);
     } else {
@@ -126,8 +129,8 @@ export function useFinancialState() {
       isFirstRender.current = false;
       return;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, retirementAge: retirementAge !== 65 ? retirementAge : undefined, isRetired: isRetired || undefined, mode });
-  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, retirementAge, isRetired, mode]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, retirementAge: retirementAge !== 65 ? retirementAge : undefined, governmentRetirementIncome, isRetired: isRetired || undefined, mode });
+  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, retirementAge, governmentRetirementIncome, isRetired, mode]);
 
   // Sync computed assets for stocks and property equity (auto-update amounts, preserve ROI & surplusTarget)
   const syncComputedAssets = useCallback(() => {
@@ -293,6 +296,7 @@ export function useFinancialState() {
     flowchartAcks,
     flowchartSkips,
     retirementAge,
+    governmentRetirementIncome,
     isRetired,
     mode,
     showSampleProfiles,
@@ -324,6 +328,7 @@ export function useFinancialState() {
     setFlowchartAcks,
     setFlowchartSkips,
     setRetirementAge,
+    setGovernmentRetirementIncome,
     setIsRetired,
     setMode,
     setShowSampleProfiles,

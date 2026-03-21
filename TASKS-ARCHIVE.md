@@ -226,3 +226,5 @@
 - [x] Task 185: Auto-complete taxable investing flowchart step — CA and US "Taxable Investing & Goals" steps should auto-complete when user has non-registered assets or stocks (like AU's `au-etf-invest` already does). Compute `hasTaxableHoldings` from non-tax-advantaged assets + stocks in `buildCASteps`/`buildUSSteps`, set `isComplete` and `progress` accordingly. [@fullstack]
 
 - [x] Task 186: Retirement age input — Add a `retirementAge` field (default 65) to FinancialState and the settings/profile UI. Persist in URL state. Use it in FIRE/Coast FIRE calculations instead of hardcoded 65. Show "years to retirement" in the snapshot dashboard. [@fullstack]
+
+- [x] Task 187: Government retirement income estimator (CA) — Add CPP and OAS ballpark estimators. User enters expected CPP monthly amount (or "average"/"max" preset) and whether they qualify for OAS. Show combined government income in retirement and factor it into FIRE number calculation (reduces annual expenses to cover). Add to CA flowchart steps. [@fullstack] [MATH]

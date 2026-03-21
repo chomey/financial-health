@@ -100,11 +100,13 @@ export default function Home() {
     flowchartAcks,
     flowchartSkips,
     retirementAge,
+    governmentRetirementIncome,
     isRetired,
     mode,
     setFlowchartAcks,
     setFlowchartSkips,
     setRetirementAge,
+    setGovernmentRetirementIncome,
     setIsRetired,
     setMode,
   } = useFinancialState();
@@ -214,7 +216,7 @@ export default function Home() {
     window.scrollTo(0, 0);
   }, []);
 
-  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, retirementAge: retirementAge !== 65 ? retirementAge : undefined, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride, taxCredits, filingStatus, taxYear };
+  const state = { assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, retirementAge: retirementAge !== 65 ? retirementAge : undefined, governmentRetirementIncome, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxRates: effectiveFxRates, fxManualOverride, taxCredits, filingStatus, taxYear };
 
   // Computed values needed by both wizard and dashboard
   const totals = computeTotals(state);
@@ -250,6 +252,7 @@ export default function Home() {
         jurisdiction={jurisdiction}
         age={age}
         retirementAge={retirementAge}
+        governmentRetirementIncome={governmentRetirementIncome}
         taxCredits={taxCredits}
         filingStatus={filingStatus}
         taxYear={taxYear}
@@ -271,6 +274,7 @@ export default function Home() {
         setJurisdiction={setJurisdiction}
         setAge={setAge}
         setRetirementAge={setRetirementAge}
+        setGovernmentRetirementIncome={setGovernmentRetirementIncome}
         setTaxCredits={setTaxCredits}
         setFilingStatus={setFilingStatus}
         setTaxYear={setTaxYear}

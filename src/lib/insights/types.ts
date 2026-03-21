@@ -52,6 +52,8 @@ export interface FinancialData {
   currentAge?: number;
   /** Target retirement age. Default 65. Used for FIRE/Coast FIRE calculations. */
   retirementAge?: number;
+  /** Monthly government retirement income (CPP+OAS, Social Security, Age Pension). Reduces FIRE number. */
+  monthlyGovernmentRetirementIncome?: number;
   /** Total monthly investment contributions. Used for Coast FIRE projection. */
   monthlySavings?: number;
   /** User-entered tax credits and deductions */

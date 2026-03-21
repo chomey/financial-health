@@ -630,7 +630,7 @@ export function generateInsights(data: FinancialData): Insight[] {
   if (data.currentAge && data.liquidAssets && data.rawMonthlyExpenses && data.rawMonthlyExpenses > 0) {
     const annualExpenses = data.rawMonthlyExpenses * 12;
     const targetRetirementAge = data.retirementAge ?? 65;
-    const coastAge = computeCoastFireAge(data.currentAge, data.liquidAssets, annualExpenses, targetRetirementAge, 0.05, data.monthlySavings ?? 0);
+    const coastAge = computeCoastFireAge(data.currentAge, data.liquidAssets, annualExpenses, targetRetirementAge, 0.05, data.monthlySavings ?? 0, data.monthlyGovernmentRetirementIncome ?? 0);
     if (coastAge !== null) {
       if (coastAge <= data.currentAge) {
         insights.push({

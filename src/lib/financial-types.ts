@@ -7,6 +7,18 @@ import type { StockHolding } from "@/components/StockEntry";
 import type { FxRates } from "@/lib/currency";
 import type { TaxCredit, FilingStatus } from "@/lib/tax-credits";
 
+/** Government retirement income estimates (CPP/OAS for CA, Social Security for US, Age Pension for AU) */
+export interface GovernmentRetirementIncome {
+  /** CPP monthly benefit (CA). Presets: "average" ~$816/mo, "max" ~$1,365/mo, or custom amount. */
+  cppMonthly?: number;
+  /** OAS monthly benefit (CA). Presets: "full" ~$728/mo, or custom amount. 0 = not eligible. */
+  oasMonthly?: number;
+  /** Social Security monthly benefit (US). */
+  ssMonthly?: number;
+  /** Age Pension fortnightly benefit (AU). */
+  agePensionFortnightly?: number;
+}
+
 export interface FinancialState {
   assets: Asset[];
   debts: Debt[];
@@ -28,6 +40,7 @@ export interface FinancialState {
   flowchartAcks?: string[]; // Money Steps acknowledged step IDs
   flowchartSkips?: string[]; // Money Steps skipped (N/A) step IDs
   retirementAge?: number; // target retirement age (default 65)
+  governmentRetirementIncome?: GovernmentRetirementIncome; // expected government benefits in retirement
   isRetired?: boolean; // retirement mode flag
   mode?: "simple" | "advanced"; // UI complexity mode (default: "simple")
 }

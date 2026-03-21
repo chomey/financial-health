@@ -171,6 +171,7 @@ interface CompactState {
   fca?: string[]; // flowchart acknowledged step IDs
   fcs2?: string[]; // flowchart skipped step IDs (fcs2 to avoid collision with old fcs= param)
   ra?: number; // retirement age (omitted when 65/default)
+  gri?: { cpp?: number; oas?: number; ss?: number; ap?: number }; // government retirement income
   ret?: 1; // retired flag
   mo?: string; // mode ("advanced" only; omitted when simple/default)
 }
@@ -261,6 +262,15 @@ function toCompact(state: FinancialState): CompactState {
   if (state.flowchartAcks && state.flowchartAcks.length > 0) compact.fca = state.flowchartAcks;
   if (state.flowchartSkips && state.flowchartSkips.length > 0) compact.fcs2 = state.flowchartSkips;
   if (state.retirementAge !== undefined && state.retirementAge !== 65) compact.ra = state.retirementAge;
+  if (state.governmentRetirementIncome) {
+    const g = state.governmentRetirementIncome;
+    const gri: { cpp?: number; oas?: number; ss?: number; ap?: number } = {};
+    if (g.cppMonthly) gri.cpp = g.cppMonthly;
+    if (g.oasMonthly) gri.oas = g.oasMonthly;
+    if (g.ssMonthly) gri.ss = g.ssMonthly;
+    if (g.agePensionFortnightly) gri.ap = g.agePensionFortnightly;
+    if (Object.keys(gri).length > 0) compact.gri = gri;
+  }
   if (state.isRetired) compact.ret = 1;
   if (state.mode && state.mode !== "simple") compact.mo = state.mode;
   return compact;
@@ -352,6 +362,12 @@ function fromCompact(compact: CompactState): FinancialState {
     flowchartAcks: compact.fca,
     flowchartSkips: compact.fcs2,
     retirementAge: compact.ra,
+    governmentRetirementIncome: compact.gri ? {
+      cppMonthly: compact.gri.cpp,
+      oasMonthly: compact.gri.oas,
+      ssMonthly: compact.gri.ss,
+      agePensionFortnightly: compact.gri.ap,
+    } : undefined,
     isRetired: compact.ret === 1 ? true : undefined,
     mode: compact.mo as "simple" | "advanced" | undefined,
   };
