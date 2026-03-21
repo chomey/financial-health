@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 193,
+    title: "Retirement readiness score",
+    description: "New 0-100 Retirement Readiness score in the Compare section. Combines 5 weighted components: income replacement ratio (30%), emergency runway (20%), tax diversification (20%), government benefit coverage (15%), and debt position (15%). Color-coded tiers from Getting Started (0-19) through Retirement Ready (80-100). Each component shows a mini progress bar so you can see exactly where to focus.",
+    date: "2026-03-21",
+  },
+  {
     version: 192,
     title: "RRIF/RMD required minimum distributions",
     description: "Added required minimum distribution modeling for Canada (RRIF minimums from age 71, using CRA prescribed factors) and US (RMDs from age 73, using IRS Uniform Lifetime Table). When your age triggers RMDs, an insight shows the required annual withdrawal per account with percentage and dollar amounts. For ages 65-72, a preview insight warns that forced withdrawals are coming. AU has no equivalent forced withdrawal mechanism.",

@@ -23,6 +23,8 @@ import InsightsPanel from "@/components/InsightsPanel";
 import FinancialHealthScore from "@/components/FinancialHealthScore";
 import FinancialFlowchart from "@/components/FinancialFlowchart";
 import RetirementIncomeChart from "@/components/RetirementIncomeChart";
+import RetirementReadinessScore from "@/components/RetirementReadinessScore";
+import { computeRetirementReadiness } from "@/lib/retirement-readiness";
 import WithdrawalTaxSummary from "@/components/WithdrawalTaxSummary";
 import ZoomableCard from "@/components/ZoomableCard";
 import { DataFlowProvider } from "@/components/DataFlowArrows";
@@ -307,6 +309,19 @@ export default function Home() {
   const monthlyGovRetirementIncome = financialData.monthlyGovernmentRetirementIncome ?? 0;
   const monthlyPortfolioWithdrawal = financialData.liquidAssets ? (financialData.liquidAssets * 0.04 / 12) : 0;
   const showRetirementChart = monthlyGovRetirementIncome > 0 || monthlyPortfolioWithdrawal > 0;
+
+  // Retirement readiness score
+  const retirementReadiness = computeRetirementReadiness({
+    incomeReplacementRatio: financialData.incomeReplacementRatio,
+    runwayMonths: metrics.find(m => m.title === "Financial Runway")?.value ?? 0,
+    monthlyGovernmentIncome: monthlyGovRetirementIncome,
+    monthlyExpenses: financialData.rawMonthlyExpenses ?? 0,
+    totalDebts: debtTotal,
+    totalAssets: financialData.liquidAssets ?? 0,
+    taxFreeTotal: financialData.withdrawalTax?.accountsByTreatment?.taxFree?.total ?? 0,
+    taxDeferredTotal: financialData.withdrawalTax?.accountsByTreatment?.taxDeferred?.total ?? 0,
+    taxableTotal: financialData.withdrawalTax?.accountsByTreatment?.taxable?.total ?? 0,
+  });
 
   // Data-flow connections for metric cards
   const fmtLabel = (v: number) => {
@@ -619,6 +634,9 @@ export default function Home() {
                 debtToIncomeRatio={benchmarkDebtToIncome}
                 annualIncome={annualIncome}
               /></ZoomableCard>
+            </div>
+            <div className="mt-4">
+              <ZoomableCard><RetirementReadinessScore result={retirementReadiness} /></ZoomableCard>
             </div>
             {stocks.length > 0 && (() => {
               const portfolio = getPortfolioSummary(stocks);
