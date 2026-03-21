@@ -50,6 +50,8 @@ export interface FinancialData {
   monthlyHousingCost?: number;
   /** User's current age. Used for Coast FIRE and age-based insights. */
   currentAge?: number;
+  /** Target retirement age. Default 65. Used for FIRE/Coast FIRE calculations. */
+  retirementAge?: number;
   /** Total monthly investment contributions. Used for Coast FIRE projection. */
   monthlySavings?: number;
   /** User-entered tax credits and deductions */

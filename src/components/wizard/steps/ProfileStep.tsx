@@ -20,7 +20,9 @@ export default function ProfileStep({
   fxManualOverride,
   onCountryChange,
   onJurisdictionChange,
+  retirementAge,
   onAgeChange,
+  onRetirementAgeChange,
   onFilingStatusChange,
   onTaxYearChange,
   onFxManualOverrideChange,
@@ -28,6 +30,7 @@ export default function ProfileStep({
   country: "CA" | "US" | "AU";
   jurisdiction: string;
   age: number | undefined;
+  retirementAge: number;
   filingStatus: FilingStatus;
   taxYear: number;
   homeCurrency: SupportedCurrency;
@@ -37,6 +40,7 @@ export default function ProfileStep({
   onCountryChange: (c: "CA" | "US" | "AU") => void;
   onJurisdictionChange: (j: string) => void;
   onAgeChange: (a: number | undefined) => void;
+  onRetirementAgeChange: (a: number) => void;
   onFilingStatusChange: (fs: FilingStatus) => void;
   onTaxYearChange: (y: number) => void;
   onFxManualOverrideChange: (v: number | undefined) => void;
@@ -152,6 +156,23 @@ export default function ProfileStep({
             data-testid="wizard-age-input"
           />
           <p className="mt-1 text-xs text-slate-500">Used for retirement projections and age-based benchmarks.</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">Target Retirement Age</label>
+          <input
+            type="number"
+            min={30}
+            max={100}
+            value={retirementAge}
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10);
+              if (val >= 30 && val <= 100) onRetirementAgeChange(val);
+            }}
+            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
+            data-testid="wizard-retirement-age-input"
+          />
+          <p className="mt-1 text-xs text-slate-500">Used for FIRE and Coast FIRE calculations. Default: 65.</p>
         </div>
 
         <div>

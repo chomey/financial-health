@@ -27,6 +27,7 @@ export interface FinancialState {
   taxYear?: number; // tax year for brackets/credits (default: current year)
   flowchartAcks?: string[]; // Money Steps acknowledged step IDs
   flowchartSkips?: string[]; // Money Steps skipped (N/A) step IDs
+  retirementAge?: number; // target retirement age (default 65)
   isRetired?: boolean; // retirement mode flag
   mode?: "simple" | "advanced"; // UI complexity mode (default: "simple")
 }

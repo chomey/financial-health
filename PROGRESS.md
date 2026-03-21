@@ -7,12 +7,30 @@
 -->
 
 ## Summary
-- **Total Tasks**: 184
-- **Completed**: 184
-- **Remaining**: 0
-- **Last Updated**: 2026-03-09
+- **Total Tasks**: 195
+- **Completed**: 186
+- **Remaining**: 9
+- **Last Updated**: 2026-03-20
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 186: Retirement age input [@fullstack]
+- **Date**: 2026-03-20
+- **Files**:
+  - `src/lib/financial-types.ts`: Added `retirementAge?: number` to FinancialState interface.
+  - `src/lib/url-state.ts`: Added `ra?: number` to CompactState, serialize/deserialize (omitted when default 65).
+  - `src/app/_use-financial-state.ts`: Added `retirementAge`/`setRetirementAge` state, URL restore, URL persist.
+  - `src/app/_page-helpers.tsx`: New `RetirementAgeInput` component with inline editing, "years away" display.
+  - `src/components/wizard/steps/ProfileStep.tsx`: Added retirement age input field below age input.
+  - `src/components/wizard/WizardShell.tsx`: Added `retirementAge`/`setRetirementAge` props.
+  - `src/app/page.tsx`: Wired `retirementAge`/`setRetirementAge` through state and WizardShell.
+  - `src/lib/financial-state.ts`: Passes `retirementAge` through `toFinancialData`.
+  - `src/lib/insights/types.ts`: Added `retirementAge` to `FinancialData` interface.
+  - `src/lib/insights/generate.ts`: Coast FIRE insight uses `retirementAge` instead of hardcoded 65.
+  - `tests/unit/retirement-age.test.ts`: New — 12 tests covering computeCoastFireAge with custom retirement age, toFinancialData passing, URL state round-trip.
+  - `tests/e2e/retirement-age.spec.ts`: New — 4 tests covering default value, change, URL persistence, default omission.
+- **Tests**: T1: 2722 passed (146 files), T2: 4 passed (Playwright), Build: passes
+- **Screenshots**: `task-186-retirement-age-default.png`, `task-186-retirement-age-changed.png`
 
 ## Task 184: Simple/advanced mode E2E tests [@qa] [E2E]
 - **Date**: 2026-03-09

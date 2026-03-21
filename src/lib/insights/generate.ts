@@ -629,13 +629,14 @@ export function generateInsights(data: FinancialData): Insight[] {
   // Coast FIRE insight
   if (data.currentAge && data.liquidAssets && data.rawMonthlyExpenses && data.rawMonthlyExpenses > 0) {
     const annualExpenses = data.rawMonthlyExpenses * 12;
-    const coastAge = computeCoastFireAge(data.currentAge, data.liquidAssets, annualExpenses, 65, 0.05, data.monthlySavings ?? 0);
+    const targetRetirementAge = data.retirementAge ?? 65;
+    const coastAge = computeCoastFireAge(data.currentAge, data.liquidAssets, annualExpenses, targetRetirementAge, 0.05, data.monthlySavings ?? 0);
     if (coastAge !== null) {
       if (coastAge <= data.currentAge) {
         insights.push({
           id: "coast-fire-achieved",
           type: "coast-fire",
-          message: `You've hit Coast FIRE! Even if you stopped saving today, your investments would grow to cover retirement by age 65. Coast FIRE means your existing portfolio, compounding at ~5% real return, will reach your FIRE number without additional contributions — a powerful milestone for peace of mind.`,
+          message: `You've hit Coast FIRE! Even if you stopped saving today, your investments would grow to cover retirement by age ${targetRetirementAge}. Coast FIRE means your existing portfolio, compounding at ~5% real return, will reach your FIRE number without additional contributions — a powerful milestone for peace of mind.`,
           icon: "🏖️",
         });
       } else {
@@ -643,7 +644,7 @@ export function generateInsights(data: FinancialData): Insight[] {
         insights.push({
           id: "coast-fire-progress",
           type: "coast-fire",
-          message: `If you keep saving until age ${coastAge}, you could stop contributing and still retire at 65 — that's ${yearsAway} year${yearsAway !== 1 ? "s" : ""} away. Coast FIRE is the point where your current investments, growing at ~5% real return, will compound to cover your retirement expenses without any more contributions.`,
+          message: `If you keep saving until age ${coastAge}, you could stop contributing and still retire at ${targetRetirementAge} — that's ${yearsAway} year${yearsAway !== 1 ? "s" : ""} away. Coast FIRE is the point where your current investments, growing at ~5% real return, will compound to cover your retirement expenses without any more contributions.`,
           icon: "🏖️",
         });
       }

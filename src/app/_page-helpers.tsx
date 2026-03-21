@@ -356,6 +356,61 @@ export function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange
   );
 }
 
+export function RetirementAgeInput({ retirementAge, onChange, currentAge }: { retirementAge: number; onChange: (age: number) => void; currentAge?: number }) {
+  const [editing, setEditing] = useState(false);
+  const [input, setInput] = useState(retirementAge.toString());
+
+  const submit = () => {
+    const parsed = parseInt(input, 10);
+    if (parsed >= 30 && parsed <= 100) {
+      onChange(parsed);
+    } else {
+      setInput(retirementAge.toString());
+    }
+    setEditing(false);
+  };
+
+  const yearsToRetirement = currentAge && currentAge < retirementAge ? retirementAge - currentAge : undefined;
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1.5" data-testid="retirement-age-form">
+        <label className="text-sm font-medium text-slate-400">Retire at:</label>
+        <input
+          type="number"
+          min={30}
+          max={100}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setInput(retirementAge.toString()); setEditing(false); } }}
+          onBlur={submit}
+          autoFocus
+          className="w-16 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm text-slate-200 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20 transition-all duration-150"
+          data-testid="retirement-age-input"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1" data-testid="retirement-age-display">
+      <span className="text-sm font-medium text-slate-400">Retire at:</span>
+      <button
+        onClick={() => { setInput(retirementAge.toString()); setEditing(true); }}
+        className="min-h-[36px] rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
+        data-testid="retirement-age-value"
+      >
+        {retirementAge}
+      </button>
+      {yearsToRetirement !== undefined && (
+        <span className="text-xs text-slate-500" data-testid="years-to-retirement">
+          ({yearsToRetirement}y away)
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function WelcomeBanner() {
   return (
     <div className="relative mb-6 rounded-xl border border-violet-400/20 bg-gradient-to-br from-violet-400/10 to-cyan-400/5 px-4 py-4 shadow-sm sm:px-6 sm:py-5 backdrop-blur-sm">

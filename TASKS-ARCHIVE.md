@@ -222,3 +222,7 @@
 - [x] Task 173: AU E2E tests and regression — Full Playwright E2E test suite for AU flow: select AU country, pick AU sample profile, verify dashboard shows AUD values, verify Money Steps show AU-specific steps, verify tax summary uses AU brackets, verify super accounts appear in assets. Run full regression to ensure CA/US flows are unaffected by AU additions. [@qa] [E2E] [MILESTONE]
 
 - [x] Task 184: Simple/advanced mode E2E tests — Test mode toggle persists in URL, test simple mode hides correct wizard steps and fields, test advanced mode shows all fields, test switching modes preserves data (enter data in advanced → switch to simple → switch back → data still there), test simple mode dashboard shows correct subset of sections. Test both new quick-start profiles load correctly. [@qa] [E2E]
+
+- [x] Task 185: Auto-complete taxable investing flowchart step — CA and US "Taxable Investing & Goals" steps should auto-complete when user has non-registered assets or stocks (like AU's `au-etf-invest` already does). Compute `hasTaxableHoldings` from non-tax-advantaged assets + stocks in `buildCASteps`/`buildUSSteps`, set `isComplete` and `progress` accordingly. [@fullstack]
+
+- [x] Task 186: Retirement age input — Add a `retirementAge` field (default 65) to FinancialState and the settings/profile UI. Persist in URL state. Use it in FIRE/Coast FIRE calculations instead of hardcoded 65. Show "years to retirement" in the snapshot dashboard. [@fullstack]

@@ -38,6 +38,7 @@ export interface WizardProps {
   country: "CA" | "US" | "AU";
   jurisdiction: string;
   age: number | undefined;
+  retirementAge: number;
   taxCredits: TaxCredit[];
   filingStatus: FilingStatus;
   taxYear: number;
@@ -61,6 +62,7 @@ export interface WizardProps {
   handleCountryChange: (country: "CA" | "US" | "AU") => void;
   setJurisdiction: (j: string) => void;
   setAge: (age: number | undefined) => void;
+  setRetirementAge: (age: number) => void;
   setTaxCredits: (credits: TaxCredit[]) => void;
   setFilingStatus: (fs: FilingStatus) => void;
   setTaxYear: (y: number) => void;
@@ -178,7 +180,9 @@ export default function WizardShell(props: WizardProps) {
             fxManualOverride={props.fxManualOverride}
             onCountryChange={props.handleCountryChange}
             onJurisdictionChange={props.setJurisdiction}
+            retirementAge={props.retirementAge}
             onAgeChange={props.setAge}
+            onRetirementAgeChange={props.setRetirementAge}
             onFilingStatusChange={props.setFilingStatus}
             onTaxYearChange={props.setTaxYear}
             onFxManualOverrideChange={props.setFxManualOverride}

@@ -38,6 +38,7 @@ export function useFinancialState() {
   const [taxYear, setTaxYear] = useState<number>(new Date().getFullYear());
   const [flowchartAcks, setFlowchartAcks] = useState<string[]>([]);
   const [flowchartSkips, setFlowchartSkips] = useState<string[]>([]);
+  const [retirementAge, setRetirementAge] = useState<number>(65);
   const [isRetired, setIsRetired] = useState(false);
   const [mode, setMode] = useState<AppMode>("simple");
   const [showSampleProfiles, setShowSampleProfiles] = useState(false);
@@ -76,6 +77,7 @@ export function useFinancialState() {
       if (urlState.taxYear) setTaxYear(urlState.taxYear);
       if (urlState.flowchartAcks) setFlowchartAcks(urlState.flowchartAcks);
       if (urlState.flowchartSkips) setFlowchartSkips(urlState.flowchartSkips);
+      if (urlState.retirementAge !== undefined) setRetirementAge(urlState.retirementAge);
       if (urlState.isRetired) setIsRetired(true);
       if (urlState.mode) setMode(urlState.mode);
     } else {
@@ -124,8 +126,8 @@ export function useFinancialState() {
       isFirstRender.current = false;
       return;
     }
-    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, isRetired: isRetired || undefined, mode });
-  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, isRetired, mode]);
+    updateURL({ assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, retirementAge: retirementAge !== 65 ? retirementAge : undefined, isRetired: isRetired || undefined, mode });
+  }, [assets, debts, properties, stocks, income, expenses, country, jurisdiction, age, federalTaxOverride, provincialTaxOverride, surplusTargetComputedId, fxManualOverride, taxCredits, filingStatus, taxYear, flowchartAcks, flowchartSkips, retirementAge, isRetired, mode]);
 
   // Sync computed assets for stocks and property equity (auto-update amounts, preserve ROI & surplusTarget)
   const syncComputedAssets = useCallback(() => {
@@ -290,6 +292,7 @@ export function useFinancialState() {
     taxYear,
     flowchartAcks,
     flowchartSkips,
+    retirementAge,
     isRetired,
     mode,
     showSampleProfiles,
@@ -320,6 +323,7 @@ export function useFinancialState() {
     setTaxYear,
     setFlowchartAcks,
     setFlowchartSkips,
+    setRetirementAge,
     setIsRetired,
     setMode,
     setShowSampleProfiles,

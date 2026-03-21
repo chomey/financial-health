@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 186,
+    title: "Retirement age input",
+    description: "Set your target retirement age in the Profile section (default: 65). Coast FIRE and FIRE calculations now use your chosen retirement age instead of always assuming 65. The retirement age persists in your shareable URL — non-default values are encoded, while 65 is omitted to keep URLs compact. When your current age is set, a 'years away' indicator shows how far you are from your target.",
+    date: "2026-03-20",
+  },
+  {
     version: 185,
     title: "Auto-complete taxable investing flowchart step",
     description: "The 'Taxable Investing & Goals' step in the CA and US financial flowcharts now auto-completes when you have stocks or taxable/non-registered investment holdings (brokerage, ETF, index fund, etc.). No more manually checking the obvious. The acknowledge checkbox only appears when no taxable holdings are detected.",

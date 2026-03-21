@@ -109,6 +109,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
     monthlyGrossIncome: monthlyIncome > 0 ? monthlyIncome : undefined,
     monthlyHousingCost: monthlyHousingCost > 0 ? monthlyHousingCost : undefined,
     currentAge: state.age,
+    retirementAge: state.retirementAge ?? 65,
     monthlySavings: totalMonthlyContributions > 0 ? totalMonthlyContributions : undefined,
     taxCredits: state.taxCredits,
     filingStatus: state.filingStatus,
