@@ -8,11 +8,21 @@
 
 ## Summary
 - **Total Tasks**: 195
-- **Completed**: 189
-- **Remaining**: 6
+- **Completed**: 190
+- **Remaining**: 5
 - **Last Updated**: 2026-03-20
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 190: Retirement income waterfall chart [@frontend]
+- **Date**: 2026-03-21
+- **Files**:
+  - `src/components/RetirementIncomeChart.tsx`: New — horizontal stacked bar chart comparing retirement income sources (government benefits + portfolio 4% rule) vs monthly expenses. Color-coded segments (cyan=government, violet=portfolio), coverage percentage, gap calculation. Country-aware labels (CPP+OAS / Social Security / Age Pension).
+  - `src/app/page.tsx`: Added RetirementIncomeChart import. Computed `monthlyGovRetirementIncome`, `monthlyPortfolioWithdrawal`, `showRetirementChart`. Renders in breakdowns section when any retirement income exists.
+  - `tests/unit/retirement-income-chart.test.ts`: New — 9 tests covering coverage calculation, gap computation, portfolio withdrawal (4% rule), government income by country.
+  - `tests/e2e/retirement-income-chart.spec.ts`: New — 2 tests covering chart visibility with/without government income.
+- **Tests**: T1: 2787 passed (150 files), T2: 2 passed (Playwright), Build: passes
+- **Screenshots**: `task-190-retirement-income-chart-ca.png`, `task-190-retirement-income-chart-default.png`
 
 ## Task 189: Government retirement income estimator (AU) [@fullstack] [MATH]
 - **Date**: 2026-03-20

@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 190,
+    title: "Retirement income waterfall chart",
+    description: "New visual comparison of retirement income sources vs monthly expenses, shown in the Breakdowns section. Stacked horizontal bars show government benefits (CPP+OAS, Social Security, or Age Pension) and portfolio withdrawals (4% rule) against your expenses. Coverage percentage and gap amount are displayed with color-coded tiers (green = fully covered, cyan = 75%+, amber = below 75%).",
+    date: "2026-03-21",
+  },
+  {
     version: 189,
     title: "Government retirement income estimator (Australia)",
     description: "Estimate your Age Pension in the Profile section (advanced mode, AU only). Choose single ($1,116/fortnight) or couple ($841/fortnight each) full pension presets, or enter a custom amount. Amounts display in fortnightly with monthly equivalents. Like the Canadian and US estimators, Age Pension income reduces your FIRE number. Also exports Super preservation age (60) and Age Pension age (67) constants for future use.",

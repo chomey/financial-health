@@ -232,3 +232,5 @@
 - [x] Task 188: Government retirement income estimator (US) — Add Social Security ballpark estimator. User enters expected monthly benefit (or "average"/"max" preset based on claiming age 62/67/70). Show benefit in retirement income and factor into FIRE number calculation. Add to US flowchart steps. [@fullstack] [MATH]
 
 - [x] Task 189: Government retirement income estimator (AU) — Add Age Pension ballpark estimator. User enters single/couple status and whether they expect full/part/no pension (or enters fortnightly amount). Factor Super pension phase income + Age Pension into FIRE number calculation. Account for Super preservation age (60) vs Age Pension age (67). Add to AU flowchart steps. [@fullstack] [MATH]
+
+- [x] Task 190: Retirement income waterfall chart — New visualization showing stacked income sources in retirement: government benefits (CPP/OAS, Social Security, or Age Pension), pension/annuity income, portfolio withdrawals (4% rule), and any remaining income. Show as horizontal stacked bar vs monthly expenses target. Display in SnapshotDashboard when retirement metrics are visible. [@frontend]

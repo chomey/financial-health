@@ -22,6 +22,7 @@ import CashFlowSankey from "@/components/CashFlowSankey";
 import InsightsPanel from "@/components/InsightsPanel";
 import FinancialHealthScore from "@/components/FinancialHealthScore";
 import FinancialFlowchart from "@/components/FinancialFlowchart";
+import RetirementIncomeChart from "@/components/RetirementIncomeChart";
 import ZoomableCard from "@/components/ZoomableCard";
 import { DataFlowProvider } from "@/components/DataFlowArrows";
 import { CurrencyProvider } from "@/lib/CurrencyContext";
@@ -301,6 +302,11 @@ export default function Home() {
   const financialData = { ...toFinancialData(state), outlookYears };
   const debtTotal = totals.totalDebts;
 
+  // Retirement income chart data
+  const monthlyGovRetirementIncome = financialData.monthlyGovernmentRetirementIncome ?? 0;
+  const monthlyPortfolioWithdrawal = financialData.liquidAssets ? (financialData.liquidAssets * 0.04 / 12) : 0;
+  const showRetirementChart = monthlyGovRetirementIncome > 0 || monthlyPortfolioWithdrawal > 0;
+
   // Data-flow connections for metric cards
   const fmtLabel = (v: number) => {
     const sign = v >= 0 ? "+" : "-";
@@ -569,6 +575,17 @@ export default function Home() {
                 stocks={stocks}
               /></ZoomableCard>
             </div>
+            {showRetirementChart && (
+              <div className="mt-4">
+                <ZoomableCard><RetirementIncomeChart
+                  monthlyGovernmentIncome={monthlyGovRetirementIncome}
+                  monthlyPortfolioWithdrawal={monthlyPortfolioWithdrawal}
+                  monthlyExpenses={financialData.rawMonthlyExpenses ?? 0}
+                  country={country}
+                  homeCurrency={homeCurrency}
+                /></ZoomableCard>
+              </div>
+            )}
           </section>}
 
           {/* Compare (2-col) */}
