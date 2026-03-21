@@ -2,12 +2,10 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 187. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 188. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Retirement Planning
-
-- [ ] Task 188: Government retirement income estimator (US) — Add Social Security ballpark estimator. User enters expected monthly benefit (or "average"/"max" preset based on claiming age 62/67/70). Show benefit in retirement income and factor into FIRE number calculation. Add to US flowchart steps. [@fullstack] [MATH]
 
 - [ ] Task 189: Government retirement income estimator (AU) — Add Age Pension ballpark estimator. User enters single/couple status and whether they expect full/part/no pension (or enters fortnightly amount). Factor Super pension phase income + Age Pension into FIRE number calculation. Account for Super preservation age (60) vs Age Pension age (67). Add to AU flowchart steps. [@fullstack] [MATH]
 

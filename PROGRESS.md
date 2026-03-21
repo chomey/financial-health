@@ -8,11 +8,21 @@
 
 ## Summary
 - **Total Tasks**: 195
-- **Completed**: 187
-- **Remaining**: 8
+- **Completed**: 188
+- **Remaining**: 7
 - **Last Updated**: 2026-03-20
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 188: Government retirement income estimator (US) [@fullstack] [MATH]
+- **Date**: 2026-03-20
+- **Files**:
+  - `src/lib/government-retirement.ts`: Added SS constants (average $1,976, max at 62/67/70), `SsPreset` type, `getSsPresetAmount` helper.
+  - `src/components/GovernmentRetirementInput.tsx`: Added `SocialSecurityInput` component with 6 presets (none/average/max-62/max-67/max-70/custom). Updated main component to render US input when country=US.
+  - `tests/unit/government-retirement-us.test.ts`: New — 16 tests covering SS presets, computeMonthlyGovernmentIncome for US, FIRE number reduction, toFinancialData, URL round-trip.
+  - `tests/e2e/government-retirement-us.spec.ts`: New — 4 tests covering SS rendering, preset selection, URL persistence.
+- **Tests**: T1: 2760 passed (148 files), T2: 4 passed (Playwright), Build: passes
+- **Screenshots**: `task-188-ss-default.png`, `task-188-ss-average.png`, `task-188-ss-max-70.png`
 
 ## Task 187: Government retirement income estimator (CA) [@fullstack] [MATH]
 - **Date**: 2026-03-20

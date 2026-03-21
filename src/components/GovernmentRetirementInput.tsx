@@ -6,8 +6,13 @@ import {
   CPP_MAX_MONTHLY,
   CPP_AVERAGE_MONTHLY,
   OAS_MAX_MONTHLY_65_74,
+  SS_AVERAGE_MONTHLY,
+  SS_MAX_AT_62,
+  SS_MAX_AT_67,
+  SS_MAX_AT_70,
   type CppPreset,
   type OasPreset,
+  type SsPreset,
 } from "@/lib/government-retirement";
 import HelpTip from "@/components/HelpTip";
 
@@ -161,8 +166,97 @@ function CppOasInput({ value, onChange }: { value: GovernmentRetirementIncome | 
   );
 }
 
+function SocialSecurityInput({ value, onChange }: { value: GovernmentRetirementIncome | undefined; onChange: (v: GovernmentRetirementIncome | undefined) => void }) {
+  const ssAmount = value?.ssMonthly ?? 0;
+
+  const detectPreset = (): SsPreset => {
+    if (ssAmount === 0) return "none";
+    if (Math.abs(ssAmount - SS_AVERAGE_MONTHLY) < 1) return "average";
+    if (Math.abs(ssAmount - SS_MAX_AT_62) < 1) return "max-62";
+    if (Math.abs(ssAmount - SS_MAX_AT_67) < 1) return "max-67";
+    if (Math.abs(ssAmount - SS_MAX_AT_70) < 1) return "max-70";
+    return "custom";
+  };
+
+  const [preset, setPreset] = useState<SsPreset>(detectPreset);
+
+  const update = (amount: number) => {
+    if (amount === 0) {
+      onChange(undefined);
+    } else {
+      onChange({ ...value, ssMonthly: amount });
+    }
+  };
+
+  const handlePreset = (p: SsPreset) => {
+    setPreset(p);
+    let amount = 0;
+    if (p === "average") amount = SS_AVERAGE_MONTHLY;
+    else if (p === "max-62") amount = SS_MAX_AT_62;
+    else if (p === "max-67") amount = SS_MAX_AT_67;
+    else if (p === "max-70") amount = SS_MAX_AT_70;
+    else if (p === "custom") amount = ssAmount || SS_AVERAGE_MONTHLY;
+    update(amount);
+  };
+
+  const presetButtons: { key: SsPreset; label: string }[] = [
+    { key: "none", label: "None" },
+    { key: "average", label: `Avg (${formatMo(SS_AVERAGE_MONTHLY)})` },
+    { key: "max-62", label: `Age 62 (${formatMo(SS_MAX_AT_62)})` },
+    { key: "max-67", label: `Age 67 (${formatMo(SS_MAX_AT_67)})` },
+    { key: "max-70", label: `Age 70 (${formatMo(SS_MAX_AT_70)})` },
+    { key: "custom", label: "Custom" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="mb-2 flex items-center gap-1.5">
+          <label className="text-sm font-medium text-slate-300">Social Security</label>
+          <HelpTip text={`Expected monthly Social Security benefit. Average: ${formatMo(SS_AVERAGE_MONTHLY)}. Maximum depends on claiming age: ${formatMo(SS_MAX_AT_62)} at 62, ${formatMo(SS_MAX_AT_67)} at 67 (full retirement age), ${formatMo(SS_MAX_AT_70)} at 70. Check your estimate at ssa.gov/myaccount.`} />
+        </div>
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {presetButtons.map((p) => (
+            <button
+              key={p.key}
+              type="button"
+              onClick={() => handlePreset(p.key)}
+              className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150 ${
+                preset === p.key
+                  ? "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/40"
+                  : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300"
+              }`}
+              data-testid={`ss-preset-${p.key}`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+        {preset === "custom" && (
+          <input
+            type="number"
+            min={0}
+            max={10000}
+            value={ssAmount || ""}
+            onChange={(e) => update(parseFloat(e.target.value) || 0)}
+            placeholder="Monthly Social Security amount"
+            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
+            data-testid="ss-custom-input"
+          />
+        )}
+      </div>
+
+      {ssAmount > 0 && (
+        <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 text-sm text-emerald-300" data-testid="gov-income-summary">
+          Expected government income in retirement: <strong>{formatMo(ssAmount)}</strong>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function GovernmentRetirementInput({ country, value, onChange }: Props) {
-  if (country !== "CA") return null; // US and AU will be added in tasks 188/189
+  if (country !== "CA" && country !== "US") return null; // AU will be added in task 189
 
   return (
     <div data-testid="government-retirement-input">
@@ -170,7 +264,8 @@ export default function GovernmentRetirementInput({ country, value, onChange }: 
         <label className="block text-sm font-medium text-slate-300">Government Retirement Income</label>
         <HelpTip text="Estimated government benefits you'll receive in retirement. This reduces your FIRE number — you need less from your portfolio when government income covers part of your expenses." />
       </div>
-      <CppOasInput value={value} onChange={onChange} />
+      {country === "CA" && <CppOasInput value={value} onChange={onChange} />}
+      {country === "US" && <SocialSecurityInput value={value} onChange={onChange} />}
     </div>
   );
 }

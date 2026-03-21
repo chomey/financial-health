@@ -228,3 +228,5 @@
 - [x] Task 186: Retirement age input — Add a `retirementAge` field (default 65) to FinancialState and the settings/profile UI. Persist in URL state. Use it in FIRE/Coast FIRE calculations instead of hardcoded 65. Show "years to retirement" in the snapshot dashboard. [@fullstack]
 
 - [x] Task 187: Government retirement income estimator (CA) — Add CPP and OAS ballpark estimators. User enters expected CPP monthly amount (or "average"/"max" preset) and whether they qualify for OAS. Show combined government income in retirement and factor it into FIRE number calculation (reduces annual expenses to cover). Add to CA flowchart steps. [@fullstack] [MATH]
+
+- [x] Task 188: Government retirement income estimator (US) — Add Social Security ballpark estimator. User enters expected monthly benefit (or "average"/"max" preset based on claiming age 62/67/70). Show benefit in retirement income and factor into FIRE number calculation. Add to US flowchart steps. [@fullstack] [MATH]

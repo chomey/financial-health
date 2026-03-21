@@ -39,6 +39,30 @@ export function getOasPresetAmount(preset: OasPreset, customAmount?: number): nu
   }
 }
 
+// ── US Social Security ───────────────────────────────────────────────────────
+
+/** SS average monthly benefit for retired workers (2025). Source: ssa.gov */
+export const SS_AVERAGE_MONTHLY = 1_976;
+/** SS maximum monthly benefit at age 62 (2025). Source: ssa.gov */
+export const SS_MAX_AT_62 = 2_710;
+/** SS maximum monthly benefit at full retirement age 67 (2025). Source: ssa.gov */
+export const SS_MAX_AT_67 = 3_822;
+/** SS maximum monthly benefit at age 70 (2025). Source: ssa.gov */
+export const SS_MAX_AT_70 = 4_873;
+
+export type SsPreset = "none" | "average" | "max-62" | "max-67" | "max-70" | "custom";
+
+export function getSsPresetAmount(preset: SsPreset, customAmount?: number): number {
+  switch (preset) {
+    case "none": return 0;
+    case "average": return SS_AVERAGE_MONTHLY;
+    case "max-62": return SS_MAX_AT_62;
+    case "max-67": return SS_MAX_AT_67;
+    case "max-70": return SS_MAX_AT_70;
+    case "custom": return customAmount ?? 0;
+  }
+}
+
 /**
  * Compute total monthly government retirement income for a given country.
  * Returns 0 if no government income is configured.

@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 188,
+    title: "Government retirement income estimator (US)",
+    description: "Estimate your Social Security benefits in the Profile section (advanced mode, US only). Choose from presets based on claiming age: average ($1,976/mo), or maximum at age 62 ($2,710), 67 ($3,822), or 70 ($4,873) — plus a custom option. Like the Canadian estimator, Social Security income reduces your FIRE number since your portfolio only needs to cover the gap.",
+    date: "2026-03-20",
+  },
+  {
     version: 187,
     title: "Government retirement income estimator (Canada)",
     description: "Estimate your CPP and OAS benefits in the Profile section (advanced mode, CA only). Choose from presets — CPP average ($817/mo), CPP max ($1,365/mo), or custom — plus OAS full ($728/mo) or custom. Government income reduces your FIRE number: if CPP+OAS will cover $1,500/mo of expenses, your portfolio needs to cover that much less. Coast FIRE calculations also factor in expected government income. Data persists in your shareable URL.",
