@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 195,
+    title: "Retirement planning E2E tests",
+    description: "Comprehensive end-to-end test suite covering all retirement planning features: retirement age input and URL persistence, government income estimators for all three countries (CPP/OAS, Social Security, Age Pension), retirement income waterfall chart, early withdrawal penalty warnings, retirement readiness score with 5 components, income gap analysis, cross-country switching, and full profile-to-dashboard journey. Also fixed 5 pre-existing test failures from prior UI changes.",
+    date: "2026-03-21",
+  },
+  {
     version: 194,
     title: "Retirement income gap analysis",
     description: "New insight showing how much of your monthly expenses are covered by projected retirement income (government benefits + portfolio 4% rule). Four tiers: fully covered (100%+), close (75-99%), moderate (50-74%), and large gap (<50%). Each tier includes the coverage percentage, gap amount in dollars, and actionable suggestions — increase savings, delay retirement, reduce expenses, or add government benefit estimates in your profile.",

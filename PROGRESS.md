@@ -8,11 +8,23 @@
 
 ## Summary
 - **Total Tasks**: 195
-- **Completed**: 194
-- **Remaining**: 1
+- **Completed**: 195
+- **Remaining**: 0
 - **Last Updated**: 2026-03-20
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 195: Retirement planning E2E tests [@qa] [E2E]
+- **Date**: 2026-03-21
+- **Files**:
+  - `tests/e2e/retirement-planning-e2e.spec.ts`: New — 12 comprehensive tests covering full retirement planning flow: retirement age persistence, CA CPP/OAS presets + custom + persistence, US Social Security presets, AU Age Pension single/couple, retirement income chart rendering, early withdrawal penalties for young/old users, readiness score components, income gap coverage, cross-country switching, and full profile→dashboard journey.
+  - `tests/e2e/asset-allocation.spec.ts`: Fixed — donut chart now in breakdowns section.
+  - `tests/e2e/arrow-polish.spec.ts`: Fixed — removed reference to deleted click-to-explain-hint testid and stale aria-live assertion.
+  - `tests/e2e/chart-fullwidth.spec.ts`: Fixed — projection chart width test uses dashboard section, not removed entry section.
+  - `tests/e2e/coast-fire.spec.ts`: Fixed — age setting now via wizard flow instead of removed dashboard age buttons.
+  - `tests/e2e/data-flow-arrows.spec.ts`: Fixed — removed stale h1 text assertion, uses dashboard-panel waitFor.
+- **Tests**: T1: 2855 passed (154 files), T3: 134 passed (full Playwright regression), Build: passes
+- **Screenshots**: `task-195-ca-cpp-oas.png`, `task-195-us-social-security.png`, `task-195-au-age-pension.png`, `task-195-retirement-chart.png`, `task-195-early-penalties.png`, `task-195-readiness-score.png`, `task-195-full-journey.png`
 
 ## Task 194: Retirement income gap analysis [@fullstack]
 - **Date**: 2026-03-21
