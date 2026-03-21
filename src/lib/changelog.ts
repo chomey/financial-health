@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 194,
+    title: "Retirement income gap analysis",
+    description: "New insight showing how much of your monthly expenses are covered by projected retirement income (government benefits + portfolio 4% rule). Four tiers: fully covered (100%+), close (75-99%), moderate (50-74%), and large gap (<50%). Each tier includes the coverage percentage, gap amount in dollars, and actionable suggestions — increase savings, delay retirement, reduce expenses, or add government benefit estimates in your profile.",
+    date: "2026-03-21",
+  },
+  {
     version: 193,
     title: "Retirement readiness score",
     description: "New 0-100 Retirement Readiness score in the Compare section. Combines 5 weighted components: income replacement ratio (30%), emergency runway (20%), tax diversification (20%), government benefit coverage (15%), and debt position (15%). Color-coded tiers from Getting Started (0-19) through Retirement Ready (80-100). Each component shows a mini progress bar so you can see exactly where to focus.",

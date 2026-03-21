@@ -8,11 +8,22 @@
 
 ## Summary
 - **Total Tasks**: 195
-- **Completed**: 193
-- **Remaining**: 2
+- **Completed**: 194
+- **Remaining**: 1
 - **Last Updated**: 2026-03-20
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 194: Retirement income gap analysis [@fullstack]
+- **Date**: 2026-03-21
+- **Files**:
+  - `src/lib/insights/generate.ts`: Added retirement-income-gap insight with 4 tiers: covered (100%+), close (75-99%), moderate (50-74%), large (<50%). Shows coverage percentage, gap amount, and actionable suggestions. Prompts to add government benefits when none configured.
+  - `src/lib/insights/types.ts`: Added `"retirement-income-gap"` to InsightType.
+  - `src/components/InsightsPanel.tsx`: Added insight-section mapping for retirement-income-gap.
+  - `tests/unit/retirement-income-gap.test.ts`: New — 7 tests covering all 4 tiers, government benefits suggestion, edge cases.
+  - `tests/e2e/retirement-income-gap.spec.ts`: New — 1 test verifying coverage display on dashboard.
+- **Tests**: T1: 2855 passed (154 files), T2: 1 passed (Playwright), Build: passes
+- **Screenshots**: `task-194-retirement-income-gap.png`
 
 ## Task 193: Retirement readiness score [@fullstack]
 - **Date**: 2026-03-21

@@ -48,6 +48,7 @@ const INSIGHT_TYPE_SOURCES: Record<InsightType, string[]> = {
   "au-franking": ["section-income"],
   "au-mls": ["section-income", "section-expenses"],
   "rmd": ["section-assets"],
+  "retirement-income-gap": ["section-assets", "section-expenses"],
 };
 
 function InsightRow({

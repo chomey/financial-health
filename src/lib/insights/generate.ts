@@ -875,6 +875,45 @@ export function generateInsights(data: FinancialData): Insight[] {
     }
   }
 
+  // Retirement income gap analysis
+  if (data.rawMonthlyExpenses && data.rawMonthlyExpenses > 0 && data.liquidAssets) {
+    const govIncome = data.monthlyGovernmentRetirementIncome ?? 0;
+    const portfolioIncome = (data.liquidAssets * 0.04) / 12;
+    const totalRetirementIncome = govIncome + portfolioIncome;
+    const coveragePct = Math.min(100, Math.round((totalRetirementIncome / data.rawMonthlyExpenses) * 100));
+    const gap = Math.max(0, data.rawMonthlyExpenses - totalRetirementIncome);
+
+    if (coveragePct >= 100) {
+      insights.push({
+        id: "retirement-income-gap-covered",
+        type: "retirement-income-gap",
+        message: `Your projected retirement income fully covers your expenses (${coveragePct}%). Government benefits${govIncome > 0 ? ` (${formatCurrency(govIncome)}/mo)` : ""} plus portfolio withdrawals (${formatCurrency(portfolioIncome)}/mo via 4% rule) exceed your ${formatCurrency(data.rawMonthlyExpenses)}/mo in expenses.`,
+        icon: "✅",
+      });
+    } else if (coveragePct >= 75) {
+      insights.push({
+        id: "retirement-income-gap-close",
+        type: "retirement-income-gap",
+        message: `Your retirement income covers ${coveragePct}% of expenses — close to full coverage. Gap: ${formatCurrency(gap)}/mo. ${govIncome > 0 ? "Boosting savings or delaying retirement by a year or two could close it." : "Adding expected government benefits (CPP/OAS or Social Security) in your profile would improve this estimate."}`,
+        icon: "📊",
+      });
+    } else if (coveragePct >= 50) {
+      insights.push({
+        id: "retirement-income-gap-moderate",
+        type: "retirement-income-gap",
+        message: `Your retirement income covers ${coveragePct}% of expenses. Gap: ${formatCurrency(gap)}/mo. Consider: increasing savings rate, reducing expenses, or delaying retirement to let your portfolio grow.${govIncome === 0 ? " Adding expected government benefits in your profile may also improve this number." : ""}`,
+        icon: "📊",
+      });
+    } else if (totalRetirementIncome > 0) {
+      insights.push({
+        id: "retirement-income-gap-large",
+        type: "retirement-income-gap",
+        message: `Your retirement income covers ${coveragePct}% of expenses — gap of ${formatCurrency(gap)}/mo. Focus on building your portfolio and maximizing tax-advantaged contributions.${govIncome === 0 ? " Don't forget to add expected government benefits (CPP/OAS, Social Security, or Age Pension) in your profile." : ""}`,
+        icon: "📊",
+      });
+    }
+  }
+
   // RMD/RRIF insight
   if (data.rmdSummaries && data.rmdSummaries.length > 0) {
     const totalAnnual = data.rmdSummaries.reduce((sum, s) => sum + s.annualMinimum, 0);
