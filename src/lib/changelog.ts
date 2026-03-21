@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 191,
+    title: "Early withdrawal penalty warnings",
+    description: "The Withdrawal Tax Impact panel now shows warnings when your age means early withdrawal penalties apply. US: 10% penalty on 401k/IRA/Roth IRA earnings before age 59½. Canada: RRSP withholding tax warning before 65. Australia: Super preservation age 60 restriction. Each warning shows the penalty percentage, the rule, and when you'll be penalty-free. Also wired the WithdrawalTaxSummary panel into the Breakdowns section.",
+    date: "2026-03-21",
+  },
+  {
     version: 190,
     title: "Retirement income waterfall chart",
     description: "New visual comparison of retirement income sources vs monthly expenses, shown in the Breakdowns section. Stacked horizontal bars show government benefits (CPP+OAS, Social Security, or Age Pension) and portfolio withdrawals (4% rule) against your expenses. Coverage percentage and gap amount are displayed with color-coded tiers (green = fully covered, cyan = 75%+, amber = below 75%).",

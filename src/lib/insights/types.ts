@@ -76,6 +76,8 @@ export interface FinancialData {
   outlookYears?: number;
   /** Withdrawal tax impact data */
   withdrawalTax?: {
+    /** Early withdrawal penalties based on user's current age */
+    earlyWithdrawalPenalties?: import("@/lib/withdrawal-tax").EarlyWithdrawalPenalty[];
     /** How many months shorter the runway is due to withdrawal taxes */
     taxDragMonths: number;
     /** Optimal withdrawal order for this account mix */

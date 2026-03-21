@@ -2,12 +2,10 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 190. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 191. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Retirement Planning
-
-- [ ] Task 191: Early withdrawal penalty warnings — When runway simulation withdraws from tax-sheltered accounts (RRSP before 71, 401k/IRA before 59.5, AU Super before preservation age 60), show warning badges in WithdrawalTaxSummary. Add penalty percentage to withdrawal tax calculation for applicable accounts based on user's current age. [@fullstack] [MATH]
 
 - [ ] Task 192: RRIF/RMD required minimum distributions — Model forced withdrawals: RRSP→RRIF conversion at 71 (CA) and RMD from 401k/IRA at 73 (US). Add minimum withdrawal percentages by age. Show in projections when user's age + projection year crosses threshold. Add insight when RMDs would push user into a higher tax bracket. [@fullstack] [MATH]
 

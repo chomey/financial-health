@@ -8,11 +8,24 @@
 
 ## Summary
 - **Total Tasks**: 195
-- **Completed**: 190
-- **Remaining**: 5
+- **Completed**: 191
+- **Remaining**: 4
 - **Last Updated**: 2026-03-20
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 191: Early withdrawal penalty warnings [@fullstack] [MATH]
+- **Date**: 2026-03-21
+- **Files**:
+  - `src/lib/withdrawal-tax.ts`: Added `EarlyWithdrawalPenalty` interface and `getEarlyWithdrawalPenalties` function. Rules: US 401k/IRA 10% penalty before 59.5, CA RRSP withholding warning before 65, AU Super preservation age 60. FHSS excluded.
+  - `src/lib/financial-state.ts`: `computeWithdrawalTaxSummary` now computes and includes early withdrawal penalties based on user age.
+  - `src/lib/insights/types.ts`: Added `earlyWithdrawalPenalties` to withdrawalTax data.
+  - `src/components/WithdrawalTaxSummary.tsx`: Added penalty warning badges with amber styling, penalty percentage badges, rule descriptions, and penalty-free age display.
+  - `src/app/page.tsx`: Wired WithdrawalTaxSummary into breakdowns section (was previously unused). Passes earlyWithdrawalPenalties prop.
+  - `tests/unit/early-withdrawal-penalties.test.ts`: New — 19 tests covering US/CA/AU penalties, edge cases, toFinancialData integration.
+  - `tests/e2e/early-withdrawal-penalties.spec.ts`: New — 2 tests covering penalty visibility for young CA user and absence for older user.
+- **Tests**: T1: 2806 passed (151 files), T2: 2 passed (Playwright), Build: passes
+- **Screenshots**: `task-191-early-withdrawal-ca-40.png`, `task-191-no-penalties-ca-70.png`
 
 ## Task 190: Retirement income waterfall chart [@frontend]
 - **Date**: 2026-03-21

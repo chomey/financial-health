@@ -61,6 +61,97 @@ export function classifyTaxTreatment(category: string): TaxTreatment {
   return "taxable";
 }
 
+// ── Early Withdrawal Penalties ────────────────────────────────────────────────
+
+export interface EarlyWithdrawalPenalty {
+  /** Account category that would incur a penalty */
+  category: string;
+  /** Penalty percentage (e.g., 10 for 10%) */
+  penaltyPercent: number;
+  /** Minimum age for penalty-free withdrawal */
+  penaltyFreeAge: number;
+  /** Country-specific rule description */
+  rule: string;
+}
+
+/**
+ * Check if withdrawing from an account would incur early withdrawal penalties
+ * based on the user's current age and account type.
+ *
+ * Rules:
+ * - CA: RRSP/LIRA — withholding tax always applies, but no age-based "penalty" per se.
+ *       We flag RRSP withdrawals before retirement age as suboptimal (taxed as income).
+ * - US: 401k/IRA — 10% penalty before age 59.5 (on top of income tax)
+ *       Roth IRA — 10% penalty on earnings before 59.5 (contributions are always penalty-free)
+ * - AU: Super — cannot access before preservation age 60 (effectively infinite penalty)
+ */
+export function getEarlyWithdrawalPenalties(
+  categories: string[],
+  age: number | undefined,
+  country: "CA" | "US" | "AU",
+): EarlyWithdrawalPenalty[] {
+  if (age === undefined || age <= 0) return [];
+
+  const penalties: EarlyWithdrawalPenalty[] = [];
+
+  for (const cat of categories) {
+    const lower = cat.toLowerCase();
+
+    if (country === "US") {
+      // 401k/Traditional IRA: 10% penalty before 59.5
+      if (age < 59.5) {
+        if (
+          (lower.includes("401k") || lower.includes("ira") || lower.includes("403b") || lower.includes("457")) &&
+          !lower.includes("roth")
+        ) {
+          penalties.push({
+            category: cat,
+            penaltyPercent: 10,
+            penaltyFreeAge: 59.5,
+            rule: "10% early withdrawal penalty before age 59½ (plus income tax)",
+          });
+        }
+        // Roth IRA earnings penalty before 59.5
+        if (lower.includes("roth") && lower.includes("ira")) {
+          penalties.push({
+            category: cat,
+            penaltyPercent: 10,
+            penaltyFreeAge: 59.5,
+            rule: "10% penalty on earnings before age 59½ (contributions always penalty-free)",
+          });
+        }
+      }
+    }
+
+    if (country === "CA") {
+      // RRSP: withholding tax on early withdrawal (not exactly a penalty, but tax-inefficient)
+      // We flag it as a warning since it's taxed as income and withholding applies
+      if (age < 65 && (lower.includes("rrsp") || lower.includes("lira"))) {
+        penalties.push({
+          category: cat,
+          penaltyPercent: 0, // No explicit penalty, but withholding tax 10-30%
+          penaltyFreeAge: 65,
+          rule: "Withdrawals taxed as income with 10-30% withholding. Consider waiting until lower income years.",
+        });
+      }
+    }
+
+    if (country === "AU") {
+      // Super: cannot access before preservation age 60
+      if (age < 60 && lower.includes("super") && !lower.includes("fhss") && !lower.includes("first home")) {
+        penalties.push({
+          category: cat,
+          penaltyPercent: 0, // Not accessible at all, not a percentage penalty
+          penaltyFreeAge: 60,
+          rule: "Super cannot be accessed before preservation age 60 (limited exceptions apply)",
+        });
+      }
+    }
+  }
+
+  return penalties;
+}
+
 /**
  * Get the tax treatment for a given account category.
  * If an override is provided, it takes priority over keyword matching.

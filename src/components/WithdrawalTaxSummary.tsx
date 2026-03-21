@@ -1,5 +1,7 @@
 "use client";
 
+import type { EarlyWithdrawalPenalty } from "@/lib/withdrawal-tax";
+
 interface AccountsByTreatment {
   taxFree: { categories: string[]; total: number };
   taxDeferred: { categories: string[]; total: number };
@@ -10,6 +12,7 @@ interface WithdrawalTaxSummaryProps {
   taxDragMonths: number;
   withdrawalOrder: string[];
   accountsByTreatment: AccountsByTreatment;
+  earlyWithdrawalPenalties?: EarlyWithdrawalPenalty[];
   homeCurrency?: string;
 }
 
@@ -25,6 +28,7 @@ export default function WithdrawalTaxSummary({
   taxDragMonths,
   withdrawalOrder,
   accountsByTreatment,
+  earlyWithdrawalPenalties = [],
   homeCurrency = "USD",
 }: WithdrawalTaxSummaryProps) {
   const totalLiquid =
@@ -128,6 +132,36 @@ export default function WithdrawalTaxSummary({
               );
             })}
           </div>
+
+          {/* Early withdrawal penalty warnings */}
+          {earlyWithdrawalPenalties.length > 0 && (
+            <div className="space-y-1.5" data-testid="early-withdrawal-penalties">
+              <p className="text-xs font-medium text-amber-400 mb-1">
+                Early withdrawal warnings:
+              </p>
+              {earlyWithdrawalPenalties.map((p) => (
+                <div
+                  key={p.category}
+                  className="flex items-start gap-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2"
+                  data-testid={`penalty-warning-${p.category.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
+                >
+                  <span className="mt-0.5 shrink-0 text-sm" aria-hidden="true">⚠️</span>
+                  <div className="min-w-0">
+                    <span className="text-xs font-semibold text-amber-300">{p.category}</span>
+                    {p.penaltyPercent > 0 && (
+                      <span className="ml-1.5 rounded bg-amber-400/20 px-1.5 py-0.5 text-xs font-bold text-amber-300">
+                        {p.penaltyPercent}% penalty
+                      </span>
+                    )}
+                    <p className="mt-0.5 text-xs text-amber-400/70">{p.rule}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      Penalty-free after age {p.penaltyFreeAge % 1 === 0 ? p.penaltyFreeAge : p.penaltyFreeAge.toFixed(1)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Suggested withdrawal order */}
           {withdrawalOrder.length > 0 && (

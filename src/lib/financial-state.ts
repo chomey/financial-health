@@ -26,7 +26,7 @@ import { getStockValue } from "@/components/StockEntry";
 import { getDefaultRoi, computeEmployerMatchMonthly } from "@/components/AssetEntry";
 import { getHomeCurrency, getEffectiveFxRates, convertToHome } from "@/lib/currency";
 import type { SupportedCurrency } from "@/lib/currency";
-import { getTaxTreatment } from "@/lib/withdrawal-tax";
+import { getTaxTreatment, getEarlyWithdrawalPenalties } from "@/lib/withdrawal-tax";
 import { getMarginalRateForIncome } from "@/lib/tax-engine";
 import { computeTotals, computeMonthlyInvestmentReturns, computeFireNumber, computeMonthlyObligations } from "@/lib/compute-totals";
 import { simulateRunwayWithGrowth, simulateRunwayWithTax } from "@/lib/runway-simulation";
@@ -251,9 +251,14 @@ export function computeWithdrawalTaxSummary(
     }
   }
 
+  // Check for early withdrawal penalties based on user's age
+  const allCategories = [...taxFree.categories, ...taxDeferred.categories, ...taxable.categories];
+  const earlyWithdrawalPenalties = getEarlyWithdrawalPenalties(allCategories, state.age, state.country ?? "CA");
+
   return {
     taxDragMonths,
     withdrawalOrder,
     accountsByTreatment: { taxFree, taxDeferred, taxable },
+    earlyWithdrawalPenalties: earlyWithdrawalPenalties.length > 0 ? earlyWithdrawalPenalties : undefined,
   };
 }

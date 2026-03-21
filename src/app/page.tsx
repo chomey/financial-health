@@ -23,6 +23,7 @@ import InsightsPanel from "@/components/InsightsPanel";
 import FinancialHealthScore from "@/components/FinancialHealthScore";
 import FinancialFlowchart from "@/components/FinancialFlowchart";
 import RetirementIncomeChart from "@/components/RetirementIncomeChart";
+import WithdrawalTaxSummary from "@/components/WithdrawalTaxSummary";
 import ZoomableCard from "@/components/ZoomableCard";
 import { DataFlowProvider } from "@/components/DataFlowArrows";
 import { CurrencyProvider } from "@/lib/CurrencyContext";
@@ -582,6 +583,17 @@ export default function Home() {
                   monthlyPortfolioWithdrawal={monthlyPortfolioWithdrawal}
                   monthlyExpenses={financialData.rawMonthlyExpenses ?? 0}
                   country={country}
+                  homeCurrency={homeCurrency}
+                /></ZoomableCard>
+              </div>
+            )}
+            {financialData.withdrawalTax && (
+              <div className="mt-4">
+                <ZoomableCard><WithdrawalTaxSummary
+                  taxDragMonths={financialData.withdrawalTax.taxDragMonths}
+                  withdrawalOrder={financialData.withdrawalTax.withdrawalOrder}
+                  accountsByTreatment={financialData.withdrawalTax.accountsByTreatment}
+                  earlyWithdrawalPenalties={financialData.withdrawalTax.earlyWithdrawalPenalties}
                   homeCurrency={homeCurrency}
                 /></ZoomableCard>
               </div>
