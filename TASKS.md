@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 198. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 199. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Canada plugin (plan tasks 6–11)
-
-- [ ] Task 199: canadianInsights provider — Implement `InsightProvider` for Canada. Create `src/lib/countries/canada/insights.ts` with `getCandidates(state)` returning `[]` if state.country !== "CA", otherwise calling extracted CA-specific candidate generators (TFSA contribution room, RRSP recommendation, FHSA usage, etc.) pulled from `src/lib/insights/generate.ts`. Original generate.ts left untouched until plan task 41 (Ralph task 231). Tests at `tests/unit/countries/canada/insights.test.ts`. [@fullstack]
 
 - [ ] Task 200: canadianTaxEngine implementation — Implement `TaxEngine` for Canada at `src/lib/countries/canada/tax-engine.ts`. Move `computeCanadianTax` logic from `src/lib/tax-engine.ts` (lines 111–157), the CA branches of `getEarlyWithdrawalPenalties` from `src/lib/withdrawal-tax.ts:126-137`, the keyword-based `classifyTaxTreatment` for CA categories, and the `tax-deferred`/`taxable` arms of `getWithdrawalTaxRate`. Populate `TaxResult.breakdown` with two entries: `{kind: "income-tax", label: "Federal Tax"}` and `{kind: "sub-federal", label: "Provincial Tax"}`. Keep legacy `federalTax`/`provincialStateTax` fields temporarily for shim compatibility (removed in Ralph task 219). Comparison tests against legacy `computeTax(country="CA", ...)` and `getWithdrawalTaxRate` at `tests/unit/countries/canada/tax-engine.test.ts`. Snapshot regressions must stay green. [@backend] [MATH] [OPUS]
 

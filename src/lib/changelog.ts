@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 199,
+    title: "Country plugin: Canadian insights provider",
+    description: "CA-specific insight candidates now live behind an `InsightProvider` interface at `src/lib/countries/canada/insights.ts`. The provider generates four candidate insights from raw `FinancialState`: TFSA/FHSA recommendation (no tax-free account present), RRSP suggestion (employment income but no RRSP), FHSA opportunity (non-homeowner without an FHSA), and RRIF conversion reminder (age 65–70 with RRSP). The original `generate.ts` is left untouched — dispatch migration happens in a later task.",
+    date: "2026-05-10",
+  },
+  {
     version: 198,
     title: "Country plugin: Canadian sample profiles library",
     description: "The three CA sample profiles (Fresh grad, Mid-career family, Pre-retirement) and two CA quick-start profiles (Renter, Homeowner) now live behind a `ProfileLibrary` interface at `src/lib/countries/canada/sample-profiles.ts`. No user-visible change — the registry will wire this in once all Canada plugin pieces are assembled.",

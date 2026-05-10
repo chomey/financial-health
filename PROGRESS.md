@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 198
-- **Remaining**: 36
+- **Completed**: 199
+- **Remaining**: 35
 - **Last Updated**: 2026-05-10
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -19,6 +19,15 @@
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 199: canadianInsights provider [@fullstack]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/canada/insights.ts`: New — `canadianInsights: InsightProvider` implementing `getCandidates(state)`. Returns `[]` for non-CA states. CA candidates: `ca-no-tfsa` (no TFSA/FHSA in assets), `ca-no-rrsp` (employment income but no RRSP/LIRA), `ca-fhsa` (no property, no FHSA, employment income), `ca-rrif-upcoming` (age 65–70 with RRSP).
+  - `tests/unit/countries/canada/insights.test.ts`: New — 18 tests covering all four candidate generators, non-CA guard, property/age/category presence/absence checks, and insight shape validation.
+- **Tests**: T1: 3425 passed (162 files), Build: passes
+- **Screenshots**: N/A (backend/logic task)
+- **Notes**: `getCandidates` operates on raw `FinancialState` (not computed `FinancialData`). Employment income detected via `state.income` category keywords. Original `generate.ts` left untouched per plan — dispatch migration is Task 231.
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08
