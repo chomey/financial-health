@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 204. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 205. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### USA plugin (plan tasks 12–19)
-
-- [ ] Task 205: americanTaxCredits catalog — Same pattern as Ralph task 197 with `jurisdiction: "US"` entries. Tests at `tests/unit/countries/usa/tax-credits.test.ts`. [@backend]
 
 - [ ] Task 206: americanProfiles library — Same pattern as Ralph task 198 with US sample profiles. Tests at `tests/unit/countries/usa/sample-profiles.test.ts`. [@backend]
 

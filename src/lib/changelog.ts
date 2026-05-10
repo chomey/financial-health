@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 205,
+    title: "Country plugin: USA tax credits catalog",
+    description: "US federal tax credits and deductions are now catalogued behind a `TaxCreditCatalog` interface at `src/lib/countries/usa/tax-credits.ts`. Includes 13 claimable entries (EITC, Child Tax Credit, Child & Dependent Care, AOTC, Lifetime Learning, Saver's Credit, Premium Tax Credit, Adoption Credit, Residential Clean Energy, EV Credit, SALT Deduction, Student Loan Interest, Charitable Contributions) plus 4 informational entries (Standard Deduction, Mortgage Interest, HSA Deduction, SSDI/SSI). Year overrides carry 2026 inflation-adjusted amounts where published. No user-visible change — foundation for the USA CountryProfile assembly in a later task.",
+    date: "2026-05-10",
+  },
+  {
     version: 204,
     title: "Country plugin: USA government retirement",
     description: "Social Security ballpark estimates (average $1,976/mo, max at 62/67/70) now live behind a `GovernmentRetirementPlugin` interface at `src/lib/countries/usa/government-retirement.ts`. The plugin's `computeMonthly` returns the user's monthly Social Security amount and `presetsFor(\"ss\")` exposes the six presets used by the retirement income estimator. Constants moved out of `src/lib/government-retirement.ts`, which now re-exports them for backward compatibility. No user-visible change — foundation for the USA CountryProfile assembly in a later task.",
