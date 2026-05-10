@@ -2904,3 +2904,13 @@
 - **Tests**: T1: 3425 passed (162 files), Build: passes
 - **Screenshots**: N/A (backend/logic task)
 - **Notes**: `getCandidates` operates on raw `FinancialState` (not computed `FinancialData`). Employment income detected via `state.income` category keywords. Original `generate.ts` left untouched per plan — dispatch migration is Task 231.
+## Task 200: canadianTaxEngine implementation [@backend] [MATH] [OPUS]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/bracket-math.ts`: Added `getMarginalRate(taxableIncome, table)` export — shared helper that returns the rate of the bracket the income falls into (0 for non-positive income, last bracket rate as fallback).
+  - `src/lib/tax-engine.ts`: Added `TaxBreakdownKind` (`"income-tax" | "social" | "sub-federal"`), `TaxBreakdownLine` interface, and an optional `breakdown?: TaxBreakdownLine[]` field on `TaxResult`. Legacy `federalTax`/`provincialStateTax` retained for shim compatibility (removed in Ralph task 219).
+  - `src/lib/countries/canada/tax-engine.ts`: New — `canadianTaxEngine: TaxEngine`. Mirrors legacy `computeCanadianTax` (federal + provincial bracket math, capital-gains inclusion via `CA_CAPITAL_GAINS`, marginal-rate adjustment for capital gains). Adds `breakdown` lines for Federal Tax (`income-tax`) and Provincial Tax (`sub-federal`). Implements `classifyTaxTreatment` using CA keyword sets (`tfsa`/`fhsa`/`tax-free` → tax-free; `rrsp`/`resp`/`lira`/`pension` → tax-deferred; else taxable), `getWithdrawalTaxRate` for `tax-free`/`tax-deferred`/`taxable` arms, and `getEarlyWithdrawalPenalties` for RRSP/LIRA under 65.
+  - `tests/unit/countries/canada/tax-engine.test.ts`: New — 225 tests. Comparison sweep against legacy `computeTax(country="CA", ...)` for `[10k, 50k, 100k, 200k, 500k] × {ON, AB, BC, QC} × {2025, 2026} × {employment, capital-gains, other}`. Comparison sweep against legacy `getMarginalRateForIncome`. Breakdown shape assertions (federal + provincial sum to totalTax, empty for zero income). Comparison sweep against legacy `getWithdrawalTaxRate` for all CA categories. Penalty tests for RRSP/LIRA under 65 and TFSA exemption.
+- **Tests**: T1: 3650 passed (163 files); snapshot regressions both green (`tax-engine-snapshot.test.ts` 440/440, `withdrawal-tax-snapshot.test.ts` 54/54). Build: clean. Lint/tsc: no new errors introduced (pre-existing test-file errors only).
+- **Screenshots**: N/A (backend/math task)
+- **Notes**: Tax engine not yet wired through the registry — that happens in Ralph task 222 (`tax-engine.ts` shim) and 223 (`withdrawal-tax.ts` shim). At this point the new engine coexists with the legacy free functions and is verified by direct comparison.
