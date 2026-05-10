@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 199. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 200. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Canada plugin (plan tasks 6–11)
-
-- [ ] Task 200: canadianTaxEngine implementation — Implement `TaxEngine` for Canada at `src/lib/countries/canada/tax-engine.ts`. Move `computeCanadianTax` logic from `src/lib/tax-engine.ts` (lines 111–157), the CA branches of `getEarlyWithdrawalPenalties` from `src/lib/withdrawal-tax.ts:126-137`, the keyword-based `classifyTaxTreatment` for CA categories, and the `tax-deferred`/`taxable` arms of `getWithdrawalTaxRate`. Populate `TaxResult.breakdown` with two entries: `{kind: "income-tax", label: "Federal Tax"}` and `{kind: "sub-federal", label: "Provincial Tax"}`. Keep legacy `federalTax`/`provincialStateTax` fields temporarily for shim compatibility (removed in Ralph task 219). Comparison tests against legacy `computeTax(country="CA", ...)` and `getWithdrawalTaxRate` at `tests/unit/countries/canada/tax-engine.test.ts`. Snapshot regressions must stay green. [@backend] [MATH] [OPUS]
 
 - [ ] Task 201: CANADA CountryProfile assembly — Create `src/lib/countries/canada/index.ts` exporting `CANADA: CountryProfile` with all jurisdictions (13 provinces/territories from `src/components/CountryJurisdictionSelector.tsx`), `defaultJurisdiction: "ON"`, filing statuses, `taxYearLabel(year) => String(year)`, `taxYearBoundary: { startMonth: 1, startDay: 1 }`, locale `"en-CA"`, and references to all 6 plugin instances (taxEngine, vehicles, governmentRetirement, taxCredits, profiles, insights). Register CANADA in `src/lib/countries/index.ts`. Sanity test at `tests/unit/countries/canada/profile.test.ts`. [@backend]
 

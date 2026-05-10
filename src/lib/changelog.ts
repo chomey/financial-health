@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 200,
+    title: "Country plugin: Canadian tax engine",
+    description: "Federal + provincial income tax, capital-gains inclusion, withdrawal-tax classification, and early-withdrawal penalty rules for Canada now live behind a `TaxEngine` interface at `src/lib/countries/canada/tax-engine.ts`. Results expose a country-agnostic `breakdown` array (Federal Tax + Provincial Tax) alongside the legacy `federalTax`/`provincialStateTax` fields, which stay temporarily for shim compatibility. A shared `getMarginalRate` helper moved into `bracket-math.ts`. No user-visible change — engine is verified by 225 comparison tests against the legacy free functions, and the snapshot regression suites stay green.",
+    date: "2026-05-10",
+  },
+  {
     version: 199,
     title: "Country plugin: Canadian insights provider",
     description: "CA-specific insight candidates now live behind an `InsightProvider` interface at `src/lib/countries/canada/insights.ts`. The provider generates four candidate insights from raw `FinancialState`: TFSA/FHSA recommendation (no tax-free account present), RRSP suggestion (employment income but no RRSP), FHSA opportunity (non-homeowner without an FHSA), and RRIF conversion reminder (age 65–70 with RRSP). The original `generate.ts` is left untouched — dispatch migration happens in a later task.",

@@ -17,6 +17,14 @@ import {
   type BracketTable,
 } from "./tax-tables";
 
+export type TaxBreakdownKind = "income-tax" | "social" | "sub-federal";
+
+export interface TaxBreakdownLine {
+  label: string;
+  amount: number;
+  kind: TaxBreakdownKind;
+}
+
 export interface TaxResult {
   federalTax: number;
   provincialStateTax: number;
@@ -24,6 +32,12 @@ export interface TaxResult {
   effectiveRate: number;
   afterTaxIncome: number;
   marginalRate: number;
+  /**
+   * Country-agnostic line-by-line breakdown. Populated by per-country `TaxEngine`
+   * implementations (added in Ralph tasks 200/208/216). Becomes required and
+   * legacy `federalTax`/`provincialStateTax` are removed in Ralph task 219.
+   */
+  breakdown?: TaxBreakdownLine[];
 }
 
 export type IncomeType = "employment" | "capital-gains" | "other";

@@ -35,3 +35,17 @@ export function calculateProgressiveTax(
   const bpaCredit = table.basicPersonalAmount * lowestRate;
   return Math.max(0, tax - bpaCredit);
 }
+
+/**
+ * Return the rate of the bracket that the income falls into.
+ */
+export function getMarginalRate(taxableIncome: number, table: BracketTable): number {
+  if (taxableIncome <= 0) return 0;
+  for (const bracket of table.brackets) {
+    if (taxableIncome <= bracket.max) {
+      return bracket.rate;
+    }
+  }
+  const last = table.brackets[table.brackets.length - 1];
+  return last?.rate ?? 0;
+}
