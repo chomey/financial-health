@@ -1,0 +1,3851 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`marginal rate snapshot regression > AU/NSW 2025 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > AU/NSW 2025 50000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/NSW 2025 100000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/NSW 2025 200000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/NSW 2025 500000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/NSW 2026 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > AU/NSW 2026 50000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/NSW 2026 100000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/NSW 2026 200000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/NSW 2026 500000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2025 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2025 50000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2025 100000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2025 200000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2025 500000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2026 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2026 50000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2026 100000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2026 200000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/QLD 2026 500000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2025 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2025 50000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2025 100000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2025 200000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2025 500000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2026 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2026 50000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2026 100000 1`] = `0.32`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2026 200000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > AU/VIC 2026 500000 1`] = `0.47000000000000003`;
+
+exports[`marginal rate snapshot regression > CA/AB 2025 10000 1`] = `0.25`;
+
+exports[`marginal rate snapshot regression > CA/AB 2025 50000 1`] = `0.25`;
+
+exports[`marginal rate snapshot regression > CA/AB 2025 100000 1`] = `0.305`;
+
+exports[`marginal rate snapshot regression > CA/AB 2025 200000 1`] = `0.42`;
+
+exports[`marginal rate snapshot regression > CA/AB 2025 500000 1`] = `0.48`;
+
+exports[`marginal rate snapshot regression > CA/AB 2026 10000 1`] = `0.25`;
+
+exports[`marginal rate snapshot regression > CA/AB 2026 50000 1`] = `0.25`;
+
+exports[`marginal rate snapshot regression > CA/AB 2026 100000 1`] = `0.305`;
+
+exports[`marginal rate snapshot regression > CA/AB 2026 200000 1`] = `0.42`;
+
+exports[`marginal rate snapshot regression > CA/AB 2026 500000 1`] = `0.48`;
+
+exports[`marginal rate snapshot regression > CA/BC 2025 10000 1`] = `0.2006`;
+
+exports[`marginal rate snapshot regression > CA/BC 2025 50000 1`] = `0.22699999999999998`;
+
+exports[`marginal rate snapshot regression > CA/BC 2025 100000 1`] = `0.31`;
+
+exports[`marginal rate snapshot regression > CA/BC 2025 200000 1`] = `0.45799999999999996`;
+
+exports[`marginal rate snapshot regression > CA/BC 2025 500000 1`] = `0.535`;
+
+exports[`marginal rate snapshot regression > CA/BC 2026 10000 1`] = `0.2006`;
+
+exports[`marginal rate snapshot regression > CA/BC 2026 50000 1`] = `0.22699999999999998`;
+
+exports[`marginal rate snapshot regression > CA/BC 2026 100000 1`] = `0.31`;
+
+exports[`marginal rate snapshot regression > CA/BC 2026 200000 1`] = `0.45799999999999996`;
+
+exports[`marginal rate snapshot regression > CA/BC 2026 500000 1`] = `0.535`;
+
+exports[`marginal rate snapshot regression > CA/ON 2025 10000 1`] = `0.2005`;
+
+exports[`marginal rate snapshot regression > CA/ON 2025 50000 1`] = `0.2005`;
+
+exports[`marginal rate snapshot regression > CA/ON 2025 100000 1`] = `0.2965`;
+
+exports[`marginal rate snapshot regression > CA/ON 2025 200000 1`] = `0.41159999999999997`;
+
+exports[`marginal rate snapshot regression > CA/ON 2025 500000 1`] = `0.4616`;
+
+exports[`marginal rate snapshot regression > CA/ON 2026 10000 1`] = `0.2005`;
+
+exports[`marginal rate snapshot regression > CA/ON 2026 50000 1`] = `0.2005`;
+
+exports[`marginal rate snapshot regression > CA/ON 2026 100000 1`] = `0.2965`;
+
+exports[`marginal rate snapshot regression > CA/ON 2026 200000 1`] = `0.41159999999999997`;
+
+exports[`marginal rate snapshot regression > CA/ON 2026 500000 1`] = `0.4616`;
+
+exports[`marginal rate snapshot regression > CA/QC 2025 10000 1`] = `0.29000000000000004`;
+
+exports[`marginal rate snapshot regression > CA/QC 2025 50000 1`] = `0.29000000000000004`;
+
+exports[`marginal rate snapshot regression > CA/QC 2025 100000 1`] = `0.395`;
+
+exports[`marginal rate snapshot regression > CA/QC 2025 200000 1`] = `0.5475`;
+
+exports[`marginal rate snapshot regression > CA/QC 2025 500000 1`] = `0.5875`;
+
+exports[`marginal rate snapshot regression > CA/QC 2026 10000 1`] = `0.29000000000000004`;
+
+exports[`marginal rate snapshot regression > CA/QC 2026 50000 1`] = `0.29000000000000004`;
+
+exports[`marginal rate snapshot regression > CA/QC 2026 100000 1`] = `0.395`;
+
+exports[`marginal rate snapshot regression > CA/QC 2026 200000 1`] = `0.5475`;
+
+exports[`marginal rate snapshot regression > CA/QC 2026 500000 1`] = `0.5875`;
+
+exports[`marginal rate snapshot regression > US/CA 2025 10000 1`] = `0.01`;
+
+exports[`marginal rate snapshot regression > US/CA 2025 50000 1`] = `0.18`;
+
+exports[`marginal rate snapshot regression > US/CA 2025 100000 1`] = `0.313`;
+
+exports[`marginal rate snapshot regression > US/CA 2025 200000 1`] = `0.33299999999999996`;
+
+exports[`marginal rate snapshot regression > US/CA 2025 500000 1`] = `0.46299999999999997`;
+
+exports[`marginal rate snapshot regression > US/CA 2026 10000 1`] = `0.01`;
+
+exports[`marginal rate snapshot regression > US/CA 2026 50000 1`] = `0.18`;
+
+exports[`marginal rate snapshot regression > US/CA 2026 100000 1`] = `0.313`;
+
+exports[`marginal rate snapshot regression > US/CA 2026 200000 1`] = `0.33299999999999996`;
+
+exports[`marginal rate snapshot regression > US/CA 2026 500000 1`] = `0.46299999999999997`;
+
+exports[`marginal rate snapshot regression > US/FL 2025 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > US/FL 2025 50000 1`] = `0.12`;
+
+exports[`marginal rate snapshot regression > US/FL 2025 100000 1`] = `0.22`;
+
+exports[`marginal rate snapshot regression > US/FL 2025 200000 1`] = `0.24`;
+
+exports[`marginal rate snapshot regression > US/FL 2025 500000 1`] = `0.35`;
+
+exports[`marginal rate snapshot regression > US/FL 2026 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > US/FL 2026 50000 1`] = `0.12`;
+
+exports[`marginal rate snapshot regression > US/FL 2026 100000 1`] = `0.22`;
+
+exports[`marginal rate snapshot regression > US/FL 2026 200000 1`] = `0.24`;
+
+exports[`marginal rate snapshot regression > US/FL 2026 500000 1`] = `0.35`;
+
+exports[`marginal rate snapshot regression > US/NY 2025 10000 1`] = `0.045`;
+
+exports[`marginal rate snapshot regression > US/NY 2025 50000 1`] = `0.175`;
+
+exports[`marginal rate snapshot regression > US/NY 2025 100000 1`] = `0.28`;
+
+exports[`marginal rate snapshot regression > US/NY 2025 200000 1`] = `0.3`;
+
+exports[`marginal rate snapshot regression > US/NY 2025 500000 1`] = `0.4185`;
+
+exports[`marginal rate snapshot regression > US/NY 2026 10000 1`] = `0.045`;
+
+exports[`marginal rate snapshot regression > US/NY 2026 50000 1`] = `0.175`;
+
+exports[`marginal rate snapshot regression > US/NY 2026 100000 1`] = `0.28`;
+
+exports[`marginal rate snapshot regression > US/NY 2026 200000 1`] = `0.3`;
+
+exports[`marginal rate snapshot regression > US/NY 2026 500000 1`] = `0.4185`;
+
+exports[`marginal rate snapshot regression > US/TX 2025 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > US/TX 2025 50000 1`] = `0.12`;
+
+exports[`marginal rate snapshot regression > US/TX 2025 100000 1`] = `0.22`;
+
+exports[`marginal rate snapshot regression > US/TX 2025 200000 1`] = `0.24`;
+
+exports[`marginal rate snapshot regression > US/TX 2025 500000 1`] = `0.35`;
+
+exports[`marginal rate snapshot regression > US/TX 2026 10000 1`] = `0`;
+
+exports[`marginal rate snapshot regression > US/TX 2026 50000 1`] = `0.12`;
+
+exports[`marginal rate snapshot regression > US/TX 2026 100000 1`] = `0.22`;
+
+exports[`marginal rate snapshot regression > US/TX 2026 200000 1`] = `0.24`;
+
+exports[`marginal rate snapshot regression > US/TX 2026 500000 1`] = `0.35`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48912,
+  "effectiveRate": 0.02176,
+  "federalTax": 1088,
+  "marginalRate": 0.08,
+  "provincialStateTax": 0,
+  "totalTax": 1088,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 93212,
+  "effectiveRate": 0.06788,
+  "federalTax": 5788,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 6788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177212,
+  "effectiveRate": 0.11394,
+  "federalTax": 20788,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 22788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 416362,
+  "effectiveRate": 0.167276,
+  "federalTax": 78638,
+  "marginalRate": 0.23500000000000001,
+  "provincialStateTax": 0,
+  "totalTax": 83638,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43212,
+  "effectiveRate": 0.13576,
+  "federalTax": 5788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 77212,
+  "effectiveRate": 0.22788,
+  "federalTax": 20788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 139862,
+  "effectiveRate": 0.30069,
+  "federalTax": 56138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 60138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 298862,
+  "effectiveRate": 0.402276,
+  "federalTax": 191138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 201138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 43212,
+  "effectiveRate": 0.13576,
+  "federalTax": 5788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 77212,
+  "effectiveRate": 0.22788,
+  "federalTax": 20788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 139862,
+  "effectiveRate": 0.30069,
+  "federalTax": 56138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 60138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 298862,
+  "effectiveRate": 0.402276,
+  "federalTax": 191138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 201138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48992,
+  "effectiveRate": 0.02016,
+  "federalTax": 1008,
+  "marginalRate": 0.08,
+  "provincialStateTax": 0,
+  "totalTax": 1008,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 93446,
+  "effectiveRate": 0.06554,
+  "federalTax": 5554,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 6554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177446,
+  "effectiveRate": 0.11277,
+  "federalTax": 20554,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 22554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 417218,
+  "effectiveRate": 0.165564,
+  "federalTax": 77782,
+  "marginalRate": 0.23500000000000001,
+  "provincialStateTax": 0,
+  "totalTax": 82782,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43446,
+  "effectiveRate": 0.13108,
+  "federalTax": 5554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 77446,
+  "effectiveRate": 0.22554,
+  "federalTax": 20554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 140718,
+  "effectiveRate": 0.29641,
+  "federalTax": 55282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 59282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 299718,
+  "effectiveRate": 0.400564,
+  "federalTax": 190282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 200282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 43446,
+  "effectiveRate": 0.13108,
+  "federalTax": 5554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 77446,
+  "effectiveRate": 0.22554,
+  "federalTax": 20554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 140718,
+  "effectiveRate": 0.29641,
+  "federalTax": 55282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 59282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/NSW 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 299718,
+  "effectiveRate": 0.400564,
+  "federalTax": 190282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 200282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48912,
+  "effectiveRate": 0.02176,
+  "federalTax": 1088,
+  "marginalRate": 0.08,
+  "provincialStateTax": 0,
+  "totalTax": 1088,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 93212,
+  "effectiveRate": 0.06788,
+  "federalTax": 5788,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 6788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177212,
+  "effectiveRate": 0.11394,
+  "federalTax": 20788,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 22788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 416362,
+  "effectiveRate": 0.167276,
+  "federalTax": 78638,
+  "marginalRate": 0.23500000000000001,
+  "provincialStateTax": 0,
+  "totalTax": 83638,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43212,
+  "effectiveRate": 0.13576,
+  "federalTax": 5788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 77212,
+  "effectiveRate": 0.22788,
+  "federalTax": 20788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 139862,
+  "effectiveRate": 0.30069,
+  "federalTax": 56138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 60138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 298862,
+  "effectiveRate": 0.402276,
+  "federalTax": 191138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 201138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 43212,
+  "effectiveRate": 0.13576,
+  "federalTax": 5788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 77212,
+  "effectiveRate": 0.22788,
+  "federalTax": 20788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 139862,
+  "effectiveRate": 0.30069,
+  "federalTax": 56138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 60138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 298862,
+  "effectiveRate": 0.402276,
+  "federalTax": 191138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 201138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48992,
+  "effectiveRate": 0.02016,
+  "federalTax": 1008,
+  "marginalRate": 0.08,
+  "provincialStateTax": 0,
+  "totalTax": 1008,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 93446,
+  "effectiveRate": 0.06554,
+  "federalTax": 5554,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 6554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177446,
+  "effectiveRate": 0.11277,
+  "federalTax": 20554,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 22554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 417218,
+  "effectiveRate": 0.165564,
+  "federalTax": 77782,
+  "marginalRate": 0.23500000000000001,
+  "provincialStateTax": 0,
+  "totalTax": 82782,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43446,
+  "effectiveRate": 0.13108,
+  "federalTax": 5554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 77446,
+  "effectiveRate": 0.22554,
+  "federalTax": 20554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 140718,
+  "effectiveRate": 0.29641,
+  "federalTax": 55282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 59282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 299718,
+  "effectiveRate": 0.400564,
+  "federalTax": 190282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 200282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 43446,
+  "effectiveRate": 0.13108,
+  "federalTax": 5554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 77446,
+  "effectiveRate": 0.22554,
+  "federalTax": 20554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 140718,
+  "effectiveRate": 0.29641,
+  "federalTax": 55282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 59282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/QLD 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 299718,
+  "effectiveRate": 0.400564,
+  "federalTax": 190282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 200282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48912,
+  "effectiveRate": 0.02176,
+  "federalTax": 1088,
+  "marginalRate": 0.08,
+  "provincialStateTax": 0,
+  "totalTax": 1088,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 93212,
+  "effectiveRate": 0.06788,
+  "federalTax": 5788,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 6788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177212,
+  "effectiveRate": 0.11394,
+  "federalTax": 20788,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 22788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 416362,
+  "effectiveRate": 0.167276,
+  "federalTax": 78638,
+  "marginalRate": 0.23500000000000001,
+  "provincialStateTax": 0,
+  "totalTax": 83638,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43212,
+  "effectiveRate": 0.13576,
+  "federalTax": 5788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 77212,
+  "effectiveRate": 0.22788,
+  "federalTax": 20788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 139862,
+  "effectiveRate": 0.30069,
+  "federalTax": 56138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 60138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 298862,
+  "effectiveRate": 0.402276,
+  "federalTax": 191138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 201138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 43212,
+  "effectiveRate": 0.13576,
+  "federalTax": 5788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 77212,
+  "effectiveRate": 0.22788,
+  "federalTax": 20788,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22788,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 139862,
+  "effectiveRate": 0.30069,
+  "federalTax": 56138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 60138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 298862,
+  "effectiveRate": 0.402276,
+  "federalTax": 191138,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 201138,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48992,
+  "effectiveRate": 0.02016,
+  "federalTax": 1008,
+  "marginalRate": 0.08,
+  "provincialStateTax": 0,
+  "totalTax": 1008,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 93446,
+  "effectiveRate": 0.06554,
+  "federalTax": 5554,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 6554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177446,
+  "effectiveRate": 0.11277,
+  "federalTax": 20554,
+  "marginalRate": 0.16,
+  "provincialStateTax": 0,
+  "totalTax": 22554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 417218,
+  "effectiveRate": 0.165564,
+  "federalTax": 77782,
+  "marginalRate": 0.23500000000000001,
+  "provincialStateTax": 0,
+  "totalTax": 82782,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43446,
+  "effectiveRate": 0.13108,
+  "federalTax": 5554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 77446,
+  "effectiveRate": 0.22554,
+  "federalTax": 20554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 140718,
+  "effectiveRate": 0.29641,
+  "federalTax": 55282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 59282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 299718,
+  "effectiveRate": 0.400564,
+  "federalTax": 190282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 200282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 43446,
+  "effectiveRate": 0.13108,
+  "federalTax": 5554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 6554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 77446,
+  "effectiveRate": 0.22554,
+  "federalTax": 20554,
+  "marginalRate": 0.32,
+  "provincialStateTax": 0,
+  "totalTax": 22554,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 140718,
+  "effectiveRate": 0.29641,
+  "federalTax": 55282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 59282,
+}
+`;
+
+exports[`tax engine snapshot regression > AU/VIC 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 299718,
+  "effectiveRate": 0.400564,
+  "federalTax": 190282,
+  "marginalRate": 0.47000000000000003,
+  "provincialStateTax": 0,
+  "totalTax": 200282,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.125,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48269.65,
+  "effectiveRate": 0.034607,
+  "federalTax": 1330.65,
+  "marginalRate": 0.125,
+  "provincialStateTax": 399.6999999999998,
+  "totalTax": 1730.35,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 92019.65,
+  "effectiveRate": 0.0798035,
+  "federalTax": 5080.65,
+  "marginalRate": 0.125,
+  "provincialStateTax": 2899.7,
+  "totalTax": 7980.349999999999,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177175.275,
+  "effectiveRate": 0.11412362499999999,
+  "federalTax": 14925.025,
+  "marginalRate": 0.1525,
+  "provincialStateTax": 7899.7,
+  "totalTax": 22824.725,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 397574.1316666667,
+  "effectiveRate": 0.20485173666666665,
+  "federalTax": 70809.73499999999,
+  "marginalRate": 0.31333333333333335,
+  "provincialStateTax": 31616.133333333335,
+  "totalTax": 102425.86833333332,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.25,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 42019.65,
+  "effectiveRate": 0.159607,
+  "federalTax": 5080.65,
+  "marginalRate": 0.25,
+  "provincialStateTax": 2899.7,
+  "totalTax": 7980.349999999999,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 77175.275,
+  "effectiveRate": 0.22824724999999998,
+  "federalTax": 14925.025,
+  "marginalRate": 0.305,
+  "provincialStateTax": 7899.7,
+  "totalTax": 22824.725,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 139485.16499999998,
+  "effectiveRate": 0.30257417500000006,
+  "federalTax": 41359.735,
+  "marginalRate": 0.42,
+  "provincialStateTax": 19155.100000000002,
+  "totalTax": 60514.83500000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 298215.91500000004,
+  "effectiveRate": 0.40356817,
+  "federalTax": 139559.735,
+  "marginalRate": 0.48,
+  "provincialStateTax": 62224.350000000006,
+  "totalTax": 201784.085,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.25,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 42019.65,
+  "effectiveRate": 0.159607,
+  "federalTax": 5080.65,
+  "marginalRate": 0.25,
+  "provincialStateTax": 2899.7,
+  "totalTax": 7980.349999999999,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 77175.275,
+  "effectiveRate": 0.22824724999999998,
+  "federalTax": 14925.025,
+  "marginalRate": 0.305,
+  "provincialStateTax": 7899.7,
+  "totalTax": 22824.725,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 139485.16499999998,
+  "effectiveRate": 0.30257417500000006,
+  "federalTax": 41359.735,
+  "marginalRate": 0.42,
+  "provincialStateTax": 19155.100000000002,
+  "totalTax": 60514.83500000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 298215.91500000004,
+  "effectiveRate": 0.40356817,
+  "federalTax": 139559.735,
+  "marginalRate": 0.48,
+  "provincialStateTax": 62224.350000000006,
+  "totalTax": 201784.085,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.125,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48334.9,
+  "effectiveRate": 0.033302,
+  "federalTax": 1265.4,
+  "marginalRate": 0.125,
+  "provincialStateTax": 399.6999999999998,
+  "totalTax": 1665.1,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 92084.9,
+  "effectiveRate": 0.079151,
+  "federalTax": 5015.4,
+  "marginalRate": 0.125,
+  "provincialStateTax": 2899.7,
+  "totalTax": 7915.099999999999,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177325.72,
+  "effectiveRate": 0.1133714,
+  "federalTax": 14774.58,
+  "marginalRate": 0.1525,
+  "provincialStateTax": 7899.7,
+  "totalTax": 22674.28,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 398260.8816666667,
+  "effectiveRate": 0.20347823666666665,
+  "federalTax": 70122.98499999999,
+  "marginalRate": 0.31333333333333335,
+  "provincialStateTax": 31616.133333333335,
+  "totalTax": 101739.11833333332,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.25,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 42084.9,
+  "effectiveRate": 0.158302,
+  "federalTax": 5015.4,
+  "marginalRate": 0.25,
+  "provincialStateTax": 2899.7,
+  "totalTax": 7915.099999999999,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 77325.72,
+  "effectiveRate": 0.2267428,
+  "federalTax": 14774.58,
+  "marginalRate": 0.305,
+  "provincialStateTax": 7899.7,
+  "totalTax": 22674.28,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 139934.315,
+  "effectiveRate": 0.300328425,
+  "federalTax": 40910.585,
+  "marginalRate": 0.42,
+  "provincialStateTax": 19155.100000000002,
+  "totalTax": 60065.685,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 298902.665,
+  "effectiveRate": 0.40219467000000003,
+  "federalTax": 138872.98500000002,
+  "marginalRate": 0.48,
+  "provincialStateTax": 62224.350000000006,
+  "totalTax": 201097.33500000002,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.25,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 42084.9,
+  "effectiveRate": 0.158302,
+  "federalTax": 5015.4,
+  "marginalRate": 0.25,
+  "provincialStateTax": 2899.7,
+  "totalTax": 7915.099999999999,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 77325.72,
+  "effectiveRate": 0.2267428,
+  "federalTax": 14774.58,
+  "marginalRate": 0.305,
+  "provincialStateTax": 7899.7,
+  "totalTax": 22674.28,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 139934.315,
+  "effectiveRate": 0.300328425,
+  "federalTax": 40910.585,
+  "marginalRate": 0.42,
+  "provincialStateTax": 19155.100000000002,
+  "totalTax": 60065.685,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/AB 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 298902.665,
+  "effectiveRate": 0.40219467000000003,
+  "federalTax": 138872.98500000002,
+  "marginalRate": 0.48,
+  "provincialStateTax": 62224.350000000006,
+  "totalTax": 201097.33500000002,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.1003,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48040.898,
+  "effectiveRate": 0.03918204,
+  "federalTax": 1330.65,
+  "marginalRate": 0.1003,
+  "provincialStateTax": 628.452,
+  "totalTax": 1959.102,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 92971.4348,
+  "effectiveRate": 0.070285652,
+  "federalTax": 5080.65,
+  "marginalRate": 0.11349999999999999,
+  "provincialStateTax": 1947.9152000000001,
+  "totalTax": 7028.5652,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 179161.5598,
+  "effectiveRate": 0.104192201,
+  "federalTax": 14925.025,
+  "marginalRate": 0.155,
+  "provincialStateTax": 5913.4152,
+  "totalTax": 20838.4402,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 392334.5419333334,
+  "effectiveRate": 0.2153309161333333,
+  "federalTax": 70809.73499999999,
+  "marginalRate": 0.3566666666666667,
+  "provincialStateTax": 36855.72306666666,
+  "totalTax": 107665.45806666664,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.2006,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 42971.4348,
+  "effectiveRate": 0.140571304,
+  "federalTax": 5080.65,
+  "marginalRate": 0.22699999999999998,
+  "provincialStateTax": 1947.9152000000001,
+  "totalTax": 7028.5652,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 79161.5598,
+  "effectiveRate": 0.208384402,
+  "federalTax": 14925.025,
+  "marginalRate": 0.31,
+  "provincialStateTax": 5913.4152,
+  "totalTax": 20838.4402,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 138624.3846,
+  "effectiveRate": 0.306878077,
+  "federalTax": 41359.735,
+  "marginalRate": 0.45799999999999996,
+  "provincialStateTax": 20015.880400000002,
+  "totalTax": 61375.6154,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 280876.2086,
+  "effectiveRate": 0.4382475828,
+  "federalTax": 139559.735,
+  "marginalRate": 0.535,
+  "provincialStateTax": 79564.0564,
+  "totalTax": 219123.7914,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.2006,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 42971.4348,
+  "effectiveRate": 0.140571304,
+  "federalTax": 5080.65,
+  "marginalRate": 0.22699999999999998,
+  "provincialStateTax": 1947.9152000000001,
+  "totalTax": 7028.5652,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 79161.5598,
+  "effectiveRate": 0.208384402,
+  "federalTax": 14925.025,
+  "marginalRate": 0.31,
+  "provincialStateTax": 5913.4152,
+  "totalTax": 20838.4402,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 138624.3846,
+  "effectiveRate": 0.306878077,
+  "federalTax": 41359.735,
+  "marginalRate": 0.45799999999999996,
+  "provincialStateTax": 20015.880400000002,
+  "totalTax": 61375.6154,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 280876.2086,
+  "effectiveRate": 0.4382475828,
+  "federalTax": 139559.735,
+  "marginalRate": 0.535,
+  "provincialStateTax": 79564.0564,
+  "totalTax": 219123.7914,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.1003,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48106.148,
+  "effectiveRate": 0.03787704,
+  "federalTax": 1265.4,
+  "marginalRate": 0.1003,
+  "provincialStateTax": 628.452,
+  "totalTax": 1893.852,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 93036.6848,
+  "effectiveRate": 0.069633152,
+  "federalTax": 5015.4,
+  "marginalRate": 0.11349999999999999,
+  "provincialStateTax": 1947.9152000000001,
+  "totalTax": 6963.3152,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 179312.0048,
+  "effectiveRate": 0.103439976,
+  "federalTax": 14774.58,
+  "marginalRate": 0.155,
+  "provincialStateTax": 5913.4152,
+  "totalTax": 20687.9952,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 393021.2919333334,
+  "effectiveRate": 0.2139574161333333,
+  "federalTax": 70122.98499999999,
+  "marginalRate": 0.3566666666666667,
+  "provincialStateTax": 36855.72306666666,
+  "totalTax": 106978.70806666664,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.2006,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43036.6848,
+  "effectiveRate": 0.139266304,
+  "federalTax": 5015.4,
+  "marginalRate": 0.22699999999999998,
+  "provincialStateTax": 1947.9152000000001,
+  "totalTax": 6963.3152,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 79312.0048,
+  "effectiveRate": 0.206879952,
+  "federalTax": 14774.58,
+  "marginalRate": 0.31,
+  "provincialStateTax": 5913.4152,
+  "totalTax": 20687.9952,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 139073.5346,
+  "effectiveRate": 0.304632327,
+  "federalTax": 40910.585,
+  "marginalRate": 0.45799999999999996,
+  "provincialStateTax": 20015.880400000002,
+  "totalTax": 60926.4654,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 281562.9586,
+  "effectiveRate": 0.4368740828,
+  "federalTax": 138872.98500000002,
+  "marginalRate": 0.535,
+  "provincialStateTax": 79564.0564,
+  "totalTax": 218437.04140000002,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.2006,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 43036.6848,
+  "effectiveRate": 0.139266304,
+  "federalTax": 5015.4,
+  "marginalRate": 0.22699999999999998,
+  "provincialStateTax": 1947.9152000000001,
+  "totalTax": 6963.3152,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 79312.0048,
+  "effectiveRate": 0.206879952,
+  "federalTax": 14774.58,
+  "marginalRate": 0.31,
+  "provincialStateTax": 5913.4152,
+  "totalTax": 20687.9952,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 139073.5346,
+  "effectiveRate": 0.304632327,
+  "federalTax": 40910.585,
+  "marginalRate": 0.45799999999999996,
+  "provincialStateTax": 20015.880400000002,
+  "totalTax": 60926.4654,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/BC 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 281562.9586,
+  "effectiveRate": 0.4368740828,
+  "federalTax": 138872.98500000002,
+  "marginalRate": 0.535,
+  "provincialStateTax": 79564.0564,
+  "totalTax": 218437.04140000002,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.10025,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48006.0325,
+  "effectiveRate": 0.03987935,
+  "federalTax": 1330.65,
+  "marginalRate": 0.10025,
+  "provincialStateTax": 663.3175,
+  "totalTax": 1993.9675000000002,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 92993.5325,
+  "effectiveRate": 0.07006467499999999,
+  "federalTax": 5080.65,
+  "marginalRate": 0.10025,
+  "provincialStateTax": 1925.8175,
+  "totalTax": 7006.4675,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 178692.4835,
+  "effectiveRate": 0.10653758249999999,
+  "federalTax": 14925.025,
+  "marginalRate": 0.14825,
+  "provincialStateTax": 6382.4915,
+  "totalTax": 21307.516499999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 399400.51766666665,
+  "effectiveRate": 0.20119896466666665,
+  "federalTax": 70809.73499999999,
+  "marginalRate": 0.3077333333333333,
+  "provincialStateTax": 29789.74733333333,
+  "totalTax": 100599.48233333332,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.2005,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 42993.5325,
+  "effectiveRate": 0.14012934999999999,
+  "federalTax": 5080.65,
+  "marginalRate": 0.2005,
+  "provincialStateTax": 1925.8175,
+  "totalTax": 7006.4675,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 78692.4835,
+  "effectiveRate": 0.21307516499999998,
+  "federalTax": 14925.025,
+  "marginalRate": 0.2965,
+  "provincialStateTax": 6382.4915,
+  "totalTax": 21307.516499999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 140713.851,
+  "effectiveRate": 0.29643074500000005,
+  "federalTax": 41359.735,
+  "marginalRate": 0.41159999999999997,
+  "provincialStateTax": 17926.414,
+  "totalTax": 59286.149000000005,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 303233.851,
+  "effectiveRate": 0.39353229799999995,
+  "federalTax": 139559.735,
+  "marginalRate": 0.4616,
+  "provincialStateTax": 57206.414,
+  "totalTax": 196766.14899999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.2005,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 42993.5325,
+  "effectiveRate": 0.14012934999999999,
+  "federalTax": 5080.65,
+  "marginalRate": 0.2005,
+  "provincialStateTax": 1925.8175,
+  "totalTax": 7006.4675,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 78692.4835,
+  "effectiveRate": 0.21307516499999998,
+  "federalTax": 14925.025,
+  "marginalRate": 0.2965,
+  "provincialStateTax": 6382.4915,
+  "totalTax": 21307.516499999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 140713.851,
+  "effectiveRate": 0.29643074500000005,
+  "federalTax": 41359.735,
+  "marginalRate": 0.41159999999999997,
+  "provincialStateTax": 17926.414,
+  "totalTax": 59286.149000000005,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 303233.851,
+  "effectiveRate": 0.39353229799999995,
+  "federalTax": 139559.735,
+  "marginalRate": 0.4616,
+  "provincialStateTax": 57206.414,
+  "totalTax": 196766.14899999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.10025,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48071.2825,
+  "effectiveRate": 0.03857435000000001,
+  "federalTax": 1265.4,
+  "marginalRate": 0.10025,
+  "provincialStateTax": 663.3175,
+  "totalTax": 1928.7175000000002,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 93058.7825,
+  "effectiveRate": 0.06941217499999999,
+  "federalTax": 5015.4,
+  "marginalRate": 0.10025,
+  "provincialStateTax": 1925.8175,
+  "totalTax": 6941.2175,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 178842.9285,
+  "effectiveRate": 0.1057853575,
+  "federalTax": 14774.58,
+  "marginalRate": 0.14825,
+  "provincialStateTax": 6382.4915,
+  "totalTax": 21157.0715,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 400087.26766666665,
+  "effectiveRate": 0.19982546466666665,
+  "federalTax": 70122.98499999999,
+  "marginalRate": 0.3077333333333333,
+  "provincialStateTax": 29789.74733333333,
+  "totalTax": 99912.73233333332,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.2005,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43058.7825,
+  "effectiveRate": 0.13882434999999999,
+  "federalTax": 5015.4,
+  "marginalRate": 0.2005,
+  "provincialStateTax": 1925.8175,
+  "totalTax": 6941.2175,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 78842.92850000001,
+  "effectiveRate": 0.211570715,
+  "federalTax": 14774.58,
+  "marginalRate": 0.2965,
+  "provincialStateTax": 6382.4915,
+  "totalTax": 21157.0715,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 141163.001,
+  "effectiveRate": 0.294184995,
+  "federalTax": 40910.585,
+  "marginalRate": 0.41159999999999997,
+  "provincialStateTax": 17926.414,
+  "totalTax": 58836.998999999996,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 303920.601,
+  "effectiveRate": 0.39215879800000003,
+  "federalTax": 138872.98500000002,
+  "marginalRate": 0.4616,
+  "provincialStateTax": 57206.414,
+  "totalTax": 196079.399,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.2005,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 43058.7825,
+  "effectiveRate": 0.13882434999999999,
+  "federalTax": 5015.4,
+  "marginalRate": 0.2005,
+  "provincialStateTax": 1925.8175,
+  "totalTax": 6941.2175,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 78842.92850000001,
+  "effectiveRate": 0.211570715,
+  "federalTax": 14774.58,
+  "marginalRate": 0.2965,
+  "provincialStateTax": 6382.4915,
+  "totalTax": 21157.0715,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 141163.001,
+  "effectiveRate": 0.294184995,
+  "federalTax": 40910.585,
+  "marginalRate": 0.41159999999999997,
+  "provincialStateTax": 17926.414,
+  "totalTax": 58836.998999999996,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/ON 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 303920.601,
+  "effectiveRate": 0.39215879800000003,
+  "federalTax": 138872.98500000002,
+  "marginalRate": 0.4616,
+  "provincialStateTax": 57206.414,
+  "totalTax": 196079.399,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.14500000000000002,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 47697.19,
+  "effectiveRate": 0.046056200000000005,
+  "federalTax": 1330.65,
+  "marginalRate": 0.14500000000000002,
+  "provincialStateTax": 972.1600000000003,
+  "totalTax": 2302.8100000000004,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 90447.19,
+  "effectiveRate": 0.09552810000000002,
+  "federalTax": 5080.65,
+  "marginalRate": 0.14500000000000002,
+  "provincialStateTax": 4472.160000000001,
+  "totalTax": 9552.810000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 171265.565,
+  "effectiveRate": 0.14367217499999999,
+  "federalTax": 14925.025,
+  "marginalRate": 0.1975,
+  "provincialStateTax": 13809.41,
+  "totalTax": 28734.434999999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 366869.26333333337,
+  "effectiveRate": 0.2662614733333333,
+  "federalTax": 70809.73499999999,
+  "marginalRate": 0.39166666666666666,
+  "provincialStateTax": 62321.00166666666,
+  "totalTax": 133130.73666666663,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.29000000000000004,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 40447.19,
+  "effectiveRate": 0.19105620000000004,
+  "federalTax": 5080.65,
+  "marginalRate": 0.29000000000000004,
+  "provincialStateTax": 4472.160000000001,
+  "totalTax": 9552.810000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 71265.565,
+  "effectiveRate": 0.28734434999999997,
+  "federalTax": 14925.025,
+  "marginalRate": 0.395,
+  "provincialStateTax": 13809.41,
+  "totalTax": 28734.434999999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 119923.43,
+  "effectiveRate": 0.40038285,
+  "federalTax": 41359.735,
+  "marginalRate": 0.5475,
+  "provincialStateTax": 38716.83500000001,
+  "totalTax": 80076.57,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 244473.43,
+  "effectiveRate": 0.51105314,
+  "federalTax": 139559.735,
+  "marginalRate": 0.5875,
+  "provincialStateTax": 115966.835,
+  "totalTax": 255526.57,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.29000000000000004,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 40447.19,
+  "effectiveRate": 0.19105620000000004,
+  "federalTax": 5080.65,
+  "marginalRate": 0.29000000000000004,
+  "provincialStateTax": 4472.160000000001,
+  "totalTax": 9552.810000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 71265.565,
+  "effectiveRate": 0.28734434999999997,
+  "federalTax": 14925.025,
+  "marginalRate": 0.395,
+  "provincialStateTax": 13809.41,
+  "totalTax": 28734.434999999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 119923.43,
+  "effectiveRate": 0.40038285,
+  "federalTax": 41359.735,
+  "marginalRate": 0.5475,
+  "provincialStateTax": 38716.83500000001,
+  "totalTax": 80076.57,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 244473.43,
+  "effectiveRate": 0.51105314,
+  "federalTax": 139559.735,
+  "marginalRate": 0.5875,
+  "provincialStateTax": 115966.835,
+  "totalTax": 255526.57,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.14500000000000002,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 47762.44,
+  "effectiveRate": 0.044751200000000005,
+  "federalTax": 1265.4,
+  "marginalRate": 0.14500000000000002,
+  "provincialStateTax": 972.1600000000003,
+  "totalTax": 2237.5600000000004,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 90512.44,
+  "effectiveRate": 0.09487560000000002,
+  "federalTax": 5015.4,
+  "marginalRate": 0.14500000000000002,
+  "provincialStateTax": 4472.160000000001,
+  "totalTax": 9487.560000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 171416.01,
+  "effectiveRate": 0.14291995,
+  "federalTax": 14774.58,
+  "marginalRate": 0.1975,
+  "provincialStateTax": 13809.41,
+  "totalTax": 28583.989999999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 367556.01333333337,
+  "effectiveRate": 0.26488797333333325,
+  "federalTax": 70122.98499999999,
+  "marginalRate": 0.39166666666666666,
+  "provincialStateTax": 62321.00166666666,
+  "totalTax": 132443.98666666663,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.29000000000000004,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 40512.44,
+  "effectiveRate": 0.18975120000000004,
+  "federalTax": 5015.4,
+  "marginalRate": 0.29000000000000004,
+  "provincialStateTax": 4472.160000000001,
+  "totalTax": 9487.560000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 71416.01000000001,
+  "effectiveRate": 0.2858399,
+  "federalTax": 14774.58,
+  "marginalRate": 0.395,
+  "provincialStateTax": 13809.41,
+  "totalTax": 28583.989999999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 120372.57999999999,
+  "effectiveRate": 0.3981371000000001,
+  "federalTax": 40910.585,
+  "marginalRate": 0.5475,
+  "provincialStateTax": 38716.83500000001,
+  "totalTax": 79627.42000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 245160.18,
+  "effectiveRate": 0.50967964,
+  "federalTax": 138872.98500000002,
+  "marginalRate": 0.5875,
+  "provincialStateTax": 115966.835,
+  "totalTax": 254839.82,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0.29000000000000004,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 40512.44,
+  "effectiveRate": 0.18975120000000004,
+  "federalTax": 5015.4,
+  "marginalRate": 0.29000000000000004,
+  "provincialStateTax": 4472.160000000001,
+  "totalTax": 9487.560000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 71416.01000000001,
+  "effectiveRate": 0.2858399,
+  "federalTax": 14774.58,
+  "marginalRate": 0.395,
+  "provincialStateTax": 13809.41,
+  "totalTax": 28583.989999999998,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 120372.57999999999,
+  "effectiveRate": 0.3981371000000001,
+  "federalTax": 40910.585,
+  "marginalRate": 0.5475,
+  "provincialStateTax": 38716.83500000001,
+  "totalTax": 79627.42000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > CA/QC 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 245160.18,
+  "effectiveRate": 0.50967964,
+  "federalTax": 138872.98500000002,
+  "marginalRate": 0.5875,
+  "provincialStateTax": 115966.835,
+  "totalTax": 254839.82,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 9900,
+  "effectiveRate": 0.01,
+  "federalTax": 0,
+  "marginalRate": 0.01,
+  "provincialStateTax": 100,
+  "totalTax": 100,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48174.94,
+  "effectiveRate": 0.0365012,
+  "federalTax": 247.5,
+  "marginalRate": 0.21,
+  "provincialStateTax": 1577.56,
+  "totalTax": 1825.06,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 86410.138,
+  "effectiveRate": 0.13589862,
+  "federalTax": 7747.5,
+  "marginalRate": 0.243,
+  "provincialStateTax": 5842.362,
+  "totalTax": 13589.862000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 162110.138,
+  "effectiveRate": 0.18944931,
+  "federalTax": 22747.5,
+  "marginalRate": 0.243,
+  "provincialStateTax": 15142.362000000001,
+  "totalTax": 37889.862,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 387144.598,
+  "effectiveRate": 0.22571080400000001,
+  "federalTax": 67747.5,
+  "marginalRate": 0.263,
+  "provincialStateTax": 45107.902,
+  "totalTax": 112855.402,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 9900,
+  "effectiveRate": 0.01,
+  "federalTax": 0,
+  "marginalRate": 0.01,
+  "provincialStateTax": 100,
+  "totalTax": 100,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 44460.94,
+  "effectiveRate": 0.1107812,
+  "federalTax": 3961.5,
+  "marginalRate": 0.18,
+  "provincialStateTax": 1577.56,
+  "totalTax": 5539.0599999999995,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 80543.638,
+  "effectiveRate": 0.19456362000000002,
+  "federalTax": 13614,
+  "marginalRate": 0.313,
+  "provincialStateTax": 5842.362,
+  "totalTax": 19456.362,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 147610.638,
+  "effectiveRate": 0.26194681000000003,
+  "federalTax": 37247,
+  "marginalRate": 0.33299999999999996,
+  "provincialStateTax": 15142.362000000001,
+  "totalTax": 52389.362,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 315594.848,
+  "effectiveRate": 0.368810304,
+  "federalTax": 139297.25,
+  "marginalRate": 0.46299999999999997,
+  "provincialStateTax": 45107.902,
+  "totalTax": 184405.152,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 9900,
+  "effectiveRate": 0.01,
+  "federalTax": 0,
+  "marginalRate": 0.01,
+  "provincialStateTax": 100,
+  "totalTax": 100,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 44460.94,
+  "effectiveRate": 0.1107812,
+  "federalTax": 3961.5,
+  "marginalRate": 0.18,
+  "provincialStateTax": 1577.56,
+  "totalTax": 5539.0599999999995,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 80543.638,
+  "effectiveRate": 0.19456362000000002,
+  "federalTax": 13614,
+  "marginalRate": 0.313,
+  "provincialStateTax": 5842.362,
+  "totalTax": 19456.362,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 147610.638,
+  "effectiveRate": 0.26194681000000003,
+  "federalTax": 37247,
+  "marginalRate": 0.33299999999999996,
+  "provincialStateTax": 15142.362000000001,
+  "totalTax": 52389.362,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 315594.848,
+  "effectiveRate": 0.368810304,
+  "federalTax": 139297.25,
+  "marginalRate": 0.46299999999999997,
+  "provincialStateTax": 45107.902,
+  "totalTax": 184405.152,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 9900,
+  "effectiveRate": 0.01,
+  "federalTax": 0,
+  "marginalRate": 0.01,
+  "provincialStateTax": 100,
+  "totalTax": 100,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 48377.89,
+  "effectiveRate": 0.0324422,
+  "federalTax": 44.55,
+  "marginalRate": 0.21,
+  "provincialStateTax": 1577.56,
+  "totalTax": 1622.11,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 86613.088,
+  "effectiveRate": 0.13386912,
+  "federalTax": 7544.549999999999,
+  "marginalRate": 0.243,
+  "provincialStateTax": 5842.362,
+  "totalTax": 13386.912,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 162313.088,
+  "effectiveRate": 0.18843455999999997,
+  "federalTax": 22544.55,
+  "marginalRate": 0.243,
+  "provincialStateTax": 15142.362000000001,
+  "totalTax": 37686.912,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 387347.548,
+  "effectiveRate": 0.225304904,
+  "federalTax": 67544.55,
+  "marginalRate": 0.263,
+  "provincialStateTax": 45107.902,
+  "totalTax": 112652.452,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 9900,
+  "effectiveRate": 0.01,
+  "federalTax": 0,
+  "marginalRate": 0.01,
+  "provincialStateTax": 100,
+  "totalTax": 100,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 44518.020000000004,
+  "effectiveRate": 0.10963959999999999,
+  "federalTax": 3904.42,
+  "marginalRate": 0.18,
+  "provincialStateTax": 1577.56,
+  "totalTax": 5481.98,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 80778.418,
+  "effectiveRate": 0.19221582,
+  "federalTax": 13379.220000000001,
+  "marginalRate": 0.313,
+  "provincialStateTax": 5842.362,
+  "totalTax": 19221.582000000002,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 147911.698,
+  "effectiveRate": 0.26044151000000004,
+  "federalTax": 36945.94,
+  "marginalRate": 0.33299999999999996,
+  "provincialStateTax": 15142.362000000001,
+  "totalTax": 52088.302,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 316594.478,
+  "effectiveRate": 0.366811044,
+  "federalTax": 138297.62,
+  "marginalRate": 0.46299999999999997,
+  "provincialStateTax": 45107.902,
+  "totalTax": 183405.522,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 9900,
+  "effectiveRate": 0.01,
+  "federalTax": 0,
+  "marginalRate": 0.01,
+  "provincialStateTax": 100,
+  "totalTax": 100,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 44518.020000000004,
+  "effectiveRate": 0.10963959999999999,
+  "federalTax": 3904.42,
+  "marginalRate": 0.18,
+  "provincialStateTax": 1577.56,
+  "totalTax": 5481.98,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 80778.418,
+  "effectiveRate": 0.19221582,
+  "federalTax": 13379.220000000001,
+  "marginalRate": 0.313,
+  "provincialStateTax": 5842.362,
+  "totalTax": 19221.582000000002,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 147911.698,
+  "effectiveRate": 0.26044151000000004,
+  "federalTax": 36945.94,
+  "marginalRate": 0.33299999999999996,
+  "provincialStateTax": 15142.362000000001,
+  "totalTax": 52088.302,
+}
+`;
+
+exports[`tax engine snapshot regression > US/CA 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 316594.478,
+  "effectiveRate": 0.366811044,
+  "federalTax": 138297.62,
+  "marginalRate": 0.46299999999999997,
+  "provincialStateTax": 45107.902,
+  "totalTax": 183405.522,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 49752.5,
+  "effectiveRate": 0.00495,
+  "federalTax": 247.5,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 247.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 92252.5,
+  "effectiveRate": 0.077475,
+  "federalTax": 7747.5,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 7747.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177252.5,
+  "effectiveRate": 0.1137375,
+  "federalTax": 22747.5,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 22747.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 432252.5,
+  "effectiveRate": 0.135495,
+  "federalTax": 67747.5,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 67747.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 46038.5,
+  "effectiveRate": 0.07923,
+  "federalTax": 3961.5,
+  "marginalRate": 0.12,
+  "provincialStateTax": 0,
+  "totalTax": 3961.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 86386,
+  "effectiveRate": 0.13614,
+  "federalTax": 13614,
+  "marginalRate": 0.22,
+  "provincialStateTax": 0,
+  "totalTax": 13614,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 162753,
+  "effectiveRate": 0.186235,
+  "federalTax": 37247,
+  "marginalRate": 0.24,
+  "provincialStateTax": 0,
+  "totalTax": 37247,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 360702.75,
+  "effectiveRate": 0.2785945,
+  "federalTax": 139297.25,
+  "marginalRate": 0.35,
+  "provincialStateTax": 0,
+  "totalTax": 139297.25,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 46038.5,
+  "effectiveRate": 0.07923,
+  "federalTax": 3961.5,
+  "marginalRate": 0.12,
+  "provincialStateTax": 0,
+  "totalTax": 3961.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 86386,
+  "effectiveRate": 0.13614,
+  "federalTax": 13614,
+  "marginalRate": 0.22,
+  "provincialStateTax": 0,
+  "totalTax": 13614,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 162753,
+  "effectiveRate": 0.186235,
+  "federalTax": 37247,
+  "marginalRate": 0.24,
+  "provincialStateTax": 0,
+  "totalTax": 37247,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 360702.75,
+  "effectiveRate": 0.2785945,
+  "federalTax": 139297.25,
+  "marginalRate": 0.35,
+  "provincialStateTax": 0,
+  "totalTax": 139297.25,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 49955.45,
+  "effectiveRate": 0.000891,
+  "federalTax": 44.55,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 44.55,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 92455.45,
+  "effectiveRate": 0.0754455,
+  "federalTax": 7544.549999999999,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 7544.549999999999,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177455.45,
+  "effectiveRate": 0.11272275,
+  "federalTax": 22544.55,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 22544.55,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 432455.45,
+  "effectiveRate": 0.13508910000000002,
+  "federalTax": 67544.55,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 67544.55,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 46095.58,
+  "effectiveRate": 0.0780884,
+  "federalTax": 3904.42,
+  "marginalRate": 0.12,
+  "provincialStateTax": 0,
+  "totalTax": 3904.42,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 86620.78,
+  "effectiveRate": 0.1337922,
+  "federalTax": 13379.220000000001,
+  "marginalRate": 0.22,
+  "provincialStateTax": 0,
+  "totalTax": 13379.220000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 163054.06,
+  "effectiveRate": 0.18472970000000002,
+  "federalTax": 36945.94,
+  "marginalRate": 0.24,
+  "provincialStateTax": 0,
+  "totalTax": 36945.94,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 361702.38,
+  "effectiveRate": 0.27659523999999996,
+  "federalTax": 138297.62,
+  "marginalRate": 0.35,
+  "provincialStateTax": 0,
+  "totalTax": 138297.62,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 46095.58,
+  "effectiveRate": 0.0780884,
+  "federalTax": 3904.42,
+  "marginalRate": 0.12,
+  "provincialStateTax": 0,
+  "totalTax": 3904.42,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 86620.78,
+  "effectiveRate": 0.1337922,
+  "federalTax": 13379.220000000001,
+  "marginalRate": 0.22,
+  "provincialStateTax": 0,
+  "totalTax": 13379.220000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 163054.06,
+  "effectiveRate": 0.18472970000000002,
+  "federalTax": 36945.94,
+  "marginalRate": 0.24,
+  "provincialStateTax": 0,
+  "totalTax": 36945.94,
+}
+`;
+
+exports[`tax engine snapshot regression > US/FL 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 361702.38,
+  "effectiveRate": 0.27659523999999996,
+  "federalTax": 138297.62,
+  "marginalRate": 0.35,
+  "provincialStateTax": 0,
+  "totalTax": 138297.62,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 9592.5,
+  "effectiveRate": 0.04075,
+  "federalTax": 0,
+  "marginalRate": 0.045,
+  "provincialStateTax": 407.5,
+  "totalTax": 407.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 47167.5,
+  "effectiveRate": 0.05665,
+  "federalTax": 247.5,
+  "marginalRate": 0.205,
+  "provincialStateTax": 2585,
+  "totalTax": 2832.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 86820.75,
+  "effectiveRate": 0.1317925,
+  "federalTax": 7747.5,
+  "marginalRate": 0.21,
+  "provincialStateTax": 5431.75,
+  "totalTax": 13179.25,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 165820.75,
+  "effectiveRate": 0.17089625,
+  "federalTax": 22747.5,
+  "marginalRate": 0.21,
+  "provincialStateTax": 11431.75,
+  "totalTax": 34179.25,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 400401.65,
+  "effectiveRate": 0.1991967,
+  "federalTax": 67747.5,
+  "marginalRate": 0.2185,
+  "provincialStateTax": 31850.850000000002,
+  "totalTax": 99598.35,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 9592.5,
+  "effectiveRate": 0.04075,
+  "federalTax": 0,
+  "marginalRate": 0.045,
+  "provincialStateTax": 407.5,
+  "totalTax": 407.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43453.5,
+  "effectiveRate": 0.13093,
+  "federalTax": 3961.5,
+  "marginalRate": 0.175,
+  "provincialStateTax": 2585,
+  "totalTax": 6546.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 80954.25,
+  "effectiveRate": 0.1904575,
+  "federalTax": 13614,
+  "marginalRate": 0.28,
+  "provincialStateTax": 5431.75,
+  "totalTax": 19045.75,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 151321.25,
+  "effectiveRate": 0.24339375,
+  "federalTax": 37247,
+  "marginalRate": 0.3,
+  "provincialStateTax": 11431.75,
+  "totalTax": 48678.75,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 328851.9,
+  "effectiveRate": 0.3422962,
+  "federalTax": 139297.25,
+  "marginalRate": 0.4185,
+  "provincialStateTax": 31850.850000000002,
+  "totalTax": 171148.1,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 9592.5,
+  "effectiveRate": 0.04075,
+  "federalTax": 0,
+  "marginalRate": 0.045,
+  "provincialStateTax": 407.5,
+  "totalTax": 407.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 43453.5,
+  "effectiveRate": 0.13093,
+  "federalTax": 3961.5,
+  "marginalRate": 0.175,
+  "provincialStateTax": 2585,
+  "totalTax": 6546.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 80954.25,
+  "effectiveRate": 0.1904575,
+  "federalTax": 13614,
+  "marginalRate": 0.28,
+  "provincialStateTax": 5431.75,
+  "totalTax": 19045.75,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 151321.25,
+  "effectiveRate": 0.24339375,
+  "federalTax": 37247,
+  "marginalRate": 0.3,
+  "provincialStateTax": 11431.75,
+  "totalTax": 48678.75,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 328851.9,
+  "effectiveRate": 0.3422962,
+  "federalTax": 139297.25,
+  "marginalRate": 0.4185,
+  "provincialStateTax": 31850.850000000002,
+  "totalTax": 171148.1,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 9592.5,
+  "effectiveRate": 0.04075,
+  "federalTax": 0,
+  "marginalRate": 0.045,
+  "provincialStateTax": 407.5,
+  "totalTax": 407.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 47370.45,
+  "effectiveRate": 0.052591000000000006,
+  "federalTax": 44.55,
+  "marginalRate": 0.205,
+  "provincialStateTax": 2585,
+  "totalTax": 2629.55,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 87023.7,
+  "effectiveRate": 0.129763,
+  "federalTax": 7544.549999999999,
+  "marginalRate": 0.21,
+  "provincialStateTax": 5431.75,
+  "totalTax": 12976.3,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 166023.7,
+  "effectiveRate": 0.16988150000000002,
+  "federalTax": 22544.55,
+  "marginalRate": 0.21,
+  "provincialStateTax": 11431.75,
+  "totalTax": 33976.3,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 400604.6,
+  "effectiveRate": 0.19879080000000002,
+  "federalTax": 67544.55,
+  "marginalRate": 0.2185,
+  "provincialStateTax": 31850.850000000002,
+  "totalTax": 99395.40000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 9592.5,
+  "effectiveRate": 0.04075,
+  "federalTax": 0,
+  "marginalRate": 0.045,
+  "provincialStateTax": 407.5,
+  "totalTax": 407.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 43510.58,
+  "effectiveRate": 0.1297884,
+  "federalTax": 3904.42,
+  "marginalRate": 0.175,
+  "provincialStateTax": 2585,
+  "totalTax": 6489.42,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 81189.03,
+  "effectiveRate": 0.18810970000000002,
+  "federalTax": 13379.220000000001,
+  "marginalRate": 0.28,
+  "provincialStateTax": 5431.75,
+  "totalTax": 18810.97,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 151622.31,
+  "effectiveRate": 0.24188845,
+  "federalTax": 36945.94,
+  "marginalRate": 0.3,
+  "provincialStateTax": 11431.75,
+  "totalTax": 48377.69,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 329851.53,
+  "effectiveRate": 0.34029694,
+  "federalTax": 138297.62,
+  "marginalRate": 0.4185,
+  "provincialStateTax": 31850.850000000002,
+  "totalTax": 170148.47,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 9592.5,
+  "effectiveRate": 0.04075,
+  "federalTax": 0,
+  "marginalRate": 0.045,
+  "provincialStateTax": 407.5,
+  "totalTax": 407.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 43510.58,
+  "effectiveRate": 0.1297884,
+  "federalTax": 3904.42,
+  "marginalRate": 0.175,
+  "provincialStateTax": 2585,
+  "totalTax": 6489.42,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 81189.03,
+  "effectiveRate": 0.18810970000000002,
+  "federalTax": 13379.220000000001,
+  "marginalRate": 0.28,
+  "provincialStateTax": 5431.75,
+  "totalTax": 18810.97,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 151622.31,
+  "effectiveRate": 0.24188845,
+  "federalTax": 36945.94,
+  "marginalRate": 0.3,
+  "provincialStateTax": 11431.75,
+  "totalTax": 48377.69,
+}
+`;
+
+exports[`tax engine snapshot regression > US/NY 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 329851.53,
+  "effectiveRate": 0.34029694,
+  "federalTax": 138297.62,
+  "marginalRate": 0.4185,
+  "provincialStateTax": 31850.850000000002,
+  "totalTax": 170148.47,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 49752.5,
+  "effectiveRate": 0.00495,
+  "federalTax": 247.5,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 247.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 92252.5,
+  "effectiveRate": 0.077475,
+  "federalTax": 7747.5,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 7747.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177252.5,
+  "effectiveRate": 0.1137375,
+  "federalTax": 22747.5,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 22747.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 432252.5,
+  "effectiveRate": 0.135495,
+  "federalTax": 67747.5,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 67747.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 employment 50000 1`] = `
+{
+  "afterTaxIncome": 46038.5,
+  "effectiveRate": 0.07923,
+  "federalTax": 3961.5,
+  "marginalRate": 0.12,
+  "provincialStateTax": 0,
+  "totalTax": 3961.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 employment 100000 1`] = `
+{
+  "afterTaxIncome": 86386,
+  "effectiveRate": 0.13614,
+  "federalTax": 13614,
+  "marginalRate": 0.22,
+  "provincialStateTax": 0,
+  "totalTax": 13614,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 employment 200000 1`] = `
+{
+  "afterTaxIncome": 162753,
+  "effectiveRate": 0.186235,
+  "federalTax": 37247,
+  "marginalRate": 0.24,
+  "provincialStateTax": 0,
+  "totalTax": 37247,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 employment 500000 1`] = `
+{
+  "afterTaxIncome": 360702.75,
+  "effectiveRate": 0.2785945,
+  "federalTax": 139297.25,
+  "marginalRate": 0.35,
+  "provincialStateTax": 0,
+  "totalTax": 139297.25,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 other 50000 1`] = `
+{
+  "afterTaxIncome": 46038.5,
+  "effectiveRate": 0.07923,
+  "federalTax": 3961.5,
+  "marginalRate": 0.12,
+  "provincialStateTax": 0,
+  "totalTax": 3961.5,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 other 100000 1`] = `
+{
+  "afterTaxIncome": 86386,
+  "effectiveRate": 0.13614,
+  "federalTax": 13614,
+  "marginalRate": 0.22,
+  "provincialStateTax": 0,
+  "totalTax": 13614,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 other 200000 1`] = `
+{
+  "afterTaxIncome": 162753,
+  "effectiveRate": 0.186235,
+  "federalTax": 37247,
+  "marginalRate": 0.24,
+  "provincialStateTax": 0,
+  "totalTax": 37247,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2025 other 500000 1`] = `
+{
+  "afterTaxIncome": 360702.75,
+  "effectiveRate": 0.2785945,
+  "federalTax": 139297.25,
+  "marginalRate": 0.35,
+  "provincialStateTax": 0,
+  "totalTax": 139297.25,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 capital-gains 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 capital-gains 50000 1`] = `
+{
+  "afterTaxIncome": 49955.45,
+  "effectiveRate": 0.000891,
+  "federalTax": 44.55,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 44.55,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 capital-gains 100000 1`] = `
+{
+  "afterTaxIncome": 92455.45,
+  "effectiveRate": 0.0754455,
+  "federalTax": 7544.549999999999,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 7544.549999999999,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 capital-gains 200000 1`] = `
+{
+  "afterTaxIncome": 177455.45,
+  "effectiveRate": 0.11272275,
+  "federalTax": 22544.55,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 22544.55,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 capital-gains 500000 1`] = `
+{
+  "afterTaxIncome": 432455.45,
+  "effectiveRate": 0.13508910000000002,
+  "federalTax": 67544.55,
+  "marginalRate": 0.15,
+  "provincialStateTax": 0,
+  "totalTax": 67544.55,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 employment 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 employment 50000 1`] = `
+{
+  "afterTaxIncome": 46095.58,
+  "effectiveRate": 0.0780884,
+  "federalTax": 3904.42,
+  "marginalRate": 0.12,
+  "provincialStateTax": 0,
+  "totalTax": 3904.42,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 employment 100000 1`] = `
+{
+  "afterTaxIncome": 86620.78,
+  "effectiveRate": 0.1337922,
+  "federalTax": 13379.220000000001,
+  "marginalRate": 0.22,
+  "provincialStateTax": 0,
+  "totalTax": 13379.220000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 employment 200000 1`] = `
+{
+  "afterTaxIncome": 163054.06,
+  "effectiveRate": 0.18472970000000002,
+  "federalTax": 36945.94,
+  "marginalRate": 0.24,
+  "provincialStateTax": 0,
+  "totalTax": 36945.94,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 employment 500000 1`] = `
+{
+  "afterTaxIncome": 361702.38,
+  "effectiveRate": 0.27659523999999996,
+  "federalTax": 138297.62,
+  "marginalRate": 0.35,
+  "provincialStateTax": 0,
+  "totalTax": 138297.62,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 other 10000 1`] = `
+{
+  "afterTaxIncome": 10000,
+  "effectiveRate": 0,
+  "federalTax": 0,
+  "marginalRate": 0,
+  "provincialStateTax": 0,
+  "totalTax": 0,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 other 50000 1`] = `
+{
+  "afterTaxIncome": 46095.58,
+  "effectiveRate": 0.0780884,
+  "federalTax": 3904.42,
+  "marginalRate": 0.12,
+  "provincialStateTax": 0,
+  "totalTax": 3904.42,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 other 100000 1`] = `
+{
+  "afterTaxIncome": 86620.78,
+  "effectiveRate": 0.1337922,
+  "federalTax": 13379.220000000001,
+  "marginalRate": 0.22,
+  "provincialStateTax": 0,
+  "totalTax": 13379.220000000001,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 other 200000 1`] = `
+{
+  "afterTaxIncome": 163054.06,
+  "effectiveRate": 0.18472970000000002,
+  "federalTax": 36945.94,
+  "marginalRate": 0.24,
+  "provincialStateTax": 0,
+  "totalTax": 36945.94,
+}
+`;
+
+exports[`tax engine snapshot regression > US/TX 2026 other 500000 1`] = `
+{
+  "afterTaxIncome": 361702.38,
+  "effectiveRate": 0.27659523999999996,
+  "federalTax": 138297.62,
+  "marginalRate": 0.35,
+  "provincialStateTax": 0,
+  "totalTax": 138297.62,
+}
+`;
