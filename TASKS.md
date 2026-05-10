@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 195. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 196. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Canada plugin (plan tasks 6–11)
-
-- [ ] Task 196: canadianGovernmentRetirement plugin — Implement `GovernmentRetirementPlugin` for Canada (CPP + OAS). Create `src/lib/countries/canada/government-retirement.ts` with `computeMonthly` summing `cppMonthly + oasMonthly` and `presetsFor("cpp"|"oas")` returning preset arrays with `none/average/max/full/custom` options. Move `CPP_*` and `OAS_*` constants from `src/lib/government-retirement.ts`. Tests at `tests/unit/countries/canada/government-retirement.test.ts`. [@backend] [MATH]
 
 - [ ] Task 197: canadianTaxCredits catalog — Implement `TaxCreditCatalog` for Canada. Create `src/lib/countries/canada/tax-credits.ts` extracting all `jurisdiction: "CA"` entries from `ALL_CREDIT_CATEGORIES` in `src/lib/tax-credits.ts`. Implement `getCategories`, `getCategoriesForFilingStatus` (filter `requiresSpouse` for `married-common-law`), and `findCategory`. Use existing `resolveCategoryForYear` helper. Tests at `tests/unit/countries/canada/tax-credits.test.ts`. [@backend]
 

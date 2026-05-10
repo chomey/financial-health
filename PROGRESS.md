@@ -7,12 +7,23 @@
 -->
 
 ## Summary
-- **Total Tasks**: 195
-- **Completed**: 195
-- **Remaining**: 0
-- **Last Updated**: 2026-03-20
+- **Total Tasks**: 234
+- **Completed**: 196
+- **Remaining**: 38
+- **Last Updated**: 2026-05-10
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 196: canadianGovernmentRetirement plugin [@backend] [MATH]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/canada/government-retirement.ts`: New — exports `canadianGovernmentRetirement: GovernmentRetirementPlugin` plus the CPP/OAS constants (`CPP_MAX_MONTHLY`, `CPP_AVERAGE_MONTHLY`, `OAS_MAX_MONTHLY_65_74`, `OAS_MAX_MONTHLY_75_PLUS`, `OAS_CLAWBACK_THRESHOLD`). `computeMonthly` returns `cppMonthly + oasMonthly`. `presetsFor("cpp")` returns `none/average/max/custom`; `presetsFor("oas")` returns `none/full/custom`; unknown fields return `[]`.
+  - `src/lib/government-retirement.ts`: Re-exports the CA constants from the new plugin location for backward compatibility (the legacy `getCppPresetAmount`/`getOasPresetAmount` helpers and `CppPreset`/`OasPreset` types remain until the shim refactor in Ralph task 224). `GovernmentRetirementInput.tsx` and `tests/unit/government-retirement-ca.test.ts` keep working unchanged.
+  - `tests/unit/countries/canada/government-retirement.test.ts`: New — 22 tests covering `computeMonthly` (sum, undefined, partial, ignores other-country fields), `presetsFor("cpp"|"oas")` (values, amounts, labels), `presetsFor` for unknown fields, and constant sanity checks.
+  - `src/lib/changelog.ts`: Added version 196 entry.
+  - `tests/unit/changelog.test.ts`: Updated entry count to 196.
+- **Tests**: T1: 3383 passed (159 files), Build: passes
+- **Screenshots**: N/A (backend/library task)
 
 ## Task 195: Retirement planning E2E tests [@qa] [E2E]
 - **Date**: 2026-03-21

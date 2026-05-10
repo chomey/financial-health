@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 196,
+    title: "Country plugin: Canadian government retirement",
+    description: "Refactor groundwork for multi-country support. The CPP + OAS logic now lives behind a `GovernmentRetirementPlugin` interface at `src/lib/countries/canada/government-retirement.ts`, with `computeMonthly` summing CPP + OAS and `presetsFor('cpp'|'oas')` returning the option arrays. The legacy module re-exports the constants so existing UI keeps working unchanged. No user-visible change yet — the registry will swap in once all three countries are migrated.",
+    date: "2026-05-10",
+  },
+  {
     version: 195,
     title: "Retirement planning E2E tests",
     description: "Comprehensive end-to-end test suite covering all retirement planning features: retirement age input and URL persistence, government income estimators for all three countries (CPP/OAS, Social Security, Age Pension), retirement income waterfall chart, early withdrawal penalty warnings, retirement readiness score with 5 components, income gap analysis, cross-country switching, and full profile-to-dashboard journey. Also fixed 5 pre-existing test failures from prior UI changes.",

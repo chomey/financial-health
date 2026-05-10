@@ -5,19 +5,22 @@
  */
 
 // ── Canadian CPP & OAS ──────────────────────────────────────────────────────
+// CA constants live in src/lib/countries/canada/government-retirement.ts.
+// Re-exported here for backward compatibility until the shim refactor (Ralph task 224).
 
-/** CPP maximum monthly benefit at age 65 (2025). Source: canada.ca */
-export const CPP_MAX_MONTHLY = 1_364.60;
-/** CPP average monthly benefit (2025). Source: canada.ca */
-export const CPP_AVERAGE_MONTHLY = 816.52;
+export {
+  CPP_MAX_MONTHLY,
+  CPP_AVERAGE_MONTHLY,
+  OAS_MAX_MONTHLY_65_74,
+  OAS_MAX_MONTHLY_75_PLUS,
+  OAS_CLAWBACK_THRESHOLD,
+} from "@/lib/countries/canada/government-retirement";
 
-/** OAS maximum monthly benefit ages 65-74 (Q1 2025). Source: canada.ca */
-export const OAS_MAX_MONTHLY_65_74 = 727.67;
-/** OAS maximum monthly benefit ages 75+ (Q1 2025). Source: canada.ca */
-export const OAS_MAX_MONTHLY_75_PLUS = 800.44;
-
-/** OAS clawback threshold — recovery tax begins above this net income (2024 tax year). */
-export const OAS_CLAWBACK_THRESHOLD = 90_997;
+import {
+  CPP_MAX_MONTHLY,
+  CPP_AVERAGE_MONTHLY,
+  OAS_MAX_MONTHLY_65_74,
+} from "@/lib/countries/canada/government-retirement";
 
 export type CppPreset = "none" | "average" | "max" | "custom";
 export type OasPreset = "none" | "full" | "custom";
