@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 197. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 198. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Canada plugin (plan tasks 6–11)
-
-- [ ] Task 198: canadianProfiles library — Implement `ProfileLibrary` for Canada. Create `src/lib/countries/canada/sample-profiles.ts` extracting CA `SampleProfile` entries from `src/lib/sample-profiles.ts` (the ones with `country: "CA"` plus the CA quick-starts). Tests at `tests/unit/countries/canada/sample-profiles.test.ts`. [@backend]
 
 - [ ] Task 199: canadianInsights provider — Implement `InsightProvider` for Canada. Create `src/lib/countries/canada/insights.ts` with `getCandidates(state)` returning `[]` if state.country !== "CA", otherwise calling extracted CA-specific candidate generators (TFSA contribution room, RRSP recommendation, FHSA usage, etc.) pulled from `src/lib/insights/generate.ts`. Original generate.ts left untouched until plan task 41 (Ralph task 231). Tests at `tests/unit/countries/canada/insights.test.ts`. [@fullstack]
 

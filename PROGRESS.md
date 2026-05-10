@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 197
-- **Remaining**: 37
+- **Completed**: 198
+- **Remaining**: 36
 - **Last Updated**: 2026-05-10
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -17,6 +17,15 @@
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 198: canadianProfiles library [@backend]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/canada/sample-profiles.ts`: New — `CA_SAMPLE_PROFILES` (3 profiles: fresh-grad, mid-career, pre-retirement), `CA_QUICK_START_PROFILES` (2 profiles: ca-renter, ca-homeowner), `canadaProfiles: ProfileLibrary`
+  - `tests/unit/countries/canada/sample-profiles.test.ts`: New — 12 tests covering profile counts, country codes, asset categories, quick-start no-stocks rule, and ProfileLibrary shape
+- **Tests**: T1: 3407 passed (161 files), Build: passes
+- **Screenshots**: N/A (backend task)
+- **Notes**: Extracted CA entries verbatim from src/lib/sample-profiles.ts. No changes to the source file.
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

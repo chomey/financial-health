@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 198,
+    title: "Country plugin: Canadian sample profiles library",
+    description: "The three CA sample profiles (Fresh grad, Mid-career family, Pre-retirement) and two CA quick-start profiles (Renter, Homeowner) now live behind a `ProfileLibrary` interface at `src/lib/countries/canada/sample-profiles.ts`. No user-visible change — the registry will wire this in once all Canada plugin pieces are assembled.",
+    date: "2026-05-10",
+  },
+  {
     version: 197,
     title: "Country plugin: Canadian tax credits catalog",
     description: "All 15 Canadian tax credit categories now live behind a `TaxCreditCatalog` interface at `src/lib/countries/canada/tax-credits.ts`. The catalog supports year-specific overrides (2025 vs 2026 indexed amounts), filters info-only entries like the RRSP deduction, and hides spouse-only credits (Spousal Amount) when filing status is single. No user-visible change — the registry will wire this in once all Canada plugin pieces are assembled.",
