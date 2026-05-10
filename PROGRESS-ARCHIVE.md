@@ -2888,3 +2888,11 @@
 - **Tests**: T1: 3392 passed (160 files), Build: passes
 - **Screenshots**: N/A (backend task)
 - **Notes**: RRSP Deduction is `infoOnly: true` and correctly excluded from `getCategories`. `findCategory` resolves year overrides (DTC $10,138 → $10,412 for 2026).
+## Task 198: canadianProfiles library [@backend]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/canada/sample-profiles.ts`: New — `CA_SAMPLE_PROFILES` (3 profiles: fresh-grad, mid-career, pre-retirement), `CA_QUICK_START_PROFILES` (2 profiles: ca-renter, ca-homeowner), `canadaProfiles: ProfileLibrary`
+  - `tests/unit/countries/canada/sample-profiles.test.ts`: New — 12 tests covering profile counts, country codes, asset categories, quick-start no-stocks rule, and ProfileLibrary shape
+- **Tests**: T1: 3407 passed (161 files), Build: passes
+- **Screenshots**: N/A (backend task)
+- **Notes**: Extracted CA entries verbatim from src/lib/sample-profiles.ts. No changes to the source file.
