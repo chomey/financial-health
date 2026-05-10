@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 197,
+    title: "Country plugin: Canadian tax credits catalog",
+    description: "All 15 Canadian tax credit categories now live behind a `TaxCreditCatalog` interface at `src/lib/countries/canada/tax-credits.ts`. The catalog supports year-specific overrides (2025 vs 2026 indexed amounts), filters info-only entries like the RRSP deduction, and hides spouse-only credits (Spousal Amount) when filing status is single. No user-visible change — the registry will wire this in once all Canada plugin pieces are assembled.",
+    date: "2026-05-10",
+  },
+  {
     version: 196,
     title: "Country plugin: Canadian government retirement",
     description: "Refactor groundwork for multi-country support. The CPP + OAS logic now lives behind a `GovernmentRetirementPlugin` interface at `src/lib/countries/canada/government-retirement.ts`, with `computeMonthly` summing CPP + OAS and `presetsFor('cpp'|'oas')` returning the option arrays. The legacy module re-exports the constants so existing UI keeps working unchanged. No user-visible change yet — the registry will swap in once all three countries are migrated.",

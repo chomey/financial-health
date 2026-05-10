@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 196. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 197. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Canada plugin (plan tasks 6–11)
-
-- [ ] Task 197: canadianTaxCredits catalog — Implement `TaxCreditCatalog` for Canada. Create `src/lib/countries/canada/tax-credits.ts` extracting all `jurisdiction: "CA"` entries from `ALL_CREDIT_CATEGORIES` in `src/lib/tax-credits.ts`. Implement `getCategories`, `getCategoriesForFilingStatus` (filter `requiresSpouse` for `married-common-law`), and `findCategory`. Use existing `resolveCategoryForYear` helper. Tests at `tests/unit/countries/canada/tax-credits.test.ts`. [@backend]
 
 - [ ] Task 198: canadianProfiles library — Implement `ProfileLibrary` for Canada. Create `src/lib/countries/canada/sample-profiles.ts` extracting CA `SampleProfile` entries from `src/lib/sample-profiles.ts` (the ones with `country: "CA"` plus the CA quick-starts). Tests at `tests/unit/countries/canada/sample-profiles.test.ts`. [@backend]
 

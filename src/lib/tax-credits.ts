@@ -152,7 +152,7 @@ export function getIncomeLimitDescription(
  * Resolve a credit category for a specific tax year by merging yearOverrides.
  * Returns a new object with overridden fields applied (does not mutate original).
  */
-function resolveCategoryForYear(category: TaxCreditCategory, year: number): TaxCreditCategory {
+export function resolveCategoryForYear(category: TaxCreditCategory, year: number): TaxCreditCategory {
   const overrides = category.yearOverrides?.[year];
   if (!overrides) return category;
   return {
