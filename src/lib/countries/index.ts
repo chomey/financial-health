@@ -35,3 +35,7 @@ export type {
   Locale,
   WithdrawalTaxArgs,
 } from "./types";
+
+// ── Country registrations ────────────────────────────────────────────────────
+import { CANADA } from "./canada";
+registerCountry(CANADA);

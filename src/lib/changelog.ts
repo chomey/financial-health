@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 201,
+    title: "Country plugin: CANADA CountryProfile",
+    description: "All six Canadian plugin instances (tax engine, vehicles, government retirement, tax credits, sample profiles, insights) are now assembled into a single `CANADA: CountryProfile` object at `src/lib/countries/canada/index.ts`. Importing `@/lib/countries` auto-registers the profile via a module-level side effect. No user-visible change — foundation for the registry-driven consumer migration in later tasks.",
+    date: "2026-05-10",
+  },
+  {
     version: 200,
     title: "Country plugin: Canadian tax engine",
     description: "Federal + provincial income tax, capital-gains inclusion, withdrawal-tax classification, and early-withdrawal penalty rules for Canada now live behind a `TaxEngine` interface at `src/lib/countries/canada/tax-engine.ts`. Results expose a country-agnostic `breakdown` array (Federal Tax + Provincial Tax) alongside the legacy `federalTax`/`provincialStateTax` fields, which stay temporarily for shim compatibility. A shared `getMarginalRate` helper moved into `bracket-math.ts`. No user-visible change — engine is verified by 225 comparison tests against the legacy free functions, and the snapshot regression suites stay green.",
