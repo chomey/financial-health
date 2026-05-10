@@ -16,14 +16,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 205: americanTaxCredits catalog [@backend]
-- **Date**: 2026-05-10
-- **Files**:
-  - `src/lib/countries/usa/tax-credits.ts`: New — `americanTaxCredits` implementing `TaxCreditCatalog`. 17 US entries (13 non-infoOnly, 4 infoOnly): EITC, Child Tax Credit, Child & Dependent Care, AOTC, Lifetime Learning, Saver's Credit, Premium Tax Credit, Adoption Credit, Residential Clean Energy, EV Credit, SALT Deduction, Student Loan Interest, Charitable Contributions, plus infoOnly: Standard Deduction, Mortgage Interest, HSA Deduction, SSDI/SSI Benefits. Year overrides for 2026 (EITC, Saver's Credit, Adoption Credit, Student Loan Interest, Standard Deduction).
-  - `tests/unit/countries/usa/tax-credits.test.ts`: New — 10 tests covering jurisdiction filter, infoOnly exclusion, findCategory, year overrides, filing status filter, known-credits assertions.
-  - `src/lib/changelog.ts`: Added version 205 entry.
-- **Tests**: T1: 3694 passed (167 files), Build: passes
-- **Screenshots**: N/A (backend task)
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

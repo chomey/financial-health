@@ -2972,3 +2972,11 @@
   - `tests/unit/countries/usa/government-retirement.test.ts`: New — 18 tests covering computeMonthly, presetsFor, and constant values.
 - **Tests**: T1: 3684 passed (166 files), Build: passes
 - **Screenshots**: N/A (backend/math task)
+## Task 205: americanTaxCredits catalog [@backend]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/usa/tax-credits.ts`: New — `americanTaxCredits` implementing `TaxCreditCatalog`. 17 US entries (13 non-infoOnly, 4 infoOnly): EITC, Child Tax Credit, Child & Dependent Care, AOTC, Lifetime Learning, Saver's Credit, Premium Tax Credit, Adoption Credit, Residential Clean Energy, EV Credit, SALT Deduction, Student Loan Interest, Charitable Contributions, plus infoOnly: Standard Deduction, Mortgage Interest, HSA Deduction, SSDI/SSI Benefits. Year overrides for 2026 (EITC, Saver's Credit, Adoption Credit, Student Loan Interest, Standard Deduction).
+  - `tests/unit/countries/usa/tax-credits.test.ts`: New — 10 tests covering jurisdiction filter, infoOnly exclusion, findCategory, year overrides, filing status filter, known-credits assertions.
+  - `src/lib/changelog.ts`: Added version 205 entry.
+- **Tests**: T1: 3694 passed (167 files), Build: passes
+- **Screenshots**: N/A (backend task)
