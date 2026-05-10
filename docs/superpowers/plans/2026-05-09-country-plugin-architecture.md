@@ -10,6 +10,8 @@
 
 **Reference:** Spec at `docs/superpowers/specs/2026-05-09-uk-support-design.md`. This plan implements Phase A only.
 
+**Test file convention:** `vitest.config.ts` includes only `tests/unit/**/*.test.{ts,tsx}`. The plan's `__tests__` paths (e.g., `src/lib/countries/canada/__tests__/vehicles.test.ts`) should be mapped to `tests/unit/countries/canada/vehicles.test.ts` etc. Source files stay co-located under `src/lib/countries/<country>/`.
+
 ---
 
 ## Pre-flight
