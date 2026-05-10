@@ -2924,3 +2924,25 @@
 - **Tests**: T1: 3655 passed (164 files), Build: passes
 - **Screenshots**: N/A (backend task)
 - **Notes**: Registration is a module-level side effect — importing `@/lib/countries` now registers CANADA automatically.
+## Task 202: Extract usa/tax-tables.ts [@backend]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/usa/tax-tables.ts`: New — all US federal/state bracket tables (2025), capital gains tables (2025/2026), `US_PROVINCIAL_2025`/`US_PROVINCIAL_2026` lookup maps, `getUSBrackets`, `getUSCapitalGainsBrackets`
+  - `src/lib/tax-tables.ts`: Removed US section (~700 lines), added re-exports for all US constants from new location; also re-exports individual state constants for backward compat
+- **Tests**: T1: 3655 passed (164 files), Build: passes (exit 0)
+- **Screenshots**: N/A (backend task)
+- **Notes**: `US_PROVINCIAL_2025`/`US_PROVINCIAL_2026` are new named exports (previously private `US_STATE_TABLES`/`US_STATE_TABLES_2026`). Individual state constants re-exported for backward compat with existing tests.
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
