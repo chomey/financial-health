@@ -2980,3 +2980,11 @@
   - `src/lib/changelog.ts`: Added version 205 entry.
 - **Tests**: T1: 3694 passed (167 files), Build: passes
 - **Screenshots**: N/A (backend task)
+## Task 206: americanProfiles library [@backend]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/usa/sample-profiles.ts`: New — exports `US_SAMPLE_PROFILES` (3 profiles: fresh-grad-us, mid-career-us, pre-retirement-us), `US_QUICK_START_PROFILES` (2 profiles: us-renter, us-homeowner), and `usaProfiles: ProfileLibrary`.
+  - `tests/unit/countries/usa/sample-profiles.test.ts`: New — 15 tests covering profile counts, country codes, IDs, US-specific vehicles (Roth IRA, 401k, HSA), and ProfileLibrary shape.
+- **Tests**: T1: 3709 passed (168 files), Build: passes
+- **Screenshots**: N/A (backend task)
+- **Notes**: Followed the exact same pattern as `src/lib/countries/canada/sample-profiles.ts` (task 198). Data mirrors the existing US_SAMPLE_PROFILES and QUICK_START_US_PROFILES from sample-profiles.ts.
