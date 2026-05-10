@@ -2954,4 +2954,13 @@
 - **Tests**: T1: 505 passed (3 files: new + snapshots), Build: passes
 - **Screenshots**: N/A (backend task)
 
+## Task 204: americanGovernmentRetirement plugin [@backend] [MATH]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/usa/government-retirement.ts`: New — `americanGovernmentRetirement: GovernmentRetirementPlugin` with `SS_AVERAGE_MONTHLY` ($1,976), `SS_MAX_AT_62` ($2,710), `SS_MAX_AT_67` ($3,822), `SS_MAX_AT_70` ($4,873) constants. `computeMonthly` returns `ssMonthly`. `presetsFor("ss")` returns 6 presets (none/average/max-62/max-67/max-70/custom) with dollar-formatted labels.
+  - `src/lib/government-retirement.ts`: SS_* constants now re-exported from the new countries/usa location (mirrors the Canada pattern). `getSsPresetAmount` and `SsPreset` kept for backward-compat shim until task 224.
+  - `tests/unit/countries/usa/government-retirement.test.ts`: New — 18 tests covering computeMonthly (returns ssMonthly, ignores other-country fields), presetsFor("ss") values/amounts/labels/ordering invariant, presetsFor("cpp"/"oas"/unknown) returns empty, and constant values.
+- **Tests**: T1: 3684 passed (166 files), Build: passes
+- **Screenshots**: N/A (backend/math task)
+
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->

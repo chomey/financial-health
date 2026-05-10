@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 204,
+    title: "Country plugin: USA government retirement",
+    description: "Social Security ballpark estimates (average $1,976/mo, max at 62/67/70) now live behind a `GovernmentRetirementPlugin` interface at `src/lib/countries/usa/government-retirement.ts`. The plugin's `computeMonthly` returns the user's monthly Social Security amount and `presetsFor(\"ss\")` exposes the six presets used by the retirement income estimator. Constants moved out of `src/lib/government-retirement.ts`, which now re-exports them for backward compatibility. No user-visible change — foundation for the USA CountryProfile assembly in a later task.",
+    date: "2026-05-10",
+  },
+  {
     version: 203,
     title: "Country plugin: USA vehicle catalog",
     description: "US-specific investment account types (401k, Roth 401k, IRA, Roth IRA, 529, HSA) are now catalogued behind a `VehicleCatalog` interface at `src/lib/countries/usa/vehicles.ts`. Each vehicle carries a description, default ROI (7% for retirement accounts, 6% for 529/HSA), and classification flags (tax-sheltered, tax-deferred, employer-match-eligible, reinvest-default). No user-visible change — foundation for the USA CountryProfile assembly in a later task.",

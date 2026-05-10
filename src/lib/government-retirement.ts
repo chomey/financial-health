@@ -43,15 +43,22 @@ export function getOasPresetAmount(preset: OasPreset, customAmount?: number): nu
 }
 
 // ── US Social Security ───────────────────────────────────────────────────────
+// US constants live in src/lib/countries/usa/government-retirement.ts.
+// Re-exported here for backward compatibility until the shim refactor (Ralph task 224).
 
-/** SS average monthly benefit for retired workers (2025). Source: ssa.gov */
-export const SS_AVERAGE_MONTHLY = 1_976;
-/** SS maximum monthly benefit at age 62 (2025). Source: ssa.gov */
-export const SS_MAX_AT_62 = 2_710;
-/** SS maximum monthly benefit at full retirement age 67 (2025). Source: ssa.gov */
-export const SS_MAX_AT_67 = 3_822;
-/** SS maximum monthly benefit at age 70 (2025). Source: ssa.gov */
-export const SS_MAX_AT_70 = 4_873;
+export {
+  SS_AVERAGE_MONTHLY,
+  SS_MAX_AT_62,
+  SS_MAX_AT_67,
+  SS_MAX_AT_70,
+} from "@/lib/countries/usa/government-retirement";
+
+import {
+  SS_AVERAGE_MONTHLY,
+  SS_MAX_AT_62,
+  SS_MAX_AT_67,
+  SS_MAX_AT_70,
+} from "@/lib/countries/usa/government-retirement";
 
 export type SsPreset = "none" | "average" | "max-62" | "max-67" | "max-70" | "custom";
 

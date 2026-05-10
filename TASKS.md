@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 203. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 204. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### USA plugin (plan tasks 12–19)
-
-- [ ] Task 204: americanGovernmentRetirement plugin — Implement `GovernmentRetirementPlugin` for USA (Social Security). Create `src/lib/countries/usa/government-retirement.ts` with `computeMonthly` returning `ssMonthly`, presets including `average/max-62/max-67/max-70/custom`. Move `SS_*` constants from `src/lib/government-retirement.ts`. Tests at `tests/unit/countries/usa/government-retirement.test.ts`. [@backend] [MATH]
 
 - [ ] Task 205: americanTaxCredits catalog — Same pattern as Ralph task 197 with `jurisdiction: "US"` entries. Tests at `tests/unit/countries/usa/tax-credits.test.ts`. [@backend]
 
