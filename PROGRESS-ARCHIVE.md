@@ -2914,3 +2914,13 @@
 - **Tests**: T1: 3650 passed (163 files); snapshot regressions both green (`tax-engine-snapshot.test.ts` 440/440, `withdrawal-tax-snapshot.test.ts` 54/54). Build: clean. Lint/tsc: no new errors introduced (pre-existing test-file errors only).
 - **Screenshots**: N/A (backend/math task)
 - **Notes**: Tax engine not yet wired through the registry — that happens in Ralph task 222 (`tax-engine.ts` shim) and 223 (`withdrawal-tax.ts` shim). At this point the new engine coexists with the legacy free functions and is verified by direct comparison.
+## Task 201: CANADA CountryProfile assembly [@backend]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/canada/index.ts`: New — exports `CANADA: CountryProfile` assembling all 6 plugin instances (taxEngine, vehicles, governmentRetirement, taxCredits, profiles, insights) with 13 CA jurisdictions, `defaultJurisdiction: "ON"`, two filing statuses, calendar tax year, `locale: "en-CA"`.
+  - `src/lib/countries/index.ts`: Added side-effect import `import { CANADA } from "./canada"` and `registerCountry(CANADA)` to auto-register at module load.
+  - `tests/unit/countries/canada/profile.test.ts`: New — 4 sanity tests verifying registration, all 13 jurisdictions, filing statuses, tax year boundary, and all 6 plugins present.
+  - `src/lib/changelog.ts`: Added version 201 entry.
+- **Tests**: T1: 3655 passed (164 files), Build: passes
+- **Screenshots**: N/A (backend task)
+- **Notes**: Registration is a module-level side effect — importing `@/lib/countries` now registers CANADA automatically.
