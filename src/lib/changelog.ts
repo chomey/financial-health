@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 203,
+    title: "Country plugin: USA vehicle catalog",
+    description: "US-specific investment account types (401k, Roth 401k, IRA, Roth IRA, 529, HSA) are now catalogued behind a `VehicleCatalog` interface at `src/lib/countries/usa/vehicles.ts`. Each vehicle carries a description, default ROI (7% for retirement accounts, 6% for 529/HSA), and classification flags (tax-sheltered, tax-deferred, employer-match-eligible, reinvest-default). No user-visible change — foundation for the USA CountryProfile assembly in a later task.",
+    date: "2026-05-10",
+  },
+  {
     version: 202,
     title: "Country plugin: USA tax-tables extracted",
     description: "All US federal and state bracket tables (2025/2026), capital-gains tables, and the `getUSBrackets`/`getUSCapitalGainsBrackets` helpers have moved from the monolithic `src/lib/tax-tables.ts` to `src/lib/countries/usa/tax-tables.ts`. The original file re-exports everything for backward compatibility. State tables are now also exposed as `US_PROVINCIAL_2025`/`US_PROVINCIAL_2026` maps, mirroring the Canadian pattern. No user-visible change — foundation for the USA country plugin in later tasks.",

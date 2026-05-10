@@ -8,9 +8,17 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 202
-- **Remaining**: 32
+- **Completed**: 203
+- **Remaining**: 31
 - **Last Updated**: 2026-05-10
+
+## Task 203: americanVehicles catalog [@backend]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/usa/vehicles.ts`: New — `americanVehicles: VehicleCatalog` with 6 US categories (401k, Roth 401k, IRA, Roth IRA, 529, HSA), descriptions, ROI defaults (7% for 401k/IRA, 6% for 529/HSA), tax-sheltered/deferred/employer-match sets.
+  - `tests/unit/countries/usa/vehicles.test.ts`: New — 11 tests covering categories list, flagEmoji, descriptions, ROI defaults, tax-sheltered/deferred classification, income-tax ROI, reinvest-default, employer-match eligibility, and no-overlap invariant.
+- **Tests**: T1: 505 passed (3 files: new + snapshots), Build: passes
+- **Screenshots**: N/A (backend task)
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 

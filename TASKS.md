@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 202. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 203. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### USA plugin (plan tasks 12–19)
-
-- [ ] Task 203: americanVehicles catalog — Implement `VehicleCatalog` for USA. Create `src/lib/countries/usa/vehicles.ts` with categories `["401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA"]`, descriptions matching `ACCOUNT_TYPE_DESCRIPTIONS` for US, ROI defaults (7% for 401k/IRA, 6% for 529/HSA), tax-sheltered set `{"Roth IRA", "Roth 401k", "HSA"}`, tax-deferred set `{"401k", "IRA", "529"}`, employer-match-eligible `{"401k", "Roth 401k"}`. Tests at `tests/unit/countries/usa/vehicles.test.ts`. [@backend]
 
 - [ ] Task 204: americanGovernmentRetirement plugin — Implement `GovernmentRetirementPlugin` for USA (Social Security). Create `src/lib/countries/usa/government-retirement.ts` with `computeMonthly` returning `ssMonthly`, presets including `average/max-62/max-67/max-70/custom`. Move `SS_*` constants from `src/lib/government-retirement.ts`. Tests at `tests/unit/countries/usa/government-retirement.test.ts`. [@backend] [MATH]
 
