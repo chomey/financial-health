@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 206,
+    title: "Country plugin: USA sample profiles library",
+    description: "Three US sample profiles (fresh grad with Roth IRA, mid-career family with 401k/HSA, pre-retirement with large 401k) and two quick-start profiles (renter, homeowner) are now exported from `src/lib/countries/usa/sample-profiles.ts` as a `ProfileLibrary`. No user-visible change — foundation for the USA CountryProfile assembly in a later task.",
+    date: "2026-05-10",
+  },
+  {
     version: 205,
     title: "Country plugin: USA tax credits catalog",
     description: "US federal tax credits and deductions are now catalogued behind a `TaxCreditCatalog` interface at `src/lib/countries/usa/tax-credits.ts`. Includes 13 claimable entries (EITC, Child Tax Credit, Child & Dependent Care, AOTC, Lifetime Learning, Saver's Credit, Premium Tax Credit, Adoption Credit, Residential Clean Energy, EV Credit, SALT Deduction, Student Loan Interest, Charitable Contributions) plus 4 informational entries (Standard Deduction, Mortgage Interest, HSA Deduction, SSDI/SSI). Year overrides carry 2026 inflation-adjusted amounts where published. No user-visible change — foundation for the USA CountryProfile assembly in a later task.",
