@@ -459,11 +459,6 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
 
   ITER_START=$(date +%s)
 
-  # Snapshot which tasks are checked before Claude runs
-  local before_completed
-  before_completed=$(grep -c '^\- \[x\]' "$TASKS_FILE" 2>/dev/null || true)
-  before_completed=${before_completed:-0}
-
   # Get current task info
   next_task=$(grep '^\- \[ \]' "$TASKS_FILE" | sort -t' ' -k4 -n | head -n 1)
   task_title=$(extract_task_title "$next_task")
@@ -593,21 +588,11 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   fi
 
   # ─── Merge worktree back to main branch ────────────────────────────────
-  # Check if the worktree branch has any commits beyond main
-  local wt_tasks_file="${wt_path}/TASKS.md"
-  local wt_after_completed
-  wt_after_completed=$(grep -c '^\- \[x\]' "$wt_tasks_file" 2>/dev/null || true)
-  wt_after_completed=${wt_after_completed:-0}
-
-  if [[ "$wt_after_completed" -le "$before_completed" ]]; then
-    print ""
-    print "${RED}  ⚠ Warning: Task may not have been marked complete!${NC}"
-    print "${RED}    '${task_title}' is still unchecked in TASKS.md${NC}"
-    print "${YELLOW}    Continuing to next iteration anyway...${NC}"
-    TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
-  else
-    TASKS_COMPLETED_THIS_RUN=$((TASKS_COMPLETED_THIS_RUN + 1))
-  fi
+  # Reaching this point means the retry path didn't fail, so the task
+  # completed. Don't bother re-checking TASKS.md state — PROMPT.md tells
+  # Ralph to move completed tasks to TASKS-ARCHIVE.md, so a `- [x]`
+  # search in TASKS.md is structurally always empty.
+  TASKS_COMPLETED_THIS_RUN=$((TASKS_COMPLETED_THIS_RUN + 1))
 
   # Merge the worktree branch into main
   local has_new_commits
