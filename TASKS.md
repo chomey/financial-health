@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 201. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 202. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### USA plugin (plan tasks 12–19)
-
-- [ ] Task 202: Extract usa/tax-tables.ts — Move all `US_*_2025`/`US_*_2026` state bracket tables, `US_FEDERAL_*`, `US_PROVINCIAL_*`, `US_CAPITAL_GAINS_*`, `getUSBrackets`, `getUSCapitalGainsBrackets`, and `US_FEDERAL_BY_YEAR`/`US_STATE_BY_YEAR` lookup maps from `src/lib/tax-tables.ts` to `src/lib/countries/usa/tax-tables.ts`. Update `src/lib/tax-tables.ts` to re-export from new location. Snapshot regressions must stay green. [@backend]
 
 - [ ] Task 203: americanVehicles catalog — Implement `VehicleCatalog` for USA. Create `src/lib/countries/usa/vehicles.ts` with categories `["401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA"]`, descriptions matching `ACCOUNT_TYPE_DESCRIPTIONS` for US, ROI defaults (7% for 401k/IRA, 6% for 529/HSA), tax-sheltered set `{"Roth IRA", "Roth 401k", "HSA"}`, tax-deferred set `{"401k", "IRA", "529"}`, employer-match-eligible `{"401k", "Roth 401k"}`. Tests at `tests/unit/countries/usa/vehicles.test.ts`. [@backend]
 

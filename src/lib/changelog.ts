@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 202,
+    title: "Country plugin: USA tax-tables extracted",
+    description: "All US federal and state bracket tables (2025/2026), capital-gains tables, and the `getUSBrackets`/`getUSCapitalGainsBrackets` helpers have moved from the monolithic `src/lib/tax-tables.ts` to `src/lib/countries/usa/tax-tables.ts`. The original file re-exports everything for backward compatibility. State tables are now also exposed as `US_PROVINCIAL_2025`/`US_PROVINCIAL_2026` maps, mirroring the Canadian pattern. No user-visible change — foundation for the USA country plugin in later tasks.",
+    date: "2026-05-10",
+  },
+  {
     version: 201,
     title: "Country plugin: CANADA CountryProfile",
     description: "All six Canadian plugin instances (tax engine, vehicles, government retirement, tax credits, sample profiles, insights) are now assembled into a single `CANADA: CountryProfile` object at `src/lib/countries/canada/index.ts`. Importing `@/lib/countries` auto-registers the profile via a module-level side effect. No user-visible change — foundation for the registry-driven consumer migration in later tasks.",
