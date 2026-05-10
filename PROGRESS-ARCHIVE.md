@@ -2988,3 +2988,19 @@
 - **Tests**: T1: 3709 passed (168 files), Build: passes
 - **Screenshots**: N/A (backend task)
 - **Notes**: Followed the exact same pattern as `src/lib/countries/canada/sample-profiles.ts` (task 198). Data mirrors the existing US_SAMPLE_PROFILES and QUICK_START_US_PROFILES from sample-profiles.ts.
+## Task 207: americanInsights provider [@fullstack]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/countries/usa/insights.ts`: New — `americanInsights` InsightProvider with 5 US-specific candidates: Roth IRA (us-no-roth-ira), 401k employer match (us-no-401k), HSA triple-tax advantage (us-no-hsa), Traditional IRA supplement (us-no-ira), and RMD upcoming reminder for ages 65–72 (us-rmd-upcoming).
+  - `tests/unit/countries/usa/insights.test.ts`: New — 19 tests covering country guard, each candidate's trigger/suppress conditions, RMD year calculation, and insight shape validation.
+  - `src/lib/changelog.ts`: Added version 207 entry.
+- **Tests**: T1: 3728 passed (169 files), Build: passes
+- **Screenshots**: N/A (backend/logic task)
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
