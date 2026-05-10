@@ -16,15 +16,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 197: canadianTaxCredits catalog [@backend]
-- **Date**: 2026-05-10
-- **Files**:
-  - `src/lib/tax-credits.ts`: Exported `resolveCategoryForYear` (was private)
-  - `src/lib/countries/canada/tax-credits.ts`: New — `canadianTaxCredits: TaxCreditCatalog` with all 15 CA credit categories inline
-  - `tests/unit/countries/canada/tax-credits.test.ts`: New — 9 tests covering CA-only filter, info-only exclusion, findCategory, year overrides (2025 vs 2026), married/single spouse filtering
-- **Tests**: T1: 3392 passed (160 files), Build: passes
-- **Screenshots**: N/A (backend task)
-- **Notes**: RRSP Deduction is `infoOnly: true` and correctly excluded from `getCategories`. `findCategory` resolves year overrides (DTC $10,138 → $10,412 for 2026).
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

@@ -2879,3 +2879,12 @@
 - **Tests**: T1: 2710 passed (145 files), T2: 21 passed, T3: 693 passed (full regression), Build: passes
 - **Screenshots**: task-184-simple-mode-persists-url, task-184-data-preserved-after-mode-switch, task-184-debts-preserved-through-simple, task-184-simple-dashboard-sections, task-184-advanced-dashboard-sections, task-184-ca-renter-dashboard, task-184-ca-homeowner-dashboard, task-184-us-renter-dashboard, task-184-us-homeowner-dashboard, task-184-au-renter-dashboard, task-184-au-homeowner-dashboard
 - **Notes**: All 184 tasks complete. Full regression green — 693 E2E tests pass.
+## Task 197: canadianTaxCredits catalog [@backend]
+- **Date**: 2026-05-10
+- **Files**:
+  - `src/lib/tax-credits.ts`: Exported `resolveCategoryForYear` (was private)
+  - `src/lib/countries/canada/tax-credits.ts`: New — `canadianTaxCredits: TaxCreditCatalog` with all 15 CA credit categories inline
+  - `tests/unit/countries/canada/tax-credits.test.ts`: New — 9 tests covering CA-only filter, info-only exclusion, findCategory, year overrides (2025 vs 2026), married/single spouse filtering
+- **Tests**: T1: 3392 passed (160 files), Build: passes
+- **Screenshots**: N/A (backend task)
+- **Notes**: RRSP Deduction is `infoOnly: true` and correctly excluded from `getCategories`. `findCategory` resolves year overrides (DTC $10,138 → $10,412 for 2026).
