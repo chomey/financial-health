@@ -34,9 +34,8 @@ export {
   calculateCanadianCapitalGainsInclusion,
 } from "@/lib/countries/canada/tax-tables";
 
-// Also re-export SUPPORTED_TAX_YEARS and TaxYear from canada module
-// (they were defined in this file originally)
-export { SUPPORTED_TAX_YEARS } from "@/lib/countries/canada/tax-tables";
+import { SUPPORTED_TAX_YEARS } from "@/lib/countries/canada/tax-tables";
+export { SUPPORTED_TAX_YEARS };
 export type { TaxYear } from "@/lib/countries/canada/tax-tables";
 
 // ═══════════════════════════════════════════════════════════════════════════════
