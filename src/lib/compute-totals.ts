@@ -143,8 +143,8 @@ export function computeTotals(state: FinancialState) {
   for (const [type, annualAmt] of Object.entries(incomeByType)) {
     const taxResult = computeTax(annualAmt, type as "employment" | "capital-gains" | "other", country, jurisdiction, taxYear);
     totalAnnualTax += taxResult.totalTax;
-    totalFederalTax += taxResult.federalTax;
-    totalProvincialStateTax += taxResult.provincialStateTax;
+    totalFederalTax += taxResult.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+    totalProvincialStateTax += taxResult.breakdown.find((b) => b.kind === "sub-federal")?.amount ?? 0;
     totalAfterTaxAnnual += taxResult.afterTaxIncome;
     weightedEffectiveRate += taxResult.effectiveRate * annualAmt;
   }

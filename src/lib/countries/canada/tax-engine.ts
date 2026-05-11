@@ -42,8 +42,6 @@ function computeCanadianTax(
 ): TaxResult {
   if (annualIncome <= 0) {
     return {
-      federalTax: 0,
-      provincialStateTax: 0,
       totalTax: 0,
       effectiveRate: 0,
       afterTaxIncome: 0,
@@ -74,8 +72,6 @@ function computeCanadianTax(
   }
 
   return {
-    federalTax,
-    provincialStateTax: provincialTax,
     totalTax,
     effectiveRate: annualIncome > 0 ? totalTax / annualIncome : 0,
     afterTaxIncome: annualIncome - totalTax,

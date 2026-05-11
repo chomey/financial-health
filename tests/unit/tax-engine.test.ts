@@ -2,17 +2,26 @@ import { describe, it, expect } from "vitest";
 import { computeTax } from "@/lib/tax-engine";
 import type { TaxResult } from "@/lib/tax-engine";
 
+function federalAmount(result: TaxResult): number {
+  return result.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+}
+
+function subFederalAmount(result: TaxResult): number {
+  return result.breakdown.find((b) => b.kind === "sub-federal")?.amount ?? 0;
+}
+
 // Helper to check TaxResult shape
 function expectValidResult(result: TaxResult) {
-  expect(result.federalTax).toBeGreaterThanOrEqual(0);
-  expect(result.provincialStateTax).toBeGreaterThanOrEqual(0);
+  expect(federalAmount(result)).toBeGreaterThanOrEqual(0);
+  expect(subFederalAmount(result)).toBeGreaterThanOrEqual(0);
   expect(result.totalTax).toBeGreaterThanOrEqual(0);
   expect(result.effectiveRate).toBeGreaterThanOrEqual(0);
   expect(result.effectiveRate).toBeLessThanOrEqual(1);
   expect(result.marginalRate).toBeGreaterThanOrEqual(0);
   expect(result.afterTaxIncome).toBeLessThanOrEqual(result.afterTaxIncome + result.totalTax);
-  // totalTax = federal + provincial/state
-  expect(result.totalTax).toBeCloseTo(result.federalTax + result.provincialStateTax, 2);
+  // For CA/US, totalTax = federal + provincial/state. AU adds Medicare Levy on top.
+  const sumOfBreakdown = result.breakdown.reduce((acc, line) => acc + line.amount, 0);
+  expect(result.totalTax).toBeCloseTo(sumOfBreakdown, 2);
   // afterTaxIncome = income - totalTax (for positive income)
 }
 
@@ -23,8 +32,7 @@ function expectValidResult(result: TaxResult) {
 describe("computeTax — edge cases", () => {
   it("returns all zeros for zero income", () => {
     const result = computeTax(0, "employment", "CA", "ON");
-    expect(result.federalTax).toBe(0);
-    expect(result.provincialStateTax).toBe(0);
+    expect(result.breakdown).toEqual([]);
     expect(result.totalTax).toBe(0);
     expect(result.effectiveRate).toBe(0);
     expect(result.afterTaxIncome).toBe(0);
@@ -60,11 +68,11 @@ describe("computeTax — Canadian employment income", () => {
 
     // Federal: $50,000 in first bracket (15%), BPA credit = $16,129 × 0.15
     // Net federal ≈ $5,081
-    expect(result.federalTax).toBeCloseTo(5_081, -1);
+    expect(federalAmount(result)).toBeCloseTo(5_081, -1);
 
     // Provincial ON: $50,000 in first bracket (5.05%), BPA credit = $11,865 × 0.0505
     // Net provincial ≈ $1,926
-    expect(result.provincialStateTax).toBeCloseTo(1_926, -1);
+    expect(subFederalAmount(result)).toBeCloseTo(1_926, -1);
 
     expect(result.afterTaxIncome).toBeCloseTo(50_000 - result.totalTax, 2);
     expect(result.effectiveRate).toBeCloseTo(result.totalTax / 50_000, 4);
@@ -84,11 +92,11 @@ describe("computeTax — Canadian employment income", () => {
     expectValidResult(result);
 
     // Federal ≈ $14,925
-    expect(result.federalTax).toBeCloseTo(14_925, -1);
+    expect(federalAmount(result)).toBeCloseTo(14_925, -1);
 
     // AB: $100,000 in first bracket (10%), BPA credit = $21,003 × 0.10
     // Gross = $10,000, credit = $2,100.30, net ≈ $7,900
-    expect(result.provincialStateTax).toBeCloseTo(7_900, -1);
+    expect(subFederalAmount(result)).toBeCloseTo(7_900, -1);
   });
 
   it("computes tax for $200,000 income in BC", () => {
@@ -96,8 +104,8 @@ describe("computeTax — Canadian employment income", () => {
     expectValidResult(result);
 
     // Should have significant federal and provincial tax
-    expect(result.federalTax).toBeGreaterThan(20_000);
-    expect(result.provincialStateTax).toBeGreaterThan(10_000);
+    expect(federalAmount(result)).toBeGreaterThan(20_000);
+    expect(subFederalAmount(result)).toBeGreaterThan(10_000);
     expect(result.effectiveRate).toBeGreaterThan(0.25);
   });
 
@@ -115,8 +123,8 @@ describe("computeTax — Canadian employment income", () => {
     // Federal BPA = $16,129, ON BPA = $11,865
     // At $10,000: federal credit > tax, ON credit > tax
     const result = computeTax(10_000, "employment", "CA", "ON");
-    expect(result.federalTax).toBe(0);
-    expect(result.provincialStateTax).toBe(0);
+    expect(federalAmount(result)).toBe(0);
+    expect(subFederalAmount(result)).toBe(0);
     expect(result.totalTax).toBe(0);
     expect(result.afterTaxIncome).toBe(10_000);
   });
@@ -125,7 +133,7 @@ describe("computeTax — Canadian employment income", () => {
     const employment = computeTax(80_000, "employment", "CA", "ON");
     const other = computeTax(80_000, "other", "CA", "ON");
     expect(employment.totalTax).toBeCloseTo(other.totalTax, 2);
-    expect(employment.federalTax).toBeCloseTo(other.federalTax, 2);
+    expect(federalAmount(employment)).toBeCloseTo(federalAmount(other), 2);
   });
 });
 
@@ -186,11 +194,11 @@ describe("computeTax — US employment income", () => {
     // Bracket 1: $11,925 × 10% = $1,192.50
     // Bracket 2: ($35,000 - $11,925) × 12% = $23,075 × 0.12 = $2,769
     // Federal ≈ $3,962
-    expect(result.federalTax).toBeCloseTo(3_962, -1);
+    expect(federalAmount(result)).toBeCloseTo(3_962, -1);
 
     // CA state tax on $50k (no standard deduction in our tables):
     // Applied at graduated rates
-    expect(result.provincialStateTax).toBeGreaterThan(0);
+    expect(subFederalAmount(result)).toBeGreaterThan(0);
   });
 
   it("computes tax for $100,000 income in New York", () => {
@@ -199,35 +207,35 @@ describe("computeTax — US employment income", () => {
 
     // Federal: $100k - $15k = $85k taxable
     // Should be less than calculateProgressiveTax($100k) since deduction is applied
-    expect(result.federalTax).toBeGreaterThan(10_000);
-    expect(result.federalTax).toBeLessThan(16_000);
+    expect(federalAmount(result)).toBeGreaterThan(10_000);
+    expect(federalAmount(result)).toBeLessThan(16_000);
 
     // NY state tax ≈ $5,432
-    expect(result.provincialStateTax).toBeCloseTo(5_432, -1);
+    expect(subFederalAmount(result)).toBeCloseTo(5_432, -1);
   });
 
   it("computes zero state tax for Texas (no state income tax)", () => {
     const result = computeTax(100_000, "employment", "US", "TX");
     expectValidResult(result);
 
-    expect(result.provincialStateTax).toBe(0);
-    expect(result.totalTax).toBe(result.federalTax);
+    expect(subFederalAmount(result)).toBe(0);
+    expect(result.totalTax).toBe(federalAmount(result));
   });
 
   it("computes zero state tax for Florida", () => {
     const result = computeTax(150_000, "employment", "US", "FL");
-    expect(result.provincialStateTax).toBe(0);
+    expect(subFederalAmount(result)).toBe(0);
   });
 
   it("returns zero federal tax for income at or below standard deduction", () => {
     const result = computeTax(15_000, "employment", "US", "TX");
     // $15k - $15k deduction = $0 taxable → $0 federal tax
-    expect(result.federalTax).toBe(0);
+    expect(federalAmount(result)).toBe(0);
   });
 
   it("returns zero federal tax for income below standard deduction", () => {
     const result = computeTax(10_000, "employment", "US", "TX");
-    expect(result.federalTax).toBe(0);
+    expect(federalAmount(result)).toBe(0);
     expect(result.afterTaxIncome).toBe(10_000);
   });
 
@@ -256,7 +264,7 @@ describe("computeTax — US employment income", () => {
     // Taxable = $50k - $15k = $35k
     // Tax on $35k: $11,925 × 10% + ($35k - $11,925) × 12%
     // = $1,192.50 + $2,769 = $3,961.50
-    expect(result.federalTax).toBeCloseTo(3_961.50, 0);
+    expect(federalAmount(result)).toBeCloseTo(3_961.50, 0);
   });
 });
 
@@ -269,35 +277,35 @@ describe("computeTax — US capital gains", () => {
     const result = computeTax(40_000, "capital-gains", "US", "TX");
     // Federal: $0 (below 0% threshold)
     // TX: $0 (no state tax)
-    expect(result.federalTax).toBe(0);
+    expect(federalAmount(result)).toBe(0);
     expect(result.totalTax).toBe(0);
   });
 
   it("applies 15% rate for gains between thresholds", () => {
     const result = computeTax(100_000, "capital-gains", "US", "TX", 2025);
     // Federal: $48,350 × 0% + ($100k - $48,350) × 15% = $7,747.50
-    expect(result.federalTax).toBeCloseTo(7_747.5, 0);
-    expect(result.provincialStateTax).toBe(0);
+    expect(federalAmount(result)).toBeCloseTo(7_747.5, 0);
+    expect(subFederalAmount(result)).toBe(0);
   });
 
   it("capital gains have lower federal tax than employment", () => {
     const gains = computeTax(200_000, "capital-gains", "US", "CA");
     const employment = computeTax(200_000, "employment", "US", "CA");
 
-    expect(gains.federalTax).toBeLessThan(employment.federalTax);
+    expect(federalAmount(gains)).toBeLessThan(federalAmount(employment));
   });
 
   it("states tax capital gains as ordinary income", () => {
     const gains = computeTax(100_000, "capital-gains", "US", "CA");
     // CA state should still tax capital gains (as ordinary income)
-    expect(gains.provincialStateTax).toBeGreaterThan(0);
+    expect(subFederalAmount(gains)).toBeGreaterThan(0);
   });
 
   it("no state tax on capital gains in no-tax states", () => {
     const noTaxStates = ["AK", "FL", "NV", "NH", "SD", "TN", "TX", "WA", "WY"];
     for (const state of noTaxStates) {
       const result = computeTax(100_000, "capital-gains", "US", state);
-      expect(result.provincialStateTax).toBe(0);
+      expect(subFederalAmount(result)).toBe(0);
     }
   });
 });

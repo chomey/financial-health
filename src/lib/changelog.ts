@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 219,
+    title: "TaxResult: single breakdown[] source of truth",
+    description: "The `TaxResult` interface in `src/lib/tax-engine.ts` no longer carries the country-specific `federalTax` and `provincialStateTax` fields. `breakdown` is now required and is the single source of truth for line items — `kind: \"income-tax\"` for the federal/national bracket-based tax, `kind: \"sub-federal\"` for provincial/state tax, and `kind: \"social\"` for Australia's Medicare Levy. Australia's breakdown omits the `sub-federal` line entirely because there is no state income tax. The dispatcher (`computeTax` in `src/lib/tax-engine.ts`) and each country's `tax-engine.ts` (`countries/canada`, `countries/usa`, `countries/australia`) now return only the new shape. The single internal consumer — `compute-totals.ts` — reads federal and sub-federal amounts via `breakdown.find(...)?.amount ?? 0`. Tax-engine snapshots were regenerated (330 entries) and now reflect the breakdown structure with identical numerical values. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 218,
     title: "Static COUNTRIES registry replaces dynamic registerCountry()",
     description: "The country registry in `src/lib/countries/index.ts` is now a static `Record<CountryCode, CountryProfile>` object instead of a mutable Partial record. `registerCountry()` is removed. TypeScript will now emit a compile error if a new `CountryCode` is added without a corresponding entry in `COUNTRIES`. `getCountry` is a direct property lookup; `getRegisteredCountries` returns `Object.values(COUNTRIES)`.",

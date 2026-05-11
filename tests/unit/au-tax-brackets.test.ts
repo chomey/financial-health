@@ -172,9 +172,12 @@ describe("AU computeTax — marginal rates at key thresholds", () => {
 // ─── computeTax for AU — tax amount verification ────────────────────────────
 
 describe("AU computeTax — tax amounts at key income levels", () => {
+  const auFederalAmount = (r: ReturnType<typeof computeTax>) =>
+    r.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+
   it("$18,200 (exactly tax-free threshold) → $0 tax", () => {
     const result = computeTax(18_200, "employment", "AU", "NSW", 2025);
-    expect(result.federalTax).toBe(0);
+    expect(auFederalAmount(result)).toBe(0);
     expect(result.totalTax).toBe(0);
   });
 
@@ -182,7 +185,7 @@ describe("AU computeTax — tax amounts at key income levels", () => {
     // Federal: 16% × ($45,000 - $18,200) = 16% × $26,800 = $4,288
     // Medicare: full 2% × $45,000 = $900
     const result = computeTax(45_000, "employment", "AU", "NSW", 2025);
-    expect(result.federalTax).toBeCloseTo(4_288, 0);
+    expect(auFederalAmount(result)).toBeCloseTo(4_288, 0);
     expect(result.totalTax).toBeCloseTo(5_188, 0);
   });
 
@@ -190,7 +193,7 @@ describe("AU computeTax — tax amounts at key income levels", () => {
     // Federal: $4,288 + 30% × ($135,000 - $45,000) = $4,288 + $27,000 = $31,288
     // Medicare: 2% × $135,000 = $2,700
     const result = computeTax(135_000, "employment", "AU", "NSW", 2025);
-    expect(result.federalTax).toBeCloseTo(31_288, 0);
+    expect(auFederalAmount(result)).toBeCloseTo(31_288, 0);
     expect(result.totalTax).toBeCloseTo(33_988, 0);
   });
 
@@ -198,7 +201,7 @@ describe("AU computeTax — tax amounts at key income levels", () => {
     // Federal: $31,288 + 37% × ($190,000 - $135,000) = $31,288 + $20,350 = $51,638
     // Medicare: 2% × $190,000 = $3,800
     const result = computeTax(190_000, "employment", "AU", "NSW", 2025);
-    expect(result.federalTax).toBeCloseTo(51_638, 0);
+    expect(auFederalAmount(result)).toBeCloseTo(51_638, 0);
     expect(result.totalTax).toBeCloseTo(55_438, 0);
   });
 
@@ -206,25 +209,29 @@ describe("AU computeTax — tax amounts at key income levels", () => {
     // Federal: $51,638 + 45% × ($300,000 - $190,000) = $51,638 + $49,500 = $101,138
     // Medicare: 2% × $300,000 = $6,000
     const result = computeTax(300_000, "employment", "AU", "NSW", 2025);
-    expect(result.federalTax).toBeCloseTo(101_138, 0);
+    expect(auFederalAmount(result)).toBeCloseTo(101_138, 0);
     expect(result.totalTax).toBeCloseTo(107_138, 0);
   });
 
-  it("provincialStateTax is always 0", () => {
+  it("breakdown omits sub-federal line (no state income tax)", () => {
     const result = computeTax(100_000, "employment", "AU", "VIC", 2025);
-    expect(result.provincialStateTax).toBe(0);
+    const subFederal = result.breakdown.find((b) => b.kind === "sub-federal");
+    expect(subFederal).toBeUndefined();
   });
 });
 
 // ─── AU capital gains ───────────────────────────────────────────────────────
 
 describe("AU computeTax — capital gains", () => {
+  const auFederalAmount = (r: ReturnType<typeof computeTax>) =>
+    r.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+
   it("applies 50% CGT discount", () => {
     // $100,000 capital gains → taxable = $50,000
     // Federal on $50k: 0 + 16% × $26,800 + 30% × $5,000 = $4,288 + $1,500 = $5,788
     // Medicare on $50k: 2% × $50,000 = $1,000
     const result = computeTax(100_000, "capital-gains", "AU", "NSW", 2025);
-    expect(result.federalTax).toBeCloseTo(5_788, 0);
+    expect(auFederalAmount(result)).toBeCloseTo(5_788, 0);
     expect(result.totalTax).toBeCloseTo(6_788, 0);
   });
 
@@ -237,7 +244,7 @@ describe("AU computeTax — capital gains", () => {
   it("small capital gains below tax-free threshold → $0", () => {
     // $30,000 CG → taxable $15,000 → below $18,200 threshold
     const result = computeTax(30_000, "capital-gains", "AU", "NSW", 2025);
-    expect(result.federalTax).toBe(0);
+    expect(auFederalAmount(result)).toBe(0);
     expect(result.totalTax).toBe(0);
   });
 });
@@ -254,8 +261,9 @@ describe("AU computeTax — 2026 tax year", () => {
 
   it("computes reasonable values for 2026", () => {
     const result = computeTax(80_000, "employment", "AU", "NSW", 2026);
-    expect(result.federalTax).toBeGreaterThan(0);
-    expect(result.totalTax).toBeGreaterThan(result.federalTax); // includes Medicare
+    const fed = result.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+    expect(fed).toBeGreaterThan(0);
+    expect(result.totalTax).toBeGreaterThan(fed); // includes Medicare
     expect(result.afterTaxIncome).toBeGreaterThan(0);
     expect(result.afterTaxIncome).toBeLessThan(80_000);
   });
@@ -268,11 +276,14 @@ describe("AU computeTax — all jurisdictions produce same result (no state tax)
 
   it("all AU jurisdictions return identical tax for same income", () => {
     const baseline = computeTax(100_000, "employment", "AU", "NSW", 2025);
+    const baselineFed = baseline.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
     for (const j of jurisdictions) {
       const result = computeTax(100_000, "employment", "AU", j, 2025);
+      const fed = result.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
       expect(result.totalTax).toBe(baseline.totalTax);
-      expect(result.federalTax).toBe(baseline.federalTax);
-      expect(result.provincialStateTax).toBe(0);
+      expect(fed).toBe(baselineFed);
+      // No state income tax in AU — breakdown should not include a sub-federal line
+      expect(result.breakdown.find((b) => b.kind === "sub-federal")).toBeUndefined();
     }
   });
 });

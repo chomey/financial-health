@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 217. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 219. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Cross-cutting interface changes (plan tasks 28–31)
-
-- [ ] Task 219: Drop legacy TaxResult fields — Remove `federalTax` and `provincialStateTax` from the `TaxResult` interface in `src/lib/tax-engine.ts`. Find every consumer (`grep -rn "\.federalTax\|\.provincialStateTax\|\.medicareLevy" src/`) and rewrite as `result.breakdown.find(b => b.kind === "income-tax")?.amount ?? 0` (or `"social"` for Medicare Levy, `"sub-federal"` for state/provincial). Remove legacy field population from each country's `tax-engine.ts`. Regenerate tax-engine snapshot with `-u` and visually verify the new shape. [@fullstack] [OPUS]
 
 - [ ] Task 220: Locale threading through CurrencyFormatter — Extend `CurrencyFormatter` constructor in `src/lib/currency.ts` to accept an optional `locale: Locale` (default `"en-US"`). Update `formatCurrency` and `formatCurrencyCompact` to accept and use locale. Update `CurrencyContext.tsx` to pull locale from `getCountry(country).locale` when constructing the formatter. Visual check: CA/US/AU formatting unchanged. [@fullstack]
 

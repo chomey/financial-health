@@ -10,7 +10,7 @@
  * that delegate here via `getCountry("AU").taxEngine.*`.
  *
  * AU specifics that differ from CA/US:
- * - No state/territory income tax — `provincialStateTax` is always 0.
+ * - No state/territory income tax — breakdown omits any `sub-federal` line.
  * - Tax-free threshold is handled via a 0% first bracket, not a BPA credit.
  * - Medicare Levy is a separate 2% surcharge above income thresholds, with a
  *   phase-in zone. Surfaced as its own `kind: "social"` breakdown line.
@@ -51,8 +51,6 @@ function computeAustralianTax(
 ): TaxResult {
   if (annualIncome <= 0) {
     return {
-      federalTax: 0,
-      provincialStateTax: 0,
       totalTax: 0,
       effectiveRate: 0,
       afterTaxIncome: 0,
@@ -99,8 +97,6 @@ function computeAustralianTax(
   }
 
   return {
-    federalTax,
-    provincialStateTax: 0,
     totalTax,
     effectiveRate: annualIncome > 0 ? totalTax / annualIncome : 0,
     afterTaxIncome: annualIncome - totalTax,

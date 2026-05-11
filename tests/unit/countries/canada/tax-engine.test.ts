@@ -12,11 +12,17 @@ describe("canadianTaxEngine.computeTax matches legacy", () => {
             const expected = legacyComputeTax(income, type, "CA", province, year);
             const actual = canadianTaxEngine.computeTax(income, type, province, year);
             expect(actual.totalTax).toBeCloseTo(expected.totalTax, 2);
-            expect(actual.federalTax).toBeCloseTo(expected.federalTax, 2);
-            expect(actual.provincialStateTax).toBeCloseTo(expected.provincialStateTax, 2);
             expect(actual.afterTaxIncome).toBeCloseTo(expected.afterTaxIncome, 2);
             expect(actual.effectiveRate).toBeCloseTo(expected.effectiveRate, 6);
             expect(actual.marginalRate).toBeCloseTo(expected.marginalRate, 6);
+
+            const expectedFed = expected.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+            const actualFed = actual.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+            expect(actualFed).toBeCloseTo(expectedFed, 2);
+
+            const expectedProv = expected.breakdown.find((b) => b.kind === "sub-federal")?.amount ?? 0;
+            const actualProv = actual.breakdown.find((b) => b.kind === "sub-federal")?.amount ?? 0;
+            expect(actualProv).toBeCloseTo(expectedProv, 2);
           });
         }
       }
@@ -27,23 +33,24 @@ describe("canadianTaxEngine.computeTax matches legacy", () => {
 describe("canadianTaxEngine.computeTax breakdown", () => {
   it("populates breakdown with Federal Tax (income-tax) and Provincial Tax (sub-federal)", () => {
     const result = canadianTaxEngine.computeTax(100_000, "employment", "ON", 2025);
-    expect(result.breakdown).toBeDefined();
     expect(result.breakdown).toHaveLength(2);
 
-    const federal = result.breakdown!.find((b) => b.kind === "income-tax");
+    const federal = result.breakdown.find((b) => b.kind === "income-tax");
     expect(federal).toBeDefined();
     expect(federal!.label).toBe("Federal Tax");
-    expect(federal!.amount).toBeCloseTo(result.federalTax, 2);
+    expect(federal!.amount).toBeGreaterThan(0);
 
-    const provincial = result.breakdown!.find((b) => b.kind === "sub-federal");
+    const provincial = result.breakdown.find((b) => b.kind === "sub-federal");
     expect(provincial).toBeDefined();
     expect(provincial!.label).toBe("Provincial Tax");
-    expect(provincial!.amount).toBeCloseTo(result.provincialStateTax, 2);
+    expect(provincial!.amount).toBeGreaterThan(0);
+
+    expect(federal!.amount + provincial!.amount).toBeCloseTo(result.totalTax, 2);
   });
 
   it("breakdown sums to totalTax", () => {
     const result = canadianTaxEngine.computeTax(150_000, "employment", "BC", 2025);
-    const sum = result.breakdown!.reduce((acc, line) => acc + line.amount, 0);
+    const sum = result.breakdown.reduce((acc, line) => acc + line.amount, 0);
     expect(sum).toBeCloseTo(result.totalTax, 2);
   });
 

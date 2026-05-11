@@ -26,18 +26,11 @@ export interface TaxBreakdownLine {
 }
 
 export interface TaxResult {
-  federalTax: number;
-  provincialStateTax: number;
   totalTax: number;
   effectiveRate: number;
   afterTaxIncome: number;
   marginalRate: number;
-  /**
-   * Country-agnostic line-by-line breakdown. Populated by per-country `TaxEngine`
-   * implementations (added in Ralph tasks 200/208/216). Becomes required and
-   * legacy `federalTax`/`provincialStateTax` are removed in Ralph task 219.
-   */
-  breakdown?: TaxBreakdownLine[];
+  breakdown: TaxBreakdownLine[];
 }
 
 export type IncomeType = "employment" | "capital-gains" | "other";
@@ -104,12 +97,11 @@ export function computeTax(
 ): TaxResult {
   if (annualIncome <= 0) {
     return {
-      federalTax: 0,
-      provincialStateTax: 0,
       totalTax: 0,
       effectiveRate: 0,
       afterTaxIncome: 0,
       marginalRate: 0,
+      breakdown: [],
     };
   }
 
@@ -161,12 +153,14 @@ function computeCanadianTax(
   const afterTaxIncome = annualIncome - totalTax;
 
   return {
-    federalTax,
-    provincialStateTax: provincialTax,
     totalTax,
     effectiveRate,
     afterTaxIncome,
     marginalRate,
+    breakdown: [
+      { label: "Federal Tax", amount: federalTax, kind: "income-tax" },
+      { label: "Provincial Tax", amount: provincialTax, kind: "sub-federal" },
+    ],
   };
 }
 
@@ -203,12 +197,14 @@ function computeUSTax(
   const marginalRate = federalMarginal + stateMarginal;
 
   return {
-    federalTax,
-    provincialStateTax: stateTax,
     totalTax,
     effectiveRate,
     afterTaxIncome,
     marginalRate,
+    breakdown: [
+      { label: "Federal Tax", amount: federalTax, kind: "income-tax" },
+      { label: "State Tax", amount: stateTax, kind: "sub-federal" },
+    ],
   };
 }
 
@@ -238,12 +234,14 @@ function computeUSCapitalGainsTax(
   const marginalRate = federalMarginal + stateMarginal;
 
   return {
-    federalTax,
-    provincialStateTax: stateTax,
     totalTax,
     effectiveRate,
     afterTaxIncome,
     marginalRate,
+    breakdown: [
+      { label: "Federal Tax", amount: federalTax, kind: "income-tax" },
+      { label: "State Tax", amount: stateTax, kind: "sub-federal" },
+    ],
   };
 }
 
@@ -324,11 +322,13 @@ function computeAUTax(
   }
 
   return {
-    federalTax,
-    provincialStateTax: 0, // No state income tax in Australia
     totalTax,
     effectiveRate,
     afterTaxIncome,
     marginalRate,
+    breakdown: [
+      { label: "Income Tax", amount: federalTax, kind: "income-tax" },
+      { label: "Medicare Levy", amount: medicareLevy, kind: "social" },
+    ],
   };
 }

@@ -12,11 +12,17 @@ describe("australianTaxEngine.computeTax matches legacy", () => {
             const expected = legacyComputeTax(income, type, "AU", jurisdiction, year);
             const actual = australianTaxEngine.computeTax(income, type, jurisdiction, year);
             expect(actual.totalTax).toBeCloseTo(expected.totalTax, 2);
-            expect(actual.federalTax).toBeCloseTo(expected.federalTax, 2);
-            expect(actual.provincialStateTax).toBeCloseTo(expected.provincialStateTax, 2);
             expect(actual.afterTaxIncome).toBeCloseTo(expected.afterTaxIncome, 2);
             expect(actual.effectiveRate).toBeCloseTo(expected.effectiveRate, 6);
             expect(actual.marginalRate).toBeCloseTo(expected.marginalRate, 6);
+
+            const expectedFed = expected.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+            const actualFed = actual.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+            expect(actualFed).toBeCloseTo(expectedFed, 2);
+
+            const expectedSocial = expected.breakdown.find((b) => b.kind === "social")?.amount ?? 0;
+            const actualSocial = actual.breakdown.find((b) => b.kind === "social")?.amount ?? 0;
+            expect(actualSocial).toBeCloseTo(expectedSocial, 2);
           });
         }
       }
@@ -27,15 +33,14 @@ describe("australianTaxEngine.computeTax matches legacy", () => {
 describe("australianTaxEngine.computeTax breakdown", () => {
   it("populates breakdown with Income Tax (income-tax) and Medicare Levy (social)", () => {
     const result = australianTaxEngine.computeTax(100_000, "employment", "NSW", 2025);
-    expect(result.breakdown).toBeDefined();
     expect(result.breakdown).toHaveLength(2);
 
-    const incomeTax = result.breakdown!.find((b) => b.kind === "income-tax");
+    const incomeTax = result.breakdown.find((b) => b.kind === "income-tax");
     expect(incomeTax).toBeDefined();
     expect(incomeTax!.label).toBe("Income Tax");
-    expect(incomeTax!.amount).toBeCloseTo(result.federalTax, 2);
+    expect(incomeTax!.amount).toBeGreaterThan(0);
 
-    const medicare = result.breakdown!.find((b) => b.kind === "social");
+    const medicare = result.breakdown.find((b) => b.kind === "social");
     expect(medicare).toBeDefined();
     expect(medicare!.label).toBe("Medicare Levy");
     expect(medicare!.amount).toBeGreaterThan(0);
@@ -44,14 +49,14 @@ describe("australianTaxEngine.computeTax breakdown", () => {
   it("Medicare Levy line equals 2% above shade-out", () => {
     // At $100k, well above the shade-out, levy = 2% × $100k = $2,000.
     const result = australianTaxEngine.computeTax(100_000, "employment", "NSW", 2025);
-    const medicare = result.breakdown!.find((b) => b.kind === "social");
+    const medicare = result.breakdown.find((b) => b.kind === "social");
     expect(medicare!.amount).toBeCloseTo(2_000, 0);
   });
 
   it("breakdown sums to totalTax exactly", () => {
     for (const income of [25_000, 30_000, 80_000, 150_000, 300_000]) {
       const result = australianTaxEngine.computeTax(income, "employment", "NSW", 2025);
-      const sum = result.breakdown!.reduce((acc, line) => acc + line.amount, 0);
+      const sum = result.breakdown.reduce((acc, line) => acc + line.amount, 0);
       expect(sum).toBeCloseTo(result.totalTax, 6);
     }
   });
@@ -59,23 +64,22 @@ describe("australianTaxEngine.computeTax breakdown", () => {
   it("populates breakdown for capital gains too (50% CGT discount applied)", () => {
     const result = australianTaxEngine.computeTax(100_000, "capital-gains", "NSW", 2025);
     expect(result.breakdown).toHaveLength(2);
-    const incomeTax = result.breakdown!.find((b) => b.kind === "income-tax");
-    const medicare = result.breakdown!.find((b) => b.kind === "social");
-    expect(incomeTax!.amount).toBeCloseTo(result.federalTax, 2);
+    const incomeTax = result.breakdown.find((b) => b.kind === "income-tax");
+    const medicare = result.breakdown.find((b) => b.kind === "social");
     expect(incomeTax!.amount + medicare!.amount).toBeCloseTo(result.totalTax, 2);
   });
 
   it("Medicare Levy is 0 below the low-income threshold", () => {
     // $20k is below the $26k single threshold → levy = 0.
     const result = australianTaxEngine.computeTax(20_000, "employment", "NSW", 2025);
-    const medicare = result.breakdown!.find((b) => b.kind === "social");
+    const medicare = result.breakdown.find((b) => b.kind === "social");
     expect(medicare!.amount).toBe(0);
   });
 
   it("Medicare Levy uses the phase-in rate inside the shade-out zone", () => {
     // $29k: 10% × ($29k − $26k) = $300.
     const result = australianTaxEngine.computeTax(29_000, "employment", "NSW", 2025);
-    const medicare = result.breakdown!.find((b) => b.kind === "social");
+    const medicare = result.breakdown.find((b) => b.kind === "social");
     expect(medicare!.amount).toBeCloseTo(300, 0);
   });
 

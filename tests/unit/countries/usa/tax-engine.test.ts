@@ -12,11 +12,17 @@ describe("americanTaxEngine.computeTax matches legacy", () => {
             const expected = legacyComputeTax(income, type, "US", state, year);
             const actual = americanTaxEngine.computeTax(income, type, state, year);
             expect(actual.totalTax).toBeCloseTo(expected.totalTax, 2);
-            expect(actual.federalTax).toBeCloseTo(expected.federalTax, 2);
-            expect(actual.provincialStateTax).toBeCloseTo(expected.provincialStateTax, 2);
             expect(actual.afterTaxIncome).toBeCloseTo(expected.afterTaxIncome, 2);
             expect(actual.effectiveRate).toBeCloseTo(expected.effectiveRate, 6);
             expect(actual.marginalRate).toBeCloseTo(expected.marginalRate, 6);
+
+            const expectedFed = expected.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+            const actualFed = actual.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+            expect(actualFed).toBeCloseTo(expectedFed, 2);
+
+            const expectedState = expected.breakdown.find((b) => b.kind === "sub-federal")?.amount ?? 0;
+            const actualState = actual.breakdown.find((b) => b.kind === "sub-federal")?.amount ?? 0;
+            expect(actualState).toBeCloseTo(expectedState, 2);
           });
         }
       }
@@ -27,30 +33,31 @@ describe("americanTaxEngine.computeTax matches legacy", () => {
 describe("americanTaxEngine.computeTax breakdown", () => {
   it("populates breakdown with Federal Tax (income-tax) and State Tax (sub-federal)", () => {
     const result = americanTaxEngine.computeTax(100_000, "employment", "CA", 2025);
-    expect(result.breakdown).toBeDefined();
     expect(result.breakdown).toHaveLength(2);
 
-    const federal = result.breakdown!.find((b) => b.kind === "income-tax");
+    const federal = result.breakdown.find((b) => b.kind === "income-tax");
     expect(federal).toBeDefined();
     expect(federal!.label).toBe("Federal Tax");
-    expect(federal!.amount).toBeCloseTo(result.federalTax, 2);
+    expect(federal!.amount).toBeGreaterThan(0);
 
-    const state = result.breakdown!.find((b) => b.kind === "sub-federal");
+    const state = result.breakdown.find((b) => b.kind === "sub-federal");
     expect(state).toBeDefined();
     expect(state!.label).toBe("State Tax");
-    expect(state!.amount).toBeCloseTo(result.provincialStateTax, 2);
+    expect(state!.amount).toBeGreaterThan(0);
+
+    expect(federal!.amount + state!.amount).toBeCloseTo(result.totalTax, 2);
   });
 
   it("breakdown sums to totalTax", () => {
     const result = americanTaxEngine.computeTax(150_000, "employment", "NY", 2025);
-    const sum = result.breakdown!.reduce((acc, line) => acc + line.amount, 0);
+    const sum = result.breakdown.reduce((acc, line) => acc + line.amount, 0);
     expect(sum).toBeCloseTo(result.totalTax, 2);
   });
 
   it("breakdown still includes a $0 State Tax line for no-income-tax states", () => {
     const result = americanTaxEngine.computeTax(100_000, "employment", "TX", 2025);
     expect(result.breakdown).toHaveLength(2);
-    const state = result.breakdown!.find((b) => b.kind === "sub-federal");
+    const state = result.breakdown.find((b) => b.kind === "sub-federal");
     expect(state).toBeDefined();
     expect(state!.amount).toBe(0);
   });
@@ -58,10 +65,9 @@ describe("americanTaxEngine.computeTax breakdown", () => {
   it("populates breakdown for capital gains too", () => {
     const result = americanTaxEngine.computeTax(100_000, "capital-gains", "CA", 2025);
     expect(result.breakdown).toHaveLength(2);
-    const federal = result.breakdown!.find((b) => b.kind === "income-tax");
-    const state = result.breakdown!.find((b) => b.kind === "sub-federal");
-    expect(federal!.amount).toBeCloseTo(result.federalTax, 2);
-    expect(state!.amount).toBeCloseTo(result.provincialStateTax, 2);
+    const federal = result.breakdown.find((b) => b.kind === "income-tax");
+    const state = result.breakdown.find((b) => b.kind === "sub-federal");
+    expect(federal!.amount + state!.amount).toBeCloseTo(result.totalTax, 2);
   });
 
   it("returns empty breakdown for zero income", () => {

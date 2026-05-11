@@ -148,16 +148,18 @@ describe("AU country type – tax engine", () => {
     // = 0 + 4,288 + 10,500 = $14,788 federal
     // Medicare: $80k > $32,500 shade-out → full 2% = $1,600
     // Total: $16,388
-    expect(result.federalTax).toBeCloseTo(14_788, 0);
+    const fed = result.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+    expect(fed).toBeCloseTo(14_788, 0);
     expect(result.totalTax).toBeCloseTo(16_388, 0);
-    expect(result.provincialStateTax).toBe(0);
+    expect(result.breakdown.find((b) => b.kind === "sub-federal")).toBeUndefined();
     expect(result.effectiveRate).toBeCloseTo(16_388 / 80_000, 4);
     expect(result.afterTaxIncome).toBeCloseTo(63_612, 0);
   });
 
   it("computeTax for AU with income below tax-free threshold", () => {
     const result = computeTax(15000, "employment", "AU", "NSW", 2025);
-    expect(result.federalTax).toBe(0);
+    const fed = result.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+    expect(fed).toBe(0);
     expect(result.totalTax).toBe(0);
     expect(result.afterTaxIncome).toBe(15000);
   });

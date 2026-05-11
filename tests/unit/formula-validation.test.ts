@@ -136,8 +136,9 @@ describe("Formula Validation — Estimated Tax", () => {
   it("bracket math: sum of bracket taxes = subtotal", () => {
     const annualIncome = 100000;
     const taxResult = computeTax(annualIncome, "employment", "CA", "ON");
-    // Federal + provincial should equal total
-    expect(taxResult.federalTax + taxResult.provincialStateTax).toBeCloseTo(taxResult.totalTax, 2);
+    // Breakdown lines (Federal + Provincial) should sum to total
+    const sum = taxResult.breakdown.reduce((acc, line) => acc + line.amount, 0);
+    expect(sum).toBeCloseTo(taxResult.totalTax, 2);
     // After-tax = income - total tax
     expect(taxResult.afterTaxIncome).toBeCloseTo(annualIncome - taxResult.totalTax, 2);
   });
@@ -440,8 +441,10 @@ describe("Formula Validation — Cross-metric Consistency", () => {
     const totals = computeTotals(state);
     const directTax = computeTax(6000 * 12, "employment", "CA", "ON", 2025);
 
-    expect(totals.totalFederalTax).toBeCloseTo(directTax.federalTax, 2);
-    expect(totals.totalProvincialStateTax).toBeCloseTo(directTax.provincialStateTax, 2);
+    const directFed = directTax.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
+    const directProv = directTax.breakdown.find((b) => b.kind === "sub-federal")?.amount ?? 0;
+    expect(totals.totalFederalTax).toBeCloseTo(directFed, 2);
+    expect(totals.totalProvincialStateTax).toBeCloseTo(directProv, 2);
     expect(totals.totalTaxEstimate).toBeCloseTo(directTax.totalTax, 2);
   });
 
