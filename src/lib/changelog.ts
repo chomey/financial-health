@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 216,
+    title: "Country plugin: Australian tax engine",
+    description: "Australian tax computation is now a `TaxEngine` plugin at `src/lib/countries/australia/tax-engine.ts`. The engine handles federal brackets, Medicare Levy (with the low-income phase-in zone), the 50% CGT discount on long-term capital gains, super-aware account classification (pension phase tax-free, accumulation 15%, FHSS marginal − 30% offset), and the super preservation-age-60 early-withdrawal rule with FHSS/First-Home carve-outs. New: `TaxResult.breakdown` now surfaces Medicare Levy as its own `{kind: \"social\"}` line alongside `{kind: \"income-tax\"}` for federal tax — previously Medicare was only visible inside the `totalTax` total. The legacy `computeTax`/`getWithdrawalTaxRate` functions and their existing snapshots are unchanged; this is a parallel implementation that the legacy code will delegate to in upcoming tasks. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 215,
     title: "Country plugin: Australian insights provider",
     description: "AU-specific insight candidates are now defined as an `InsightProvider` at `src/lib/countries/australia/insights.ts`. The provider generates three candidates from raw `FinancialState`: super setup prompt (employment income but no super account, type `au-super`), First Home Super Saver suggestion (no property, no FHSS account, employment income, type `au-fhss`), and Age Pension upcoming reminder (ages 60–66, type `retirement-income-gap`). Integration into the app UI happens in task 217 when the AUSTRALIA CountryProfile is assembled. No user-visible change.",

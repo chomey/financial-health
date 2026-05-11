@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 215
-- **Remaining**: 19
+- **Completed**: 216
+- **Remaining**: 18
 - **Last Updated**: 2026-05-11
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -25,6 +25,15 @@
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 216: australianTaxEngine implementation [@backend] [MATH] [OPUS]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/australia/tax-engine.ts`: New — implements the `TaxEngine` contract for Australia. Mirrors legacy `computeAUTax` (federal brackets + Medicare Levy + 50% CGT discount) and adds the new `TaxResult.breakdown` with `{kind: "income-tax", label: "Income Tax"}` and `{kind: "social", label: "Medicare Levy"}`. Implements AU branches of `getWithdrawalTaxRate` (tax-free, super-accumulation flat 15%, super-fhss marginal − 30% offset, taxable with cost basis) and `getEarlyWithdrawalPenalties` (super preservation age 60, with FHSS / First Home carve-outs).
+  - `tests/unit/countries/australia/tax-engine.test.ts`: New — 227 tests covering: legacy-comparison parity for `computeTax` across incomes/jurisdictions/years/types; breakdown shape (Income Tax + Medicare Levy, sums to totalTax, empty for zero income); marginal-rate parity; classifier rules for AU super accounts; withdrawal-tax parity for AU categories; FHSS offset and flat-15% Super (Accumulation); early-withdrawal penalty rules.
+- **Tests**: T1: 4317 passed (178 files), Build: passes
+- **Screenshots**: N/A (backend logic, no UI)
+- **Notes**: Legacy `src/lib/tax-engine.ts` and `src/lib/withdrawal-tax.ts` left untouched on purpose — they become thin shims that delegate to `getCountry("AU").taxEngine.*` in Ralph tasks 222/223. Snapshot regressions stay green because the legacy code path is unchanged. The breakdown's "Medicare Levy" line uses `kind: "social"` (a new value), surfacing what was previously bundled into `totalTax` only.
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08
