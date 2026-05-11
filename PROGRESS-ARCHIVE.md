@@ -3121,3 +3121,38 @@
 - **Tests**: T1: 181 test files, 4338 tests — all pass. Build: passes. T2: `projection-drawdown-tax.spec.ts` — 2/2 pass.
 - **Screenshots**: N/A (interface refactor — no UI change; `TaxExplainerDetails` in `DataFlowArrows.tsx` is a separate type and untouched).
 - **Notes**: AU's `totalTax` includes Medicare Levy via the `social` breakdown line, so `breakdown.reduce(sum)` equals `totalTax` for every country. `compute-totals.ts` continues to bucket Medicare Levy outside `totalFederalTax`/`totalProvincialStateTax` (the only consumer of those buckets is the explainer, which only renders income-tax-kind components) — pre-existing behavior preserved.
+## Task 220: Locale threading through CurrencyFormatter — 2026-05-11
+- **Files**:
+  - `src/lib/currency.ts`: Added `Locale` type export. Added `locale` to `formatCurrency` opts (used in `Intl.NumberFormat`). Added `locale` param to `formatCurrencyCompact`. Extended `CurrencyFormatter` constructor with optional `locale: Locale = "en-US"`, stored and threaded through `compact`, `full`, `foreign`.
+  - `src/lib/countries/types.ts`: Replaced local `Locale` definition with import+re-export from `src/lib/currency` to eliminate circular dependency.
+  - `src/lib/CurrencyContext.tsx`: Added `country: CountryCode` prop. Constructs `CurrencyFormatter` with `getCountry(country).locale`.
+  - `tests/test-utils.tsx`: Added `country?: CountryCode` prop (default `"US"`) to `TestProviders` and `customRender`.
+  - `tests/unit/welcome-step-simple-mode.test.tsx`: Added `country={country}` to `CurrencyProvider` usage.
+  - `src/app/page.tsx`: Added `country={country}` to both `<CurrencyProvider>` usages.
+  - `tests/unit/currency.test.ts`: Added 7 locale-threading tests.
+  - `tests/e2e/locale-currency-formatter.spec.ts`: 3 Playwright tests verifying CA/US/AU wizard loads correctly.
+  - `src/lib/changelog.ts`: Added version 154 entry.
+- **Tests**: T1: 4345 passed (181 files), T2: 3 passed (Playwright)
+- **Screenshots**: `task-220-ca-locale.png`, `task-220-us-locale.png`, `task-220-au-locale.png`
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
