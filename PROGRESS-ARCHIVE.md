@@ -3053,3 +3053,11 @@
 - **Tests**: T1: 4034 passed (174 files), Build: passes, Lint: 25 pre-existing problems (unrelated)
 - **Screenshots**: N/A (backend/math task)
 - **Notes**: Pattern mirrors `canadianGovernmentRetirement` and `americanGovernmentRetirement`. Existing consumers (`GovernmentRetirementInput.tsx`, `tests/unit/government-retirement-au.test.ts`, `tests/unit/retirement-income-chart.test.ts`) keep working through the re-export shim until task 224's full shim refactor.
+## Task 213: australianTaxCredits catalog [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/australia/tax-credits.ts`: New — `australianTaxCredits: TaxCreditCatalog` with 13 AU entries: LITO, SAPTO, Private Health Insurance Rebate, Franking Credits, Zone Tax Offset, Super Co-contribution, Spouse Super Tax Offset (requiresSpouse), Work-Related Expenses Deduction, Charitable Donations (DGR), Self-Education Expenses Deduction, Rental Property Losses (Negative Gearing), Income Protection Insurance Deduction, Super Concessional Contributions (infoOnly). MLS moved to infoOnly.
+  - `src/lib/tax-credits.ts`: Added 5 new AU deduction entries to `ALL_CREDIT_CATEGORIES`: Work-Related Expenses, Charitable Donations (DGR), Self-Education Expenses, Rental Property Losses (Negative Gearing), Income Protection Insurance.
+  - `tests/unit/countries/australia/tax-credits.test.ts`: New — 20 tests covering getCategories, getCategoriesForFilingStatus, findCategory, amountOptions, phase-out thresholds, infoOnly/requiresSpouse filtering.
+- **Tests**: T1: 4054 passed (175 files), Build: passes
+- **Screenshots**: N/A (backend/data task)
