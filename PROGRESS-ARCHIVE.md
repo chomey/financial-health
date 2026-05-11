@@ -3095,3 +3095,11 @@
   - `tests/unit/countries/australia/profile.test.ts`: New — 7 tests covering registry resolution, 8 jurisdictions, filing statuses, taxYearBoundary, taxYearLabel formatting, plugin presence, and NSW jurisdiction details.
 - **Tests**: T1: 4324 passed (179 files), Build: passes
 - **Screenshots**: N/A (backend task)
+## Task 218: Tighten registry to non-Partial Record [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/index.ts`: Replaced `COUNTRIES_INTERNAL: Partial<Record<...>>` and `registerCountry()` with static `COUNTRIES: Record<CountryCode, CountryProfile> = { CA: CANADA, US: USA, AU: AUSTRALIA }`. Simplified `getCountry` to direct lookup. `getRegisteredCountries` now uses `Object.values(COUNTRIES)`. Dropped `registerCountry` export. TypeScript will error if `CountryCode` gains a new value without a matching entry.
+  - `src/lib/changelog.ts`: Fixed pre-existing parse error (unescaped `"` in description string from Task 217). Added version 218 entry.
+  - `tests/unit/countries/types.test.ts`: Removed `registerCountry` import and test that mutated the registry with a stub.
+  - `tests/unit/countries/registry.test.ts`: New — 7 tests verifying `COUNTRIES` shape, `getCountry` identity, `getRegisteredCountries` completeness.
+- **Test results**: 180 test files, 4331 tests — all pass.

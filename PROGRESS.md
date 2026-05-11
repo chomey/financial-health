@@ -30,14 +30,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 218: Tighten registry to non-Partial Record [@backend]
-- **Date**: 2026-05-11
-- **Files**:
-  - `src/lib/countries/index.ts`: Replaced `COUNTRIES_INTERNAL: Partial<Record<...>>` and `registerCountry()` with static `COUNTRIES: Record<CountryCode, CountryProfile> = { CA: CANADA, US: USA, AU: AUSTRALIA }`. Simplified `getCountry` to direct lookup. `getRegisteredCountries` now uses `Object.values(COUNTRIES)`. Dropped `registerCountry` export. TypeScript will error if `CountryCode` gains a new value without a matching entry.
-  - `src/lib/changelog.ts`: Fixed pre-existing parse error (unescaped `"` in description string from Task 217). Added version 218 entry.
-  - `tests/unit/countries/types.test.ts`: Removed `registerCountry` import and test that mutated the registry with a stub.
-  - `tests/unit/countries/registry.test.ts`: New — 7 tests verifying `COUNTRIES` shape, `getCountry` identity, `getRegisteredCountries` completeness.
-- **Test results**: 180 test files, 4331 tests — all pass.
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08
