@@ -3024,3 +3024,13 @@
   - `tests/unit/countries/usa/profile.test.ts`: New — 9 tests covering metadata, jurisdiction count/contents, defaultJurisdiction, filing statuses, taxYearLabel, taxYearBoundary, plugin wiring, registry lookup.
 - **Tests**: T1: 3972 passed (171 files), Build: passes
 - **Screenshots**: N/A (backend task)
+## Task 210: Extract australia/tax-tables.ts [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/australia/tax-tables.ts`: New — moved `AU_FEDERAL_2025`, `AU_FEDERAL_2026`, `AU_FEDERAL_BY_YEAR`, `AU_MEDICARE_LEVY`, `getAUBrackets`, `calculateMedicareLevy` from `src/lib/tax-tables.ts`.
+  - `src/lib/tax-tables.ts`: Replaced AU inline definitions with re-exports from `@/lib/countries/australia/tax-tables`.
+  - `tests/unit/countries/australia/tax-tables.test.ts`: New — 18 tests covering bracket structure, by-year lookup, Medicare Levy constants, getAUBrackets for all jurisdictions and years, calculateMedicareLevy phase-in and shade-out logic.
+  - `src/lib/changelog.ts`: Added version 210 entry.
+- **Tests**: T1: 3997 passed (172 files), Build: passes
+- **Screenshots**: N/A (backend refactor task)
+- **Notes**: All existing snapshot tests and AU tax bracket tests remain green. `AU_FEDERAL_BY_YEAR` is now exported from the module (was previously unexported private const in tax-tables.ts).
