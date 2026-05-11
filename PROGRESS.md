@@ -16,15 +16,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 211: australianVehicles catalog [@backend]
-- **Date**: 2026-05-11
-- **Files**:
-  - `src/lib/countries/australia/vehicles.ts`: New — `australianVehicles: VehicleCatalog` with 3 categories (Super Accumulation, Pension Phase, FHSS), 🇦🇺 flag emoji, descriptions from AssetEntry.tsx, 7% default ROI for all, tax-sheltered: Pension Phase, tax-deferred: Accumulation, employer-match: Accumulation, reinvest-default: all three + Brokerage.
-  - `tests/unit/countries/australia/vehicles.test.ts`: New — 10 tests covering categories, flagEmoji, descriptions, ROI, tax-sheltered/deferred (no overlap), income-tax ROI, reinvest-default, employer-match.
-  - `TASKS.md`: Marked task 211 done, moved to archive.
-  - `src/lib/changelog.ts`: Added version 211 entry.
-- **Tests**: T1: 4007 passed (173 files), Build: passes
-- **Screenshots**: N/A (backend task)
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08
