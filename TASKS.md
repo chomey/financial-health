@@ -26,8 +26,6 @@ test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehi
 
 ### Cross-cutting interface changes (plan tasks 28–31)
 
-- [ ] Task 218: Tighten registry to non-Partial Record — Replace `COUNTRIES_INTERNAL: Partial<Record<CountryCode, CountryProfile>>` and `registerCountry()` function in `src/lib/countries/index.ts` with a static `COUNTRIES: Record<CountryCode, CountryProfile> = { CA: CANADA, US: USA, AU: AUSTRALIA }`. Tighten `getCountry` accordingly. Drop `registerCountry` export. Compile error if a 4th `CountryCode` ever lacks a profile. [@backend]
-
 - [ ] Task 219: Drop legacy TaxResult fields — Remove `federalTax` and `provincialStateTax` from the `TaxResult` interface in `src/lib/tax-engine.ts`. Find every consumer (`grep -rn "\.federalTax\|\.provincialStateTax\|\.medicareLevy" src/`) and rewrite as `result.breakdown.find(b => b.kind === "income-tax")?.amount ?? 0` (or `"social"` for Medicare Levy, `"sub-federal"` for state/provincial). Remove legacy field population from each country's `tax-engine.ts`. Regenerate tax-engine snapshot with `-u` and visually verify the new shape. [@fullstack] [OPUS]
 
 - [ ] Task 220: Locale threading through CurrencyFormatter — Extend `CurrencyFormatter` constructor in `src/lib/currency.ts` to accept an optional `locale: Locale` (default `"en-US"`). Update `formatCurrency` and `formatCurrencyCompact` to accept and use locale. Update `CurrencyContext.tsx` to pull locale from `getCountry(country).locale` when constructing the formatter. Visual check: CA/US/AU formatting unchanged. [@fullstack]

@@ -7,9 +7,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 218,
+    title: "Static COUNTRIES registry replaces dynamic registerCountry()",
+    description: "The country registry in `src/lib/countries/index.ts` is now a static `Record<CountryCode, CountryProfile>` object instead of a mutable Partial record. `registerCountry()` is removed. TypeScript will now emit a compile error if a new `CountryCode` is added without a corresponding entry in `COUNTRIES`. `getCountry` is a direct property lookup; `getRegisteredCountries` returns `Object.values(COUNTRIES)`.",
+    date: "2026-05-11",
+  },
+  {
     version: 217,
     title: "Country plugin: AUSTRALIA CountryProfile",
-    description: "Australia is now a fully registered country in the app. `src/lib/countries/australia/index.ts` exports `AUSTRALIA: CountryProfile` wiring all existing AU plugins (tax engine, vehicles, government retirement, tax credits, sample profiles, insights). The profile covers 8 states and territories (NSW, VIC, QLD, WA, SA, TAS, ACT, NT), defaulting to NSW, with two filing statuses (Single and Married/De Facto), and an Australian fiscal year boundary of July 1 — expressed via `taxYearLabel` as e.g. "2024/25 FY". Locale is `en-AU`. The country is registered via `registerCountry(AUSTRALIA)` in the central registry.",
+    description: "Australia is now a fully registered country in the app. `src/lib/countries/australia/index.ts` exports `AUSTRALIA: CountryProfile` wiring all existing AU plugins (tax engine, vehicles, government retirement, tax credits, sample profiles, insights). The profile covers 8 states and territories (NSW, VIC, QLD, WA, SA, TAS, ACT, NT), defaulting to NSW, with two filing statuses (Single and Married/De Facto), and an Australian fiscal year boundary of July 1 — expressed via `taxYearLabel` as e.g. \"2024/25 FY\". Locale is `en-AU`. The country is registered via `registerCountry(AUSTRALIA)` in the central registry.",
     date: "2026-05-11",
   },
   {
