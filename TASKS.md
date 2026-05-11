@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 207. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 208. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### USA plugin (plan tasks 12–19)
-
-- [ ] Task 208: americanTaxEngine implementation — Implement `TaxEngine` for USA at `src/lib/countries/usa/tax-engine.ts`. Move `computeUSTax` and `computeUSCapitalGainsTax` from `src/lib/tax-engine.ts:159-234`, US branches of `getEarlyWithdrawalPenalties` from `src/lib/withdrawal-tax.ts:100-124`. Key US specifics: standard deduction subtracted from gross income (not credit), long-term capital gains use their own bracket table, states with no income tax have empty bracket arrays. Populate `TaxResult.breakdown` with `{kind: "income-tax", label: "Federal Tax"}` and `{kind: "sub-federal", label: "State Tax"}`. Snapshot regressions must stay green. [@backend] [MATH] [OPUS]
 
 - [ ] Task 209: USA CountryProfile assembly — Create `src/lib/countries/usa/index.ts` exporting `USA: CountryProfile` with 50 states + DC from `US_STATES` in `CountryJurisdictionSelector.tsx`, `defaultJurisdiction: "CA"`, four filing statuses, `taxYearLabel(year) => String(year)`, calendar tax year boundary, locale `"en-US"`. Register in `src/lib/countries/index.ts`. [@backend]
 
