@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 210,
+    title: "Country plugin: Australia tax-tables module",
+    description: "Australian federal tax tables and Medicare Levy logic have been extracted from `src/lib/tax-tables.ts` into a dedicated module at `src/lib/countries/australia/tax-tables.ts`. The barrel file (`tax-tables.ts`) re-exports all AU symbols for full backward compatibility. `AU_FEDERAL_BY_YEAR` is now also exported. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 209,
     title: "Country plugin: USA CountryProfile assembly",
     description: "The United States now has a fully assembled `CountryProfile` at `src/lib/countries/usa/index.ts`. It wires together all previously built US plugins — tax engine, vehicle catalog, government retirement (Social Security), tax credits, sample profiles, and insights — into a single registry entry. Jurisdictions include all 50 states plus DC, defaulting to California. Four filing statuses (Single, Married Filing Jointly, Married Filing Separately, Head of Household). Calendar tax year (Jan 1 boundary) with `taxYearLabel` returning the plain year string. Locale `en-US`. USA is registered alongside Canada in `src/lib/countries/index.ts` and is immediately retrievable via `getCountry(\"US\")`.",

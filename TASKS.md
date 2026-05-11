@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 209. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 210. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Australia plugin (plan tasks 20–27)
-
-- [ ] Task 210: Extract australia/tax-tables.ts — Move `AU_FEDERAL_2025`, `AU_FEDERAL_2026`, `AU_FEDERAL_BY_YEAR`, `AU_MEDICARE_LEVY`, `getAUBrackets`, `calculateMedicareLevy` from `src/lib/tax-tables.ts:1021-1128` to `src/lib/countries/australia/tax-tables.ts`. Snapshot regressions must stay green. [@backend]
 
 - [ ] Task 211: australianVehicles catalog — Categories `["Super (Accumulation)", "Super (Pension Phase)", "First Home Super Saver"]`. Tax-sheltered: `{"Super (Pension Phase)"}`. Tax-deferred: `{"Super (Accumulation)"}`. Employer-match-eligible: `{"Super (Accumulation)"}`. Tests at `tests/unit/countries/australia/vehicles.test.ts`. [@backend]
 
