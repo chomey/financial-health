@@ -22,14 +22,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 214: australianProfiles library [@backend]
-- **Date**: 2026-05-11
-- **Files**:
-  - `src/lib/countries/australia/sample-profiles.ts`: New — `AU_SAMPLE_PROFILES` (3 personas: fresh-grad-au in NSW, mid-career-au in VIC, pre-retirement-au in QLD), `AU_QUICK_START_PROFILES` (au-renter, au-homeowner), `australianProfiles: ProfileLibrary`. Uses Super (Accumulation), First Home Super Saver, and Brokerage with realistic AUD amounts and ASX ETF tickers.
-  - `tests/unit/countries/australia/sample-profiles.test.ts`: New — 18 tests covering profile count, country codes, AU vehicles, Super balances, employer match, jurisdictions, quick-start shape.
-  - `src/lib/changelog.ts`: Added version 214 entry.
-- **Tests**: T1: 176 files / 4072 tests passed (18 new), Build: passes
-- **Screenshots**: N/A (backend/data-only task)
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08
