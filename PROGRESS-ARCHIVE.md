@@ -3015,3 +3015,12 @@
 - **Notes**: Legacy `computeTax`/`getEarlyWithdrawalPenalties` in `src/lib/tax-engine.ts` and `src/lib/withdrawal-tax.ts` stay untouched until the shim/cleanup tasks (222/223/233). The snapshot-regression suites pass because the legacy entrypoint still routes through the original functions.
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+## Task 209: USA CountryProfile assembly [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/usa/index.ts`: New — `USA: CountryProfile` assembling all US plugins (tax engine, vehicles, government retirement, tax credits, sample profiles, insights). 51 jurisdictions (50 states + DC), `defaultJurisdiction: "CA"`, four filing statuses, calendar tax year, locale `"en-US"`.
+  - `src/lib/countries/index.ts`: Registered `USA` alongside `CANADA`.
+  - `src/lib/changelog.ts`: Added version 209 entry.
+  - `tests/unit/countries/usa/profile.test.ts`: New — 9 tests covering metadata, jurisdiction count/contents, defaultJurisdiction, filing statuses, taxYearLabel, taxYearBoundary, plugin wiring, registry lookup.
+- **Tests**: T1: 3972 passed (171 files), Build: passes
+- **Screenshots**: N/A (backend task)
