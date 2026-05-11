@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 211
-- **Remaining**: 23
+- **Completed**: 212
+- **Remaining**: 22
 - **Last Updated**: 2026-05-11
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -17,6 +17,17 @@
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 212: australianGovernmentRetirement plugin — Age Pension [@backend] [MATH]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/australia/government-retirement.ts`: New — exports `AU_PENSION_SINGLE_FORTNIGHTLY`, `AU_PENSION_COUPLE_EACH_FORTNIGHTLY`, `AU_PENSION_AGE`, `AU_SUPER_PRESERVATION_AGE`, `AuPensionPreset` type, `getAuPensionPresetAmount`, `fortnightlyToMonthly`, and `australianGovernmentRetirement: GovernmentRetirementPlugin`. `computeMonthly` returns `fortnightlyToMonthly(agePensionFortnightly ?? 0)`. `presetsFor("agePension")` returns `[none, full-single, full-couple, custom]`; all other fields return `[]`.
+  - `src/lib/government-retirement.ts`: Removed AU pension block (constants, type, helpers) and replaced with re-exports from `@/lib/countries/australia/government-retirement` (backward compat). `computeMonthlyGovernmentIncome` now delegates the AU branch to `fortnightlyToMonthly`.
+  - `tests/unit/countries/australia/government-retirement.test.ts`: New — 27 tests covering `computeMonthly` (formula, undefined/missing/zero, other-country fields ignored), `presetsFor` (4 expected presets, amounts match constants, unknown fields return `[]`), constants (Sep 2024 published values), legacy free functions, and backward-compat re-exports from `@/lib/government-retirement`.
+  - `src/lib/changelog.ts`: Added version 212 entry.
+- **Tests**: T1: 4034 passed (174 files), Build: passes, Lint: 25 pre-existing problems (unrelated)
+- **Screenshots**: N/A (backend/math task)
+- **Notes**: Pattern mirrors `canadianGovernmentRetirement` and `americanGovernmentRetirement`. Existing consumers (`GovernmentRetirementInput.tsx`, `tests/unit/government-retirement-au.test.ts`, `tests/unit/retirement-income-chart.test.ts`) keep working through the re-export shim until task 224's full shim refactor.
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

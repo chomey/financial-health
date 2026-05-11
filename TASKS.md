@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 211. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 212. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Australia plugin (plan tasks 20–27)
-
-- [ ] Task 212: australianGovernmentRetirement plugin — Age Pension. Move `AU_PENSION_*` constants, `getAuPensionPresetAmount`, `fortnightlyToMonthly` from `src/lib/government-retirement.ts:67-91`. `computeMonthly` returns `agePensionFortnightly × 26 / 12`. Presets `full-single/full-couple/custom`. Tests at `tests/unit/countries/australia/government-retirement.test.ts`. [@backend] [MATH]
 
 - [ ] Task 213: australianTaxCredits catalog — Same pattern with `jurisdiction: "AU"` entries. Tests at `tests/unit/countries/australia/tax-credits.test.ts`. [@backend]
 

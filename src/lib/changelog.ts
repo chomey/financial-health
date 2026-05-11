@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 212,
+    title: "Country plugin: Australian government retirement",
+    description: "The Australian Age Pension is now a `GovernmentRetirementPlugin` at `src/lib/countries/australia/government-retirement.ts`. It owns the AU pension constants (single & couple fortnightly rates, eligibility age 67, super preservation age 60), the `AuPensionPreset` type, and the `getAuPensionPresetAmount` / `fortnightlyToMonthly` helpers. `computeMonthly` converts the fortnightly rate to monthly via × 26 / 12, and `presetsFor(\"agePension\")` exposes the none / full-single / full-couple / custom options. The legacy `src/lib/government-retirement.ts` re-exports every symbol for backward compatibility. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 211,
     title: "Country plugin: Australian vehicle catalog",
     description: "Australian superannuation account types are now defined as a `VehicleCatalog` plugin at `src/lib/countries/australia/vehicles.ts`. The three categories — Super (Accumulation), Super (Pension Phase), and First Home Super Saver — carry descriptions, 7% default ROI, tax-sheltered/deferred classification, reinvest defaults, and employer-match eligibility. No user-visible change.",
