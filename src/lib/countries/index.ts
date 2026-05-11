@@ -42,3 +42,6 @@ registerCountry(CANADA);
 
 import { USA } from "./usa";
 registerCountry(USA);
+
+import { AUSTRALIA } from "./australia";
+registerCountry(AUSTRALIA);

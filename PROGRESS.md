@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 216
-- **Remaining**: 18
+- **Completed**: 217
+- **Remaining**: 17
 - **Last Updated**: 2026-05-11
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -27,6 +27,15 @@
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 217: AUSTRALIA CountryProfile assembly [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/australia/index.ts`: New — exports `AUSTRALIA: CountryProfile` with 8 states/territories (NSW, VIC, QLD, WA, SA, TAS, ACT, NT), `defaultJurisdiction: "NSW"`, filing statuses single/married-de-facto, fiscal year boundary July 1, `taxYearLabel` formatting (e.g., 2025 → "2024/25 FY"), locale `"en-AU"`. Wires all existing AU plugins.
+  - `src/lib/countries/index.ts`: Registered `AUSTRALIA` via `registerCountry`.
+  - `tests/unit/countries/australia/profile.test.ts`: New — 7 tests covering registry resolution, 8 jurisdictions, filing statuses, taxYearBoundary, taxYearLabel formatting, plugin presence, and NSW jurisdiction details.
+- **Tests**: T1: 4324 passed (179 files), Build: passes
+- **Screenshots**: N/A (backend task)
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

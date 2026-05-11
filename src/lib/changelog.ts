@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 217,
+    title: "Country plugin: AUSTRALIA CountryProfile",
+    description: "Australia is now a fully registered country in the app. `src/lib/countries/australia/index.ts` exports `AUSTRALIA: CountryProfile` wiring all existing AU plugins (tax engine, vehicles, government retirement, tax credits, sample profiles, insights). The profile covers 8 states and territories (NSW, VIC, QLD, WA, SA, TAS, ACT, NT), defaulting to NSW, with two filing statuses (Single and Married/De Facto), and an Australian fiscal year boundary of July 1 — expressed via `taxYearLabel` as e.g. "2024/25 FY". Locale is `en-AU`. The country is registered via `registerCountry(AUSTRALIA)` in the central registry.",
+    date: "2026-05-11",
+  },
+  {
     version: 216,
     title: "Country plugin: Australian tax engine",
     description: "Australian tax computation is now a `TaxEngine` plugin at `src/lib/countries/australia/tax-engine.ts`. The engine handles federal brackets, Medicare Levy (with the low-income phase-in zone), the 50% CGT discount on long-term capital gains, super-aware account classification (pension phase tax-free, accumulation 15%, FHSS marginal − 30% offset), and the super preservation-age-60 early-withdrawal rule with FHSS/First-Home carve-outs. New: `TaxResult.breakdown` now surfaces Medicare Levy as its own `{kind: \"social\"}` line alongside `{kind: \"income-tax\"}` for federal tax — previously Medicare was only visible inside the `totalTax` total. The legacy `computeTax`/`getWithdrawalTaxRate` functions and their existing snapshots are unchanged; this is a parallel implementation that the legacy code will delegate to in upcoming tasks. No user-visible change.",
