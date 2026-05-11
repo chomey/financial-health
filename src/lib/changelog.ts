@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 209,
+    title: "Country plugin: USA CountryProfile assembly",
+    description: "The United States now has a fully assembled `CountryProfile` at `src/lib/countries/usa/index.ts`. It wires together all previously built US plugins — tax engine, vehicle catalog, government retirement (Social Security), tax credits, sample profiles, and insights — into a single registry entry. Jurisdictions include all 50 states plus DC, defaulting to California. Four filing statuses (Single, Married Filing Jointly, Married Filing Separately, Head of Household). Calendar tax year (Jan 1 boundary) with `taxYearLabel` returning the plain year string. Locale `en-US`. USA is registered alongside Canada in `src/lib/countries/index.ts` and is immediately retrievable via `getCountry(\"US\")`.",
+    date: "2026-05-11",
+  },
+  {
     version: 208,
     title: "Country plugin: American tax engine",
     description: "Federal + state income tax, long-term capital-gains brackets, withdrawal-tax classification, and early-withdrawal penalty rules for the United States now live behind a `TaxEngine` interface at `src/lib/countries/usa/tax-engine.ts`. US specifics handled inline: the federal standard deduction is subtracted from gross income before applying brackets (not a BPA-style credit), long-term capital gains use their own 0/15/20% bracket table, and states with no income tax produce zero state tax and zero state marginal rate. Results expose a country-agnostic `breakdown` array (Federal Tax + State Tax) alongside the legacy `federalTax`/`provincialStateTax` fields, which stay temporarily for shim compatibility. No user-visible change — verified by 233 comparison tests against the legacy free functions, and the snapshot regression suites stay green.",

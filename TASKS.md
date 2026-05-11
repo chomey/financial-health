@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 208. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 209. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -23,10 +23,6 @@ regenerating snapshots.
 
 **Test convention:** vitest only includes `tests/unit/**/*.test.{ts,tsx}`. Put new
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
-
-### USA plugin (plan tasks 12–19)
-
-- [ ] Task 209: USA CountryProfile assembly — Create `src/lib/countries/usa/index.ts` exporting `USA: CountryProfile` with 50 states + DC from `US_STATES` in `CountryJurisdictionSelector.tsx`, `defaultJurisdiction: "CA"`, four filing statuses, `taxYearLabel(year) => String(year)`, calendar tax year boundary, locale `"en-US"`. Register in `src/lib/countries/index.ts`. [@backend]
 
 ### Australia plugin (plan tasks 20–27)
 

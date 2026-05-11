@@ -8,11 +8,21 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 208
-- **Remaining**: 26
+- **Completed**: 209
+- **Remaining**: 25
 - **Last Updated**: 2026-05-11
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 209: USA CountryProfile assembly [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/usa/index.ts`: New — `USA: CountryProfile` assembling all US plugins (tax engine, vehicles, government retirement, tax credits, sample profiles, insights). 51 jurisdictions (50 states + DC), `defaultJurisdiction: "CA"`, four filing statuses, calendar tax year, locale `"en-US"`.
+  - `src/lib/countries/index.ts`: Registered `USA` alongside `CANADA`.
+  - `src/lib/changelog.ts`: Added version 209 entry.
+  - `tests/unit/countries/usa/profile.test.ts`: New — 9 tests covering metadata, jurisdiction count/contents, defaultJurisdiction, filing statuses, taxYearLabel, taxYearBoundary, plugin wiring, registry lookup.
+- **Tests**: T1: 3972 passed (171 files), Build: passes
+- **Screenshots**: N/A (backend task)
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

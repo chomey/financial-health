@@ -39,3 +39,6 @@ export type {
 // ── Country registrations ────────────────────────────────────────────────────
 import { CANADA } from "./canada";
 registerCountry(CANADA);
+
+import { USA } from "./usa";
+registerCountry(USA);
