@@ -808,6 +808,47 @@ export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [
     fixedAmount: true,
   },
   {
+    name: "Work-Related Expenses Deduction",
+    type: "deduction",
+    jurisdiction: "AU",
+    description:
+      "Deduction for expenses you incur in earning your employment income — uniforms, tools, professional memberships, and home office costs. You can claim up to $300 for work-related items without receipts; amounts above $300 require substantiation. No income cap.",
+    incomeLimits: {},
+    maxAmount: 300,
+  },
+  {
+    name: "Charitable Donations (DGR)",
+    type: "deduction",
+    jurisdiction: "AU",
+    description:
+      "Donations of $2 or more to Deductible Gift Recipients (DGRs) are fully tax-deductible. DGRs include registered charities, disaster relief funds, environmental and cultural organisations, and many educational funds. No income cap — you can generally deduct the full donation against your taxable income.",
+    incomeLimits: {},
+  },
+  {
+    name: "Self-Education Expenses Deduction",
+    type: "deduction",
+    jurisdiction: "AU",
+    description:
+      "Tuition, textbooks, stationery, travel, and other education costs are deductible when the study is directly related to your current employment and maintains or improves the specific skills required for your role. A non-deductible floor of $250 may apply in some cases. No income cap.",
+    incomeLimits: {},
+  },
+  {
+    name: "Rental Property Losses (Negative Gearing)",
+    type: "deduction",
+    jurisdiction: "AU",
+    description:
+      "If your rental property expenses (interest, depreciation, maintenance, management fees) exceed your rental income, the net loss is deductible against your other income — reducing your taxable income dollar-for-dollar. Capital gains tax applies when you eventually sell. No income cap.",
+    incomeLimits: {},
+  },
+  {
+    name: "Income Protection Insurance Deduction",
+    type: "deduction",
+    jurisdiction: "AU",
+    description:
+      "Premiums paid on income protection insurance (also called salary continuance insurance) held outside of super are fully tax-deductible. Payments received under the policy are assessable income. Policies held inside super are not separately deductible — the super fund claims the deduction. No income cap.",
+    incomeLimits: {},
+  },
+  {
     name: "Super (Concessional Contributions)",
     type: "deduction",
     jurisdiction: "AU",

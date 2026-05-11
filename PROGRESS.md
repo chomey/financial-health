@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 212
-- **Remaining**: 22
+- **Completed**: 213
+- **Remaining**: 21
 - **Last Updated**: 2026-05-11
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -19,6 +19,15 @@
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 213: australianTaxCredits catalog [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/australia/tax-credits.ts`: New — `australianTaxCredits: TaxCreditCatalog` with 13 AU entries: LITO, SAPTO, Private Health Insurance Rebate, Franking Credits, Zone Tax Offset, Super Co-contribution, Spouse Super Tax Offset (requiresSpouse), Work-Related Expenses Deduction, Charitable Donations (DGR), Self-Education Expenses Deduction, Rental Property Losses (Negative Gearing), Income Protection Insurance Deduction, Super Concessional Contributions (infoOnly). MLS moved to infoOnly.
+  - `src/lib/tax-credits.ts`: Added 5 new AU deduction entries to `ALL_CREDIT_CATEGORIES`: Work-Related Expenses, Charitable Donations (DGR), Self-Education Expenses, Rental Property Losses (Negative Gearing), Income Protection Insurance.
+  - `tests/unit/countries/australia/tax-credits.test.ts`: New — 20 tests covering getCategories, getCategoriesForFilingStatus, findCategory, amountOptions, phase-out thresholds, infoOnly/requiresSpouse filtering.
+- **Tests**: T1: 4054 passed (175 files), Build: passes
+- **Screenshots**: N/A (backend/data task)
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

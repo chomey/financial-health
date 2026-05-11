@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 213,
+    title: "Country plugin: Australian tax credits catalog",
+    description: "Australian tax credits, offsets, and deductions are now defined as a `TaxCreditCatalog` plugin at `src/lib/countries/australia/tax-credits.ts`. The catalog includes LITO, SAPTO, Private Health Insurance Rebate, Franking Credits, Zone Tax Offset, Super Co-contribution, and Spouse Super Tax Offset (offset entries), plus five new deductions: Work-Related Expenses, Charitable Donations (DGR), Self-Education Expenses, Rental Property Losses (Negative Gearing), and Income Protection Insurance. The same five deductions were also added to the shared `ALL_CREDIT_CATEGORIES` array for consistency. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 212,
     title: "Country plugin: Australian government retirement",
     description: "The Australian Age Pension is now a `GovernmentRetirementPlugin` at `src/lib/countries/australia/government-retirement.ts`. It owns the AU pension constants (single & couple fortnightly rates, eligibility age 67, super preservation age 60), the `AuPensionPreset` type, and the `getAuPensionPresetAmount` / `fortnightlyToMonthly` helpers. `computeMonthly` converts the fortnightly rate to monthly via × 26 / 12, and `presetsFor(\"agePension\")` exposes the none / full-single / full-couple / custom options. The legacy `src/lib/government-retirement.ts` re-exports every symbol for backward compatibility. No user-visible change.",
