@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 214,
+    title: "Country plugin: Australian sample profiles library",
+    description: "Australian sample profiles and quick-starts are now defined at `src/lib/countries/australia/sample-profiles.ts`. Exports `AU_SAMPLE_PROFILES` (three personas: fresh grad in Sydney, mid-career family in Melbourne, pre-retirement in Brisbane), `AU_QUICK_START_PROFILES` (au-renter and au-homeowner), and `australianProfiles: ProfileLibrary`. Profiles use Super (Accumulation), First Home Super Saver, and Brokerage vehicles with realistic AUD amounts and ASX ETF holdings. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 213,
     title: "Country plugin: Australian tax credits catalog",
     description: "Australian tax credits, offsets, and deductions are now defined as a `TaxCreditCatalog` plugin at `src/lib/countries/australia/tax-credits.ts`. The catalog includes LITO, SAPTO, Private Health Insurance Rebate, Franking Credits, Zone Tax Offset, Super Co-contribution, and Spouse Super Tax Offset (offset entries), plus five new deductions: Work-Related Expenses, Charitable Donations (DGR), Self-Education Expenses, Rental Property Losses (Negative Gearing), and Income Protection Insurance. The same five deductions were also added to the shared `ALL_CREDIT_CATEGORIES` array for consistency. No user-visible change.",

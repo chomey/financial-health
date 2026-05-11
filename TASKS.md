@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 213. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 214. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Australia plugin (plan tasks 20–27)
-
-- [ ] Task 214: australianProfiles library — Same pattern with AU sample profiles and AU quick-starts. Tests at `tests/unit/countries/australia/sample-profiles.test.ts`. [@backend]
 
 - [ ] Task 215: australianInsights provider — AU-specific candidates (Super contribution, FHSS, Age Pension). Tests at `tests/unit/countries/australia/insights.test.ts`. [@fullstack]
 
