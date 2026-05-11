@@ -3103,3 +3103,21 @@
   - `tests/unit/countries/types.test.ts`: Removed `registerCountry` import and test that mutated the registry with a stub.
   - `tests/unit/countries/registry.test.ts`: New — 7 tests verifying `COUNTRIES` shape, `getCountry` identity, `getRegisteredCountries` completeness.
 - **Test results**: 180 test files, 4331 tests — all pass.
+## Task 219: Drop legacy TaxResult fields [@fullstack] [OPUS]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/tax-engine.ts`: Removed `federalTax` and `provincialStateTax` from the `TaxResult` interface and made `breakdown` required (was optional). Updated the dispatcher (`computeCanadianTax`, `computeUSTax`, `computeUSCapitalGainsTax`, `computeAUTax`, and the zero-income early return) to populate `breakdown` instead of the legacy fields.
+  - `src/lib/countries/canada/tax-engine.ts`: Removed legacy `federalTax`/`provincialStateTax` from both `computeCanadianTax` return statements.
+  - `src/lib/countries/usa/tax-engine.ts`: Removed legacy `federalTax`/`provincialStateTax` from both `computeAmericanTax` return statements.
+  - `src/lib/countries/australia/tax-engine.ts`: Removed legacy `federalTax`/`provincialStateTax` from both `computeAustralianTax` return statements. Updated header comment.
+  - `src/lib/compute-totals.ts`: Migrated the only `TaxResult` consumer (lines 146–147) — `totalFederalTax` and `totalProvincialStateTax` now derive from `taxResult.breakdown.find(b => b.kind === "income-tax" / "sub-federal")?.amount ?? 0`.
+  - `tests/unit/tax-engine-breakdown.test.ts`: New — 7 tests asserting the dispatcher populates breakdown correctly for CA/US/AU (Federal+Provincial, Federal+State incl. no-tax states, Income Tax+Medicare Levy, AU omits sub-federal). Drove the implementation TDD-style (RED → GREEN).
+  - `tests/unit/tax-engine.test.ts`: Replaced all `result.federalTax` / `result.provincialStateTax` assertions with breakdown reads via local `federalAmount` / `subFederalAmount` helpers. `expectValidResult` now sums the breakdown for the totalTax invariant.
+  - `tests/unit/au-tax-brackets.test.ts`, `tests/unit/au-country-type.test.ts`: Same migration to breakdown reads. The "provincialStateTax is always 0" assertion was replaced with "breakdown omits sub-federal line" for AU.
+  - `tests/unit/countries/{canada,usa,australia}/tax-engine.test.ts`: Updated "matches legacy" comparisons to compare breakdown line amounts instead of `expected.federalTax` / `expected.provincialStateTax`. Removed `result.breakdown!` non-null assertions (now type-safe). Australia gains a `social`-kind comparison line.
+  - `tests/unit/formula-validation.test.ts`: Replaced `taxResult.federalTax + taxResult.provincialStateTax` with `breakdown.reduce(sum)` for the bracket-math invariant; tax-component consistency assertions now derive from breakdown.
+  - `tests/unit/__snapshots__/tax-engine-snapshot.test.ts.snap`: Regenerated 330 snapshots — now show `breakdown[]` instead of `federalTax`/`provincialStateTax`. Spot-checked CA/ON, US/CA, AU/NSW samples — numerical values unchanged, only shape changed.
+  - `src/lib/changelog.ts`: Added version 219 entry.
+- **Tests**: T1: 181 test files, 4338 tests — all pass. Build: passes. T2: `projection-drawdown-tax.spec.ts` — 2/2 pass.
+- **Screenshots**: N/A (interface refactor — no UI change; `TaxExplainerDetails` in `DataFlowArrows.tsx` is a separate type and untouched).
+- **Notes**: AU's `totalTax` includes Medicare Levy via the `social` breakdown line, so `breakdown.reduce(sum)` equals `totalTax` for every country. `compute-totals.ts` continues to bucket Medicare Levy outside `totalFederalTax`/`totalProvincialStateTax` (the only consumer of those buckets is the explainer, which only renders income-tax-kind components) — pre-existing behavior preserved.
