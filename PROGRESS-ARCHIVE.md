@@ -3087,3 +3087,11 @@
 - **Tests**: T1: 4317 passed (178 files), Build: passes
 - **Screenshots**: N/A (backend logic, no UI)
 - **Notes**: Legacy `src/lib/tax-engine.ts` and `src/lib/withdrawal-tax.ts` left untouched on purpose — they become thin shims that delegate to `getCountry("AU").taxEngine.*` in Ralph tasks 222/223. Snapshot regressions stay green because the legacy code path is unchanged. The breakdown's "Medicare Levy" line uses `kind: "social"` (a new value), surfacing what was previously bundled into `totalTax` only.
+## Task 217: AUSTRALIA CountryProfile assembly [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/australia/index.ts`: New — exports `AUSTRALIA: CountryProfile` with 8 states/territories (NSW, VIC, QLD, WA, SA, TAS, ACT, NT), `defaultJurisdiction: "NSW"`, filing statuses single/married-de-facto, fiscal year boundary July 1, `taxYearLabel` formatting (e.g., 2025 → "2024/25 FY"), locale `"en-AU"`. Wires all existing AU plugins.
+  - `src/lib/countries/index.ts`: Registered `AUSTRALIA` via `registerCountry`.
+  - `tests/unit/countries/australia/profile.test.ts`: New — 7 tests covering registry resolution, 8 jurisdictions, filing statuses, taxYearBoundary, taxYearLabel formatting, plugin presence, and NSW jurisdiction details.
+- **Tests**: T1: 4324 passed (179 files), Build: passes
+- **Screenshots**: N/A (backend task)
