@@ -2,17 +2,23 @@
 
 import { createContext, useContext, useMemo } from "react";
 import { CurrencyFormatter, type SupportedCurrency } from "@/lib/currency";
+import { getCountry, type CountryCode } from "@/lib/countries";
 
 const CurrencyContext = createContext<CurrencyFormatter | null>(null);
 
 export function CurrencyProvider({
   currency,
+  country,
   children,
 }: {
   currency: SupportedCurrency;
+  country: CountryCode;
   children: React.ReactNode;
 }) {
-  const fmt = useMemo(() => new CurrencyFormatter(currency), [currency]);
+  const fmt = useMemo(
+    () => new CurrencyFormatter(currency, getCountry(country).locale),
+    [currency, country],
+  );
   return (
     <CurrencyContext.Provider value={fmt}>{children}</CurrencyContext.Provider>
   );

@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 220,
+    title: "Locale threading through CurrencyFormatter",
+    description: "`CurrencyFormatter` in `src/lib/currency.ts` now accepts an optional `locale: Locale` parameter (default `\"en-US\"`). `formatCurrency` and `formatCurrencyCompact` accept and use locale for `Intl.NumberFormat` calls. The `Locale` type has moved from `src/lib/countries/types.ts` to `src/lib/currency.ts` (re-exported from both) to avoid circular imports. `CurrencyContext.tsx` now accepts a `country: CountryCode` prop and derives the formatter locale from `getCountry(country).locale`, ensuring Canadian users get `en-CA`, US users get `en-US`, and Australian users get `en-AU`.",
+    date: "2026-05-11",
+  },
+  {
     version: 219,
     title: "TaxResult: single breakdown[] source of truth",
     description: "The `TaxResult` interface in `src/lib/tax-engine.ts` no longer carries the country-specific `federalTax` and `provincialStateTax` fields. `breakdown` is now required and is the single source of truth for line items — `kind: \"income-tax\"` for the federal/national bracket-based tax, `kind: \"sub-federal\"` for provincial/state tax, and `kind: \"social\"` for Australia's Medicare Levy. Australia's breakdown omits the `sub-federal` line entirely because there is no state income tax. The dispatcher (`computeTax` in `src/lib/tax-engine.ts`) and each country's `tax-engine.ts` (`countries/canada`, `countries/usa`, `countries/australia`) now return only the new shape. The single internal consumer — `compute-totals.ts` — reads federal and sub-federal amounts via `breakdown.find(...)?.amount ?? 0`. Tax-engine snapshots were regenerated (330 entries) and now reflect the breakdown structure with identical numerical values. No user-visible change.",

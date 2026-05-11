@@ -1,4 +1,5 @@
 export type SupportedCurrency = "CAD" | "USD" | "AUD";
+export type Locale = "en-CA" | "en-US" | "en-AU" | "en-GB";
 
 export interface FxRates {
   /** Rate to convert from foreign currency to home currency. Key is "CAD_USD" or "USD_CAD". */
@@ -64,15 +65,16 @@ export function convertToHome(
 export function formatCurrency(
   amount: number,
   currency: SupportedCurrency,
-  opts?: { maximumFractionDigits?: number; showSign?: boolean; homeCurrency?: SupportedCurrency },
+  opts?: { maximumFractionDigits?: number; showSign?: boolean; homeCurrency?: SupportedCurrency; locale?: Locale },
 ): string {
   const maxFrac = opts?.maximumFractionDigits ?? 0;
+  const locale = opts?.locale ?? "en-US";
   const abs = Math.abs(amount);
   const isForeign = opts?.homeCurrency !== undefined && currency !== opts.homeCurrency;
   // Use plain "$" for home currency, full prefix for foreign
   const formatted = isForeign
-    ? new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: maxFrac }).format(abs)
-    : "$" + new Intl.NumberFormat("en-US", { maximumFractionDigits: maxFrac }).format(abs);
+    ? new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: maxFrac }).format(abs)
+    : "$" + new Intl.NumberFormat(locale, { maximumFractionDigits: maxFrac }).format(abs);
   const sign = amount < 0 ? "-" : opts?.showSign && amount > 0 ? "+" : "";
   return `${sign}${formatted}`;
 }
@@ -85,6 +87,7 @@ export function formatCurrencyCompact(
   amount: number,
   currency: SupportedCurrency,
   homeCurrency?: SupportedCurrency,
+  locale?: Locale,
 ): string {
   const abs = Math.abs(amount);
   const sign = amount < 0 ? "-" : "";
@@ -101,11 +104,14 @@ export function formatCurrencyCompact(
  * then use `.compact()` and `.full()` everywhere.
  */
 export class CurrencyFormatter {
-  constructor(public readonly currency: SupportedCurrency) {}
+  constructor(
+    public readonly currency: SupportedCurrency,
+    public readonly locale: Locale = "en-US",
+  ) {}
 
   /** Compact display for chart axes / tight spaces: $1.2M, $55k, $123 */
   compact(amount: number): string {
-    return formatCurrencyCompact(amount, this.currency, this.currency);
+    return formatCurrencyCompact(amount, this.currency, this.currency, this.locale);
   }
 
   /** Full formatted display for tooltips / tables: $1,234,567 */
@@ -114,12 +120,13 @@ export class CurrencyFormatter {
       showSign: opts?.showSign,
       maximumFractionDigits: opts?.decimals,
       homeCurrency: this.currency,
+      locale: this.locale,
     });
   }
 
   /** Format an amount in a specific (possibly foreign) currency: US$5,000 or $5,000 */
   foreign(amount: number, itemCurrency: SupportedCurrency): string {
-    return formatCurrency(amount, itemCurrency, { homeCurrency: this.currency });
+    return formatCurrency(amount, itemCurrency, { homeCurrency: this.currency, locale: this.locale });
   }
 }
 

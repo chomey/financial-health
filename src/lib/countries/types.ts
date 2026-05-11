@@ -10,7 +10,7 @@ import type {
   FinancialState,
 } from "@/lib/financial-types";
 import type { SampleProfile } from "@/lib/sample-profiles";
-import type { SupportedCurrency } from "@/lib/currency";
+import type { SupportedCurrency, Locale } from "@/lib/currency";
 import type { Insight } from "@/lib/insights/types";
 
 export type CountryCode = "CA" | "US" | "AU";
@@ -69,7 +69,7 @@ export interface InsightProvider {
   getCandidates(state: FinancialState): Insight[];
 }
 
-export type Locale = "en-CA" | "en-US" | "en-AU" | "en-GB";
+export type { Locale };
 
 export interface CountryProfile {
   code: CountryCode;

@@ -244,7 +244,7 @@ export default function Home() {
   if (phase === "wizard") {
     return (
       <ModeProvider mode={mode} setMode={setMode}>
-      <CurrencyProvider currency={homeCurrency}>
+      <CurrencyProvider currency={homeCurrency} country={country}>
       <WizardShell
         assets={assets}
         debts={debts}
@@ -470,7 +470,7 @@ export default function Home() {
 
   return (
     <ModeProvider mode={mode} setMode={setMode}>
-    <CurrencyProvider currency={homeCurrency}>
+    <CurrencyProvider currency={homeCurrency} country={country}>
     <DataFlowProvider homeCurrency={homeCurrency}>
     <div className="min-h-screen bg-slate-950 flex flex-col">
       {/* ── Header (sticky) ── */}

@@ -8,6 +8,7 @@ import {
   formatCurrencyCompact,
   getEffectiveFxRates,
   FALLBACK_RATES,
+  CurrencyFormatter,
 } from "@/lib/currency";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
 
@@ -165,6 +166,50 @@ describe("currency", () => {
     it("retains decimal for non-round millions", () => {
       expect(formatCurrencyCompact(1_200_000, "USD", "USD")).toBe("$1.2M");
       expect(formatCurrencyCompact(1_500_000, "CAD", "CAD")).toBe("$1.5M");
+    });
+  });
+
+  describe("locale threading", () => {
+    it("CurrencyFormatter defaults to en-US locale", () => {
+      const fmt = new CurrencyFormatter("USD");
+      expect(fmt.locale).toBe("en-US");
+    });
+
+    it("CurrencyFormatter stores provided locale", () => {
+      const fmt = new CurrencyFormatter("CAD", "en-CA");
+      expect(fmt.locale).toBe("en-CA");
+      const fmtAU = new CurrencyFormatter("AUD", "en-AU");
+      expect(fmtAU.locale).toBe("en-AU");
+    });
+
+    it("CurrencyFormatter.full uses locale for number formatting", () => {
+      const usFmt = new CurrencyFormatter("USD", "en-US");
+      const caFmt = new CurrencyFormatter("CAD", "en-CA");
+      // Both English locales produce identical formatting for these amounts
+      expect(usFmt.full(1234)).toBe("$1,234");
+      expect(caFmt.full(1234)).toBe("$1,234");
+    });
+
+    it("CurrencyFormatter.compact accepts locale without error", () => {
+      const fmt = new CurrencyFormatter("AUD", "en-AU");
+      expect(fmt.compact(1_200_000)).toBe("$1.2M");
+      expect(fmt.compact(55_000)).toBe("$55k");
+    });
+
+    it("CurrencyFormatter.foreign uses locale for foreign currency display", () => {
+      const caFmt = new CurrencyFormatter("CAD", "en-CA");
+      const result = caFmt.foreign(1000, "USD");
+      expect(result).toContain("1,000");
+    });
+
+    it("formatCurrency accepts locale option", () => {
+      expect(formatCurrency(1234, "USD", { locale: "en-US" })).toBe("$1,234");
+      expect(formatCurrency(1234, "CAD", { locale: "en-CA" })).toBe("$1,234");
+    });
+
+    it("formatCurrencyCompact accepts locale without error", () => {
+      expect(formatCurrencyCompact(55_000, "AUD", "AUD", "en-AU")).toBe("$55k");
+      expect(formatCurrencyCompact(1_200_000, "CAD", "CAD", "en-CA")).toBe("$1.2M");
     });
   });
 

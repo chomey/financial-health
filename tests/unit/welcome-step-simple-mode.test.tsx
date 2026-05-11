@@ -19,7 +19,7 @@ function renderWelcome(mode: "simple" | "advanced", country: "CA" | "US" | "AU" 
 
   render(
     <ModeProvider mode={mode} setMode={() => {}}>
-      <CurrencyProvider currency="CAD">
+      <CurrencyProvider currency="CAD" country={country}>
         <WelcomeStep
           country={country}
           jurisdiction="ON"

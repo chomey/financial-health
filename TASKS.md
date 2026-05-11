@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 219. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 220. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Cross-cutting interface changes (plan tasks 28–31)
-
-- [ ] Task 220: Locale threading through CurrencyFormatter — Extend `CurrencyFormatter` constructor in `src/lib/currency.ts` to accept an optional `locale: Locale` (default `"en-US"`). Update `formatCurrency` and `formatCurrencyCompact` to accept and use locale. Update `CurrencyContext.tsx` to pull locale from `getCountry(country).locale` when constructing the formatter. Visual check: CA/US/AU formatting unchanged. [@fullstack]
 
 - [ ] Task 221: Plugin contract tests — Create `tests/unit/countries/contract.test.ts` running shared assertions against every `CountryProfile` in `COUNTRIES`: zero income → zero tax, breakdown sums to totalTax, marginalRate in [0,1], effectiveRate ≤ marginalRate, locale parseable by Intl, defaultJurisdiction in jurisdictions list, defaultFilingStatus in filingStatuses, taxYearLabel non-empty. [@backend] [@qa]
 
