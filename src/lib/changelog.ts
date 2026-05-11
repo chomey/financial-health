@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 211,
+    title: "Country plugin: Australian vehicle catalog",
+    description: "Australian superannuation account types are now defined as a `VehicleCatalog` plugin at `src/lib/countries/australia/vehicles.ts`. The three categories — Super (Accumulation), Super (Pension Phase), and First Home Super Saver — carry descriptions, 7% default ROI, tax-sheltered/deferred classification, reinvest defaults, and employer-match eligibility. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 210,
     title: "Country plugin: Australia tax-tables module",
     description: "Australian federal tax tables and Medicare Levy logic have been extracted from `src/lib/tax-tables.ts` into a dedicated module at `src/lib/countries/australia/tax-tables.ts`. The barrel file (`tax-tables.ts`) re-exports all AU symbols for full backward compatibility. `AU_FEDERAL_BY_YEAR` is now also exported. No user-visible change.",
