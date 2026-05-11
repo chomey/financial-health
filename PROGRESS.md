@@ -12,16 +12,6 @@
 - **Remaining**: 26
 - **Last Updated**: 2026-05-11
 
-## Task 208: americanTaxEngine implementation [@backend] [MATH] [OPUS]
-- **Date**: 2026-05-11
-- **Files**:
-  - `src/lib/countries/usa/tax-engine.ts`: New — `americanTaxEngine` TaxEngine implementing `computeTax`, `getMarginalRate`, `classifyTaxTreatment`, `getWithdrawalTaxRate`, and `getEarlyWithdrawalPenalties` for the US. Federal income tax subtracts the standard deduction from gross income (unlike the BPA-credit treatment for CA). Long-term capital gains use the dedicated `getUSCapitalGainsBrackets` table. States with no income tax (empty bracket arrays) contribute zero state tax and zero state marginal rate. `TaxResult.breakdown` is populated with `{kind: "income-tax", label: "Federal Tax"}` and `{kind: "sub-federal", label: "State Tax"}`. Early-withdrawal penalties mirror the legacy US branch: 10% on 401k/Traditional IRA/403b/457 before 59½ (excluding "Roth" matches), plus a 10% Roth IRA earnings penalty.
-  - `tests/unit/countries/usa/tax-engine.test.ts`: New — 233 tests covering: 6 incomes × 4 states (CA/TX/NY/FL) × 2 years × 3 income types comparison against the legacy free function, breakdown shape and sums, marginal-rate parity, US-specific tax-treatment classification (Roth-priority over 401k/IRA), withdrawal-tax parity for 7 categories × 3 amounts, capital-gains brokerage cost-basis math, and the full early-withdrawal penalty matrix including edge cases (Roth 401k → no penalty, age 59.5 exactly → no penalty).
-  - `src/lib/changelog.ts`: Added version 208 entry.
-- **Tests**: T1: 3961 passed (170 files), Build: passes
-- **Screenshots**: N/A (backend/math task)
-- **Notes**: Legacy `computeTax`/`getEarlyWithdrawalPenalties` in `src/lib/tax-engine.ts` and `src/lib/withdrawal-tax.ts` stay untouched until the shim/cleanup tasks (222/223/233). The snapshot-regression suites pass because the legacy entrypoint still routes through the original functions.
-
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
