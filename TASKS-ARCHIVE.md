@@ -270,3 +270,4 @@
 - [x] Task 212: australianGovernmentRetirement plugin — Age Pension. Move `AU_PENSION_*` constants, `getAuPensionPresetAmount`, `fortnightlyToMonthly` from `src/lib/government-retirement.ts:67-91`. `computeMonthly` returns `agePensionFortnightly × 26 / 12`. Presets `full-single/full-couple/custom`. Tests at `tests/unit/countries/australia/government-retirement.test.ts`. [@backend] [MATH]
 - [x] Task 213: australianTaxCredits catalog — Same pattern with `jurisdiction: "AU"` entries. Tests at `tests/unit/countries/australia/tax-credits.test.ts`. [@backend]
 - [x] Task 214: australianProfiles library — Same pattern with AU sample profiles and AU quick-starts. Tests at `tests/unit/countries/australia/sample-profiles.test.ts`. [@backend]
+- [x] Task 215: australianInsights provider — AU-specific candidates (Super contribution, FHSS, Age Pension). Tests at `tests/unit/countries/australia/insights.test.ts`. [@fullstack]

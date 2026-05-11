@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 214
-- **Remaining**: 20
+- **Completed**: 215
+- **Remaining**: 19
 - **Last Updated**: 2026-05-11
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -23,6 +23,17 @@
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 215: australianInsights provider [@fullstack]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/countries/australia/insights.ts`: New — `australianInsights: InsightProvider` with three AU-specific candidates: `au-no-super` (employment income but no super), `au-fhss` (no property, no FHSS, employment income), `au-age-pension-upcoming` (ages 60–66 approaching Age Pension eligibility at 67)
+  - `tests/unit/countries/australia/insights.test.ts`: New — 18 unit tests covering all three insights, positive/negative cases, country filtering, singular/plural year formatting, and insight shape validation
+  - `tests/e2e/au-insights.spec.ts`: New — T2 Playwright tests verifying insights panel renders for AU young-professional and mid-career-family profiles
+  - `src/lib/changelog.ts`: Added version 215 entry
+- **Tests**: T1: 4090 passed (177 files), T2: 2 passed, Build: passes
+- **Screenshots**: task-215-au-insights-panel-young-professional.png, task-215-au-insights-panel-mid-career-family.png
+- **Notes**: `australianInsights` is a standalone module; integration into the app UI happens in task 217 (AUSTRALIA CountryProfile assembly). Age Pension reminder triggers for ages 60–66 (7 years before eligibility at 67).
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08

@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 215,
+    title: "Country plugin: Australian insights provider",
+    description: "AU-specific insight candidates are now defined as an `InsightProvider` at `src/lib/countries/australia/insights.ts`. The provider generates three candidates from raw `FinancialState`: super setup prompt (employment income but no super account, type `au-super`), First Home Super Saver suggestion (no property, no FHSS account, employment income, type `au-fhss`), and Age Pension upcoming reminder (ages 60–66, type `retirement-income-gap`). Integration into the app UI happens in task 217 when the AUSTRALIA CountryProfile is assembled. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 214,
     title: "Country plugin: Australian sample profiles library",
     description: "Australian sample profiles and quick-starts are now defined at `src/lib/countries/australia/sample-profiles.ts`. Exports `AU_SAMPLE_PROFILES` (three personas: fresh grad in Sydney, mid-career family in Melbourne, pre-retirement in Brisbane), `AU_QUICK_START_PROFILES` (au-renter and au-homeowner), and `australianProfiles: ProfileLibrary`. Profiles use Super (Accumulation), First Home Super Saver, and Brokerage vehicles with realistic AUD amounts and ASX ETF holdings. No user-visible change.",

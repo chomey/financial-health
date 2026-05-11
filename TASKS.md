@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 214. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 215. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -25,8 +25,6 @@ regenerating snapshots.
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
 
 ### Australia plugin (plan tasks 20–27)
-
-- [ ] Task 215: australianInsights provider — AU-specific candidates (Super contribution, FHSS, Age Pension). Tests at `tests/unit/countries/australia/insights.test.ts`. [@fullstack]
 
 - [ ] Task 216: australianTaxEngine implementation — Implement `TaxEngine` for Australia at `src/lib/countries/australia/tax-engine.ts`. Move `computeAUTax` from `src/lib/tax-engine.ts:255-320`, AU branch of `getEarlyWithdrawalPenalties` from `src/lib/withdrawal-tax.ts:139-149`, and AU-specific `super-accumulation`/`super-fhss` arms of `getWithdrawalTaxRate` from `src/lib/withdrawal-tax.ts:211-231`. **NEW:** populate `TaxResult.breakdown` with two entries: `{label: "Income Tax", amount: federalTax, kind: "income-tax"}` and `{label: "Medicare Levy", amount: medicareLevy, kind: "social"}`. Previously Medicare Levy was bundled into totalTax only — this surfaces it. Comparison tests must match `totalTax` exactly. Snapshot regressions must stay green. [@backend] [MATH] [OPUS]
 
