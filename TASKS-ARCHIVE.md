@@ -279,3 +279,5 @@
 - [x] Task 221: Plugin contract tests — Create `tests/unit/countries/contract.test.ts` running shared assertions against every `CountryProfile` in `COUNTRIES`: zero income → zero tax, breakdown sums to totalTax, marginalRate in [0,1], effectiveRate ≤ marginalRate, locale parseable by Intl, defaultJurisdiction in jurisdictions list, defaultFilingStatus in filingStatuses, taxYearLabel non-empty. [@backend] [@qa]
 
 - [x] Task 222: tax-engine.ts shim — Rewrite `src/lib/tax-engine.ts` to a thin shim. Public `computeTax(income, type, country, jurisdiction, year)` and `getMarginalRateForIncome` delegate to `getCountry(country).taxEngine.*`. Keep `IncomeType` and `TaxResult` type exports. Snapshot regressions must stay green. [@backend]
+
+- [x] Task 223: withdrawal-tax.ts shim — Rewrite `src/lib/withdrawal-tax.ts` to delegate `getWithdrawalTaxRate`, `classifyTaxTreatment`, `getEarlyWithdrawalPenalties` to `getCountry(country).taxEngine`. Keep `TaxTreatment`, `WithdrawalTaxResult`, `EarlyWithdrawalPenalty` type exports. Snapshot regressions must stay green. [@backend]

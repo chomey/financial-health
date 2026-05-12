@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 222. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 223. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -27,8 +27,6 @@ test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehi
 ### Consumer migration — library shims (plan tasks 32–36)
 
 - [x] Task 222: tax-engine.ts shim — Rewrite `src/lib/tax-engine.ts` to a thin shim. Public `computeTax(income, type, country, jurisdiction, year)` and `getMarginalRateForIncome` delegate to `getCountry(country).taxEngine.*`. Keep `IncomeType` and `TaxResult` type exports. Snapshot regressions must stay green. [@backend]
-
-- [ ] Task 223: withdrawal-tax.ts shim — Rewrite `src/lib/withdrawal-tax.ts` to delegate `getWithdrawalTaxRate`, `classifyTaxTreatment`, `getEarlyWithdrawalPenalties` to `getCountry(country).taxEngine`. Keep `TaxTreatment`, `WithdrawalTaxResult`, `EarlyWithdrawalPenalty` type exports. Snapshot regressions must stay green. [@backend]
 
 - [ ] Task 224: government-retirement.ts shim — Rewrite `computeMonthlyGovernmentIncome(country, gri)` as `getCountry(country).governmentRetirement.computeMonthly(gri)`. Keep `GovernmentRetirementIncome` type export. [@backend]
 
