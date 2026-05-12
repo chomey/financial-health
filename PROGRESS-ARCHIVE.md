@@ -3170,3 +3170,11 @@
 - **Tests**: T1: 4375 passed (182 files), Build: clean
 - **Screenshots**: N/A (backend task)
 - **Notes**: Circular `import type` dependency (country plugins import types from tax-engine.ts; shim imports getCountry from countries) is type-only and handled safely by TypeScript. All snapshot regressions still green.
+## Task 223: withdrawal-tax.ts shim [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/withdrawal-tax.ts`: Rewrote as thin shim. `getWithdrawalTaxRate` and `getEarlyWithdrawalPenalties` delegate to `getCountry(country).taxEngine`. `classifyTaxTreatment` kept as cross-country keyword matcher (no country context at call sites). `computeTax` import removed. Type exports `TaxTreatment`, `WithdrawalTaxResult`, `EarlyWithdrawalPenalty` preserved.
+  - `tests/unit/withdrawal-tax-shim.test.ts`: New — 18 tests verifying delegation via spies, zero-withdrawal short-circuit, and cross-country keyword classification.
+  - `src/lib/changelog.ts`: Added version entry.
+- **Tests**: T1: 4393 passed (183 files), Build: passes
+- **Screenshots**: N/A (backend task)

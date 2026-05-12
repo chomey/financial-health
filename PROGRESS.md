@@ -18,14 +18,7 @@
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 223: withdrawal-tax.ts shim [@backend]
-- **Date**: 2026-05-11
-- **Files**:
-  - `src/lib/withdrawal-tax.ts`: Rewrote as thin shim. `getWithdrawalTaxRate` and `getEarlyWithdrawalPenalties` delegate to `getCountry(country).taxEngine`. `classifyTaxTreatment` kept as cross-country keyword matcher (no country context at call sites). `computeTax` import removed. Type exports `TaxTreatment`, `WithdrawalTaxResult`, `EarlyWithdrawalPenalty` preserved.
-  - `tests/unit/withdrawal-tax-shim.test.ts`: New — 18 tests verifying delegation via spies, zero-withdrawal short-circuit, and cross-country keyword classification.
-  - `src/lib/changelog.ts`: Added version entry.
-- **Tests**: T1: 4393 passed (183 files), Build: passes
-- **Screenshots**: N/A (backend task)
+<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08
