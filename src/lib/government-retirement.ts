@@ -87,7 +87,11 @@ export {
   type AuPensionPreset,
 } from "@/lib/countries/australia/government-retirement";
 
-import { fortnightlyToMonthly } from "@/lib/countries/australia/government-retirement";
+// ── GovernmentRetirementIncome type ──────────────────────────────────────────
+export type { GovernmentRetirementIncome } from "@/lib/financial-types";
+
+import type { GovernmentRetirementIncome } from "@/lib/financial-types";
+import { getCountry } from "@/lib/countries";
 
 /**
  * Compute total monthly government retirement income for a given country.
@@ -95,17 +99,7 @@ import { fortnightlyToMonthly } from "@/lib/countries/australia/government-retir
  */
 export function computeMonthlyGovernmentIncome(
   country: "CA" | "US" | "AU",
-  gri?: { cppMonthly?: number; oasMonthly?: number; ssMonthly?: number; agePensionFortnightly?: number },
+  gri?: GovernmentRetirementIncome,
 ): number {
-  if (!gri) return 0;
-  switch (country) {
-    case "CA":
-      return (gri.cppMonthly ?? 0) + (gri.oasMonthly ?? 0);
-    case "US":
-      return gri.ssMonthly ?? 0;
-    case "AU":
-      return fortnightlyToMonthly(gri.agePensionFortnightly ?? 0);
-    default:
-      return 0;
-  }
+  return getCountry(country).governmentRetirement.computeMonthly(gri);
 }

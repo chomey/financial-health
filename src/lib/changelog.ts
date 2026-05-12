@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 224,
+    title: "government-retirement.ts becomes a thin shim",
+    description: "`computeMonthlyGovernmentIncome` now delegates to `getCountry(country).governmentRetirement.computeMonthly(gri)` via the country plugin registry. The `GovernmentRetirementIncome` type is re-exported for backward compatibility. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 223,
     title: "withdrawal-tax.ts becomes a thin shim",
     description: "`src/lib/withdrawal-tax.ts` is now a thin shim. `getWithdrawalTaxRate` and `getEarlyWithdrawalPenalties` delegate to `getCountry(country).taxEngine.*` via the country plugin registry. `classifyTaxTreatment` is kept as a cross-country keyword matcher for call sites that lack country context. Type exports `TaxTreatment`, `WithdrawalTaxResult`, and `EarlyWithdrawalPenalty` are preserved. No user-visible change.",
