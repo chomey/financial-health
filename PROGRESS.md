@@ -12,27 +12,6 @@
 - **Remaining**: 9
 - **Last Updated**: 2026-05-11
 
-## Task 225: tax-credits.ts shim [@backend]
-- **Date**: 2026-05-11
-- **Files**:
-  - `src/lib/tax-credits.ts`: Shimmed `getCreditCategories`, `getCreditCategoriesForFilingStatus`, `findCreditCategory` to delegate to `getCountry(jurisdiction).taxCredits.*`. Removed local `resolveCategoryForYear` definition; re-exported from new utility.
-  - `src/lib/tax-credit-resolve.ts`: New — isolated `resolveCategoryForYear` to break circular dependency (country plugins import this; `tax-credits.ts` imports `getCountry` from registry).
-  - `src/lib/countries/canada/tax-credits.ts`: Updated import of `resolveCategoryForYear` to `@/lib/tax-credit-resolve`.
-  - `src/lib/countries/usa/tax-credits.ts`: Same.
-  - `src/lib/countries/australia/tax-credits.ts`: Same.
-  - `tests/unit/tax-credits-shim.test.ts`: New — 13 T1 tests verifying shim delegation matches registry output for CA/US/AU, year overrides, filing-status filtering, spouse-only exclusion, and unknown-credit handling.
-  - `src/lib/changelog.ts`: Added version 225 entry.
-- **Tests**: T1: 4420 passed (185 files), Build: passes
-- **Screenshots**: N/A (backend/data-only task)
-
-<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
-
-<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
-
-<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
-
-<!-- Older entries archived to PROGRESS-ARCHIVE.md -->
-
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
