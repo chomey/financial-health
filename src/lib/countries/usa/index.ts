@@ -82,4 +82,11 @@ export const USA: CountryProfile = {
   taxCredits: americanTaxCredits,
   profiles: usaProfiles,
   insights: americanInsights,
+  wizardRegisteredCategories: ["Roth IRA", "401k"],
+  flowchartWiki: {
+    tipName: "r/personalfinance",
+    linkText: "r/personalfinance",
+    linkUrl: "https://www.reddit.com/r/personalfinance/wiki/commontopics",
+  },
+  regionTaxLabel: "State",
 };

@@ -2,6 +2,7 @@
 
 import { computeTotals, computeMonthlyInvestmentReturns, computeSurplus } from "@/lib/financial-state";
 import type { FinancialState } from "@/lib/financial-types";
+import { getCountry } from "@/lib/countries";
 
 function fmt(n: number): string {
   return "$" + Math.round(Math.abs(n)).toLocaleString();
@@ -18,7 +19,7 @@ export default function TaxSummaryStep({ state }: { state: FinancialState }) {
   const afterTaxMonthly = afterTaxAnnual / 12;
   const country = state.country ?? "CA";
   const federalLabel = "Federal";
-  const provincialLabel = country === "CA" ? "Provincial" : country === "AU" ? "State" : "State";
+  const provincialLabel = getCountry(country).regionTaxLabel;
 
   // Investment returns
   const investmentReturns = computeMonthlyInvestmentReturns(state.assets);

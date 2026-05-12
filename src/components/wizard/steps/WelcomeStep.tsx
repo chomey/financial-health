@@ -1,8 +1,9 @@
 "use client";
 
-import { getProfilesForCountry, getQuickStartProfilesForCountry, type SampleProfile } from "@/lib/sample-profiles";
+import type { SampleProfile } from "@/lib/sample-profiles";
 import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
 import { useModeContext } from "@/lib/ModeContext";
+import { getCountry } from "@/lib/countries";
 
 export default function WelcomeStep({
   country,
@@ -26,9 +27,8 @@ export default function WelcomeStep({
   onEnterOwn: () => void;
 }) {
   const { mode } = useModeContext();
-  const profiles = mode === "simple"
-    ? getQuickStartProfilesForCountry(country)
-    : getProfilesForCountry(country);
+  const countryProfiles = getCountry(country).profiles;
+  const profiles = mode === "simple" ? countryProfiles.quickStarts : countryProfiles.samples;
 
   return (
     <div className="space-y-6">

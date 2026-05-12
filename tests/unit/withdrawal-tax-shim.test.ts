@@ -16,7 +16,7 @@ describe("withdrawal-tax shim delegation", () => {
         taxableAmount: 50000,
       }),
     };
-    spy.mockReturnValue({ taxEngine: mockEngine } as ReturnType<typeof countries.getCountry>);
+    spy.mockReturnValue({ taxEngine: mockEngine } as unknown as ReturnType<typeof countries.getCountry>);
 
     const result = withdrawalTax.getWithdrawalTaxRate("RRSP", "CA", "ON", 50000, 100, undefined, 2025);
 
@@ -52,7 +52,7 @@ describe("withdrawal-tax shim delegation", () => {
       getWithdrawalTaxRate: vi.fn(),
       getEarlyWithdrawalPenalties: vi.fn().mockReturnValue(mockPenalties),
     };
-    spy.mockReturnValue({ taxEngine: mockEngine } as ReturnType<typeof countries.getCountry>);
+    spy.mockReturnValue({ taxEngine: mockEngine } as unknown as ReturnType<typeof countries.getCountry>);
 
     const result = withdrawalTax.getEarlyWithdrawalPenalties(["401k"], 45, "US");
 

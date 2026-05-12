@@ -4,6 +4,17 @@
   This file is automatically updated by Ralph after each task iteration.
   It serves as a running log of what was done and provides context for
 
+## Task 228: CountryJurisdictionSelector reads from registry [@fullstack]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/components/CountryJurisdictionSelector.tsx`: Removed `CA_PROVINCES`, `US_STATES`, `AU_STATES_TERRITORIES`, `DEFAULT_JURISDICTION` constants. Added `getRegisteredCountries`, `getCountry`, `CountryCode` imports. Country buttons now rendered via `getRegisteredCountries().map()` using `profile.flagEmoji` and `profile.shortLabel`. Jurisdiction dropdown uses `getCountry(country).jurisdictions`. Country change handler uses `getCountry(newCountry).defaultJurisdiction`.
+  - `tests/unit/country-jurisdiction-selector.test.tsx`: Removed constant imports; updated `AU_STATES_TERRITORIES.length`/`CA_PROVINCES.length`/`US_STATES.length` assertions to use `getCountry(code).jurisdictions.length`. Rewrote "jurisdiction data" describe block to use `getCountry()` registry; dropped AU alphabetical sort test (plugin orders by prominence).
+  - `src/lib/compute-totals.ts`: Replaced `CA_PROVINCES`/`US_STATES`/`AU_STATES_TERRITORIES` import with `getCountry`. Simplified jurisdiction label lookup to `getCountry(country).jurisdictions.find(...)`.
+  - `src/lib/changelog.ts`: Added version 228 entry.
+- **Tests**: T1: 4443 passed (186 files), T2: 8 passed (country-jurisdiction.spec.ts), Build: passes
+- **Screenshots**: task-228-country-jurisdiction-selector.png
+- **Notes**: AU shortLabel in plugin is "Australia" (was hardcoded "AU" in old button). The existing E2E tests use data-testids not button text, so all 8 pass. AU jurisdictions in plugin are ordered by prominence (NSW, VIC, QLD...) not alphabetically — dropped AU alphabetical sort test accordingly.
+
 ## Task 140: [OPUS] Tax Credits & Deductions data model, filing status selector, and entry UI
 - **Date**: 2026-03-07
 - **Files**: `src/components/TaxCreditEntry.tsx`, `src/lib/tax-credits.ts`, `src/app/page.tsx`, `src/lib/url-state.ts`, `src/lib/financial-state.ts`, `src/lib/changelog.ts`, `src/components/SnapshotDashboard.tsx`, `tests/unit/tax-credits.test.ts`, `tests/unit/changelog.test.ts`, `tests/unit/dashboard-dark-theme.test.ts`, `tests/e2e/tax-credits.spec.ts`

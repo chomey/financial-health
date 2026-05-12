@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import type { GovernmentRetirementIncome } from "@/lib/financial-types";
 import {
   CPP_MAX_MONTHLY,
@@ -19,9 +19,15 @@ import {
   type AuPensionPreset,
 } from "@/lib/government-retirement";
 import HelpTip from "@/components/HelpTip";
+import type { CountryCode } from "@/lib/countries";
 
 interface Props {
-  country: "CA" | "US" | "AU";
+  country: CountryCode;
+  value: GovernmentRetirementIncome | undefined;
+  onChange: (v: GovernmentRetirementIncome | undefined) => void;
+}
+
+interface SubInputProps {
   value: GovernmentRetirementIncome | undefined;
   onChange: (v: GovernmentRetirementIncome | undefined) => void;
 }
@@ -347,17 +353,21 @@ function AgePensionInput({ value, onChange }: { value: GovernmentRetirementIncom
   );
 }
 
-export default function GovernmentRetirementInput({ country, value, onChange }: Props) {
+const INPUT_BY_COUNTRY: Record<CountryCode, ComponentType<SubInputProps>> = {
+  CA: CppOasInput,
+  US: SocialSecurityInput,
+  AU: AgePensionInput,
+};
 
+export default function GovernmentRetirementInput({ country, value, onChange }: Props) {
+  const Input = INPUT_BY_COUNTRY[country];
   return (
     <div data-testid="government-retirement-input">
       <div className="mb-2 flex items-center gap-1.5">
         <label className="block text-sm font-medium text-slate-300">Government Retirement Income</label>
         <HelpTip text="Estimated government benefits you'll receive in retirement. This reduces your FIRE number — you need less from your portfolio when government income covers part of your expenses." />
       </div>
-      {country === "CA" && <CppOasInput value={value} onChange={onChange} />}
-      {country === "US" && <SocialSecurityInput value={value} onChange={onChange} />}
-      {country === "AU" && <AgePensionInput value={value} onChange={onChange} />}
+      <Input value={value} onChange={onChange} />
     </div>
   );
 }

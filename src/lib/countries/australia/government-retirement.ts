@@ -35,6 +35,7 @@ export function fortnightlyToMonthly(fortnightly: number): number {
 }
 
 export const australianGovernmentRetirement: GovernmentRetirementPlugin = {
+  programLabel: "Age Pension",
   computeMonthly(income) {
     if (!income) return 0;
     return fortnightlyToMonthly(income.agePensionFortnightly ?? 0);

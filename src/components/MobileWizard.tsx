@@ -5,6 +5,7 @@ import type { Asset } from "@/components/AssetEntry";
 import type { Debt } from "@/components/DebtEntry";
 import type { IncomeItem } from "@/components/IncomeEntry";
 import type { ExpenseItem } from "@/components/ExpenseEntry";
+import { getCountry } from "@/lib/countries";
 
 export interface WizardResult {
   income: IncomeItem[];
@@ -47,7 +48,7 @@ export function buildWizardResult(country: "CA" | "US" | "AU", data: WizardData)
 
   const assetItems: Asset[] = [];
   if (data.savings > 0) assetItems.push({ id: "w-savings", category: "Savings", amount: data.savings });
-  const [reg1Cat, reg2Cat] = country === "CA" ? ["TFSA", "RRSP"] : ["Roth IRA", "401k"];
+  const [reg1Cat, reg2Cat] = getCountry(country).wizardRegisteredCategories;
   if (data.registered1 > 0) assetItems.push({ id: "w-reg1", category: reg1Cat, amount: data.registered1 });
   if (data.registered2 > 0) assetItems.push({ id: "w-reg2", category: reg2Cat, amount: data.registered2 });
 
@@ -189,7 +190,7 @@ export default function MobileWizard({ country, onComplete, onSkip }: MobileWiza
     onSkip();
   }, [onSkip]);
 
-  const [reg1Label, reg2Label] = country === "CA" ? ["TFSA", "RRSP"] : ["Roth IRA", "401k"];
+  const [reg1Label, reg2Label] = getCountry(country).wizardRegisteredCategories;
   const currentStep = STEPS[step];
   const isLastStep = step === STEPS.length - 1;
 

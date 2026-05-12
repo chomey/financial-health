@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCurrencyCompact, type SupportedCurrency } from "@/lib/currency";
+import { getCountry } from "@/lib/countries";
 
 interface RetirementIncomeSource {
   label: string;
@@ -14,14 +15,6 @@ interface Props {
   monthlyExpenses: number;
   country: "CA" | "US" | "AU";
   homeCurrency: SupportedCurrency;
-}
-
-function getGovernmentLabel(country: "CA" | "US" | "AU"): string {
-  switch (country) {
-    case "CA": return "CPP + OAS";
-    case "US": return "Social Security";
-    case "AU": return "Age Pension";
-  }
 }
 
 export default function RetirementIncomeChart({
@@ -38,7 +31,7 @@ export default function RetirementIncomeChart({
 
   if (monthlyGovernmentIncome > 0) {
     sources.push({
-      label: getGovernmentLabel(country),
+      label: getCountry(country).governmentRetirement.programLabel,
       monthlyAmount: monthlyGovernmentIncome,
       color: "#22d3ee", // cyan
     });

@@ -37,4 +37,11 @@ export const AUSTRALIA: CountryProfile = {
   taxCredits: australianTaxCredits,
   profiles: australianProfiles,
   insights: australianInsights,
+  wizardRegisteredCategories: ["Roth IRA", "401k"],
+  flowchartWiki: {
+    tipName: "r/AusFinance",
+    linkText: "r/personalfinance",
+    linkUrl: "https://www.reddit.com/r/personalfinance/wiki/commontopics",
+  },
+  regionTaxLabel: "State",
 };

@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 229,
+    title: "UI component country switches dispatched via country plugin registry",
+    description: "Migrated `MobileWizard.tsx`, `RetirementIncomeChart.tsx`, `FinancialFlowchart.tsx`, `GovernmentRetirementInput.tsx`, `DataFlowArrows.tsx`, and wizard steps (`ProfileStep`, `WelcomeStep`, `TaxSummaryStep`) away from inline `if (country === \"CA\"/...)` switches. They now read per-country UI data from new `CountryProfile` fields (`wizardRegisteredCategories`, `flowchartWiki`, `regionTaxLabel`) and from `GovernmentRetirementPlugin.programLabel`. `GovernmentRetirementInput` dispatches on country via a Record keyed by `CountryCode`. No user-visible change.",
+    date: "2026-05-12",
+  },
+  {
     version: 228,
     title: "CountryJurisdictionSelector reads from country plugin registry",
     description: "Removed `CA_PROVINCES`, `US_STATES`, `AU_STATES_TERRITORIES`, and `DEFAULT_JURISDICTION` constants from `CountryJurisdictionSelector.tsx`. Country buttons now rendered from `getRegisteredCountries()` using each plugin's `flagEmoji` and `shortLabel`. Jurisdiction dropdown uses `getCountry(country).jurisdictions`. Default jurisdiction on country switch uses `getCountry(newCountry).defaultJurisdiction`. Also migrated `compute-totals.ts` jurisdiction label lookup to `getCountry(country).jurisdictions`. No user-visible change.",

@@ -21,6 +21,7 @@ export const OAS_MAX_MONTHLY_75_PLUS = 800.44;
 export const OAS_CLAWBACK_THRESHOLD = 90_997;
 
 export const canadianGovernmentRetirement: GovernmentRetirementPlugin = {
+  programLabel: "CPP + OAS",
   computeMonthly(income) {
     if (!income) return 0;
     return (income.cppMonthly ?? 0) + (income.oasMonthly ?? 0);

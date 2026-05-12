@@ -42,4 +42,11 @@ export const CANADA: CountryProfile = {
   taxCredits: canadianTaxCredits,
   profiles: canadaProfiles,
   insights: canadianInsights,
+  wizardRegisteredCategories: ["TFSA", "RRSP"],
+  flowchartWiki: {
+    tipName: "r/PersonalFinanceCanada",
+    linkText: "r/PersonalFinanceCanada",
+    linkUrl: "https://www.reddit.com/r/PersonalFinanceCanada/wiki/money-steps",
+  },
+  regionTaxLabel: "Provincial",
 };

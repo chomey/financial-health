@@ -14,6 +14,7 @@ import {
   type StepContext,
 } from "@/lib/flowchart-steps";
 import type { FinancialState } from "@/lib/financial-types";
+import { getCountry } from "@/lib/countries";
 
 // ── Exported pure helpers (used in unit tests) ─────────────────────────────────
 
@@ -509,8 +510,7 @@ export default function FinancialFlowchart({
     setDetailStep(null);
   }, []);
 
-  const caWikiUrl = "https://www.reddit.com/r/PersonalFinanceCanada/wiki/money-steps";
-  const usWikiUrl = "https://www.reddit.com/r/personalfinance/wiki/commontopics";
+  const wiki = getCountry(country).flowchartWiki;
 
   return (
     <div
@@ -522,7 +522,7 @@ export default function FinancialFlowchart({
         <div className="flex items-center gap-2">
           <span className="text-lg" aria-hidden="true">🗺️</span>
           <h3 className="text-sm font-medium text-slate-400">Money Steps</h3>
-          <HelpTip text={`A prioritized financial checklist from the ${country === "CA" ? "r/PersonalFinanceCanada" : country === "AU" ? "r/AusFinance" : "r/personalfinance"} community wiki. Work through steps in order for maximum impact.`} />
+          <HelpTip text={`A prioritized financial checklist from the ${wiki.tipName} community wiki. Work through steps in order for maximum impact.`} />
           <span className="text-lg font-bold text-white ml-1">
             {completed}<span className="text-slate-500">/{total}</span>
           </span>
@@ -622,15 +622,9 @@ export default function FinancialFlowchart({
       <div className="mt-4 border-t border-white/5 pt-3 space-y-1.5">
         <p className="text-[11px] leading-relaxed text-slate-600">
           Based on{" "}
-          {country === "CA" ? (
-            <a href={caWikiUrl} target="_blank" rel="noopener noreferrer" className="text-slate-500 underline underline-offset-2 hover:text-slate-300 transition-colors">
-              r/PersonalFinanceCanada
-            </a>
-          ) : (
-            <a href={usWikiUrl} target="_blank" rel="noopener noreferrer" className="text-slate-500 underline underline-offset-2 hover:text-slate-300 transition-colors">
-              r/personalfinance
-            </a>
-          )}
+          <a href={wiki.linkUrl} target="_blank" rel="noopener noreferrer" className="text-slate-500 underline underline-offset-2 hover:text-slate-300 transition-colors">
+            {wiki.linkText}
+          </a>
           . General guidance only — not financial advice.
         </p>
         <p className="text-[10px] leading-relaxed text-slate-700">

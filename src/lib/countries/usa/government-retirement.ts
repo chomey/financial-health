@@ -17,6 +17,7 @@ export const SS_MAX_AT_67 = 3_822;
 export const SS_MAX_AT_70 = 4_873;
 
 export const americanGovernmentRetirement: GovernmentRetirementPlugin = {
+  programLabel: "Social Security",
   computeMonthly(income) {
     if (!income) return 0;
     return income.ssMonthly ?? 0;

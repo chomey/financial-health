@@ -12,6 +12,32 @@ import React, {
 } from "react";
 import { formatCurrency, type SupportedCurrency } from "@/lib/currency";
 import { getTickerName } from "@/lib/ticker-names";
+import type { CountryCode } from "@/lib/countries";
+
+const renderUSCapitalGainsExplainer = () => (
+  <div className="text-xs text-slate-400 space-y-1">
+    <p>US long-term capital gains have their own bracket rates:</p>
+    <p className="font-medium text-slate-300">0% up to $48,350 · 15% up to $533,400 · 20% above</p>
+  </div>
+);
+
+const CAPITAL_GAINS_EXPLAINERS: Record<CountryCode, (totalCapitalGains: number) => ReactNode> = {
+  CA: (totalCapitalGains) => (
+    <div className="text-xs text-slate-400 space-y-1">
+      <p>Canada taxes capital gains at a reduced inclusion rate:</p>
+      <p className="font-medium text-slate-300">First $250,000: 50% included in income</p>
+      {totalCapitalGains > 250000 && (
+        <p className="font-medium text-slate-300">Above $250,000: 66.67% included</p>
+      )}
+    </div>
+  ),
+  US: renderUSCapitalGainsExplainer,
+  AU: renderUSCapitalGainsExplainer,
+};
+
+function CapitalGainsExplainer({ info }: { info: { country: CountryCode; totalCapitalGains: number } }) {
+  return <>{CAPITAL_GAINS_EXPLAINERS[info.country](info.totalCapitalGains)}</>;
+}
 
 // --- Types ---
 
@@ -706,20 +732,7 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
       {details.hasCapitalGains && details.capitalGainsInfo && (
         <div className="rounded-xl border border-violet-700/40 bg-violet-900/20 p-4" data-testid="tax-capital-gains">
           <p className="text-sm font-semibold text-slate-200 mb-1">Capital Gains</p>
-          {details.capitalGainsInfo.country === "CA" ? (
-            <div className="text-xs text-slate-400 space-y-1">
-              <p>Canada taxes capital gains at a reduced inclusion rate:</p>
-              <p className="font-medium text-slate-300">First $250,000: 50% included in income</p>
-              {details.capitalGainsInfo.totalCapitalGains > 250000 && (
-                <p className="font-medium text-slate-300">Above $250,000: 66.67% included</p>
-              )}
-            </div>
-          ) : (
-            <div className="text-xs text-slate-400 space-y-1">
-              <p>US long-term capital gains have their own bracket rates:</p>
-              <p className="font-medium text-slate-300">0% up to $48,350 · 15% up to $533,400 · 20% above</p>
-            </div>
-          )}
+          <CapitalGainsExplainer info={details.capitalGainsInfo} />
         </div>
       )}
 

@@ -4,8 +4,8 @@ import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelecto
 import FxRateDisplay from "@/components/FxRateDisplay";
 import GovernmentRetirementInput from "@/components/GovernmentRetirementInput";
 import HelpTip from "@/components/HelpTip";
-import { getFilingStatuses } from "@/lib/tax-credits";
 import type { FilingStatus } from "@/lib/tax-credits";
+import { getCountry } from "@/lib/countries";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
 import type { GovernmentRetirementIncome } from "@/lib/financial-types";
 import { useModeContext } from "@/lib/ModeContext";
@@ -201,7 +201,7 @@ export default function ProfileStep({
             className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
             data-testid="wizard-filing-status"
           >
-            {getFilingStatuses(country).map((fs) => (
+            {getCountry(country).filingStatuses.map((fs) => (
               <option key={fs.value} value={fs.value} className="bg-slate-800">
                 {fs.label}
               </option>

@@ -27,6 +27,7 @@ export type {
   TaxCreditCatalog,
   ProfileLibrary,
   InsightProvider,
+  FlowchartWiki,
   Locale,
   WithdrawalTaxArgs,
 } from "./types";

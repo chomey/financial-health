@@ -50,8 +50,15 @@ export interface VehicleCatalog {
 }
 
 export interface GovernmentRetirementPlugin {
+  programLabel: string;
   computeMonthly(income: GovernmentRetirementIncome | undefined): number;
   presetsFor(field: string): { value: string; label: string; amount: number }[];
+}
+
+export interface FlowchartWiki {
+  tipName: string;
+  linkText: string;
+  linkUrl: string;
 }
 
 export interface TaxCreditCatalog {
@@ -90,4 +97,7 @@ export interface CountryProfile {
   taxCredits: TaxCreditCatalog;
   profiles: ProfileLibrary;
   insights: InsightProvider;
+  wizardRegisteredCategories: [string, string];
+  flowchartWiki: FlowchartWiki;
+  regionTaxLabel: string;
 }
