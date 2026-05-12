@@ -1,6 +1,6 @@
 import type { TaxCreditCatalog } from "@/lib/countries/types";
 import type { TaxCreditCategory, FilingStatus } from "@/lib/tax-credits";
-import { resolveCategoryForYear } from "@/lib/tax-credits";
+import { resolveCategoryForYear } from "@/lib/tax-credit-resolve";
 
 const CA_CATEGORIES: TaxCreditCategory[] = [
   {

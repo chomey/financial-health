@@ -1,7 +1,15 @@
 /**
  * Tax credits and deductions data model.
  * Supports per-filing-status income limits for eligibility indicators.
+ *
+ * getCreditCategories, getCreditCategoriesForFilingStatus, findCreditCategory
+ * delegate to the country registry (getCountry(country).taxCredits).
+ * ALL_CREDIT_CATEGORIES is retained for getAllCreditCategories and direct lookups.
  */
+
+import { getCountry } from "@/lib/countries";
+import { resolveCategoryForYear } from "@/lib/tax-credit-resolve";
+export { resolveCategoryForYear };
 
 // Filing status types
 export type USFilingStatus = "single" | "married-jointly" | "married-separately" | "head-of-household";
@@ -148,27 +156,9 @@ export function getIncomeLimitDescription(
   return null;
 }
 
-/**
- * Resolve a credit category for a specific tax year by merging yearOverrides.
- * Returns a new object with overridden fields applied (does not mutate original).
- */
-export function resolveCategoryForYear(category: TaxCreditCategory, year: number): TaxCreditCategory {
-  const overrides = category.yearOverrides?.[year];
-  if (!overrides) return category;
-  return {
-    ...category,
-    ...(overrides.maxAmount !== undefined ? { maxAmount: overrides.maxAmount } : {}),
-    ...(overrides.description !== undefined ? { description: overrides.description } : {}),
-    ...(overrides.incomeLimits !== undefined ? { incomeLimits: overrides.incomeLimits } : {}),
-    ...(overrides.amountOptions !== undefined ? { amountOptions: overrides.amountOptions } : {}),
-  };
-}
-
 /** Get all credit categories for a jurisdiction, excluding info-only entries */
 export function getCreditCategories(jurisdiction: "CA" | "US" | "AU", year: number = 2025): TaxCreditCategory[] {
-  return ALL_CREDIT_CATEGORIES
-    .filter((c) => c.jurisdiction === jurisdiction && !c.infoOnly)
-    .map((c) => resolveCategoryForYear(c, year));
+  return getCountry(jurisdiction).taxCredits.getCategories(year);
 }
 
 /**
@@ -180,16 +170,7 @@ export function getCreditCategoriesForFilingStatus(
   filingStatus: FilingStatus,
   year: number = 2025,
 ): TaxCreditCategory[] {
-  const isMarried =
-    filingStatus === "married-common-law" || filingStatus === "married-jointly" || filingStatus === "married-de-facto";
-  return ALL_CREDIT_CATEGORIES
-    .filter(
-      (c) =>
-        c.jurisdiction === jurisdiction &&
-        !c.infoOnly &&
-        (!c.requiresSpouse || isMarried),
-    )
-    .map((c) => resolveCategoryForYear(c, year));
+  return getCountry(jurisdiction).taxCredits.getCategoriesForFilingStatus(filingStatus, year);
 }
 
 /** Get all credit categories including info-only for a jurisdiction */
@@ -201,10 +182,7 @@ export function getAllCreditCategories(jurisdiction: "CA" | "US" | "AU", year: n
 
 /** Look up a category definition by name and jurisdiction */
 export function findCreditCategory(name: string, jurisdiction: "CA" | "US" | "AU", year: number = 2025): TaxCreditCategory | undefined {
-  const found = ALL_CREDIT_CATEGORIES.find(
-    (c) => c.name === name && c.jurisdiction === jurisdiction,
-  );
-  return found ? resolveCategoryForYear(found, year) : undefined;
+  return getCountry(jurisdiction).taxCredits.findCategory(name, year);
 }
 
 export const ALL_CREDIT_CATEGORIES: TaxCreditCategory[] = [

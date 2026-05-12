@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 223. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 225. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -27,8 +27,6 @@ test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehi
 ### Consumer migration — library shims (plan tasks 32–36)
 
 - [x] Task 222: tax-engine.ts shim — Rewrite `src/lib/tax-engine.ts` to a thin shim. Public `computeTax(income, type, country, jurisdiction, year)` and `getMarginalRateForIncome` delegate to `getCountry(country).taxEngine.*`. Keep `IncomeType` and `TaxResult` type exports. Snapshot regressions must stay green. [@backend]
-
-- [ ] Task 225: tax-credits.ts shim — Rewrite `getCreditCategories(country, year)`, `getCategoriesForFilingStatus`, `findCreditCategory` to delegate via registry. Keep `TaxCreditCategory`, `FilingStatus`, `IncomeLimitThresholds`, `TaxCredit` type exports and the `resolveCategoryForYear` helper. [@backend]
 
 - [ ] Task 226: sample-profiles.ts shim — Rewrite `getProfilesForCountry(country)` and `getQuickStartProfilesForCountry(country)` to delegate to `getCountry(country).profiles`. Keep `SampleProfile` type export. [@backend]
 

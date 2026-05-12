@@ -283,3 +283,5 @@
 - [x] Task 223: withdrawal-tax.ts shim — Rewrite `src/lib/withdrawal-tax.ts` to delegate `getWithdrawalTaxRate`, `classifyTaxTreatment`, `getEarlyWithdrawalPenalties` to `getCountry(country).taxEngine`. Keep `TaxTreatment`, `WithdrawalTaxResult`, `EarlyWithdrawalPenalty` type exports. Snapshot regressions must stay green. [@backend]
 
 - [x] Task 224: government-retirement.ts shim — Rewrite `computeMonthlyGovernmentIncome(country, gri)` as `getCountry(country).governmentRetirement.computeMonthly(gri)`. Keep `GovernmentRetirementIncome` type export. [@backend]
+
+- [x] Task 225: tax-credits.ts shim — Rewrite `getCreditCategories(country, year)`, `getCategoriesForFilingStatus`, `findCreditCategory` to delegate via registry. Keep `TaxCreditCategory`, `FilingStatus`, `IncomeLimitThresholds`, `TaxCredit` type exports and the `resolveCategoryForYear` helper. [@backend]

@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 225,
+    title: "tax-credits.ts becomes a thin shim",
+    description: "`getCreditCategories`, `getCreditCategoriesForFilingStatus`, and `findCreditCategory` now delegate to `getCountry(country).taxCredits.*` via the country plugin registry. A new `src/lib/tax-credit-resolve.ts` utility isolates `resolveCategoryForYear` to prevent a circular import. Type exports `TaxCreditCategory`, `FilingStatus`, `IncomeLimitThresholds`, and `TaxCredit` are preserved. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 224,
     title: "government-retirement.ts becomes a thin shim",
     description: "`computeMonthlyGovernmentIncome` now delegates to `getCountry(country).governmentRetirement.computeMonthly(gri)` via the country plugin registry. The `GovernmentRetirementIncome` type is re-exported for backward compatibility. No user-visible change.",
