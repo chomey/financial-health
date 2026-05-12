@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 221,
+    title: "CountryProfile contract test harness",
+    description: "Added `tests/unit/countries/contract.test.ts` — a cross-country structural test suite that runs 10 assertions against every `CountryProfile` registered in `COUNTRIES`. Assertions cover: homeCurrency in SupportedCurrency, locale is a valid BCP-47 tag, defaultJurisdiction in jurisdictions list, defaultFilingStatus in filingStatuses list, vehicles.categories non-empty, zero income → zero tax, breakdown sums to totalTax (within 1 unit rounding), marginalRate in [0,1], effectiveRate ≤ marginalRate, taxYearLabel non-empty. Tests run against CA, US, and AU via `getRegisteredCountries()` and automatically extend to any future country added to the registry.",
+    date: "2026-05-11",
+  },
+  {
     version: 220,
     title: "Locale threading through CurrencyFormatter",
     description: "`CurrencyFormatter` in `src/lib/currency.ts` now accepts an optional `locale: Locale` parameter (default `\"en-US\"`). `formatCurrency` and `formatCurrencyCompact` accept and use locale for `Intl.NumberFormat` calls. The `Locale` type has moved from `src/lib/countries/types.ts` to `src/lib/currency.ts` (re-exported from both) to avoid circular imports. `CurrencyContext.tsx` now accepts a `country: CountryCode` prop and derives the formatter locale from `getCountry(country).locale`, ensuring Canadian users get `en-CA`, US users get `en-US`, and Australian users get `en-AU`.",

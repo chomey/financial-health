@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 220. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 221. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -23,10 +23,6 @@ regenerating snapshots.
 
 **Test convention:** vitest only includes `tests/unit/**/*.test.{ts,tsx}`. Put new
 test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehicles.test.ts`).
-
-### Cross-cutting interface changes (plan tasks 28–31)
-
-- [ ] Task 221: Plugin contract tests — Create `tests/unit/countries/contract.test.ts` running shared assertions against every `CountryProfile` in `COUNTRIES`: zero income → zero tax, breakdown sums to totalTax, marginalRate in [0,1], effectiveRate ≤ marginalRate, locale parseable by Intl, defaultJurisdiction in jurisdictions list, defaultFilingStatus in filingStatuses, taxYearLabel non-empty. [@backend] [@qa]
 
 ### Consumer migration — library shims (plan tasks 32–36)
 

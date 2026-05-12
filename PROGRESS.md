@@ -8,11 +8,19 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 220
-- **Remaining**: 14
+- **Completed**: 221
+- **Remaining**: 13
 - **Last Updated**: 2026-05-11
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
+
+## Task 221: Plugin contract tests [@backend] [@qa]
+- **Date**: 2026-05-11
+- **Files**:
+  - `tests/unit/countries/contract.test.ts`: New — 30 contract tests covering all 3 countries (CA, US, AU): homeCurrency in SupportedCurrency, locale is valid BCP-47, defaultJurisdiction in jurisdictions list, defaultFilingStatus in filingStatuses list, vehicles.categories non-empty, zero income → zero tax, breakdown sums to totalTax (±1), marginalRate in [0,1], effectiveRate ≤ marginalRate, taxYearLabel non-empty.
+- **Tests**: T1: 4375 passed (182 files), Build: passes
+- **Screenshots**: N/A (backend/test-only task)
+- **Notes**: Pure contract test harness — no source changes. Tests run via `getRegisteredCountries()` so they automatically extend to any future country registered in the `COUNTRIES` map.
 
 ## Task 162: AU tax credits and offsets [@backend] [MATH]
 - **Date**: 2026-03-08
