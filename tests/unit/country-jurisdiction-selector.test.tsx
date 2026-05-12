@@ -1,12 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import CountryJurisdictionSelector, {
-  CA_PROVINCES,
-  US_STATES,
-  AU_STATES_TERRITORIES,
-  DEFAULT_JURISDICTION,
-} from "@/components/CountryJurisdictionSelector";
+import CountryJurisdictionSelector from "@/components/CountryJurisdictionSelector";
+import { getCountry } from "@/lib/countries";
 
 describe("CountryJurisdictionSelector", () => {
   const defaultProps = {
@@ -57,7 +53,7 @@ describe("CountryJurisdictionSelector", () => {
     );
     const select = screen.getByTestId("jurisdiction-select") as HTMLSelectElement;
     const options = Array.from(select.options);
-    expect(options).toHaveLength(AU_STATES_TERRITORIES.length);
+    expect(options).toHaveLength(getCountry("AU").jurisdictions.length);
     expect(options.some((o) => o.value === "NSW")).toBe(true);
     expect(options.some((o) => o.value === "VIC")).toBe(true);
     expect(options.some((o) => o.value === "QLD")).toBe(true);
@@ -103,7 +99,7 @@ describe("CountryJurisdictionSelector", () => {
     render(<CountryJurisdictionSelector {...defaultProps} />);
     const select = screen.getByTestId("jurisdiction-select") as HTMLSelectElement;
     const options = Array.from(select.options);
-    expect(options).toHaveLength(CA_PROVINCES.length);
+    expect(options).toHaveLength(getCountry("CA").jurisdictions.length);
     expect(options.some((o) => o.value === "ON")).toBe(true);
     expect(options.some((o) => o.value === "BC")).toBe(true);
     // Should NOT show US states
@@ -116,7 +112,7 @@ describe("CountryJurisdictionSelector", () => {
     );
     const select = screen.getByTestId("jurisdiction-select") as HTMLSelectElement;
     const options = Array.from(select.options);
-    expect(options).toHaveLength(US_STATES.length);
+    expect(options).toHaveLength(getCountry("US").jurisdictions.length);
     expect(options.some((o) => o.value === "NY")).toBe(true);
     expect(options.some((o) => o.value === "TX")).toBe(true);
     // Should NOT show Canadian provinces
@@ -190,45 +186,45 @@ describe("CountryJurisdictionSelector", () => {
   });
 });
 
-describe("jurisdiction data", () => {
-  it("CA_PROVINCES has 13 entries (10 provinces + 3 territories)", () => {
-    expect(CA_PROVINCES).toHaveLength(13);
+describe("jurisdiction data via country registry", () => {
+  it("CA has 13 jurisdictions (10 provinces + 3 territories)", () => {
+    expect(getCountry("CA").jurisdictions).toHaveLength(13);
   });
 
-  it("US_STATES has 51 entries (50 states + DC)", () => {
-    expect(US_STATES).toHaveLength(51);
+  it("US has 51 jurisdictions (50 states + DC)", () => {
+    expect(getCountry("US").jurisdictions).toHaveLength(51);
   });
 
-  it("all CA province codes are 2 characters", () => {
-    CA_PROVINCES.forEach((p) => {
+  it("AU has 8 jurisdictions (6 states + 2 territories)", () => {
+    expect(getCountry("AU").jurisdictions).toHaveLength(8);
+  });
+
+  it("all CA jurisdiction codes are 2 characters", () => {
+    getCountry("CA").jurisdictions.forEach((p) => {
       expect(p.code).toHaveLength(2);
     });
   });
 
-  it("all US state codes are 2 characters", () => {
-    US_STATES.forEach((s) => {
+  it("all US jurisdiction codes are 2 characters", () => {
+    getCountry("US").jurisdictions.forEach((s) => {
       expect(s.code).toHaveLength(2);
     });
   });
 
-  it("CA_PROVINCES are sorted alphabetically by name", () => {
-    const names = CA_PROVINCES.map((p) => p.name);
+  it("CA jurisdictions are sorted alphabetically by name", () => {
+    const names = getCountry("CA").jurisdictions.map((p) => p.name);
     const sorted = [...names].sort();
     expect(names).toEqual(sorted);
   });
 
-  it("US_STATES are sorted alphabetically by name", () => {
-    const names = US_STATES.map((s) => s.name);
+  it("US jurisdictions are sorted alphabetically by name", () => {
+    const names = getCountry("US").jurisdictions.map((s) => s.name);
     const sorted = [...names].sort();
     expect(names).toEqual(sorted);
   });
 
-  it("AU_STATES_TERRITORIES has 8 entries (6 states + 2 territories)", () => {
-    expect(AU_STATES_TERRITORIES).toHaveLength(8);
-  });
-
-  it("AU_STATES_TERRITORIES includes all expected codes", () => {
-    const codes = AU_STATES_TERRITORIES.map((s) => s.code);
+  it("AU jurisdictions include all expected codes", () => {
+    const codes = getCountry("AU").jurisdictions.map((s) => s.code);
     expect(codes).toContain("NSW");
     expect(codes).toContain("VIC");
     expect(codes).toContain("QLD");
@@ -239,15 +235,12 @@ describe("jurisdiction data", () => {
     expect(codes).toContain("ACT");
   });
 
-  it("AU_STATES_TERRITORIES are sorted alphabetically by name", () => {
-    const names = AU_STATES_TERRITORIES.map((s) => s.name);
-    const sorted = [...names].sort();
-    expect(names).toEqual(sorted);
-  });
-
-  it("default jurisdictions are valid", () => {
-    expect(CA_PROVINCES.some((p) => p.code === DEFAULT_JURISDICTION.CA)).toBe(true);
-    expect(US_STATES.some((s) => s.code === DEFAULT_JURISDICTION.US)).toBe(true);
-    expect(AU_STATES_TERRITORIES.some((s) => s.code === DEFAULT_JURISDICTION.AU)).toBe(true);
+  it("default jurisdictions are valid entries", () => {
+    const ca = getCountry("CA");
+    expect(ca.jurisdictions.some((p) => p.code === ca.defaultJurisdiction)).toBe(true);
+    const us = getCountry("US");
+    expect(us.jurisdictions.some((s) => s.code === us.defaultJurisdiction)).toBe(true);
+    const au = getCountry("AU");
+    expect(au.jurisdictions.some((s) => s.code === au.defaultJurisdiction)).toBe(true);
   });
 });

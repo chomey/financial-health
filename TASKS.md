@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 227. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 228. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -29,8 +29,6 @@ test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehi
 - [x] Task 222: tax-engine.ts shim — Rewrite `src/lib/tax-engine.ts` to a thin shim. Public `computeTax(income, type, country, jurisdiction, year)` and `getMarginalRateForIncome` delegate to `getCountry(country).taxEngine.*`. Keep `IncomeType` and `TaxResult` type exports. Snapshot regressions must stay green. [@backend]
 
 ### Consumer migration — components (plan tasks 37–41)
-
-- [ ] Task 228: CountryJurisdictionSelector reads from registry — In `src/components/CountryJurisdictionSelector.tsx`, remove `CA_PROVINCES`, `US_STATES`, `AU_STATES_TERRITORIES`, `DEFAULT_JURISDICTION` constants. Render country buttons from `getRegisteredCountries()` (using profile.flagEmoji and profile.shortLabel). Render jurisdiction options from `getCountry(country).jurisdictions`. On country change, default jurisdiction comes from `getCountry(newCountry).defaultJurisdiction`. [@fullstack]
 
 - [ ] Task 229: Migrate UI consumers of country switches — Rewrite country-branching code in: `BenchmarkComparisons.tsx`, `DataFlowArrows.tsx`, `FinancialFlowchart.tsx`, `GovernmentRetirementInput.tsx`, `MobileWizard.tsx`, `RetirementIncomeChart.tsx`, `TaxCreditEntry.tsx`, all wizard step files (`ExpensesStep`, `ProfileStep`, `TaxCreditsStep`, `TaxSummaryStep`, `WelcomeStep`), and `WizardShell.tsx`. Replace `if (country === "CA") ... else if (country === "US") ...` with `getCountry(country).{appropriate plugin}` lookups. Keep visible UI text identical. [@fullstack] [OPUS]
 

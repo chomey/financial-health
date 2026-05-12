@@ -3364,3 +3364,12 @@
   - `src/lib/changelog.ts`: Added version 152 entry.
 - **Tests**: T1: 2090 passed (all), T2: 3 passed, Build: passes
 - **Screenshots**: `task-152-tax-credits-applied.png`, `task-152-cash-flow-with-credits.png`
+
+## Task 227: AssetEntry reads from VehicleCatalog [@fullstack]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/components/AssetEntry.tsx`: Added `getRegisteredCountries` import. Deleted 10 hardcoded constants (`CATEGORY_SUGGESTIONS`, `ACCOUNT_TYPE_DESCRIPTIONS`, `CA_ASSET_CATEGORIES`, `US_ASSET_CATEGORIES`, `AU_ASSET_CATEGORIES`, `DEFAULT_ROI`, `EMPLOYER_MATCH_ELIGIBLE`, `INCOME_TAX_ROI_CATEGORIES`, `TAX_SHELTERED_CATEGORIES`, `REINVEST_DEFAULT_CATEGORIES`). Rewrote `getAccountTypeDescription`, `getAllCategorySuggestions`, `getGroupedCategorySuggestions`, `getDefaultRoi`, `getDefaultRoiTaxTreatment`, `shouldShowRoiTaxToggle`, `getDefaultReinvest`, `getAssetCategoryFlag` to delegate to `getRegisteredCountries()` and `c.vehicles.*`. Replaced inline `EMPLOYER_MATCH_ELIGIBLE.has()` with `getRegisteredCountries().some()`. Kept `UNIVERSAL_CATEGORIES` and `UNIVERSAL_DEFAULT_ROI` for generic fallbacks.
+  - Tests updated: asset-type-descriptions, asset-roi, grouped-dropdowns, roi-tax-treatment, roth-401k, au-super-accounts, employer-match.
+  - `src/lib/changelog.ts`: Added version 227 entry.
+- **Tests**: T1: 4444 passed (186 files), T2: 5 passed (asset-vehicle-catalog.spec.ts), Build: passes
+- **Screenshots**: task-227-*.png

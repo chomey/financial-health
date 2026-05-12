@@ -10,7 +10,7 @@ import { getTaxTreatment } from "@/lib/withdrawal-tax";
 import { computeTax } from "@/lib/tax-engine";
 import type { TaxExplainerDetails, TaxBracketSegment } from "@/components/DataFlowArrows";
 import { getCanadianBrackets, getUSBrackets, getAUBrackets, getUSCapitalGainsBrackets, calculateCanadianCapitalGainsInclusion, type BracketTable } from "@/lib/tax-tables";
-import { CA_PROVINCES, US_STATES, AU_STATES_TERRITORIES } from "@/components/CountryJurisdictionSelector";
+import { getCountry } from "@/lib/countries";
 
 export interface InvestmentIncomeAccount {
   label: string;
@@ -213,8 +213,7 @@ export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncom
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
 
   // Get jurisdiction label
-  const jurisdictions = country === "CA" ? CA_PROVINCES : country === "AU" ? AU_STATES_TERRITORIES : US_STATES;
-  const jurisdictionLabel = jurisdictions.find((j) => j.code === jurisdiction)?.name ?? jurisdiction;
+  const jurisdictionLabel = getCountry(country).jurisdictions.find((j) => j.code === jurisdiction)?.name ?? jurisdiction;
   const jurisdictionType = country === "CA" ? "Provincial" as const : country === "AU" ? "State" as const : "State" as const;
 
   // Zero income: return details with empty bracket amounts so the explainer
