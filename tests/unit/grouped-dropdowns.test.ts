@@ -3,8 +3,6 @@ import {
   getAllCategorySuggestions,
   getGroupedCategorySuggestions,
   getAssetCategoryFlag,
-  CA_ASSET_CATEGORIES,
-  US_ASSET_CATEGORIES,
 } from "@/components/AssetEntry";
 import {
   getAllDebtCategorySuggestions,
@@ -129,11 +127,11 @@ describe("FinancialState no longer has region field", () => {
     expect((decoded as Record<string, unknown>)).not.toHaveProperty("region");
   });
 
-  it("CA_ASSET_CATEGORIES and US_ASSET_CATEGORIES sets are correct", () => {
-    expect(CA_ASSET_CATEGORIES.has("TFSA")).toBe(true);
-    expect(CA_ASSET_CATEGORIES.has("401k")).toBe(false);
-    expect(US_ASSET_CATEGORIES.has("401k")).toBe(true);
-    expect(US_ASSET_CATEGORIES.has("TFSA")).toBe(false);
+  it("getAssetCategoryFlag correctly identifies CA and US categories", () => {
+    expect(getAssetCategoryFlag("TFSA")).toBe("🇨🇦");
+    expect(getAssetCategoryFlag("401k")).toBe("🇺🇸");
+    expect(getAssetCategoryFlag("TFSA")).not.toBe("🇺🇸");
+    expect(getAssetCategoryFlag("401k")).not.toBe("🇨🇦");
   });
 
   it("CA_DEBT_CATEGORIES and US_DEBT_CATEGORIES sets are correct", () => {

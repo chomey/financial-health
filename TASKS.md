@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 226. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 227. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -29,8 +29,6 @@ test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehi
 - [x] Task 222: tax-engine.ts shim — Rewrite `src/lib/tax-engine.ts` to a thin shim. Public `computeTax(income, type, country, jurisdiction, year)` and `getMarginalRateForIncome` delegate to `getCountry(country).taxEngine.*`. Keep `IncomeType` and `TaxResult` type exports. Snapshot regressions must stay green. [@backend]
 
 ### Consumer migration — components (plan tasks 37–41)
-
-- [ ] Task 227: AssetEntry reads from VehicleCatalog — In `src/components/AssetEntry.tsx`, replace `CATEGORY_SUGGESTIONS` (line ~38), `ACCOUNT_TYPE_DESCRIPTIONS` (~51), `DEFAULT_ROI` (~107), `EMPLOYER_MATCH_ELIGIBLE` (~134), `INCOME_TAX_ROI_CATEGORIES` (~156), `TAX_SHELTERED_CATEGORIES` (~161), `REINVEST_DEFAULT_CATEGORIES` (~177), CA/US/AU asset category sets (~77-81), `getGroupedCategorySuggestions` (~97), and `getAssetCategoryFlag` (~190) with calls into `getRegisteredCountries()` and `getCountry(code).vehicles`. Delete the now-unused constants. [@fullstack]
 
 - [ ] Task 228: CountryJurisdictionSelector reads from registry — In `src/components/CountryJurisdictionSelector.tsx`, remove `CA_PROVINCES`, `US_STATES`, `AU_STATES_TERRITORIES`, `DEFAULT_JURISDICTION` constants. Render country buttons from `getRegisteredCountries()` (using profile.flagEmoji and profile.shortLabel). Render jurisdiction options from `getCountry(country).jurisdictions`. On country change, default jurisdiction comes from `getCountry(newCountry).defaultJurisdiction`. [@fullstack]
 

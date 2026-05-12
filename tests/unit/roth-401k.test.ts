@@ -4,7 +4,6 @@ import {
   getDefaultRoi,
   shouldShowRoiTaxToggle,
   getAssetCategoryFlag,
-  US_ASSET_CATEGORIES,
 } from "@/components/AssetEntry";
 import { getTaxTreatment } from "@/lib/withdrawal-tax";
 import { computeAllocationByCategory } from "@/components/AssetAllocationChart";
@@ -25,7 +24,7 @@ describe("Roth 401k support", () => {
     });
 
     it("is recognized as a US asset category", () => {
-      expect(US_ASSET_CATEGORIES.has("Roth 401k")).toBe(true);
+      expect(getAssetCategoryFlag("Roth 401k")).toBe("🇺🇸");
     });
 
     it("shows US flag for Roth 401k", () => {

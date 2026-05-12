@@ -3,7 +3,7 @@ import { screen } from "@testing-library/react";
 import { render } from "../test-utils";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import AssetEntry, { getDefaultRoi, DEFAULT_ROI } from "@/components/AssetEntry";
+import AssetEntry, { getDefaultRoi } from "@/components/AssetEntry";
 import type { Asset } from "@/components/AssetEntry";
 import { encodeState, decodeState, toCompact, fromCompact } from "@/lib/url-state";
 import type { FinancialState } from "@/lib/financial-state";

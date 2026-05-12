@@ -287,3 +287,5 @@
 - [x] Task 225: tax-credits.ts shim — Rewrite `getCreditCategories(country, year)`, `getCategoriesForFilingStatus`, `findCreditCategory` to delegate via registry. Keep `TaxCreditCategory`, `FilingStatus`, `IncomeLimitThresholds`, `TaxCredit` type exports and the `resolveCategoryForYear` helper. [@backend]
 
 - [x] Task 226: sample-profiles.ts shim — Rewrite `getProfilesForCountry(country)` and `getQuickStartProfilesForCountry(country)` to delegate to `getCountry(country).profiles`. Keep `SampleProfile` type export. [@backend]
+
+- [x] Task 227: AssetEntry reads from VehicleCatalog — In `src/components/AssetEntry.tsx`, replace `CATEGORY_SUGGESTIONS`, `ACCOUNT_TYPE_DESCRIPTIONS`, `DEFAULT_ROI`, `EMPLOYER_MATCH_ELIGIBLE`, `INCOME_TAX_ROI_CATEGORIES`, `TAX_SHELTERED_CATEGORIES`, `REINVEST_DEFAULT_CATEGORIES`, CA/US/AU asset category sets, `getGroupedCategorySuggestions`, and `getAssetCategoryFlag` with calls into `getRegisteredCountries()` and `getCountry(code).vehicles`. Delete the now-unused constants. [@fullstack]

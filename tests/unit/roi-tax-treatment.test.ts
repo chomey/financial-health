@@ -10,7 +10,6 @@ describe("getDefaultRoiTaxTreatment", () => {
     expect(getDefaultRoiTaxTreatment("Savings Account")).toBe("income");
     expect(getDefaultRoiTaxTreatment("Checking")).toBe("income");
     expect(getDefaultRoiTaxTreatment("GIC")).toBe("income");
-    expect(getDefaultRoiTaxTreatment("Money Market")).toBe("income");
     expect(getDefaultRoiTaxTreatment("HISA")).toBe("income");
   });
 

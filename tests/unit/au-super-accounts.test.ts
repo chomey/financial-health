@@ -3,12 +3,10 @@ import {
   getAllCategorySuggestions,
   getGroupedCategorySuggestions,
   getDefaultRoi,
-  AU_ASSET_CATEGORIES,
   getAssetCategoryFlag,
-  EMPLOYER_MATCH_ELIGIBLE,
   getDefaultReinvest,
-  DEFAULT_ROI,
 } from "@/components/AssetEntry";
+import { getRegisteredCountries } from "@/lib/countries";
 import { shouldShowRoiTaxToggle } from "@/components/AssetEntry";
 import {
   getTaxTreatment,
@@ -43,9 +41,9 @@ describe("AU superannuation account types", () => {
       expect(auGroup!.items).toEqual(AU_SUPER_ACCOUNTS);
     });
 
-    it("has AU asset categories set", () => {
+    it("all AU super accounts show 🇦🇺 flag via getAssetCategoryFlag", () => {
       for (const account of AU_SUPER_ACCOUNTS) {
-        expect(AU_ASSET_CATEGORIES.has(account)).toBe(true);
+        expect(getAssetCategoryFlag(account)).toBe("🇦🇺");
       }
     });
 
@@ -72,15 +70,15 @@ describe("AU superannuation account types", () => {
 
   describe("employer match eligibility", () => {
     it("Super (Accumulation) is eligible for employer match", () => {
-      expect(EMPLOYER_MATCH_ELIGIBLE.has("Super (Accumulation)")).toBe(true);
+      expect(getRegisteredCountries().some((c) => c.vehicles.isEmployerMatchEligible("Super (Accumulation)"))).toBe(true);
     });
 
     it("Super (Pension Phase) is not eligible for employer match", () => {
-      expect(EMPLOYER_MATCH_ELIGIBLE.has("Super (Pension Phase)")).toBe(false);
+      expect(getRegisteredCountries().some((c) => c.vehicles.isEmployerMatchEligible("Super (Pension Phase)"))).toBe(false);
     });
 
     it("First Home Super Saver is not eligible for employer match", () => {
-      expect(EMPLOYER_MATCH_ELIGIBLE.has("First Home Super Saver")).toBe(false);
+      expect(getRegisteredCountries().some((c) => c.vehicles.isEmployerMatchEligible("First Home Super Saver"))).toBe(false);
     });
   });
 

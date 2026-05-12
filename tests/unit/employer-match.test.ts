@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { computeEmployerMatchMonthly, EMPLOYER_MATCH_ELIGIBLE } from "@/components/AssetEntry";
+import { computeEmployerMatchMonthly } from "@/components/AssetEntry";
+import { getRegisteredCountries } from "@/lib/countries";
 import { generateInsights } from "@/lib/insights";
 
 describe("computeEmployerMatchMonthly", () => {
@@ -55,29 +56,32 @@ describe("computeEmployerMatchMonthly", () => {
   });
 });
 
-describe("EMPLOYER_MATCH_ELIGIBLE", () => {
+describe("employer match eligibility via country plugins", () => {
+  const isEligible = (category: string) =>
+    getRegisteredCountries().some((c) => c.vehicles.isEmployerMatchEligible(category));
+
   it("includes RRSP", () => {
-    expect(EMPLOYER_MATCH_ELIGIBLE.has("RRSP")).toBe(true);
+    expect(isEligible("RRSP")).toBe(true);
   });
 
   it("includes 401k", () => {
-    expect(EMPLOYER_MATCH_ELIGIBLE.has("401k")).toBe(true);
+    expect(isEligible("401k")).toBe(true);
   });
 
   it("includes Roth 401k", () => {
-    expect(EMPLOYER_MATCH_ELIGIBLE.has("Roth 401k")).toBe(true);
+    expect(isEligible("Roth 401k")).toBe(true);
   });
 
   it("does NOT include TFSA", () => {
-    expect(EMPLOYER_MATCH_ELIGIBLE.has("TFSA")).toBe(false);
+    expect(isEligible("TFSA")).toBe(false);
   });
 
   it("does NOT include IRA", () => {
-    expect(EMPLOYER_MATCH_ELIGIBLE.has("IRA")).toBe(false);
+    expect(isEligible("IRA")).toBe(false);
   });
 
   it("does NOT include Roth IRA", () => {
-    expect(EMPLOYER_MATCH_ELIGIBLE.has("Roth IRA")).toBe(false);
+    expect(isEligible("Roth IRA")).toBe(false);
   });
 });
 

@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 227,
+    title: "AssetEntry reads category data from country plugin registry",
+    description: "Removed 10 hardcoded constant arrays/sets from `AssetEntry.tsx` (`CATEGORY_SUGGESTIONS`, `ACCOUNT_TYPE_DESCRIPTIONS`, `DEFAULT_ROI`, `EMPLOYER_MATCH_ELIGIBLE`, and associated category sets). All functions (`getAccountTypeDescription`, `getDefaultRoi`, `getGroupedCategorySuggestions`, `getAssetCategoryFlag`, `getDefaultRoiTaxTreatment`, `shouldShowRoiTaxToggle`, `getDefaultReinvest`) now delegate to `getRegisteredCountries()` and `c.vehicles.*`. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 226,
     title: "sample-profiles.ts becomes a thin shim",
     description: "`getProfilesForCountry` and `getQuickStartProfilesForCountry` now delegate to `getCountry(country).profiles.samples` and `.quickStarts` via the country plugin registry. The `SampleProfile` type export is preserved. All inline profile arrays have been removed from the file. No user-visible change.",

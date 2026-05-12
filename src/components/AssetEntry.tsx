@@ -11,6 +11,7 @@ import { generateId, useEditState, useAddNew } from "@/lib/entry-hooks";
 import HelpTip from "@/components/HelpTip";
 import { useModeContext } from "@/lib/ModeContext";
 import type { Property } from "@/components/PropertyEntry";
+import { getRegisteredCountries } from "@/lib/countries";
 
 /** ID for the single property created in simple mode */
 export const SIMPLE_HOME_ID = "_simple_home";
@@ -34,58 +35,21 @@ export interface Asset {
   reinvestReturns?: boolean; // true = compound returns back into balance, false = pay out as income
 }
 
-const CATEGORY_SUGGESTIONS = {
-  CA: ["TFSA", "RRSP", "RESP", "FHSA", "LIRA"],
-  US: ["401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA"],
-  AU: ["Super (Accumulation)", "Super (Pension Phase)", "First Home Super Saver"],
-  universal: [
-    "Savings",
-    "Checking",
-    "Brokerage",
-    "Vehicle",
-    "Other",
-  ],
-};
+const UNIVERSAL_CATEGORIES = ["Savings", "Checking", "Brokerage", "Vehicle", "Other"];
 
-/** Short descriptions for known account types */
-export const ACCOUNT_TYPE_DESCRIPTIONS: Record<string, string> = {
-  // Canada
-  "TFSA": "Tax-free growth and withdrawals, $7,000/yr contribution room",
-  "RRSP": "Tax-deferred, contributions reduce taxable income, taxed on withdrawal",
-  "RESP": "Education savings, government grants up to $7,200 lifetime",
-  "FHSA": "Tax-free first home savings, $8,000/yr limit",
-  "LIRA": "Locked-in retirement, from employer pension, withdrawal restrictions",
-  // USA
-  "401k": "Employer-sponsored, pre-tax contributions, taxed on withdrawal",
-  "Roth 401k": "After-tax contributions, tax-free growth and withdrawals",
-  "IRA": "Individual retirement, pre-tax, $7,000/yr limit",
-  "Roth IRA": "After-tax, tax-free growth, $7,000/yr limit, income limits apply",
-  "529": "Education savings, tax-free for qualified expenses",
-  "HSA": "Triple tax advantage for medical expenses, $4,300/yr single",
-  // Australia
-  "Super (Accumulation)": "Employer contributions + salary sacrifice, 15% tax on earnings, preserved until age 60",
-  "Super (Pension Phase)": "Tax-free earnings and withdrawals after 60",
-  "First Home Super Saver": "Withdraw up to $50,000 of voluntary super contributions for first home",
-};
-
-/** Get the description for a known account type */
+/** Get the description for a known account type from country vehicle plugins */
 export function getAccountTypeDescription(category: string): string | undefined {
-  return ACCOUNT_TYPE_DESCRIPTIONS[category];
+  for (const c of getRegisteredCountries()) {
+    const desc = c.vehicles.getDescription(category);
+    if (desc !== undefined) return desc;
+  }
+  return undefined;
 }
-
-/** Set of CA-specific asset category names */
-export const CA_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.CA);
-/** Set of US-specific asset category names */
-export const US_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.US);
-/** Set of AU-specific asset category names */
-export const AU_ASSET_CATEGORIES = new Set(CATEGORY_SUGGESTIONS.AU);
 
 export function getAllCategorySuggestions(): string[] {
   return [
-    ...CATEGORY_SUGGESTIONS.CA,
-    ...CATEGORY_SUGGESTIONS.US,
-    ...CATEGORY_SUGGESTIONS.AU,
-    ...CATEGORY_SUGGESTIONS.universal,
+    ...getRegisteredCountries().flatMap((c) => c.vehicles.categories),
+    ...UNIVERSAL_CATEGORIES,
   ];
 }
 
@@ -96,44 +60,29 @@ export interface SuggestionGroup {
 
 export function getGroupedCategorySuggestions(): SuggestionGroup[] {
   return [
-    { label: "🇨🇦 Canada", items: CATEGORY_SUGGESTIONS.CA },
-    { label: "🇺🇸 USA", items: CATEGORY_SUGGESTIONS.US },
-    { label: "🇦🇺 Australia", items: CATEGORY_SUGGESTIONS.AU },
-    { label: "General", items: CATEGORY_SUGGESTIONS.universal },
+    ...getRegisteredCountries().map((c) => ({
+      label: `${c.flagEmoji} ${c.shortLabel}`,
+      items: c.vehicles.categories,
+    })),
+    { label: "General", items: UNIVERSAL_CATEGORIES },
   ];
 }
 
-/** Smart ROI defaults by account type (annual %) */
-export const DEFAULT_ROI: Record<string, number> = {
-  "401k": 7,
-  "Roth 401k": 7,
-  "IRA": 7,
-  "Roth IRA": 7,
-  "TFSA": 5,
-  "RRSP": 5,
-  "RESP": 5,
-  "FHSA": 5,
-  "LIRA": 5,
-  "Super (Accumulation)": 7,
-  "Super (Pension Phase)": 7,
-  "First Home Super Saver": 7,
+const UNIVERSAL_DEFAULT_ROI: Record<string, number> = {
   "Savings": 2,
   "Savings Account": 2,
   "Checking": 0.5,
   "Brokerage": 7,
-  "529": 6,
-  "HSA": 6,
 };
 
 /** Get the suggested ROI for a category, or undefined if none */
 export function getDefaultRoi(category: string): number | undefined {
-  return DEFAULT_ROI[category];
+  for (const c of getRegisteredCountries()) {
+    const roi = c.vehicles.getDefaultRoi(category);
+    if (roi !== undefined) return roi;
+  }
+  return UNIVERSAL_DEFAULT_ROI[category];
 }
-
-/** Employer-sponsored registered accounts eligible for employer match */
-export const EMPLOYER_MATCH_ELIGIBLE = new Set([
-  "RRSP", "401k", "Roth 401k", "Super (Accumulation)",
-]);
 
 /**
  * Compute monthly employer match contribution.
@@ -152,45 +101,27 @@ export function computeEmployerMatchMonthly(
   return Math.min(matchOnContrib, monthlyCap);
 }
 
-/** Categories whose ROI is taxed as interest income (not capital gains) by default */
-const INCOME_TAX_ROI_CATEGORIES = new Set([
-  "Savings", "Savings Account", "Checking", "GIC", "Money Market", "HISA",
-]);
-
-/** Tax-sheltered accounts where ROI is tax-free — toggle should be hidden */
-const TAX_SHELTERED_CATEGORIES = new Set([
-  "TFSA", "Roth IRA", "Roth 401k", "FHSA", "HSA",
-  "Super (Pension Phase)",
-]);
-
 /** Get the default ROI tax treatment for a category */
 export function getDefaultRoiTaxTreatment(category: string): RoiTaxTreatment {
-  return INCOME_TAX_ROI_CATEGORIES.has(category) ? "income" : "capital-gains";
+  return getRegisteredCountries().some((c) => c.vehicles.isIncomeTaxRoi(category)) ? "income" : "capital-gains";
 }
 
 /** Whether the ROI tax treatment toggle should be shown for a category */
 export function shouldShowRoiTaxToggle(category: string, taxTreatmentOverride?: TaxTreatment): boolean {
-  return !TAX_SHELTERED_CATEGORIES.has(category) && getTaxTreatment(category, taxTreatmentOverride) !== "tax-free";
+  const isTaxSheltered = getRegisteredCountries().some((c) => c.vehicles.isTaxSheltered(category));
+  return !isTaxSheltered && getTaxTreatment(category, taxTreatmentOverride) !== "tax-free";
 }
-
-/** Categories that default to reinvesting returns (compound within the account) */
-const REINVEST_DEFAULT_CATEGORIES = new Set([
-  "401k", "Roth 401k", "IRA", "Roth IRA", "529", "HSA",
-  "TFSA", "RRSP", "RESP", "FHSA", "LIRA",
-  "Super (Accumulation)", "Super (Pension Phase)", "First Home Super Saver",
-  "Brokerage",
-]);
 
 /** Get the default reinvest-returns setting for a category */
 export function getDefaultReinvest(category: string): boolean {
-  return REINVEST_DEFAULT_CATEGORIES.has(category);
+  return getRegisteredCountries().some((c) => c.vehicles.isReinvestDefault(category));
 }
 
 /** Returns a flag emoji if the category is region-specific, or empty string */
 export function getAssetCategoryFlag(category: string): string {
-  if (CA_ASSET_CATEGORIES.has(category)) return "🇨🇦";
-  if (US_ASSET_CATEGORIES.has(category)) return "🇺🇸";
-  if (AU_ASSET_CATEGORIES.has(category)) return "🇦🇺";
+  for (const c of getRegisteredCountries()) {
+    if (c.vehicles.categories.includes(category)) return c.vehicles.flagEmoji;
+  }
   return "";
 }
 
@@ -800,7 +731,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 )}
 
                 {/* Employer match — only for eligible registered accounts */}
-                {EMPLOYER_MATCH_ELIGIBLE.has(asset.category) && !isComputed && (() => {
+                {getRegisteredCountries().some((c) => c.vehicles.isEmployerMatchEligible(asset.category)) && !isComputed && (() => {
                   const hasPct = asset.employerMatchPct !== undefined && asset.employerMatchPct > 0;
                   const hasCap = asset.employerMatchCap !== undefined && asset.employerMatchCap > 0;
                   const monthlyMatch = (hasPct && hasCap && asset.monthlyContribution)
