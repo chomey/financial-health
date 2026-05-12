@@ -3178,3 +3178,11 @@
   - `src/lib/changelog.ts`: Added version entry.
 - **Tests**: T1: 4393 passed (183 files), Build: passes
 - **Screenshots**: N/A (backend task)
+## Task 224: government-retirement.ts shim [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/government-retirement.ts`: Rewrote `computeMonthlyGovernmentIncome` to delegate to `getCountry(country).governmentRetirement.computeMonthly(gri)`. Added `GovernmentRetirementIncome` type re-export from `@/lib/financial-types`. Removed the now-unused direct `fortnightlyToMonthly` import.
+  - `tests/unit/government-retirement-shim.test.ts`: New — 12 tests covering CA, US, AU delegation; undefined/empty gri edge cases; parity with country plugin directly; and type re-export compile check.
+  - `src/lib/changelog.ts`: Added version 224 entry.
+- **Tests**: T1: 4406 passed (184 files), Build: passes
+- **Screenshots**: N/A (backend task)
