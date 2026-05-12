@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 222,
+    title: "tax-engine.ts becomes a thin shim",
+    description: "`src/lib/tax-engine.ts` is now a thin shim. `computeTax` and `getMarginalRateForIncome` delegate to `getCountry(country).taxEngine.*` via the country plugin registry. All per-country computation logic has moved to the individual country plugins (`countries/canada/tax-engine.ts`, `countries/usa/tax-engine.ts`, `countries/australia/tax-engine.ts`). Public `IncomeType` and `TaxResult` type exports are preserved for backward compatibility. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 221,
     title: "CountryProfile contract test harness",
     description: "Added `tests/unit/countries/contract.test.ts` — a cross-country structural test suite that runs 10 assertions against every `CountryProfile` registered in `COUNTRIES`. Assertions cover: homeCurrency in SupportedCurrency, locale is a valid BCP-47 tag, defaultJurisdiction in jurisdictions list, defaultFilingStatus in filingStatuses list, vehicles.categories non-empty, zero income → zero tax, breakdown sums to totalTax (within 1 unit rounding), marginalRate in [0,1], effectiveRate ≤ marginalRate, taxYearLabel non-empty. Tests run against CA, US, and AU via `getRegisteredCountries()` and automatically extend to any future country added to the registry.",
