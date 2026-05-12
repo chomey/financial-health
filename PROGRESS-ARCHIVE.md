@@ -3163,3 +3163,10 @@
 - **Tests**: T1: 4375 passed (182 files), Build: passes
 - **Screenshots**: N/A (backend/test-only task)
 - **Notes**: Pure contract test harness — no source changes. Tests run via `getRegisteredCountries()` so they automatically extend to any future country registered in the `COUNTRIES` map.
+## Task 222: tax-engine.ts shim [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/tax-engine.ts`: Rewritten as thin shim — delegates `computeTax` and `getMarginalRateForIncome` to `getCountry(country).taxEngine.*`. Removed all per-country computation logic. Kept `IncomeType` and `TaxResult` type exports.
+- **Tests**: T1: 4375 passed (182 files), Build: clean
+- **Screenshots**: N/A (backend task)
+- **Notes**: Circular `import type` dependency (country plugins import types from tax-engine.ts; shim imports getCountry from countries) is type-only and handled safely by TypeScript. All snapshot regressions still green.
