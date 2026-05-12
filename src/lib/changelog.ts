@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 226,
+    title: "sample-profiles.ts becomes a thin shim",
+    description: "`getProfilesForCountry` and `getQuickStartProfilesForCountry` now delegate to `getCountry(country).profiles.samples` and `.quickStarts` via the country plugin registry. The `SampleProfile` type export is preserved. All inline profile arrays have been removed from the file. No user-visible change.",
+    date: "2026-05-11",
+  },
+  {
     version: 225,
     title: "tax-credits.ts becomes a thin shim",
     description: "`getCreditCategories`, `getCreditCategoriesForFilingStatus`, and `findCreditCategory` now delegate to `getCountry(country).taxCredits.*` via the country plugin registry. A new `src/lib/tax-credit-resolve.ts` utility isolates `resolveCategoryForYear` to prevent a circular import. Type exports `TaxCreditCategory`, `FilingStatus`, `IncomeLimitThresholds`, and `TaxCredit` are preserved. No user-visible change.",

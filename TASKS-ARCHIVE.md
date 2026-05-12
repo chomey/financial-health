@@ -285,3 +285,5 @@
 - [x] Task 224: government-retirement.ts shim — Rewrite `computeMonthlyGovernmentIncome(country, gri)` as `getCountry(country).governmentRetirement.computeMonthly(gri)`. Keep `GovernmentRetirementIncome` type export. [@backend]
 
 - [x] Task 225: tax-credits.ts shim — Rewrite `getCreditCategories(country, year)`, `getCategoriesForFilingStatus`, `findCreditCategory` to delegate via registry. Keep `TaxCreditCategory`, `FilingStatus`, `IncomeLimitThresholds`, `TaxCredit` type exports and the `resolveCategoryForYear` helper. [@backend]
+
+- [x] Task 226: sample-profiles.ts shim — Rewrite `getProfilesForCountry(country)` and `getQuickStartProfilesForCountry(country)` to delegate to `getCountry(country).profiles`. Keep `SampleProfile` type export. [@backend]

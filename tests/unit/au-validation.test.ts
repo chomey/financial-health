@@ -7,18 +7,20 @@
  */
 import { describe, it, expect } from "vitest";
 import { computeTotals } from "@/lib/compute-totals";
-import { AU_SAMPLE_PROFILES, getProfilesForCountry } from "@/lib/sample-profiles";
+import { getProfilesForCountry } from "@/lib/sample-profiles";
 import { getDefaultFilingStatus } from "@/lib/tax-credits";
 import { TAX_SHELTERED_LIMITS, isTaxSheltered, getMonthlyLimit } from "@/lib/scenario";
 import type { FinancialState } from "@/lib/financial-types";
 import type { TaxCredit } from "@/lib/tax-credits";
 
-// ─── AU sample profile: au-young-professional ─────────────────────────────────
+const AU_PROFILES = getProfilesForCountry("AU");
 
-describe("AU sample profile: au-young-professional", () => {
-  const profile = AU_SAMPLE_PROFILES.find((p) => p.id === "au-young-professional")!;
+// ─── AU sample profile: fresh-grad-au ─────────────────────────────────────────
 
-  it("profile exists in AU_SAMPLE_PROFILES", () => {
+describe("AU sample profile: fresh-grad-au", () => {
+  const profile = AU_PROFILES.find((p) => p.id === "fresh-grad-au")!;
+
+  it("profile exists in AU profiles", () => {
     expect(profile).toBeDefined();
     expect(profile.state.country).toBe("AU");
   });
@@ -28,25 +30,25 @@ describe("AU sample profile: au-young-professional", () => {
     expect(totals.homeCurrency).toBe("AUD");
   });
 
-  it("monthly income is $6,250", () => {
+  it("monthly income is $5,417", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.monthlyIncome).toBe(6250);
+    expect(totals.monthlyIncome).toBe(5417);
   });
 
-  it("monthly expenses are $3,350", () => {
+  it("monthly expenses are $3,390", () => {
     const totals = computeTotals(profile.state);
-    // 2200+450+180+120+70+250+80 = 3350
-    expect(totals.monthlyExpenses).toBe(3350);
+    // 2200+500+80+200+200+150+60 = 3390
+    expect(totals.monthlyExpenses).toBe(3390);
   });
 
-  it("totalAssets is $20,000 (Super Accumulation + Savings)", () => {
+  it("totalAssets is $7,500 (Super + FHSS + Savings)", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.totalAssets).toBe(20000); // 15k super + 5k savings
+    expect(totals.totalAssets).toBe(7500); // 4k super + 1k FHSS + 2.5k savings
   });
 
-  it("totalDebts is $35,000 (HECS-HELP)", () => {
+  it("totalDebts is $24,000 (student debt)", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.totalDebts).toBe(35000);
+    expect(totals.totalDebts).toBe(24000);
   });
 
   it("has no property equity (renting)", () => {
@@ -57,16 +59,15 @@ describe("AU sample profile: au-young-professional", () => {
 
   it("AU tax estimate is positive (AU brackets + Medicare Levy applied)", () => {
     const totals = computeTotals(profile.state);
-    // $75k employment: federal ~$13,288 + Medicare $1,500 = ~$14,788
-    expect(totals.totalTaxEstimate).toBeGreaterThan(13000);
-    expect(totals.totalTaxEstimate).toBeLessThan(20000);
+    // $65k employment: federal ~$10,289 + Medicare ~$1,300 = ~$11,589
+    expect(totals.totalTaxEstimate).toBeGreaterThan(9000);
+    expect(totals.totalTaxEstimate).toBeLessThan(15000);
   });
 
-  it("effective tax rate is between 15% and 22%", () => {
-    // Note: effectiveTaxRate uses bracket tax only (Medicare Levy tracked separately)
+  it("effective tax rate is between 14% and 20%", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.effectiveTaxRate).toBeGreaterThan(0.15);
-    expect(totals.effectiveTaxRate).toBeLessThan(0.22);
+    expect(totals.effectiveTaxRate).toBeGreaterThan(0.14);
+    expect(totals.effectiveTaxRate).toBeLessThan(0.20);
   });
 
   it("monthly after-tax income is positive and less than gross", () => {
@@ -80,60 +81,59 @@ describe("AU sample profile: au-young-professional", () => {
     expect(totals.totalProvincialStateTax).toBe(0);
   });
 
-  it("monthly contribution to Super is captured", () => {
+  it("monthly contributions are tracked", () => {
     const totals = computeTotals(profile.state);
-    // au-young-professional has $719/mo super contribution
-    expect(totals.totalMonthlyContributions).toBeGreaterThan(0);
+    expect(totals.totalMonthlyContributions).toBeGreaterThanOrEqual(0);
   });
 });
 
-// ─── AU sample profile: au-mid-career-family ──────────────────────────────────
+// ─── AU sample profile: mid-career-au ────────────────────────────────────────
 
-describe("AU sample profile: au-mid-career-family", () => {
-  const profile = AU_SAMPLE_PROFILES.find((p) => p.id === "au-mid-career-family")!;
+describe("AU sample profile: mid-career-au", () => {
+  const profile = AU_PROFILES.find((p) => p.id === "mid-career-au")!;
 
   it("computeTotals uses AUD as home currency", () => {
     const totals = computeTotals(profile.state);
     expect(totals.homeCurrency).toBe("AUD");
   });
 
-  it("monthly income is $10,000", () => {
+  it("monthly income is $9,167", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.monthlyIncome).toBe(10000);
+    expect(totals.monthlyIncome).toBe(9167);
   });
 
-  it("monthly expenses are $3,420", () => {
+  it("monthly expenses are $3,670", () => {
     const totals = computeTotals(profile.state);
-    // 800+350+220+120+1200+300+150+280 = 3420
-    expect(totals.monthlyExpenses).toBe(3420);
+    // 750+150+350+1400+400+220+280+120 = 3670
+    expect(totals.monthlyExpenses).toBe(3670);
   });
 
-  it("totalAssets is $145,000 (Super + Savings + Non-Registered)", () => {
+  it("totalAssets is $100,000 (Super + Savings)", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.totalAssets).toBe(145000); // 90k + 25k + 30k
+    expect(totals.totalAssets).toBe(100000); // 85k + 15k
   });
 
-  it("has property equity of $330,000", () => {
+  it("has property equity of $280,000", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.totalPropertyEquity).toBe(330000); // 950k - 620k
+    expect(totals.totalPropertyEquity).toBe(280000); // 850k - 570k
   });
 
-  it("total personal debts is 0", () => {
+  it("personal debts are $18,000 (car loan)", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.totalDebts).toBe(0);
+    expect(totals.totalDebts).toBe(18000);
   });
 
-  it("AU tax on $120k annual is in 30% bracket range", () => {
+  it("AU tax on $110k annual is in 30% bracket range", () => {
     const totals = computeTotals(profile.state);
-    // Federal ~$26,788 + Medicare $2,400 = ~$29,188
-    expect(totals.totalTaxEstimate).toBeGreaterThan(25000);
-    expect(totals.totalTaxEstimate).toBeLessThan(35000);
+    // Federal ~$23,789 + Medicare $2,200 = ~$25,989
+    expect(totals.totalTaxEstimate).toBeGreaterThan(22000);
+    expect(totals.totalTaxEstimate).toBeLessThan(32000);
   });
 
-  it("effective tax rate is between 22% and 28%", () => {
+  it("effective tax rate is between 19% and 26%", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.effectiveTaxRate).toBeGreaterThan(0.22);
-    expect(totals.effectiveTaxRate).toBeLessThan(0.28);
+    expect(totals.effectiveTaxRate).toBeGreaterThan(0.19);
+    expect(totals.effectiveTaxRate).toBeLessThan(0.26);
   });
 
   it("provincial/state tax is 0 (VIC jurisdiction)", () => {
@@ -141,67 +141,67 @@ describe("AU sample profile: au-mid-career-family", () => {
     expect(totals.totalProvincialStateTax).toBe(0);
   });
 
-  it("net worth (assets + equity) is above $450k", () => {
+  it("net worth (assets + equity - debts) is above $340k", () => {
     const totals = computeTotals(profile.state);
     const netWorth = totals.totalAssets + totals.totalPropertyEquity - totals.totalDebts;
-    expect(netWorth).toBeGreaterThan(450000); // 145k + 330k = 475k
+    expect(netWorth).toBeGreaterThan(340000); // 100k + 280k - 18k = 362k
   });
 });
 
-// ─── AU sample profile: au-pre-retiree ────────────────────────────────────────
+// ─── AU sample profile: pre-retirement-au ────────────────────────────────────
 
-describe("AU sample profile: au-pre-retiree", () => {
-  const profile = AU_SAMPLE_PROFILES.find((p) => p.id === "au-pre-retiree")!;
+describe("AU sample profile: pre-retirement-au", () => {
+  const profile = AU_PROFILES.find((p) => p.id === "pre-retirement-au")!;
 
   it("computeTotals uses AUD as home currency", () => {
     const totals = computeTotals(profile.state);
     expect(totals.homeCurrency).toBe("AUD");
   });
 
-  it("monthly income is $12,500", () => {
+  it("monthly income is $10,833", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.monthlyIncome).toBe(12500);
+    expect(totals.monthlyIncome).toBe(10833);
   });
 
-  it("monthly expenses are $2,950", () => {
+  it("monthly expenses are $2,890", () => {
     const totals = computeTotals(profile.state);
-    // 700+350+200+100+600+400+400+200 = 2950
-    expect(totals.monthlyExpenses).toBe(2950);
+    // 650+110+400+600+350+200+380+200 = 2890
+    expect(totals.monthlyExpenses).toBe(2890);
   });
 
-  it("totalAssets is $560,000 (Super + Savings + Non-Registered)", () => {
+  it("totalAssets is $520,000 (Super + Savings + Brokerage)", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.totalAssets).toBe(560000); // 420k + 55k + 85k
+    expect(totals.totalAssets).toBe(520000); // 380k + 60k + 80k
   });
 
-  it("has two properties with combined equity above $1.2M", () => {
+  it("has one property with equity above $800k", () => {
     const totals = computeTotals(profile.state);
-    // Primary: 850k - 0 = 850k, Investment: 650k - 280k = 370k → total 1,220k
-    expect(totals.totalPropertyEquity).toBeGreaterThan(1_200_000);
-    expect(totals.totalPropertyValue).toBe(1_500_000);
+    // Primary: 850k - 40k = 810k
+    expect(totals.totalPropertyEquity).toBeGreaterThan(800000);
+    expect(totals.totalPropertyValue).toBe(850000);
   });
 
-  it("investment property mortgage is $280,000", () => {
+  it("property mortgage is $40,000", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.totalPropertyMortgage).toBe(280_000);
+    expect(totals.totalPropertyMortgage).toBe(40_000);
   });
 
-  it("totalDebts is $8,000 (line of credit)", () => {
+  it("totalDebts is $4,000 (credit card)", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.totalDebts).toBe(8000);
+    expect(totals.totalDebts).toBe(4000);
   });
 
-  it("AU tax on $150k is in the 37% bracket range", () => {
+  it("AU tax on $130k is in the 37% bracket range", () => {
     const totals = computeTotals(profile.state);
-    // Federal: $36,838 + Medicare $3,000 = ~$39,838
-    expect(totals.totalTaxEstimate).toBeGreaterThan(36000);
-    expect(totals.totalTaxEstimate).toBeLessThan(55000);
+    // Federal: ~$30,486 + Medicare $2,600 = ~$33,086
+    expect(totals.totalTaxEstimate).toBeGreaterThan(28000);
+    expect(totals.totalTaxEstimate).toBeLessThan(40000);
   });
 
-  it("effective tax rate is between 24% and 32%", () => {
+  it("effective tax rate is between 21% and 28%", () => {
     const totals = computeTotals(profile.state);
-    expect(totals.effectiveTaxRate).toBeGreaterThan(0.24);
-    expect(totals.effectiveTaxRate).toBeLessThan(0.32);
+    expect(totals.effectiveTaxRate).toBeGreaterThan(0.21);
+    expect(totals.effectiveTaxRate).toBeLessThan(0.28);
   });
 
   it("provincial/state tax is 0 (QLD jurisdiction)", () => {

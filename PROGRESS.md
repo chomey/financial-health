@@ -8,9 +8,21 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 225
-- **Remaining**: 9
+- **Completed**: 226
+- **Remaining**: 8
 - **Last Updated**: 2026-05-11
+
+## Task 226: sample-profiles.ts shim [@backend]
+- **Date**: 2026-05-11
+- **Files**:
+  - `src/lib/sample-profiles.ts`: Rewritten as shim — `getProfilesForCountry` delegates to `getCountry(country).profiles.samples`, `getQuickStartProfilesForCountry` delegates to `getCountry(country).profiles.quickStarts`. Removed all inline profile arrays. `SampleProfile` type export preserved.
+  - `tests/unit/sample-profiles.test.ts`: Updated to use `getProfilesForCountry`/`getQuickStartProfilesForCountry` instead of removed direct array exports. AU tests updated to match plugin profile IDs (`fresh-grad-au`, `mid-career-au`, `pre-retirement-au`).
+  - `tests/unit/au-url-state.test.ts`: Updated to use `getProfilesForCountry("AU")`, new profile IDs, and corrected specific values.
+  - `tests/unit/au-validation.test.ts`: Updated to use `getProfilesForCountry("AU")`, new profile IDs, corrected expected values (income/expense/asset totals and tax ranges) for the plugin profiles.
+  - `tests/unit/welcome-step-simple-mode.test.tsx`: Removed `QUICK_START_*` array imports; switched to `getQuickStartProfilesForCountry` calls.
+  - `src/lib/changelog.ts`: Added version 226 entry.
+- **Tests**: T1: 4423 passed (185 files), Build: passes
+- **Screenshots**: N/A (backend task)
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 

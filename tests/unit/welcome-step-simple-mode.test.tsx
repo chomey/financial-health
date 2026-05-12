@@ -4,9 +4,6 @@ import React from "react";
 import {
   getQuickStartProfilesForCountry,
   getProfilesForCountry,
-  QUICK_START_CA_PROFILES,
-  QUICK_START_US_PROFILES,
-  QUICK_START_AU_PROFILES,
 } from "@/lib/sample-profiles";
 import { ModeProvider } from "@/lib/ModeContext";
 import WelcomeStep from "@/components/wizard/steps/WelcomeStep";
@@ -43,20 +40,20 @@ function renderWelcome(mode: "simple" | "advanced", country: "CA" | "US" | "AU" 
 describe("getQuickStartProfilesForCountry", () => {
   it("returns CA quick-start profiles for CA", () => {
     const profiles = getQuickStartProfilesForCountry("CA");
-    expect(profiles).toBe(QUICK_START_CA_PROFILES);
     expect(profiles).toHaveLength(2);
+    expect(profiles[0].state.country).toBe("CA");
   });
 
   it("returns US quick-start profiles for US", () => {
     const profiles = getQuickStartProfilesForCountry("US");
-    expect(profiles).toBe(QUICK_START_US_PROFILES);
     expect(profiles).toHaveLength(2);
+    expect(profiles[0].state.country).toBe("US");
   });
 
   it("returns AU quick-start profiles for AU", () => {
     const profiles = getQuickStartProfilesForCountry("AU");
-    expect(profiles).toBe(QUICK_START_AU_PROFILES);
     expect(profiles).toHaveLength(2);
+    expect(profiles[0].state.country).toBe("AU");
   });
 
   it("CA quick-start profiles have expected IDs", () => {
@@ -97,14 +94,14 @@ describe("getQuickStartProfilesForCountry", () => {
   });
 
   it("homeowner profiles include _simple_home property", () => {
-    const caHomeowner = QUICK_START_CA_PROFILES.find((p) => p.id === "ca-homeowner")!;
+    const caHomeowner = getQuickStartProfilesForCountry("CA").find((p) => p.id === "ca-homeowner")!;
     expect(caHomeowner.state.properties).toHaveLength(1);
     expect(caHomeowner.state.properties[0].id).toBe("_simple_home");
 
-    const usHomeowner = QUICK_START_US_PROFILES.find((p) => p.id === "us-homeowner")!;
+    const usHomeowner = getQuickStartProfilesForCountry("US").find((p) => p.id === "us-homeowner")!;
     expect(usHomeowner.state.properties[0].id).toBe("_simple_home");
 
-    const auHomeowner = QUICK_START_AU_PROFILES.find((p) => p.id === "au-homeowner")!;
+    const auHomeowner = getQuickStartProfilesForCountry("AU").find((p) => p.id === "au-homeowner")!;
     expect(auHomeowner.state.properties[0].id).toBe("_simple_home");
   });
 
@@ -158,7 +155,7 @@ describe("WelcomeStep — simple mode", () => {
   it("clicking a quick-start profile calls loadProfile with correct data", () => {
     const { loadProfile, onProfileLoaded } = renderWelcome("simple");
     fireEvent.click(screen.getByTestId("sample-profile-ca-renter"));
-    expect(loadProfile).toHaveBeenCalledWith(QUICK_START_CA_PROFILES[0]);
+    expect(loadProfile).toHaveBeenCalledWith(getQuickStartProfilesForCountry("CA")[0]);
     expect(onProfileLoaded).toHaveBeenCalled();
   });
 
