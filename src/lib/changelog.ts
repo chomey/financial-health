@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 230,
+    title: "Library-side consumers dispatch through the country plugin registry",
+    description: "Migrated remaining `country === \"CA\"/\"US\"/\"AU\"` switches in `compute-totals.ts`, `required-minimum-distributions.ts`, `benchmarks.ts`, and `flowchart-steps.ts` to `getCountry(country).*` lookups. Added four plugin surfaces: `TaxEngine.computeBracketSegments` (federal/regional bracket render with country-specific capital-gains handling), a per-country `rmd` rule (CA RRIF, US RMD, AU no-op), a per-country `benchmarks` data block (age-group medians + national average + source attribution), and a per-country `flowchartSteps.build` adapter. Also migrated `financial-state.ts`, `projections.ts`, and `runway-simulation.ts` from deprecated free-function shims to direct `taxEngine` calls. The `COUNTRIES` registry uses property getters so cycle-induced module-load ordering can no longer snapshot `undefined`. No user-visible change.",
+    date: "2026-05-12",
+  },
+  {
     version: 229,
     title: "UI component country switches dispatched via country plugin registry",
     description: "Migrated `MobileWizard.tsx`, `RetirementIncomeChart.tsx`, `FinancialFlowchart.tsx`, `GovernmentRetirementInput.tsx`, `DataFlowArrows.tsx`, and wizard steps (`ProfileStep`, `WelcomeStep`, `TaxSummaryStep`) away from inline `if (country === \"CA\"/...)` switches. They now read per-country UI data from new `CountryProfile` fields (`wizardRegisteredCategories`, `flowchartWiki`, `regionTaxLabel`) and from `GovernmentRetirementPlugin.programLabel`. `GovernmentRetirementInput` dispatches on country via a Record keyed by `CountryCode`. No user-visible change.",

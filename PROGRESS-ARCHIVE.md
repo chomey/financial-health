@@ -3384,3 +3384,30 @@
   - `src/lib/changelog.ts`: Added version 227 entry.
 - **Tests**: T1: 4444 passed (186 files), T2: 5 passed (asset-vehicle-catalog.spec.ts), Build: passes
 - **Screenshots**: task-227-*.png
+
+## Task 229: Migrate UI consumers of country switches [@fullstack] [OPUS]
+- **Date**: 2026-05-12
+- **Files**:
+  - `src/lib/countries/types.ts`: Added `FlowchartWiki` type. Added `programLabel: string` to `GovernmentRetirementPlugin`. Added `wizardRegisteredCategories: [string, string]`, `flowchartWiki: FlowchartWiki`, `regionTaxLabel: string` to `CountryProfile`.
+  - `src/lib/countries/index.ts`: Re-export `FlowchartWiki` type.
+  - `src/lib/countries/canada/government-retirement.ts`: `programLabel: "CPP + OAS"`.
+  - `src/lib/countries/usa/government-retirement.ts`: `programLabel: "Social Security"`.
+  - `src/lib/countries/australia/government-retirement.ts`: `programLabel: "Age Pension"`.
+  - `src/lib/countries/canada/index.ts`: `wizardRegisteredCategories: ["TFSA", "RRSP"]`, `flowchartWiki: r/PersonalFinanceCanada` (tip/link/URL), `regionTaxLabel: "Provincial"`.
+  - `src/lib/countries/usa/index.ts`: `wizardRegisteredCategories: ["Roth IRA", "401k"]`, `flowchartWiki: r/personalfinance`, `regionTaxLabel: "State"`.
+  - `src/lib/countries/australia/index.ts`: `wizardRegisteredCategories: ["Roth IRA", "401k"]` (preserves pre-refactor fallthrough), `flowchartWiki: tipName=r/AusFinance, linkText=r/personalfinance, linkUrl=us-link` (preserves the pre-refactor inconsistency between help tip and visible link), `regionTaxLabel: "State"`.
+  - `src/components/MobileWizard.tsx`: `country === "CA" ? [...] : [...]` replaced with `getCountry(country).wizardRegisteredCategories` for both `reg1Cat/reg2Cat` and `reg1Label/reg2Label`.
+  - `src/components/RetirementIncomeChart.tsx`: Deleted local `getGovernmentLabel` switch. Source label now reads `getCountry(country).governmentRetirement.programLabel`.
+  - `src/components/FinancialFlowchart.tsx`: Replaced inline `country === "CA"/"AU"` HelpTip ternary and link ternary with `getCountry(country).flowchartWiki.{tipName,linkText,linkUrl}` lookups. Removed local `caWikiUrl`/`usWikiUrl` consts.
+  - `src/components/GovernmentRetirementInput.tsx`: Replaced three `country === "..."` conditional render branches with a `Record<CountryCode, ComponentType<SubInputProps>>` lookup.
+  - `src/components/wizard/steps/ProfileStep.tsx`: Dropped `getFilingStatuses` import. Filing-status dropdown now iterates `getCountry(country).filingStatuses`.
+  - `src/components/wizard/steps/WelcomeStep.tsx`: Dropped `getProfilesForCountry`/`getQuickStartProfilesForCountry` imports. Reads `getCountry(country).profiles.{samples,quickStarts}` directly.
+  - `src/components/wizard/steps/TaxSummaryStep.tsx`: `country === "CA" ? "Provincial" : ...` replaced with `getCountry(country).regionTaxLabel`.
+  - `src/components/DataFlowArrows.tsx`: Extracted capital-gains explainer into a `Record<CountryCode, fn>` keyed dispatch and a tiny `CapitalGainsExplainer` component. AU maps to the US explainer to preserve current UI.
+  - `tests/unit/countries/profile-ui-fields.test.ts` (new): 13 tests covering the new fields per country.
+  - `tests/unit/withdrawal-tax-shim.test.ts`: Updated mock casts.
+  - `tests/e2e/task-229-registry-migration.spec.ts` (new): 3 verification tests.
+  - `src/lib/changelog.ts`: Added version 229 entry.
+- **Tests**: T1 + T2 green; snapshot regression green; build clean.
+- **Screenshots**: `task-229-dashboard-ca.png`, `task-229-flowchart-ca.png`, `task-229-wizard-tax-summary-ca.png`.
+- **Notes**: AU keeps pre-refactor visible text intentionally.

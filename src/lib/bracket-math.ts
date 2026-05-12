@@ -49,3 +49,27 @@ export function getMarginalRate(taxableIncome: number, table: BracketTable): num
   const last = table.brackets[table.brackets.length - 1];
   return last?.rate ?? 0;
 }
+
+/**
+ * Walk the brackets and return per-bracket segments with the amount and tax
+ * that falls inside each one. Used to render the tax-explainer visualisation.
+ * Pass `taxableIncome: 0` to get a reference rendering (all amounts zero).
+ */
+export function buildBracketSegments(
+  taxableIncome: number,
+  table: BracketTable,
+): { min: number; max: number; rate: number; amountInBracket: number; taxInBracket: number }[] {
+  return table.brackets.map((bracket) => {
+    if (taxableIncome <= bracket.min) {
+      return { min: bracket.min, max: bracket.max, rate: bracket.rate, amountInBracket: 0, taxInBracket: 0 };
+    }
+    const amountInBracket = Math.min(taxableIncome, bracket.max) - bracket.min;
+    return {
+      min: bracket.min,
+      max: bracket.max,
+      rate: bracket.rate,
+      amountInBracket,
+      taxInBracket: amountInBracket * bracket.rate,
+    };
+  });
+}

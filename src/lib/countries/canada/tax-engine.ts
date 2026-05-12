@@ -10,8 +10,8 @@
  * 222/223) that delegate here via `getCountry("CA").taxEngine.*`.
  */
 
-import { calculateProgressiveTax, getMarginalRate } from "@/lib/bracket-math";
-import type { TaxEngine, WithdrawalTaxArgs } from "@/lib/countries/types";
+import { buildBracketSegments, calculateProgressiveTax, getMarginalRate } from "@/lib/bracket-math";
+import type { BracketSegmentArgs, BracketSegmentResult, TaxEngine, WithdrawalTaxArgs } from "@/lib/countries/types";
 import type { IncomeType, TaxResult } from "@/lib/tax-engine";
 import type {
   EarlyWithdrawalPenalty,
@@ -167,6 +167,22 @@ function getCanadianEarlyWithdrawalPenalties(
   return penalties;
 }
 
+function computeCanadianBracketSegments(args: BracketSegmentArgs): BracketSegmentResult {
+  const { jurisdiction, year, grossAnnualIncome, capGainsTotal } = args;
+  const { federal, provincial } = getCanadianBrackets(jurisdiction, year);
+  const otherIncome = grossAnnualIncome - capGainsTotal;
+  const taxableIncome =
+    grossAnnualIncome > 0
+      ? otherIncome + (capGainsTotal > 0 ? calculateCanadianCapitalGainsInclusion(capGainsTotal) : 0)
+      : 0;
+  return {
+    federalBrackets: buildBracketSegments(taxableIncome, federal),
+    regionalBrackets: buildBracketSegments(taxableIncome, provincial),
+    federalBPA: federal.basicPersonalAmount,
+    regionalBPA: provincial.basicPersonalAmount,
+  };
+}
+
 export const canadianTaxEngine: TaxEngine = {
   computeTax: computeCanadianTax,
   getMarginalRate(annualIncome, jurisdiction, year) {
@@ -176,4 +192,5 @@ export const canadianTaxEngine: TaxEngine = {
   classifyTaxTreatment: classifyCanadianTaxTreatment,
   getWithdrawalTaxRate: getCanadianWithdrawalTaxRate,
   getEarlyWithdrawalPenalties: getCanadianEarlyWithdrawalPenalties,
+  computeBracketSegments: computeCanadianBracketSegments,
 };

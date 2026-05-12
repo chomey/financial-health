@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 229. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 230. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -29,8 +29,6 @@ test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehi
 - [x] Task 222: tax-engine.ts shim — Rewrite `src/lib/tax-engine.ts` to a thin shim. Public `computeTax(income, type, country, jurisdiction, year)` and `getMarginalRateForIncome` delegate to `getCountry(country).taxEngine.*`. Keep `IncomeType` and `TaxResult` type exports. Snapshot regressions must stay green. [@backend]
 
 ### Consumer migration — components (plan tasks 37–41)
-
-- [ ] Task 230: Migrate library-side consumers — Rewrite country switches in `src/lib/compute-totals.ts`, `src/lib/financial-state.ts`, `src/lib/projections.ts`, `src/lib/runway-simulation.ts`, `src/lib/required-minimum-distributions.ts`, `src/lib/scenario.ts`, `src/lib/benchmarks.ts`, `src/lib/flowchart-steps.ts`, `src/app/page.tsx` to use `getCountry(country).*`. The shimmed free functions still work, so this task targets direct `country === "..."` branches. [@fullstack] [OPUS]
 
 - [ ] Task 231: Insights generate.ts dispatches via registry — In `src/lib/insights/generate.ts`, replace inline CA/US/AU branches with `getCountry(state.country).insights.getCandidates(state)` plus universal-insights generation. Each country's per-country `insights.ts` already exists by this point. [@fullstack]
 

@@ -21,7 +21,8 @@
  *   FHSS withdrawals are taxed at marginal rate minus a 30% offset.
  */
 
-import type { TaxEngine, WithdrawalTaxArgs } from "@/lib/countries/types";
+import { buildBracketSegments } from "@/lib/bracket-math";
+import type { BracketSegmentArgs, BracketSegmentResult, TaxEngine, WithdrawalTaxArgs } from "@/lib/countries/types";
 import type { IncomeType, TaxResult } from "@/lib/tax-engine";
 import type {
   EarlyWithdrawalPenalty,
@@ -211,6 +212,18 @@ function getAustralianEarlyWithdrawalPenalties(
   return penalties;
 }
 
+function computeAustralianBracketSegments(args: BracketSegmentArgs): BracketSegmentResult {
+  const { jurisdiction, year, grossAnnualIncome } = args;
+  const { federal, state: stateTable } = getAUBrackets(jurisdiction, year);
+  return {
+    federalBrackets: buildBracketSegments(Math.max(0, grossAnnualIncome), federal),
+    // AU has no state income tax — always render the state table with zero amounts.
+    regionalBrackets: buildBracketSegments(0, stateTable),
+    federalBPA: federal.basicPersonalAmount,
+    regionalBPA: stateTable.basicPersonalAmount,
+  };
+}
+
 export const australianTaxEngine: TaxEngine = {
   computeTax: computeAustralianTax,
   getMarginalRate(annualIncome, jurisdiction, year) {
@@ -220,4 +233,5 @@ export const australianTaxEngine: TaxEngine = {
   classifyTaxTreatment: classifyAustralianTaxTreatment,
   getWithdrawalTaxRate: getAustralianWithdrawalTaxRate,
   getEarlyWithdrawalPenalties: getAustralianEarlyWithdrawalPenalties,
+  computeBracketSegments: computeAustralianBracketSegments,
 };

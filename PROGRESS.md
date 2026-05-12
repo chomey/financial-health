@@ -8,53 +8,57 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 229
-- **Remaining**: 5
+- **Completed**: 230
+- **Remaining**: 4
 - **Last Updated**: 2026-05-12
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
-## Task 229: Migrate UI consumers of country switches [@fullstack] [OPUS]
+## Task 230: Migrate library-side consumers of country switches [@fullstack] [OPUS]
 - **Date**: 2026-05-12
 - **Files**:
-  - `src/lib/countries/types.ts`: Added `FlowchartWiki` type. Added `programLabel: string` to `GovernmentRetirementPlugin`. Added `wizardRegisteredCategories: [string, string]`, `flowchartWiki: FlowchartWiki`, `regionTaxLabel: string` to `CountryProfile`.
-  - `src/lib/countries/index.ts`: Re-export `FlowchartWiki` type.
-  - `src/lib/countries/canada/government-retirement.ts`: `programLabel: "CPP + OAS"`.
-  - `src/lib/countries/usa/government-retirement.ts`: `programLabel: "Social Security"`.
-  - `src/lib/countries/australia/government-retirement.ts`: `programLabel: "Age Pension"`.
-  - `src/lib/countries/canada/index.ts`: `wizardRegisteredCategories: ["TFSA", "RRSP"]`, `flowchartWiki: r/PersonalFinanceCanada` (tip/link/URL), `regionTaxLabel: "Provincial"`.
-  - `src/lib/countries/usa/index.ts`: `wizardRegisteredCategories: ["Roth IRA", "401k"]`, `flowchartWiki: r/personalfinance`, `regionTaxLabel: "State"`.
-  - `src/lib/countries/australia/index.ts`: `wizardRegisteredCategories: ["Roth IRA", "401k"]` (preserves pre-refactor fallthrough), `flowchartWiki: tipName=r/AusFinance, linkText=r/personalfinance, linkUrl=us-link` (preserves the pre-refactor inconsistency between help tip and visible link), `regionTaxLabel: "State"`.
-  - `src/components/MobileWizard.tsx`: `country === "CA" ? [...] : [...]` replaced with `getCountry(country).wizardRegisteredCategories` for both `reg1Cat/reg2Cat` and `reg1Label/reg2Label`.
-  - `src/components/RetirementIncomeChart.tsx`: Deleted local `getGovernmentLabel` switch. Source label now reads `getCountry(country).governmentRetirement.programLabel`.
-  - `src/components/FinancialFlowchart.tsx`: Replaced inline `country === "CA"/"AU"` HelpTip ternary and link ternary with `getCountry(country).flowchartWiki.{tipName,linkText,linkUrl}` lookups. Removed local `caWikiUrl`/`usWikiUrl` consts.
-  - `src/components/GovernmentRetirementInput.tsx`: Replaced three `country === "..."` conditional render branches with a `Record<CountryCode, ComponentType<SubInputProps>>` lookup. `Input` resolved via `INPUT_BY_COUNTRY[country]`.
-  - `src/components/wizard/steps/ProfileStep.tsx`: Dropped `getFilingStatuses` import. Filing-status dropdown now iterates `getCountry(country).filingStatuses`.
-  - `src/components/wizard/steps/WelcomeStep.tsx`: Dropped `getProfilesForCountry`/`getQuickStartProfilesForCountry` imports. Reads `getCountry(country).profiles.{samples,quickStarts}` directly.
-  - `src/components/wizard/steps/TaxSummaryStep.tsx`: `country === "CA" ? "Provincial" : ...` replaced with `getCountry(country).regionTaxLabel`.
-  - `src/components/DataFlowArrows.tsx`: Extracted capital-gains explainer into a `Record<CountryCode, fn>` keyed dispatch and a tiny `CapitalGainsExplainer` component. AU maps to the US explainer to preserve current UI.
-  - `tests/unit/countries/profile-ui-fields.test.ts` (new): 13 tests covering the new `wizardRegisteredCategories`, `flowchartWiki`, `regionTaxLabel`, `governmentRetirement.programLabel` fields per country.
-  - `tests/unit/withdrawal-tax-shim.test.ts`: Updated the `as ReturnType<typeof getCountry>` casts to `as unknown as ReturnType<typeof getCountry>` so the partial mock survives the new required fields.
-  - `tests/e2e/task-229-registry-migration.spec.ts` (new): 3 verification tests that load the dashboard, flowchart link, and wizard tax summary for CA and screenshot each.
-  - `src/lib/changelog.ts`: Added version 229 entry.
+  - `src/lib/countries/types.ts`: Added `TaxBracketSegment`, `BracketSegmentArgs`, `BracketSegmentResult`, `RmdRule`, `AgeGroupBenchmark`, `NationalAverage`, `BenchmarkData`, `RawFlowchartStep`, `FlowchartStepsBuilder` types. Added `computeBracketSegments` method to `TaxEngine`. Added `rmd: RmdRule`, `benchmarks: BenchmarkData`, `flowchartSteps: FlowchartStepsBuilder` to `CountryProfile`.
+  - `src/lib/countries/index.ts`: Re-export new types. Switched `COUNTRIES` to property getters (`get CA() { return CANADA; }`, etc.) so the registry tolerates cycle-induced module-load ordering — the prior frozen object literal snapshotted `undefined` when a country plugin transitively pulled `getCountry` back through itself.
+  - `src/lib/countries/canada/tax-engine.ts`: Added `computeCanadianBracketSegments` (federal + provincial brackets, CA capital-gains inclusion).
+  - `src/lib/countries/usa/tax-engine.ts`: Added `computeAmericanBracketSegments` (federal brackets, capital-gains alternative, state brackets, standard-deduction handling).
+  - `src/lib/countries/australia/tax-engine.ts`: Added `computeAustralianBracketSegments` (federal only; state always zeroed).
+  - `src/lib/countries/canada/rmd.ts` (new): CA RRIF rule — `ruleName: "RRIF minimum"`, RRSP/LIRA/RRIF/LIF mapping with `getCaRrifPercent`.
+  - `src/lib/countries/usa/rmd.ts` (new): US RMD rule — `ruleName: "RMD"`, 401k/IRA/403b/457 (non-Roth) mapping with `getUsRmdPercent`.
+  - `src/lib/countries/australia/rmd.ts` (new): AU no-op RMD plugin (no forced-withdrawal mechanism).
+  - `src/lib/countries/canada/benchmarks.ts` (new): SFS 2023 age-group benchmarks + national average in CAD.
+  - `src/lib/countries/usa/benchmarks.ts` (new): SCF 2022 age-group benchmarks + national average in USD.
+  - `src/lib/countries/australia/benchmarks.ts` (new): ABS 2021-22 age-group benchmarks + national average in AUD.
+  - `src/lib/countries/canada/flowchart-steps.ts` (new): Wraps `buildCASteps(inferData(...))`.
+  - `src/lib/countries/usa/flowchart-steps.ts` (new): Wraps `buildUSSteps(inferData(...))`.
+  - `src/lib/countries/australia/flowchart-steps.ts` (new): Wraps `buildAUSteps(inferData(...))`.
+  - `src/lib/countries/canada/index.ts`, `usa/index.ts`, `australia/index.ts`: Wired `rmd`, `benchmarks`, `flowchartSteps` into each profile.
+  - `src/lib/bracket-math.ts`: Added shared `buildBracketSegments(taxableIncome, table)` helper used by each country's `computeBracketSegments` implementation.
+  - `src/lib/compute-totals.ts`: Removed `country === "CA"/"AU"` switches. `jurisdictionType` reads `profile.regionTaxLabel`. Bracket lookup (zero-income reference AND non-zero) goes through `profile.taxEngine.computeBracketSegments({jurisdiction, year, grossAnnualIncome, capGainsTotal})`. `computeTax` shim call replaced with `profile.taxEngine.computeTax(...)`. Dropped imports of `computeTax`, `getCanadianBrackets`, `getUSBrackets`, `getAUBrackets`, `getUSCapitalGainsBrackets`, `calculateCanadianCapitalGainsInclusion`, `BracketTable`, `TaxBracketSegment`. Deleted local `computeBracketSegments` helper (logic moved into country plugins).
+  - `src/lib/required-minimum-distributions.ts`: Replaced inline US/CA branches with `getCountry(country).rmd.{ruleName,computeRmd}`. File now re-exports the helper percent functions from per-country `rmd.ts` for backward compat. `getRmdSummaries` reads `rule.ruleName` once per call instead of `country === "CA" ? "RRIF minimum" : "RMD"`.
+  - `src/lib/benchmarks.ts`: Replaced inline CA/AU constant lookups (`CA_BENCHMARKS`, `AU_BENCHMARKS`, `US_BENCHMARKS`, etc.) with `getCountry(country).benchmarks.{ageGroups,national,dataSource}`. Removed in-file benchmark data and `DATA_SOURCES` const (replaced by a registry-backed `Record`).
+  - `src/lib/flowchart-steps.ts`: Exported `inferData`, `buildCASteps`, `buildUSSteps`, `buildAUSteps`, and `RawStep` for per-country plugin use. `getFlowchartSteps` now calls `getCountry(country).flowchartSteps.build(state, isRetired)` instead of the `country === "US"/"AU"/"CA"` ternary. Imported `getCountry` and `RawFlowchartStep`.
+  - `src/lib/financial-state.ts`: Replaced shim calls — `getMarginalRateForIncome(...)` → `profile.taxEngine.getMarginalRate(...)`; `getEarlyWithdrawalPenalties(...)` → `getCountry(...).taxEngine.getEarlyWithdrawalPenalties(...)`; `computeMonthlyGovernmentIncome(...)` → `profile.governmentRetirement.computeMonthly(...)`. Dropped now-unused imports.
+  - `src/lib/projections.ts`: Replaced `getWithdrawalTaxRate(...)` shim call with `taxEngine.getWithdrawalTaxRate({...})` using a captured `getCountry(country).taxEngine` reference.
+  - `src/lib/runway-simulation.ts`: Same migration as projections (both `simulateRunwayWithTax` and `simulateRunwayTimeSeries`). Switched the `country: "CA" | "US" | "AU"` parameters to the `CountryCode` type re-exported from the registry.
+  - `src/app/page.tsx`: Removed unused `getProfilesForCountry` import.
+  - `tests/unit/countries/registry-consumer-plugins.test.ts` (new): 31 tests covering `taxEngine.computeBracketSegments` (zero-income reference rendering, populated buckets, CA capital-gains inclusion, AU zero-state, US cap-gains brackets), the new `rmd` plugin (per-country label/computeRmd correctness for RRSP/401k/Roth/Super), `benchmarks` (age-group + national + source per country), and `flowchartSteps` (country-prefixed step ids).
+  - `tests/e2e/task-230-library-consumer-migration.spec.ts` (new): 3 verification tests — dashboard renders, flowchart roadmap renders with CA steps, tax-explainer brackets render.
+  - `src/lib/changelog.ts`: Added version 230 entry.
 - **Tests**:
-  - T1: All affected files + new fields tested. Sample runs:
-    - `tests/unit/countries/profile-ui-fields.test.ts`: 13/13 pass
-    - `tests/unit/countries/contract.test.ts`: 30/30 pass
-    - `tests/unit/withdrawal-tax-shim.test.ts`: 18/18 pass
-    - `tests/unit/mobile-wizard.test.ts`: 11/11 pass
-    - `tests/unit/welcome-step-simple-mode.test.tsx`: 17/17 pass
-    - `tests/unit/data-flow-arrows.test.tsx`: 6/6 pass
-    - `tests/unit/financial-flowchart.test.ts`: 11/11 pass
-    - `tests/unit/tax-explainer.test.tsx`: 45/45 pass
-    - `tests/unit/tax-engine-snapshot.test.ts`: 440/440 pass (regression baseline green)
-    - `tests/unit/withdrawal-tax-snapshot.test.ts`: 54/54 pass (regression baseline green)
-  - T2: 35/35 affected E2E pass (`country-jurisdiction.spec.ts`, `financial-flowchart.spec.ts`, `government-retirement-au/ca/us.spec.ts`, `retirement-income-chart.spec.ts`, `tax-summary.spec.ts`, `task-229-registry-migration.spec.ts`).
-  - Build: `npm run build` → `Compiled successfully in 5.6s`.
-- **Screenshots**: `task-229-dashboard-ca.png`, `task-229-flowchart-ca.png`, `task-229-wizard-tax-summary-ca.png`.
+  - T1: All affected files green. Highlights:
+    - `tests/unit/countries/registry-consumer-plugins.test.ts`: 31/31 pass.
+    - `tests/unit/countries/contract.test.ts`: 30/30 pass.
+    - `tests/unit/countries/registry.test.ts`: 7/7 pass.
+    - `tests/unit/required-minimum-distributions.test.ts`: 19/19 pass (existing tests still green through the new registry-backed shim).
+    - `tests/unit/tax-engine-snapshot.test.ts`: 440/440 pass (regression baseline green).
+    - `tests/unit/withdrawal-tax-snapshot.test.ts`: 54/54 pass (regression baseline green).
+    - Full suite: 4487/4487 pass.
+  - T2: 3/3 task-230 E2E tests pass.
+  - Build: `npm run build` → `Compiled successfully in 2.2s`.
+  - Lint: 11 errors before and after this task — all pre-existing, none introduced.
+- **Screenshots**: `task-230-dashboard-default.png`, `task-230-flowchart-after-migration.png`, `task-230-tax-explainer-brackets.png`.
 - **Notes**:
-  - `BenchmarkComparisons.tsx`, `TaxCreditEntry.tsx`, `ExpensesStep.tsx`, `TaxCreditsStep.tsx`, `WizardShell.tsx` — listed in the task but contained no `country === "X"` switches (only typed props or registry-backed helper calls). Left unchanged.
-  - Pre-existing failures NOT introduced by this task and NOT fixed here:
-    - `tests/e2e/mobile-wizard.spec.ts` — `mobile-wizard` testId is never rendered (component was removed from active rendering in commit 7101022). Verified pre-existing by stashing this task's changes and re-running.
-    - `tests/e2e/tax-explainer.spec.ts` "Zero Income" group — flaky setup that tries to hover a Salary row that has detached. Verified pre-existing the same way.
-  - AU keeps the pre-refactor visible text (Roth IRA/401k wizard labels, r/personalfinance flowchart link) — intentional per "Keep visible UI text identical." The help tip already said "r/AusFinance" pre-refactor and continues to.
+  - `src/lib/scenario.ts` was in the file list but contained no `country === "..."` switches — `TAX_SHELTERED_LIMITS` uses country as a data tag, not a branch. Left unchanged.
+  - `src/lib/financial-state.ts`, `projections.ts`, `runway-simulation.ts` had no `country === "..."` branches either, only deprecated shim calls. Migrated those to direct `getCountry(country).taxEngine.*` to align with the consumer-migration goal.
+  - `src/app/page.tsx`'s only registry-relevant change was a stale unused import — every other country use was already prop-typed.
+  - `COUNTRIES` const was switched to property getters because the new flowchart plugin path created a real value-import cycle (`country/index → country/flowchart-steps → lib/flowchart-steps → lib/countries → country/index`). A frozen object literal snapshotted `undefined` for the still-loading country; getters re-read the live binding at access time so the test (`Object.keys` + identity) still passes.

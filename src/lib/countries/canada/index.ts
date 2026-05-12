@@ -5,6 +5,9 @@ import { canadianGovernmentRetirement } from "./government-retirement";
 import { canadianTaxCredits } from "./tax-credits";
 import { canadaProfiles } from "./sample-profiles";
 import { canadianInsights } from "./insights";
+import { canadianRmd } from "./rmd";
+import { canadianBenchmarks } from "./benchmarks";
+import { canadianFlowchartSteps } from "./flowchart-steps";
 
 export const CANADA: CountryProfile = {
   code: "CA",
@@ -42,6 +45,9 @@ export const CANADA: CountryProfile = {
   taxCredits: canadianTaxCredits,
   profiles: canadaProfiles,
   insights: canadianInsights,
+  rmd: canadianRmd,
+  benchmarks: canadianBenchmarks,
+  flowchartSteps: canadianFlowchartSteps,
   wizardRegisteredCategories: ["TFSA", "RRSP"],
   flowchartWiki: {
     tipName: "r/PersonalFinanceCanada",

@@ -4,7 +4,8 @@ import { getDefaultRoi, computeEmployerMatchMonthly } from "@/components/AssetEn
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { getEffectivePayment, getDefaultAppreciation } from "@/components/PropertyEntry";
 import { getHomeCurrency, getEffectiveFxRates, convertToHome, type SupportedCurrency } from "@/lib/currency";
-import { getTaxTreatment, getWithdrawalTaxRate, type TaxTreatment } from "@/lib/withdrawal-tax";
+import { getTaxTreatment, type TaxTreatment } from "@/lib/withdrawal-tax";
+import { getCountry } from "@/lib/countries";
 
 export interface ProjectionPoint {
   month: number;
@@ -92,6 +93,7 @@ export function projectFinances(
   const withdrawalPriority: Record<TaxTreatment, number> = { "tax-free": 0, "super-fhss": 1, "super-accumulation": 1, "taxable": 1, "tax-deferred": 2 };
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
+  const taxEngine = getCountry(country).taxEngine;
   let cumulativeWithdrawalTax = 0;
 
   // Track each debt individually for interest/payments (converted to home currency)
@@ -228,10 +230,12 @@ export function projectFinances(
           } else {
             // Compute gross-up for tax
             const annualizedShortfall = shortfall * 12;
-            const taxResult = getWithdrawalTaxRate(
-              bucket.category, country, jurisdiction,
-              annualizedShortfall, bucket.costBasisPercent
-            );
+            const taxResult = taxEngine.getWithdrawalTaxRate({
+              category: bucket.category,
+              jurisdiction,
+              annualWithdrawal: annualizedShortfall,
+              costBasisPercent: bucket.costBasisPercent,
+            });
             const effectiveRate = taxResult.effectiveRate;
             const grossUpFactor = effectiveRate < 1 ? 1 / (1 - effectiveRate) : 10;
             const grossWithdrawal = Math.min(shortfall * grossUpFactor, bucket.balance);

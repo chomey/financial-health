@@ -26,11 +26,10 @@ import { getStockValue } from "@/components/StockEntry";
 import { getDefaultRoi, computeEmployerMatchMonthly } from "@/components/AssetEntry";
 import { getHomeCurrency, getEffectiveFxRates, convertToHome } from "@/lib/currency";
 import type { SupportedCurrency } from "@/lib/currency";
-import { getTaxTreatment, getEarlyWithdrawalPenalties } from "@/lib/withdrawal-tax";
-import { getMarginalRateForIncome } from "@/lib/tax-engine";
+import { getTaxTreatment } from "@/lib/withdrawal-tax";
+import { getCountry } from "@/lib/countries";
 import { computeTotals, computeMonthlyInvestmentReturns, computeFireNumber, computeMonthlyObligations } from "@/lib/compute-totals";
 import { simulateRunwayWithGrowth, simulateRunwayWithTax } from "@/lib/runway-simulation";
-import { computeMonthlyGovernmentIncome } from "@/lib/government-retirement";
 import { getRmdSummaries } from "@/lib/required-minimum-distributions";
 import type { Asset } from "@/components/AssetEntry";
 
@@ -58,7 +57,8 @@ export function toFinancialData(state: FinancialState): FinancialData {
     }, 0);
 
   // FIRE number: (annual expenses - government income) / 4% SWR
-  const monthlyGovIncome = computeMonthlyGovernmentIncome(country, state.governmentRetirementIncome);
+  const profile = getCountry(country);
+  const monthlyGovIncome = profile.governmentRetirement.computeMonthly(state.governmentRetirementIncome);
   const fireNumber = computeFireNumber(monthlyExpenses, monthlyGovIncome);
 
   // Monthly debt payments: sum of minimum debt payments + mortgage payments
@@ -79,7 +79,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
 
   // Marginal rate for tax optimization suggestions — use employment income
   const marginalRate = annualEmploymentSalary > 0
-    ? getMarginalRateForIncome(annualEmploymentSalary, country, jurisdiction, state.taxYear ?? new Date().getFullYear())
+    ? profile.taxEngine.getMarginalRate(annualEmploymentSalary, jurisdiction, state.taxYear ?? new Date().getFullYear())
     : undefined;
 
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
@@ -259,7 +259,9 @@ export function computeWithdrawalTaxSummary(
 
   // Check for early withdrawal penalties based on user's age
   const allCategories = [...taxFree.categories, ...taxDeferred.categories, ...taxable.categories];
-  const earlyWithdrawalPenalties = getEarlyWithdrawalPenalties(allCategories, state.age, state.country ?? "CA");
+  const earlyWithdrawalPenalties = state.age && state.age > 0
+    ? getCountry(state.country ?? "CA").taxEngine.getEarlyWithdrawalPenalties(allCategories, state.age)
+    : [];
 
   return {
     taxDragMonths,

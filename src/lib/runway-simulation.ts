@@ -1,5 +1,5 @@
 import type { TaxTreatment } from "@/lib/withdrawal-tax";
-import { getWithdrawalTaxRate } from "@/lib/withdrawal-tax";
+import { getCountry, type CountryCode } from "@/lib/countries";
 import type { RunwayExplainerDetails, RunwayTimeSeriesPoint, RunwayWithdrawalOrderEntry } from "@/components/DataFlowArrows";
 
 /**
@@ -41,10 +41,11 @@ export function simulateRunwayWithGrowth(
 export function simulateRunwayWithTax(
   buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number; roiTaxTreatment?: "capital-gains" | "income" }[],
   monthlyWithdrawal: number,
-  country: "CA" | "US" | "AU",
+  country: CountryCode,
   jurisdiction: string,
 ): number {
   if (monthlyWithdrawal <= 0) return 0;
+  const taxEngine = getCountry(country).taxEngine;
   const balances = buckets.map((b) => b.balance);
   const rates = buckets.map((b) => b.monthlyRate);
   const MAX_MONTHS = 1200;
@@ -73,11 +74,13 @@ export function simulateRunwayWithTax(
         remaining -= grossWithdrawal;
       } else {
         const annualizedWithdrawal = remaining * 12;
-        const taxResult = getWithdrawalTaxRate(
-          buckets[idx].category, country, jurisdiction,
-          annualizedWithdrawal, buckets[idx].costBasisPercent,
-          buckets[idx].roiTaxTreatment
-        );
+        const taxResult = taxEngine.getWithdrawalTaxRate({
+          category: buckets[idx].category,
+          jurisdiction,
+          annualWithdrawal: annualizedWithdrawal,
+          costBasisPercent: buckets[idx].costBasisPercent,
+          roiTaxTreatment: buckets[idx].roiTaxTreatment,
+        });
         const effectiveRate = taxResult.effectiveRate;
         const grossUpFactor = effectiveRate < 1 ? 1 / (1 - effectiveRate) : 10;
         grossWithdrawal = Math.min(remaining * grossUpFactor, balances[idx]);
@@ -99,13 +102,14 @@ export function simulateRunwayWithTax(
 export function simulateRunwayTimeSeries(
   buckets: { balance: number; monthlyRate: number; taxTreatment: TaxTreatment; category: string; costBasisPercent: number; roiTaxTreatment?: "capital-gains" | "income" }[],
   monthlyWithdrawal: number,
-  country: "CA" | "US" | "AU",
+  country: CountryCode,
   jurisdiction: string,
 ): { withGrowth: RunwayTimeSeriesPoint[]; withoutGrowth: RunwayTimeSeriesPoint[]; withTax: RunwayTimeSeriesPoint[] } {
   if (monthlyWithdrawal <= 0 || buckets.length === 0) {
     return { withGrowth: [], withoutGrowth: [], withTax: [] };
   }
 
+  const taxEngine = getCountry(country).taxEngine;
   const MAX_MONTHS = 600; // Cap at 50 years for charting
   const categories = buckets.map((b) => b.category);
 
@@ -202,11 +206,13 @@ export function simulateRunwayTimeSeries(
             remaining -= grossWithdrawal;
           } else {
             const annualizedWithdrawal = remaining * 12;
-            const taxResult = getWithdrawalTaxRate(
-              buckets[idx].category, country, jurisdiction,
-              annualizedWithdrawal, buckets[idx].costBasisPercent,
-              buckets[idx].roiTaxTreatment
-            );
+            const taxResult = taxEngine.getWithdrawalTaxRate({
+              category: buckets[idx].category,
+              jurisdiction,
+              annualWithdrawal: annualizedWithdrawal,
+              costBasisPercent: buckets[idx].costBasisPercent,
+              roiTaxTreatment: buckets[idx].roiTaxTreatment,
+            });
             const effectiveRate = taxResult.effectiveRate;
             const grossUpFactor = effectiveRate < 1 ? 1 / (1 - effectiveRate) : 10;
             grossWithdrawal = Math.min(remaining * grossUpFactor, taxBalances[idx]);
@@ -241,7 +247,7 @@ export function buildRunwayExplainerDetails(
   runway: number,
   runwayWithGrowth: number | undefined,
   runwayAfterTax: number | undefined,
-  country: "CA" | "US" | "AU",
+  country: CountryCode,
   jurisdiction: string,
 ): RunwayExplainerDetails | undefined {
   if (detailedBuckets.length === 0 || monthlyObligations <= 0) return undefined;

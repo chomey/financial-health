@@ -5,6 +5,9 @@ import { americanGovernmentRetirement } from "./government-retirement";
 import { americanTaxCredits } from "./tax-credits";
 import { usaProfiles } from "./sample-profiles";
 import { americanInsights } from "./insights";
+import { americanRmd } from "./rmd";
+import { americanBenchmarks } from "./benchmarks";
+import { americanFlowchartSteps } from "./flowchart-steps";
 
 export const USA: CountryProfile = {
   code: "US",
@@ -82,6 +85,9 @@ export const USA: CountryProfile = {
   taxCredits: americanTaxCredits,
   profiles: usaProfiles,
   insights: americanInsights,
+  rmd: americanRmd,
+  benchmarks: americanBenchmarks,
+  flowchartSteps: americanFlowchartSteps,
   wizardRegisteredCategories: ["Roth IRA", "401k"],
   flowchartWiki: {
     tipName: "r/personalfinance",

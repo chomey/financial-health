@@ -29,12 +29,37 @@ export interface WithdrawalTaxArgs {
   year?: number;
 }
 
+export interface TaxBracketSegment {
+  min: number;
+  max: number;
+  rate: number;
+  amountInBracket: number;
+  taxInBracket: number;
+}
+
+export interface BracketSegmentArgs {
+  jurisdiction: string;
+  year: number;
+  grossAnnualIncome: number;
+  capGainsTotal: number;
+}
+
+export interface BracketSegmentResult {
+  federalBrackets: TaxBracketSegment[];
+  regionalBrackets: TaxBracketSegment[];
+  federalBPA: number;
+  regionalBPA: number;
+}
+
 export interface TaxEngine {
   computeTax(annualIncome: number, type: IncomeType, jurisdiction: string, year: number): TaxResult;
   getMarginalRate(annualIncome: number, jurisdiction: string, year: number): number;
   classifyTaxTreatment(category: string): TaxTreatment;
   getWithdrawalTaxRate(args: WithdrawalTaxArgs): WithdrawalTaxResult;
   getEarlyWithdrawalPenalties(categories: string[], age: number): EarlyWithdrawalPenalty[];
+  /** Compute federal + regional bracket segments for tax-explainer rendering.
+   * Pass `grossAnnualIncome: 0` to get a reference rendering (all amounts zero). */
+  computeBracketSegments(args: BracketSegmentArgs): BracketSegmentResult;
 }
 
 export interface VehicleCatalog {
@@ -76,6 +101,59 @@ export interface InsightProvider {
   getCandidates(state: FinancialState): Insight[];
 }
 
+export interface RmdRule {
+  /** Country-specific summary label used in the UI (e.g. "RMD", "RRIF minimum"). */
+  ruleName: string;
+  /** Compute the annual minimum required distribution for one account.
+   * Returns 0 if the account category does not have an RMD/RRIF requirement. */
+  computeRmd(balance: number, age: number, category: string): number;
+}
+
+export interface AgeGroupBenchmark {
+  ageMin: number;
+  ageMax: number;
+  label: string;
+  medianNetWorth: number;
+  medianSavingsRate: number;
+  medianDebtToIncomeRatio: number;
+  recommendedEmergencyMonths: number;
+  medianIncome: number;
+}
+
+export interface NationalAverage {
+  netWorth: number;
+  savingsRate: number;
+  debtToIncomeRatio: number;
+  emergencyMonths: number;
+  income: number;
+}
+
+export interface BenchmarkData {
+  ageGroups: AgeGroupBenchmark[];
+  national: NationalAverage;
+  /** Short attribution string shown in the UI footer. */
+  dataSource: string;
+}
+
+export interface RawFlowchartStep {
+  id: string;
+  title: string;
+  description: string;
+  completionHint: string;
+  detailText: string;
+  progress: number;
+  isComplete: boolean;
+  userAcknowledgeable?: boolean;
+  acknowledgeLabel?: string;
+  skippable?: boolean;
+  skipLabel?: string;
+}
+
+export interface FlowchartStepsBuilder {
+  /** Build country-specific raw flowchart steps for the user's state. */
+  build(state: FinancialState, isRetired: boolean): RawFlowchartStep[];
+}
+
 export type { Locale };
 
 export interface CountryProfile {
@@ -97,6 +175,9 @@ export interface CountryProfile {
   taxCredits: TaxCreditCatalog;
   profiles: ProfileLibrary;
   insights: InsightProvider;
+  rmd: RmdRule;
+  benchmarks: BenchmarkData;
+  flowchartSteps: FlowchartStepsBuilder;
   wizardRegisteredCategories: [string, string];
   flowchartWiki: FlowchartWiki;
   regionTaxLabel: string;

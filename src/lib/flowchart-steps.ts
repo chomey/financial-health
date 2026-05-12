@@ -12,6 +12,8 @@
  */
 
 import type { FinancialState } from "@/lib/financial-types";
+import type { RawFlowchartStep } from "@/lib/countries/types";
+import { getCountry } from "@/lib/countries";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { normalizeExpenseToMonthly } from "@/components/ExpenseEntry";
 import { getStockValue } from "@/components/StockEntry";
@@ -190,7 +192,7 @@ interface InferredData {
   isRetired: boolean;
 }
 
-function inferData(state: FinancialState, isRetired: boolean): InferredData {
+export function inferData(state: FinancialState, isRetired: boolean): InferredData {
   const monthlyIncome = getMonthlyIncome(state);
   const monthlyExpenses = getRawMonthlyExpenses(state);
   const monthlyMortgage = getMonthlyMortgage(state);
@@ -273,21 +275,9 @@ function buildBudgetDetailText(d: InferredData): string {
 
 // ── CA step definitions ───────────────────────────────────────────────────────
 
-interface RawStep {
-  id: string;
-  title: string;
-  description: string;
-  completionHint: string;
-  detailText: string;
-  progress: number;
-  isComplete: boolean;
-  userAcknowledgeable?: boolean;
-  acknowledgeLabel?: string;
-  skippable?: boolean;
-  skipLabel?: string;
-}
+export type RawStep = RawFlowchartStep;
 
-function buildCASteps(d: InferredData): RawStep[] {
+export function buildCASteps(d: InferredData): RawStep[] {
   const { cashAssets, monthlyObligations, assetCategories, highInterestDebts, moderateInterestDebts, hasStocks, isRetired } = d;
 
   const starterTarget = 1000;
@@ -465,7 +455,7 @@ function buildCASteps(d: InferredData): RawStep[] {
 
 // ── US step definitions ───────────────────────────────────────────────────────
 
-function buildUSSteps(d: InferredData): RawStep[] {
+export function buildUSSteps(d: InferredData): RawStep[] {
   const { cashAssets, monthlyObligations, assetCategories, highInterestDebts, moderateInterestDebts, hasStocks, isRetired } = d;
 
   const starterTarget = 1000;
@@ -642,7 +632,7 @@ function buildUSSteps(d: InferredData): RawStep[] {
 
 // ── AU step definitions ───────────────────────────────────────────────────────
 
-function buildAUSteps(d: InferredData): RawStep[] {
+export function buildAUSteps(d: InferredData): RawStep[] {
   const { cashAssets, monthlyObligations, assetCategories, highInterestDebts, moderateInterestDebts, isRetired } = d;
 
   const fullEFTarget = monthlyObligations > 0 ? monthlyObligations * 3 : 0;
@@ -831,9 +821,7 @@ function buildAUSteps(d: InferredData): RawStep[] {
  */
 export function getFlowchartSteps(state: FinancialState, isRetired = false): FlowchartStep[] {
   const country = state.country ?? "CA";
-  const d = inferData(state, isRetired);
-  const rawSteps =
-    country === "US" ? buildUSSteps(d) : country === "AU" ? buildAUSteps(d) : buildCASteps(d);
+  const rawSteps = getCountry(country).flowchartSteps.build(state, isRetired);
 
   // Assign sequential status: complete → complete, first incomplete → in-progress, rest → upcoming
   let foundFirstIncomplete = false;

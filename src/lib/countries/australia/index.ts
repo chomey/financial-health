@@ -5,6 +5,9 @@ import { australianGovernmentRetirement } from "./government-retirement";
 import { australianTaxCredits } from "./tax-credits";
 import { australianProfiles } from "./sample-profiles";
 import { australianInsights } from "./insights";
+import { australianRmd } from "./rmd";
+import { australianBenchmarks } from "./benchmarks";
+import { australianFlowchartSteps } from "./flowchart-steps";
 
 export const AUSTRALIA: CountryProfile = {
   code: "AU",
@@ -37,6 +40,9 @@ export const AUSTRALIA: CountryProfile = {
   taxCredits: australianTaxCredits,
   profiles: australianProfiles,
   insights: australianInsights,
+  rmd: australianRmd,
+  benchmarks: australianBenchmarks,
+  flowchartSteps: australianFlowchartSteps,
   wizardRegisteredCategories: ["Roth IRA", "401k"],
   flowchartWiki: {
     tipName: "r/AusFinance",

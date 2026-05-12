@@ -36,7 +36,6 @@ import {
   computeMonthlyInvestmentReturns,
   toFinancialData,
 } from "@/lib/financial-state";
-import { getProfilesForCountry } from "@/lib/sample-profiles";
 import WizardShell from "@/components/wizard/WizardShell";
 import { formatCurrencyCompact } from "@/lib/currency";
 import { getDefaultRoiTaxTreatment } from "@/components/AssetEntry";

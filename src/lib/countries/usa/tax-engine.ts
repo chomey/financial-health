@@ -17,8 +17,8 @@
  *   their stateTax as 0 and their marginal rate as 0.
  */
 
-import { calculateProgressiveTax, getMarginalRate, type BracketTable } from "@/lib/bracket-math";
-import type { TaxEngine, WithdrawalTaxArgs } from "@/lib/countries/types";
+import { buildBracketSegments, calculateProgressiveTax, getMarginalRate, type BracketTable } from "@/lib/bracket-math";
+import type { BracketSegmentArgs, BracketSegmentResult, TaxEngine, WithdrawalTaxArgs } from "@/lib/countries/types";
 import type { IncomeType, TaxResult } from "@/lib/tax-engine";
 import type {
   EarlyWithdrawalPenalty,
@@ -206,6 +206,33 @@ function getAmericanEarlyWithdrawalPenalties(
   return penalties;
 }
 
+function computeAmericanBracketSegments(args: BracketSegmentArgs): BracketSegmentResult {
+  const { jurisdiction, year, grossAnnualIncome, capGainsTotal } = args;
+  const { federal, state: stateTable } = getUSBrackets(jurisdiction, year);
+
+  let federalSegments: BracketSegmentResult["federalBrackets"];
+  if (grossAnnualIncome <= 0) {
+    federalSegments = buildBracketSegments(0, federal);
+  } else if (capGainsTotal > 0 && capGainsTotal >= grossAnnualIncome * 0.99) {
+    federalSegments = buildBracketSegments(grossAnnualIncome, getUSCapitalGainsBrackets(year));
+  } else {
+    const taxableIncome = Math.max(0, grossAnnualIncome - federal.basicPersonalAmount);
+    federalSegments = buildBracketSegments(taxableIncome, federal);
+  }
+
+  const regionalSegments = buildBracketSegments(
+    grossAnnualIncome > 0 ? Math.max(0, grossAnnualIncome - stateTable.basicPersonalAmount) : 0,
+    stateTable,
+  );
+
+  return {
+    federalBrackets: federalSegments,
+    regionalBrackets: regionalSegments,
+    federalBPA: federal.basicPersonalAmount,
+    regionalBPA: stateTable.basicPersonalAmount,
+  };
+}
+
 export const americanTaxEngine: TaxEngine = {
   computeTax: computeAmericanTax,
   getMarginalRate(annualIncome, jurisdiction, year) {
@@ -215,4 +242,5 @@ export const americanTaxEngine: TaxEngine = {
   classifyTaxTreatment: classifyAmericanTaxTreatment,
   getWithdrawalTaxRate: getAmericanWithdrawalTaxRate,
   getEarlyWithdrawalPenalties: getAmericanEarlyWithdrawalPenalties,
+  computeBracketSegments: computeAmericanBracketSegments,
 };
