@@ -1,17 +1,19 @@
 import { describe, it, expect } from "vitest";
 import {
   getCanadianBrackets,
-  getUSBrackets,
-  getUSCapitalGainsBrackets,
   CA_FEDERAL_2025,
   CA_FEDERAL_2026,
+  SUPPORTED_TAX_YEARS,
+} from "@/lib/countries/canada/tax-tables";
+import {
+  getUSBrackets,
+  getUSCapitalGainsBrackets,
   US_FEDERAL_2025,
   US_FEDERAL_2026,
   US_CAPITAL_GAINS_2025,
   US_CAPITAL_GAINS_2026,
-  SUPPORTED_TAX_YEARS,
-  calculateProgressiveTax,
-} from "@/lib/tax-tables";
+} from "@/lib/countries/usa/tax-tables";
+import { calculateProgressiveTax } from "@/lib/tax-tables";
 import { computeTax } from "@/lib/tax-engine";
 import {
   findCreditCategory,

@@ -20,6 +20,22 @@ export const OAS_MAX_MONTHLY_75_PLUS = 800.44;
 /** OAS clawback threshold — recovery tax begins above this net income (2024 tax year). */
 export const OAS_CLAWBACK_THRESHOLD = 90_997;
 
+export type CppPreset = "none" | "average" | "max" | "custom";
+export type OasPreset = "none" | "full" | "custom";
+
+export function getCppPresetAmount(preset: CppPreset, customAmount?: number): number {
+  if (preset === "average") return CPP_AVERAGE_MONTHLY;
+  if (preset === "max") return CPP_MAX_MONTHLY;
+  if (preset === "custom") return customAmount ?? 0;
+  return 0;
+}
+
+export function getOasPresetAmount(preset: OasPreset, customAmount?: number): number {
+  if (preset === "full") return OAS_MAX_MONTHLY_65_74;
+  if (preset === "custom") return customAmount ?? 0;
+  return 0;
+}
+
 export const canadianGovernmentRetirement: GovernmentRetirementPlugin = {
   programLabel: "CPP + OAS",
   computeMonthly(income) {

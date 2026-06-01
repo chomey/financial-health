@@ -3,7 +3,6 @@ import { computeCoastFireAge } from "@/lib/financial-state";
 import {
   checkIncomeEligibility,
   findCreditCategory,
-  ALL_CREDIT_CATEGORIES,
 } from "@/lib/tax-credits";
 import type { FinancialData, Insight } from "./types";
 import { setInsightCurrency, formatCurrency, formatCompact, _filingStatusLabel } from "./formatting";
@@ -690,7 +689,7 @@ export function generateInsights(data: FinancialData): Insight[] {
 
       // Helper: check eligibility before suggesting
       const eligible = (creditName: string): boolean => {
-        const cat = ALL_CREDIT_CATEGORIES.find((c) => c.name === creditName && c.jurisdiction === country);
+        const cat = findCreditCategory(creditName, country);
         if (!cat) return false;
         if (annualGrossIncome > 0) {
           return checkIncomeEligibility(cat, annualGrossIncome, filingStatus) !== "ineligible";

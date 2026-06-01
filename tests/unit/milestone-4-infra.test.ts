@@ -46,10 +46,11 @@ describe("Milestone 4 E2E infrastructure verification", () => {
     expect(typeof taxEngine.computeTax).toBe("function");
   });
 
-  it("tax-tables exports getCanadianBrackets and getUSBrackets", async () => {
-    const taxTables = await import("@/lib/tax-tables");
-    expect(typeof taxTables.getCanadianBrackets).toBe("function");
-    expect(typeof taxTables.getUSBrackets).toBe("function");
+  it("country plugins export their tax-table lookups", async () => {
+    const caTaxTables = await import("@/lib/countries/canada/tax-tables");
+    const usTaxTables = await import("@/lib/countries/usa/tax-tables");
+    expect(typeof caTaxTables.getCanadianBrackets).toBe("function");
+    expect(typeof usTaxTables.getUSBrackets).toBe("function");
   });
 
   it("financial-state includes country and jurisdiction in INITIAL_STATE", async () => {

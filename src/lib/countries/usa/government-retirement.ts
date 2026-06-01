@@ -16,6 +16,17 @@ export const SS_MAX_AT_67 = 3_822;
 /** SS maximum monthly benefit at age 70 (2025). Source: ssa.gov */
 export const SS_MAX_AT_70 = 4_873;
 
+export type SsPreset = "none" | "average" | "max-62" | "max-67" | "max-70" | "custom";
+
+export function getSsPresetAmount(preset: SsPreset, customAmount?: number): number {
+  if (preset === "average") return SS_AVERAGE_MONTHLY;
+  if (preset === "max-62") return SS_MAX_AT_62;
+  if (preset === "max-67") return SS_MAX_AT_67;
+  if (preset === "max-70") return SS_MAX_AT_70;
+  if (preset === "custom") return customAmount ?? 0;
+  return 0;
+}
+
 export const americanGovernmentRetirement: GovernmentRetirementPlugin = {
   programLabel: "Social Security",
   computeMonthly(income) {

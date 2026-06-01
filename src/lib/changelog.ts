@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 233,
+    title: "Country plugin migration cleanup",
+    description: "Pruned the former monolithic tax-table, government-retirement, and tax-credit libraries into thin shared facades. Country-specific constants and catalogs now live only in their country plugins, and tax-credit all-category lookups dispatch through the registry. No user-visible change.",
+    date: "2026-06-01",
+  },
+  {
     version: 232,
     title: "Tax-year choices use country-specific labels",
     description: "Tax-year buttons in the welcome selector and profile step now render through `getCountry(country).taxYearLabel(...)`. Australia displays fiscal-year choices such as \"2024/25 FY\" while Canada and the United States retain calendar-year labels.",

@@ -156,17 +156,3 @@ describe("fortnightlyToMonthly", () => {
     expect(fortnightlyToMonthly(0)).toBe(0);
   });
 });
-
-describe("backward compatibility: re-exports from @/lib/government-retirement", () => {
-  it("re-exports AU pension constants and helpers", async () => {
-    const legacy = await import("@/lib/government-retirement");
-    expect(legacy.AU_PENSION_SINGLE_FORTNIGHTLY).toBe(AU_PENSION_SINGLE_FORTNIGHTLY);
-    expect(legacy.AU_PENSION_COUPLE_EACH_FORTNIGHTLY).toBe(AU_PENSION_COUPLE_EACH_FORTNIGHTLY);
-    expect(legacy.AU_PENSION_AGE).toBe(AU_PENSION_AGE);
-    expect(legacy.AU_SUPER_PRESERVATION_AGE).toBe(AU_SUPER_PRESERVATION_AGE);
-    expect(legacy.getAuPensionPresetAmount("full-single")).toBe(
-      getAuPensionPresetAmount("full-single"),
-    );
-    expect(legacy.fortnightlyToMonthly(1000)).toBe(fortnightlyToMonthly(1000));
-  });
-});

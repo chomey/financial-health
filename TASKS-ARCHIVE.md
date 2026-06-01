@@ -299,3 +299,5 @@
 - [x] Task 231: Insights generate.ts dispatches via registry — In `src/lib/insights/generate.ts`, replace inline CA/US/AU branches with `getCountry(state.country).insights.getCandidates(state)` plus universal-insights generation. Each country's per-country `insights.ts` already exists by this point. [@fullstack]
 
 - [x] Task 232: Tax year display via taxYearLabel — Find every site that displays the tax year (search `src/components/` for `taxYear` or `"tax year"` strings) and replace `${taxYear}` with `getCountry(country).taxYearLabel(taxYear)`. AU users will see "2024/25 FY", CA/US still "2025". [@frontend]
+
+- [x] Task 233: Prune monolithic lib files — After all migrations, audit `src/lib/tax-tables.ts`, `src/lib/government-retirement.ts`, `src/lib/sample-profiles.ts`, `src/lib/tax-credits.ts`, `src/lib/withdrawal-tax.ts`. Each should now hold only shared types + thin shim free functions. Delete any remaining per-country constants/functions/sets. Confirm `wc -l` on each is < 100. Snapshot regressions must stay green. [@backend]

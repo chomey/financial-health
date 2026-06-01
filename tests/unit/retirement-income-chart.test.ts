@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { computeMonthlyGovernmentIncome, fortnightlyToMonthly, AU_PENSION_SINGLE_FORTNIGHTLY } from "@/lib/government-retirement";
+import { computeMonthlyGovernmentIncome } from "@/lib/government-retirement";
+import { fortnightlyToMonthly, AU_PENSION_SINGLE_FORTNIGHTLY } from "@/lib/countries/australia/government-retirement";
 
 describe("Retirement income chart data", () => {
   describe("coverage calculation", () => {

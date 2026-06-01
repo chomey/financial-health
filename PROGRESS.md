@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 232
-- **Remaining**: 2
+- **Completed**: 233
+- **Remaining**: 1
 - **Last Updated**: 2026-06-01
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -87,3 +87,16 @@
   - T2: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=232 npx playwright test tests/e2e/task-232-tax-year-label.spec.ts` passed (`1/1`).
 - **Screenshots**: `task-232-au-tax-year-labels.png`.
 - **Notes**: One repeated `npm test` run exposed an intermittent pre-existing `IncomeEntry.tsx` animation timeout after jsdom teardown. The isolated `income-frequency.test.tsx` suite passed (`18/18`) and the final full rerun passed (`4490/4490`).
+
+## Task 233: Prune monolithic lib files [@backend]
+- **Date**: 2026-06-01
+- **Files**:
+  - `src/lib/tax-tables.ts`, `src/lib/government-retirement.ts`, `src/lib/tax-credits.ts`: Removed remaining country-data aggregation and reduced each to a shared thin shim.
+  - `src/lib/tax-credit-types.ts`, `src/lib/tax-credit-eligibility.ts`: Moved shared tax-credit model and eligibility helpers out of the registry facade.
+  - `src/lib/countries/**`: Added registry-backed all-category catalog access and kept retirement preset helpers with their country plugins.
+  - `src/components/GovernmentRetirementInput.tsx`, `src/lib/insights/generate.ts`, `tests/unit/**`: Migrated consumers and added pruning regression coverage.
+- **Tests**:
+  - Build: `npm run build` passed.
+  - T1: `npm test` passed (`4495/4495`), including `tax-engine-snapshot.test.ts` (`440/440`) and `withdrawal-tax-snapshot.test.ts` (`54/54`).
+  - Audit: `wc -l` passed: `tax-tables.ts` 3, `government-retirement.ts` 12, `sample-profiles.ts` 22, `tax-credits.ts` 49, `withdrawal-tax.ts` 88.
+- **Screenshots**: None (backend-only cleanup).

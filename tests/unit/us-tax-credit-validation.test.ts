@@ -10,7 +10,7 @@ import {
   US_CAPITAL_GAINS_2025,
   US_CAPITAL_GAINS_2026,
   getUSBrackets,
-} from "@/lib/tax-tables";
+} from "@/lib/countries/usa/tax-tables";
 
 describe("Task 155 — US tax credit/bracket validation (2025/2026)", () => {
   describe("US federal brackets 2025", () => {

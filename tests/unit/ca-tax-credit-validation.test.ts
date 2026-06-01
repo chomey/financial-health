@@ -8,7 +8,7 @@ import {
   CA_FEDERAL_2025,
   CA_FEDERAL_2026,
   getCanadianBrackets,
-} from "@/lib/tax-tables";
+} from "@/lib/countries/canada/tax-tables";
 
 describe("Task 154 — Canadian tax credit/bracket validation (2025/2026)", () => {
   describe("CA federal brackets 2025", () => {

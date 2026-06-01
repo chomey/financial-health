@@ -9,7 +9,7 @@ import {
   AU_MEDICARE_LEVY,
   getAUBrackets,
   calculateMedicareLevy,
-} from "@/lib/tax-tables";
+} from "@/lib/countries/australia/tax-tables";
 import { computeTax } from "@/lib/tax-engine";
 
 // ─── AU Federal Bracket Structure ───────────────────────────────────────────

@@ -5,6 +5,8 @@ import {
   OAS_MAX_MONTHLY_65_74,
   getCppPresetAmount,
   getOasPresetAmount,
+} from "@/lib/countries/canada/government-retirement";
+import {
   computeMonthlyGovernmentIncome,
 } from "@/lib/government-retirement";
 import { computeFireNumber } from "@/lib/compute-totals";

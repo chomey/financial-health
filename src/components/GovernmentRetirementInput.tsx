@@ -6,18 +6,22 @@ import {
   CPP_MAX_MONTHLY,
   CPP_AVERAGE_MONTHLY,
   OAS_MAX_MONTHLY_65_74,
+  type CppPreset,
+  type OasPreset,
+} from "@/lib/countries/canada/government-retirement";
+import {
   SS_AVERAGE_MONTHLY,
   SS_MAX_AT_62,
   SS_MAX_AT_67,
   SS_MAX_AT_70,
+  type SsPreset,
+} from "@/lib/countries/usa/government-retirement";
+import {
   AU_PENSION_SINGLE_FORTNIGHTLY,
   AU_PENSION_COUPLE_EACH_FORTNIGHTLY,
   fortnightlyToMonthly,
-  type CppPreset,
-  type OasPreset,
-  type SsPreset,
   type AuPensionPreset,
-} from "@/lib/government-retirement";
+} from "@/lib/countries/australia/government-retirement";
 import HelpTip from "@/components/HelpTip";
 import type { CountryCode } from "@/lib/countries";
 

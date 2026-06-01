@@ -276,6 +276,9 @@ export const americanTaxCredits: TaxCreditCatalog = {
   getCategories(year) {
     return US_CATEGORIES.filter((c) => !c.infoOnly).map((c) => resolveCategoryForYear(c, year));
   },
+  getAllCategories(year) {
+    return US_CATEGORIES.map((c) => resolveCategoryForYear(c, year));
+  },
   getCategoriesForFilingStatus(filingStatus: FilingStatus, year) {
     const isMarried =
       filingStatus === "married-jointly" || filingStatus === "married-separately";

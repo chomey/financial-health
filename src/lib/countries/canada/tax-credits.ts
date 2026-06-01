@@ -251,6 +251,9 @@ export const canadianTaxCredits: TaxCreditCatalog = {
   getCategories(year) {
     return CA_CATEGORIES.filter((c) => !c.infoOnly).map((c) => resolveCategoryForYear(c, year));
   },
+  getAllCategories(year) {
+    return CA_CATEGORIES.map((c) => resolveCategoryForYear(c, year));
+  },
   getCategoriesForFilingStatus(filingStatus: FilingStatus, year) {
     const isMarried = filingStatus === "married-common-law";
     return CA_CATEGORIES

@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 232. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 233. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -29,8 +29,6 @@ test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehi
 - [x] Task 222: tax-engine.ts shim — Rewrite `src/lib/tax-engine.ts` to a thin shim. Public `computeTax(income, type, country, jurisdiction, year)` and `getMarginalRateForIncome` delegate to `getCountry(country).taxEngine.*`. Keep `IncomeType` and `TaxResult` type exports. Snapshot regressions must stay green. [@backend]
 
 ### Cleanup (plan tasks 42–44)
-
-- [ ] Task 233: Prune monolithic lib files — After all migrations, audit `src/lib/tax-tables.ts`, `src/lib/government-retirement.ts`, `src/lib/sample-profiles.ts`, `src/lib/tax-credits.ts`, `src/lib/withdrawal-tax.ts`. Each should now hold only shared types + thin shim free functions. Delete any remaining per-country constants/functions/sets. Confirm `wc -l` on each is < 100. Snapshot regressions must stay green. [@backend]
 
 - [ ] Task 234: Final regression check + changelog — Run `npm test && npx tsc --noEmit && npx playwright test`. All green. Add changelog entry to `src/lib/changelog.ts` describing the refactor (no user-visible change, foundation for future country additions). Run `npm run lint`. [@qa] [E2E] [MILESTONE]
 

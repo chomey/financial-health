@@ -4,7 +4,7 @@
  * creating a circular dependency with tax-credits.ts → countries/ → here.
  */
 
-import type { TaxCreditCategory } from "@/lib/tax-credits";
+import type { TaxCreditCategory } from "@/lib/tax-credit-types";
 
 /**
  * Resolve a credit category for a specific tax year by merging yearOverrides.

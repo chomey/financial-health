@@ -89,6 +89,7 @@ export interface FlowchartWiki {
 export interface TaxCreditCatalog {
   getCategories(year: number): TaxCreditCategory[];
   getCategoriesForFilingStatus(filingStatus: FilingStatus, year: number): TaxCreditCategory[];
+  getAllCategories(year: number): TaxCreditCategory[];
   findCategory(name: string, year: number): TaxCreditCategory | undefined;
 }
 

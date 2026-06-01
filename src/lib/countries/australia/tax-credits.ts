@@ -159,6 +159,9 @@ export const australianTaxCredits: TaxCreditCatalog = {
   getCategories(year) {
     return AU_CATEGORIES.filter((c) => !c.infoOnly).map((c) => resolveCategoryForYear(c, year));
   },
+  getAllCategories(year) {
+    return AU_CATEGORIES.map((c) => resolveCategoryForYear(c, year));
+  },
   getCategoriesForFilingStatus(filingStatus: FilingStatus, year) {
     const isMarried = filingStatus === "married-de-facto";
     return AU_CATEGORIES

@@ -1,8 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   getCanadianBrackets,
-  getUSBrackets,
-  calculateProgressiveTax,
   calculateCanadianCapitalGainsInclusion,
   CA_FEDERAL_2025,
   CA_ON_2025,
@@ -10,13 +8,17 @@ import {
   CA_AB_2025,
   CA_QC_2025,
   CA_CAPITAL_GAINS,
+} from "@/lib/countries/canada/tax-tables";
+import {
+  getUSBrackets,
   US_FEDERAL_2025,
   US_CAPITAL_GAINS_2025,
   US_CA_2025,
   US_NY_2025,
   US_TX_2025,
   US_FL_2025,
-} from "@/lib/tax-tables";
+} from "@/lib/countries/usa/tax-tables";
+import { calculateProgressiveTax } from "@/lib/tax-tables";
 
 describe("getCanadianBrackets", () => {
   it("returns federal and provincial tables for valid province codes", () => {
