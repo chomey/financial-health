@@ -21,7 +21,8 @@ export default function CountryJurisdictionSelector({
   taxYear = new Date().getFullYear(),
   onTaxYearChange,
 }: CountryJurisdictionSelectorProps) {
-  const jurisdictions = getCountry(country).jurisdictions;
+  const profile = getCountry(country);
+  const jurisdictions = profile.jurisdictions;
 
   const handleCountryChange = useCallback(
     (newCountry: CountryCode) => {
@@ -48,10 +49,10 @@ export default function CountryJurisdictionSelector({
                   : "text-slate-500 hover:text-slate-300"
               }`}
               aria-pressed={taxYear === 2025}
-              aria-label="Tax year 2025"
+              aria-label={`Tax year ${profile.taxYearLabel(2025)}`}
               data-testid="tax-year-2025"
             >
-              2025
+              {profile.taxYearLabel(2025)}
             </button>
             <button
               type="button"
@@ -62,10 +63,10 @@ export default function CountryJurisdictionSelector({
                   : "text-slate-500 hover:text-slate-300"
               }`}
               aria-pressed={taxYear === 2026}
-              aria-label="Tax year 2026"
+              aria-label={`Tax year ${profile.taxYearLabel(2026)}`}
               data-testid="tax-year-2026"
             >
-              2026
+              {profile.taxYearLabel(2026)}
             </button>
           </div>
         )}

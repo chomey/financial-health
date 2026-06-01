@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 232,
+    title: "Tax-year choices use country-specific labels",
+    description: "Tax-year buttons in the welcome selector and profile step now render through `getCountry(country).taxYearLabel(...)`. Australia displays fiscal-year choices such as \"2024/25 FY\" while Canada and the United States retain calendar-year labels.",
+    date: "2026-06-01",
+  },
+  {
     version: 231,
     title: "Insights dispatch through the country plugin registry",
     description: "Insight generation now keeps universal candidates in `generate.ts` and appends country-specific candidates through `getCountry(state.country).insights.getCandidates(state, data)`. Raw financial state is threaded into the derived insight data for registry dispatch. Australia-only Super Guarantee, HECS-HELP, FHSS, franking-credit, and MLS candidates moved behind the Australia insight provider while preserving their existing messages. No user-visible change.",

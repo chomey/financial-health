@@ -184,6 +184,25 @@ describe("CountryJurisdictionSelector", () => {
     const select = screen.getByTestId("jurisdiction-select") as HTMLSelectElement;
     expect(select.value).toBe("QC");
   });
+
+  it("renders calendar-year labels for CA", () => {
+    render(<CountryJurisdictionSelector {...defaultProps} onTaxYearChange={vi.fn()} />);
+    expect(screen.getByTestId("tax-year-2025")).toHaveTextContent("2025");
+    expect(screen.getByTestId("tax-year-2026")).toHaveAccessibleName("Tax year 2026");
+  });
+
+  it("renders fiscal-year labels for AU", () => {
+    render(
+      <CountryJurisdictionSelector
+        {...defaultProps}
+        country="AU"
+        jurisdiction="NSW"
+        onTaxYearChange={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId("tax-year-2025")).toHaveTextContent("2024/25 FY");
+    expect(screen.getByTestId("tax-year-2026")).toHaveAccessibleName("Tax year 2025/26 FY");
+  });
 });
 
 describe("jurisdiction data via country registry", () => {

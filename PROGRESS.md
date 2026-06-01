@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 231
-- **Remaining**: 3
+- **Completed**: 232
+- **Remaining**: 2
 - **Last Updated**: 2026-06-01
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -75,3 +75,15 @@
   - T2: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=231 npx playwright test tests/e2e/task-231-insights-registry-dispatch.spec.ts` passed (`1/1`).
   - Lint: `npm run lint` still reports `20` errors and `5` warnings in pre-existing untouched files; no new lint findings in task files.
 - **Screenshots**: `task-231-insights-registry-dispatch.png`.
+
+## Task 232: Tax year display via taxYearLabel [@frontend]
+- **Date**: 2026-06-01
+- **Files**:
+  - `src/components/CountryJurisdictionSelector.tsx`, `src/components/wizard/steps/ProfileStep.tsx`: Rendered tax-year choices through `getCountry(country).taxYearLabel(...)`; welcome selector accessibility labels now use the same country-specific text.
+  - `tests/unit/country-jurisdiction-selector.test.tsx`, `tests/e2e/task-232-tax-year-label.spec.ts`: Added T1 and T2 coverage for AU fiscal-year labels while preserving CA calendar-year labels.
+- **Tests**:
+  - Build: `npm run build` passed.
+  - T1: `npm test` passed (`4490/4490`).
+  - T2: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=232 npx playwright test tests/e2e/task-232-tax-year-label.spec.ts` passed (`1/1`).
+- **Screenshots**: `task-232-au-tax-year-labels.png`.
+- **Notes**: One repeated `npm test` run exposed an intermittent pre-existing `IncomeEntry.tsx` animation timeout after jsdom teardown. The isolated `income-frequency.test.tsx` suite passed (`18/18`) and the final full rerun passed (`4490/4490`).

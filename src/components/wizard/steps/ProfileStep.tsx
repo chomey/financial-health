@@ -118,7 +118,7 @@ export default function ProfileStep({
               aria-pressed={taxYear === 2025}
               data-testid="tax-year-2025"
             >
-              2025
+              {getCountry(country).taxYearLabel(2025)}
             </button>
             <button
               type="button"
@@ -131,7 +131,7 @@ export default function ProfileStep({
               aria-pressed={taxYear === 2026}
               data-testid="tax-year-2026"
             >
-              2026
+              {getCountry(country).taxYearLabel(2026)}
             </button>
           </div>
         </div>
