@@ -1,13 +1,14 @@
 #!/usr/bin/env zsh
 set -euo pipefail
 
-# Ralph Loop - Automated Claude iteration driver
+# Ralph Loop - Automated Codex iteration driver
 # Usage: ./ralph.zsh [number_of_tasks]
 #
 # Examples:
 #   ./ralph.zsh 20    # Run next 20 uncompleted tasks
 #   ./ralph.zsh 5     # Run next 5 uncompleted tasks
 #   ./ralph.zsh       # Run next 10 uncompleted tasks (default)
+#   CODEX_MODEL=gpt-5.4 ./ralph.zsh 1  # Override the Codex config model
 
 TASK_COUNT="${1:-10}"
 
@@ -38,7 +39,7 @@ TASKS_MAX_COMPLETED=3     # Keep last N completed tasks in TASKS.md
 
 # Tracking arrays for the final summary
 typeset -a ITER_TIMES=()
-typeset -a ITER_MODELS=()
+typeset -a ITER_EFFORTS=()
 typeset -a ITER_TAGS=()
 typeset -a ITER_TITLES=()
 TASKS_COMPLETED_THIS_RUN=0
@@ -241,17 +242,17 @@ print_summary() {
     print "  ${BOLD}Avg/task:${NC}  $(format_duration $avg)  ${DIM}(fastest: $(format_duration $fastest), slowest: $(format_duration $slowest))${NC}"
   fi
 
-  # Model breakdown
-  if [[ ${#ITER_MODELS[@]} -gt 0 ]]; then
-    local sonnet_count=0 opus_count=0
-    for m in "${ITER_MODELS[@]}"; do
-      [[ "$m" == "sonnet" ]] && sonnet_count=$((sonnet_count + 1))
-      [[ "$m" == "opus" ]] && opus_count=$((opus_count + 1))
+  # Reasoning effort breakdown
+  if [[ ${#ITER_EFFORTS[@]} -gt 0 ]]; then
+    local medium_count=0 high_count=0
+    for effort in "${ITER_EFFORTS[@]}"; do
+      [[ "$effort" == "medium" ]] && medium_count=$((medium_count + 1))
+      [[ "$effort" == "high" ]] && high_count=$((high_count + 1))
     done
-    local model_summary=""
-    [[ $sonnet_count -gt 0 ]] && model_summary+="${sonnet_count} Sonnet"
-    [[ $opus_count -gt 0 ]] && { [[ -n "$model_summary" ]] && model_summary+=" + "; model_summary+="${opus_count} Opus"; }
-    print "  ${BOLD}Models:${NC}    ${model_summary}"
+    local effort_summary=""
+    [[ $medium_count -gt 0 ]] && effort_summary+="${medium_count} medium"
+    [[ $high_count -gt 0 ]] && { [[ -n "$effort_summary" ]] && effort_summary+=" + "; effort_summary+="${high_count} high"; }
+    print "  ${BOLD}Reasoning:${NC} ${effort_summary}"
   fi
 
   # Agent tag breakdown
@@ -276,10 +277,10 @@ print_summary() {
     print "  ${BOLD}Task breakdown:${NC}"
     for ((t = 1; t <= ${#ITER_TITLES[@]}; t++)); do
       local dur=$(format_duration ${ITER_TIMES[$t]})
-      local mdl="${ITER_MODELS[$t]}"
-      local mdl_color="${CYAN}"
-      [[ "$mdl" == "opus" ]] && mdl_color="${MAGENTA}"
-      print "    ${DIM}${dur}${NC}  ${mdl_color}${mdl}${NC}  ${ITER_TITLES[$t]}"
+      local effort="${ITER_EFFORTS[$t]}"
+      local effort_color="${CYAN}"
+      [[ "$effort" == "high" ]] && effort_color="${MAGENTA}"
+      print "    ${DIM}${dur}${NC}  ${effort_color}${effort}${NC}  ${ITER_TITLES[$t]}"
     done
   fi
 
@@ -311,10 +312,10 @@ trap trap_handler INT TERM
 START_TIME=$(date +%s)
 START_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
-print "${BLUE}╔══════════════════════════════════════╗${NC}"
-print "${BLUE}║     🚌 Ralph Loop v3.0 (worktree) 🚌  ║${NC}"
-print "${BLUE}║  \"I'm helping!\" - Ralph Wiggum       ║${NC}"
-print "${BLUE}╚══════════════════════════════════════╝${NC}"
+print "${BLUE}╔════════════════════════════════════════════╗${NC}"
+print "${BLUE}║   🚌 Ralph Loop v3.1 (Codex worktree) 🚌   ║${NC}"
+print "${BLUE}║      \"I'm helping!\" - Ralph Wiggum        ║${NC}"
+print "${BLUE}╚════════════════════════════════════════════╝${NC}"
 print ""
 print "${CYAN}Started: ${START_TIMESTAMP}${NC}"
 print ""
@@ -323,6 +324,13 @@ print ""
 for f in "$TASKS_FILE" "$PROMPT_FILE" "$PROGRESS_FILE"; do
   if [[ ! -f "$f" ]]; then
     print "${RED}Error: Missing required file: $f${NC}"
+    exit 1
+  fi
+done
+
+for cmd in codex jq; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    print "${RED}Error: ${cmd} is not installed or is not on PATH.${NC}"
     exit 1
   fi
 done
@@ -387,9 +395,9 @@ grep '^\- \[ \]' "$TASKS_FILE" | sort -t' ' -k4 -n | head -n "$TASK_COUNT" | whi
   local tag=$(extract_agent_tag "$task")
   local model_hint=""
   if echo "$task" | grep -qiE '\[OPUS\]|\[MATH\]'; then
-    model_hint=" ${MAGENTA}opus${NC}"
+    model_hint=" ${MAGENTA}codex/high${NC}"
   else
-    model_hint=" ${CYAN}sonnet${NC}"
+    model_hint=" ${CYAN}codex/medium${NC}"
   fi
   print "  ${YELLOW}${title}${NC}  ${DIM}${tag}${NC}${model_hint}"
 done
@@ -452,7 +460,27 @@ for orphan_branch in $(git -C "$SCRIPT_DIR" branch --list 'ralph/task-*' 2>/dev/
   fi
 done
 
-# Run Claude for each task (in isolated worktrees)
+# render_codex_events — prints only Codex's human-facing Markdown updates
+render_codex_events() {
+  jq --unbuffered -r '
+    if .type == "item.completed" and .item.type == "agent_message" then
+      .item.text + "\n"
+    elif .type == "turn.failed" then
+      "Codex failed: " + (.error.message // (.error | tostring)) + "\n"
+    else empty end
+  '
+}
+
+# run_codex — runs Codex non-interactively with concise live Markdown output
+run_codex() {
+  local -a codex_args=(exec --json --dangerously-bypass-approvals-and-sandbox -c "model_reasoning_effort=${reasoning_effort}")
+  if [[ -n "${CODEX_MODEL:-}" ]]; then
+    codex_args+=(--model "$CODEX_MODEL")
+  fi
+  (cd "$wt_path" && print -r -- "$prompt" | codex "${codex_args[@]}" - 2>&1 | tee "$codex_log_file" | render_codex_events)
+}
+
+# Run Codex for each task (in isolated worktrees)
 for ((i = 1; i <= TASK_COUNT; i++)); do
   # Bail out if interrupted between iterations
   [[ $INTERRUPTED -eq 1 ]] && { print_summary; exit 130; }
@@ -495,7 +523,7 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
       print "${RED}  ✗ Retry failed. Stopping loop.${NC}"
       TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
       ITER_TIMES+=($(($(date +%s) - ITER_START)))
-      ITER_MODELS+=("unknown")
+      ITER_EFFORTS+=("unknown")
       ITER_TAGS+=("$task_tag")
       ITER_TITLES+=("${task_title} ${RED}(worktree failed)${NC}")
       break
@@ -506,38 +534,40 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   local wt_prompt_file="${wt_path}/PROMPT.md"
   prompt=$(cat "$wt_prompt_file")
 
-  # Pick model: Opus for tasks needing deep reasoning, Sonnet for everything else
+  # Use more reasoning effort for tasks tagged as complex or math-heavy.
   if echo "$next_task" | grep -qiE '\[OPUS\]|\[MATH\]'; then
-    model="opus"
+    reasoning_effort="high"
     local tag_reason="complex"
     echo "$next_task" | grep -qiE '\[MATH\]' && tag_reason="math-heavy"
-    print "  ${MAGENTA}▸ Model: opus${NC} ${DIM}(${tag_reason} task)${NC}"
+    print "  ${MAGENTA}▸ Codex reasoning: high${NC} ${DIM}(${tag_reason} task)${NC}"
   else
-    model="sonnet"
-    print "  ${CYAN}▸ Model: sonnet${NC}"
+    reasoning_effort="medium"
+    print "  ${CYAN}▸ Codex reasoning: medium${NC}"
   fi
   print ""
 
-  # Run Claude inside the worktree (45-minute timeout per task)
-  local claude_exit=0
+  # Run Codex inside the worktree (45-minute timeout per task)
+  local codex_exit=0
   local TASK_TIMEOUT=2700  # 45 minutes
-  local claude_pid
-  (cd "$wt_path" && claude --print --dangerously-skip-permissions --model "$model" "$prompt") &
-  claude_pid=$!
+  local codex_log_file="${TMPDIR:-/tmp}/ralph-task-${task_num}.jsonl"
+  local codex_pid
+  print "  ${DIM}▸ Full transcript: ${codex_log_file}${NC}"
+  run_codex &
+  codex_pid=$!
 
   # Monitor with timeout — check every 10 seconds
   local elapsed=0
-  while kill -0 "$claude_pid" 2>/dev/null; do
+  while kill -0 "$codex_pid" 2>/dev/null; do
     if [[ $elapsed -ge $TASK_TIMEOUT ]]; then
       print ""
       print "${RED}  ✗ Task timed out after $((TASK_TIMEOUT / 60)) minutes. Killing...${NC}"
-      kill -TERM "$claude_pid" 2>/dev/null
+      kill -TERM "$codex_pid" 2>/dev/null
       sleep 2
-      kill -9 "$claude_pid" 2>/dev/null || true
-      wait "$claude_pid" 2>/dev/null || true
+      kill -9 "$codex_pid" 2>/dev/null || true
+      wait "$codex_pid" 2>/dev/null || true
       TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
       ITER_TIMES+=($(($(date +%s) - ITER_START)))
-      ITER_MODELS+=("$model")
+      ITER_EFFORTS+=("$reasoning_effort")
       ITER_TAGS+=("$task_tag")
       ITER_TITLES+=("${task_title} ${RED}(timed out)${NC}")
       cleanup_worktree "$wt_path" "$branch_name"
@@ -546,29 +576,29 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
     sleep 10
     elapsed=$((elapsed + 10))
   done
-  wait "$claude_pid" 2>/dev/null || claude_exit=$?
+  wait "$codex_pid" 2>/dev/null || codex_exit=$?
 
   # If interrupted (Ctrl+C), clean up worktree and exit
-  if [[ $INTERRUPTED -eq 1 || $claude_exit -eq 130 ]]; then
+  if [[ $INTERRUPTED -eq 1 || $codex_exit -eq 130 ]]; then
     INTERRUPTED=1
     cleanup_worktree "$wt_path" "$branch_name"
     ITER_TIMES+=($(($(date +%s) - ITER_START)))
-    ITER_MODELS+=("$model")
+    ITER_EFFORTS+=("$reasoning_effort")
     ITER_TAGS+=("$task_tag")
     ITER_TITLES+=("${task_title} ${YELLOW}(interrupted)${NC}")
     print_summary
     exit 130
   fi
 
-  # Check if Claude failed
-  if [[ $claude_exit -ne 0 ]]; then
+  # Check if Codex failed
+  if [[ $codex_exit -ne 0 ]]; then
     print ""
-    print "${RED}  ✗ Claude exited with code ${claude_exit} on iteration ${i}.${NC}"
+    print "${RED}  ✗ Codex exited with code ${codex_exit} on iteration ${i}.${NC}"
 
     # Retry once for transient failures
     print "${YELLOW}  Retrying in 5 seconds...${NC}"
     sleep 5
-    (cd "$wt_path" && claude --print --dangerously-skip-permissions --model "$model" "$prompt") || {
+    run_codex || {
       # Check again for interrupt during retry
       if [[ $INTERRUPTED -eq 1 ]]; then
         cleanup_worktree "$wt_path" "$branch_name"
@@ -578,7 +608,7 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
       print "${RED}  ✗ Retry also failed. Stopping loop.${NC}"
       TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
       ITER_TIMES+=($(($(date +%s) - ITER_START)))
-      ITER_MODELS+=("$model")
+      ITER_EFFORTS+=("$reasoning_effort")
       ITER_TAGS+=("$task_tag")
       ITER_TITLES+=("${task_title} ${RED}(FAILED)${NC}")
       cleanup_worktree "$wt_path" "$branch_name"
@@ -626,7 +656,7 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
       print "${YELLOW}    Resolve manually: cd ${SCRIPT_DIR} && git merge ${branch_name}${NC}"
       TASKS_FAILED_THIS_RUN=$((TASKS_FAILED_THIS_RUN + 1))
       ITER_TIMES+=($(($(date +%s) - ITER_START)))
-      ITER_MODELS+=("$model")
+      ITER_EFFORTS+=("$reasoning_effort")
       ITER_TAGS+=("$task_tag")
       ITER_TITLES+=("${task_title} ${RED}(merge conflict)${NC}")
       print_summary
@@ -668,7 +698,7 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   ITER_END=$(date +%s)
   ITER_ELAPSED=$((ITER_END - ITER_START))
   ITER_TIMES+=($ITER_ELAPSED)
-  ITER_MODELS+=("$model")
+  ITER_EFFORTS+=("$reasoning_effort")
   ITER_TAGS+=("$task_tag")
   ITER_TITLES+=("$task_title")
 
