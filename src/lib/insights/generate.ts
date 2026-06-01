@@ -8,6 +8,32 @@ import {
 import type { FinancialData, Insight } from "./types";
 import { setInsightCurrency, formatCurrency, formatCompact, _filingStatusLabel } from "./formatting";
 import { getNetWorthMilestone, getAgeGroup } from "./net-worth";
+import { getCountry } from "@/lib/countries";
+import type { FinancialState } from "@/lib/financial-types";
+
+function toInsightProviderState(data: FinancialData): FinancialState {
+  const country = data.country ?? "CA";
+  return {
+    assets: (data.assetCategories ?? []).map((category, index) => ({
+      id: `insight-asset-${index}`,
+      category,
+      amount: 0,
+    })),
+    debts: (data.debtCategories ?? []).map((category, index) => ({
+      id: `insight-debt-${index}`,
+      category,
+      amount: 0,
+    })),
+    income: data.annualEmploymentIncome
+      ? [{ id: "insight-income", category: "Salary", amount: data.annualEmploymentIncome / 12 }]
+      : [],
+    expenses: [],
+    properties: data.isHomeowner ? [{} as FinancialState["properties"][number]] : [],
+    stocks: [],
+    country,
+    age: data.currentAge,
+  };
+}
 
 /**
  * Build a context-aware message for the "tax rate is high" insight.
@@ -349,83 +375,6 @@ export function generateInsights(data: FinancialData): Insight[] {
       message: `Your employer match adds ${formatCurrency(data.employerMatchAnnual)}/yr in free money — that's ${formatCompact(data.employerMatchAnnual * outlookYears)} over ${outlookYears} years. Make sure you're contributing enough to get the full match.`,
       icon: "🎁",
     });
-  }
-
-  // AU-specific insights: super guarantee, HECS-HELP, FHSS, franking credits, MLS
-  if ((data.country ?? "CA") === "AU") {
-    const auAssetCats = (data.assetCategories ?? []).map((c) => c.toLowerCase());
-    const auDebtCats = (data.debtCategories ?? []).map((c) => c.toLowerCase());
-    const auAnnualIncome = (data.monthlyGrossIncome ?? 0) * 12;
-    const auEmploymentIncome = data.annualEmploymentIncome ?? 0;
-
-    // Super guarantee check — 11.5% of salary (2024-25 rate)
-    if (auEmploymentIncome > 0) {
-      const hasSuperAcct = auAssetCats.some((c) => c.includes("super") || c.includes("pension phase") || c.includes("fhss"));
-      const expectedGuarantee = auEmploymentIncome * 0.115;
-      const employerContrib = data.employerMatchAnnual ?? 0;
-      if (!hasSuperAcct) {
-        insights.push({
-          id: "au-super-missing",
-          type: "au-super",
-          message: `Your employer must contribute 11.5% of your salary (${formatCurrency(expectedGuarantee)}/yr) to your super as the Super Guarantee. Make sure you've nominated a fund — and add your super account to track your balance.`,
-          icon: "🦘",
-        });
-      } else if (employerContrib > 0 && employerContrib < expectedGuarantee * 0.9) {
-        insights.push({
-          id: "au-super-guarantee",
-          type: "au-super",
-          message: `Your employer should be contributing ${formatCurrency(expectedGuarantee)}/yr (11.5% Super Guarantee) to your super. Check your latest super statement to confirm the full amount is being paid.`,
-          icon: "🦘",
-        });
-      }
-    }
-
-    // HECS-HELP compulsory repayment threshold (2025-26: $54,435)
-    const hasHECS = auDebtCats.some((c) => c.includes("hecs") || c.includes("help"));
-    if (hasHECS && auEmploymentIncome >= 54_435) {
-      insights.push({
-        id: "au-hecs-repayment",
-        type: "au-hecs-help",
-        message: `Your HECS-HELP repayments are automatically deducted via PAYG at your income level. Unlike regular interest, HECS-HELP is indexed to CPI — voluntary early repayments don't save you interest, they just reduce the balance before the annual indexation date (June 1). Check your MyGov account for your current balance.`,
-        icon: "🎓",
-      });
-    }
-
-    // FHSS eligibility — user is not a homeowner, has income, no FHSS account
-    if (!data.isHomeowner && auEmploymentIncome > 0) {
-      const hasFHSS = auAssetCats.some((c) => c.includes("fhss") || c.includes("first home super"));
-      if (!hasFHSS) {
-        insights.push({
-          id: "au-fhss",
-          type: "au-fhss",
-          message: `Saving for your first home? The First Home Super Saver (FHSS) scheme lets you voluntarily contribute up to $15,000/yr ($50,000 lifetime cap) into super at a 15% tax rate, then withdraw it for a deposit — a great deal if your marginal rate is above 15%.`,
-          icon: "🏠",
-        });
-      }
-    }
-
-    // Franking credits — user has taxable investments but hasn't claimed franking credits
-    const taxableBalance = data.withdrawalTax?.accountsByTreatment.taxable.total ?? 0;
-    const hasFrankingClaim = (data.taxCredits ?? []).some((c) => c.category.toLowerCase().includes("franking"));
-    if (taxableBalance > 10_000 && !hasFrankingClaim) {
-      insights.push({
-        id: "au-franking",
-        type: "au-franking",
-        message: `Australian shares often pay franked dividends — the attached franking credits represent company tax already paid at 30%. You include the grossed-up dividend in your taxable income and claim the credit as an offset. If the credits exceed your tax liability, the ATO refunds the difference. Track these in the Tax Credits section.`,
-        icon: "📋",
-      });
-    }
-
-    // Medicare Levy Surcharge avoidance — income > $93,000, no private health insurance rebate claimed
-    const hasPHI = (data.taxCredits ?? []).some((c) => c.category.toLowerCase().includes("private health"));
-    if (auAnnualIncome >= 93_000 && !hasPHI) {
-      insights.push({
-        id: "au-mls",
-        type: "au-mls",
-        message: `At your income level, you may be liable for the Medicare Levy Surcharge (MLS) of 1–1.5% (up to ${formatCurrency(Math.round(auAnnualIncome * 0.015))}/yr) if you don't hold private hospital cover. Basic hospital cover typically costs less than the surcharge — worth comparing. Add a Private Health Insurance Rebate in Tax Credits if you have cover.`,
-        icon: "🏥",
-      });
-    }
   }
 
   // Debt payoff strategy comparison — shown when user has 2+ debts with interest & payments
@@ -943,6 +892,11 @@ export function generateInsights(data: FinancialData): Insight[] {
         });
       }
     }
+  }
+
+  const state = data.insightState ?? (data.country === "AU" ? toInsightProviderState(data) : undefined);
+  if (state?.country) {
+    insights.push(...getCountry(state.country).insights.getCandidates(state, data));
   }
 
   return deduplicateInsights(insights);

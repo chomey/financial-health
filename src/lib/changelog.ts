@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 231,
+    title: "Insights dispatch through the country plugin registry",
+    description: "Insight generation now keeps universal candidates in `generate.ts` and appends country-specific candidates through `getCountry(state.country).insights.getCandidates(state, data)`. Raw financial state is threaded into the derived insight data for registry dispatch. Australia-only Super Guarantee, HECS-HELP, FHSS, franking-credit, and MLS candidates moved behind the Australia insight provider while preserving their existing messages. No user-visible change.",
+    date: "2026-06-01",
+  },
+  {
     version: 230,
     title: "Library-side consumers dispatch through the country plugin registry",
     description: "Migrated remaining `country === \"CA\"/\"US\"/\"AU\"` switches in `compute-totals.ts`, `required-minimum-distributions.ts`, `benchmarks.ts`, and `flowchart-steps.ts` to `getCountry(country).*` lookups. Added four plugin surfaces: `TaxEngine.computeBracketSegments` (federal/regional bracket render with country-specific capital-gains handling), a per-country `rmd` rule (CA RRIF, US RMD, AU no-op), a per-country `benchmarks` data block (age-group medians + national average + source attribution), and a per-country `flowchartSteps.build` adapter. Also migrated `financial-state.ts`, `projections.ts`, and `runway-simulation.ts` from deprecated free-function shims to direct `taxEngine` calls. The `COUNTRIES` registry uses property getters so cycle-induced module-load ordering can no longer snapshot `undefined`. No user-visible change.",

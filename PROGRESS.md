@@ -8,9 +8,9 @@
 
 ## Summary
 - **Total Tasks**: 234
-- **Completed**: 230
-- **Remaining**: 4
-- **Last Updated**: 2026-05-12
+- **Completed**: 231
+- **Remaining**: 3
+- **Last Updated**: 2026-06-01
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
 
@@ -62,3 +62,16 @@
   - `src/lib/financial-state.ts`, `projections.ts`, `runway-simulation.ts` had no `country === "..."` branches either, only deprecated shim calls. Migrated those to direct `getCountry(country).taxEngine.*` to align with the consumer-migration goal.
   - `src/app/page.tsx`'s only registry-relevant change was a stale unused import — every other country use was already prop-typed.
   - `COUNTRIES` const was switched to property getters because the new flowchart plugin path created a real value-import cycle (`country/index → country/flowchart-steps → lib/flowchart-steps → lib/countries → country/index`). A frozen object literal snapshotted `undefined` for the still-loading country; getters re-read the live binding at access time so the test (`Object.keys` + identity) still passes.
+
+## Task 231: Insights generate.ts dispatches via registry [@fullstack]
+- **Date**: 2026-06-01
+- **Files**:
+  - `src/lib/insights/generate.ts`, `src/lib/insights/types.ts`, `src/lib/financial-state.ts`: Threaded raw app state into insight generation and dispatch selected country candidates through `getCountry(state.country).insights.getCandidates(state, data)`.
+  - `src/lib/countries/types.ts`, `src/lib/countries/australia/insights.ts`: Extended the provider context for derived-data candidates and moved the AU-only Super Guarantee, HECS-HELP, FHSS, franking-credit, and MLS candidates behind the Australia plugin.
+  - `tests/unit/countries/insights-registry-dispatch.test.ts`, `tests/e2e/task-231-insights-registry-dispatch.spec.ts`: Added T1 registry-dispatch coverage and T2 dashboard render coverage.
+- **Tests**:
+  - Build: `npm run build` passed.
+  - T1: `npm test` passed (`4488/4488`).
+  - T2: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=231 npx playwright test tests/e2e/task-231-insights-registry-dispatch.spec.ts` passed (`1/1`).
+  - Lint: `npm run lint` still reports `20` errors and `5` warnings in pre-existing untouched files; no new lint findings in task files.
+- **Screenshots**: `task-231-insights-registry-dispatch.png`.

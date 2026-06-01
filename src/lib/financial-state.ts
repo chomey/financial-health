@@ -84,6 +84,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
 
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
   return {
+    insightState: state,
     totalAssets: totalAssets + totalStocks + totalPropertyValue,
     totalDebts: totalDebts + totalPropertyMortgage,
     liquidAssets: totalAssets + totalStocks,

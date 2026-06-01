@@ -11,7 +11,7 @@ import type {
 } from "@/lib/financial-types";
 import type { SampleProfile } from "@/lib/sample-profiles";
 import type { SupportedCurrency, Locale } from "@/lib/currency";
-import type { Insight } from "@/lib/insights/types";
+import type { FinancialData, Insight } from "@/lib/insights/types";
 
 export type CountryCode = "CA" | "US" | "AU";
 
@@ -98,7 +98,7 @@ export interface ProfileLibrary {
 }
 
 export interface InsightProvider {
-  getCandidates(state: FinancialState): Insight[];
+  getCandidates(state: FinancialState, data?: FinancialData): Insight[];
 }
 
 export interface RmdRule {

@@ -1,4 +1,5 @@
 import type { TaxCredit, FilingStatus } from "@/lib/tax-credits";
+import type { FinancialState } from "@/lib/financial-types";
 
 export interface DebtDetail {
   category: string;
@@ -8,6 +9,8 @@ export interface DebtDetail {
 }
 
 export interface FinancialData {
+  /** Raw app state used for country-plugin insight dispatch. */
+  insightState?: FinancialState;
   totalAssets: number;
   totalDebts: number;
   /** Liquid assets only (excludes property equity). Used for runway calculation. */
