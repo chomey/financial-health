@@ -16,7 +16,7 @@ test.describe("AU sample profile dashboard metrics (Task 172)", () => {
 
     // Select AU country and load the young professional profile
     await page.getByTestId("country-au").click();
-    await page.getByTestId("sample-profile-au-young-professional").click();
+    await page.getByTestId("sample-profile-fresh-grad-au").click();
 
     // Wait for dashboard to load with URL state
     await page.waitForFunction(() => window.location.search.includes("s="));
@@ -29,7 +29,7 @@ test.describe("AU sample profile dashboard metrics (Task 172)", () => {
 
     // Select AU country and load the pre-retiree profile
     await page.getByTestId("country-au").click();
-    await page.getByTestId("sample-profile-au-pre-retiree").click();
+    await page.getByTestId("sample-profile-pre-retirement-au").click();
 
     // Wait for dashboard to load with URL state
     await page.waitForFunction(() => window.location.search.includes("s="));
@@ -42,7 +42,7 @@ test.describe("AU sample profile dashboard metrics (Task 172)", () => {
 
     // Select AU country and load the mid-career family profile
     await page.getByTestId("country-au").click();
-    await page.getByTestId("sample-profile-au-mid-career-family").click();
+    await page.getByTestId("sample-profile-mid-career-au").click();
 
     // Wait for dashboard to load with URL state
     await page.waitForFunction(() => window.location.search.includes("s="));
@@ -60,9 +60,9 @@ test.describe("AU sample profile dashboard metrics (Task 172)", () => {
     await page.getByTestId("country-au").click();
 
     // AU profiles should now be visible
-    await expect(page.getByTestId("sample-profile-au-young-professional")).toBeVisible();
-    await expect(page.getByTestId("sample-profile-au-mid-career-family")).toBeVisible();
-    await expect(page.getByTestId("sample-profile-au-pre-retiree")).toBeVisible();
+    await expect(page.getByTestId("sample-profile-fresh-grad-au")).toBeVisible();
+    await expect(page.getByTestId("sample-profile-mid-career-au")).toBeVisible();
+    await expect(page.getByTestId("sample-profile-pre-retirement-au")).toBeVisible();
 
     await captureScreenshot(page, "task-172-au-country-switch");
   });
@@ -75,7 +75,7 @@ test.describe("AU sample profile dashboard metrics (Task 172)", () => {
 
     // Switch to AU
     await page.getByTestId("country-au").click();
-    await expect(page.getByTestId("sample-profile-au-young-professional")).toBeVisible();
+    await expect(page.getByTestId("sample-profile-fresh-grad-au")).toBeVisible();
 
     // Switch to US
     await page.getByTestId("country-us").click();

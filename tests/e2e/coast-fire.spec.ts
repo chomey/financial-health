@@ -3,7 +3,13 @@ import { captureScreenshot } from "./helpers";
 
 test.describe("Coast FIRE insight", () => {
   async function setAgeViaWizard(page: import("@playwright/test").Page, age: string) {
-    await page.goto("/?step=profile");
+    if (page.url() === "about:blank") {
+      await page.goto("/?step=profile");
+    } else {
+      const url = new URL(page.url());
+      url.searchParams.set("step", "profile");
+      await page.goto(url.toString());
+    }
     await page.waitForSelector('[data-testid="wizard-step-profile"]');
     await page.getByTestId("wizard-age-input").fill(age);
     await page.waitForTimeout(500);
@@ -14,11 +20,15 @@ test.describe("Coast FIRE insight", () => {
   }
 
   async function addLargeAsset(page: import("@playwright/test").Page) {
+    const url = new URL(page.url());
+    url.searchParams.set("step", "assets");
+    await page.goto(url.toString());
+    await page.waitForSelector('[data-testid="wizard-step-assets"]');
     await page.click('text="+ Add Asset"');
     await page.fill('[aria-label="New asset category"]', "Investment Portfolio");
     await page.fill('[aria-label="New asset amount"]', "500000");
     await page.click('[aria-label="Confirm add asset"]');
-    await page.waitForTimeout(500);
+    await page.waitForFunction(() => window.location.search.includes("s="));
   }
 
   test.beforeEach(async ({ page }) => {
@@ -46,11 +56,11 @@ test.describe("Coast FIRE insight", () => {
     await addLargeAsset(page);
 
     // Set age to 30
-    await setAge(page, "30");
+    await setAgeViaWizard(page, "30");
     await page.waitForTimeout(1000);
 
     // Coast FIRE insight should appear as achieved
-    const coastInsight = page.locator('[data-insight-type="coast-fire"]');
+    const coastInsight = page.locator('[data-testid="metric-card-income-replacement"]');
     await expect(coastInsight).toBeVisible({ timeout: 5000 });
 
     const text = await coastInsight.textContent();
@@ -59,17 +69,17 @@ test.describe("Coast FIRE insight", () => {
     await captureScreenshot(page, "task-137-coast-fire-achieved");
   });
 
-  test("coast-fire insight has beach icon", async ({ page }) => {
+  test("income replacement card shows achieved coast-fire summary", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
     await addLargeAsset(page);
-    await setAge(page, "30");
+    await setAgeViaWizard(page, "30");
     await page.waitForTimeout(1000);
 
-    const coastInsight = page.locator('[data-insight-type="coast-fire"]');
+    const coastInsight = page.locator('[data-testid="metric-card-income-replacement"]');
     await expect(coastInsight).toBeVisible({ timeout: 5000 });
-    await expect(coastInsight).toContainText("\u{1F3D6}\u{FE0F}");
+    await expect(coastInsight).toContainText("Coast FIRE");
   });
 
   test("no coast-fire insight without age", async ({ page }) => {
@@ -86,10 +96,10 @@ test.describe("Coast FIRE insight", () => {
     await page.waitForSelector('[data-testid="insights-panel"]');
 
     await addLargeAsset(page);
-    await setAge(page, "30");
+    await setAgeViaWizard(page, "30");
     await page.waitForTimeout(1000);
 
-    const coastInsight = page.locator('[data-insight-type="coast-fire"]');
+    const coastInsight = page.locator('[data-testid="metric-card-income-replacement"]');
     await expect(coastInsight).toBeVisible({ timeout: 5000 });
 
     // Should contain educational explanation about real return

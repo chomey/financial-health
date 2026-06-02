@@ -10,9 +10,9 @@ test.describe("AU Sample profiles (Task 165)", () => {
     await page.getByTestId("country-au").click();
 
     // AU profile cards should now be visible
-    await expect(page.getByTestId("sample-profile-au-young-professional")).toBeVisible();
-    await expect(page.getByTestId("sample-profile-au-mid-career-family")).toBeVisible();
-    await expect(page.getByTestId("sample-profile-au-pre-retiree")).toBeVisible();
+    await expect(page.getByTestId("sample-profile-fresh-grad-au")).toBeVisible();
+    await expect(page.getByTestId("sample-profile-mid-career-au")).toBeVisible();
+    await expect(page.getByTestId("sample-profile-pre-retirement-au")).toBeVisible();
 
     await captureScreenshot(page, "task-165-au-profiles-wizard");
   });
@@ -21,7 +21,7 @@ test.describe("AU Sample profiles (Task 165)", () => {
     await page.goto("/?step=welcome");
 
     await page.getByTestId("country-au").click();
-    await page.getByTestId("sample-profile-au-young-professional").click();
+    await page.getByTestId("sample-profile-fresh-grad-au").click();
 
     // URL should have state and step=dashboard
     await page.waitForFunction(() => window.location.search.includes("s="));
@@ -33,7 +33,7 @@ test.describe("AU Sample profiles (Task 165)", () => {
     await page.goto("/?step=welcome");
 
     await page.getByTestId("country-au").click();
-    await page.getByTestId("sample-profile-au-mid-career-family").click();
+    await page.getByTestId("sample-profile-mid-career-au").click();
 
     await page.waitForFunction(() => window.location.search.includes("s="));
 
@@ -44,7 +44,7 @@ test.describe("AU Sample profiles (Task 165)", () => {
     await page.goto("/?step=welcome");
 
     await page.getByTestId("country-au").click();
-    await page.getByTestId("sample-profile-au-pre-retiree").click();
+    await page.getByTestId("sample-profile-pre-retirement-au").click();
 
     await page.waitForFunction(() => window.location.search.includes("s="));
 
@@ -57,13 +57,13 @@ test.describe("AU Sample profiles (Task 165)", () => {
     await page.getByTestId("country-au").click();
 
     // Check young professional highlights
-    const youngCard = page.getByTestId("sample-profile-au-young-professional");
-    await expect(youngCard).toContainText("HECS-HELP");
+    const youngCard = page.getByTestId("sample-profile-fresh-grad-au");
+    await expect(youngCard).toContainText("HELP debt");
     await expect(youngCard).toContainText("Super");
 
     // Check pre-retiree highlights
-    const preRetireeCard = page.getByTestId("sample-profile-au-pre-retiree");
-    await expect(preRetireeCard).toContainText("Franking");
+    const preRetireeCard = page.getByTestId("sample-profile-pre-retirement-au");
+    await expect(preRetireeCard).toContainText("Large Super");
 
     await captureScreenshot(page, "task-165-au-profile-cards");
   });
@@ -73,6 +73,6 @@ test.describe("AU Sample profiles (Task 165)", () => {
 
     // Default is CA — should see CA profile cards, not AU
     await expect(page.getByTestId("sample-profile-fresh-grad")).toBeVisible();
-    await expect(page.getByTestId("sample-profile-au-young-professional")).not.toBeVisible();
+    await expect(page.getByTestId("sample-profile-fresh-grad-au")).not.toBeVisible();
   });
 });

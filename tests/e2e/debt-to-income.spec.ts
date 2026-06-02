@@ -2,12 +2,12 @@ import { test, expect } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.describe("Debt-to-income ratio insight", () => {
-  test("shows DTI insight in the insights panel with default state", async ({ page }) => {
+  test("shows DTI insight in the debt ratio metric card with default state", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
     // DTI insight should appear (default state has income but no debt monthly payments = 0% DTI)
-    const dtiInsight = page.locator('[data-insight-type="debt-to-income"]');
+    const dtiInsight = page.locator('[data-testid="metric-card-debt-to-asset-ratio"]');
     await expect(dtiInsight).toBeVisible({ timeout: 5000 });
 
     await captureScreenshot(page, "task-135-dti-insight-default");
@@ -17,7 +17,7 @@ test.describe("Debt-to-income ratio insight", () => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
-    const dtiInsight = page.locator('[data-insight-type="debt-to-income"]');
+    const dtiInsight = page.locator('[data-testid="metric-card-debt-to-asset-ratio"]');
     await expect(dtiInsight).toBeVisible({ timeout: 5000 });
 
     // Message should contain a percentage
@@ -29,7 +29,7 @@ test.describe("Debt-to-income ratio insight", () => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
-    const dtiInsight = page.locator('[data-insight-type="debt-to-income"]');
+    const dtiInsight = page.locator('[data-testid="metric-card-debt-to-asset-ratio"]');
     await expect(dtiInsight).toBeVisible({ timeout: 5000 });
 
     // Default state has no debt monthly payments, so DTI = 0% = excellent
@@ -38,22 +38,22 @@ test.describe("Debt-to-income ratio insight", () => {
     expect(text?.toLowerCase()).toContain("excellent");
   });
 
-  test("DTI insight has correct icon", async ({ page }) => {
+  test("debt ratio metric card has correct icon", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
-    const dtiInsight = page.locator('[data-insight-type="debt-to-income"]');
+    const dtiInsight = page.locator('[data-testid="metric-card-debt-to-asset-ratio"]');
     await expect(dtiInsight).toBeVisible({ timeout: 5000 });
 
-    // Should show chart icon
-    await expect(dtiInsight).toContainText("📊");
+    // Should show balance-scale icon
+    await expect(dtiInsight).toContainText("⚖️");
   });
 
-  test("clicking DTI insight opens explainer modal", async ({ page }) => {
+  test("clicking debt ratio metric card opens explainer modal", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('[data-testid="insights-panel"]');
 
-    const dtiInsight = page.locator('[data-insight-type="debt-to-income"]');
+    const dtiInsight = page.locator('[data-testid="metric-card-debt-to-asset-ratio"]');
     await expect(dtiInsight).toBeVisible({ timeout: 5000 });
 
     await dtiInsight.click();

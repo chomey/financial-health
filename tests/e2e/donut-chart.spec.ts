@@ -35,14 +35,14 @@ test.describe("Net Worth Donut Chart", () => {
     await expect(chart).toBeVisible();
   });
 
-  test("chart shows in dashboard column", async ({ page }) => {
+  test("chart shows in breakdowns section", async ({ page }) => {
     await page.goto("/");
 
-    const dashboard = page.locator('section[aria-label="Financial dashboard"]');
-    await expect(dashboard).toBeVisible();
+    const breakdowns = page.locator('section[aria-label="Expense and net worth breakdowns"]');
+    await expect(breakdowns).toBeVisible();
 
-    const chartInDashboard = dashboard.locator('[data-testid="donut-chart"]');
-    await expect(chartInDashboard).toBeVisible();
+    const chartInBreakdowns = breakdowns.locator('[data-testid="donut-chart"]');
+    await expect(chartInBreakdowns).toBeVisible();
   });
 
   test("donut center shows net worth value", async ({ page }) => {

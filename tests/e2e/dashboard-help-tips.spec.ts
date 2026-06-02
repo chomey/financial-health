@@ -22,12 +22,12 @@ test.describe("Dashboard HelpTip contextual help (Task 170)", () => {
     await captureScreenshot(page, "task-170-dashboard-metric-cards");
   });
 
-  test("clicking a metric card help tip shows popover", async ({ page }) => {
+  test("hovering a metric card help tip shows popover", async ({ page }) => {
     await goToDashboard(page);
 
     const firstHelpBtn = page.locator("[data-testid='snapshot-dashboard'] [data-testid='help-tip-button']").first();
     await expect(firstHelpBtn).toBeVisible();
-    await firstHelpBtn.click();
+    await firstHelpBtn.hover();
 
     const popover = page.locator("[data-testid='help-tip-popover']").first();
     await expect(popover).toBeVisible();
@@ -66,7 +66,7 @@ test.describe("Dashboard HelpTip contextual help (Task 170)", () => {
 
     const helpBtn = netWorthCard.locator("[data-testid='help-tip-button']");
     await expect(helpBtn).toBeVisible();
-    await helpBtn.click();
+    await helpBtn.hover();
 
     const popover = page.locator("[data-testid='help-tip-popover']").first();
     await expect(popover).toBeVisible();

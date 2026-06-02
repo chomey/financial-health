@@ -8,8 +8,8 @@
 
 ## Summary
 - **Total Tasks**: 252
-- **Completed**: 234
-- **Remaining**: 18
+- **Completed**: 235
+- **Remaining**: 17
 - **Last Updated**: 2026-06-01
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -112,3 +112,15 @@
   - Typecheck audit: `npx tsc --noEmit` still reports the pre-existing test-only type backlog (legacy E2E helper signatures and older test fixture shapes); no Phase A regression was identified, so these unrelated findings were left unchanged.
   - Lint audit: `npm run lint` still reports the pre-existing `20` errors and `5` warnings; no task-scoped lint regression was identified.
 - **Screenshots**: None (unit-regression gate only; Playwright verification is split across Tasks 234b-234d).
+
+## Task 234b: Phase A Playwright regression shard 1/3 [@qa] [E2E]
+- **Date**: 2026-06-01
+- **Files**:
+  - `tests/e2e/**`: Updated stale AU sample-profile IDs, dashboard selectors, HelpTip interaction expectations, breakdown-section placement checks, locale-format assertions, Coast FIRE checks, and FIRE controls to match the current UI.
+  - `tests/e2e/full-e2e.spec.ts`: Gave the multi-step T3 workflow an explicit 60-second timeout.
+  - `TASKS.md`, `TASKS-ARCHIVE.md`, `PROGRESS.md`, `src/lib/changelog.ts`: Archived Task 234b and updated bookkeeping.
+- **Tests**:
+  - Build: `npm run build` passed.
+  - T1: `npm test` passed (`4495/4495`).
+  - T3 shard: `CAPTURE_SCREENSHOTS=1 CAPTURE_TASK=234b npx playwright test --shard=1/3` passed (`288/288`).
+- **Screenshots**: None (regression shard; existing capture names remain scoped to their original visual tasks).

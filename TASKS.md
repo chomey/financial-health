@@ -2,7 +2,7 @@
 
 <!-- Older tasks archived to TASKS-ARCHIVE.md -->
 
-<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 234a. -->
+<!-- Completed tasks archived to TASKS-ARCHIVE.md. Last completed: Task 234b. -->
 <!-- Ralph picks up the first unchecked task and works on exactly one per iteration. -->
 
 ## Country Plugin Architecture Refactor (Phase A)
@@ -29,8 +29,6 @@ test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehi
 - [x] Task 222: tax-engine.ts shim — Rewrite `src/lib/tax-engine.ts` to a thin shim. Public `computeTax(income, type, country, jurisdiction, year)` and `getMarginalRateForIncome` delegate to `getCountry(country).taxEngine.*`. Keep `IncomeType` and `TaxResult` type exports. Snapshot regressions must stay green. [@backend]
 
 ### Cleanup (plan tasks 42–44)
-
-- [ ] Task 234b: Phase A Playwright regression shard 1/3 — Run `npx playwright test --shard=1/3`. Fix regressions exposed by this shard only, rerun the shard until green, and commit. Do not run the full Playwright suite. [@qa] [E2E]
 
 - [ ] Task 234c: Phase A Playwright regression shard 2/3 — Run `npx playwright test --shard=2/3`. Fix regressions exposed by this shard only, rerun the shard until green, and commit. Do not run the full Playwright suite. [@qa] [E2E]
 

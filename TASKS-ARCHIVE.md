@@ -303,3 +303,5 @@
 - [x] Task 233: Prune monolithic lib files — After all migrations, audit `src/lib/tax-tables.ts`, `src/lib/government-retirement.ts`, `src/lib/sample-profiles.ts`, `src/lib/tax-credits.ts`, `src/lib/withdrawal-tax.ts`. Each should now hold only shared types + thin shim free functions. Delete any remaining per-country constants/functions/sets. Confirm `wc -l` on each is < 100. Snapshot regressions must stay green. [@backend]
 
 - [x] Task 234a: Phase A unit regression + changelog — Run `npm test && npx tsc --noEmit`. Fix Phase A regressions only. Add a changelog entry to `src/lib/changelog.ts` describing the country-plugin architecture refactor (no user-visible change, foundation for future country additions). Run `npm run lint`; document pre-existing lint findings instead of expanding scope. [@qa] [MILESTONE]
+
+- [x] Task 234b: Phase A Playwright regression shard 1/3 — Run `npx playwright test --shard=1/3`. Fix regressions exposed by this shard only, rerun the shard until green, and commit. Do not run the full Playwright suite. [@qa] [E2E]

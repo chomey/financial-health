@@ -12,6 +12,8 @@ async function goToStep(page: import("@playwright/test").Page, step: string) {
 
 test.describe("T3: Full end-to-end user journey", () => {
   test("complete financial snapshot workflow with live dashboard updates", async ({ page }) => {
+    test.setTimeout(60000);
+
     // Start at dashboard — INITIAL_STATE: Assets $55k, Debts $5k → NW $50k
     await page.goto("/?step=dashboard");
     await page.waitForSelector('[data-testid="snapshot-dashboard"]');

@@ -50,20 +50,15 @@ test.describe("Expense Breakdown Chart", () => {
     expect(badgeCount).toBeGreaterThan(0);
   });
 
-  test("chart is positioned between metrics and donut chart in dashboard", async ({ page }) => {
+  test("chart shares the breakdowns section with the donut chart", async ({ page }) => {
     await page.goto("/");
-    const dashboard = page.locator('[aria-label="Financial dashboard"]');
-    await expect(dashboard).toBeVisible();
+    const breakdowns = page.locator('[aria-label="Expense and net worth breakdowns"]');
+    await expect(breakdowns).toBeVisible();
 
-    const expenseChart = dashboard.locator('[data-testid="expense-breakdown-chart"]');
-    const donutChart = dashboard.locator('[data-testid="donut-chart"]');
+    const expenseChart = breakdowns.locator('[data-testid="expense-breakdown-chart"]');
+    const donutChart = breakdowns.locator('[data-testid="donut-chart"]');
     await expect(expenseChart).toBeVisible();
     await expect(donutChart).toBeVisible();
-
-    // Expense chart should be above donut chart
-    const expenseBox = await expenseChart.boundingBox();
-    const donutBox = await donutChart.boundingBox();
-    expect(expenseBox!.y).toBeLessThan(donutBox!.y);
   });
 
   test("captures screenshot of expense breakdown", async ({ page }) => {

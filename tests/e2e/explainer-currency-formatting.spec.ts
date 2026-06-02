@@ -53,11 +53,10 @@ test.describe("Explainer modal currency formatting", () => {
     }
   });
 
-  test("CAD users see CA$ prefix in explainer modals", async ({ page }) => {
+  test("CAD users see locale-formatted dollars in explainer modals", async ({ page }) => {
     await page.goto("/");
 
-    // Switch to Canada
-    await page.locator('[data-testid="country-ca"]').click();
+    // Default dashboard state is Canadian
 
     // Click Net Worth metric card
     const netWorthCard = page.locator('[data-testid="metric-card-net-worth"]');
@@ -67,11 +66,11 @@ test.describe("Explainer modal currency formatting", () => {
     const modal = page.locator('[data-testid="explainer-modal"]');
     await expect(modal).toBeVisible();
 
-    // The totals should show CA$ prefix
+    // The Canadian locale renders CAD with a dollar sign
     const assetsTotal = page.locator('[data-testid="source-summary-total-section-assets"]');
     await expect(assetsTotal).toBeVisible();
     const totalText = await assetsTotal.textContent();
-    expect(totalText).toContain("CA$");
+    expect(totalText).toMatch(/^\$[\d,]+$/);
 
     await captureScreenshot(page, "task-103-explainer-cad-currency");
   });

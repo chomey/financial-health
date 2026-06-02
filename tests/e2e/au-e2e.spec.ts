@@ -17,7 +17,7 @@ import { captureScreenshot } from "./helpers";
 /** Load an AU sample profile through the wizard welcome step and navigate to dashboard */
 async function loadAUProfile(
   page: import("@playwright/test").Page,
-  profileId = "au-young-professional"
+  profileId = "fresh-grad-au"
 ) {
   await page.goto("/?step=welcome");
   await page.getByTestId("country-au").click();
@@ -43,7 +43,7 @@ test.describe("AU E2E: Full flow — select country, load profile, reach dashboa
     page,
   }) => {
     test.setTimeout(60000);
-    await loadAUProfile(page, "au-young-professional");
+    await loadAUProfile(page, "fresh-grad-au");
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
     await expect(dashboard).toBeVisible();
     await captureScreenshot(page, "task-173-au-young-professional-dashboard");
@@ -53,7 +53,7 @@ test.describe("AU E2E: Full flow — select country, load profile, reach dashboa
     page,
   }) => {
     test.setTimeout(60000);
-    await loadAUProfile(page, "au-mid-career-family");
+    await loadAUProfile(page, "mid-career-au");
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
     await expect(dashboard).toBeVisible();
     await captureScreenshot(page, "task-173-au-mid-career-family-dashboard");
@@ -63,7 +63,7 @@ test.describe("AU E2E: Full flow — select country, load profile, reach dashboa
     page,
   }) => {
     test.setTimeout(60000);
-    await loadAUProfile(page, "au-pre-retiree");
+    await loadAUProfile(page, "pre-retirement-au");
     const dashboard = page.locator('[data-testid="snapshot-dashboard"]');
     await expect(dashboard).toBeVisible();
     await captureScreenshot(page, "task-173-au-pre-retiree-dashboard");
@@ -214,7 +214,7 @@ test.describe("AU E2E: Tax summary uses AU brackets", () => {
 
   test("AU pre-retiree tax-summary step shows tax details", async ({ page }) => {
     test.setTimeout(60000);
-    await loadAUProfile(page, "au-pre-retiree");
+    await loadAUProfile(page, "pre-retirement-au");
     await goToStep(page, "tax-summary");
 
     await expect(page.getByText("Financial Summary")).toBeVisible();
@@ -242,7 +242,7 @@ test.describe("AU E2E: Super accounts appear in assets wizard step", () => {
     page,
   }) => {
     test.setTimeout(60000);
-    await loadAUProfile(page, "au-mid-career-family");
+    await loadAUProfile(page, "mid-career-au");
     await goToStep(page, "assets");
 
     const assetsList = page.getByRole("list", { name: "Asset items" });
@@ -255,7 +255,7 @@ test.describe("AU E2E: Super accounts appear in assets wizard step", () => {
     page,
   }) => {
     test.setTimeout(60000);
-    await loadAUProfile(page, "au-pre-retiree");
+    await loadAUProfile(page, "pre-retirement-au");
     await goToStep(page, "assets");
 
     const assetsList = page.getByRole("list", { name: "Asset items" });
@@ -304,13 +304,13 @@ test.describe("Regression: CA and US flows unaffected by AU additions", () => {
     // Switch to AU
     await page.getByTestId("country-au").click();
     await expect(
-      page.getByTestId("sample-profile-au-young-professional")
+      page.getByTestId("sample-profile-fresh-grad-au")
     ).toBeVisible();
     await expect(
-      page.getByTestId("sample-profile-au-mid-career-family")
+      page.getByTestId("sample-profile-mid-career-au")
     ).toBeVisible();
     await expect(
-      page.getByTestId("sample-profile-au-pre-retiree")
+      page.getByTestId("sample-profile-pre-retirement-au")
     ).toBeVisible();
 
     // Switch to US
@@ -319,7 +319,7 @@ test.describe("Regression: CA and US flows unaffected by AU additions", () => {
       page.getByTestId("sample-profile-fresh-grad-us")
     ).toBeVisible();
     await expect(
-      page.getByTestId("sample-profile-au-young-professional")
+      page.getByTestId("sample-profile-fresh-grad-au")
     ).not.toBeVisible();
     await captureScreenshot(page, "task-173-regression-country-cycle");
   });

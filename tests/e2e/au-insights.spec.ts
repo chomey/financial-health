@@ -11,7 +11,7 @@ import { captureScreenshot } from "./helpers";
 
 async function loadAUProfile(
   page: import("@playwright/test").Page,
-  profileId = "au-young-professional"
+  profileId = "fresh-grad-au"
 ) {
   await page.goto("/?step=welcome");
   await page.getByTestId("country-au").click();
@@ -23,7 +23,7 @@ async function loadAUProfile(
 test.describe("AU insights panel — Task 215", () => {
   test("AU young professional profile: insights panel is visible and shows insights", async ({ page }) => {
     test.setTimeout(60000);
-    await loadAUProfile(page, "au-young-professional");
+    await loadAUProfile(page, "fresh-grad-au");
 
     const insightsPanel = page.locator('[data-testid="insights-panel"]');
     await expect(insightsPanel).toBeVisible({ timeout: 10000 });
@@ -37,7 +37,7 @@ test.describe("AU insights panel — Task 215", () => {
 
   test("AU mid-career family profile: insights panel renders without errors", async ({ page }) => {
     test.setTimeout(60000);
-    await loadAUProfile(page, "au-mid-career-family");
+    await loadAUProfile(page, "mid-career-au");
 
     const insightsPanel = page.locator('[data-testid="insights-panel"]');
     await expect(insightsPanel).toBeVisible({ timeout: 10000 });

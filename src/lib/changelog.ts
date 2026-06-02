@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 234.1,
+    title: "Phase A browser regression shard 1",
+    description: "Validated the first Playwright regression shard after the country-plugin architecture refactor. Updated stale E2E selectors, sample-profile IDs, and workflow timing expectations to match the current UI. No user-visible change.",
+    date: "2026-06-01",
+  },
+  {
     version: 234,
     title: "Country plugin architecture refactor complete",
     description: "Completed the Phase A country-plugin architecture refactor. Country-specific tax, retirement, vehicle, benchmark, flowchart, profile, and insight behavior now dispatches through the registry-backed plugin structure. This is a foundation for future country additions with no user-visible change.",
