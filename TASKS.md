@@ -30,7 +30,15 @@ test files there, mirroring source paths (e.g. `tests/unit/countries/canada/vehi
 
 ### Cleanup (plan tasks 42–44)
 
-- [ ] Task 234: Final regression check + changelog — Run `npm test && npx tsc --noEmit && npx playwright test`. All green. Add changelog entry to `src/lib/changelog.ts` describing the refactor (no user-visible change, foundation for future country additions). Run `npm run lint`. [@qa] [E2E] [MILESTONE]
+- [ ] Task 234a: Phase A unit regression + changelog — Run `npm test && npx tsc --noEmit`. Fix Phase A regressions only. Add a changelog entry to `src/lib/changelog.ts` describing the country-plugin architecture refactor (no user-visible change, foundation for future country additions). Run `npm run lint`; document pre-existing lint findings instead of expanding scope. [@qa] [MILESTONE]
+
+- [ ] Task 234b: Phase A Playwright regression shard 1/3 — Run `npx playwright test --shard=1/3`. Fix regressions exposed by this shard only, rerun the shard until green, and commit. Do not run the full Playwright suite. [@qa] [E2E]
+
+- [ ] Task 234c: Phase A Playwright regression shard 2/3 — Run `npx playwright test --shard=2/3`. Fix regressions exposed by this shard only, rerun the shard until green, and commit. Do not run the full Playwright suite. [@qa] [E2E]
+
+- [ ] Task 234d: Phase A Playwright regression shard 3/3 — Run `npx playwright test --shard=3/3`. Fix regressions exposed by this shard only, rerun the shard until green, and commit. Do not run the full Playwright suite. [@qa] [E2E]
+
+- [ ] Task 234e: Phase A regression signoff — Confirm Tasks 234a–234d recorded green unit/typecheck and all three Playwright shards. Run `npm test && npx tsc --noEmit && npm run lint`. Fix only Phase A regressions. Do not rerun the full Playwright suite: the three green shard runs are the complete E2E regression. Record the final verification in `PROGRESS.md`. [@qa] [MILESTONE]
 
 ## UK Support (Phase B + C)
 

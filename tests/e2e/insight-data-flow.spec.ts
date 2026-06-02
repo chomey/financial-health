@@ -71,12 +71,11 @@ test.describe("Insight card — click-to-explain", () => {
     await captureScreenshot(page, "task-74-insight-runway-explainer");
   });
 
-  test("net-worth insight click shows explainer with assets and debts", async ({ page }) => {
+  test("net-worth metric click shows explainer with assets and debts", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector('[data-testid="insights-panel"]');
+    await page.waitForSelector('[data-testid="metric-card-net-worth"]');
 
-    const netWorthInsight = page.locator('[data-insight-type="net-worth"]').first();
-    await netWorthInsight.click();
+    await page.getByTestId("metric-card-net-worth").click();
 
     await expect(page.locator('[data-testid="explainer-modal"]')).toBeVisible({ timeout: 3000 });
     await expect(page.locator('[data-testid="explainer-source-section-assets"]')).toBeVisible();

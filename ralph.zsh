@@ -492,9 +492,9 @@ for ((i = 1; i <= TASK_COUNT; i++)); do
   task_title=$(extract_task_title "$next_task")
   task_tag=$(extract_agent_tag "$next_task")
 
-  # Extract task number for branch naming (head -1: only the FIRST "Task NNN", not references to other tasks)
+  # Extract task ID for branch naming (head -1: only the FIRST "Task NNN", not references to other tasks)
   local task_num
-  task_num=$(echo "$next_task" | grep -oE 'Task [0-9]+' | head -1 | grep -oE '[0-9]+')
+  task_num=$(echo "$next_task" | grep -oE 'Task [0-9]+[a-z]?' | head -1 | sed 's/^Task //')
   task_num=${task_num:-$i}
 
   print ""
