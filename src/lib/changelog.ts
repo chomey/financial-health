@@ -7,6 +7,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 234,
+    title: "Country plugin architecture refactor complete",
+    description: "Completed the Phase A country-plugin architecture refactor. Country-specific tax, retirement, vehicle, benchmark, flowchart, profile, and insight behavior now dispatches through the registry-backed plugin structure. This is a foundation for future country additions with no user-visible change.",
+    date: "2026-06-01",
+  },
+  {
     version: 233,
     title: "Country plugin migration cleanup",
     description: "Pruned the former monolithic tax-table, government-retirement, and tax-credit libraries into thin shared facades. Country-specific constants and catalogs now live only in their country plugins, and tax-credit all-category lookups dispatch through the registry. No user-visible change.",

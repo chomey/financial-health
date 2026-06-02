@@ -7,9 +7,9 @@
 -->
 
 ## Summary
-- **Total Tasks**: 234
-- **Completed**: 233
-- **Remaining**: 1
+- **Total Tasks**: 252
+- **Completed**: 234
+- **Remaining**: 18
 - **Last Updated**: 2026-06-01
 
 <!-- Older entries archived to PROGRESS-ARCHIVE.md -->
@@ -100,3 +100,15 @@
   - T1: `npm test` passed (`4495/4495`), including `tax-engine-snapshot.test.ts` (`440/440`) and `withdrawal-tax-snapshot.test.ts` (`54/54`).
   - Audit: `wc -l` passed: `tax-tables.ts` 3, `government-retirement.ts` 12, `sample-profiles.ts` 22, `tax-credits.ts` 49, `withdrawal-tax.ts` 88.
 - **Screenshots**: None (backend-only cleanup).
+
+## Task 234a: Phase A unit regression + changelog [@qa] [MILESTONE]
+- **Date**: 2026-06-01
+- **Files**:
+  - `src/lib/changelog.ts`: Added the Phase A country-plugin architecture completion entry.
+  - `TASKS.md`, `TASKS-ARCHIVE.md`, `PROGRESS.md`: Archived Task 234a and updated bookkeeping.
+- **Tests**:
+  - Build: `npm run build` passed.
+  - T1: `npm test` passed (`4495/4495`).
+  - Typecheck audit: `npx tsc --noEmit` still reports the pre-existing test-only type backlog (legacy E2E helper signatures and older test fixture shapes); no Phase A regression was identified, so these unrelated findings were left unchanged.
+  - Lint audit: `npm run lint` still reports the pre-existing `20` errors and `5` warnings; no task-scoped lint regression was identified.
+- **Screenshots**: None (unit-regression gate only; Playwright verification is split across Tasks 234b-234d).
