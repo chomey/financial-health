@@ -32,6 +32,7 @@ import { computeTotals, computeMonthlyInvestmentReturns, computeFireNumber, comp
 import { simulateRunwayWithGrowth, simulateRunwayWithTax } from "@/lib/runway-simulation";
 import { getRmdSummaries } from "@/lib/required-minimum-distributions";
 import type { Asset } from "@/components/AssetEntry";
+import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
 
 export function toFinancialData(state: FinancialState): FinancialData {
   const { totalAssets, totalDebts, totalDebtPayments, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, homeCurrency } = computeTotals(state);
@@ -61,14 +62,17 @@ export function toFinancialData(state: FinancialState): FinancialData {
   const monthlyGovIncome = profile.governmentRetirement.computeMonthly(state.governmentRetirementIncome);
   const fireNumber = computeFireNumber(monthlyExpenses, monthlyGovIncome);
 
-  // Monthly debt payments: sum of minimum debt payments + mortgage payments
-  const monthlyDebtPayments = state.debts.reduce((sum, d) => sum + (d.monthlyPayment ?? 0), 0) + totalMortgagePayments;
-
   // Monthly housing cost: mortgage payment (from PropertyEntry) OR rent expense (from expenses)
   const fxRatesForHousing = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
+  const toHome = (amount: number, itemCurrency?: SupportedCurrency) =>
+    convertToHome(amount, itemCurrency ?? homeCurrency, homeCurrency, fxRatesForHousing);
+
+  // Monthly debt payments: sum of minimum debt payments + mortgage payments
+  const monthlyDebtPayments = state.debts.reduce((sum, d) => sum + toHome(d.monthlyPayment ?? 0, d.currency), 0) + totalMortgagePayments;
+
   const rentExpense = state.expenses
     .filter((e) => e.category.toLowerCase().includes("rent"))
-    .reduce((sum, e) => sum + convertToHome(normalizeExpenseToMonthly(e.amount, e.frequency), e.currency ?? homeCurrency, homeCurrency, fxRatesForHousing), 0);
+    .reduce((sum, e) => sum + toHome(normalizeExpenseToMonthly(e.amount, e.frequency), e.currency), 0);
   const monthlyHousingCost = totalMortgagePayments > 0 ? totalMortgagePayments : rentExpense;
 
   // Income replacement ratio: % of monthly after-tax income sustainable by portfolio via 4% rule
@@ -79,7 +83,7 @@ export function toFinancialData(state: FinancialState): FinancialData {
 
   // Marginal rate for tax optimization suggestions — use employment income
   const marginalRate = annualEmploymentSalary > 0
-    ? profile.taxEngine.getMarginalRate(annualEmploymentSalary, jurisdiction, state.taxYear ?? new Date().getFullYear())
+    ? profile.taxEngine.getMarginalRate(annualEmploymentSalary, jurisdiction, clampTaxYear(state.taxYear ?? new Date().getFullYear()))
     : undefined;
 
   // Use property value + mortgage so that netWorth = totalAssets - totalDebts matches computeMetrics
@@ -180,6 +184,11 @@ export function computeWithdrawalTaxSummary(
   totalAssets: number,
   totalStocks: number,
 ): FinancialData["withdrawalTax"] {
+  const homeCurrency = getHomeCurrency(state.country ?? "CA");
+  const fxRates = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
+  const toHome = (amount: number, itemCurrency?: SupportedCurrency) =>
+    convertToHome(amount, itemCurrency ?? homeCurrency, homeCurrency, fxRates);
+
   const realAssets = state.assets.filter((a) => !a.computed);
   const computedAssets = state.assets.filter((a) => a.computed);
   const hasComputedStocks = computedAssets.some((a) => a.id === "_computed_stocks");
@@ -201,7 +210,7 @@ export function computeWithdrawalTaxSummary(
     if (asset.id === "_computed_equity") continue;
     const treatment = getTaxTreatment(asset.category, asset.taxTreatment);
     const bucket = treatment === "tax-free" ? taxFree : treatment === "tax-deferred" ? taxDeferred : taxable;
-    bucket.total += asset.amount;
+    bucket.total += toHome(asset.amount, asset.currency);
     if (!bucket.categories.includes(asset.category)) {
       bucket.categories.push(asset.category);
     }
@@ -217,9 +226,9 @@ export function computeWithdrawalTaxSummary(
   if (taxDeferred.categories.length > 0) withdrawalOrder.push(...taxDeferred.categories);
 
   // Compute tax drag: difference between base runway and tax-adjusted runway
-  const rawExpenses = state.expenses.reduce((sum, e) => sum + normalizeExpenseToMonthly(e.amount, e.frequency), 0);
-  const rawMortgage = (state.properties ?? []).reduce((sum, p) => sum + getEffectivePayment(p), 0);
-  const rawDebtPayments = state.debts.reduce((sum, d) => sum + (d.monthlyPayment ?? 0), 0);
+  const rawExpenses = state.expenses.reduce((sum, e) => sum + toHome(normalizeExpenseToMonthly(e.amount, e.frequency), e.currency), 0);
+  const rawMortgage = (state.properties ?? []).reduce((sum, p) => sum + toHome(getEffectivePayment(p), p.currency), 0);
+  const rawDebtPayments = state.debts.reduce((sum, d) => sum + toHome(d.monthlyPayment ?? 0, d.currency), 0);
   const monthlyObligations = computeMonthlyObligations(rawExpenses, rawMortgage, rawDebtPayments);
 
   let taxDragMonths = 0;
@@ -230,7 +239,7 @@ export function computeWithdrawalTaxSummary(
     const taxBuckets = allAssets
       .filter((a) => a.amount > 0 && a.id !== "_computed_equity")
       .map((a) => ({
-        balance: a.amount,
+        balance: toHome(a.amount, a.currency),
         monthlyRate: (a.roi ?? getDefaultRoi(a.category) ?? 0) / 100 / 12,
         taxTreatment: getTaxTreatment(a.category, a.taxTreatment),
         category: a.category,

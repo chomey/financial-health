@@ -123,6 +123,49 @@ describe("financial-state", () => {
       expect(totals.monthlyAfterTaxIncome).toBeCloseTo(expectedAfterTaxAnnual / 12, 2);
       expect(totals.totalTaxEstimate).toBeCloseTo(usTax.totalTax, 2);
     });
+
+    it("stacks US long-term capital gains on top of ordinary income", () => {
+      const state: FinancialState = {
+        assets: [],
+        debts: [],
+        income: [
+          { id: "i1", category: "Salary", amount: 200_000, frequency: "annually", incomeType: "employment" },
+          { id: "i2", category: "Stock Sale", amount: 40_000, frequency: "annually", incomeType: "capital-gains" },
+        ],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "US",
+        jurisdiction: "FL",
+        taxYear: 2025,
+      };
+
+      const totals = computeTotals(state);
+      const ordinaryTax = computeTax(200_000, "employment", "US", "FL", 2025);
+      const capitalGainsTax = totals.totalTaxEstimate - ordinaryTax.totalTax;
+
+      expect(capitalGainsTax).toBeCloseTo(6_000, 2);
+    });
+
+    it("keeps US capital gains alone in the 0% bracket from zero", () => {
+      const state: FinancialState = {
+        assets: [],
+        debts: [],
+        income: [
+          { id: "i1", category: "Stock Sale", amount: 40_000, frequency: "annually", incomeType: "capital-gains" },
+        ],
+        expenses: [],
+        properties: [],
+        stocks: [],
+        country: "US",
+        jurisdiction: "FL",
+        taxYear: 2025,
+      };
+
+      const totals = computeTotals(state);
+
+      expect(totals.totalTaxEstimate).toBeCloseTo(0, 2);
+    });
   });
 
   describe("computeMetrics", () => {

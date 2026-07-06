@@ -87,6 +87,9 @@ export function computeIncomeReplacementDetails(
 export function computeMetrics(state: FinancialState): MetricData[] {
   const { totalAssets, totalDebts, totalDebtPayments, monthlyIncome, monthlyExpenses, totalMonthlyContributions, totalPropertyEquity, totalPropertyValue, totalPropertyMortgage, totalMortgagePayments, totalStocks, monthlyAfterTaxIncome, totalTaxEstimate, effectiveTaxRate, totalFederalTax, totalProvincialStateTax, investmentIncomeAccounts, totalInvestmentInterest, totalTaxableBase, rawTaxEstimate, totalCreditBenefit, totalDeductions } = computeTotals(state);
   const hc = getHomeCurrency(state.country ?? "CA");
+  const fxRates = getEffectiveFxRates(hc, state.fxManualOverride, state.fxRates);
+  const toHome = (amount: number, itemCurrency?: SupportedCurrency) =>
+    convertToHome(amount, itemCurrency ?? hc, hc, fxRates);
   const $ = (n: number) => fmtShort(n, hc);
 
   // Net worth: show without property equity as primary, with equity as secondary
@@ -123,7 +126,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
     for (const asset of state.assets.filter((a) => !a.computed)) {
       if (asset.amount > 0) {
         detailedBuckets.push({
-          balance: asset.amount,
+          balance: toHome(asset.amount, asset.currency),
           ror: asset.roi ?? getDefaultRoi(asset.category) ?? 0,
           category: asset.category,
           taxTreatment: getTaxTreatment(asset.category, asset.taxTreatment) as TaxTreatment,
@@ -136,7 +139,7 @@ export function computeMetrics(state: FinancialState): MetricData[] {
     for (const asset of computedAssets) {
       if (asset.amount > 0 && asset.id !== "_computed_equity") {
         detailedBuckets.push({
-          balance: asset.amount,
+          balance: toHome(asset.amount, asset.currency),
           ror: asset.roi ?? 0,
           category: asset.category,
           taxTreatment: getTaxTreatment(asset.category, asset.taxTreatment) as TaxTreatment,
