@@ -98,7 +98,7 @@ export default function WithdrawalTaxSummary({
             return (
               <div
                 key={t.label}
-                className="transition-all duration-500"
+                className="transition-all duration-[400ms] ease-out"
                 style={{ width: `${pct}%`, backgroundColor: t.barColor }}
                 title={`${t.label}: ${formatValue(t.data.total, homeCurrency)} (${Math.round(pct)}%)`}
               />
@@ -155,7 +155,7 @@ export default function WithdrawalTaxSummary({
                       </span>
                     )}
                     <p className="mt-0.5 text-xs text-amber-400/70">{p.rule}</p>
-                    <p className="mt-0.5 text-xs text-slate-500">
+                    <p className="mt-0.5 text-xs text-slate-400">
                       Penalty-free after age {p.penaltyFreeAge % 1 === 0 ? p.penaltyFreeAge : p.penaltyFreeAge.toFixed(1)}
                     </p>
                   </div>
@@ -184,14 +184,14 @@ export default function WithdrawalTaxSummary({
                   </span>
                 ))}
               </div>
-              <p className="mt-1.5 text-xs text-slate-500 italic" data-testid="withdrawal-order-disclaimer">
+              <p className="mt-1.5 text-xs text-slate-400 italic" data-testid="withdrawal-order-disclaimer">
                 We don&apos;t have full visibility into each account&apos;s tax implications — this is a rough suggestion. Consult a tax professional for personalized advice.
               </p>
             </div>
           )}
         </div>
 
-      <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+      <p className="mt-2 text-xs text-slate-400 leading-relaxed">
         How withdrawal taxes affect your savings. Tax-free accounts are withdrawn first to minimize tax impact.
       </p>
     </div>

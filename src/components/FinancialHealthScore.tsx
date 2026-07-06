@@ -104,14 +104,14 @@ function ScoreRing({ score }: { score: number }) {
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className={`${getScoreStrokeColor(score)} transition-all duration-700`}
+          className={`${getScoreStrokeColor(score)} transition-all duration-[400ms] ease-out`}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className={`text-3xl font-bold ${getScoreColor(score)}`}>
           {Math.round(score)}
         </span>
-        <span className="text-xs text-slate-500 mt-0.5">/100</span>
+        <span className="text-xs text-slate-400 mt-0.5">/100</span>
       </div>
     </div>
   );
@@ -123,17 +123,17 @@ function SubScoreBar({ sub }: { sub: SubScore }) {
     <div>
       <div className="flex items-center justify-between mb-1">
         <span className="text-xs font-medium text-slate-300">{sub.label}</span>
-        <span className="text-xs text-slate-500">{Math.round(sub.score)}/25</span>
+        <span className="text-xs text-slate-400">{Math.round(sub.score)}/25</span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-1)]">
         <div
-          className={`h-full rounded-full transition-all duration-500 ${
+          className={`h-full rounded-full transition-all duration-[400ms] ease-out ${
             pct >= 50 ? "bg-cyan-400" : pct >= 25 ? "bg-amber-400" : "bg-rose-400"
           }`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <p className="text-xs text-slate-500 mt-0.5">{sub.detail}</p>
+      <p className="text-xs text-slate-400 mt-0.5">{sub.detail}</p>
     </div>
   );
 }
@@ -172,7 +172,7 @@ export default function FinancialHealthScore(props: FinancialHealthScoreProps) {
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-slate-500 leading-relaxed">
+      <p className="mt-3 text-xs text-slate-400 leading-relaxed">
         Composite score based on savings rate, emergency fund, debt-to-income ratio, and net worth relative to income. Each metric contributes up to 25 points.
       </p>
     </div>

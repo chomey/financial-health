@@ -37,7 +37,7 @@ export default function RetirementReadinessScore({ result }: Props) {
   return (
     <div className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5" data-testid="retirement-readiness-score">
       <h3 className="mb-1 text-sm font-semibold text-slate-200">Retirement Readiness</h3>
-      <p className="mb-4 text-xs text-slate-500">How prepared you are for retirement</p>
+      <p className="mb-4 text-xs text-slate-400">How prepared you are for retirement</p>
 
       {/* Score and tier */}
       <div className="flex items-center gap-4 mb-4">
@@ -48,14 +48,14 @@ export default function RetirementReadinessScore({ result }: Props) {
           <div className={`inline-block rounded-full border px-2.5 py-1 text-sm font-semibold ${tierColor}`} data-testid="readiness-tier">
             {result.tier}
           </div>
-          <div className="mt-1 text-xs text-slate-500">out of 100</div>
+          <div className="mt-1 text-xs text-slate-400">out of 100</div>
         </div>
       </div>
 
       {/* Overall bar */}
       <div className="mb-4 h-3 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
         <div
-          className={`h-full rounded-full ${barColor} transition-all duration-700`}
+          className={`h-full rounded-full ${barColor} transition-all duration-[400ms] ease-out`}
           style={{ width: `${result.score}%` }}
         />
       </div>
@@ -70,11 +70,11 @@ export default function RetirementReadinessScore({ result }: Props) {
               <span className="text-xs text-slate-400 w-32 truncate">{label}</span>
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${value >= 50 ? "bg-cyan-400" : "bg-amber-400"}`}
+                  className={`h-full rounded-full transition-all duration-[400ms] ease-out ${value >= 50 ? "bg-cyan-400" : "bg-amber-400"}`}
                   style={{ width: `${value}%` }}
                 />
               </div>
-              <span className="text-xs text-slate-500 w-8 text-right">{value}</span>
+              <span className="text-xs text-slate-400 w-8 text-right">{value}</span>
             </div>
           );
         })}

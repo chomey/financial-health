@@ -326,7 +326,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
         {/* Outlook years */}
         <div className="flex items-center gap-2" data-testid="outlook-controls">
-          <span className="text-xs text-slate-500">Outlook</span>
+          <span className="text-xs text-slate-400">Outlook</span>
           <div className="flex rounded-lg border border-white/10 text-xs">
             {OUTLOOK_YEAR_OPTIONS.map((opt, i) => (
               <button
@@ -349,7 +349,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
         {/* Inflation toggle */}
         <div className="flex items-center gap-2" data-testid="inflation-controls">
-          <label className="flex min-h-10 cursor-pointer items-center gap-1.5 text-xs text-slate-500 sm:min-h-9">
+          <label className="flex min-h-10 cursor-pointer items-center gap-1.5 text-xs text-slate-400 sm:min-h-9">
             <input
               type="checkbox"
               checked={inflationAdjusted}
@@ -380,7 +380,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
         {/* Surplus subtitle inline */}
         {mode === "keep-earning" && surplusInfo.income > 0 && (
-          <p className="text-xs tabular-nums text-slate-500" data-testid="projection-surplus-subtitle">
+          <p className="text-xs tabular-nums text-slate-400" data-testid="projection-surplus-subtitle">
             Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-cyan-300" : "font-medium text-rose-400"}>{formatCurrency(surplusInfo.surplus)}</span>/mo
           </p>
         )}
@@ -393,10 +393,10 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           <table className="min-w-[560px] w-full text-xs">
             <thead>
               <tr className="border-b border-white/10">
-                <th className="sticky left-0 z-10 bg-slate-900 pb-1.5 pr-4 text-left font-medium text-slate-500">Metric</th>
-                <th className="pb-1.5 px-2 text-right font-medium text-slate-500">Now</th>
+                <th className="sticky left-0 z-10 bg-slate-900 pb-1.5 pr-4 text-left font-medium text-slate-400">Metric</th>
+                <th className="pb-1.5 px-2 text-right font-medium text-slate-400">Now</th>
                 {milestoneYears.map((y, i) => (
-                  <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-slate-500`}>
+                  <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-slate-400`}>
                     {y}yr
                   </th>
                 ))}
@@ -674,10 +674,10 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             <table className="min-w-[560px] w-full text-xs">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="sticky left-0 z-10 bg-slate-900 pb-1.5 pr-4 text-left font-medium text-slate-500">Account</th>
-                  <th className="pb-1.5 px-2 text-right font-medium text-slate-500">Now</th>
+                  <th className="sticky left-0 z-10 bg-slate-900 pb-1.5 pr-4 text-left font-medium text-slate-400">Account</th>
+                  <th className="pb-1.5 px-2 text-right font-medium text-slate-400">Now</th>
                   {milestoneYears.map((y, i) => (
-                    <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-slate-500`}>
+                    <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-slate-400`}>
                       {y}yr
                     </th>
                   ))}
@@ -782,7 +782,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
           {/* Starting balances */}
           {runwayDetails.withGrowth[0] && (
-            <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs tabular-nums text-slate-500" data-testid="burndown-starting-balances">
+            <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs tabular-nums text-slate-400" data-testid="burndown-starting-balances">
               <span className="font-medium text-slate-400">Starting:</span>
               {runwayDetails.categories
                 .map(cat => ({ category: cat, balance: runwayDetails.withGrowth[0]?.balances[cat] ?? 0 }))
@@ -808,7 +808,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     <span key={i} className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-white/5 bg-slate-700/40 px-2.5 py-1.5 text-xs sm:min-h-9" data-testid={`burndown-withdrawal-${i}`}>
                       <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-600 text-[10px] font-bold text-slate-200">{i + 1}</span>
                       <span className="max-w-[150px] truncate text-slate-200 font-medium">{entry.category}</span>
-                      <span className="text-slate-500">({treatmentLabel})</span>
+                      <span className="text-slate-400">({treatmentLabel})</span>
                     </span>
                   );
                 })}

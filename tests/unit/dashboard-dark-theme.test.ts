@@ -62,7 +62,7 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
   });
 
   it("metric breakdowns wrap as muted monospace text on mobile", () => {
-    expect(dashboardSrc).toContain("break-words font-mono text-xs text-slate-500");
+    expect(dashboardSrc).toContain("break-words font-mono text-xs text-slate-400");
     expect(dashboardSrc).toContain("title={metric.breakdown}");
   });
 

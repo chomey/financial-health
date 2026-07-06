@@ -59,7 +59,7 @@ export default function RetirementIncomeChart({
   return (
     <div className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5" data-testid="retirement-income-chart">
       <h3 className="mb-1 text-sm font-semibold text-slate-200">Retirement Income vs Expenses</h3>
-      <p className="mb-4 text-xs text-slate-500">
+      <p className="mb-4 text-xs text-slate-400">
         How your projected retirement income covers monthly expenses
       </p>
 
@@ -76,7 +76,7 @@ export default function RetirementIncomeChart({
               return (
                 <div
                   key={source.label}
-                  className="h-full transition-all duration-500"
+                  className="h-full transition-all duration-[400ms] ease-out"
                   style={{ width: `${widthPct}%`, backgroundColor: source.color }}
                   title={`${source.label}: ${fc(source.monthlyAmount)}/mo`}
                   data-testid={`income-segment-${source.label.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
@@ -95,7 +95,7 @@ export default function RetirementIncomeChart({
         </div>
         <div className="h-8 w-full overflow-hidden rounded-lg bg-[var(--surface-1)]" data-testid="expenses-bar">
           <div
-            className="h-full rounded-lg transition-all duration-500"
+            className="h-full rounded-lg transition-all duration-[400ms] ease-out"
             style={{ width: `${(monthlyExpenses / barMax) * 100}%`, backgroundColor: CHART_SEMANTIC.expenses }}
           />
         </div>

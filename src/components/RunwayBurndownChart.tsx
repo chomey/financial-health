@@ -242,7 +242,7 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
 
       {/* Starting balances */}
       {startingBalances.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs text-slate-500" data-testid="burndown-starting-balances">
+        <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs text-slate-400" data-testid="burndown-starting-balances">
           <span className="font-medium text-slate-400">Starting:</span>
           {startingBalances.map((b, i) => (
             <span key={b.category}>
@@ -265,7 +265,7 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
                 <span key={i} className="inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-slate-700/40 px-2.5 py-1.5 text-xs" data-testid={`burndown-withdrawal-${i}`}>
                   <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-600 text-[10px] font-bold text-slate-200">{i + 1}</span>
                   <span className="max-w-[150px] truncate font-medium text-slate-200">{entry.category}</span>
-                  <span className="text-slate-500">({treatmentLabel})</span>
+                  <span className="text-slate-400">({treatmentLabel})</span>
                 </span>
               );
             })}

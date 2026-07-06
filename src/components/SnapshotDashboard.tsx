@@ -108,12 +108,17 @@ const METRIC_TO_INSIGHT_TYPES: Record<string, InsightType[]> = {
   "Income Replacement": ["income-replacement", "coast-fire"],
 };
 
-function useCountUp(target: number, duration: number = 1000): number {
+function useCountUp(target: number, duration: number = 400): number {
   const [current, setCurrent] = useState(0);
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      setCurrent(target);
+      return;
+    }
+
     startTimeRef.current = null;
 
     const animate = (timestamp: number) => {
@@ -254,7 +259,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       </div>
       {metric.breakdown && (
         <p
-          className="mt-3 break-words font-mono text-xs text-slate-500"
+          className="mt-3 break-words font-mono text-xs text-slate-400"
           data-testid={metric.format === "percent" ? "income-replacement-tier" : "metric-breakdown"}
           title={metric.breakdown}
         >
@@ -265,7 +270,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
         <div className="mt-2" data-testid="income-replacement-progress">
           <div className="h-2 w-full rounded-full bg-slate-700 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-emerald-500 to-emerald-400 transition-all duration-700"
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-emerald-500 to-emerald-400 transition-all duration-[400ms] ease-out"
               style={{ width: `${Math.min(100, animatedValue)}%` }}
               aria-hidden="true"
             />
@@ -286,7 +291,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
           ))}
         </div>
       )}
-      <div className="mt-3 space-y-1 text-xs leading-relaxed text-slate-500">
+      <div className="mt-3 space-y-1 text-xs leading-relaxed text-slate-400">
         <p>{metric.tooltip}</p>
         {metric.helpText && <p>{metric.helpText}</p>}
       </div>

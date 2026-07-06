@@ -57,7 +57,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
         <div className="flex items-center gap-1.5">
           {percentile !== undefined && ageGroupLabel && (
             <span
-              className="text-xs text-slate-500"
+              className="text-xs text-slate-400"
               title={`Estimated percentile within the ${ageGroupLabel} age group`}
               data-testid={`benchmark-${metric.toLowerCase().replace(/\s+/g, "-")}-percentile`}
             >
@@ -78,7 +78,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
           <span className="text-xs text-slate-400 w-14 shrink-0">You</span>
           <div className="h-5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
-              className="h-full rounded-full transition-all duration-500"
+              className="h-full rounded-full transition-all duration-[400ms] ease-out"
               style={{ width: `${userWidth}%`, backgroundColor: userColor }}
             />
           </div>
@@ -92,7 +92,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
           <span className="text-xs text-slate-400 w-14 shrink-0">Median</span>
           <div className="h-5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
-              className="h-full rounded-full transition-all duration-500"
+              className="h-full rounded-full transition-all duration-[400ms] ease-out"
               style={{ width: `${benchmarkWidth}%`, backgroundColor: benchmarkColor }}
             />
           </div>
@@ -106,7 +106,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
           <span className="text-xs text-slate-400 w-14 shrink-0">Nat&apos;l Avg</span>
           <div className="h-5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
-              className="h-full rounded-full transition-all duration-500"
+              className="h-full rounded-full transition-all duration-[400ms] ease-out"
               style={{ width: `${nationalWidth}%`, backgroundColor: nationalColor }}
             />
           </div>
@@ -146,7 +146,7 @@ export default function BenchmarkComparisons({
           <span className="text-lg" aria-hidden="true">📊</span>
           <h3 className="text-base font-semibold text-slate-200">How You Compare</h3>
           <HelpTip text="Compares your metrics against the median for your age group and the national average. Sources: Statistics Canada SFS 2023, Federal Reserve SCF 2022, ABS 2021-22." />
-          {age && <span className="text-xs text-slate-500">Age {age}</span>}
+          {age && <span className="text-xs text-slate-400">Age {age}</span>}
         </div>
         <button
           onClick={() => setShowInfo(!showInfo)}
@@ -178,7 +178,7 @@ export default function BenchmarkComparisons({
           ))}
         </div>
       ) : !age ? (
-        <p className="text-sm text-slate-500 text-center py-2">
+        <p className="text-sm text-slate-400 text-center py-2">
           Set your age in Inputs &rarr; Profile to see personalized benchmarks
         </p>
       ) : null}

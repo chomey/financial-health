@@ -107,6 +107,10 @@ const colorPairs: {
   // Muted/secondary text, including text-xs chart legends
   { name: "slate-400 (#94a3b8) on background", fg: "#94a3b8", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
   { name: "slate-400 (#94a3b8) on surface-2", fg: "#94a3b8", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
+  { name: "slate-400 (#94a3b8) on surface-3", fg: "#94a3b8", bg: BG_SURFACE_3, minRatio: WCAG_AA_NORMAL },
+  { name: "amber-300 (#fcd34d) on amber-tinted surface", fg: "#fcd34d", bg: blendRgba(120, 53, 15, 0.20, BG_DARK), minRatio: WCAG_AA_NORMAL },
+  { name: "cyan-300 (#67e8f9) on cyan-tinted surface", fg: "#67e8f9", bg: blendRgba(22, 78, 99, 0.30, BG_DARK), minRatio: WCAG_AA_NORMAL },
+  { name: "violet-300 (#c4b5fd) on violet-tinted surface", fg: "#c4b5fd", bg: blendRgba(76, 29, 149, 0.20, BG_DARK), minRatio: WCAG_AA_NORMAL },
 
   // Focus indicators — non-text contrast threshold
   { name: "cyan-400/60 focus ring on slate-900", fg: FOCUS_RING_CYAN, bg: BG_DARK, minRatio: WCAG_AA_LARGE },
@@ -136,6 +140,13 @@ describe("Task 134: WCAG AA contrast ratio verification for cyberpunk theme", ()
       expect(ratio).toBeGreaterThanOrEqual(pair.minRatio);
     });
   }
+});
+
+describe("Task 134: Slate muted copy keeps an accessible floor", () => {
+  it("does not approve slate-500 as meaningful copy on dark surfaces", () => {
+    expect(contrastRatio("#64748b", BG_DARK)).toBeLessThan(WCAG_AA_NORMAL);
+    expect(contrastRatio("#64748b", BG_SURFACE_2)).toBeLessThan(WCAG_AA_NORMAL);
+  });
 });
 
 // --- Source file static checks ---

@@ -512,7 +512,7 @@ export default function Home() {
         <div className="mx-auto max-w-5xl space-y-4 sm:space-y-6">
 
           {/* Welcome */}
-          <p className="text-sm text-slate-500 max-w-3xl">
+          <p className="text-sm text-slate-400 max-w-3xl">
             Your financial snapshot at a glance. Edit numbers in{" "}
             <button type="button" onClick={switchToWizard} className="inline-flex min-h-10 items-center text-violet-400 underline underline-offset-2 transition-colors hover:text-violet-300 sm:min-h-9">Inputs</button>
             {" "}— everything stays in your browser, nothing is stored.
@@ -676,12 +676,12 @@ export default function Home() {
                   {/* Allocation bar */}
                   {stockDetails.length > 1 && (
                     <div className="mt-3">
-                      <p className="mb-1 text-xs font-medium text-slate-500">Allocation</p>
+                      <p className="mb-1 text-xs font-medium text-slate-400">Allocation</p>
                       <div className="flex h-3 overflow-hidden rounded-full">
                         {stockDetails.map((s, i) => (
                           <div
                             key={s.id}
-                            className="transition-all duration-300"
+                            className="transition-all duration-300 ease-out"
                             style={{ width: `${s.weight}%`, backgroundColor: ALLOC_COLORS[i % ALLOC_COLORS.length], minWidth: s.weight > 0 ? 4 : 0 }}
                             title={`${s.ticker} ${s.weight.toFixed(1)}%`}
                           />
@@ -702,7 +702,7 @@ export default function Home() {
                   <div className="mt-3 overflow-x-auto">
                     <table className="min-w-[560px] w-full text-xs">
                       <thead>
-                        <tr className="border-b border-white/10 text-slate-500">
+                        <tr className="border-b border-white/10 text-slate-400">
                           <th className="sticky left-0 z-10 bg-slate-900 py-1.5 text-left font-medium">Ticker</th>
                           <th className="py-1.5 text-right font-medium">Value</th>
                           <th className="py-1.5 text-right font-medium">Gain/Loss</th>

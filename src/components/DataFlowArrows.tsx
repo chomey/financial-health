@@ -495,6 +495,11 @@ function CountUpValue({ formattedValue }: { formattedValue: string }) {
       return;
     }
 
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      setDisplayed(formattedValue);
+      return;
+    }
+
     const prefix = formattedValue.match(/^[^0-9]*/)?.[0] || "";
     const suffix = formattedValue.match(/[^0-9]*$/)?.[0] || "";
     const isNegative = formattedValue.includes("-");
@@ -606,7 +611,7 @@ function TieredBracketBars({
                 {/* Fill bar */}
                 {isFilled && (
                   <div
-                    className="absolute inset-y-0 left-0 rounded-lg transition-all duration-300 opacity-60"
+                    className="absolute inset-y-0 left-0 rounded-lg opacity-60 transition-all duration-300 ease-out"
                     style={{ width: `${fillPct}%`, backgroundColor: color }}
                     data-testid={`${testIdPrefix}-fill-${i}`}
                   />
@@ -715,11 +720,11 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
             <p className="text-lg font-semibold text-slate-400" data-testid="tax-marginal-rate">
               {(details.marginalRate * 100).toFixed(1)}%
             </p>
-            <p className="text-xs text-slate-500">Marginal rate</p>
+            <p className="text-xs text-slate-400">Marginal rate</p>
           </div>
         </div>
         {details.marginalRate > details.effectiveRate && (
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-slate-400">
             Your effective rate is lower because only income above each bracket threshold is taxed at the higher rate.
           </p>
         )}
@@ -751,7 +756,7 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
               </div>
             )}
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             Interest income is taxed annually as ordinary income. Capital gains and tax-deferred withdrawals are taxed only when realized.
           </p>
         </div>
@@ -766,7 +771,7 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
               <div key={i} className="flex items-center justify-between text-xs text-slate-400">
                 <span>
                   {c.name}
-                  <span className="ml-1.5 text-[10px] text-slate-500">
+                  <span className="ml-1.5 text-[10px] text-slate-400">
                     {c.type === "refundable" ? "refundable" : c.type === "non-refundable" ? "non-refundable" : "deduction"}
                   </span>
                 </span>
@@ -779,7 +784,7 @@ function TaxExplainerContent({ details, homeCurrency }: { details: TaxExplainerD
             <span className="text-emerald-400">{fmt(details.totalTax)}/yr</span>
           </div>
           {details.taxCreditSummary.deductions > 0 && (
-            <p className="mt-1.5 text-[11px] text-slate-500">
+            <p className="mt-1.5 text-[11px] text-slate-400">
               Deductions reduced taxable income by {fmt(details.taxCreditSummary.deductions)} before computing brackets.
             </p>
           )}
@@ -813,7 +818,7 @@ function RunwayExplainerContent({ details, homeCurrency }: { details: RunwayExpl
   return (
     <div className="space-y-5" data-testid="runway-explainer">
       {/* Note pointing to unified chart */}
-      <p className="text-xs text-slate-500 italic" data-testid="runway-chart-note">
+      <p className="text-xs text-slate-400 italic" data-testid="runway-chart-note">
         Switch to &quot;Income Stops&quot; mode on the projection chart above for the full burndown visualization.
       </p>
 
@@ -889,7 +894,7 @@ function RunwayExplainerContent({ details, homeCurrency }: { details: RunwayExpl
                     return (
                       <div
                         key={t.label}
-                        className={`${t.barColor} transition-all duration-500`}
+                        className={`${t.barColor} transition-all duration-[400ms] ease-out`}
                         style={{ width: `${pct}%` }}
                         title={`${t.label}: ${fmt(t.data.total)} (${Math.round(pct)}%)`}
                       />
@@ -929,7 +934,7 @@ function RunwayExplainerContent({ details, homeCurrency }: { details: RunwayExpl
                     <div className="flex items-center gap-2">
                       <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-600 text-xs font-bold text-slate-200">{i + 1}</span>
                       <span className="text-sm text-slate-200">{entry.category}</span>
-                      <span className="text-xs text-slate-500">({treatmentLabel})</span>
+                      <span className="text-xs text-slate-400">({treatmentLabel})</span>
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-semibold text-slate-100">{fmt(entry.startingBalance)}</span>
@@ -941,7 +946,7 @@ function RunwayExplainerContent({ details, homeCurrency }: { details: RunwayExpl
                 );
               })}
             </ol>
-            <p className="mt-1.5 text-xs text-slate-500 italic" data-testid="withdrawal-order-disclaimer">
+            <p className="mt-1.5 text-xs text-slate-400 italic" data-testid="withdrawal-order-disclaimer">
               We don&apos;t have full visibility into each account&apos;s tax implications — this is a rough suggestion. Consult a tax professional for personalized advice.
             </p>
           </div>
@@ -971,7 +976,7 @@ function InvestmentReturnsSummary({ returns, homeCurrency }: { returns: SurplusI
       <div className="mb-2 flex items-center gap-2">
         <span aria-hidden="true" className="text-base">📊</span>
         <span className="text-sm font-semibold text-slate-200">Investment Returns</span>
-        <span className="text-xs text-slate-500 italic">(estimated)</span>
+        <span className="text-xs text-slate-400 italic">(estimated)</span>
       </div>
       <ul className="space-y-1.5" data-testid="investment-returns-list">
         {returns.map((r, i) => (
@@ -1023,7 +1028,7 @@ function IncomeReplacementExplainerContent({ details, homeCurrency }: { details:
             <span className="text-slate-400">Total invested portfolio</span>
             <span className="font-semibold text-slate-100" data-testid="income-replacement-total-invested">{fmt(details.totalInvestedAssets)}</span>
           </div>
-          <div className="flex items-center justify-between text-slate-500 text-xs">
+          <div className="flex items-center justify-between text-slate-400 text-xs">
             <span>× 4% safe withdrawal rate ÷ 12</span>
             <span className="font-medium text-cyan-400" data-testid="income-replacement-monthly-withdrawal">= {fmt(details.monthlyWithdrawal4pct)}/mo</span>
           </div>
@@ -1044,7 +1049,7 @@ function IncomeReplacementExplainerContent({ details, homeCurrency }: { details:
         <div className="relative mb-3">
           <div className="h-2 w-full rounded-full bg-slate-700 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-cyan-500 to-cyan-400 transition-all duration-700"
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-cyan-500 to-cyan-400 transition-all duration-[400ms] ease-out"
               style={{ width: `${Math.min(100, details.incomeReplacementPct)}%` }}
               aria-hidden="true"
             />
@@ -1103,8 +1108,8 @@ function IncomeReplacementExplainerContent({ details, homeCurrency }: { details:
               <div key={i} className="flex items-center justify-between rounded-lg bg-slate-700/40 px-3 py-2 text-sm">
                 <span className="text-slate-300 truncate mr-2">{item.label}</span>
                 <div className="flex items-center gap-2 whitespace-nowrap">
-                  <span className="text-slate-500 text-xs">{fmt(item.balance)}</span>
-                  <span className="text-slate-500">→</span>
+                  <span className="text-slate-400 text-xs">{fmt(item.balance)}</span>
+                  <span className="text-slate-400">→</span>
                   <span className="font-medium text-cyan-400">{fmt(item.monthlyWithdrawal)}/mo</span>
                 </div>
               </div>
@@ -1287,7 +1292,7 @@ function ExplainerModal({
               </div>
               {/* Summary: positive vs negative */}
               {positiveConns.length > 0 && negativeConns.length > 0 && (
-                <p className="mt-2 text-center text-xs text-slate-500 animate-result-in" data-testid="explainer-summary" style={{ animationDelay: "1100ms" }}>
+                <p className="mt-2 text-center text-xs text-slate-400 animate-result-in" data-testid="explainer-summary" style={{ animationDelay: "1100ms" }}>
                   {positiveConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" + ")}
                   {" \u2212 "}
                   {negativeConns.map((c) => c.label || getSourceMetadata(c.sourceId)?.label || c.sourceId).join(" \u2212 ")}

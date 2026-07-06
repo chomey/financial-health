@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import fs from "fs";
+import path from "path";
 import { screen, fireEvent } from "@testing-library/react";
 import { render } from "../test-utils";
 import userEvent from "@testing-library/user-event";
@@ -8,6 +10,12 @@ import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
+
+const globalsCss = fs.readFileSync(
+  path.join(process.cwd(), "src/app/globals.css"),
+  "utf-8"
+);
+
 describe("Metric cards have consistent styling", () => {
   it("metric cards have no special glow or pulse animations", () => {
     const metrics: MetricData[] = [
@@ -21,6 +29,25 @@ describe("Metric cards have consistent styling", () => {
     expect(runwayCard.className).not.toContain("animate-glow-pulse");
     expect(runwayCard.className).not.toContain("animate-warning-pulse");
     expect(runwayCard.className).toContain("border-[var(--surface-border-strong)]");
+  });
+});
+
+describe("Global motion restraint", () => {
+  it("slows perpetual pulses and softens their glow", () => {
+    expect(globalsCss).toContain("animation: glow-pulse 6s ease-in-out infinite");
+    expect(globalsCss).toContain("animation: warning-pulse 6s ease-in-out infinite");
+    expect(globalsCss).toContain("rgba(34, 211, 238, 0.15)");
+    expect(globalsCss).toContain("rgba(34, 211, 238, 0.25)");
+    expect(globalsCss).toContain("rgba(251, 113, 133, 0.15)");
+    expect(globalsCss).toContain("rgba(251, 113, 133, 0.25)");
+  });
+
+  it("honors prefers-reduced-motion globally", () => {
+    expect(globalsCss).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(globalsCss).toContain("animation-duration: 0.01ms !important");
+    expect(globalsCss).toContain("animation-iteration-count: 1 !important");
+    expect(globalsCss).toContain("transition-duration: 0.01ms !important");
+    expect(globalsCss).toContain("scroll-behavior: auto !important");
   });
 });
 

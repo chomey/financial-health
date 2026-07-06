@@ -179,29 +179,29 @@ body {
 /* Celebratory glow pulse — cyan accent for positive metrics */
 @keyframes glow-pulse {
   0%, 100% {
-    box-shadow: 0 0 8px rgba(34, 211, 238, 0.3), 0 0 16px rgba(34, 211, 238, 0.1);
+    box-shadow: 0 0 8px rgba(34, 211, 238, 0.15), 0 0 16px rgba(34, 211, 238, 0.05);
   }
   50% {
-    box-shadow: 0 0 16px rgba(34, 211, 238, 0.5), 0 0 32px rgba(34, 211, 238, 0.2);
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.25), 0 0 32px rgba(34, 211, 238, 0.1);
   }
 }
 
 .animate-glow-pulse {
-  animation: glow-pulse 3s ease-in-out infinite;
+  animation: glow-pulse 6s ease-in-out infinite;
 }
 
 /* Warning glow pulse — rose accent for negative metrics */
 @keyframes warning-pulse {
   0%, 100% {
-    box-shadow: 0 0 8px rgba(251, 113, 133, 0.3), 0 0 16px rgba(251, 113, 133, 0.1);
+    box-shadow: 0 0 8px rgba(251, 113, 133, 0.15), 0 0 16px rgba(251, 113, 133, 0.05);
   }
   50% {
-    box-shadow: 0 0 16px rgba(251, 113, 133, 0.5), 0 0 32px rgba(251, 113, 133, 0.2);
+    box-shadow: 0 0 16px rgba(251, 113, 133, 0.25), 0 0 32px rgba(251, 113, 133, 0.1);
   }
 }
 
 .animate-warning-pulse {
-  animation: warning-pulse 3s ease-in-out infinite;
+  animation: warning-pulse 6s ease-in-out infinite;
 }
 
 /* Global card hover glow — targets all rounded card elements with border */
@@ -216,6 +216,17 @@ html body :is(.rounded-2xl, .rounded-xl, .rounded-lg)[class*="border"][class*="b
 
 .focus-ring {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Tooltip fade transition */
