@@ -18,6 +18,7 @@ import { type FilingStatus, getDefaultFilingStatus } from "@/lib/tax-credits";
 import type { SampleProfile } from "@/lib/sample-profiles";
 import type { WizardResult } from "@/components/MobileWizard";
 import type { GovernmentRetirementIncome } from "@/lib/financial-types";
+import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
 
 export function useFinancialState() {
   const [assets, setAssets] = useState<Asset[]>(INITIAL_STATE.assets);
@@ -36,7 +37,7 @@ export function useFinancialState() {
   const [fxRates, setFxRates] = useState<FxRates | undefined>(undefined);
   const [taxCredits, setTaxCredits] = useState<TaxCredit[]>(INITIAL_STATE.taxCredits ?? []);
   const [filingStatus, setFilingStatus] = useState<FilingStatus>(INITIAL_STATE.filingStatus ?? getDefaultFilingStatus(INITIAL_STATE.country ?? "CA"));
-  const [taxYear, setTaxYear] = useState<number>(new Date().getFullYear());
+  const [taxYear, setTaxYear] = useState<number>(clampTaxYear(new Date().getFullYear()));
   const [flowchartAcks, setFlowchartAcks] = useState<string[]>([]);
   const [flowchartSkips, setFlowchartSkips] = useState<string[]>([]);
   const [retirementAge, setRetirementAge] = useState<number>(65);

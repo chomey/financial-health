@@ -4,6 +4,7 @@ import {
   CA_FEDERAL_2025,
   CA_FEDERAL_2026,
   SUPPORTED_TAX_YEARS,
+  clampTaxYear,
 } from "@/lib/countries/canada/tax-tables";
 import {
   getUSBrackets,
@@ -15,6 +16,7 @@ import {
 } from "@/lib/countries/usa/tax-tables";
 import { calculateProgressiveTax } from "@/lib/tax-tables";
 import { computeTax } from "@/lib/tax-engine";
+import { computeTotals } from "@/lib/compute-totals";
 import {
   findCreditCategory,
   getCreditCategories,
@@ -29,6 +31,14 @@ describe("SUPPORTED_TAX_YEARS", () => {
     expect(SUPPORTED_TAX_YEARS).toContain(2025);
     expect(SUPPORTED_TAX_YEARS).toContain(2026);
   });
+
+  it("clamps arbitrary years into the supported range", () => {
+    expect(clampTaxYear(2024)).toBe(2025);
+    expect(clampTaxYear(2025)).toBe(2025);
+    expect(clampTaxYear(2026)).toBe(2026);
+    expect(clampTaxYear(2027)).toBe(2026);
+    expect(clampTaxYear(Number.NaN)).toBe(2026);
+  });
 });
 
 describe("CA federal brackets differ by year", () => {
@@ -37,10 +47,10 @@ describe("CA federal brackets differ by year", () => {
     expect(CA_FEDERAL_2026.basicPersonalAmount).toBeGreaterThan(CA_FEDERAL_2025.basicPersonalAmount);
   });
 
-  it("2026 BPA is approximately 2.7% higher", () => {
+  it("2026 BPA is approximately 2.0% higher", () => {
     const ratio = CA_FEDERAL_2026.basicPersonalAmount / CA_FEDERAL_2025.basicPersonalAmount;
     expect(ratio).toBeGreaterThan(1.02);
-    expect(ratio).toBeLessThan(1.04);
+    expect(ratio).toBeLessThan(1.021);
   });
 });
 
@@ -78,8 +88,9 @@ describe("getCanadianBrackets with year parameter", () => {
     expect(r2026.provincial).toEqual(r2025.provincial);
   });
 
-  it("throws for unsupported year", () => {
-    expect(() => getCanadianBrackets("ON", 2024)).toThrow("not supported");
+  it("clamps unsupported years to the nearest supported year", () => {
+    expect(getCanadianBrackets("ON", 2024).federal).toEqual(CA_FEDERAL_2025);
+    expect(getCanadianBrackets("ON", 2027).federal).toEqual(CA_FEDERAL_2026);
   });
 });
 
@@ -94,8 +105,9 @@ describe("getUSBrackets with year parameter", () => {
     expect(federal).toEqual(US_FEDERAL_2026);
   });
 
-  it("throws for unsupported year", () => {
-    expect(() => getUSBrackets("CA", 2024)).toThrow("not supported");
+  it("clamps unsupported years to the nearest supported year", () => {
+    expect(getUSBrackets("CA", 2024).federal).toEqual(US_FEDERAL_2025);
+    expect(getUSBrackets("CA", 2027).federal).toEqual(US_FEDERAL_2026);
   });
 });
 
@@ -134,6 +146,31 @@ describe("computeTax with year parameter", () => {
     const tax2026 = computeTax(100000, "capital-gains", "US", "TX", 2026);
     // 2026 0% bracket is wider, so less tax
     expect(tax2026.totalTax).toBeLessThanOrEqual(tax2025.totalTax);
+  });
+
+  it("clamps future tax-engine years to 2026", () => {
+    const cases = [
+      { country: "CA" as const, jurisdiction: "ON" },
+      { country: "US" as const, jurisdiction: "CA" },
+      { country: "AU" as const, jurisdiction: "NSW" },
+    ];
+
+    for (const { country, jurisdiction } of cases) {
+      const tax2026 = computeTax(60000, "employment", country, jurisdiction, 2026);
+      expect(computeTax(60000, "employment", country, jurisdiction, 2027).totalTax).toBe(tax2026.totalTax);
+      expect(computeTax(60000, "employment", country, jurisdiction, 2030).totalTax).toBe(tax2026.totalTax);
+    }
+  });
+
+  it("clamps future computeTotals tax years to 2026", () => {
+    const totals2026 = computeTotals({ ...INITIAL_STATE, taxYear: 2026 });
+    const totals2027 = computeTotals({ ...INITIAL_STATE, taxYear: 2027 });
+    const totals2030 = computeTotals({ ...INITIAL_STATE, taxYear: 2030 });
+
+    expect(totals2027.totalTaxEstimate).toBe(totals2026.totalTaxEstimate);
+    expect(totals2030.totalTaxEstimate).toBe(totals2026.totalTaxEstimate);
+    expect(totals2027.monthlyAfterTaxIncome).toBe(totals2026.monthlyAfterTaxIncome);
+    expect(totals2030.monthlyAfterTaxIncome).toBe(totals2026.monthlyAfterTaxIncome);
   });
 });
 

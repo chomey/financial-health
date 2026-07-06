@@ -1,4 +1,5 @@
 import { getCountry, type CountryCode } from "@/lib/countries";
+import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
 
 export type IncomeType = "employment" | "capital-gains" | "other";
 
@@ -16,9 +17,9 @@ export function computeTax(
   type: IncomeType,
   country: CountryCode,
   jurisdiction: string,
-  year: number = new Date().getFullYear(),
+  year: number = clampTaxYear(new Date().getFullYear()),
 ): TaxResult {
-  return getCountry(country).taxEngine.computeTax(annualIncome, type, jurisdiction, year);
+  return getCountry(country).taxEngine.computeTax(annualIncome, type, jurisdiction, clampTaxYear(year));
 }
 
 /** @deprecated Use getCountry(code).taxEngine.getMarginalRate */
@@ -26,7 +27,7 @@ export function getMarginalRateForIncome(
   annualIncome: number,
   country: CountryCode,
   jurisdiction: string,
-  year: number = new Date().getFullYear(),
+  year: number = clampTaxYear(new Date().getFullYear()),
 ): number {
-  return getCountry(country).taxEngine.getMarginalRate(annualIncome, jurisdiction, year);
+  return getCountry(country).taxEngine.getMarginalRate(annualIncome, jurisdiction, clampTaxYear(year));
 }

@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { getRegisteredCountries, getCountry } from "@/lib/countries";
 import type { CountryCode } from "@/lib/countries";
+import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
 
 interface CountryJurisdictionSelectorProps {
   country: CountryCode;
@@ -18,7 +19,7 @@ export default function CountryJurisdictionSelector({
   jurisdiction,
   onCountryChange,
   onJurisdictionChange,
-  taxYear = new Date().getFullYear(),
+  taxYear = clampTaxYear(new Date().getFullYear()),
   onTaxYearChange,
 }: CountryJurisdictionSelectorProps) {
   const profile = getCountry(country);

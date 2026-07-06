@@ -9,9 +9,9 @@ import type { TaxCredit, FilingStatus } from "@/lib/tax-credits";
 
 /** Government retirement income estimates (CPP/OAS for CA, Social Security for US, Age Pension for AU) */
 export interface GovernmentRetirementIncome {
-  /** CPP monthly benefit (CA). Presets: "average" ~$816/mo, "max" ~$1,365/mo, or custom amount. */
+  /** CPP monthly benefit (CA). Presets: "average" ~$925/mo, "max" ~$1,508/mo, or custom amount. */
   cppMonthly?: number;
-  /** OAS monthly benefit (CA). Presets: "full" ~$728/mo, or custom amount. 0 = not eligible. */
+  /** OAS monthly benefit (CA). Presets: "full" ~$742/mo, or custom amount. 0 = not eligible. */
   oasMonthly?: number;
   /** Social Security monthly benefit (US). */
   ssMonthly?: number;

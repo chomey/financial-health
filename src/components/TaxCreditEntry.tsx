@@ -13,6 +13,7 @@ import {
 import { formatCurrency as canonicalFormatCurrency } from "@/lib/currency";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
+import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
 
 export type { TaxCredit } from "@/lib/tax-credits";
 
@@ -56,7 +57,7 @@ function EligibilityBadge({
   annualIncome,
   filingStatus,
   country,
-  taxYear = new Date().getFullYear(),
+  taxYear = clampTaxYear(new Date().getFullYear()),
 }: {
   category: string;
   annualIncome: number;
@@ -107,7 +108,7 @@ export default function TaxCreditEntry({
   country,
   filingStatus,
   annualIncome,
-  taxYear = new Date().getFullYear(),
+  taxYear = clampTaxYear(new Date().getFullYear()),
 }: TaxCreditEntryProps) {
   const [credits, setCredits] = useControlledArray(items, [], onChange);
 

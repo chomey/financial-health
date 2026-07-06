@@ -9,6 +9,7 @@ import type { SupportedCurrency } from "@/lib/currency";
 import { getTaxTreatment } from "@/lib/withdrawal-tax";
 import type { TaxExplainerDetails } from "@/components/DataFlowArrows";
 import { getCountry } from "@/lib/countries";
+import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
 
 export interface InvestmentIncomeAccount {
   label: string;
@@ -51,7 +52,7 @@ export function computeMonthlyInvestmentReturns(assets: FinancialState["assets"]
 export function computeTotals(state: FinancialState) {
   const homeCurrency = getHomeCurrency(state.country ?? "CA");
   const fxRates = getEffectiveFxRates(homeCurrency, state.fxManualOverride, state.fxRates);
-  const taxYear = state.taxYear ?? new Date().getFullYear();
+  const taxYear = clampTaxYear(state.taxYear ?? new Date().getFullYear());
 
   // Helper to convert an item amount to home currency
   const toHome = (amount: number, itemCurrency?: SupportedCurrency) =>
@@ -65,7 +66,7 @@ export function computeTotals(state: FinancialState) {
   const monthlyIncome = state.income.reduce((sum, i) => sum + toHome(normalizeToMonthly(i.amount, i.frequency), i.currency), 0);
   const monthlyExpenses = state.expenses.reduce((sum, e) => sum + toHome(normalizeExpenseToMonthly(e.amount, e.frequency), e.currency), 0);
   // Total monthly contributions to investment accounts (comes from income, not double-counted in expenses)
-  const totalMonthlyContributions = realAssets.reduce((sum, a) => sum + (a.monthlyContribution ?? 0), 0);
+  const totalMonthlyContributions = realAssets.reduce((sum, a) => sum + toHome(a.monthlyContribution ?? 0, a.currency), 0);
   // Properties: equity = value - mortgage. Counts toward net worth but NOT runway (illiquid).
   const properties = state.properties ?? [];
   const totalPropertyEquity = properties.reduce((sum, p) => sum + toHome(Math.max(0, p.value - p.mortgage), p.currency), 0);
@@ -136,16 +137,24 @@ export function computeTotals(state: FinancialState) {
   let totalFederalTax = 0;
   let totalProvincialStateTax = 0;
   let totalAfterTaxAnnual = 0;
-  let weightedEffectiveRate = 0;
 
   const profile = getCountry(country);
+  const ordinaryIncomeContext = Object.entries(incomeByType)
+    .filter(([type]) => type !== "capital-gains")
+    .reduce((sum, [, annualAmt]) => sum + annualAmt, 0);
+
   for (const [type, annualAmt] of Object.entries(incomeByType)) {
-    const taxResult = profile.taxEngine.computeTax(annualAmt, type as "employment" | "capital-gains" | "other", jurisdiction, taxYear);
+    const taxResult = profile.taxEngine.computeTax(
+      annualAmt,
+      type as "employment" | "capital-gains" | "other",
+      jurisdiction,
+      taxYear,
+      type === "capital-gains" ? ordinaryIncomeContext : undefined,
+    );
     totalAnnualTax += taxResult.totalTax;
     totalFederalTax += taxResult.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
     totalProvincialStateTax += taxResult.breakdown.find((b) => b.kind === "sub-federal")?.amount ?? 0;
     totalAfterTaxAnnual += taxResult.afterTaxIncome;
-    weightedEffectiveRate += taxResult.effectiveRate * annualAmt;
   }
 
   // Apply non-refundable and refundable credits to reduce computed tax
@@ -192,7 +201,7 @@ export function computeTotals(state: FinancialState) {
 export function buildTaxExplainerDetails(state: FinancialState, grossAnnualIncome: number, federalTax: number, provincialStateTax: number, effectiveTaxRate: number, totalTax: number, investmentIncomeAccounts?: InvestmentIncomeAccount[]): TaxExplainerDetails | undefined {
   const country = state.country ?? "CA";
   const jurisdiction = state.jurisdiction ?? "ON";
-  const taxYear = state.taxYear ?? new Date().getFullYear();
+  const taxYear = clampTaxYear(state.taxYear ?? new Date().getFullYear());
   const hasCapitalGains = state.income.some((i) => i.incomeType === "capital-gains");
 
   const profile = getCountry(country);
