@@ -154,7 +154,7 @@ exports[`withdrawal tax snapshot regression > CA LIRA 10000 1`] = `
 
 exports[`withdrawal tax snapshot regression > CA LIRA 50000 1`] = `
 {
-  "effectiveRate": 0.14012934999999999,
+  "effectiveRate": 0.13674224999999998,
   "taxFreeAmount": 0,
   "taxableAmount": 50000,
 }
@@ -162,7 +162,7 @@ exports[`withdrawal tax snapshot regression > CA LIRA 50000 1`] = `
 
 exports[`withdrawal tax snapshot regression > CA LIRA 100000 1`] = `
 {
-  "effectiveRate": 0.21307516499999998,
+  "effectiveRate": 0.21101286500000002,
   "taxFreeAmount": 0,
   "taxableAmount": 100000,
 }
@@ -178,7 +178,7 @@ exports[`withdrawal tax snapshot regression > CA RESP 10000 1`] = `
 
 exports[`withdrawal tax snapshot regression > CA RESP 50000 1`] = `
 {
-  "effectiveRate": 0.14012934999999999,
+  "effectiveRate": 0.13674224999999998,
   "taxFreeAmount": 0,
   "taxableAmount": 50000,
 }
@@ -186,7 +186,7 @@ exports[`withdrawal tax snapshot regression > CA RESP 50000 1`] = `
 
 exports[`withdrawal tax snapshot regression > CA RESP 100000 1`] = `
 {
-  "effectiveRate": 0.21307516499999998,
+  "effectiveRate": 0.21101286500000002,
   "taxFreeAmount": 0,
   "taxableAmount": 100000,
 }
@@ -202,7 +202,7 @@ exports[`withdrawal tax snapshot regression > CA RRSP 10000 1`] = `
 
 exports[`withdrawal tax snapshot regression > CA RRSP 50000 1`] = `
 {
-  "effectiveRate": 0.14012934999999999,
+  "effectiveRate": 0.13674224999999998,
   "taxFreeAmount": 0,
   "taxableAmount": 50000,
 }
@@ -210,7 +210,7 @@ exports[`withdrawal tax snapshot regression > CA RRSP 50000 1`] = `
 
 exports[`withdrawal tax snapshot regression > CA RRSP 100000 1`] = `
 {
-  "effectiveRate": 0.21307516499999998,
+  "effectiveRate": 0.21101286500000002,
   "taxFreeAmount": 0,
   "taxableAmount": 100000,
 }
@@ -274,7 +274,7 @@ exports[`withdrawal tax snapshot regression > US 401k 10000 1`] = `
 
 exports[`withdrawal tax snapshot regression > US 401k 50000 1`] = `
 {
-  "effectiveRate": 0.1107812,
+  "effectiveRate": 0.10898119999999999,
   "taxFreeAmount": 0,
   "taxableAmount": 50000,
 }
@@ -282,7 +282,7 @@ exports[`withdrawal tax snapshot regression > US 401k 50000 1`] = `
 
 exports[`withdrawal tax snapshot regression > US 401k 100000 1`] = `
 {
-  "effectiveRate": 0.19456362000000002,
+  "effectiveRate": 0.19291362,
   "taxFreeAmount": 0,
   "taxableAmount": 100000,
 }
@@ -298,7 +298,7 @@ exports[`withdrawal tax snapshot regression > US 529 10000 1`] = `
 
 exports[`withdrawal tax snapshot regression > US 529 50000 1`] = `
 {
-  "effectiveRate": 0.1107812,
+  "effectiveRate": 0.10898119999999999,
   "taxFreeAmount": 0,
   "taxableAmount": 50000,
 }
@@ -306,7 +306,7 @@ exports[`withdrawal tax snapshot regression > US 529 50000 1`] = `
 
 exports[`withdrawal tax snapshot regression > US 529 100000 1`] = `
 {
-  "effectiveRate": 0.19456362000000002,
+  "effectiveRate": 0.19291362,
   "taxFreeAmount": 0,
   "taxableAmount": 100000,
 }
@@ -370,7 +370,7 @@ exports[`withdrawal tax snapshot regression > US IRA 10000 1`] = `
 
 exports[`withdrawal tax snapshot regression > US IRA 50000 1`] = `
 {
-  "effectiveRate": 0.1107812,
+  "effectiveRate": 0.10898119999999999,
   "taxFreeAmount": 0,
   "taxableAmount": 50000,
 }
@@ -378,7 +378,7 @@ exports[`withdrawal tax snapshot regression > US IRA 50000 1`] = `
 
 exports[`withdrawal tax snapshot regression > US IRA 100000 1`] = `
 {
-  "effectiveRate": 0.19456362000000002,
+  "effectiveRate": 0.19291362,
   "taxFreeAmount": 0,
   "taxableAmount": 100000,
 }

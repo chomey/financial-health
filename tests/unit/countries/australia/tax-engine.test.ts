@@ -70,17 +70,17 @@ describe("australianTaxEngine.computeTax breakdown", () => {
   });
 
   it("Medicare Levy is 0 below the low-income threshold", () => {
-    // $20k is below the $26k single threshold → levy = 0.
+    // $20k is below the $27,222 single threshold → levy = 0.
     const result = australianTaxEngine.computeTax(20_000, "employment", "NSW", 2025);
     const medicare = result.breakdown.find((b) => b.kind === "social");
     expect(medicare!.amount).toBe(0);
   });
 
   it("Medicare Levy uses the phase-in rate inside the shade-out zone", () => {
-    // $29k: 10% × ($29k − $26k) = $300.
+    // $29k: 10% × ($29k - $27,222) = $177.80.
     const result = australianTaxEngine.computeTax(29_000, "employment", "NSW", 2025);
     const medicare = result.breakdown.find((b) => b.kind === "social");
-    expect(medicare!.amount).toBeCloseTo(300, 0);
+    expect(medicare!.amount).toBeCloseTo(178, 0);
   });
 
   it("returns empty breakdown for zero income", () => {

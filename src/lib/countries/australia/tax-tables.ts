@@ -8,7 +8,7 @@
  */
 
 import type { BracketTable } from "@/lib/bracket-math";
-import { SUPPORTED_TAX_YEARS } from "@/lib/countries/canada/tax-tables";
+import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
 
 // ─── Federal ──────────────────────────────────────────────────────────────────
 
@@ -29,16 +29,17 @@ export const AU_FEDERAL_2025: BracketTable = {
 };
 
 /**
- * 2025-26 Australian Federal Tax Brackets (estimated via ~2.5% indexation).
- * Official ATO values to be confirmed mid-2025.
+ * 2025-26 Australian Federal Tax Brackets (Residents).
+ * ATO does not index thresholds; FY2025-26 rates are unchanged from
+ * FY2024-25 (the 15% first-rate cut begins FY2026-27, not covered).
  */
 export const AU_FEDERAL_2026: BracketTable = {
   brackets: [
-    { min: 0, max: 18_700, rate: 0 },
-    { min: 18_700, max: 46_100, rate: 0.16 },
-    { min: 46_100, max: 138_400, rate: 0.30 },
-    { min: 138_400, max: 194_800, rate: 0.37 },
-    { min: 194_800, max: Infinity, rate: 0.45 },
+    { min: 0, max: 18_200, rate: 0 },
+    { min: 18_200, max: 45_000, rate: 0.16 },
+    { min: 45_000, max: 135_000, rate: 0.30 },
+    { min: 135_000, max: 190_000, rate: 0.37 },
+    { min: 190_000, max: Infinity, rate: 0.45 },
   ],
   basicPersonalAmount: 0,
 };
@@ -55,21 +56,20 @@ export const AU_FEDERAL_BY_YEAR: Record<number, BracketTable> = {
  * Below the threshold: no levy. Between threshold and shade-out: reduced levy.
  * Above shade-out: full 2%.
  *
- * 2024-25 thresholds (singles):
- * - Exempt below $26,000
- * - Phase-in from $26,000 to $32,500 (10% of excess over threshold)
- * - Full 2% above $32,500
+ * Official thresholds (singles):
+ * - FY2024-25: exempt at or below $27,222; phase-in to $34,027
+ * - FY2025-26: exempt at or below $28,011; phase-in to $35,013
  *
  * Family threshold: $43,846 (+ $4,027 per dependent child)
  * We use single thresholds since we don't track family size in the tax engine.
  */
 export const AU_MEDICARE_LEVY = {
   rate: 0.02,
-  singleThreshold2025: 26_000,
-  singleShadeOut2025: 32_500,
+  singleThreshold2025: 27_222,
+  singleShadeOut2025: 34_027,
   phaseInRate: 0.10, // 10% of income above threshold until full levy
-  singleThreshold2026: 26_650, // estimated ~2.5% indexation
-  singleShadeOut2026: 33_313,
+  singleThreshold2026: 28_011,
+  singleShadeOut2026: 35_013,
 };
 
 // ─── Bracket accessor ─────────────────────────────────────────────────────────
@@ -84,10 +84,7 @@ export function getAUBrackets(
   jurisdiction: string,
   year: number = 2025
 ): { federal: BracketTable; state: BracketTable } {
-  const federal = AU_FEDERAL_BY_YEAR[year];
-  if (!federal) {
-    throw new Error(`Tax year ${year} is not supported for AU. Supported years: ${SUPPORTED_TAX_YEARS.join(", ")}`);
-  }
+  const federal = AU_FEDERAL_BY_YEAR[clampTaxYear(year)];
 
   // No state/territory income tax in Australia
   return {

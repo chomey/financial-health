@@ -42,11 +42,10 @@ describe("AU_FEDERAL_2025", () => {
 });
 
 describe("AU_FEDERAL_2026", () => {
-  it("has 5 brackets with indexed thresholds higher than 2025", () => {
+  it("has 5 brackets unchanged from 2025", () => {
     expect(AU_FEDERAL_2026.brackets).toHaveLength(5);
-    expect(AU_FEDERAL_2026.brackets[0].max).toBeGreaterThan(AU_FEDERAL_2025.brackets[0].max);
-    expect(AU_FEDERAL_2026.brackets[1].max).toBeGreaterThan(AU_FEDERAL_2025.brackets[1].max);
-    expect(AU_FEDERAL_2026.brackets[2].max).toBeGreaterThan(AU_FEDERAL_2025.brackets[2].max);
+    expect(AU_FEDERAL_2026.brackets).toEqual(AU_FEDERAL_2025.brackets);
+    expect(AU_FEDERAL_2026.basicPersonalAmount).toBe(AU_FEDERAL_2025.basicPersonalAmount);
   });
 
   it("preserves same rate structure as 2025", () => {
@@ -76,6 +75,10 @@ describe("AU_MEDICARE_LEVY constants", () => {
   });
 
   it("2026 thresholds are higher than 2025", () => {
+    expect(AU_MEDICARE_LEVY.singleThreshold2025).toBe(27_222);
+    expect(AU_MEDICARE_LEVY.singleShadeOut2025).toBe(34_027);
+    expect(AU_MEDICARE_LEVY.singleThreshold2026).toBe(28_011);
+    expect(AU_MEDICARE_LEVY.singleShadeOut2026).toBe(35_013);
     expect(AU_MEDICARE_LEVY.singleThreshold2026).toBeGreaterThan(AU_MEDICARE_LEVY.singleThreshold2025);
     expect(AU_MEDICARE_LEVY.singleShadeOut2026).toBeGreaterThan(AU_MEDICARE_LEVY.singleShadeOut2025);
   });
@@ -101,8 +104,9 @@ describe("getAUBrackets", () => {
     }
   });
 
-  it("throws for unsupported year", () => {
-    expect(() => getAUBrackets("NSW", 2020)).toThrow("not supported");
+  it("clamps unsupported years to the nearest supported year", () => {
+    expect(getAUBrackets("NSW", 2020).federal).toBe(AU_FEDERAL_2025);
+    expect(getAUBrackets("NSW", 2027).federal).toBe(AU_FEDERAL_2026);
   });
 
   it("defaults to year 2025 when year is omitted", () => {
@@ -112,35 +116,35 @@ describe("getAUBrackets", () => {
 });
 
 describe("calculateMedicareLevy", () => {
-  it("returns 0 for income at or below threshold ($26,000)", () => {
+  it("returns 0 for income at or below threshold ($27,222)", () => {
     expect(calculateMedicareLevy(0, 2025)).toBe(0);
     expect(calculateMedicareLevy(20_000, 2025)).toBe(0);
-    expect(calculateMedicareLevy(26_000, 2025)).toBe(0);
+    expect(calculateMedicareLevy(27_222, 2025)).toBe(0);
   });
 
   it("returns 0 for negative income", () => {
     expect(calculateMedicareLevy(-5_000, 2025)).toBe(0);
   });
 
-  it("phases in at 10% of excess between $26,000 and $32,500", () => {
-    // At $29,000: 10% × ($29,000 - $26,000) = $300
-    expect(calculateMedicareLevy(29_000, 2025)).toBeCloseTo(300, 0);
+  it("phases in at 10% of excess between $27,222 and $34,027", () => {
+    // At $29,000: 10% × ($29,000 - $27,222) = $177.80
+    expect(calculateMedicareLevy(29_000, 2025)).toBeCloseTo(178, 0);
   });
 
-  it("applies full 2% above shade-out ($32,500)", () => {
+  it("applies full 2% above shade-out ($34,027)", () => {
     expect(calculateMedicareLevy(50_000, 2025)).toBeCloseTo(1_000, 0);
     expect(calculateMedicareLevy(100_000, 2025)).toBeCloseTo(2_000, 0);
   });
 
   it("uses 2026 thresholds when year >= 2026", () => {
-    // $26,500 is below 2026 threshold ($26,650) → $0
-    expect(calculateMedicareLevy(26_500, 2026)).toBe(0);
-    // $26,500 is above 2025 threshold ($26,000) → phase-in applies
-    expect(calculateMedicareLevy(26_500, 2025)).toBeGreaterThan(0);
+    // $27,500 is below 2026 threshold ($28,011) → $0
+    expect(calculateMedicareLevy(27_500, 2026)).toBe(0);
+    // $27,500 is above 2025 threshold ($27,222) → phase-in applies
+    expect(calculateMedicareLevy(27_500, 2025)).toBeGreaterThan(0);
   });
 
   it("defaults to year 2025 when year is omitted", () => {
-    // $26,500 should trigger phase-in under 2025 rules
-    expect(calculateMedicareLevy(26_500)).toBeGreaterThan(0);
+    // $27,500 should trigger phase-in under 2025 rules
+    expect(calculateMedicareLevy(27_500)).toBeGreaterThan(0);
   });
 });

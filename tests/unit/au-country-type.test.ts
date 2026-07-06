@@ -146,7 +146,7 @@ describe("AU country type – tax engine", () => {
     const result = computeTax(80000, "employment", "AU", "NSW", 2025);
     // $80k: 0% on first $18,200 + 16% on $18,200-$45,000 + 30% on $45,000-$80,000
     // = 0 + 4,288 + 10,500 = $14,788 federal
-    // Medicare: $80k > $32,500 shade-out → full 2% = $1,600
+    // Medicare: $80k > $34,027 shade-out → full 2% = $1,600
     // Total: $16,388
     const fed = result.breakdown.find((b) => b.kind === "income-tax")?.amount ?? 0;
     expect(fed).toBeCloseTo(14_788, 0);
