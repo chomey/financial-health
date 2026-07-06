@@ -3,12 +3,19 @@
  * and related components (Task 131)
  */
 import { describe, it, expect } from "vitest";
+import fs from "fs";
+import path from "path";
 import { screen } from "@testing-library/react";
 import { render } from "../test-utils";
 import InsightsPanel from "@/components/InsightsPanel";
 import BenchmarkComparisons from "@/components/BenchmarkComparisons";
 import FxRateDisplay from "@/components/FxRateDisplay";
 import CurrencyBadge from "@/components/CurrencyBadge";
+
+const fastForwardSrc = fs.readFileSync(
+  path.join(process.cwd(), "src/components/FastForwardPanel.tsx"),
+  "utf-8"
+);
 
 describe("InsightsPanel dark theme", () => {
   it("renders insight cards with dark glass style", () => {
@@ -127,5 +134,18 @@ describe("CurrencyBadge dark theme", () => {
     const badge = container.querySelector('[data-testid="currency-badge"]') as HTMLElement;
     expect(badge.className).toContain("bg-white/5");
     expect(badge.className).toContain("text-slate-500");
+  });
+});
+
+describe("FastForwardPanel interaction states", () => {
+  it("buttons, sliders, and inputs use the shared cyan focus ring", () => {
+    expect(fastForwardSrc).toContain("focus-ring rounded-lg border");
+    expect(fastForwardSrc).toContain("focus-ring w-24 accent-");
+    expect(fastForwardSrc).toContain("focus-visible:border-cyan-400/50");
+  });
+
+  it("what-if control rows use color-only transitions", () => {
+    expect(fastForwardSrc).toContain("transition-colors duration-200");
+    expect(fastForwardSrc).not.toContain("transition-all duration-200");
   });
 });

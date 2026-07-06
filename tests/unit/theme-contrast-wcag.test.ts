@@ -63,6 +63,7 @@ function blendRgba(
 const BG_DARK = "#0f172a"; // slate-900 (--background)
 // Glass card surface: rgba(255,255,255,0.05) on #0f172a
 const BG_GLASS = blendRgba(255, 255, 255, 0.05, BG_DARK);
+const FOCUS_RING_CYAN = blendRgba(34, 211, 238, 0.60, BG_DARK);
 
 const WCAG_AA_NORMAL = 4.5; // Minimum contrast ratio for normal text
 const WCAG_AA_LARGE = 3.0; // Minimum for large text (18pt+ or 14pt bold)
@@ -96,6 +97,9 @@ const colorPairs: {
   // Muted/secondary text — large text threshold (labels, section headers)
   { name: "slate-400 (#94a3b8) on background [large text]", fg: "#94a3b8", bg: BG_DARK, minRatio: WCAG_AA_LARGE },
   { name: "slate-400 (#94a3b8) on glass card [large text]", fg: "#94a3b8", bg: BG_GLASS, minRatio: WCAG_AA_LARGE },
+
+  // Focus indicators — non-text contrast threshold
+  { name: "cyan-400/60 focus ring on slate-900", fg: FOCUS_RING_CYAN, bg: BG_DARK, minRatio: WCAG_AA_LARGE },
 ];
 
 describe("Task 134: WCAG AA contrast ratio verification for cyberpunk theme", () => {

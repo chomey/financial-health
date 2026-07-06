@@ -489,7 +489,7 @@ export default function Home() {
                           el.scrollIntoView({ behavior: "smooth", block: "start" });
                         }
                       }}
-                      className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+                      className={`focus-ring flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors duration-150 ${
                         isCurrent
                           ? "bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30"
                           : "text-slate-500 hover:bg-white/5 hover:text-slate-300"

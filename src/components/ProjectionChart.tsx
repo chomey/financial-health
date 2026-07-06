@@ -278,7 +278,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 key={s}
                 onClick={() => setScenario(s)}
                 title={SCENARIO_DESCRIPTIONS[s]}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                   scenario === s
                     ? "text-slate-900 shadow-sm"
                     : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
@@ -300,7 +300,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           <div className="flex gap-1" data-testid="chart-mode-tabs">
             <button
               onClick={(e) => { e.stopPropagation(); setMode("keep-earning"); }}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+              className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                 mode === "keep-earning"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
                   : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
@@ -311,7 +311,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); setMode("income-stops"); }}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+              className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                 mode === "income-stops"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
                   : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
@@ -331,7 +331,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               <button
                 key={opt}
                 onClick={() => handleOutlookChange(opt)}
-                className={`px-2 py-0.5 transition-colors duration-150 ${
+                className={`focus-ring px-2 py-0.5 transition-colors duration-150 ${
                   i === 0 ? "rounded-l-lg" : i === OUTLOOK_YEAR_OPTIONS.length - 1 ? "rounded-r-lg" : ""
                 } ${
                   outlookYears === opt
@@ -353,7 +353,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               type="checkbox"
               checked={inflationAdjusted}
               onChange={(e) => handleInflationToggle(e.target.checked)}
-              className="h-3 w-3 cursor-pointer accent-emerald-400"
+              className="focus-ring h-3 w-3 cursor-pointer accent-cyan-400"
               data-testid="inflation-toggle"
               aria-label="Adjust for inflation"
             />
@@ -368,7 +368,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 step="0.1"
                 value={inflationRateInput}
                 onChange={(e) => handleInflationRateChange(e.target.value)}
-                className="w-12 rounded border border-white/10 bg-slate-800 px-1 py-0.5 text-right text-xs text-slate-200 transition-colors focus:border-emerald-500/50 focus:outline-none"
+                className="focus-ring w-12 rounded border border-white/10 bg-slate-800 px-1 py-0.5 text-right text-xs text-slate-200 transition-colors duration-150 focus-visible:border-cyan-400/50"
                 data-testid="inflation-rate-input"
                 aria-label="Annual inflation rate"
               />
@@ -630,7 +630,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       <div className="mt-3 border-t border-white/10 pt-3" data-testid="scenario-legend">
         <button
           onClick={() => setLegendOpen(!legendOpen)}
-          className="flex w-full items-center gap-1.5 text-xs font-medium text-slate-500 transition-colors duration-200 hover:text-slate-300"
+          className="focus-ring flex w-full items-center gap-1.5 rounded text-xs font-medium text-slate-500 transition-colors duration-150 hover:text-slate-300"
           data-testid="scenario-legend-toggle"
           aria-expanded={legendOpen}
         >

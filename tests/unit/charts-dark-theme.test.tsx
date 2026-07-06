@@ -2,10 +2,17 @@
  * T1 unit tests: dark cyberpunk theme for chart components (Task 130)
  */
 import { describe, it, expect } from "vitest";
+import fs from "fs";
+import path from "path";
 import { render } from "../test-utils";
 import NetWorthDonutChart from "@/components/NetWorthDonutChart";
 import ExpenseBreakdownChart from "@/components/ExpenseBreakdownChart";
 import NetWorthWaterfallChart from "@/components/NetWorthWaterfallChart";
+
+const projectionSrc = fs.readFileSync(
+  path.join(process.cwd(), "src/components/ProjectionChart.tsx"),
+  "utf-8"
+);
 
 // COLORS array tests — verify vivid cyberpunk palette
 describe("NetWorthDonutChart dark theme", () => {
@@ -145,5 +152,18 @@ describe("NetWorthWaterfallChart dark theme", () => {
     // Legend container should have slate text
     const legendText = container.querySelector('[class*="text-slate-400"]');
     expect(legendText).toBeTruthy();
+  });
+});
+
+describe("ProjectionChart interaction states", () => {
+  it("scenario, mode, and outlook controls use shared cyan focus rings", () => {
+    expect(projectionSrc).toContain("focus-ring rounded-full");
+    expect(projectionSrc).toContain("focus-ring px-2 py-0.5");
+    expect(projectionSrc).toContain("focus-visible:border-cyan-400/50");
+  });
+
+  it("interactive chart controls use color transitions instead of transition-all", () => {
+    expect(projectionSrc).toContain("transition-colors duration-150");
+    expect(projectionSrc).not.toContain("rounded-full px-3 py-1 text-xs font-medium transition-all");
   });
 });

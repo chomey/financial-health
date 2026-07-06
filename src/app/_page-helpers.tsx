@@ -10,7 +10,7 @@ export function PrintSnapshotButton() {
     <button
       type="button"
       onClick={() => window.print()}
-      className="rounded-md p-1.5 text-slate-500 transition-all duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95 print:hidden"
+      className="focus-ring rounded-md p-1.5 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 active:scale-95 print:hidden"
       aria-label="Print snapshot"
       data-testid="print-snapshot-button"
     >
@@ -40,7 +40,7 @@ export function ModeToggle() {
       <button
         type="button"
         onClick={() => setMode("simple")}
-        className={`rounded-l-lg px-2 py-1 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+        className={`focus-ring rounded-l-lg px-2 py-1 font-medium transition-colors duration-150 ${
           mode === "simple"
             ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-inset ring-emerald-500/30"
             : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
@@ -53,7 +53,7 @@ export function ModeToggle() {
       <button
         type="button"
         onClick={() => setMode("advanced")}
-        className={`rounded-r-lg px-2 py-1 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+        className={`focus-ring rounded-r-lg px-2 py-1 font-medium transition-colors duration-150 ${
           mode === "advanced"
             ? "bg-violet-500/15 text-violet-300 ring-1 ring-inset ring-violet-500/30"
             : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
@@ -83,7 +83,7 @@ export function ResetButton() {
     <button
       type="button"
       onClick={handleReset}
-      className="rounded-md p-1.5 text-slate-500 transition-all duration-150 hover:bg-rose-500/10 hover:text-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-400 active:scale-95 print:hidden"
+      className="focus-ring rounded-md p-1.5 text-slate-500 transition-colors duration-150 hover:bg-rose-500/10 hover:text-rose-400 active:scale-95 print:hidden"
       aria-label="Reset all data"
       title="Reset all data"
       data-testid="reset-all-button"
@@ -124,7 +124,7 @@ export function AppHeader({
                 <button
                   type="button"
                   onClick={onSwitchPhase}
-                  className="rounded-r-lg px-2 py-1 font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400"
+                  className="focus-ring rounded-r-lg px-2 py-1 font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10 hover:text-slate-200"
                   data-testid="wizard-skip-to-dashboard"
                 >
                   <span className="hidden sm:inline">📊 </span>Dashboard
@@ -135,7 +135,7 @@ export function AppHeader({
                 <button
                   type="button"
                   onClick={onSwitchPhase}
-                  className="rounded-l-lg px-2 py-1 font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-400"
+                  className="focus-ring rounded-l-lg px-2 py-1 font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10 hover:text-slate-200"
                 >
                   <span className="hidden sm:inline">📝 </span>Inputs
                 </button>
@@ -253,7 +253,7 @@ export function CopyLinkButton() {
   return (
     <button
       onClick={handleCopy}
-      className="rounded-md p-1.5 text-slate-500 transition-all duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-400 active:scale-95 print:hidden"
+      className="focus-ring rounded-md p-1.5 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 active:scale-95 print:hidden"
       aria-label="Copy link to clipboard"
     >
       {copied ? (
@@ -314,7 +314,7 @@ export function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange
           onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") setEditing(false); }}
           onBlur={submit}
           autoFocus
-          className="w-16 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm text-slate-200 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20 transition-all duration-150"
+          className="focus-ring w-16 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm text-slate-200 transition-colors duration-150 focus-visible:border-cyan-400/50"
           placeholder="e.g. 35"
           data-testid="age-input-header"
         />
@@ -328,14 +328,14 @@ export function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange
         <span className="text-sm font-medium text-slate-400">Age:</span>
         <button
           onClick={() => { setInput(age.toString()); setEditing(true); }}
-          className="min-h-[36px] rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
+          className="focus-ring min-h-[36px] rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-colors duration-150 hover:border-white/20 hover:bg-white/10"
           data-testid="age-value-header"
         >
           {age}
         </button>
         <button
           onClick={() => { onAgeChange(undefined); setInput(""); }}
-          className="p-1 text-slate-500 hover:text-slate-300 transition-colors duration-150 rounded"
+          className="focus-ring rounded p-1 text-slate-500 transition-colors duration-150 hover:text-slate-300"
           aria-label="Clear age"
           data-testid="age-clear-header"
         >
@@ -348,7 +348,7 @@ export function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange
   return (
     <button
       onClick={() => { setInput(""); setEditing(true); }}
-      className="min-h-[36px] rounded-lg border border-dashed border-white/10 bg-transparent px-3 py-1 text-sm text-slate-500 transition-all duration-200 hover:border-white/20 hover:text-slate-300 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
+      className="focus-ring min-h-[36px] rounded-lg border border-dashed border-white/10 bg-transparent px-3 py-1 text-sm text-slate-500 transition-colors duration-150 hover:border-white/20 hover:bg-white/5 hover:text-slate-300"
       data-testid="age-add-header"
     >
       Add age
@@ -385,7 +385,7 @@ export function RetirementAgeInput({ retirementAge, onChange, currentAge }: { re
           onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setInput(retirementAge.toString()); setEditing(false); } }}
           onBlur={submit}
           autoFocus
-          className="w-16 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm text-slate-200 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20 transition-all duration-150"
+          className="focus-ring w-16 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm text-slate-200 transition-colors duration-150 focus-visible:border-cyan-400/50"
           data-testid="retirement-age-input"
         />
       </div>
@@ -397,7 +397,7 @@ export function RetirementAgeInput({ retirementAge, onChange, currentAge }: { re
       <span className="text-sm font-medium text-slate-400">Retire at:</span>
       <button
         onClick={() => { setInput(retirementAge.toString()); setEditing(true); }}
-        className="min-h-[36px] rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
+        className="focus-ring min-h-[36px] rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-colors duration-150 hover:border-white/20 hover:bg-white/10"
         data-testid="retirement-age-value"
       >
         {retirementAge}
@@ -479,7 +479,7 @@ export function CollapsibleSection({
         ref={collapsedRef}
         id={id}
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 shadow-sm text-left transition-all duration-200 hover:shadow-md hover:bg-white/10 scroll-mt-16"
+        className="focus-ring flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 shadow-sm text-left transition-colors duration-200 hover:bg-white/10 hover:shadow-md scroll-mt-16"
         aria-expanded={false}
         data-dataflow-source={dataFlowId}
       >

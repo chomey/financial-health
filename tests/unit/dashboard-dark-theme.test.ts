@@ -12,6 +12,11 @@ const arrowsSrc = fs.readFileSync(
   "utf-8"
 );
 
+const pageSrc = fs.readFileSync(
+  path.join(process.cwd(), "src/app/page.tsx"),
+  "utf-8"
+);
+
 describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
   it("metric cards use glass effect background (bg-white/5)", () => {
     expect(dashboardSrc).toContain("bg-white/5");
@@ -184,5 +189,13 @@ describe("Task 128: Dashboard dark theme — DataFlowArrows", () => {
     // Old code had conditional 'text-white' for high bracket index. Should be gone.
     expect(arrowsSrc).not.toContain('"text-emerald-800"');
     expect(arrowsSrc).not.toContain("text-emerald-800");
+  });
+});
+
+describe("Task 128: Dashboard dark theme — navigation interactions", () => {
+  it("dashboard section pills use shared cyan focus ring and color transitions", () => {
+    expect(pageSrc).toContain("focus-ring flex items-center gap-1.5 rounded-lg");
+    expect(pageSrc).toContain("transition-colors duration-150");
+    expect(pageSrc).not.toContain("focus:ring-2 focus:ring-violet-400");
   });
 });

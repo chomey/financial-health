@@ -29,6 +29,8 @@ describe("AssetEntry dark theme", () => {
     render(<AssetEntry />);
     const btn = screen.getByText("+ Add Asset");
     expect(btn.className).toContain("text-cyan-400");
+    expect(btn.className).toContain("focus-ring");
+    expect(btn.className).toContain("transition-colors");
   });
 });
 

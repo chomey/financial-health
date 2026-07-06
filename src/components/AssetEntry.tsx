@@ -320,7 +320,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   if (e.key === "Enter") { e.preventDefault(); commitHomeField("value"); }
                   if (e.key === "Escape") { setEditingHomeField(null); }
                 }}
-                className="w-32 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                className="focus-ring w-32 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-colors duration-150"
                 aria-label="Home value"
                 data-testid="simple-home-value-input"
               />
@@ -332,7 +332,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   setEditingHomeField("value");
                   setTimeout(() => homeValueInputRef.current?.focus(), 0);
                 }}
-                className="w-32 text-right text-sm font-medium text-emerald-400 rounded px-2 py-1 transition-colors duration-150 hover:bg-emerald-400/10 hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                className="focus-ring w-32 rounded px-2 py-1 text-right text-sm font-medium text-emerald-400 transition-colors duration-150 hover:bg-emerald-400/10 hover:text-emerald-300"
                 aria-label={`Edit home value, currently ${formatCurrency(simpleHomeValue)}`}
                 data-testid="simple-home-value"
               >
@@ -355,7 +355,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   if (e.key === "Enter") { e.preventDefault(); commitHomeField("mortgage"); }
                   if (e.key === "Escape") { setEditingHomeField(null); }
                 }}
-                className="w-32 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                className="focus-ring w-32 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-colors duration-150"
                 aria-label="Mortgage balance"
                 data-testid="simple-mortgage-input"
               />
@@ -367,7 +367,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   setEditingHomeField("mortgage");
                   setTimeout(() => mortgageInputRef.current?.focus(), 0);
                 }}
-                className="w-32 text-right text-sm font-medium text-rose-400 rounded px-2 py-1 transition-colors duration-150 hover:bg-rose-400/10 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                className="focus-ring w-32 rounded px-2 py-1 text-right text-sm font-medium text-rose-400 transition-colors duration-150 hover:bg-rose-400/10 hover:text-rose-300"
                 aria-label={`Edit mortgage balance, currently ${formatCurrency(simpleHomeMortgage)}`}
                 data-testid="simple-mortgage-value"
               >
@@ -401,7 +401,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
             <DataFlowSourceItem key={asset.id} id={`asset:${asset.id}`} label={asset.category} value={asset.amount}>
             <div role="listitem">
               <div
-                className={`group flex items-center justify-between rounded-lg px-3 transition-all duration-200 ${isComputed ? "py-0.5 bg-slate-800/60 border border-dashed border-white/10 rounded-md mx-1" : "py-0.5 hover:bg-white/5"}`}
+                className={`group flex items-center justify-between rounded-lg px-3 transition-colors duration-200 ${isComputed ? "py-0.5 bg-slate-800/60 border border-dashed border-white/10 rounded-md mx-1" : "py-0.5 hover:bg-white/5"}`}
               >
                 <div className="flex flex-1 items-center gap-1 sm:gap-3 min-w-0">
                   {/* Category */}
@@ -422,7 +422,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           }, 150);
                         }}
                         onKeyDown={handleEditKeyDown}
-                        className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                        className="focus-ring w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-colors duration-150"
                         aria-label="Edit category name"
                       />
                       {showSuggestions &&
@@ -442,7 +442,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                                       e.preventDefault();
                                       commitEdit(suggestion);
                                     }}
-                                    className="w-full px-3 py-1.5 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300"
+                                    className="focus-ring w-full px-3 py-1.5 text-left text-sm text-slate-200 transition-colors duration-150 hover:bg-cyan-500/10 hover:text-cyan-300"
                                   >
                                     <div>
                                       {getAssetCategoryFlag(suggestion) && (
@@ -472,7 +472,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       onClick={() =>
                         startEdit(asset.id, "category", asset.category)
                       }
-                      className="flex-1 min-w-0 min-h-[44px] sm:min-h-0 text-left text-sm text-slate-300 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
+                      className="focus-ring min-h-[44px] min-w-0 flex-1 rounded px-2 py-2 text-left text-sm text-slate-300 transition-colors duration-150 hover:bg-white/10 hover:text-slate-100 sm:min-h-0 sm:py-1"
                       aria-label={`Edit category for ${asset.category}`}
                     >
                       <div>
@@ -510,7 +510,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={() => commitEdit()}
                         onKeyDown={handleEditKeyDown}
-                        className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                        className="focus-ring w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-colors duration-150"
                         aria-label={`Edit amount for ${asset.category}`}
                       />
                     ) : (
@@ -524,7 +524,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         onClick={() =>
                           startEdit(asset.id, "amount", String(asset.amount))
                         }
-                        className="w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium text-emerald-400 rounded px-2 py-2 sm:py-1 transition-colors duration-150 hover:bg-emerald-400/10 hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                        className="focus-ring min-h-[44px] w-28 rounded px-2 py-2 text-right text-sm font-medium text-emerald-400 transition-colors duration-150 hover:bg-emerald-400/10 hover:text-emerald-300 sm:min-h-0 sm:py-1"
                         aria-label={`Edit amount for ${asset.category}, currently ${formatCurrency(asset.amount)}`}
                       >
                         {formatCurrency(asset.amount)}
@@ -539,7 +539,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 <button
                   type="button"
                   onClick={() => deleteAsset(asset.id)}
-                  className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 sm:group-hover:opacity-100"
+                  className="focus-ring ml-2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md p-2 text-slate-500 transition-colors duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus-visible:opacity-100 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 sm:group-hover:opacity-100"
                   aria-label={`Delete ${asset.category}`}
                 >
                   <svg
@@ -592,7 +592,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           a.id === asset.id ? { ...a, taxTreatment: override } : a
                         ));
                       }}
-                      className={`rounded px-1.5 py-0.5 text-xs font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${colors[effective]}`}
+                      className={`focus-ring rounded px-1.5 py-0.5 text-xs font-medium transition-colors duration-150 ${colors[effective]}`}
                       aria-label={`Tax treatment for ${asset.category}: ${labels[effective]}${isOverridden ? " (overridden)" : " (auto-detected)"}. Click to change.`}
                       data-testid={`tax-treatment-pill-${asset.id}`}
                     >
@@ -612,7 +612,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
+                    className="focus-ring w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                     aria-label={`Edit ROI for ${asset.category}`}
                     placeholder="e.g. 7"
                   />
@@ -621,7 +621,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     <button
                       type="button"
                       onClick={() => startEdit(asset.id, "roi", String(asset.roi ?? ""))}
-                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                      className={`focus-ring rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                         hasRoi
                           ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
                           : displayRoi !== undefined
@@ -653,7 +653,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           a.id === asset.id ? { ...a, roiTaxTreatment: newTreatment } : a
                         ));
                       }}
-                      className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                      className={`focus-ring rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                         isExplicit
                           ? isIncome
                             ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
@@ -681,7 +681,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                             a.id === asset.id ? { ...a, reinvestReturns: !effectiveReinvest } : a
                           ));
                         }}
-                        className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                        className={`focus-ring rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                           isExplicit
                             ? effectiveReinvest
                               ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
@@ -708,7 +708,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                     onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
+                    className="focus-ring w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                     aria-label={`Edit monthly contribution for ${asset.category}`}
                     placeholder="e.g. 500"
                   />
@@ -716,7 +716,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   <button
                     type="button"
                     onClick={() => startEdit(asset.id, "monthlyContribution", String(asset.monthlyContribution ?? ""))}
-                    className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                    className={`focus-ring rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                       hasContribution
                         ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
                         : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
@@ -755,7 +755,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                           onBlur={() => commitEdit()}
                           onKeyDown={handleEditKeyDown}
-                          className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
+                          className="focus-ring w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                           aria-label={`Edit employer match percent for ${asset.category}`}
                           placeholder="e.g. 50"
                         />
@@ -763,7 +763,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         <button
                           type="button"
                           onClick={() => startEdit(asset.id, "employerMatchPct", String(asset.employerMatchPct ?? ""))}
-                          className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                          className={`focus-ring rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                             hasPct
                               ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
                               : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
@@ -784,7 +784,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                           onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                           onBlur={() => commitEdit()}
                           onKeyDown={handleEditKeyDown}
-                          className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
+                          className="focus-ring w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                           aria-label={`Edit employer match cap for ${asset.category}`}
                           placeholder="e.g. 6"
                         />
@@ -792,7 +792,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         <button
                           type="button"
                           onClick={() => startEdit(asset.id, "employerMatchCap", String(asset.employerMatchCap ?? ""))}
-                          className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                          className={`focus-ring rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                             hasCap
                               ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
                               : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
@@ -827,7 +827,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                       onBlur={() => commitEdit()}
                       onKeyDown={handleEditKeyDown}
-                      className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
+                      className="focus-ring w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
                       aria-label={`Edit cost basis percent for ${asset.category}`}
                       placeholder="e.g. 80"
                     />
@@ -836,7 +836,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                       <button
                         type="button"
                         onClick={() => startEdit(asset.id, "costBasisPercent", String(asset.costBasisPercent ?? ""))}
-                        className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                        className={`focus-ring rounded px-1.5 py-0.5 text-xs transition-colors duration-150 ${
                           asset.costBasisPercent !== undefined && asset.costBasisPercent < 100
                             ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
                             : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
@@ -882,7 +882,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                         }))
                       );
                     }}
-                    className="h-3 w-3 border-white/20 text-amber-400 accent-amber-500"
+                    className="focus-ring h-3 w-3 border-white/20 text-amber-400 accent-amber-500"
                   />
                   Surplus goes here
                 </label>
@@ -936,7 +936,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
                 onKeyDown={(e) => handleNewKeyDown(e, "category", addAsset)}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className="focus-ring w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-colors duration-150 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New asset category"
               />
               {showNewSuggestions &&
@@ -955,7 +955,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                               setShowNewSuggestions(false);
                               newAmountRef.current?.focus();
                             }}
-                            className="w-full px-3 py-2 text-left text-sm text-slate-200 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300 sm:py-1.5"
+                            className="focus-ring w-full px-3 py-2 text-left text-sm text-slate-200 transition-colors duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 sm:py-1.5"
                           >
                             <div>
                               {getAssetCategoryFlag(suggestion) && (
@@ -982,13 +982,13 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
                 value={newAmount}
                 onChange={(e) => setNewAmount(formatNumericInput(e.target.value))}
                 onKeyDown={(e) => handleNewKeyDown(e, "amount", addAsset)}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                className="focus-ring w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-colors duration-150 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
                 aria-label="New asset amount"
               />
               <button
                 type="button"
                 onClick={addAsset}
-                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className="focus-ring min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-colors duration-150 hover:bg-cyan-400 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
                 aria-label="Confirm add asset"
               >
                 Add
@@ -996,7 +996,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
               <button
                 type="button"
                 onClick={resetNew}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="focus-ring flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md p-2 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 sm:min-h-0 sm:min-w-0 sm:p-1"
                 aria-label="Cancel adding asset"
               >
                 <svg
@@ -1026,7 +1026,7 @@ export default function AssetEntry({ items, onChange, monthlySurplus = 0, homeCu
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 active:bg-cyan-500/20"
+            className="focus-ring rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-colors duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 active:bg-cyan-500/20"
           >
             + Add Asset
           </button>

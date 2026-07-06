@@ -75,6 +75,8 @@ describe("Active states on confirm buttons", () => {
     await user.click(screen.getByText("+ Add Asset"));
     const confirmBtn = screen.getByLabelText("Confirm add asset");
     expect(confirmBtn.className).toContain("active:scale-95");
+    expect(confirmBtn.className).toContain("focus-ring");
+    expect(confirmBtn.className).toContain("transition-colors");
   });
 
   it("Add Debt confirm button has active:scale-95 class", async () => {
