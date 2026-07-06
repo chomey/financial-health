@@ -9,17 +9,46 @@ describe("InsightsPanel", () => {
     expect(screen.getByTestId("insights-panel")).toBeInTheDocument();
   });
 
-  it("renders first 5 insight cards with mock data (collapsed)", () => {
+  it("renders generated insight cards with mock data", () => {
     render(<InsightsPanel />);
     const insights = generateInsights(MOCK_FINANCIAL_DATA);
-    // First 5 should be visible in collapsed state
-    for (const insight of insights.slice(0, 5)) {
+    for (const insight of insights.slice(0, 8)) {
       expect(screen.getByText(insight.message)).toBeInTheDocument();
     }
-    // If more than 5, the rest should be hidden
-    if (insights.length > 5) {
-      expect(screen.getByTestId("insights-toggle")).toBeInTheDocument();
-    }
+    expect(screen.queryByTestId("insights-toggle")).not.toBeInTheDocument();
+  });
+
+  it("styles insights as cards in a responsive grid", () => {
+    render(<InsightsPanel />);
+    const panel = screen.getByTestId("insights-panel");
+    const list = panel.querySelector("ul");
+    const cards = screen.getAllByRole("article");
+
+    expect(list?.className).toContain("sm:grid-cols-2");
+    expect(cards[0].className).toContain("bg-white/[0.03]");
+    expect(cards[0].className).toContain("border-l-2");
+    expect(cards[0].querySelector("span")?.className).toContain("h-8 w-8");
+  });
+
+  it("lets long insights span the full grid width", () => {
+    render(<InsightsPanel data={{
+      totalAssets: 0,
+      totalDebts: 10000,
+      monthlyIncome: 0,
+      monthlyExpenses: 0,
+      monthlyDebtPayments: 5000,
+      monthlyGrossIncome: 10000,
+    }} />);
+
+    expect(screen.getByTestId("insight-card-debt-to-income").className).toContain("sm:col-span-2");
+  });
+
+  it("renders the insights label with a count badge", () => {
+    render(<InsightsPanel />);
+    const insights = generateInsights(MOCK_FINANCIAL_DATA);
+
+    expect(screen.getByText("Insights")).toBeInTheDocument();
+    expect(screen.getByText(String(Math.min(insights.length, 8))).className).toContain("bg-cyan-400/10");
   });
 
   it("renders icons for each insight", () => {

@@ -8,6 +8,58 @@ import HelpTip from "@/components/HelpTip";
 import { useOptionalModeContext } from "@/lib/ModeContext";
 
 const SIMPLE_MODE_HIDDEN_TYPES = new Set<InsightType>(["fire", "income-replacement"]);
+const LONG_INSIGHT_LENGTH = 140;
+
+type InsightTone = "celebration" | "positive" | "warning" | "informational" | "negative";
+
+const INSIGHT_TYPE_TONES: Record<InsightType, InsightTone> = {
+  "runway": "positive",
+  "surplus": "positive",
+  "net-worth": "positive",
+  "savings-rate": "positive",
+  "debt-interest": "warning",
+  "tax": "informational",
+  "withdrawal-tax": "warning",
+  "employer-match": "celebration",
+  "debt-strategy": "warning",
+  "fire": "positive",
+  "tax-optimization": "warning",
+  "income-replacement": "positive",
+  "debt-to-income": "informational",
+  "housing-cost": "informational",
+  "coast-fire": "positive",
+  "net-worth-milestone": "celebration",
+  "net-worth-percentile": "informational",
+  "tax-credits-summary": "informational",
+  "tax-credits-unclaimed": "warning",
+  "tax-credits-refundable": "positive",
+  "tax-credits-ineligible": "warning",
+  "au-super": "warning",
+  "au-hecs-help": "informational",
+  "au-fhss": "warning",
+  "au-franking": "informational",
+  "au-mls": "warning",
+  "rmd": "informational",
+  "retirement-income-gap": "informational",
+};
+
+const INSIGHT_TONE_STYLES: Record<InsightTone, { accent: string; chip: string }> = {
+  celebration: { accent: "border-l-pink-400", chip: "text-pink-300" },
+  positive: { accent: "border-l-cyan-400", chip: "text-cyan-300" },
+  warning: { accent: "border-l-amber-400", chip: "text-amber-300" },
+  informational: { accent: "border-l-violet-400", chip: "text-violet-300" },
+  negative: { accent: "border-l-rose-400", chip: "text-rose-300" },
+};
+
+function getInsightTone(insight: Insight): InsightTone {
+  if (insight.id === "debt-free" || insight.id.endsWith("-achieved")) {
+    return "celebration";
+  }
+  if (insight.id.includes("high") || insight.id.includes("drag") || insight.id.includes("ineligible") || insight.icon === "⚠️") {
+    return "negative";
+  }
+  return INSIGHT_TYPE_TONES[insight.type];
+}
 
 // Mock financial data matching the existing entry component mock values
 const MOCK_FINANCIAL_DATA: FinancialData = {
@@ -64,6 +116,8 @@ function InsightRow({
   const rowRef = useRef<HTMLLIElement>(null);
   const ctx = useOptionalDataFlow();
   const targetId = `insight-${insight.id}`;
+  const toneStyle = INSIGHT_TONE_STYLES[getInsightTone(insight)];
+  const spansFullWidth = insight.message.length > LONG_INSIGHT_LENGTH;
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 50 + index * 60);
@@ -103,9 +157,13 @@ function InsightRow({
   return (
     <li
       ref={rowRef}
-      className={`flex items-start gap-2 transition-all duration-300 ${
+      className={`flex items-start gap-3 rounded-lg border border-l-2 border-white/5 bg-white/[0.03] p-3 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40 ${
+        toneStyle.accent
+      } ${
+        spansFullWidth ? "sm:col-span-2" : ""
+      } ${
         visible ? "opacity-100" : "opacity-0"
-      } ${isClickable ? "cursor-pointer rounded-lg bg-[var(--surface-1)] px-2 py-1 hover:bg-white/5" : "rounded-lg bg-[var(--surface-1)] px-2 py-1"}`}
+      } ${isClickable ? "cursor-pointer hover:bg-white/[0.05]" : ""}`}
       data-testid={`insight-card-${insight.id}`}
       data-insight-type={insight.type}
       onClick={handleClick}
@@ -114,10 +172,10 @@ function InsightRow({
       role="article"
       aria-label={insight.message}
     >
-      <span className="mt-0.5 text-sm flex-shrink-0" aria-hidden="true">
+      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white/5 text-base ${toneStyle.chip}`} aria-hidden="true">
         {insight.icon}
       </span>
-      <p className="text-sm leading-relaxed text-slate-300">{insight.message}</p>
+      <p className="min-w-0 text-sm leading-relaxed text-slate-300">{insight.message}</p>
     </li>
   );
 }
@@ -169,10 +227,13 @@ export default function InsightsPanel({
         </div>
       )}
 
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-        {insights.length} Insights
+      <h3 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <span>Insights</span>
+        <span className="rounded-full bg-cyan-400/10 px-2 text-xs tracking-normal text-cyan-300">
+          {insights.length}
+        </span>
       </h3>
-      <ul className="space-y-2">
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {insights.map((insight, i) => (
           <InsightRow
             key={insight.id}
