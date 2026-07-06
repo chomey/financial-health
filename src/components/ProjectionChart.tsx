@@ -261,7 +261,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
   return (
     <section
-      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 backdrop-blur-sm"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-4 backdrop-blur-sm sm:p-6"
       data-testid="projection-chart"
       aria-label="Financial projection"
     >
@@ -279,7 +279,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 key={s}
                 onClick={() => setScenario(s)}
                 title={SCENARIO_DESCRIPTIONS[s]}
-                className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
+                className={`focus-ring min-h-10 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 sm:min-h-9 ${
                   scenario === s
                     ? "text-slate-900 shadow-sm"
                     : "bg-[var(--surface-1)] text-slate-400 hover:bg-white/10"
@@ -301,7 +301,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           <div className="flex gap-1" data-testid="chart-mode-tabs">
             <button
               onClick={(e) => { e.stopPropagation(); setMode("keep-earning"); }}
-              className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
+              className={`focus-ring min-h-10 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 sm:min-h-9 ${
                 mode === "keep-earning"
                   ? "border border-cyan-400/30 bg-cyan-400/20 text-cyan-300 shadow-sm"
                   : "bg-[var(--surface-1)] text-slate-400 hover:bg-white/10"
@@ -312,7 +312,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); setMode("income-stops"); }}
-              className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
+              className={`focus-ring min-h-10 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 sm:min-h-9 ${
                 mode === "income-stops"
                   ? "border border-cyan-400/30 bg-cyan-400/20 text-cyan-300 shadow-sm"
                   : "bg-[var(--surface-1)] text-slate-400 hover:bg-white/10"
@@ -332,7 +332,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               <button
                 key={opt}
                 onClick={() => handleOutlookChange(opt)}
-                className={`focus-ring px-2 py-0.5 transition-colors duration-150 ${
+                className={`focus-ring min-h-10 px-2 py-0.5 transition-colors duration-150 sm:min-h-9 ${
                   i === 0 ? "rounded-l-lg" : i === OUTLOOK_YEAR_OPTIONS.length - 1 ? "rounded-r-lg" : ""
                 } ${
                   outlookYears === opt
@@ -349,7 +349,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
         {/* Inflation toggle */}
         <div className="flex items-center gap-2" data-testid="inflation-controls">
-          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-slate-500">
+          <label className="flex min-h-10 cursor-pointer items-center gap-1.5 text-xs text-slate-500 sm:min-h-9">
             <input
               type="checkbox"
               checked={inflationAdjusted}
@@ -390,10 +390,10 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       {/* Summary table: dynamic milestone year projections */}
       <div className="mb-3 sm:mb-4" data-testid="projection-summary-table">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="min-w-[560px] w-full text-xs">
             <thead>
               <tr className="border-b border-white/10">
-                <th className="pb-1.5 pr-4 text-left font-medium text-slate-500">Metric</th>
+                <th className="sticky left-0 z-10 bg-slate-900 pb-1.5 pr-4 text-left font-medium text-slate-500">Metric</th>
                 <th className="pb-1.5 px-2 text-right font-medium text-slate-500">Now</th>
                 {milestoneYears.map((y, i) => (
                   <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-slate-500`}>
@@ -404,7 +404,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             </thead>
             <tbody className="divide-y divide-white/5">
               <tr>
-                <td className="py-1.5 pr-4 font-medium text-slate-300">Net Worth</td>
+                <td className="sticky left-0 z-10 bg-slate-900 py-1.5 pr-4 font-medium text-slate-300">Net Worth</td>
                 <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.netWorth)}</td>
                 {summaryPoints.milestones.map((p, i) => (
                   <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium tabular-nums text-cyan-400`}>
@@ -413,7 +413,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 ))}
               </tr>
               <tr>
-                <td className="py-1.5 pr-4 font-medium text-slate-300">Total Assets</td>
+                <td className="sticky left-0 z-10 bg-slate-900 py-1.5 pr-4 font-medium text-slate-300">Total Assets</td>
                 <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.totalAssets)}</td>
                 {summaryPoints.milestones.map((p, i) => (
                   <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-cyan-400`}>
@@ -424,7 +424,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               {hasBothDebtTypes ? (
                 <>
                   <tr>
-                    <td className="py-1.5 pr-4 font-medium text-slate-300">Consumer Debt</td>
+                    <td className="sticky left-0 z-10 bg-slate-900 py-1.5 pr-4 font-medium text-slate-300">Consumer Debt</td>
                     <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.consumerDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
                       <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-rose-400`}>
@@ -433,7 +433,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     ))}
                   </tr>
                   <tr>
-                    <td className="py-1.5 pr-4 font-medium text-slate-300">Mortgage</td>
+                    <td className="sticky left-0 z-10 bg-slate-900 py-1.5 pr-4 font-medium text-slate-300">Mortgage</td>
                     <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.mortgageDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
                       <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-rose-400`}>
@@ -444,7 +444,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 </>
               ) : (
                 <tr>
-                  <td className="py-1.5 pr-4 font-medium text-slate-300">Total Debts</td>
+                  <td className="sticky left-0 z-10 bg-slate-900 py-1.5 pr-4 font-medium text-slate-300">Total Debts</td>
                   <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.totalDebts)}</td>
                   {summaryPoints.milestones.map((p, i) => (
                     <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-rose-400`}>
@@ -458,7 +458,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
         </div>
       </div>
 
-      <div className="h-64 sm:h-80" data-testid="projection-chart-container">
+      <div className="h-56 sm:h-72" data-testid="projection-chart-container">
         <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
           <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
@@ -631,7 +631,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       <div className="mt-3 border-t border-white/10 pt-3" data-testid="scenario-legend">
         <button
           onClick={() => setLegendOpen(!legendOpen)}
-          className="focus-ring flex w-full items-center gap-1.5 rounded text-xs font-medium text-slate-500 transition-colors duration-150 hover:text-slate-300"
+          className="focus-ring flex min-h-10 w-full items-center gap-1.5 rounded text-xs font-medium text-slate-500 transition-colors duration-150 hover:text-slate-300 sm:min-h-9"
           data-testid="scenario-legend-toggle"
           aria-expanded={legendOpen}
         >
@@ -671,10 +671,10 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
         <div className="mt-4 border-t border-white/10 pt-4" data-testid="asset-projections-table">
           <h4 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-300">Asset Growth Projections</h4>
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="min-w-[560px] w-full text-xs">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="pb-1.5 pr-4 text-left font-medium text-slate-500">Account</th>
+                  <th className="sticky left-0 z-10 bg-slate-900 pb-1.5 pr-4 text-left font-medium text-slate-500">Account</th>
                   <th className="pb-1.5 px-2 text-right font-medium text-slate-500">Now</th>
                   {milestoneYears.map((y, i) => (
                     <th key={y} className={`pb-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium text-slate-500`}>
@@ -686,7 +686,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               <tbody className="divide-y divide-white/5">
                 {assetProjections.map((ap) => (
                   <tr key={ap.category}>
-                    <td className="py-1.5 pr-4 font-medium text-slate-300 truncate max-w-[120px]">{ap.category}</td>
+                    <td className="sticky left-0 z-10 max-w-[160px] break-words bg-slate-900 py-1.5 pr-4 font-medium text-slate-300">{ap.category}</td>
                     <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(ap.currentValue)}</td>
                     {ap.milestoneValues.map((val, i) => (
                       <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-cyan-400`}>
@@ -726,7 +726,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             )}
           </div>
 
-          <div className="h-72 sm:h-80 w-full" data-testid="burndown-chart-container">
+          <div className="h-56 w-full sm:h-72" data-testid="burndown-chart-container">
             <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
               <LineChart data={burndownData.data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
@@ -805,7 +805,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     : entry.taxTreatment === "tax-deferred" ? "taxed as income"
                     : "capital gains";
                   return (
-                    <span key={i} className="inline-flex items-center gap-1.5 rounded-lg bg-slate-700/40 border border-white/5 px-2.5 py-1.5 text-xs" data-testid={`burndown-withdrawal-${i}`}>
+                    <span key={i} className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-white/5 bg-slate-700/40 px-2.5 py-1.5 text-xs sm:min-h-9" data-testid={`burndown-withdrawal-${i}`}>
                       <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-600 text-[10px] font-bold text-slate-200">{i + 1}</span>
                       <span className="max-w-[150px] truncate text-slate-200 font-medium">{entry.category}</span>
                       <span className="text-slate-500">({treatmentLabel})</span>

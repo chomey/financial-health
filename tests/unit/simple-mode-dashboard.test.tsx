@@ -52,16 +52,17 @@ describe("SnapshotDashboard simple mode", () => {
     expect(screen.getByTestId("metric-card-income-replacement")).toBeInTheDocument();
   });
 
-  it("uses 3-column grid in simple mode", () => {
+  it("uses 2-column grid at sm and 3-column grid at lg in simple mode", () => {
     render(<SnapshotDashboard metrics={mockMetrics} />, { mode: "simple" });
     const dashboard = screen.getByTestId("snapshot-dashboard");
-    expect(dashboard.className).toContain("sm:grid-cols-3");
+    expect(dashboard.className).toContain("sm:grid-cols-2");
+    expect(dashboard.className).toContain("lg:grid-cols-3");
   });
 
-  it("uses 2-column grid in advanced mode", () => {
+  it("uses 2-column grid at sm in advanced mode", () => {
     render(<SnapshotDashboard metrics={mockMetrics} />, { mode: "advanced" });
     const dashboard = screen.getByTestId("snapshot-dashboard");
-    expect(dashboard.className).toContain("lg:grid-cols-2");
+    expect(dashboard.className).toContain("sm:grid-cols-2");
   });
 });
 

@@ -105,7 +105,7 @@ function StepContextSection({ context }: { context: StepContext }) {
         <div className="space-y-1">
           {context.items.map((item, i) => (
             <div key={i} className="flex items-center justify-between gap-2 text-sm">
-              <span className="text-slate-300 truncate">{item.label}</span>
+              <span className="min-w-0 break-words text-slate-300">{item.label}</span>
               <span className="flex-shrink-0 tabular-nums text-slate-400">
                 {fmtMoney(item.amount)}
                 {item.detail && <span className="text-slate-600 text-xs ml-0.5">{item.detail}</span>}
@@ -370,7 +370,7 @@ function TimelineStep({
   return (
     <button
       type="button"
-      className="group flex w-full items-stretch gap-0 text-left focus:outline-none"
+      className="group flex min-h-10 w-full items-stretch gap-0 text-left focus:outline-none"
       onClick={onClick}
       data-testid={`flowchart-step-${step.id}`}
     >
@@ -401,7 +401,7 @@ function TimelineStep({
         }`}
       >
         <div className="flex items-center gap-2">
-          <p className={`text-sm font-medium leading-tight truncate ${
+          <p className={`min-w-0 break-words text-sm font-medium leading-tight ${
             step.status === "complete"
               ? "text-emerald-400/70"
               : step.status === "in-progress"
@@ -417,12 +417,12 @@ function TimelineStep({
             <span className="flex-shrink-0 text-[10px] font-medium tabular-nums text-amber-400/80">{step.progress}%</span>
           )}
           {/* Chevron */}
-          <svg className="ml-auto h-3.5 w-3.5 flex-shrink-0 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="ml-auto h-3.5 w-3.5 flex-shrink-0 text-slate-600 opacity-0 transition-opacity group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </div>
         {step.status !== "complete" && step.completionHint && (
-          <p className="mt-0.5 text-[11px] leading-snug text-slate-600 truncate">{step.completionHint}</p>
+          <p className="mt-0.5 break-words text-[11px] leading-snug text-slate-600">{step.completionHint}</p>
         )}
       </div>
     </button>
@@ -514,7 +514,7 @@ export default function FinancialFlowchart({
 
   return (
     <div
-      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 shadow-sm transition-all duration-200"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-4 shadow-sm transition-all duration-200 sm:p-6"
       data-testid="financial-flowchart"
     >
       {/* Header */}
@@ -551,7 +551,7 @@ export default function FinancialFlowchart({
 
       {/* Retirement toggle */}
       <div className="mb-3 flex items-center gap-2">
-        <label className="flex cursor-pointer items-center gap-2" data-testid="retired-toggle-label">
+        <label className="flex min-h-10 cursor-pointer items-center gap-2 sm:min-h-9" data-testid="retired-toggle-label">
           <input
             type="checkbox"
             checked={isRetired}
@@ -562,7 +562,7 @@ export default function FinancialFlowchart({
           <span className="text-xs text-slate-500">I&apos;m retired</span>
         </label>
         {isRetired && (
-          <span className="rounded-full bg-violet-500/15 px-2 py-0.5 text-[10px] font-medium text-violet-400">
+          <span className="inline-flex min-h-10 items-center rounded-full bg-violet-500/15 px-2 py-0.5 text-[10px] font-medium text-violet-400 sm:min-h-9">
             Retirement mode
           </span>
         )}
@@ -582,7 +582,7 @@ export default function FinancialFlowchart({
             <button
               type="button"
               onClick={() => handleRetiredChange(true)}
-              className="mt-1 text-xs font-medium text-violet-400 underline underline-offset-2 transition-colors hover:text-violet-300"
+              className="mt-1 inline-flex min-h-10 items-center text-xs font-medium text-violet-400 underline underline-offset-2 transition-colors hover:text-violet-300 sm:min-h-9"
             >
               Enable retirement mode
             </button>

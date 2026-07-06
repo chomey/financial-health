@@ -266,7 +266,7 @@ export default function CashFlowSankey({
       <button
         type="button"
         onClick={() => setCollapsed(!collapsed)}
-        className="flex w-full items-center justify-between rounded-2xl px-5 py-3 text-left transition-colors duration-150 hover:bg-white/5"
+        className="flex min-h-10 w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition-colors duration-150 hover:bg-white/5 sm:px-5 sm:min-h-9"
         aria-expanded={!collapsed}
         data-testid="cash-flow-toggle"
       >
@@ -289,7 +289,7 @@ export default function CashFlowSankey({
       </button>
 
       {!collapsed && (
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5">
           {!hasData ? (
             <p className="text-sm text-slate-400 text-center py-6">
               Add income to see your cash flow
@@ -297,15 +297,16 @@ export default function CashFlowSankey({
           ) : layout ? (
             <>
             {/* SVG Sankey diagram */}
-            <div className="relative" data-testid="sankey-chart">
-              <svg
-                ref={svgRef}
-                viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
-                className="w-full h-auto"
-                role="img"
-                aria-label="Cash flow Sankey diagram showing how income flows to expenses, investments, and savings"
-                onMouseLeave={handleMouseLeave}
-              >
+            <div className="relative overflow-x-auto" data-testid="sankey-chart">
+              <div className="min-w-[700px]">
+                <svg
+                  ref={svgRef}
+                  viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
+                  className="h-auto w-full"
+                  role="img"
+                  aria-label="Cash flow Sankey diagram showing how income flows to expenses, investments, and savings"
+                  onMouseLeave={handleMouseLeave}
+                >
                 {/* Links */}
                 {layout.links.map((link, i) => {
                   const sourceNode = link.source as D3SankeyNode;
@@ -391,7 +392,8 @@ export default function CashFlowSankey({
                     </g>
                   );
                 })}
-              </svg>
+                </svg>
+              </div>
 
               {/* Tooltip */}
               {tooltip && (

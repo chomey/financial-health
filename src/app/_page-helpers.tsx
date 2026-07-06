@@ -10,7 +10,7 @@ export function PrintSnapshotButton() {
     <button
       type="button"
       onClick={() => window.print()}
-      className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-white/5 hover:text-slate-300 active:scale-95 print:hidden"
+      className="focus-ring flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-white/5 hover:text-slate-300 active:scale-95 print:hidden sm:h-9 sm:w-9"
       aria-label="Print snapshot"
       title="Print snapshot"
       data-testid="print-snapshot-button"
@@ -41,7 +41,7 @@ export function ModeToggle() {
       <button
         type="button"
         onClick={() => setMode("simple")}
-        className={`focus-ring rounded-md px-2.5 py-1.5 font-medium transition-colors duration-150 ${
+        className={`focus-ring min-h-10 rounded-md px-2.5 py-1.5 font-medium transition-colors duration-150 sm:min-h-9 ${
           mode === "simple"
             ? "bg-white/10 text-white shadow-sm"
             : "text-slate-400 hover:text-slate-200"
@@ -54,7 +54,7 @@ export function ModeToggle() {
       <button
         type="button"
         onClick={() => setMode("advanced")}
-        className={`focus-ring rounded-md px-2.5 py-1.5 font-medium transition-colors duration-150 ${
+        className={`focus-ring min-h-10 rounded-md px-2.5 py-1.5 font-medium transition-colors duration-150 sm:min-h-9 ${
           mode === "advanced"
             ? "bg-white/10 text-white shadow-sm"
             : "text-slate-400 hover:text-slate-200"
@@ -84,7 +84,7 @@ export function ResetButton() {
     <button
       type="button"
       onClick={handleReset}
-      className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-white/5 hover:text-rose-400 active:scale-95 print:hidden"
+      className="focus-ring flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-white/5 hover:text-rose-400 active:scale-95 print:hidden sm:h-9 sm:w-9"
       aria-label="Reset all data"
       title="Reset all data"
       data-testid="reset-all-button"
@@ -119,13 +119,13 @@ export function AppHeader({
           <div className="ml-1 inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5 text-xs">
             {inputsActive ? (
               <>
-                <span className="rounded-md bg-white/10 px-2.5 py-1.5 font-medium text-white shadow-sm">
+                <span className="inline-flex min-h-10 items-center rounded-md bg-white/10 px-2.5 py-1.5 font-medium text-white shadow-sm sm:min-h-9">
                   <span className="hidden sm:inline">📝 </span>Inputs
                 </span>
                 <button
                   type="button"
                   onClick={onSwitchPhase}
-                  className="focus-ring rounded-md px-2.5 py-1.5 font-medium text-slate-400 transition-colors duration-150 hover:text-slate-200"
+                  className="focus-ring min-h-10 rounded-md px-2.5 py-1.5 font-medium text-slate-400 transition-colors duration-150 hover:text-slate-200 sm:min-h-9"
                   data-testid="wizard-skip-to-dashboard"
                 >
                   <span className="hidden sm:inline">📊 </span>Dashboard
@@ -136,11 +136,11 @@ export function AppHeader({
                 <button
                   type="button"
                   onClick={onSwitchPhase}
-                  className="focus-ring rounded-md px-2.5 py-1.5 font-medium text-slate-400 transition-colors duration-150 hover:text-slate-200"
+                  className="focus-ring min-h-10 rounded-md px-2.5 py-1.5 font-medium text-slate-400 transition-colors duration-150 hover:text-slate-200 sm:min-h-9"
                 >
                   <span className="hidden sm:inline">📝 </span>Inputs
                 </button>
-                <span className="rounded-md bg-white/10 px-2.5 py-1.5 font-medium text-white shadow-sm">
+                <span className="inline-flex min-h-10 items-center rounded-md bg-white/10 px-2.5 py-1.5 font-medium text-white shadow-sm sm:min-h-9">
                   <span className="hidden sm:inline">📊 </span>Dashboard
                 </span>
               </>
@@ -150,7 +150,7 @@ export function AppHeader({
           <span className="flex-1" />
           <a
             href="/changelog"
-            className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+            className="focus-ring flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300 sm:h-9 sm:w-9"
             aria-label="Changelog"
             title="Changelog"
           >
@@ -160,7 +160,7 @@ export function AppHeader({
             href="https://ko-fi.com/R6R11VMSML"
             target="_blank"
             rel="noopener noreferrer"
-            className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+            className="focus-ring flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300 sm:h-9 sm:w-9"
             aria-label="Tip"
             title="Tip"
           >
@@ -256,7 +256,7 @@ export function CopyLinkButton() {
   return (
     <button
       onClick={handleCopy}
-      className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-white/5 hover:text-slate-300 active:scale-95 print:hidden"
+      className="focus-ring flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-white/5 hover:text-slate-300 active:scale-95 print:hidden sm:h-9 sm:w-9"
       aria-label="Copy link to clipboard"
       title="Copy link to clipboard"
     >
@@ -332,14 +332,14 @@ export function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange
         <span className="text-sm font-medium text-slate-400">Age:</span>
         <button
           onClick={() => { setInput(age.toString()); setEditing(true); }}
-          className="focus-ring min-h-[36px] rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-colors duration-150 hover:border-white/20 hover:bg-white/10"
+          className="focus-ring min-h-10 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-colors duration-150 hover:border-white/20 hover:bg-white/10 sm:min-h-9"
           data-testid="age-value-header"
         >
           {age}
         </button>
         <button
           onClick={() => { onAgeChange(undefined); setInput(""); }}
-          className="focus-ring rounded p-1 text-slate-500 transition-colors duration-150 hover:text-slate-300"
+          className="focus-ring min-h-10 min-w-10 rounded p-1 text-slate-500 transition-colors duration-150 hover:text-slate-300 sm:min-h-9 sm:min-w-9"
           aria-label="Clear age"
           data-testid="age-clear-header"
         >
@@ -352,7 +352,7 @@ export function AgeInputHeader({ age, onAgeChange }: { age?: number; onAgeChange
   return (
     <button
       onClick={() => { setInput(""); setEditing(true); }}
-      className="focus-ring min-h-[36px] rounded-lg border border-dashed border-white/10 bg-transparent px-3 py-1 text-sm text-slate-500 transition-colors duration-150 hover:border-white/20 hover:bg-white/5 hover:text-slate-300"
+      className="focus-ring min-h-10 rounded-lg border border-dashed border-white/10 bg-transparent px-3 py-1 text-sm text-slate-500 transition-colors duration-150 hover:border-white/20 hover:bg-white/5 hover:text-slate-300 sm:min-h-9"
       data-testid="age-add-header"
     >
       Add age
@@ -401,7 +401,7 @@ export function RetirementAgeInput({ retirementAge, onChange, currentAge }: { re
       <span className="text-sm font-medium text-slate-400">Retire at:</span>
       <button
         onClick={() => { setInput(retirementAge.toString()); setEditing(true); }}
-        className="focus-ring min-h-[36px] rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-colors duration-150 hover:border-white/20 hover:bg-white/10"
+        className="focus-ring min-h-10 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-sm font-medium text-slate-300 shadow-sm transition-colors duration-150 hover:border-white/20 hover:bg-white/10 sm:min-h-9"
         data-testid="retirement-age-value"
       >
         {retirementAge}

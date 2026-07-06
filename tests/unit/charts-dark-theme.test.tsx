@@ -157,8 +157,8 @@ describe("NetWorthWaterfallChart dark theme", () => {
 
 describe("ProjectionChart interaction states", () => {
   it("scenario, mode, and outlook controls use shared cyan focus rings", () => {
-    expect(projectionSrc).toContain("focus-ring rounded-full");
-    expect(projectionSrc).toContain("focus-ring px-2 py-0.5");
+    expect(projectionSrc).toContain("focus-ring min-h-10 rounded-full");
+    expect(projectionSrc).toContain("focus-ring min-h-10 px-2 py-0.5");
     expect(projectionSrc).toContain("focus-visible:border-cyan-400/50");
   });
 

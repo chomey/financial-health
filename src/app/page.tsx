@@ -477,7 +477,7 @@ export default function Home() {
       <AppHeader activePhase="dashboard" onSwitchPhase={switchToWizard}>
           {/* Dashboard section stepper (scroll-to links) */}
           <nav ref={stepperNavRef} className="w-full overflow-x-auto scrollbar-hide print:hidden" aria-label="Dashboard sections" style={{ scrollbarWidth: "none" }}>
-            <ol className="flex min-h-9 items-center gap-3 px-4 sm:px-0">
+            <ol className="flex min-h-10 items-center gap-3 px-4 sm:min-h-9 sm:px-0">
               {DASHBOARD_SECTIONS.map((sec) => {
                 const isCurrent = sec.id === visibleSection;
                 return (
@@ -490,7 +490,7 @@ export default function Home() {
                           el.scrollIntoView({ behavior: "smooth", block: "start" });
                         }
                       }}
-                      className={`focus-ring relative flex min-h-9 items-center gap-1.5 whitespace-nowrap px-1 pb-2 pt-1 text-xs font-medium transition-colors duration-150 after:absolute after:bottom-0 after:left-1 after:right-1 after:h-0.5 after:rounded-full after:transition-colors after:duration-150 ${
+                      className={`focus-ring relative flex min-h-10 items-center gap-1.5 whitespace-nowrap px-1 pb-2 pt-1 text-xs font-medium transition-colors duration-150 after:absolute after:bottom-0 after:left-1 after:right-1 after:h-0.5 after:rounded-full after:transition-colors after:duration-150 sm:min-h-9 ${
                         isCurrent
                           ? "text-cyan-300 after:bg-cyan-300"
                           : "text-slate-400 after:bg-transparent hover:text-slate-200"
@@ -508,13 +508,13 @@ export default function Home() {
       </AppHeader>
 
       {/* ── All sections (scrollable) ── */}
-      <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mx-auto max-w-5xl space-y-6">
+      <main className="flex-1 px-4 py-5 sm:px-6 sm:py-8">
+        <div className="mx-auto max-w-5xl space-y-4 sm:space-y-6">
 
           {/* Welcome */}
           <p className="text-sm text-slate-500 max-w-3xl">
             Your financial snapshot at a glance. Edit numbers in{" "}
-            <button type="button" onClick={switchToWizard} className="text-violet-400 hover:text-violet-300 transition-colors underline underline-offset-2">Inputs</button>
+            <button type="button" onClick={switchToWizard} className="inline-flex min-h-10 items-center text-violet-400 underline underline-offset-2 transition-colors hover:text-violet-300 sm:min-h-9">Inputs</button>
             {" "}— everything stays in your browser, nothing is stored.
           </p>
 
@@ -654,7 +654,7 @@ export default function Home() {
               const worstPerformer = stockDetails.reduce<typeof stockDetails[0] | null>((worst, s) =>
                 s.gainLoss && (!worst || !worst.gainLoss || s.gainLoss.percentage < worst.gainLoss.percentage) ? s : worst, null);
               return (
-                <ZoomableCard><div className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
+                <ZoomableCard><div className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-4 shadow-sm transition-all duration-200 sm:p-6" data-testid="portfolio-performance">
                   {/* Header */}
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Portfolio Performance</h3>
@@ -663,7 +663,7 @@ export default function Home() {
 
                   {/* Total gain/loss + return */}
                   <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                    <p className={`text-3xl font-semibold tracking-tight tabular-nums ${portfolio.totalGainLoss >= 0 ? "text-cyan-400" : "text-rose-400"}`}>
+                  <p className={`text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl md:text-4xl ${portfolio.totalGainLoss >= 0 ? "text-cyan-400" : "text-rose-400"}`}>
                       {portfolio.totalGainLoss >= 0 ? "+" : ""}{fc(portfolio.totalGainLoss)}
                     </p>
                     {portfolio.totalCostBasis > 0 && (
@@ -700,10 +700,10 @@ export default function Home() {
 
                   {/* Per-stock table */}
                   <div className="mt-3 overflow-x-auto">
-                    <table className="w-full text-xs">
+                    <table className="min-w-[560px] w-full text-xs">
                       <thead>
                         <tr className="border-b border-white/10 text-slate-500">
-                          <th className="py-1.5 text-left font-medium">Ticker</th>
+                          <th className="sticky left-0 z-10 bg-slate-900 py-1.5 text-left font-medium">Ticker</th>
                           <th className="py-1.5 text-right font-medium">Value</th>
                           <th className="py-1.5 text-right font-medium">Gain/Loss</th>
                           <th className="py-1.5 text-right font-medium">Return</th>
@@ -713,7 +713,7 @@ export default function Home() {
                       <tbody>
                         {stockDetails.map((s) => (
                           <tr key={s.id} className="border-b border-white/5 bg-[var(--surface-1)]">
-                            <td className="py-1.5 font-mono font-medium text-slate-300">{s.ticker}</td>
+                            <td className="sticky left-0 z-10 bg-slate-900 py-1.5 font-mono font-medium text-slate-300">{s.ticker}</td>
                             <td className="py-1.5 text-right tabular-nums text-slate-300">{fc(s.value)}</td>
                             <td className={`py-1.5 text-right font-medium tabular-nums ${s.gainLoss ? (s.gainLoss.amount >= 0 ? "text-cyan-400" : "text-rose-400") : "text-slate-500"}`}>
                               {s.gainLoss ? `${s.gainLoss.amount >= 0 ? "+" : ""}${fc(s.gainLoss.amount)}` : "—"}
@@ -733,10 +733,10 @@ export default function Home() {
                   {/* Best / Worst performers */}
                   {stockDetails.length > 1 && bestPerformer?.gainLoss && worstPerformer?.gainLoss && bestPerformer.ticker !== worstPerformer.ticker && (
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-cyan-400/10 px-2 py-1 text-[11px] font-medium text-cyan-300">
+                      <span className="inline-flex min-h-10 items-center gap-1 rounded-full bg-cyan-400/10 px-2 py-1 text-[11px] font-medium text-cyan-300 sm:min-h-9">
                         Best: {bestPerformer.ticker} +{bestPerformer.gainLoss.percentage.toFixed(1)}%
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-rose-400/10 px-2 py-1 text-[11px] font-medium text-rose-400">
+                      <span className="inline-flex min-h-10 items-center gap-1 rounded-full bg-rose-400/10 px-2 py-1 text-[11px] font-medium text-rose-400 sm:min-h-9">
                         Worst: {worstPerformer.ticker} {worstPerformer.gainLoss.percentage.toFixed(1)}%
                       </span>
                     </div>
@@ -753,13 +753,13 @@ export default function Home() {
 
           {/* Simple mode: upgrade banner */}
           {mode === "simple" && (
-            <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 p-5 text-center" data-testid="simple-mode-upgrade-banner">
+            <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 p-4 text-center sm:p-6" data-testid="simple-mode-upgrade-banner">
               <p className="text-sm text-slate-400">
                 Want more detail?{" "}
                 <button
                   type="button"
                   onClick={() => setMode("advanced")}
-                  className="text-violet-400 hover:text-violet-300 transition-colors underline underline-offset-2"
+                  className="inline-flex min-h-10 items-center text-violet-400 underline underline-offset-2 transition-colors hover:text-violet-300 sm:min-h-9"
                 >
                   Switch to Advanced mode
                 </button>

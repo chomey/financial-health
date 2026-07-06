@@ -2,11 +2,34 @@ import { describe, it, expect } from "vitest";
 import { screen } from "@testing-library/react";
 import { render } from "../test-utils";
 import userEvent from "@testing-library/user-event";
+import fs from "fs";
+import path from "path";
 import AssetEntry from "@/components/AssetEntry";
 import DebtEntry from "@/components/DebtEntry";
 import IncomeEntry from "@/components/IncomeEntry";
 import ExpenseEntry from "@/components/ExpenseEntry";
 import SnapshotDashboard from "@/components/SnapshotDashboard";
+
+const projectionSrc = fs.readFileSync(
+  path.join(process.cwd(), "src/components/ProjectionChart.tsx"),
+  "utf-8"
+);
+const sankeySrc = fs.readFileSync(
+  path.join(process.cwd(), "src/components/CashFlowSankey.tsx"),
+  "utf-8"
+);
+const pageSrc = fs.readFileSync(
+  path.join(process.cwd(), "src/app/page.tsx"),
+  "utf-8"
+);
+const wizardStepperSrc = fs.readFileSync(
+  path.join(process.cwd(), "src/components/wizard/WizardStepper.tsx"),
+  "utf-8"
+);
+const dashboardSrc = fs.readFileSync(
+  path.join(process.cwd(), "src/components/SnapshotDashboard.tsx"),
+  "utf-8"
+);
 
 describe("Mobile responsiveness — touch targets and layout", () => {
   describe("Delete buttons", () => {
@@ -124,6 +147,36 @@ describe("Mobile responsiveness — touch targets and layout", () => {
       expect(form).toBeTruthy();
       expect(form?.className).toContain("flex-col");
       expect(form?.className).toContain("sm:flex-row");
+    });
+  });
+
+  describe("Dashboard mobile polish", () => {
+    it("projection tables scroll horizontally with sticky first columns", () => {
+      expect(projectionSrc).toContain("overflow-x-auto");
+      expect(projectionSrc).toContain("min-w-[560px]");
+      expect(projectionSrc).toContain("sticky left-0 z-10 bg-slate-900");
+    });
+
+    it("sankey keeps a readable minimum canvas width", () => {
+      expect(sankeySrc).toContain("relative overflow-x-auto");
+      expect(sankeySrc).toContain("min-w-[700px]");
+    });
+
+    it("main charts use capped mobile heights", () => {
+      expect(projectionSrc).toContain('className="h-56 sm:h-72"');
+      expect(projectionSrc).toContain('className="h-56 w-full sm:h-72"');
+    });
+
+    it("dashboard and wizard steppers use 40px mobile tap targets", () => {
+      expect(pageSrc).toContain("flex min-h-10 items-center gap-3 px-4 sm:min-h-9");
+      expect(pageSrc).toContain("relative flex min-h-10 items-center gap-1.5");
+      expect(wizardStepperSrc).toContain("flex min-h-10 items-center px-4 sm:min-h-9");
+      expect(wizardStepperSrc).toContain("relative flex min-h-10 items-center gap-1.5");
+    });
+
+    it("metric cards use one column on mobile, two at sm, and smaller mobile values", () => {
+      expect(dashboardSrc).toContain("grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2");
+      expect(dashboardSrc).toContain("text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl md:text-4xl");
     });
   });
 });

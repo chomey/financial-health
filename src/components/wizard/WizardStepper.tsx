@@ -39,7 +39,7 @@ export default function WizardStepper({
 
   return (
     <nav className="w-full overflow-x-auto scrollbar-hide" aria-label="Wizard steps" style={{ scrollbarWidth: "none" }}>
-      <ol className="flex min-h-9 items-center px-4 sm:px-0">
+      <ol className="flex min-h-10 items-center px-4 sm:min-h-9 sm:px-0">
         {steps.map((step, idx) => {
           const meta = STEP_META[step];
           const isCurrent = step === currentStep;
@@ -55,7 +55,7 @@ export default function WizardStepper({
                 ref={isCurrent ? activeRef : undefined}
                 type="button"
                 onClick={() => onStepChange(step)}
-                className={`focus-ring relative flex min-h-9 items-center gap-1.5 whitespace-nowrap px-1 pb-2 pt-1 text-xs font-medium transition-colors duration-150 after:absolute after:bottom-0 after:left-1 after:right-1 after:h-0.5 after:rounded-full after:transition-colors after:duration-150 ${
+                className={`focus-ring relative flex min-h-10 items-center gap-1.5 whitespace-nowrap px-1 pb-2 pt-1 text-xs font-medium transition-colors duration-150 after:absolute after:bottom-0 after:left-1 after:right-1 after:h-0.5 after:rounded-full after:transition-colors after:duration-150 sm:min-h-9 ${
                   isCurrent
                     ? "text-cyan-300 after:bg-cyan-300"
                     : showCompleteChip

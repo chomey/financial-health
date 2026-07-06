@@ -175,7 +175,7 @@ function InsightRow({
       <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white/5 text-base ${toneStyle.chip}`} aria-hidden="true">
         {insight.icon}
       </span>
-      <p className="min-w-0 text-sm leading-relaxed text-slate-300">{insight.message}</p>
+      <p className="min-w-0 break-words text-sm leading-relaxed text-slate-300">{insight.message}</p>
     </li>
   );
 }
@@ -210,14 +210,14 @@ export default function InsightsPanel({
 
   return (
     <div
-      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 backdrop-blur-sm"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-4 backdrop-blur-sm sm:p-6"
       data-testid="insights-panel"
     >
       {/* Projection milestones */}
       {hasMilestones && (
         <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1" data-testid="projection-milestones">
           {milestones.map((m, i) => (
-            <span key={i} className={`inline-flex items-center gap-1 text-xs font-medium ${milestoneColorMap[m.color]}`}>
+            <span key={i} className={`inline-flex min-w-0 items-center gap-1 break-words text-xs font-medium ${milestoneColorMap[m.color]}`}>
               {m.icon} {m.text}
               {m.text.startsWith("FIRE") && (
                 <HelpTip text="The 4% rule: if you withdraw 4% of your portfolio annually, it historically lasts 30+ years. FIRE number = 25× annual expenses." />

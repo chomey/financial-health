@@ -21,7 +21,7 @@ export const SEGMENTED_CONTAINER_CLASS =
   "inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5";
 
 export const SEGMENT_CLASS =
-  "inline-flex min-h-[36px] items-center rounded-md px-2.5 py-1 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none";
+  "inline-flex min-h-10 items-center rounded-md px-2.5 py-1 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none sm:min-h-9";
 
 export const SEGMENT_ACTIVE_CLASS = "bg-white/10 text-slate-100 shadow-sm";
 

@@ -202,7 +202,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     <div
       ref={cardRef}
       id={`metric-${metric.title.toLowerCase().replace(/\s+/g, "-")}`}
-      className={`relative flex h-full flex-col rounded-2xl border border-[var(--surface-border-strong)] bg-[var(--surface-3)] backdrop-blur-sm p-5 shadow-sm scroll-mt-24 ${
+      className={`relative flex h-full flex-col rounded-2xl border border-[var(--surface-border-strong)] bg-[var(--surface-3)] p-4 shadow-sm scroll-mt-24 backdrop-blur-sm sm:p-6 ${
         hasConnections ? "cursor-pointer" : "cursor-default"
       }`}
       role="group"
@@ -213,16 +213,16 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       tabIndex={0}
     >
       <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-lg" aria-hidden="true">
+        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-lg sm:h-9 sm:w-9" aria-hidden="true">
           {metric.icon}
         </span>
         <div className="flex min-w-0 items-center gap-1.5">
-          <h3 className="text-xs font-medium uppercase tracking-wider text-slate-400">{metric.title}</h3>
+          <h3 className="break-words text-xs font-medium uppercase tracking-wider text-slate-400">{metric.title}</h3>
           {metric.helpText && <HelpTip text={metric.helpText} />}
         </div>
       </div>
       <div
-        className={`mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-3xl font-semibold tracking-tight tabular-nums md:text-4xl ${valueColor}`}
+        className={`mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl md:text-4xl ${valueColor}`}
         aria-label={`${metric.title}: ${formatMetricValue(metric.value, metric.format, homeCurrency)}`}
       >
         <span>{formatMetricValue(animatedValue, metric.format, homeCurrency)}</span>
@@ -254,7 +254,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       </div>
       {metric.breakdown && (
         <p
-          className="mt-3 truncate font-mono text-xs text-slate-500"
+          className="mt-3 break-words font-mono text-xs text-slate-500"
           data-testid={metric.format === "percent" ? "income-replacement-tier" : "metric-breakdown"}
           title={metric.breakdown}
         >
@@ -282,7 +282,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       {insights.length > 0 && (
         <div className="mt-2 space-y-1">
           {insights.map((msg, i) => (
-            <p key={i} className={`border-l-2 pl-2 text-xs leading-relaxed text-slate-400 ${metric.positive ? "border-cyan-400/50" : "border-amber-400/50"}`}>{msg}</p>
+            <p key={i} className={`break-words border-l-2 pl-2 text-xs leading-relaxed text-slate-400 ${metric.positive ? "border-cyan-400/50" : "border-amber-400/50"}`}>{msg}</p>
           ))}
         </div>
       )}
@@ -329,7 +329,7 @@ export default function SnapshotDashboard({ metrics, financialData, homeCurrency
 
   return (
     <div
-      className={`grid auto-rows-fr grid-cols-1 gap-3 sm:gap-4 ${mode === "simple" ? "sm:grid-cols-3" : "lg:grid-cols-2"}`}
+      className={`grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 ${mode === "simple" ? "lg:grid-cols-3" : ""}`}
       data-testid="snapshot-dashboard"
     >
       {displayMetrics.map((metric) => (

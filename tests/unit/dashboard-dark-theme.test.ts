@@ -54,15 +54,15 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
   });
 
   it("metric icons use consistent fixed chips", () => {
-    expect(dashboardSrc).toContain("flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-lg");
+    expect(dashboardSrc).toContain("flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-lg sm:h-9 sm:w-9");
   });
 
   it("metric values are dominant and use tabular numerals", () => {
-    expect(dashboardSrc).toContain("text-3xl font-semibold tracking-tight tabular-nums md:text-4xl");
+    expect(dashboardSrc).toContain("text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl md:text-4xl");
   });
 
-  it("metric breakdowns are single-line muted monospace text", () => {
-    expect(dashboardSrc).toContain("truncate font-mono text-xs text-slate-500");
+  it("metric breakdowns wrap as muted monospace text on mobile", () => {
+    expect(dashboardSrc).toContain("break-words font-mono text-xs text-slate-500");
     expect(dashboardSrc).toContain("title={metric.breakdown}");
   });
 
@@ -208,7 +208,8 @@ describe("Task 128: Dashboard dark theme — DataFlowArrows", () => {
 
 describe("Task 128: Dashboard dark theme — navigation interactions", () => {
   it("dashboard section links use shared cyan focus ring and quiet underline transitions", () => {
-    expect(pageSrc).toContain("focus-ring relative flex min-h-9 items-center gap-1.5");
+    expect(pageSrc).toContain("focus-ring relative flex min-h-10 items-center gap-1.5");
+    expect(pageSrc).toContain("sm:min-h-9");
     expect(pageSrc).toContain("text-cyan-300 after:bg-cyan-300");
     expect(pageSrc).toContain("transition-colors duration-150");
     expect(pageSrc).not.toContain("focus:ring-2 focus:ring-violet-400");
