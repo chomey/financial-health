@@ -106,6 +106,14 @@ describe("toCompact / fromCompact", () => {
     expect(restored.country).toBe("CA");
     expect(restored.jurisdiction).toBe("ON");
   });
+
+  it("defaults missing jurisdiction from the decoded country", () => {
+    const compact = toCompact({ ...INITIAL_STATE, country: "US", jurisdiction: undefined });
+    const restored = fromCompact(compact);
+    expect(restored.country).toBe("US");
+    expect(restored.jurisdiction).toBe("CA");
+    expect(restored.jurisdiction).not.toBe("ON");
+  });
 });
 
 describe("encodeState / decodeState", () => {

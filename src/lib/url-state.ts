@@ -2,6 +2,7 @@ import type { FinancialState } from "@/lib/financial-state";
 import { getDefaultReinvest } from "@/components/AssetEntry";
 import { getHomeCurrency } from "@/lib/currency";
 import type { SupportedCurrency } from "@/lib/currency";
+import { getCountry, type CountryCode } from "@/lib/countries";
 import { deflate, inflate } from "pako";
 
 // ASCII85 (base85) encoding/decoding for compact URL state
@@ -167,7 +168,7 @@ interface CompactState {
   fxm?: number; // FX manual override: 1 foreign = X home
   tc?: CompactTaxCredit[]; // tax credits and deductions
   fs?: string; // filing status
-  ty?: number; // tax year (2025 or 2026, omitted when 2025/default)
+  ty?: number; // tax year (persisted whenever set)
   fca?: string[]; // flowchart acknowledged step IDs
   fcs2?: string[]; // flowchart skipped step IDs (fcs2 to avoid collision with old fcs= param)
   ra?: number; // retirement age (omitted when 65/default)
@@ -276,7 +277,14 @@ function toCompact(state: FinancialState): CompactState {
   return compact;
 }
 
+function getDefaultJurisdictionForCountry(country: CountryCode): string {
+  const profile = getCountry(country);
+  return profile.defaultJurisdiction ?? profile.jurisdictions[0]?.code ?? "ON";
+}
+
 function fromCompact(compact: CompactState): FinancialState {
+  const country = (compact.co as CountryCode | undefined) ?? "CA";
+
   return {
     assets: (() => {
       const assets = compact.a.map((x, i) => {
@@ -344,8 +352,8 @@ function fromCompact(compact: CompactState): FinancialState {
       if (x.pd) stock.purchaseDate = x.pd;
       return stock;
     }),
-    country: (compact.co as "CA" | "US" | "AU") ?? "CA",
-    jurisdiction: compact.ju ?? "ON",
+    country,
+    jurisdiction: compact.ju ?? getDefaultJurisdictionForCountry(country),
     age: compact.ag,
     federalTaxOverride: compact.ft,
     provincialTaxOverride: compact.pt,

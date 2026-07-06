@@ -1,14 +1,14 @@
 # CLAUDE.md - Project Instructions
 
 ## Project Overview
-**Financial Health Snapshot**: Point-in-time financial health snapshot app. Users ballpark holdings, debts, and expenses to get encouraging, actionable insights. Supports Canadian and US financial vehicles. All state in URL query params — no database, no accounts.
+**Financial Health Snapshot**: Point-in-time financial health snapshot app. Users ballpark holdings, debts, and expenses to get encouraging, actionable insights. Supports Canadian and US financial vehicles. All state in URL query params — no database, no accounts. The only server code is two stateless API proxy routes (`fx-rate`, `stock-price`) with in-memory caching.
 
 See `PRD.md` for full product requirements.
 
 ## Tech Stack
 - TypeScript (strict), Next.js 15 (App Router), npm, Tailwind CSS v4
 - Vitest (unit) + Playwright (E2E), URL state via base85-encoded JSON in `s=` param
-- No database, no backend services, no Docker — pure client-side app
+- No database, no accounts, no Docker. The only server code is two stateless API proxy routes (`fx-rate`, `stock-price`) with in-memory caching.
 
 ## Key Commands
 - Build: `npm run build`
@@ -84,6 +84,6 @@ Ralph MUST NOT run forbidden commands (e.g., `docker`, `docker-compose`). If a d
 - T3/regression tasks: report "all tests pass", don't duplicate screenshots.
 
 ## Important Notes
-- No database — all state in URL query params
+- No database or accounts — all state in URL query params. The only server code is two stateless API proxy routes (`fx-rate`, `stock-price`) with in-memory caching.
 - Support CA (TFSA, RRSP, RESP, FHSA, LIRA) and US (401k, IRA, Roth IRA, 529, HSA) vehicles
 - Tone: positive and encouraging, never alarming or judgmental
