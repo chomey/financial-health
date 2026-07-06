@@ -10,6 +10,13 @@ import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 import HelpTip from "@/components/HelpTip";
 import { useModeContext } from "@/lib/ModeContext";
+import {
+  DESTRUCTIVE_GHOST_BUTTON_CLASS,
+  FORM_INPUT_CLASS,
+  FORM_INPUT_COMPACT_CLASS,
+  FORM_SELECT_COMPACT_CLASS,
+  PRIMARY_BUTTON_CLASS,
+} from "@/components/formStyles";
 
 export type IncomeFrequency = "monthly" | "weekly" | "biweekly" | "quarterly" | "semi-annually" | "annually";
 
@@ -255,7 +262,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                         }, 150);
                       }}
                       onKeyDown={handleEditKeyDown}
-                      className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                      className={`${FORM_INPUT_COMPACT_CLASS} w-full`}
                       aria-label="Edit category name"
                     />
                     {showSuggestions &&
@@ -317,7 +324,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                       onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                       onBlur={() => commitEdit()}
                       onKeyDown={handleEditKeyDown}
-                      className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                      className={`${FORM_INPUT_COMPACT_CLASS} w-28 text-right font-medium`}
                       aria-label={`Edit amount for ${item.category}`}
                     />
                   ) : (
@@ -346,7 +353,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                 <select
                   value={item.frequency ?? "monthly"}
                   onChange={(e) => changeFrequency(item.id, e.target.value as IncomeFrequency)}
-                  className="w-auto min-h-[44px] sm:min-h-0 rounded-md border border-white/10 bg-slate-800 px-1.5 py-1 text-xs text-slate-400 transition-all duration-150 hover:border-cyan-500/30 hover:bg-cyan-500/5 hover:text-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 cursor-pointer"
+                  className={`${FORM_SELECT_COMPACT_CLASS} w-auto min-h-[44px] text-xs text-slate-400 sm:min-h-0`}
                   aria-label={`Change frequency for ${item.category}`}
                   data-testid={`frequency-${item.id}`}
                 >
@@ -362,10 +369,10 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                 <select
                   value={item.incomeType ?? "employment"}
                   onChange={(e) => changeIncomeType(item.id, e.target.value as IncomeType)}
-                  className={`w-auto min-h-[44px] sm:min-h-0 rounded-md border px-1.5 py-1 text-xs transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 cursor-pointer ${
+                  className={`w-auto min-h-[44px] sm:min-h-0 ${FORM_SELECT_COMPACT_CLASS} text-xs ${
                     item.incomeType === "capital-gains"
                       ? "border-amber-500/30 bg-amber-500/10 text-amber-400 hover:border-amber-400/50 hover:bg-amber-500/15"
-                      : "border-white/10 bg-slate-800 text-slate-400 hover:border-cyan-500/30 hover:bg-cyan-500/5 hover:text-cyan-400"
+                      : "text-slate-400"
                   }`}
                   aria-label={`Change income type for ${item.category}`}
                   data-testid={`income-type-${item.id}`}
@@ -384,7 +391,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
               <button
                 type="button"
                 onClick={() => deleteItem(item.id)}
-                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 sm:group-hover:opacity-100"
+                className={`${DESTRUCTIVE_GHOST_BUTTON_CLASS} ml-2 flex min-h-[44px] min-w-[44px] items-center justify-center p-2 sm:min-h-0 sm:min-w-0 sm:p-1 sm:opacity-0 focus:opacity-100 sm:group-hover:opacity-100`}
                 aria-label={`Delete ${item.category}`}
               >
                 <svg
@@ -427,7 +434,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
                 onKeyDown={(e) => handleNewKeyDown(e, "category", addItem)}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className={`${FORM_INPUT_CLASS} w-full sm:h-9`}
                 aria-label="New income category"
               />
               {showNewSuggestions &&
@@ -460,14 +467,14 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                 value={newAmount}
                 onChange={(e) => setNewAmount(formatNumericInput(e.target.value))}
                 onKeyDown={(e) => handleNewKeyDown(e, "amount", addItem)}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                className={`${FORM_INPUT_CLASS} w-full text-right sm:h-9 sm:w-28`}
                 aria-label="New income amount"
               />
               <div className="flex items-center gap-1">
                 <select
                   value={newFrequency}
                   onChange={(e) => setNewFrequency(e.target.value as IncomeFrequency)}
-                  className="min-h-[44px] sm:min-h-0 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-2 text-xs text-slate-300 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:py-1 cursor-pointer"
+                  className={`${FORM_SELECT_COMPACT_CLASS} min-h-[44px] text-xs sm:min-h-0`}
                   aria-label="New income frequency"
                   data-testid="new-income-frequency"
                 >
@@ -484,7 +491,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
                 <select
                   value={newIncomeType}
                   onChange={(e) => setNewIncomeType(e.target.value as IncomeType)}
-                  className="min-h-[44px] sm:min-h-0 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-2 text-xs text-slate-300 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:py-1 cursor-pointer"
+                  className={`${FORM_SELECT_COMPACT_CLASS} min-h-[44px] text-xs sm:min-h-0`}
                   aria-label="New income type"
                   data-testid="new-income-type"
                 >
@@ -500,7 +507,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
               <button
                 type="button"
                 onClick={addItem}
-                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className={`${PRIMARY_BUTTON_CLASS} min-h-[44px] sm:min-h-0`}
                 aria-label="Confirm add income"
               >
                 Add
@@ -508,7 +515,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
               <button
                 type="button"
                 onClick={() => { resetNew(); setNewIncomeType("employment"); }}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-white/10 bg-white/5 p-2 text-slate-200 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none sm:min-h-0 sm:min-w-0 sm:p-1"
                 aria-label="Cancel adding income"
               >
                 <svg
@@ -544,7 +551,7 @@ export default function IncomeEntry({ items: controlledItems, onChange, homeCurr
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 active:bg-cyan-500/20"
+            className={PRIMARY_BUTTON_CLASS}
           >
             + Add Income
           </button>

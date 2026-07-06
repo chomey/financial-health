@@ -4,6 +4,13 @@ import { useCallback } from "react";
 import { getRegisteredCountries, getCountry } from "@/lib/countries";
 import type { CountryCode } from "@/lib/countries";
 import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
+import {
+  FORM_SELECT_CLASS,
+  SEGMENT_ACTIVE_CLASS,
+  SEGMENT_CLASS,
+  SEGMENT_INACTIVE_CLASS,
+  SEGMENTED_CONTAINER_CLASS,
+} from "@/components/formStyles";
 
 interface CountryJurisdictionSelectorProps {
   country: CountryCode;
@@ -40,15 +47,11 @@ export default function CountryJurisdictionSelector({
       {/* Tax year + Country + Region row */}
       <div className="flex flex-wrap items-center gap-2">
         {onTaxYearChange && (
-          <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
+          <div className={SEGMENTED_CONTAINER_CLASS}>
             <button
               type="button"
               onClick={() => onTaxYearChange(2025)}
-              className={`inline-flex min-h-[36px] items-center rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
-                taxYear === 2025
-                  ? "bg-white/15 text-slate-100 shadow-sm"
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
+              className={`${SEGMENT_CLASS} ${taxYear === 2025 ? SEGMENT_ACTIVE_CLASS : SEGMENT_INACTIVE_CLASS}`}
               aria-pressed={taxYear === 2025}
               aria-label={`Tax year ${profile.taxYearLabel(2025)}`}
               data-testid="tax-year-2025"
@@ -58,11 +61,7 @@ export default function CountryJurisdictionSelector({
             <button
               type="button"
               onClick={() => onTaxYearChange(2026)}
-              className={`inline-flex min-h-[36px] items-center rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
-                taxYear === 2026
-                  ? "bg-white/15 text-slate-100 shadow-sm"
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
+              className={`${SEGMENT_CLASS} ${taxYear === 2026 ? SEGMENT_ACTIVE_CLASS : SEGMENT_INACTIVE_CLASS}`}
               aria-pressed={taxYear === 2026}
               aria-label={`Tax year ${profile.taxYearLabel(2026)}`}
               data-testid="tax-year-2026"
@@ -71,17 +70,13 @@ export default function CountryJurisdictionSelector({
             </button>
           </div>
         )}
-        <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5">
+        <div className={SEGMENTED_CONTAINER_CLASS}>
           {getRegisteredCountries().map((profile) => (
             <button
               key={profile.code}
               type="button"
               onClick={() => handleCountryChange(profile.code)}
-              className={`inline-flex min-h-[36px] items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900 ${
-                country === profile.code
-                  ? "bg-white/15 text-slate-100 shadow-sm"
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
+              className={`${SEGMENT_CLASS} gap-1 ${country === profile.code ? SEGMENT_ACTIVE_CLASS : SEGMENT_INACTIVE_CLASS}`}
               aria-pressed={country === profile.code}
               aria-label={`Select ${profile.displayName}`}
               data-testid={`country-${profile.code.toLowerCase()}`}
@@ -91,19 +86,24 @@ export default function CountryJurisdictionSelector({
             </button>
           ))}
         </div>
-        <select
-          value={jurisdiction}
-          onChange={(e) => onJurisdictionChange(e.target.value)}
-          className="min-h-[36px] flex-1 rounded-lg border border-white/10 bg-slate-800 px-2 py-1 text-sm font-medium text-slate-300 shadow-sm transition-all duration-200 hover:border-white/20 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 focus:ring-offset-slate-900"
-          aria-label={country === "CA" ? "Select province or territory" : country === "AU" ? "Select state or territory" : "Select state"}
-          data-testid="jurisdiction-select"
-        >
-          {jurisdictions.map((j) => (
-            <option key={j.code} value={j.code}>
-              {j.name} ({j.code})
-            </option>
-          ))}
-        </select>
+        <div className="relative flex-1">
+          <select
+            value={jurisdiction}
+            onChange={(e) => onJurisdictionChange(e.target.value)}
+            className={`${FORM_SELECT_CLASS} w-full font-medium`}
+            aria-label={country === "CA" ? "Select province or territory" : country === "AU" ? "Select state or territory" : "Select state"}
+            data-testid="jurisdiction-select"
+          >
+            {jurisdictions.map((j) => (
+              <option key={j.code} value={j.code}>
+                {j.name} ({j.code})
+              </option>
+            ))}
+          </select>
+          <svg className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+          </svg>
+        </div>
       </div>
     </div>
   );

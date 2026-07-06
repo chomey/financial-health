@@ -6,6 +6,12 @@ import { useCurrency } from "@/lib/CurrencyContext";
 import { getTickerName, resolveTickerName } from "@/lib/ticker-names";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useEditState, useAddNew } from "@/lib/entry-hooks";
+import {
+  DESTRUCTIVE_GHOST_BUTTON_CLASS,
+  FORM_INPUT_CLASS,
+  FORM_INPUT_COMPACT_CLASS,
+  PRIMARY_BUTTON_CLASS,
+} from "@/components/formStyles";
 
 export interface StockHolding {
   id: string;
@@ -331,7 +337,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
               type="button"
               onClick={refreshAllPrices}
               disabled={fetchingPrices.size > 0}
-              className="rounded-md px-2 py-1 text-xs font-medium text-violet-400 transition-all duration-150 hover:bg-violet-400/10 hover:text-violet-300 focus:outline-none focus:ring-2 focus:ring-violet-400/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-md px-2 py-1 text-xs font-medium text-cyan-300 transition-colors duration-150 hover:bg-cyan-400/10 hover:text-cyan-200 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Refresh all stock prices"
               data-testid="refresh-all-prices"
             >
@@ -370,7 +376,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                   i === 0 ? "rounded-l-md" : ""
                 } ${i === arr.length - 1 ? "rounded-r-md" : ""} ${
                   sortBy === key
-                    ? "bg-violet-400/20 text-violet-300 font-medium"
+                    ? "bg-cyan-400/10 text-cyan-200 font-medium"
                     : "text-slate-500 hover:bg-white/5"
                 }`}
                 aria-label={ariaLabel}
@@ -435,14 +441,14 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                           onChange={(e) => setEditValue(e.target.value.toUpperCase())}
                           onBlur={commitEdit}
                           onKeyDown={handleEditKeyDown}
-                          className="w-24 rounded-md border border-violet-400/40 bg-slate-800 px-2 py-1 text-sm font-mono font-medium text-slate-200 uppercase outline-none ring-2 ring-violet-400/20 transition-all duration-200"
+                          className={`${FORM_INPUT_COMPACT_CLASS} w-24 font-mono font-medium uppercase`}
                           aria-label="Edit ticker symbol"
                         />
                       ) : (
                         <button
                           type="button"
                           onClick={() => startEdit(stock.id, "ticker", stock.ticker)}
-                          className="min-h-[44px] sm:min-h-0 rounded px-1 py-2 sm:py-1 text-sm font-mono font-semibold text-slate-200 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400/30 text-left"
+                          className="min-h-[44px] sm:min-h-0 rounded px-1 py-2 sm:py-1 text-sm font-mono font-semibold text-slate-200 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none text-left"
                           aria-label={`Edit ticker for ${stock.ticker}`}
                           data-testid={`ticker-${stock.id}`}
                         >
@@ -470,14 +476,14 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                         onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
-                        className="w-20 rounded-md border border-violet-400/40 bg-slate-800 px-2 py-1 text-right text-sm text-slate-200 outline-none ring-2 ring-violet-400/20 transition-all duration-200"
+                        className={`${FORM_INPUT_COMPACT_CLASS} w-20 text-right`}
                         aria-label={`Edit shares for ${stock.ticker}`}
                       />
                     ) : (
                       <button
                         type="button"
                         onClick={() => startEdit(stock.id, "shares", String(stock.shares))}
-                        className="min-h-[44px] sm:min-h-0 rounded px-1 py-2 sm:py-1 text-xs text-slate-400 transition-colors duration-150 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
+                        className="min-h-[44px] sm:min-h-0 rounded px-1 py-2 sm:py-1 text-xs text-slate-400 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none"
                         aria-label={`Edit shares for ${stock.ticker}, currently ${stock.shares} shares`}
                       >
                         {stock.shares}×{isFetching ? "..." : formatPrice(price)}
@@ -496,7 +502,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                     <button
                       type="button"
                       onClick={() => deleteStock(stock.id)}
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-400/30 sm:group-hover:opacity-100"
+                      className={`${DESTRUCTIVE_GHOST_BUTTON_CLASS} flex min-h-[44px] min-w-[44px] items-center justify-center p-2 sm:min-h-0 sm:min-w-0 sm:p-1 sm:opacity-0 focus:opacity-100 sm:group-hover:opacity-100`}
                       aria-label={`Delete ${stock.ticker}`}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -518,7 +524,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                       onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                       onBlur={commitEdit}
                       onKeyDown={handleEditKeyDown}
-                      className="w-24 rounded border border-violet-400/40 bg-slate-800 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-violet-400/20"
+                      className={`${FORM_INPUT_COMPACT_CLASS} w-24 text-xs`}
                       aria-label={`Edit cost basis for ${stock.ticker}`}
                       placeholder="e.g. 120.00"
                     />
@@ -549,7 +555,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
                       onChange={(e) => setEditValue(e.target.value)}
                       onBlur={commitEdit}
                       onKeyDown={handleEditKeyDown}
-                      className="w-36 rounded border border-violet-400/40 bg-slate-800 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-violet-400/20"
+                      className={`${FORM_INPUT_COMPACT_CLASS} w-36 text-xs`}
                       aria-label={`Edit purchase date for ${stock.ticker}`}
                     />
                   ) : (
@@ -621,7 +627,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
 
       {/* Add new stock row */}
       {addingNew && (
-        <div className="mt-2 rounded-lg border border-dashed border-violet-400/30 bg-violet-400/5 px-3 py-2 animate-in">
+        <div className="mt-2 rounded-lg border border-dashed border-cyan-400/30 bg-cyan-400/5 px-3 py-2 animate-in">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <input
               ref={newTickerRef}
@@ -630,7 +636,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
               value={newTicker}
               onChange={(e) => setNewTicker(e.target.value.toUpperCase())}
               onKeyDown={(e) => handleNewKeyDown(e, "category", addStock)}
-              className="w-full rounded-md border border-violet-400/40 bg-slate-800 px-3 py-2 text-base font-mono uppercase text-slate-200 outline-none ring-2 ring-violet-400/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+              className={`${FORM_INPUT_CLASS} w-full font-mono uppercase sm:h-9 sm:w-28`}
               aria-label="New stock ticker"
             />
             <input
@@ -641,14 +647,14 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
               value={newShares}
               onChange={(e) => setNewShares(formatNumericInput(e.target.value))}
               onKeyDown={(e) => handleNewKeyDown(e, "amount", addStock)}
-              className="w-full rounded-md border border-violet-400/40 bg-slate-800 px-3 py-2 text-right text-base text-slate-200 outline-none ring-2 ring-violet-400/20 transition-all duration-200 sm:w-20 sm:px-2 sm:py-1 sm:text-sm"
+              className={`${FORM_INPUT_CLASS} w-full text-right sm:h-9 sm:w-20`}
               aria-label="Number of shares"
             />
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={addStock}
-                className="min-h-[44px] rounded-md bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className={`${PRIMARY_BUTTON_CLASS} min-h-[44px] sm:min-h-0`}
                 aria-label="Confirm add stock"
               >
                 Add
@@ -656,7 +662,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
               <button
                 type="button"
                 onClick={resetNew}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-white/10 bg-white/5 p-2 text-slate-200 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none sm:min-h-0 sm:min-w-0 sm:p-1"
                 aria-label="Cancel adding stock"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -677,7 +683,7 @@ export default function StockEntry({ items, onChange }: StockEntryProps = {}) {
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-violet-400 transition-all duration-150 hover:bg-violet-400/10 hover:text-violet-300 focus:outline-none focus:ring-2 focus:ring-violet-400/30 active:bg-violet-400/15"
+            className={PRIMARY_BUTTON_CLASS}
           >
             + Add Stock
           </button>

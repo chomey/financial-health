@@ -9,6 +9,7 @@ import { DataFlowSourceItem } from "@/components/DataFlowArrows";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 import HelpTip from "@/components/HelpTip";
+import { DESTRUCTIVE_GHOST_BUTTON_CLASS, FORM_INPUT_CLASS, FORM_INPUT_COMPACT_CLASS, PRIMARY_BUTTON_CLASS } from "@/components/formStyles";
 
 export interface Debt {
   id: string;
@@ -215,7 +216,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                         }, 150);
                       }}
                       onKeyDown={handleEditKeyDown}
-                      className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                      className={`${FORM_INPUT_COMPACT_CLASS} w-full`}
                       aria-label="Edit category name"
                     />
                     {showSuggestions &&
@@ -286,7 +287,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                       onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                       onBlur={() => commitEdit()}
                       onKeyDown={handleEditKeyDown}
-                      className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                      className={`${FORM_INPUT_COMPACT_CLASS} w-28 text-right font-medium`}
                       aria-label={`Edit amount for ${debt.category}`}
                     />
                   ) : (
@@ -308,7 +309,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
               <button
                 type="button"
                 onClick={() => deleteDebt(debt.id)}
-                className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 sm:group-hover:opacity-100"
+                className={`${DESTRUCTIVE_GHOST_BUTTON_CLASS} ml-2 flex min-h-[44px] min-w-[44px] items-center justify-center p-2 sm:min-h-0 sm:min-w-0 sm:p-1 sm:opacity-0 focus:opacity-100 sm:group-hover:opacity-100`}
                 aria-label={`Delete ${debt.category}`}
               >
                 <svg
@@ -338,7 +339,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
+                    className={`${FORM_INPUT_COMPACT_CLASS} w-20 text-xs`}
                     aria-label={`Edit interest rate for ${debt.category}`}
                     placeholder="e.g. 19.9"
                   />
@@ -375,7 +376,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                     onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                     onBlur={() => commitEdit()}
                     onKeyDown={handleEditKeyDown}
-                    className="w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-cyan-500/20"
+                    className={`${FORM_INPUT_COMPACT_CLASS} w-24 text-xs`}
                     aria-label={`Edit monthly payment for ${debt.category}`}
                     placeholder="e.g. 150"
                   />
@@ -451,7 +452,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                   setTimeout(() => setShowNewSuggestions(false), 150);
                 }}
                 onKeyDown={(e) => handleNewKeyDown(e, "category", addDebt)}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className={`${FORM_INPUT_CLASS} w-full sm:h-9`}
                 aria-label="New debt category"
               />
               {showNewSuggestions &&
@@ -492,13 +493,13 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
                 value={newAmount}
                 onChange={(e) => setNewAmount(formatNumericInput(e.target.value))}
                 onKeyDown={(e) => handleNewKeyDown(e, "amount", addDebt)}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                className={`${FORM_INPUT_CLASS} w-full text-right sm:h-9 sm:w-28`}
                 aria-label="New debt amount"
               />
               <button
                 type="button"
                 onClick={addDebt}
-                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className={`${PRIMARY_BUTTON_CLASS} min-h-[44px] sm:min-h-0`}
                 aria-label="Confirm add debt"
               >
                 Add
@@ -506,7 +507,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
               <button
                 type="button"
                 onClick={resetNew}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-white/10 bg-white/5 p-2 text-slate-200 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none sm:min-h-0 sm:min-w-0 sm:p-1"
                 aria-label="Cancel adding debt"
               >
                 <svg
@@ -536,7 +537,7 @@ export default function DebtEntry({ items, onChange, homeCurrency, fxRates }: De
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 active:bg-cyan-500/20"
+            className={PRIMARY_BUTTON_CLASS}
           >
             + Add Debt
           </button>

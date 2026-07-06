@@ -55,10 +55,10 @@ export default function WelcomeStep({
       <button
         type="button"
         onClick={onEnterOwn}
-        className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-left transition-all duration-200 hover:border-violet-400/40 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95"
+        className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-left transition-all duration-200 hover:border-cyan-400/40 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none active:scale-95"
       >
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-400/10 text-violet-400 text-xl">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400/10 text-cyan-300 text-xl">
             ✏️
           </span>
           <div>
@@ -77,7 +77,7 @@ export default function WelcomeStep({
 
       {/* Sample profiles */}
       <div className="rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/5 to-emerald-400/5 p-4 sm:p-5">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {profiles.map((profile) => (
             <button
               key={profile.id}
@@ -86,7 +86,7 @@ export default function WelcomeStep({
                 loadProfile(profile);
                 onProfileLoaded();
               }}
-              className="group flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-4 text-left shadow-sm transition-all duration-200 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 active:scale-95"
+              className="group flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-md focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none active:scale-95"
               data-testid={`sample-profile-${profile.id}`}
             >
               <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export default function WelcomeStep({
               <p className="text-xs text-slate-400 leading-relaxed">{profile.description}</p>
               <div className="flex flex-wrap gap-1.5 mt-auto">
                 {profile.highlights.map((h) => (
-                  <span key={h} className="rounded-full bg-cyan-400/10 px-2 py-0.5 text-xs font-medium text-cyan-300 border border-cyan-400/20">{h}</span>
+                  <span key={h} className="rounded-full bg-cyan-400/10 text-cyan-300 border border-cyan-400/20 text-xs px-2.5 py-0.5">{h}</span>
                 ))}
               </div>
             </button>

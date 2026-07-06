@@ -28,8 +28,8 @@ describe("AssetEntry dark theme", () => {
   it("'Add Asset' button uses cyan accent", () => {
     render(<AssetEntry />);
     const btn = screen.getByText("+ Add Asset");
-    expect(btn.className).toContain("text-cyan-400");
-    expect(btn.className).toContain("focus-ring");
+    expect(btn.className).toContain("bg-cyan-500");
+    expect(btn.className).toContain("text-slate-950");
     expect(btn.className).toContain("transition-colors");
   });
 });
@@ -51,7 +51,8 @@ describe("DebtEntry dark theme", () => {
   it("'Add Debt' button uses cyan accent", () => {
     render(<DebtEntry />);
     const btn = screen.getByText("+ Add Debt");
-    expect(btn.className).toContain("text-cyan-400");
+    expect(btn.className).toContain("bg-cyan-500");
+    expect(btn.className).toContain("text-slate-950");
   });
 
   it("debt amount button uses rose accent", () => {
@@ -72,7 +73,8 @@ describe("IncomeEntry dark theme", () => {
   it("'Add Income' button uses cyan accent", () => {
     render(<IncomeEntry />);
     const btn = screen.getByText("+ Add Income");
-    expect(btn.className).toContain("text-cyan-400");
+    expect(btn.className).toContain("bg-cyan-500");
+    expect(btn.className).toContain("text-slate-950");
   });
 
   it("income amount displays in emerald", () => {
@@ -93,7 +95,8 @@ describe("ExpenseEntry dark theme", () => {
   it("'Add Expense' button uses cyan accent", () => {
     render(<ExpenseEntry />);
     const btn = screen.getByText("+ Add Expense");
-    expect(btn.className).toContain("text-cyan-400");
+    expect(btn.className).toContain("bg-cyan-500");
+    expect(btn.className).toContain("text-slate-950");
   });
 
   it("expense amount displays in rose", () => {
@@ -120,7 +123,8 @@ describe("PropertyEntry dark theme", () => {
   it("'Add Property' button uses cyan accent", () => {
     render(<PropertyEntry />);
     const btn = screen.getByText("+ Add Property");
-    expect(btn.className).toContain("text-cyan-400");
+    expect(btn.className).toContain("bg-cyan-500");
+    expect(btn.className).toContain("text-slate-950");
   });
 
   it("property value displays in emerald", () => {

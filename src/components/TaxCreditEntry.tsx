@@ -14,6 +14,13 @@ import { formatCurrency as canonicalFormatCurrency } from "@/lib/currency";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
+import {
+  DESTRUCTIVE_GHOST_BUTTON_CLASS,
+  FORM_INPUT_CLASS,
+  FORM_INPUT_COMPACT_CLASS,
+  FORM_SELECT_CLASS,
+  PRIMARY_BUTTON_CLASS,
+} from "@/components/formStyles";
 
 export type { TaxCredit } from "@/lib/tax-credits";
 
@@ -227,7 +234,7 @@ export default function TaxCreditEntry({
 
       {credits.length === 0 && !addingNew ? (
         <div className="flex flex-col items-center py-4 text-center" data-testid="tax-credit-empty-state">
-          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-violet-400/10 text-violet-400">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400/10 text-cyan-300">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
             </svg>
@@ -261,7 +268,7 @@ export default function TaxCreditEntry({
                           }}
                           onBlur={() => setTimeout(() => commitEdit(), 150)}
                           onKeyDown={handleEditKeyDown}
-                          className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                          className={`${FORM_INPUT_COMPACT_CLASS} w-full`}
                           aria-label="Edit credit category"
                         />
                         {showSuggestions && filteredSuggestions(editValue).length > 0 && (
@@ -312,10 +319,10 @@ export default function TaxCreditEntry({
                             ),
                           );
                         }}
-                        className={`w-auto min-w-[8rem] max-w-[14rem] min-h-[44px] sm:min-h-0 text-right text-sm font-medium rounded px-2 py-2 sm:py-1 bg-transparent border border-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-violet-500/30 cursor-pointer ${
+                        className={`w-auto min-w-[8rem] max-w-[14rem] min-h-[44px] sm:min-h-0 text-right text-sm font-medium rounded px-2 py-2 sm:py-1 bg-transparent border border-white/10 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none cursor-pointer ${
                           eligibility === "ineligible"
                             ? "text-slate-500"
-                            : "text-violet-400"
+                            : "text-cyan-300"
                         }`}
                         aria-label={`Select amount for ${tc.category}`}
                       >
@@ -331,7 +338,7 @@ export default function TaxCreditEntry({
                         className={`w-28 text-right text-sm font-medium px-2 py-2 sm:py-1 ${
                           eligibility === "ineligible"
                             ? "text-slate-500 line-through"
-                            : "text-violet-400"
+                            : "text-cyan-300"
                         }`}
                         title="Fixed amount"
                       >
@@ -346,17 +353,17 @@ export default function TaxCreditEntry({
                         onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={() => commitEdit()}
                         onKeyDown={handleEditKeyDown}
-                        className="w-28 rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-right text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                        className={`${FORM_INPUT_COMPACT_CLASS} w-28 text-right font-medium`}
                         aria-label={`Edit amount for ${tc.category}`}
                       />
                     ) : (
                       <button
                         type="button"
                         onClick={() => startEdit(tc.id, "amount", String(tc.annualAmount))}
-                        className={`w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium rounded px-2 py-2 sm:py-1 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-violet-500/30 ${
+                        className={`w-28 min-h-[44px] sm:min-h-0 text-right text-sm font-medium rounded px-2 py-2 sm:py-1 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none ${
                           eligibility === "ineligible"
                             ? "text-slate-500 line-through hover:bg-white/5"
-                            : "text-violet-400 hover:bg-violet-400/10 hover:text-violet-300"
+                            : "text-cyan-300 hover:bg-cyan-400/10 hover:text-cyan-200"
                         }`}
                         aria-label={`Edit amount for ${tc.category}, currently ${formatCurrency(tc.annualAmount)}/year`}
                       >
@@ -369,7 +376,7 @@ export default function TaxCreditEntry({
                   <button
                     type="button"
                     onClick={() => deleteCredit(tc.id)}
-                    className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 sm:group-hover:opacity-100"
+                    className={`${DESTRUCTIVE_GHOST_BUTTON_CLASS} ml-2 flex min-h-[44px] min-w-[44px] items-center justify-center p-2 sm:min-h-0 sm:min-w-0 sm:p-1 sm:opacity-0 focus:opacity-100 sm:group-hover:opacity-100`}
                     aria-label={`Delete ${tc.category}`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -422,7 +429,7 @@ export default function TaxCreditEntry({
                 onFocus={() => setShowNewSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowNewSuggestions(false), 150)}
                 onKeyDown={(e) => handleNewKeyDown(e, "category", addCredit)}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className={`${FORM_INPUT_CLASS} w-full sm:h-9`}
                 aria-label="New credit category"
               />
               {showNewSuggestions && filteredSuggestions(newCategory).length > 0 && (
@@ -474,7 +481,7 @@ export default function TaxCreditEntry({
                 <select
                   value={newAmount}
                   onChange={(e) => setNewAmount(e.target.value)}
-                  className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-auto sm:min-w-[10rem] sm:max-w-[16rem] sm:px-2 sm:py-1 sm:text-sm"
+                  className={`${FORM_SELECT_CLASS} w-full sm:h-9 sm:w-auto sm:min-w-[10rem] sm:max-w-[16rem]`}
                   aria-label="Select credit amount"
                 >
                   {newCatDef.amountOptions.map((opt) => (
@@ -485,7 +492,7 @@ export default function TaxCreditEntry({
                 </select>
               ) : newCatDef?.fixedAmount ? (
                 // Fixed amount, read-only
-                <span className="w-full text-right text-base font-medium text-violet-400 px-3 py-2 sm:w-28 sm:px-2 sm:py-1 sm:text-sm">
+                <span className="w-full text-right text-base font-medium text-cyan-300 px-3 py-2 sm:w-28 sm:px-2 sm:py-1 sm:text-sm">
                   {newAmount ? `${formatCurrency(Number(newAmount))}/yr` : "—"}
                 </span>
               ) : (
@@ -497,14 +504,14 @@ export default function TaxCreditEntry({
                   value={newAmount}
                   onChange={(e) => setNewAmount(formatNumericInput(e.target.value))}
                   onKeyDown={(e) => handleNewKeyDown(e, "amount", addCredit)}
-                  className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-right text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:w-28 sm:px-2 sm:py-1 sm:text-sm"
+                  className={`${FORM_INPUT_CLASS} w-full text-right sm:h-9 sm:w-28`}
                   aria-label="New credit annual amount"
                 />
               )}
               <button
                 type="button"
                 onClick={addCredit}
-                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className={`${PRIMARY_BUTTON_CLASS} min-h-[44px] sm:min-h-0`}
                 aria-label="Confirm add credit"
               >
                 Add
@@ -512,7 +519,7 @@ export default function TaxCreditEntry({
               <button
                 type="button"
                 onClick={resetNew}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-white/10 bg-white/5 p-2 text-slate-200 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none sm:min-h-0 sm:min-w-0 sm:p-1"
                 aria-label="Cancel adding credit"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -540,7 +547,7 @@ export default function TaxCreditEntry({
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 active:bg-cyan-500/20"
+            className={PRIMARY_BUTTON_CLASS}
           >
             + Add Credit
           </button>

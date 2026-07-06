@@ -25,6 +25,13 @@ import {
 } from "@/lib/countries/australia/government-retirement";
 import HelpTip from "@/components/HelpTip";
 import type { CountryCode } from "@/lib/countries";
+import { FORM_INPUT_CLASS } from "@/components/formStyles";
+
+const PRESET_BUTTON_CLASS =
+  "rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-200 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none";
+
+const PRESET_BUTTON_ACTIVE_CLASS =
+  "rounded-lg border border-cyan-400/40 bg-cyan-400/10 px-2.5 py-1.5 text-xs font-medium text-cyan-200 transition-colors duration-150 hover:bg-cyan-400/15 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none";
 
 interface Props {
   country: CountryCode;
@@ -100,11 +107,7 @@ function CppOasInput({ value, onChange }: { value: GovernmentRetirementIncome | 
               key={p}
               type="button"
               onClick={() => handleCppPreset(p)}
-              className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150 ${
-                cppPreset === p
-                  ? "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/40"
-                  : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300"
-              }`}
+              className={cppPreset === p ? PRESET_BUTTON_ACTIVE_CLASS : PRESET_BUTTON_CLASS}
               data-testid={`cpp-preset-${p}`}
             >
               {p === "none" ? "None" : p === "average" ? `Avg (${formatMo(CPP_AVERAGE_MONTHLY)})` : p === "max" ? `Max (${formatMo(CPP_MAX_MONTHLY)})` : "Custom"}
@@ -122,7 +125,7 @@ function CppOasInput({ value, onChange }: { value: GovernmentRetirementIncome | 
               update(v, oasAmount);
             }}
             placeholder="Monthly CPP amount"
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
+            className={`${FORM_INPUT_CLASS} w-full`}
             data-testid="cpp-custom-input"
           />
         )}
@@ -140,11 +143,7 @@ function CppOasInput({ value, onChange }: { value: GovernmentRetirementIncome | 
               key={p}
               type="button"
               onClick={() => handleOasPreset(p)}
-              className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150 ${
-                oasPreset === p
-                  ? "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/40"
-                  : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300"
-              }`}
+              className={oasPreset === p ? PRESET_BUTTON_ACTIVE_CLASS : PRESET_BUTTON_CLASS}
               data-testid={`oas-preset-${p}`}
             >
               {p === "none" ? "None" : p === "full" ? `Full (${formatMo(OAS_MAX_MONTHLY_65_74)})` : "Custom"}
@@ -162,7 +161,7 @@ function CppOasInput({ value, onChange }: { value: GovernmentRetirementIncome | 
               update(cppAmount, v);
             }}
             placeholder="Monthly OAS amount"
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
+            className={`${FORM_INPUT_CLASS} w-full`}
             data-testid="oas-custom-input"
           />
         )}
@@ -236,11 +235,7 @@ function SocialSecurityInput({ value, onChange }: { value: GovernmentRetirementI
               key={p.key}
               type="button"
               onClick={() => handlePreset(p.key)}
-              className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150 ${
-                preset === p.key
-                  ? "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/40"
-                  : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300"
-              }`}
+              className={preset === p.key ? PRESET_BUTTON_ACTIVE_CLASS : PRESET_BUTTON_CLASS}
               data-testid={`ss-preset-${p.key}`}
             >
               {p.label}
@@ -255,7 +250,7 @@ function SocialSecurityInput({ value, onChange }: { value: GovernmentRetirementI
             value={ssAmount || ""}
             onChange={(e) => update(parseFloat(e.target.value) || 0)}
             placeholder="Monthly Social Security amount"
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
+            className={`${FORM_INPUT_CLASS} w-full`}
             data-testid="ss-custom-input"
           />
         )}
@@ -323,11 +318,7 @@ function AgePensionInput({ value, onChange }: { value: GovernmentRetirementIncom
               key={p.key}
               type="button"
               onClick={() => handlePreset(p.key)}
-              className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150 ${
-                preset === p.key
-                  ? "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/40"
-                  : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-300"
-              }`}
+              className={preset === p.key ? PRESET_BUTTON_ACTIVE_CLASS : PRESET_BUTTON_CLASS}
               data-testid={`ap-preset-${p.key}`}
             >
               {p.label}
@@ -342,7 +333,7 @@ function AgePensionInput({ value, onChange }: { value: GovernmentRetirementIncom
             value={apAmount || ""}
             onChange={(e) => update(parseFloat(e.target.value) || 0)}
             placeholder="Fortnightly Age Pension amount"
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-400"
+            className={`${FORM_INPUT_CLASS} w-full`}
             data-testid="ap-custom-input"
           />
         )}

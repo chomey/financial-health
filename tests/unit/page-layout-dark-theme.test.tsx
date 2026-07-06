@@ -139,9 +139,9 @@ describe("CurrencyBadge dark theme", () => {
 
 describe("FastForwardPanel interaction states", () => {
   it("buttons, sliders, and inputs use the shared cyan focus ring", () => {
-    expect(fastForwardSrc).toContain("focus-ring rounded-lg border");
-    expect(fastForwardSrc).toContain("focus-ring w-24 accent-");
-    expect(fastForwardSrc).toContain("focus-visible:border-cyan-400/50");
+    expect(fastForwardSrc).toContain("accent-cyan-400");
+    expect(fastForwardSrc).toContain("FORM_INPUT_COMPACT_CLASS");
+    expect(fastForwardSrc).toContain("border-cyan-400/40 bg-cyan-400/10");
   });
 
   it("what-if control rows use color-only transitions", () => {

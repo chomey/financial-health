@@ -26,6 +26,7 @@ import type { TaxCredit, FilingStatus } from "@/lib/tax-credits";
 import type { FxRates, SupportedCurrency } from "@/lib/currency";
 import type { FinancialState } from "@/lib/financial-types";
 import type { SampleProfile } from "@/lib/sample-profiles";
+import { PRIMARY_BUTTON_CLASS, SECONDARY_BUTTON_CLASS } from "@/components/formStyles";
 
 export interface WizardProps {
   // State
@@ -292,7 +293,7 @@ export default function WizardShell(props: WizardProps) {
             type="button"
             onClick={goPrev}
             disabled={isFirst}
-            className="focus-ring rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10 hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-30"
+            className={`${SECONDARY_BUTTON_CLASS} disabled:cursor-not-allowed disabled:opacity-30`}
             data-testid="wizard-prev"
           >
             ← Back
@@ -304,11 +305,7 @@ export default function WizardShell(props: WizardProps) {
             type="button"
             onClick={goNext}
             disabled={stepCompletion[currentStep as keyof typeof stepCompletion] === false}
-            className={`focus-ring rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
-              isLast
-                ? "bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm shadow-emerald-500/20"
-                : "bg-violet-600 text-white hover:bg-violet-500"
-            }`}
+            className={`${PRIMARY_BUTTON_CLASS} disabled:cursor-not-allowed disabled:opacity-40`}
             data-testid="wizard-next"
           >
             {isLast ? "See my results →" : "Next →"}

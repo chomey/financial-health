@@ -7,6 +7,12 @@ import { useCurrency } from "@/lib/CurrencyContext";
 import { parseCurrencyInput, formatNumericInput } from "@/lib/format-input";
 import { generateId, useControlledArray, useEditState, useAddNew } from "@/lib/entry-hooks";
 import HelpTip from "@/components/HelpTip";
+import {
+  DESTRUCTIVE_GHOST_BUTTON_CLASS,
+  FORM_INPUT_CLASS,
+  FORM_INPUT_COMPACT_CLASS,
+  PRIMARY_BUTTON_CLASS,
+} from "@/components/formStyles";
 
 export interface Property {
   id: string;
@@ -327,7 +333,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                         onChange={(e) => setEditValue(e.target.value)}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
-                        className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-2 py-1 text-sm font-medium text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                        className={`${FORM_INPUT_COMPACT_CLASS} w-full font-medium`}
                         aria-label="Edit property name"
                       />
                     ) : (
@@ -360,7 +366,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                   <button
                     type="button"
                     onClick={() => deleteProperty(property.id)}
-                    className="ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-600 sm:min-h-0 sm:min-w-0 sm:p-1 sm:text-slate-600 sm:opacity-0 transition-all duration-150 hover:bg-rose-400/10 hover:text-rose-400 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-400/20 sm:group-hover:opacity-100"
+                    className={`${DESTRUCTIVE_GHOST_BUTTON_CLASS} ml-2 flex min-h-[44px] min-w-[44px] items-center justify-center p-2 sm:min-h-0 sm:min-w-0 sm:p-1 sm:opacity-0 focus:opacity-100 sm:group-hover:opacity-100`}
                     aria-label={`Delete ${property.name}`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -396,7 +402,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                         onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
-                        className="mt-0.5 w-full rounded-md border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                        className={`${FORM_INPUT_COMPACT_CLASS} mt-0.5 w-full text-xs`}
                         aria-label={`Edit value for ${property.name}`}
                       />
                     ) : (
@@ -423,7 +429,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                         onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                         onBlur={commitEdit}
                         onKeyDown={handleEditKeyDown}
-                        className="mt-0.5 w-full rounded-md border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200"
+                        className={`${FORM_INPUT_COMPACT_CLASS} mt-0.5 w-full text-xs`}
                         aria-label={`Edit mortgage for ${property.name}`}
                       />
                     ) : (
@@ -480,7 +486,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                             onBlur={commitEdit}
                             onKeyDown={handleEditKeyDown}
-                            className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
+                            className={`${FORM_INPUT_COMPACT_CLASS} w-20 text-xs`}
                             aria-label={`Edit interest rate for ${property.name}`}
                             placeholder="e.g. 5"
                           />
@@ -510,7 +516,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                             onBlur={commitEdit}
                             onKeyDown={handleEditKeyDown}
-                            className="w-24 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
+                            className={`${FORM_INPUT_COMPACT_CLASS} w-24 text-xs`}
                             aria-label={`Edit monthly payment for ${property.name}`}
                             placeholder="e.g. 1500"
                           />
@@ -546,7 +552,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                             onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                             onBlur={commitEdit}
                             onKeyDown={handleEditKeyDown}
-                            className="w-16 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
+                            className={`${FORM_INPUT_COMPACT_CLASS} w-16 text-xs`}
                             aria-label={`Edit amortization years for ${property.name}`}
                             placeholder="e.g. 25"
                           />
@@ -555,7 +561,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                           <button
                             type="button"
                             onClick={() => startEdit(property.id, "amortizationYears", String(property.amortizationYears ?? ""))}
-                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-violet-500/20 ${
+                            className={`rounded px-1.5 py-0.5 text-xs transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none ${
                               hasAmort
                                 ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
                                 : "border border-dashed border-white/10 text-slate-600 hover:bg-slate-800/60 hover:text-slate-500"
@@ -581,7 +587,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                               onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                               onBlur={commitEdit}
                               onKeyDown={handleEditKeyDown}
-                              className="w-16 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
+                              className={`${FORM_INPUT_COMPACT_CLASS} w-16 text-xs`}
                               aria-label={`Edit year purchased for ${property.name}`}
                               placeholder="e.g. 2020"
                             />
@@ -617,7 +623,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                               onChange={(e) => setEditValue(formatNumericInput(e.target.value))}
                               onBlur={commitEdit}
                               onKeyDown={handleEditKeyDown}
-                              className="w-20 rounded border border-cyan-500/50 bg-slate-900 px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-cyan-500/20"
+                              className={`${FORM_INPUT_COMPACT_CLASS} w-20 text-xs`}
                               aria-label={`Edit appreciation rate for ${property.name}`}
                               placeholder="e.g. 3 or -15"
                             />
@@ -765,7 +771,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => handleNewKeyDown(e, "name")}
-              className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+              className={`${FORM_INPUT_CLASS} w-full sm:h-9`}
               aria-label="New property name"
             />
             <div className="grid grid-cols-2 gap-2">
@@ -777,7 +783,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                 value={newValue}
                 onChange={(e) => setNewValue(formatNumericInput(e.target.value))}
                 onKeyDown={(e) => handleNewKeyDown(e, "value")}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className={`${FORM_INPUT_CLASS} w-full sm:h-9`}
                 aria-label="New property value"
               />
               <input
@@ -788,7 +794,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
                 value={newMortgage}
                 onChange={(e) => setNewMortgage(formatNumericInput(e.target.value))}
                 onKeyDown={(e) => handleNewKeyDown(e, "mortgage")}
-                className="w-full rounded-md border border-cyan-500/50 bg-slate-900 px-3 py-2 text-base text-slate-100 outline-none ring-2 ring-cyan-500/20 transition-all duration-200 sm:px-2 sm:py-1 sm:text-sm"
+                className={`${FORM_INPUT_CLASS} w-full sm:h-9`}
                 aria-label="New property mortgage"
               />
             </div>
@@ -796,7 +802,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
               <button
                 type="button"
                 onClick={addProperty}
-                className="min-h-[44px] rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-150 hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 active:scale-95 sm:min-h-0 sm:px-3 sm:py-1"
+                className={`${PRIMARY_BUTTON_CLASS} min-h-[44px] sm:min-h-0`}
                 aria-label="Confirm add property"
               >
                 Add
@@ -804,7 +810,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
               <button
                 type="button"
                 onClick={resetPropertyNew}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-2 text-slate-500 sm:min-h-0 sm:min-w-0 sm:p-1 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-white/10"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-white/10 bg-white/5 p-2 text-slate-200 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none sm:min-h-0 sm:min-w-0 sm:p-1"
                 aria-label="Cancel adding property"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -825,7 +831,7 @@ export default function PropertyEntry({ items, onChange, homeCurrency, fxRates }
           <button
             type="button"
             onClick={() => setAddingNew(true)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-400 transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 active:bg-cyan-500/20"
+            className={PRIMARY_BUTTON_CLASS}
           >
             + Add Property
           </button>

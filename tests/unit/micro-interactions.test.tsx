@@ -74,17 +74,17 @@ describe("Active states on confirm buttons", () => {
     render(<AssetEntry />);
     await user.click(screen.getByText("+ Add Asset"));
     const confirmBtn = screen.getByLabelText("Confirm add asset");
-    expect(confirmBtn.className).toContain("active:scale-95");
-    expect(confirmBtn.className).toContain("focus-ring");
+    expect(confirmBtn.className).toContain("active:bg-cyan-500");
+    expect(confirmBtn.className).toContain("focus-visible:ring-2");
     expect(confirmBtn.className).toContain("transition-colors");
   });
 
-  it("Add Debt confirm button has active:scale-95 class", async () => {
+  it("Add Debt confirm button uses primary active state", async () => {
     const user = userEvent.setup();
     render(<DebtEntry />);
     await user.click(screen.getByText("+ Add Debt"));
     const confirmBtn = screen.getByLabelText("Confirm add debt");
-    expect(confirmBtn.className).toContain("active:scale-95");
+    expect(confirmBtn.className).toContain("active:bg-cyan-500");
   });
 
 });

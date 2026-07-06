@@ -15,6 +15,7 @@ import type { Scenario } from "@/lib/projections";
 import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
 import HelpTip from "@/components/HelpTip";
+import { FORM_INPUT_COMPACT_CLASS } from "@/components/formStyles";
 
 interface FastForwardPanelProps {
   state: FinancialState;
@@ -51,6 +52,16 @@ const PRESET_CONFIGS: { id: ScenarioPreset; label: string; description: string }
   { id: "aggressive-saver", label: "Aggressive Saver", description: "Max tax-sheltered" },
   { id: "early-retirement", label: "Early Retirement", description: "No income" },
 ];
+
+const CONTROL_ROW_BASE = "rounded-lg border px-3 py-2 transition-colors duration-200";
+const CONTROL_ROW_DEFAULT = "border-white/10 bg-white/5";
+const CONTROL_ROW_ACTIVE = "border-cyan-400/40 bg-cyan-400/10";
+const CHECKBOX_CLASS = "focus-ring h-4 w-4 accent-cyan-400";
+const RANGE_CLASS = "focus-ring w-24 accent-cyan-400";
+const RESET_ICON_BUTTON_CLASS =
+  "focus-ring rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300";
+const STEPPER_BUTTON_CLASS =
+  "focus-ring flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm font-medium text-slate-200 transition-colors duration-150 hover:bg-white/10";
 
 export default function FastForwardPanel({
   state,
@@ -198,7 +209,7 @@ export default function FastForwardPanel({
           {hasModifications && (
             <button
               onClick={resetScenario}
-              className="focus-ring rounded-lg px-3 py-1 text-xs font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10 hover:text-slate-200"
+              className="focus-ring h-8 rounded-lg border border-white/10 bg-white/5 px-3 text-xs font-medium text-slate-200 transition-colors duration-150 hover:bg-white/10"
               data-testid="reset-scenario"
             >
               Reset
@@ -224,15 +235,15 @@ export default function FastForwardPanel({
       {/* Scenario Presets */}
       <div className="mb-4" data-testid="scenario-presets">
         <h4 className="mb-2 text-sm font-medium text-slate-300">Quick scenarios</h4>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap overflow-hidden rounded-lg border border-white/10 bg-white/5 p-0.5">
           {PRESET_CONFIGS.map((preset) => (
             <button
               key={preset.id}
               onClick={() => handlePreset(preset.id)}
-              className={`focus-ring rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors duration-150 ${
+              className={`focus-ring rounded-md border px-3 py-1.5 text-xs font-medium transition-colors duration-150 ${
                 activePreset === preset.id
-                  ? "border-violet-400/50 bg-violet-400/15 text-violet-300"
-                  : "border-white/10 bg-[var(--surface-1)] text-slate-400 hover:bg-white/10 hover:border-white/20"
+                  ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-200"
+                  : "border-transparent text-slate-200 hover:bg-white/10"
               }`}
               data-testid={`preset-${preset.id}`}
             >
@@ -253,22 +264,22 @@ export default function FastForwardPanel({
             <label
               className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-colors duration-200 ${
                 mod.retireToday
-                  ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
-                  : "border-white/10 bg-[var(--surface-1)] text-slate-300 hover:bg-white/10"
+                  ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-200"
+                  : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
               }`}
             >
               <input
                 type="checkbox"
                 checked={mod.retireToday}
                 onChange={toggleRetireToday}
-                className="focus-ring h-4 w-4 rounded border-white/20 bg-slate-800 text-amber-500"
+                className={CHECKBOX_CLASS}
                 data-testid="retire-today-checkbox"
               />
               <span className="flex-1">
                 Set all income to $0 and see how long your savings last
               </span>
               {mod.retireToday && (
-                <span className="text-xs font-medium text-amber-400">
+                <span className="text-xs font-medium text-cyan-200">
                   -{formatCurrency(totalMonthlyIncome)}/mo
                 </span>
               )}
@@ -285,15 +296,15 @@ export default function FastForwardPanel({
             <label
               className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-colors duration-200 ${
                 mod.maxTaxSheltered
-                  ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-300"
-                  : "border-white/10 bg-[var(--surface-1)] text-slate-300 hover:bg-white/10"
+                  ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-200"
+                  : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
               }`}
             >
               <input
                 type="checkbox"
                 checked={mod.maxTaxSheltered}
                 onChange={toggleMaxTaxSheltered}
-                className="focus-ring h-4 w-4 rounded border-white/20 bg-slate-800 text-cyan-500"
+                className={CHECKBOX_CLASS}
                 data-testid="max-tax-sheltered-checkbox"
               />
               <span className="flex-1">
@@ -334,8 +345,8 @@ export default function FastForwardPanel({
             <h4 className="mb-2 text-sm font-medium text-slate-300">
               What if you downsized housing?
             </h4>
-            <div className={`rounded-lg border px-3 py-2 transition-colors duration-200 ${
-              mod.housingDownsizePercent > 0 ? "border-violet-400/40 bg-violet-400/10" : "border-white/10 bg-[var(--surface-1)]"
+            <div className={`${CONTROL_ROW_BASE} ${
+              mod.housingDownsizePercent > 0 ? CONTROL_ROW_ACTIVE : CONTROL_ROW_DEFAULT
             }`}>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span className="text-sm text-slate-300 flex-1 min-w-[140px]">
@@ -349,18 +360,18 @@ export default function FastForwardPanel({
                     step={5}
                     value={mod.housingDownsizePercent}
                     onChange={(e) => setHousingDownsize(parseInt(e.target.value))}
-                    className="focus-ring w-24 accent-violet-400"
+                    className={RANGE_CLASS}
                     data-testid="housing-downsize-slider"
                   />
                   <span className={`min-w-[36px] text-right text-sm font-medium ${
-                    mod.housingDownsizePercent > 0 ? "text-violet-300" : "text-slate-500"
+                    mod.housingDownsizePercent > 0 ? "text-cyan-200" : "text-slate-500"
                   }`}>
                     {mod.housingDownsizePercent}%
                   </span>
                 </div>
               </div>
               {mod.housingDownsizePercent > 0 && (
-                <p className="mt-1 text-xs text-violet-300">
+                <p className="mt-1 text-xs text-cyan-200">
                   Equity released is added to your savings
                 </p>
               )}
@@ -373,8 +384,8 @@ export default function FastForwardPanel({
           <h4 className="mb-2 text-sm font-medium text-slate-300">
             What if market returns changed?
           </h4>
-          <div className={`rounded-lg border px-3 py-2 transition-colors duration-200 ${
-            mod.roiAdjustment !== 0 ? "border-pink-400/40 bg-pink-400/10" : "border-white/10 bg-[var(--surface-1)]"
+          <div className={`${CONTROL_ROW_BASE} ${
+            mod.roiAdjustment !== 0 ? CONTROL_ROW_ACTIVE : CONTROL_ROW_DEFAULT
           }`}>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="text-sm text-slate-300 flex-1 min-w-[140px]">Global ROI adjustment</span>
@@ -386,7 +397,7 @@ export default function FastForwardPanel({
                   step={1}
                   value={mod.roiAdjustment}
                   onChange={(e) => setRoiAdjustment(parseInt(e.target.value))}
-                    className="focus-ring w-24 accent-pink-400"
+                    className={RANGE_CLASS}
                   data-testid="roi-adjustment-slider"
                 />
                 <span className={`min-w-[40px] text-right text-sm font-medium ${
@@ -397,7 +408,7 @@ export default function FastForwardPanel({
                 {mod.roiAdjustment !== 0 && (
                   <button
                     onClick={() => setRoiAdjustment(0)}
-                    className="focus-ring rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                    className={RESET_ICON_BUTTON_CLASS}
                     title="Reset"
                   >
                     ↩
@@ -413,8 +424,8 @@ export default function FastForwardPanel({
           <h4 className="mb-2 text-sm font-medium text-slate-300">
             FIRE withdrawal rate
           </h4>
-          <div className={`rounded-lg border px-3 py-2 transition-colors duration-200 ${
-            safeWithdrawalRate !== 4 ? "border-amber-400/40 bg-amber-400/10" : "border-white/10 bg-[var(--surface-1)]"
+          <div className={`${CONTROL_ROW_BASE} ${
+            safeWithdrawalRate !== 4 ? CONTROL_ROW_ACTIVE : CONTROL_ROW_DEFAULT
           }`}>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="text-sm text-slate-300 flex-1 min-w-[140px]">Safe withdrawal rate</span>
@@ -426,18 +437,18 @@ export default function FastForwardPanel({
                   step={0.5}
                   value={safeWithdrawalRate}
                   onChange={(e) => onSwrChange?.(parseFloat(e.target.value))}
-                  className="focus-ring w-24 accent-amber-400"
+                  className={RANGE_CLASS}
                   data-testid="swr-slider"
                 />
                 <span className={`min-w-[36px] text-right text-sm font-medium ${
-                  safeWithdrawalRate !== 4 ? "text-amber-400" : "text-slate-500"
+                  safeWithdrawalRate !== 4 ? "text-cyan-200" : "text-slate-500"
                 }`}>
                   {safeWithdrawalRate}%
                 </span>
                 {safeWithdrawalRate !== 4 && (
                   <button
                     onClick={() => onSwrChange?.(4)}
-                    className="focus-ring rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                    className={RESET_ICON_BUTTON_CLASS}
                     title="Reset to 4%"
                   >
                     ↩
@@ -463,8 +474,8 @@ export default function FastForwardPanel({
                   key={debt.id}
                   className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-colors duration-200 ${
                     mod.excludedDebtIds.includes(debt.id)
-                      ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
-                      : "border-white/10 bg-[var(--surface-1)] text-slate-300 hover:bg-white/10"
+                      ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-200"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
                   }`}
                   data-testid={`debt-toggle-${debt.id}`}
                 >
@@ -472,7 +483,7 @@ export default function FastForwardPanel({
                     type="checkbox"
                     checked={mod.excludedDebtIds.includes(debt.id)}
                     onChange={() => toggleDebt(debt.id)}
-                    className="focus-ring h-4 w-4 rounded border-white/20 bg-slate-800 text-cyan-500"
+                    className={CHECKBOX_CLASS}
                   />
                   <span className="flex-1">
                     {debt.category}
@@ -505,7 +516,7 @@ export default function FastForwardPanel({
                     <div
                       key={asset.id}
                       className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-colors duration-200 ${
-                        isModified ? "border-violet-400/40 bg-violet-400/10" : "border-white/10 bg-[var(--surface-1)]"
+                        isModified ? CONTROL_ROW_ACTIVE : CONTROL_ROW_DEFAULT
                       }`}
                       data-testid={`contribution-${asset.id}`}
                     >
@@ -523,7 +534,7 @@ export default function FastForwardPanel({
                               setContributionOverride(asset.id, val);
                             }
                           }}
-                          className="focus-ring w-20 rounded border border-white/10 bg-slate-800 px-2 py-1 text-right text-sm text-slate-200 transition-colors duration-150 focus-visible:border-cyan-400/50"
+                          className={`${FORM_INPUT_COMPACT_CLASS} w-20 text-right`}
                           min={0}
                           step={50}
                         />
@@ -531,7 +542,7 @@ export default function FastForwardPanel({
                         {isModified && (
                           <button
                             onClick={() => setContributionOverride(asset.id, undefined)}
-                            className="focus-ring ml-1 rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                            className={`${RESET_ICON_BUTTON_CLASS} ml-1`}
                             title="Reset to original"
                           >
                             ↩
@@ -550,14 +561,14 @@ export default function FastForwardPanel({
           <h4 className="mb-2 text-sm font-medium text-slate-300">
             What if your income changed?
           </h4>
-          <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-3 py-2 transition-colors duration-200 ${
-            mod.incomeAdjustment !== 0 ? "border-cyan-400/40 bg-cyan-400/10" : "border-white/10 bg-[var(--surface-1)]"
+          <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 ${CONTROL_ROW_BASE} ${
+            mod.incomeAdjustment !== 0 ? CONTROL_ROW_ACTIVE : CONTROL_ROW_DEFAULT
           }`}>
             <span className="text-sm text-slate-300 flex-1 min-w-[140px]">Monthly adjustment</span>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setIncomeAdjustment(mod.incomeAdjustment - 500)}
-                className="focus-ring rounded-lg px-1.5 py-0.5 text-xs font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10"
+                className={STEPPER_BUTTON_CLASS}
                 data-testid="income-decrease"
               >
                 -$500
@@ -569,7 +580,7 @@ export default function FastForwardPanel({
               </span>
               <button
                 onClick={() => setIncomeAdjustment(mod.incomeAdjustment + 500)}
-                className="focus-ring rounded-lg px-1.5 py-0.5 text-xs font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10"
+                className={STEPPER_BUTTON_CLASS}
                 data-testid="income-increase"
               >
                 +$500
@@ -577,7 +588,7 @@ export default function FastForwardPanel({
               {mod.incomeAdjustment !== 0 && (
                 <button
                   onClick={() => setIncomeAdjustment(0)}
-                  className="focus-ring ml-1 rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                  className={`${RESET_ICON_BUTTON_CLASS} ml-1`}
                   title="Reset"
                 >
                   ↩
@@ -592,8 +603,8 @@ export default function FastForwardPanel({
           <h4 className="mb-2 text-sm font-medium text-slate-300">
             One-time windfall
           </h4>
-          <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-3 py-2 transition-colors duration-200 ${
-            mod.windfall > 0 ? "border-amber-400/40 bg-amber-400/10" : "border-white/10 bg-[var(--surface-1)]"
+          <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 ${CONTROL_ROW_BASE} ${
+            mod.windfall > 0 ? CONTROL_ROW_ACTIVE : CONTROL_ROW_DEFAULT
           }`}>
             <span className="text-sm text-slate-300 flex-1 min-w-[140px]">
               Bonus, inheritance, or lump sum
@@ -605,7 +616,7 @@ export default function FastForwardPanel({
                 value={mod.windfall || ""}
                 onChange={(e) => setWindfall(Math.max(0, parseFloat(e.target.value) || 0))}
                 placeholder="0"
-                className="focus-ring w-24 rounded border border-white/10 bg-slate-800 px-2 py-1 text-right text-sm text-slate-200 transition-colors duration-150 focus-visible:border-cyan-400/50"
+                className={`${FORM_INPUT_COMPACT_CLASS} w-24 text-right`}
                 min={0}
                 step={1000}
                 data-testid="windfall-amount"
@@ -613,7 +624,7 @@ export default function FastForwardPanel({
               {mod.windfall > 0 && (
                 <button
                   onClick={() => setWindfall(0)}
-                  className="focus-ring ml-1 rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                  className={`${RESET_ICON_BUTTON_CLASS} ml-1`}
                   title="Reset"
                 >
                   ↩
