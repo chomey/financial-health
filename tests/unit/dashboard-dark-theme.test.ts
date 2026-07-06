@@ -207,8 +207,9 @@ describe("Task 128: Dashboard dark theme — DataFlowArrows", () => {
 });
 
 describe("Task 128: Dashboard dark theme — navigation interactions", () => {
-  it("dashboard section pills use shared cyan focus ring and color transitions", () => {
-    expect(pageSrc).toContain("focus-ring flex items-center gap-1.5 rounded-lg");
+  it("dashboard section links use shared cyan focus ring and quiet underline transitions", () => {
+    expect(pageSrc).toContain("focus-ring relative flex min-h-9 items-center gap-1.5");
+    expect(pageSrc).toContain("text-cyan-300 after:bg-cyan-300");
     expect(pageSrc).toContain("transition-colors duration-150");
     expect(pageSrc).not.toContain("focus:ring-2 focus:ring-violet-400");
   });

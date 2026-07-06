@@ -39,36 +39,48 @@ export default function WizardStepper({
 
   return (
     <nav className="w-full overflow-x-auto scrollbar-hide" aria-label="Wizard steps" style={{ scrollbarWidth: "none" }}>
-      <ol className="flex items-center gap-0 px-4 py-0.5">
+      <ol className="flex min-h-9 items-center px-4 sm:px-0">
         {steps.map((step, idx) => {
           const meta = STEP_META[step];
           const isCurrent = step === currentStep;
           const isComplete = stepCompletion[step] ?? false;
           const isPast = idx < currentIdx;
+          const showCompleteChip = !isCurrent && (isComplete || isPast);
           const label = (mode === "simple" && meta.simpleLabel) ? meta.simpleLabel : meta.label;
           const shortLabel = (mode === "simple" && meta.simpleShort) ? meta.simpleShort : meta.shortLabel;
 
           return (
-            <li key={step} className="flex items-center">
+            <li key={step} className="flex shrink-0 items-center">
               <button
                 ref={isCurrent ? activeRef : undefined}
                 type="button"
                 onClick={() => onStepChange(step)}
-                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-violet-400 ${
+                className={`focus-ring relative flex min-h-9 items-center gap-1.5 whitespace-nowrap px-1 pb-2 pt-1 text-xs font-medium transition-colors duration-150 after:absolute after:bottom-0 after:left-1 after:right-1 after:h-0.5 after:rounded-full after:transition-colors after:duration-150 ${
                   isCurrent
-                    ? "bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30"
-                    : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                    ? "text-cyan-300 after:bg-cyan-300"
+                    : showCompleteChip
+                      ? "text-slate-400 after:bg-transparent hover:text-slate-200"
+                      : "text-slate-500 after:bg-transparent hover:text-slate-300"
                 }`}
                 aria-current={isCurrent ? "step" : undefined}
                 data-testid={`wizard-step-${step}`}
               >
-                <span className="text-sm" aria-hidden="true">{meta.icon}</span>
+                <span
+                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] ${
+                    showCompleteChip
+                      ? "bg-cyan-400/10 text-cyan-300 ring-1 ring-cyan-400/20"
+                      : "text-sm"
+                  }`}
+                  aria-hidden="true"
+                >
+                  {showCompleteChip ? "✓" : meta.icon}
+                </span>
                 <span className="hidden sm:inline">{label}</span>
                 <span className="sm:hidden">{shortLabel}</span>
               </button>
               {idx < steps.length - 1 && (
                 <div
-                  className="mx-0.5 h-px w-4 bg-white/10"
+                  className="mx-2 h-px w-5 bg-white/10"
                   aria-hidden="true"
                 />
               )}

@@ -477,11 +477,11 @@ export default function Home() {
       <AppHeader activePhase="dashboard" onSwitchPhase={switchToWizard}>
           {/* Dashboard section stepper (scroll-to links) */}
           <nav ref={stepperNavRef} className="w-full overflow-x-auto scrollbar-hide print:hidden" aria-label="Dashboard sections" style={{ scrollbarWidth: "none" }}>
-            <ol className="flex items-center gap-0 px-4 py-0.5">
-              {DASHBOARD_SECTIONS.map((sec, idx) => {
+            <ol className="flex min-h-9 items-center gap-3 px-4 sm:px-0">
+              {DASHBOARD_SECTIONS.map((sec) => {
                 const isCurrent = sec.id === visibleSection;
                 return (
-                  <li key={sec.id} className="flex items-center">
+                  <li key={sec.id} className="flex shrink-0 items-center">
                     <button
                       type="button"
                       onClick={() => {
@@ -490,20 +490,16 @@ export default function Home() {
                           el.scrollIntoView({ behavior: "smooth", block: "start" });
                         }
                       }}
-                      className={`focus-ring flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors duration-150 ${
+                      className={`focus-ring relative flex min-h-9 items-center gap-1.5 whitespace-nowrap px-1 pb-2 pt-1 text-xs font-medium transition-colors duration-150 after:absolute after:bottom-0 after:left-1 after:right-1 after:h-0.5 after:rounded-full after:transition-colors after:duration-150 ${
                         isCurrent
-                          ? "bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30"
-                          : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                          ? "text-cyan-300 after:bg-cyan-300"
+                          : "text-slate-400 after:bg-transparent hover:text-slate-200"
                       }`}
                       aria-current={isCurrent ? "step" : undefined}
                     >
                       <span className="text-sm" aria-hidden="true">{sec.icon}</span>
-                      <span className="hidden sm:inline">{sec.label}</span>
-                      <span className="sm:hidden">{sec.shortLabel}</span>
+                      <span>{sec.label}</span>
                     </button>
-                    {idx < DASHBOARD_SECTIONS.length - 1 && (
-                      <div className="mx-0.5 h-px w-4 bg-white/10" aria-hidden="true" />
-                    )}
                   </li>
                 );
               })}

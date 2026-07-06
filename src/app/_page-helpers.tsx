@@ -10,8 +10,9 @@ export function PrintSnapshotButton() {
     <button
       type="button"
       onClick={() => window.print()}
-      className="focus-ring rounded-md p-1.5 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 active:scale-95 print:hidden"
+      className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-white/5 hover:text-slate-300 active:scale-95 print:hidden"
       aria-label="Print snapshot"
+      title="Print snapshot"
       data-testid="print-snapshot-button"
     >
       <svg
@@ -36,14 +37,14 @@ export function PrintSnapshotButton() {
 export function ModeToggle() {
   const { mode, setMode } = useModeContext();
   return (
-    <div className="inline-flex rounded-lg border border-white/10 text-xs" data-testid="mode-toggle">
+    <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5 text-xs" data-testid="mode-toggle">
       <button
         type="button"
         onClick={() => setMode("simple")}
-        className={`focus-ring rounded-l-lg px-2 py-1 font-medium transition-colors duration-150 ${
+        className={`focus-ring rounded-md px-2.5 py-1.5 font-medium transition-colors duration-150 ${
           mode === "simple"
-            ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-inset ring-emerald-500/30"
-            : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
+            ? "bg-white/10 text-white shadow-sm"
+            : "text-slate-400 hover:text-slate-200"
         }`}
         aria-pressed={mode === "simple"}
         data-testid="mode-toggle-simple"
@@ -53,10 +54,10 @@ export function ModeToggle() {
       <button
         type="button"
         onClick={() => setMode("advanced")}
-        className={`focus-ring rounded-r-lg px-2 py-1 font-medium transition-colors duration-150 ${
+        className={`focus-ring rounded-md px-2.5 py-1.5 font-medium transition-colors duration-150 ${
           mode === "advanced"
-            ? "bg-violet-500/15 text-violet-300 ring-1 ring-inset ring-violet-500/30"
-            : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
+            ? "bg-white/10 text-white shadow-sm"
+            : "text-slate-400 hover:text-slate-200"
         }`}
         aria-pressed={mode === "advanced"}
         data-testid="mode-toggle-advanced"
@@ -83,7 +84,7 @@ export function ResetButton() {
     <button
       type="button"
       onClick={handleReset}
-      className="focus-ring rounded-md p-1.5 text-slate-500 transition-colors duration-150 hover:bg-rose-500/10 hover:text-rose-400 active:scale-95 print:hidden"
+      className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-white/5 hover:text-rose-400 active:scale-95 print:hidden"
       aria-label="Reset all data"
       title="Reset all data"
       data-testid="reset-all-button"
@@ -107,24 +108,24 @@ export function AppHeader({
 }) {
   const inputsActive = activePhase === "inputs";
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-900/95 backdrop-blur-sm px-4 py-2 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-white/5 bg-slate-900/80 px-4 py-2 backdrop-blur sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 print:hidden">
-          <h1 className="text-sm font-bold text-white whitespace-nowrap">
-            <span className="hidden sm:inline">Financial Health</span>
-            <span className="sm:hidden">FH</span>
+        <div className="mb-2 flex items-center gap-2 print:hidden">
+          <h1 className="flex items-center gap-1.5 whitespace-nowrap text-base font-semibold text-white">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.65)]" aria-hidden="true" />
+            <span>Financial Health</span>
           </h1>
           {/* Inputs / Dashboard pill toggle */}
-          <div className="flex rounded-lg border border-white/10 text-xs">
+          <div className="ml-1 inline-flex rounded-lg border border-white/10 bg-white/5 p-0.5 text-xs">
             {inputsActive ? (
               <>
-                <span className="rounded-l-lg bg-violet-500/15 px-2 py-1 font-medium text-violet-300 ring-1 ring-inset ring-violet-500/30">
+                <span className="rounded-md bg-white/10 px-2.5 py-1.5 font-medium text-white shadow-sm">
                   <span className="hidden sm:inline">📝 </span>Inputs
                 </span>
                 <button
                   type="button"
                   onClick={onSwitchPhase}
-                  className="focus-ring rounded-r-lg px-2 py-1 font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10 hover:text-slate-200"
+                  className="focus-ring rounded-md px-2.5 py-1.5 font-medium text-slate-400 transition-colors duration-150 hover:text-slate-200"
                   data-testid="wizard-skip-to-dashboard"
                 >
                   <span className="hidden sm:inline">📊 </span>Dashboard
@@ -135,11 +136,11 @@ export function AppHeader({
                 <button
                   type="button"
                   onClick={onSwitchPhase}
-                  className="focus-ring rounded-l-lg px-2 py-1 font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10 hover:text-slate-200"
+                  className="focus-ring rounded-md px-2.5 py-1.5 font-medium text-slate-400 transition-colors duration-150 hover:text-slate-200"
                 >
                   <span className="hidden sm:inline">📝 </span>Inputs
                 </button>
-                <span className="rounded-r-lg bg-violet-500/15 px-2 py-1 font-medium text-violet-300 ring-1 ring-inset ring-violet-500/30">
+                <span className="rounded-md bg-white/10 px-2.5 py-1.5 font-medium text-white shadow-sm">
                   <span className="hidden sm:inline">📊 </span>Dashboard
                 </span>
               </>
@@ -149,30 +150,32 @@ export function AppHeader({
           <span className="flex-1" />
           <a
             href="/changelog"
-            className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+            className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+            aria-label="Changelog"
+            title="Changelog"
           >
-            <span className="hidden sm:inline">Changelog</span>
-            <span className="sm:hidden text-sm">📋</span>
+            <span className="text-sm" aria-hidden="true">📋</span>
           </a>
           <a
             href="https://ko-fi.com/R6R11VMSML"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-md px-1.5 py-1 text-xs text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+            className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+            aria-label="Tip"
+            title="Tip"
           >
-            <span className="hidden sm:inline">☕ Tip</span>
-            <span className="sm:hidden text-sm">☕</span>
+            <span className="text-sm" aria-hidden="true">☕</span>
           </a>
           <ResetButton />
-          <span className="hidden sm:flex sm:items-center sm:gap-1">
+          <span className="hidden items-center gap-1 sm:flex">
             <CopyLinkButton />
             <PrintSnapshotButton />
           </span>
         </div>
         {children && (
-          <div className="relative">
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-slate-900 to-transparent z-10 sm:hidden" />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-slate-900 to-transparent z-10 sm:hidden" />
+          <div className="relative -mx-4 sm:mx-0">
+            <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-6 bg-gradient-to-r from-slate-900/95 to-transparent sm:hidden" />
+            <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-6 bg-gradient-to-l from-slate-900/95 to-transparent sm:hidden" />
             {children}
           </div>
         )}
@@ -253,8 +256,9 @@ export function CopyLinkButton() {
   return (
     <button
       onClick={handleCopy}
-      className="focus-ring rounded-md p-1.5 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300 active:scale-95 print:hidden"
+      className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-white/5 hover:text-slate-300 active:scale-95 print:hidden"
       aria-label="Copy link to clipboard"
+      title="Copy link to clipboard"
     >
       {copied ? (
         <svg
