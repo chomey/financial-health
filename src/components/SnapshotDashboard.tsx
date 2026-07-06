@@ -192,10 +192,9 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
   }, [ctx, connections, targetId, metric.title, metric.value, metric.format, homeCurrency]);
 
   const valueColor = metric.positive
-    ? "text-emerald-400"
-    : metric.value < 0
-      ? "text-red-400"
-      : "text-slate-200";
+    ? "text-slate-100"
+    : "text-rose-300";
+  const secondaryValueColor = metric.positive ? "text-cyan-300" : "text-rose-300";
 
   const hasConnections = connections && connections.length > 0;
 
@@ -203,7 +202,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     <div
       ref={cardRef}
       id={`metric-${metric.title.toLowerCase().replace(/\s+/g, "-")}`}
-      className={`relative rounded-2xl border border-[var(--surface-border-strong)] bg-[var(--surface-3)] backdrop-blur-sm p-5 shadow-sm scroll-mt-24 ${
+      className={`relative flex h-full flex-col rounded-2xl border border-[var(--surface-border-strong)] bg-[var(--surface-3)] backdrop-blur-sm p-5 shadow-sm scroll-mt-24 ${
         hasConnections ? "cursor-pointer" : "cursor-default"
       }`}
       role="group"
@@ -213,29 +212,53 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
       tabIndex={0}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-3">
+        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-lg" aria-hidden="true">
+          {metric.icon}
+        </span>
+        <div className="flex min-w-0 items-center gap-1.5">
           <h3 className="text-xs font-medium uppercase tracking-wider text-slate-400">{metric.title}</h3>
           {metric.helpText && <HelpTip text={metric.helpText} />}
         </div>
-        <span className="text-base" aria-hidden="true">
-          {metric.icon}
-        </span>
       </div>
-      <p
-        className={`mt-1 text-3xl font-semibold tracking-tight tabular-nums md:text-4xl ${valueColor}`}
+      <div
+        className={`mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-3xl font-semibold tracking-tight tabular-nums md:text-4xl ${valueColor}`}
         aria-label={`${metric.title}: ${formatMetricValue(metric.value, metric.format, homeCurrency)}`}
       >
-        {formatMetricValue(animatedValue, metric.format, homeCurrency)}
-      </p>
-      {metric.valueWithEquity !== undefined && metric.valueWithEquity !== metric.value && (
-        <p className="mt-0.5 text-sm text-slate-400" data-testid="net-worth-with-equity">
-          ({formatMetricValue(metric.valueWithEquity, metric.format, homeCurrency)} with home equity)
-        </p>
-      )}
-      {metric.ratioWithoutMortgage !== undefined && metric.ratioWithoutMortgage !== metric.value && (
-        <p className="mt-0.5 text-sm text-slate-400" data-testid="ratio-without-mortgage">
-          ({formatMetricValue(metric.ratioWithoutMortgage, metric.format, homeCurrency)} without mortgage)
+        <span>{formatMetricValue(animatedValue, metric.format, homeCurrency)}</span>
+        {metric.valueWithEquity !== undefined && metric.valueWithEquity !== metric.value && (
+          <span className={`text-sm font-normal tracking-normal ${secondaryValueColor}`} data-testid="net-worth-with-equity">
+            ({formatMetricValue(metric.valueWithEquity, metric.format, homeCurrency)} with home equity)
+          </span>
+        )}
+        {metric.ratioWithoutMortgage !== undefined && metric.ratioWithoutMortgage !== metric.value && (
+          <span className={`text-sm font-normal tracking-normal ${secondaryValueColor}`} data-testid="ratio-without-mortgage">
+            ({formatMetricValue(metric.ratioWithoutMortgage, metric.format, homeCurrency)} without mortgage)
+          </span>
+        )}
+        {metric.runwayWithGrowth !== undefined && (
+          <span className={`text-sm font-normal tracking-normal ${secondaryValueColor}`} data-testid="runway-with-growth">
+            ({metric.runwayWithGrowth === Infinity ? "∞" : formatMetricValue(metric.runwayWithGrowth, "months", homeCurrency)} with investment growth)
+          </span>
+        )}
+        {metric.runwayAfterTax !== undefined && metric.runwayAfterTax !== metric.runwayWithGrowth && metric.runwayAfterTax !== metric.value && (
+          <span className="text-sm font-normal tracking-normal text-amber-300" data-testid="runway-after-tax">
+            ({formatMetricValue(metric.runwayAfterTax, "months", homeCurrency)} after withdrawal taxes)
+          </span>
+        )}
+        {metric.effectiveRate !== undefined && metric.effectiveRate > 0 && (
+          <span className={`text-sm font-normal tracking-normal ${secondaryValueColor}`} data-testid="effective-tax-rate">
+            {(metric.effectiveRate * 100).toFixed(1)}% effective rate
+          </span>
+        )}
+      </div>
+      {metric.breakdown && (
+        <p
+          className="mt-3 truncate font-mono text-xs text-slate-500"
+          data-testid={metric.format === "percent" ? "income-replacement-tier" : "metric-breakdown"}
+          title={metric.breakdown}
+        >
+          {metric.breakdown}
         </p>
       )}
       {metric.format === "percent" && (
@@ -247,28 +270,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
               aria-hidden="true"
             />
           </div>
-          {metric.breakdown && (
-            <p className="mt-1 text-sm font-medium text-slate-400" data-testid="income-replacement-tier">
-              {metric.breakdown}
-            </p>
-          )}
         </div>
-      )}
-      {metric.runwayWithGrowth !== undefined && (
-        <p className="mt-0.5 text-sm text-slate-400" data-testid="runway-with-growth">
-          ({metric.runwayWithGrowth === Infinity ? "∞" : formatMetricValue(metric.runwayWithGrowth, "months", homeCurrency)} with investment growth)
-        </p>
-      )}
-      {metric.runwayAfterTax !== undefined && metric.runwayAfterTax !== metric.runwayWithGrowth && metric.runwayAfterTax !== metric.value && (
-        <p className="mt-0.5 text-sm text-amber-400" data-testid="runway-after-tax">
-          ({formatMetricValue(metric.runwayAfterTax, "months", homeCurrency)} after withdrawal taxes)
-        </p>
-      )}
-      {/* Effective tax rate sub-line */}
-      {metric.effectiveRate !== undefined && metric.effectiveRate > 0 && (
-        <p className="mt-0.5 text-sm text-slate-400" data-testid="effective-tax-rate">
-          {(metric.effectiveRate * 100).toFixed(1)}% effective rate
-        </p>
       )}
       {/* Tax credits applied badge */}
       {metric.taxCreditsApplied && (
@@ -280,19 +282,14 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
       {insights.length > 0 && (
         <div className="mt-2 space-y-1">
           {insights.map((msg, i) => (
-            <p key={i} className="text-sm font-medium text-emerald-400">{msg}</p>
+            <p key={i} className={`border-l-2 pl-2 text-xs leading-relaxed text-slate-400 ${metric.positive ? "border-cyan-400/50" : "border-amber-400/50"}`}>{msg}</p>
           ))}
         </div>
       )}
-      {/* Breakdown — always visible. Hidden for percent format (shown in progress bar section). */}
-      {metric.breakdown && metric.format !== "percent" && (
-        <p className="mt-2 text-sm leading-relaxed text-slate-500" data-testid="metric-breakdown">
-          {metric.breakdown}
-        </p>
-      )}
-      <p className="mt-2 text-sm text-slate-500 leading-relaxed">
-        {metric.tooltip}
-      </p>
+      <div className="mt-3 space-y-1 text-xs leading-relaxed text-slate-500">
+        <p>{metric.tooltip}</p>
+        {metric.helpText && <p>{metric.helpText}</p>}
+      </div>
       {/* Accessibility: announce data sources to screen readers */}
       <span className="sr-only" aria-live="polite" data-testid="dataflow-aria-live">
         {ariaAnnouncement}
@@ -332,7 +329,7 @@ export default function SnapshotDashboard({ metrics, financialData, homeCurrency
 
   return (
     <div
-      className={`grid grid-cols-1 gap-3 sm:gap-4 ${mode === "simple" ? "sm:grid-cols-3" : "lg:grid-cols-2"}`}
+      className={`grid auto-rows-fr grid-cols-1 gap-3 sm:gap-4 ${mode === "simple" ? "sm:grid-cols-3" : "lg:grid-cols-2"}`}
       data-testid="snapshot-dashboard"
     >
       {displayMetrics.map((metric) => (

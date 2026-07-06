@@ -83,6 +83,8 @@ const colorPairs: {
 
   // Accent colors on dark background
   { name: "cyan-400 (#22d3ee) on background", fg: "#22d3ee", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
+  { name: "cyan-300 (#67e8f9) on background", fg: "#67e8f9", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
+  { name: "rose-300 (#fda4af) on background", fg: "#fda4af", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
   { name: "rose-400 (#fb7185) on background", fg: "#fb7185", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
   { name: "violet-400 (#a78bfa) on background", fg: "#a78bfa", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
   { name: "pink-400 (#f472b6) on background", fg: "#f472b6", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
@@ -94,6 +96,8 @@ const colorPairs: {
   { name: "foreground (#e2e8f0) on surface-2", fg: "#e2e8f0", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
   { name: "slate-300 (#cbd5e1) on surface-2", fg: "#cbd5e1", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
   { name: "cyan-400 (#22d3ee) on surface-2", fg: "#22d3ee", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
+  { name: "cyan-300 (#67e8f9) on surface-3", fg: "#67e8f9", bg: BG_SURFACE_3, minRatio: WCAG_AA_NORMAL },
+  { name: "rose-300 (#fda4af) on surface-3", fg: "#fda4af", bg: BG_SURFACE_3, minRatio: WCAG_AA_NORMAL },
   { name: "rose-400 (#fb7185) on surface-2", fg: "#fb7185", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
   { name: "violet-400 (#a78bfa) on surface-2", fg: "#a78bfa", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
   { name: "foreground (#e2e8f0) on surface-3", fg: "#e2e8f0", bg: BG_SURFACE_3, minRatio: WCAG_AA_NORMAL },

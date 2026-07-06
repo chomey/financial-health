@@ -30,17 +30,17 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
     expect(dashboardSrc).toContain("border-[var(--surface-border-strong)]");
   });
 
-  it("positive metric value uses emerald-400 instead of green-600", () => {
-    expect(dashboardSrc).toContain("text-emerald-400");
+  it("positive metric value uses slate-100 instead of green-600", () => {
+    expect(dashboardSrc).toContain("text-slate-100");
     expect(dashboardSrc).not.toContain("text-green-600");
   });
 
-  it("negative metric value uses red-400", () => {
-    expect(dashboardSrc).toContain("text-red-400");
+  it("negative metric value uses rose-300", () => {
+    expect(dashboardSrc).toContain("text-rose-300");
   });
 
-  it("neutral metric value uses slate-200 instead of stone-700", () => {
-    expect(dashboardSrc).toContain("text-slate-200");
+  it("neutral metric value uses slate-100 instead of stone-700", () => {
+    expect(dashboardSrc).toContain("text-slate-100");
     expect(dashboardSrc).not.toContain("text-stone-700");
   });
 
@@ -53,8 +53,22 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
     expect(dashboardSrc).toContain("text-xs font-medium uppercase tracking-wider text-slate-400");
   });
 
+  it("metric icons use consistent fixed chips", () => {
+    expect(dashboardSrc).toContain("flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-lg");
+  });
+
   it("metric values are dominant and use tabular numerals", () => {
     expect(dashboardSrc).toContain("text-3xl font-semibold tracking-tight tabular-nums md:text-4xl");
+  });
+
+  it("metric breakdowns are single-line muted monospace text", () => {
+    expect(dashboardSrc).toContain("truncate font-mono text-xs text-slate-500");
+    expect(dashboardSrc).toContain("title={metric.breakdown}");
+  });
+
+  it("metric cards and grid use equal-height rows", () => {
+    expect(dashboardSrc).toContain("flex h-full flex-col");
+    expect(dashboardSrc).toContain("grid auto-rows-fr grid-cols-1");
   });
 
   it("income replacement progress bar track uses dark slate-700", () => {
@@ -72,10 +86,10 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
     expect(dashboardSrc).not.toContain("animate-warning-pulse");
   });
 
-  it("insight text uses emerald-400 instead of green-600", () => {
-    // Insights below the metric value
-    const insightLine = dashboardSrc.match(/text-(?:xs|sm) font-medium text-(\w+-\d+)/g) ?? [];
-    expect(insightLine.some((cls) => cls.includes("emerald-400"))).toBe(true);
+  it("insight text uses a left accent border instead of full-width colored text", () => {
+    expect(dashboardSrc).toContain("border-l-2 pl-2 text-xs leading-relaxed text-slate-400");
+    expect(dashboardSrc).toContain("border-cyan-400/50");
+    expect(dashboardSrc).toContain("border-amber-400/50");
   });
 
   it("does not use any stone color classes (migrated to slate)", () => {
