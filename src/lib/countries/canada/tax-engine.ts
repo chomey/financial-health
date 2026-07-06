@@ -18,11 +18,7 @@ import type {
   TaxTreatment,
   WithdrawalTaxResult,
 } from "@/lib/withdrawal-tax";
-import {
-  CA_CAPITAL_GAINS,
-  calculateCanadianCapitalGainsInclusion,
-  getCanadianBrackets,
-} from "./tax-tables";
+import { CA_CAPITAL_GAINS, calculateCanadianCapitalGainsInclusion, getCanadianBrackets } from "./tax-tables";
 
 const TAX_FREE_KEYWORDS = ["tfsa", "fhsa", "tax-free", "tax free"];
 const TAX_DEFERRED_KEYWORDS = ["rrsp", "resp", "lira", "pension"];
@@ -64,11 +60,7 @@ function computeCanadianTax(
     getMarginalRate(taxableIncome, federal) + getMarginalRate(taxableIncome, provincial);
 
   if (type === "capital-gains") {
-    const inclusionRate =
-      annualIncome <= CA_CAPITAL_GAINS.firstTierLimit
-        ? CA_CAPITAL_GAINS.firstTierRate
-        : CA_CAPITAL_GAINS.secondTierRate;
-    marginalRate *= inclusionRate;
+    marginalRate *= CA_CAPITAL_GAINS.firstTierRate;
   }
 
   return {

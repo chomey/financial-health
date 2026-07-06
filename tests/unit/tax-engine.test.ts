@@ -66,9 +66,9 @@ describe("computeTax — Canadian employment income", () => {
     const result = computeTax(50_000, "employment", "CA", "ON", 2025);
     expectValidResult(result);
 
-    // Federal: $50,000 in first bracket (15%), BPA credit = $16,129 × 0.15
-    // Net federal ≈ $5,081
-    expect(federalAmount(result)).toBeCloseTo(5_081, -1);
+    // Federal: $50,000 in first bracket (14.5%), BPA credit = $16,129 × 0.145
+    // Net federal ≈ $4,911
+    expect(federalAmount(result)).toBeCloseTo(4_911, -1);
 
     // Provincial ON: $50,000 in first bracket (5.05%), BPA credit = $11,865 × 0.0505
     // Net provincial ≈ $1,926
@@ -82,8 +82,8 @@ describe("computeTax — Canadian employment income", () => {
     const result = computeTax(100_000, "employment", "CA", "ON", 2025);
     expectValidResult(result);
 
-    // Combined federal + ON ≈ $21,307
-    expect(result.totalTax).toBeCloseTo(21_307, -2);
+    // Combined federal + ON ≈ $21,101
+    expect(result.totalTax).toBeCloseTo(21_101, -2);
     expect(result.afterTaxIncome).toBeCloseTo(100_000 - result.totalTax, 2);
   });
 
@@ -91,8 +91,8 @@ describe("computeTax — Canadian employment income", () => {
     const result = computeTax(100_000, "employment", "CA", "AB", 2025);
     expectValidResult(result);
 
-    // Federal ≈ $14,925
-    expect(federalAmount(result)).toBeCloseTo(14_925, -1);
+    // Federal ≈ $14,719
+    expect(federalAmount(result)).toBeCloseTo(14_719, -1);
 
     // AB: $100,000 in first bracket (10%), BPA credit = $21,003 × 0.10
     // Gross = $10,000, credit = $2,100.30, net ≈ $7,900
@@ -154,13 +154,13 @@ describe("computeTax — Canadian capital gains", () => {
     expect(gains.totalTax).toBeCloseTo(taxOn50k.totalTax, 0);
   });
 
-  it("applies higher inclusion rate above $250,000", () => {
+  it("applies 50% inclusion rate above $250,000", () => {
     const result = computeTax(400_000, "capital-gains", "CA", "ON");
     expectValidResult(result);
 
-    // Taxable = $250k × 50% + $150k × 66.67% = $125k + $100k = $225k
-    const taxOn225k = computeTax(225_000, "employment", "CA", "ON");
-    expect(result.totalTax).toBeCloseTo(taxOn225k.totalTax, 0);
+    // Taxable = $400k × 50% = $200k
+    const taxOn200k = computeTax(200_000, "employment", "CA", "ON");
+    expect(result.totalTax).toBeCloseTo(taxOn200k.totalTax, 0);
   });
 
   it("has lower effective rate than employment income", () => {
@@ -190,11 +190,11 @@ describe("computeTax — US employment income", () => {
     const result = computeTax(50_000, "employment", "US", "CA", 2025);
     expectValidResult(result);
 
-    // Federal: $50k - $15k deduction = $35k taxable
+    // Federal: $50k - $15,750 deduction = $34,250 taxable
     // Bracket 1: $11,925 × 10% = $1,192.50
-    // Bracket 2: ($35,000 - $11,925) × 12% = $23,075 × 0.12 = $2,769
-    // Federal ≈ $3,962
-    expect(federalAmount(result)).toBeCloseTo(3_962, -1);
+    // Bracket 2: ($34,250 - $11,925) × 12% = $22,325 × 0.12 = $2,679
+    // Federal ≈ $3,872
+    expect(federalAmount(result)).toBeCloseTo(3_872, -1);
 
     // CA state tax on $50k (no standard deduction in our tables):
     // Applied at graduated rates
@@ -205,7 +205,7 @@ describe("computeTax — US employment income", () => {
     const result = computeTax(100_000, "employment", "US", "NY");
     expectValidResult(result);
 
-    // Federal: $100k - $15k = $85k taxable
+    // Federal: $100k - $15,750 = $84,250 taxable
     // Should be less than calculateProgressiveTax($100k) since deduction is applied
     expect(federalAmount(result)).toBeGreaterThan(10_000);
     expect(federalAmount(result)).toBeLessThan(16_000);
@@ -228,8 +228,8 @@ describe("computeTax — US employment income", () => {
   });
 
   it("returns zero federal tax for income at or below standard deduction", () => {
-    const result = computeTax(15_000, "employment", "US", "TX");
-    // $15k - $15k deduction = $0 taxable → $0 federal tax
+    const result = computeTax(15_750, "employment", "US", "TX");
+    // $15,750 - $15,750 deduction = $0 taxable → $0 federal tax
     expect(federalAmount(result)).toBe(0);
   });
 
@@ -261,10 +261,10 @@ describe("computeTax — US employment income", () => {
     // not as a credit. So $50k income should have lower federal tax than
     // calculateProgressiveTax($50k, US_FEDERAL) which uses credit approach.
     const result = computeTax(50_000, "employment", "US", "TX", 2025);
-    // Taxable = $50k - $15k = $35k
-    // Tax on $35k: $11,925 × 10% + ($35k - $11,925) × 12%
-    // = $1,192.50 + $2,769 = $3,961.50
-    expect(federalAmount(result)).toBeCloseTo(3_961.50, 0);
+    // Taxable = $50k - $15,750 = $34,250
+    // Tax on $34,250: $11,925 × 10% + ($34,250 - $11,925) × 12%
+    // = $1,192.50 + $2,679 = $3,871.50
+    expect(federalAmount(result)).toBeCloseTo(3_871.50, 0);
   });
 });
 
