@@ -9,13 +9,13 @@
  */
 
 import type { BracketTable } from "@/lib/bracket-math";
-import { SUPPORTED_TAX_YEARS } from "@/lib/countries/canada/tax-tables";
+import { clampTaxYear } from "@/lib/countries/canada/tax-tables";
 
 // ─── US Federal ──────────────────────────────────────────────────────────────
 
 /**
  * 2025 US Federal Tax Brackets (Single Filer).
- * Note: basicPersonalAmount stores the standard deduction for US ($15,000 for single filers).
+ * Note: basicPersonalAmount stores the standard deduction for US ($15,750 for single filers).
  * Unlike Canadian BPA (applied as a credit), the US standard deduction is subtracted from
  * gross income before applying brackets. The tax engine (computeTax) handles this distinction.
  */
@@ -29,24 +29,24 @@ export const US_FEDERAL_2025: BracketTable = {
     { min: 250_525, max: 626_350, rate: 0.35 },
     { min: 626_350, max: Infinity, rate: 0.37 },
   ],
-  basicPersonalAmount: 15_000,
+  basicPersonalAmount: 15_750,
 };
 
 /**
- * 2026 US Federal Tax Brackets (Single Filer, estimated ~2.8% inflation adjustment).
- * These will be validated/corrected in Task 155 when official IRS values are published.
+ * 2026 US Federal Tax Brackets (Single Filer).
+ * Official values per IRS Rev. Proc. 2025-32.
  */
 export const US_FEDERAL_2026: BracketTable = {
   brackets: [
-    { min: 0, max: 12_259, rate: 0.10 },
-    { min: 12_259, max: 49_832, rate: 0.12 },
-    { min: 49_832, max: 106_244, rate: 0.22 },
-    { min: 106_244, max: 202_824, rate: 0.24 },
-    { min: 202_824, max: 257_540, rate: 0.32 },
-    { min: 257_540, max: 643_888, rate: 0.35 },
-    { min: 643_888, max: Infinity, rate: 0.37 },
+    { min: 0, max: 12_400, rate: 0.10 },
+    { min: 12_400, max: 50_400, rate: 0.12 },
+    { min: 50_400, max: 105_700, rate: 0.22 },
+    { min: 105_700, max: 201_775, rate: 0.24 },
+    { min: 201_775, max: 256_225, rate: 0.32 },
+    { min: 256_225, max: 640_600, rate: 0.35 },
+    { min: 640_600, max: Infinity, rate: 0.37 },
   ],
-  basicPersonalAmount: 15_420,
+  basicPersonalAmount: 16_100,
 };
 
 // ─── US Capital Gains ─────────────────────────────────────────────────────────
@@ -68,13 +68,14 @@ export const US_CAPITAL_GAINS_2025: BracketTable = {
 };
 
 /**
- * 2026 US Long-Term Capital Gains Tax Brackets (Single Filer, estimated).
+ * 2026 US Long-Term Capital Gains Tax Brackets (Single Filer).
+ * Official values per IRS Rev. Proc. 2025-32.
  */
 export const US_CAPITAL_GAINS_2026: BracketTable = {
   brackets: [
-    { min: 0, max: 49_703, rate: 0.00 },
-    { min: 49_703, max: 548_334, rate: 0.15 },
-    { min: 548_334, max: Infinity, rate: 0.20 },
+    { min: 0, max: 49_450, rate: 0.00 },
+    { min: 49_450, max: 545_500, rate: 0.15 },
+    { min: 545_500, max: Infinity, rate: 0.20 },
   ],
   basicPersonalAmount: 0,
 };
@@ -673,19 +674,17 @@ const US_STATE_BY_YEAR: Record<number, Record<string, BracketTable>> = {
  * @param state - Two-letter state code (e.g., "CA", "NY", "TX") or "DC"
  * @param year - Tax year (2025 or 2026; defaults to 2025)
  * @returns Federal and state bracket tables. States with no income tax return empty bracket arrays.
- * @throws If the state code is not recognized or year is unsupported
+ * @throws If the state code is not recognized
  */
 export function getUSBrackets(
   state: string,
   year: number = 2025
 ): { federal: BracketTable; state: BracketTable } {
-  const federal = US_FEDERAL_BY_YEAR[year];
-  if (!federal) {
-    throw new Error(`Tax year ${year} is not supported. Supported years: ${SUPPORTED_TAX_YEARS.join(", ")}`);
-  }
+  const taxYear = clampTaxYear(year);
+  const federal = US_FEDERAL_BY_YEAR[taxYear];
 
   const code = state.toUpperCase();
-  const stateTables = US_STATE_BY_YEAR[year] ?? US_PROVINCIAL_2025;
+  const stateTables = US_STATE_BY_YEAR[taxYear];
   const stateTable = stateTables[code];
   if (stateTable === undefined) {
     throw new Error(
@@ -701,5 +700,5 @@ export function getUSBrackets(
  * Get US long-term capital gains bracket table for a given tax year.
  */
 export function getUSCapitalGainsBrackets(year: number = 2025): BracketTable {
-  return US_CAPITAL_GAINS_BY_YEAR[year] ?? US_CAPITAL_GAINS_2025;
+  return US_CAPITAL_GAINS_BY_YEAR[clampTaxYear(year)];
 }

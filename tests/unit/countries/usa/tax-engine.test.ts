@@ -203,10 +203,14 @@ describe("americanTaxEngine.getEarlyWithdrawalPenalties", () => {
     expect(penalties[0].penaltyPercent).toBe(10);
   });
 
-  it("flags 457 under 59.5", () => {
+  it("reports no 10% penalty for 457 under 59.5", () => {
     const penalties = americanTaxEngine.getEarlyWithdrawalPenalties(["457"], 40);
     expect(penalties).toHaveLength(1);
-    expect(penalties[0].penaltyPercent).toBe(10);
+    expect(penalties[0].category).toBe("457");
+    expect(penalties[0].penaltyFreeAge).toBe(59.5);
+    expect(penalties[0].penaltyPercent).toBe(0);
+    expect(penalties[0].rule).toMatch(/No 10% early-withdrawal penalty/);
+    expect(penalties[0].rule).toMatch(/ordinary income/);
   });
 
   it("does NOT flag a plain 401k as a Roth (roth excluded from 401k-penalty arm)", () => {

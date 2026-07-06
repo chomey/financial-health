@@ -25,15 +25,22 @@ describe("Task 155 — US tax credit/bracket validation (2025/2026)", () => {
       expect(b[6]).toEqual({ min: 626_350, max: Infinity, rate: 0.37 });
     });
 
-    it("has correct 2025 standard deduction ($15,000 single)", () => {
-      expect(US_FEDERAL_2025.basicPersonalAmount).toBe(15_000);
+    it("has correct 2025 standard deduction ($15,750 single)", () => {
+      expect(US_FEDERAL_2025.basicPersonalAmount).toBe(15_750);
     });
   });
 
   describe("US federal brackets 2026", () => {
-    it("2026 brackets are inflation-indexed from 2025 (~2.8%)", () => {
-      expect(US_FEDERAL_2026.brackets[0].max).toBe(12_259);
-      expect(US_FEDERAL_2026.basicPersonalAmount).toBe(15_420);
+    it("has official 2026 bracket thresholds (Single)", () => {
+      const b = US_FEDERAL_2026.brackets;
+      expect(b[0]).toEqual({ min: 0, max: 12_400, rate: 0.10 });
+      expect(b[1]).toEqual({ min: 12_400, max: 50_400, rate: 0.12 });
+      expect(b[2]).toEqual({ min: 50_400, max: 105_700, rate: 0.22 });
+      expect(b[3]).toEqual({ min: 105_700, max: 201_775, rate: 0.24 });
+      expect(b[4]).toEqual({ min: 201_775, max: 256_225, rate: 0.32 });
+      expect(b[5]).toEqual({ min: 256_225, max: 640_600, rate: 0.35 });
+      expect(b[6]).toEqual({ min: 640_600, max: Infinity, rate: 0.37 });
+      expect(US_FEDERAL_2026.basicPersonalAmount).toBe(16_100);
     });
   });
 
@@ -45,23 +52,23 @@ describe("Task 155 — US tax credit/bracket validation (2025/2026)", () => {
       expect(b[2]).toEqual({ min: 533_400, max: Infinity, rate: 0.20 });
     });
 
-    it("2026: inflation-indexed thresholds", () => {
+    it("2026: official thresholds", () => {
       const b = US_CAPITAL_GAINS_2026.brackets;
-      expect(b[0]).toEqual({ min: 0, max: 49_703, rate: 0.00 });
-      expect(b[1]).toEqual({ min: 49_703, max: 548_334, rate: 0.15 });
-      expect(b[2]).toEqual({ min: 548_334, max: Infinity, rate: 0.20 });
+      expect(b[0]).toEqual({ min: 0, max: 49_450, rate: 0.00 });
+      expect(b[1]).toEqual({ min: 49_450, max: 545_500, rate: 0.15 });
+      expect(b[2]).toEqual({ min: 545_500, max: Infinity, rate: 0.20 });
     });
   });
 
   describe("getUSBrackets returns year-appropriate tables", () => {
     it("returns 2025 tables by default", () => {
       const { federal } = getUSBrackets("CA");
-      expect(federal.basicPersonalAmount).toBe(15_000);
+      expect(federal.basicPersonalAmount).toBe(15_750);
     });
 
     it("returns 2026 tables when requested", () => {
       const { federal } = getUSBrackets("CA", 2026);
-      expect(federal.basicPersonalAmount).toBe(15_420);
+      expect(federal.basicPersonalAmount).toBe(16_100);
     });
   });
 
