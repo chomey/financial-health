@@ -52,7 +52,7 @@ export interface BracketSegmentResult {
 }
 
 export interface TaxEngine {
-  computeTax(annualIncome: number, type: IncomeType, jurisdiction: string, year: number): TaxResult;
+  computeTax(annualIncome: number, type: IncomeType, jurisdiction: string, year: number, ordinaryIncomeContext?: number): TaxResult;
   getMarginalRate(annualIncome: number, jurisdiction: string, year: number): number;
   classifyTaxTreatment(category: string): TaxTreatment;
   getWithdrawalTaxRate(args: WithdrawalTaxArgs): WithdrawalTaxResult;

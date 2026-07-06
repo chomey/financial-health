@@ -63,7 +63,8 @@ function computeAmericanTax(
   annualIncome: number,
   type: IncomeType,
   state: string,
-  year: number
+  year: number,
+  ordinaryIncomeContext: number = 0
 ): TaxResult {
   if (annualIncome <= 0) {
     return {
@@ -82,8 +83,16 @@ function computeAmericanTax(
 
   if (type === "capital-gains") {
     const capGainsBrackets = getUSCapitalGainsBrackets(year);
-    federalTax = calculateProgressiveTax(annualIncome, capGainsBrackets);
-    federalMarginal = getMarginalRate(annualIncome, capGainsBrackets);
+    const ordinaryTaxableIncome = Math.max(0, ordinaryIncomeContext - federal.basicPersonalAmount);
+    if (ordinaryTaxableIncome > 0) {
+      federalTax =
+        calculateProgressiveTax(ordinaryTaxableIncome + annualIncome, capGainsBrackets) -
+        calculateProgressiveTax(ordinaryTaxableIncome, capGainsBrackets);
+      federalMarginal = getMarginalRate(ordinaryTaxableIncome + annualIncome, capGainsBrackets);
+    } else {
+      federalTax = calculateProgressiveTax(annualIncome, capGainsBrackets);
+      federalMarginal = getMarginalRate(annualIncome, capGainsBrackets);
+    }
   } else {
     federalTax = calculateUSFederalTax(annualIncome, federal);
     federalMarginal = getUSFederalMarginalRate(annualIncome, federal);
@@ -182,8 +191,19 @@ function getAmericanEarlyWithdrawalPenalties(
   for (const cat of categories) {
     const lower = cat.toLowerCase();
 
+    if (lower.includes("457")) {
+      penalties.push({
+        category: cat,
+        penaltyPercent: 0,
+        penaltyFreeAge: 59.5,
+        rule:
+          "No 10% early-withdrawal penalty — 457(b) withdrawals after leaving your employer are taxed as ordinary income only.",
+      });
+      continue;
+    }
+
     if (
-      (lower.includes("401k") || lower.includes("ira") || lower.includes("403b") || lower.includes("457")) &&
+      (lower.includes("401k") || lower.includes("ira") || lower.includes("403b")) &&
       !lower.includes("roth")
     ) {
       penalties.push({
