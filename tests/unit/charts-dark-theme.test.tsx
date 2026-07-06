@@ -104,13 +104,13 @@ describe("ExpenseBreakdownChart dark theme", () => {
     expect(spendingPower.className).toContain("bg-[var(--surface-1)]");
   });
 
-  it("legend entries use slate-300 text (not stone)", () => {
+  it("legend entries use slate-400 text (not stone)", () => {
     const { container } = render(
       <ExpenseBreakdownChart
         expenses={[{ id: "1", category: "Rent", amount: 2000 }]}
       />
     );
-    const legendText = container.querySelector('[class*="text-slate-300"]');
+    const legendText = container.querySelector('[class*="text-slate-400"]');
     expect(legendText).toBeTruthy();
   });
 });

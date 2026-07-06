@@ -13,18 +13,7 @@ import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
-
-// High-contrast color palette — each color is visually distinct
-const COLORS = [
-  "#059669", // emerald-600 (retirement)
-  "#2563eb", // blue-600 (savings)
-  "#d97706", // amber-600 (brokerage)
-  "#7c3aed", // violet-600 (stocks)
-  "#dc2626", // red-600 (property)
-  "#0891b2", // cyan-600 (vehicle/other)
-  "#db2777", // pink-600
-  "#65a30d", // lime-600
-];
+import { CHART_SERIES } from "@/lib/chart-theme";
 
 export type AllocationView = "category" | "liquidity";
 
@@ -149,10 +138,10 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
   return (
-    <div className="rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-md">
-      <p className="text-sm font-medium text-stone-800">{item.name}</p>
-      <p className="text-sm text-stone-600">{fmt.full(item.value)}</p>
-      <p className="text-xs text-stone-400">{item.percentage.toFixed(1)}%</p>
+    <div className="rounded-lg border border-white/10 bg-slate-800 px-3 py-2 text-xs text-slate-200 shadow-md">
+      <p className="text-sm font-medium text-slate-200">{item.name}</p>
+      <p className="text-sm text-slate-300">{fmt.full(item.value)}</p>
+      <p className="text-xs text-slate-400">{item.percentage.toFixed(1)}%</p>
     </div>
   );
 }
@@ -181,10 +170,10 @@ export default function AssetAllocationChart({
   if (data.length === 0) {
     return (
       <div
-        className="rounded-xl border border-stone-200 bg-white p-5 text-center"
+        className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 text-center"
         data-testid="allocation-chart"
       >
-        <p className="text-sm text-stone-400">
+        <p className="text-sm text-slate-400">
           Add assets to see your allocation breakdown
         </p>
       </div>
@@ -193,18 +182,18 @@ export default function AssetAllocationChart({
 
   return (
     <div
-      className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm"
+      className="rounded-xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 shadow-sm"
       data-testid="allocation-chart"
     >
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-stone-500">Asset Allocation</h3>
-        <div className="flex rounded-lg border border-stone-200 text-xs">
+        <h3 className="text-sm font-medium text-slate-400">Asset Allocation</h3>
+        <div className="flex rounded-lg border border-white/10 text-xs">
           <button
             onClick={() => setView("category")}
             className={`px-2.5 py-1 rounded-l-lg transition-colors duration-150 ${
               view === "category"
-                ? "bg-emerald-50 text-emerald-700 font-medium"
-                : "text-stone-500 hover:bg-stone-50"
+                ? "bg-cyan-400/20 text-cyan-300 font-medium"
+                : "text-slate-400 hover:bg-white/5"
             }`}
             aria-pressed={view === "category"}
           >
@@ -214,8 +203,8 @@ export default function AssetAllocationChart({
             onClick={() => setView("liquidity")}
             className={`px-2.5 py-1 rounded-r-lg transition-colors duration-150 ${
               view === "liquidity"
-                ? "bg-emerald-50 text-emerald-700 font-medium"
-                : "text-stone-500 hover:bg-stone-50"
+                ? "bg-cyan-400/20 text-cyan-300 font-medium"
+                : "text-slate-400 hover:bg-white/5"
             }`}
             aria-pressed={view === "liquidity"}
           >
@@ -242,8 +231,8 @@ export default function AssetAllocationChart({
               {data.map((_, index) => (
                 <Cell
                   key={index}
-                  fill={COLORS[index % COLORS.length]}
-                  stroke="white"
+                  fill={CHART_SERIES[index % CHART_SERIES.length]}
+                  stroke="#0f172a"
                   strokeWidth={2}
                   className="transition-opacity duration-150 hover:opacity-80 cursor-pointer"
                 />
@@ -263,16 +252,16 @@ export default function AssetAllocationChart({
           >
             <div className="flex items-center gap-1.5">
               <span
-                className="inline-block h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                className="inline-block h-2 w-2 rounded-full"
+                style={{ backgroundColor: CHART_SERIES[i % CHART_SERIES.length] }}
               />
-              <span className="text-stone-600">{slice.name}</span>
+              <span className="text-xs text-slate-400">{slice.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-stone-800 font-medium">
+              <span className="font-medium text-slate-100">
                 {fmt.full(slice.value)}
               </span>
-              <span className="text-stone-400 w-10 text-right">
+              <span className="w-10 text-right text-slate-500">
                 {slice.percentage.toFixed(1)}%
               </span>
             </div>

@@ -15,20 +15,7 @@ import type { ExpenseItem } from "@/components/ExpenseEntry";
 import { normalizeExpenseToMonthly } from "@/components/ExpenseEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
 import HelpTip from "@/components/HelpTip";
-
-// Vivid, saturated cyberpunk colors for expense categories
-const COLORS = [
-  "#f59e0b", // amber-400
-  "#f87171", // red-400
-  "#34d399", // emerald-400
-  "#60a5fa", // blue-400
-  "#a78bfa", // violet-400
-  "#22d3ee", // cyan-400
-  "#2dd4bf", // teal-400
-  "#818cf8", // indigo-400
-  "#f472b6", // pink-400
-  "#facc15", // yellow-400
-];
+import { CHART_AXIS_TICK, CHART_SEMANTIC, CHART_SERIES } from "@/lib/chart-theme";
 
 export interface ExpenseSlice {
   name: string;
@@ -187,7 +174,14 @@ export default function ExpenseBreakdownChart({
   // Build horizontal bar data — each slice is one bar entry
   const barData = data.map((slice, i) => ({
     ...slice,
-    fill: COLORS[i % COLORS.length],
+    fill:
+      slice.name === "Taxes"
+        ? CHART_SEMANTIC.taxes
+        : slice.name === "Investment Contributions"
+        ? CHART_SEMANTIC.investments
+        : slice.name === "Mortgage Payments"
+        ? CHART_SEMANTIC.debt
+        : CHART_SERIES[i % CHART_SERIES.length],
   }));
 
   return (
@@ -214,13 +208,13 @@ export default function ExpenseBreakdownChart({
               style={{
                 width: `${Math.min((totalExpenses / incomeForComparison) * 100, 100)}%`,
                 backgroundColor:
-                  totalExpenses > incomeForComparison ? "#f87171" : "#34d399",
+                  totalExpenses > incomeForComparison ? CHART_SEMANTIC.expenses : CHART_SEMANTIC.surplus,
               }}
             />
             {/* Show surplus gap annotation if income > expenses */}
             {incomeForComparison > totalExpenses && (
               <div
-                className="absolute inset-y-0 rounded-r-full bg-emerald-400/10 border-l-2 border-dashed border-emerald-400/50"
+                className="absolute inset-y-0 rounded-r-full border-l-2 border-dashed border-cyan-300/50 bg-cyan-300/10"
                 style={{
                   left: `${(totalExpenses / incomeForComparison) * 100}%`,
                   width: `${((incomeForComparison - totalExpenses) / incomeForComparison) * 100}%`,
@@ -229,7 +223,7 @@ export default function ExpenseBreakdownChart({
             )}
           </div>
           {incomeForComparison > totalExpenses ? (
-            <p className="mt-1 text-xs text-emerald-400">
+            <p className="mt-1 text-xs text-cyan-300">
               {fmt.compact(incomeForComparison - totalExpenses)}/mo surplus
             </p>
           ) : incomeForComparison < totalExpenses ? (
@@ -250,7 +244,7 @@ export default function ExpenseBreakdownChart({
           {manualExpenses > 0 && manualExpenses < spendingPower && (
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-500">Discretionary remaining</span>
-              <span className="text-xs font-medium text-emerald-400">{fmt.compact(spendingPower - manualExpenses)}/mo</span>
+              <span className="text-xs font-medium text-cyan-300">{fmt.compact(spendingPower - manualExpenses)}/mo</span>
             </div>
           )}
           <div className="flex items-center justify-between border-t border-white/5 pt-1.5">
@@ -285,7 +279,7 @@ export default function ExpenseBreakdownChart({
               type="category"
               dataKey="name"
               width={120}
-              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tick={CHART_AXIS_TICK}
               axisLine={false}
               tickLine={false}
             />
@@ -296,7 +290,7 @@ export default function ExpenseBreakdownChart({
             {incomeForComparison > 0 && (
               <ReferenceLine
                 x={incomeForComparison}
-                stroke="#34d399"
+                stroke={CHART_SEMANTIC.surplus}
                 strokeDasharray="4 4"
                 strokeWidth={1}
               />
@@ -328,10 +322,10 @@ export default function ExpenseBreakdownChart({
           >
             <div className="flex items-center gap-1.5">
               <span
-                className="inline-block h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                className="inline-block h-2 w-2 rounded-full"
+                style={{ backgroundColor: barData[i].fill }}
               />
-              <span className="text-slate-300">{slice.name}</span>
+              <span className="text-xs text-slate-400">{slice.name}</span>
               {slice.isAuto && (
                 <span className="inline-flex items-center rounded-full bg-slate-700/40 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
                   auto

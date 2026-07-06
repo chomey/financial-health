@@ -17,6 +17,7 @@ import type { Property } from "@/components/PropertyEntry";
 import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { formatCurrencyCompact } from "@/lib/currency";
+import { CHART_AXIS_TICK, CHART_SEMANTIC } from "@/lib/chart-theme";
 
 export interface WaterfallSegment {
   name: string;
@@ -27,10 +28,10 @@ export interface WaterfallSegment {
   type: "asset" | "debt" | "total";
 }
 
-const ASSET_COLOR = "#34d399"; // emerald-400
-const DEBT_COLOR = "#f87171"; // red-400
-const TOTAL_COLOR = "#22d3ee"; // cyan-400
-const TOTAL_NEGATIVE_COLOR = "#f87171"; // red-400 for negative net worth
+const ASSET_COLOR = CHART_SEMANTIC.assets;
+const DEBT_COLOR = CHART_SEMANTIC.debt;
+const TOTAL_COLOR = CHART_SEMANTIC.surplus;
+const TOTAL_NEGATIVE_COLOR = CHART_SEMANTIC.debt;
 
 export function computeWaterfallData(
   assets: Asset[],
@@ -151,12 +152,12 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
       <p
         className={`text-sm font-medium tabular-nums ${
           segment.type === "debt"
-            ? "text-red-400"
+            ? "text-rose-400"
             : segment.type === "total"
             ? segment.value >= 0
               ? "text-cyan-400"
-              : "text-red-400"
-            : "text-emerald-400"
+              : "text-rose-400"
+            : "text-cyan-400"
         }`}
       >
         {segment.type === "debt" ? "-" : ""}
@@ -227,7 +228,7 @@ export default function NetWorthWaterfallChart({
               tickFormatter={(v: number) => formatCurrency(v)}
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tick={CHART_AXIS_TICK}
             />
             <YAxis
               type="category"
@@ -235,7 +236,7 @@ export default function NetWorthWaterfallChart({
               width={100}
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tick={CHART_AXIS_TICK}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
             <ReferenceLine x={0} stroke="rgba(255,255,255,0.15)" strokeWidth={1} />
@@ -264,15 +265,15 @@ export default function NetWorthWaterfallChart({
       {/* Compact legend */}
       <div className="mt-3 flex items-center justify-center gap-4 text-xs text-slate-400">
         <div className="flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: ASSET_COLOR }} />
+          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: ASSET_COLOR }} />
           <span>Assets</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: DEBT_COLOR }} />
+          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: DEBT_COLOR }} />
           <span>Debts</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: TOTAL_COLOR }} />
+          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: TOTAL_COLOR }} />
           <span>Net Worth</span>
         </div>
       </div>

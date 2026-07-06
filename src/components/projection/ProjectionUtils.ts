@@ -2,6 +2,7 @@ import type { Scenario } from "@/lib/projections";
 import type { FinancialState } from "@/lib/financial-state";
 import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
 import type { OutlookYears } from "@/lib/url-state";
+import { CHART_SERIES } from "@/lib/chart-theme";
 
 export type ChartMode = "keep-earning" | "income-stops";
 
@@ -32,9 +33,9 @@ export const SCENARIO_LABELS: Record<Scenario, string> = {
 };
 
 export const SCENARIO_COLORS: Record<Scenario, string> = {
-  conservative: "#f59e0b", // amber-400
-  moderate: "#34d399",    // emerald-400
-  optimistic: "#60a5fa",  // blue-400
+  conservative: CHART_SERIES[3],
+  moderate: CHART_SERIES[0],
+  optimistic: CHART_SERIES[1],
 };
 
 export const SCENARIO_DESCRIPTIONS: Record<Scenario, string> = {

@@ -8,13 +8,13 @@ import {
 } from "d3-sankey";
 import {
   buildSankeyData,
-  SANKEY_COLORS,
   type SankeyNode,
   type SankeyLink,
   type CashFlowInput,
 } from "@/lib/sankey-data";
 import { useCurrency } from "@/lib/CurrencyContext";
 import HelpTip from "@/components/HelpTip";
+import { CHART_SEMANTIC, CHART_SERIES } from "@/lib/chart-theme";
 
 interface D3SankeyNode extends SankeyNode {
   x0?: number;
@@ -37,6 +37,21 @@ interface D3SankeyLink {
 const CHART_WIDTH = 700;
 const CHART_HEIGHT = 400;
 const CHART_PADDING = { top: 10, right: 120, bottom: 10, left: 90 };
+
+const SANKEY_THEME_COLORS: Record<string, string> = {
+  income: CHART_SEMANTIC.income,
+  "investment-income": CHART_SEMANTIC.investments,
+  tax: CHART_SEMANTIC.taxes,
+  pool: CHART_SEMANTIC.investments,
+  expense: CHART_SEMANTIC.expenses,
+  investment: CHART_SEMANTIC.investments,
+  debt: CHART_SEMANTIC.debt,
+  surplus: CHART_SEMANTIC.surplus,
+};
+
+function getSankeyColor(type: string): string {
+  return SANKEY_THEME_COLORS[type] ?? CHART_SERIES[5];
+}
 
 interface CashFlowSankeyProps {
   income: CashFlowInput["income"];
@@ -70,16 +85,16 @@ function CashFlowTable({
     .map((n) => ({ label: n.label, value: n.value ?? 0 }))
     .filter((r) => r.value > 0);
   if (incomeRows.length > 0) {
-    sections.push({ title: "Income", color: SANKEY_COLORS.income, rows: incomeRows });
+    sections.push({ title: "Income", color: getSankeyColor("income"), rows: incomeRows });
   }
 
   // Outflows: group by target type from the pool
   const outflowTypes: { title: string; type: string; color: string }[] = [
-    { title: "Expenses", type: "expense", color: SANKEY_COLORS.expense },
-    { title: "Investments", type: "investment", color: SANKEY_COLORS.investment },
-    { title: "Debt & Mortgage", type: "debt", color: SANKEY_COLORS.debt },
-    { title: "Taxes", type: "tax", color: SANKEY_COLORS.tax },
-    { title: "Surplus", type: "surplus", color: SANKEY_COLORS.surplus },
+    { title: "Expenses", type: "expense", color: getSankeyColor("expense") },
+    { title: "Investments", type: "investment", color: getSankeyColor("investment") },
+    { title: "Debt & Mortgage", type: "debt", color: getSankeyColor("debt") },
+    { title: "Taxes", type: "tax", color: getSankeyColor("tax") },
+    { title: "Surplus", type: "surplus", color: getSankeyColor("surplus") },
   ];
 
   for (const { title, type, color } of outflowTypes) {
@@ -295,32 +310,20 @@ export default function CashFlowSankey({
                 {layout.links.map((link, i) => {
                   const sourceNode = link.source as D3SankeyNode;
                   const targetNode = link.target as D3SankeyNode;
-                  const sourceColor = SANKEY_COLORS[sourceNode.type] ?? "#94a3b8";
-                  const targetColor = SANKEY_COLORS[targetNode.type] ?? "#94a3b8";
+                  const targetColor = getSankeyColor(targetNode.type);
                   const isHighlighted =
                     hoveredLink === i ||
                     hoveredNode === sourceNode.id ||
                     hoveredNode === targetNode.id;
                   const isOther = hoveredLink !== null || hoveredNode !== null;
-                  const opacity = isHighlighted ? 0.6 : isOther ? 0.1 : 0.3;
+                  const opacity = isHighlighted ? 0.55 : isOther ? 0.12 : 0.35;
 
                   return (
                     <g key={`link-${i}`}>
-                      <defs>
-                        <linearGradient
-                          id={`grad-${i}`}
-                          gradientUnits="userSpaceOnUse"
-                          x1={sourceNode.x1}
-                          x2={targetNode.x0}
-                        >
-                          <stop offset="0%" stopColor={sourceColor} />
-                          <stop offset="100%" stopColor={targetColor} />
-                        </linearGradient>
-                      </defs>
                       <path
                         d={linkPath(link as Parameters<typeof linkPath>[0]) ?? ""}
                         fill="none"
-                        stroke={`url(#grad-${i})`}
+                        stroke={targetColor}
                         strokeWidth={Math.max(1, link.width ?? 1)}
                         strokeOpacity={opacity}
                         className="transition-all duration-200 cursor-pointer"
@@ -334,7 +337,7 @@ export default function CashFlowSankey({
 
                 {/* Nodes */}
                 {layout.nodes.map((node) => {
-                  const color = SANKEY_COLORS[node.type] ?? "#94a3b8";
+                  const color = getSankeyColor(node.type);
                   const nodeHeight = (node.y1 ?? 0) - (node.y0 ?? 0);
                   const isLeft =
                     node.type === "income" || node.type === "investment-income";
@@ -380,7 +383,7 @@ export default function CashFlowSankey({
                         y={(node.y0 ?? 0) + nodeHeight / 2}
                         dy="0.35em"
                         textAnchor={labelAnchor}
-                        className="text-[10px] fill-slate-300 pointer-events-none select-none"
+                        className="pointer-events-none select-none fill-slate-200 text-xs"
                         data-testid={`sankey-label-${node.id}`}
                       >
                         {node.label.length > 20 ? node.label.slice(0, 19) + "…" : node.label}
@@ -410,7 +413,7 @@ export default function CashFlowSankey({
                 <span className="flex items-center gap-1">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
-                    style={{ backgroundColor: SANKEY_COLORS.income }}
+                    style={{ backgroundColor: getSankeyColor("income") }}
                   />
                   Income
                 </span>
@@ -418,7 +421,7 @@ export default function CashFlowSankey({
                   <span className="flex items-center gap-1" data-testid="sankey-legend-investment-income">
                     <span
                       className="inline-block h-2 w-2 rounded-full"
-                      style={{ backgroundColor: SANKEY_COLORS["investment-income"] }}
+                      style={{ backgroundColor: getSankeyColor("investment-income") }}
                     />
                     Interest Income
                   </span>
@@ -426,28 +429,28 @@ export default function CashFlowSankey({
                 <span className="flex items-center gap-1">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
-                    style={{ backgroundColor: SANKEY_COLORS.expense }}
+                    style={{ backgroundColor: getSankeyColor("expense") }}
                   />
                   Expenses
                 </span>
                 <span className="flex items-center gap-1">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
-                    style={{ backgroundColor: SANKEY_COLORS.investment }}
+                    style={{ backgroundColor: getSankeyColor("investment") }}
                   />
                   Investments
                 </span>
                 <span className="flex items-center gap-1">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
-                    style={{ backgroundColor: SANKEY_COLORS.tax }}
+                    style={{ backgroundColor: getSankeyColor("tax") }}
                   />
                   Taxes
                 </span>
                 <span className="flex items-center gap-1">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
-                    style={{ backgroundColor: SANKEY_COLORS.surplus }}
+                    style={{ backgroundColor: getSankeyColor("surplus") }}
                   />
                   Surplus
                 </span>

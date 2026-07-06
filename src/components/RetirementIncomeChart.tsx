@@ -2,6 +2,7 @@
 
 import { formatCurrencyCompact, type SupportedCurrency } from "@/lib/currency";
 import { getCountry } from "@/lib/countries";
+import { CHART_SEMANTIC } from "@/lib/chart-theme";
 
 interface RetirementIncomeSource {
   label: string;
@@ -33,7 +34,7 @@ export default function RetirementIncomeChart({
     sources.push({
       label: getCountry(country).governmentRetirement.programLabel,
       monthlyAmount: monthlyGovernmentIncome,
-      color: "#22d3ee", // cyan
+      color: CHART_SEMANTIC.income,
     });
   }
 
@@ -41,7 +42,7 @@ export default function RetirementIncomeChart({
     sources.push({
       label: "Portfolio (4% rule)",
       monthlyAmount: monthlyPortfolioWithdrawal,
-      color: "#a78bfa", // violet
+      color: CHART_SEMANTIC.investments,
     });
   }
 
@@ -94,8 +95,8 @@ export default function RetirementIncomeChart({
         </div>
         <div className="h-8 w-full overflow-hidden rounded-lg bg-[var(--surface-1)]" data-testid="expenses-bar">
           <div
-            className="h-full rounded-lg bg-rose-500/60 transition-all duration-500"
-            style={{ width: `${(monthlyExpenses / barMax) * 100}%` }}
+            className="h-full rounded-lg transition-all duration-500"
+            style={{ width: `${(monthlyExpenses / barMax) * 100}%`, backgroundColor: CHART_SEMANTIC.expenses }}
           />
         </div>
       </div>
@@ -104,13 +105,13 @@ export default function RetirementIncomeChart({
       <div className="flex flex-wrap gap-3 mb-3">
         {sources.map((source) => (
           <div key={source.label} className="flex items-center gap-1.5 text-xs tabular-nums text-slate-400">
-            <div className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: source.color }} />
+            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: source.color }} />
             <span>{source.label}: {fc(source.monthlyAmount)}/mo</span>
           </div>
         ))}
         {gap > 0 && (
           <div className="flex items-center gap-1.5 text-xs tabular-nums text-amber-400/80">
-            <div className="h-2.5 w-2.5 rounded-sm bg-amber-400/40" />
+            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SEMANTIC.taxes }} />
             <span>Gap: {fc(gap)}/mo</span>
           </div>
         )}
@@ -120,7 +121,7 @@ export default function RetirementIncomeChart({
       <div
         className={`rounded-lg px-3 py-2 text-sm ${
           coveragePercent >= 100
-            ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-300"
+            ? "border border-cyan-400/20 bg-cyan-400/10 text-cyan-300"
             : coveragePercent >= 75
             ? "bg-cyan-500/10 border border-cyan-500/20 text-cyan-300"
             : "bg-amber-500/10 border border-amber-500/20 text-amber-300"

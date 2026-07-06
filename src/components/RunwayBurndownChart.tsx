@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
 import { useCurrency } from "@/lib/CurrencyContext";
+import { CHART_AXIS_TICK, CHART_GRID, CHART_SEMANTIC, CHART_SERIES, CHART_TOOLTIP_STYLE } from "@/lib/chart-theme";
 
 // fmt defined inside component via useCurrency()
 
@@ -114,28 +115,28 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
   if (chartData.length <= 1) return null;
 
   return (
-    <div data-testid="runway-burndown-main" className="rounded-2xl border border-stone-200 bg-white p-4 sm:p-6">
+    <div data-testid="runway-burndown-main" className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-4 backdrop-blur-sm sm:p-6">
       <div className="mb-1">
-        <h3 className="text-sm font-semibold text-stone-700">Runway Burndown</h3>
+        <h3 className="text-sm font-semibold text-slate-300">Runway Burndown</h3>
       </div>
 
       {/* Plain-English summary */}
-      <p className="mb-4 text-sm text-stone-600" data-testid="burndown-summary">{summary}</p>
+      <p className="mb-4 text-sm text-slate-400" data-testid="burndown-summary">{summary}</p>
 
       {/* Clean legend */}
       <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" data-testid="burndown-legend">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-0.5 w-4 rounded bg-emerald-500" style={{ height: 2 }} />
-          <span className="text-stone-600">With investment growth</span>
+          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SEMANTIC.surplus }} />
+          <span className="text-slate-400">With investment growth</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-0.5 w-4 rounded bg-stone-400" style={{ height: 2, borderTop: "2px dashed #9ca3af", background: "none" }} />
-          <span className="text-stone-600">Without growth</span>
+          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SERIES[5] }} />
+          <span className="text-slate-400">Without growth</span>
         </span>
         {hasTaxData && hasTaxDrag && (
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-0.5 w-4 rounded bg-amber-500" style={{ height: 2 }} />
-            <span className="text-stone-600">After withdrawal taxes</span>
+            <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SEMANTIC.taxes }} />
+            <span className="text-slate-400">After withdrawal taxes</span>
           </span>
         )}
       </div>
@@ -143,14 +144,14 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
       <div className="h-72 sm:h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
             <XAxis
               dataKey="month"
-              tick={{ fontSize: 11, fill: "#78716c" }}
-              label={{ value: "Months", position: "insideBottom", offset: -2, fontSize: 11, fill: "#78716c" }}
+              tick={CHART_AXIS_TICK}
+              label={{ value: "Months", position: "insideBottom", offset: -2, fontSize: 11, fill: CHART_AXIS_TICK.fill }}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: "#78716c" }}
+              tick={CHART_AXIS_TICK}
               tickFormatter={(v: number) => v >= 1000 ? `$${(v/1000).toFixed(0)}k` : `$${v}`}
             />
             <Tooltip
@@ -164,17 +165,17 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
                 return [fmt(v), n];
               }}
               labelFormatter={(label: unknown) => `Month ${label}`}
-              contentStyle={{ fontSize: 12, borderRadius: 8 }}
+              contentStyle={CHART_TOOLTIP_STYLE}
             />
 
             {/* 6-month emergency fund threshold */}
             {emergencyFundThreshold > 0 && (
               <ReferenceLine
                 y={emergencyFundThreshold}
-                stroke="#d6d3d1"
+                stroke={CHART_SERIES[5]}
                 strokeDasharray="4 4"
                 strokeWidth={1}
-                label={{ value: "6-mo emergency fund", position: "right", fontSize: 10, fill: "#a8a29e" }}
+                label={{ value: "6-mo emergency fund", position: "right", fontSize: 10, fill: CHART_AXIS_TICK.fill }}
               />
             )}
 
@@ -182,28 +183,28 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
             {noGrowthZeroMonth !== null && (
               <ReferenceLine
                 x={noGrowthZeroMonth}
-                stroke="#9ca3af"
+                stroke={CHART_SERIES[5]}
                 strokeDasharray="3 3"
                 strokeWidth={1}
-                label={{ value: fmtDuration(noGrowthZeroMonth), position: "top", fontSize: 10, fill: "#78716c" }}
+                label={{ value: fmtDuration(noGrowthZeroMonth), position: "top", fontSize: 10, fill: CHART_AXIS_TICK.fill }}
               />
             )}
             {growthZeroMonth !== null && growthZeroMonth !== noGrowthZeroMonth && (
               <ReferenceLine
                 x={growthZeroMonth}
-                stroke="#10b981"
+                stroke={CHART_SEMANTIC.surplus}
                 strokeDasharray="3 3"
                 strokeWidth={1}
-                label={{ value: fmtDuration(growthZeroMonth), position: "top", fontSize: 10, fill: "#059669" }}
+                label={{ value: fmtDuration(growthZeroMonth), position: "top", fontSize: 10, fill: CHART_SEMANTIC.surplus }}
               />
             )}
             {taxZeroMonth !== null && taxZeroMonth !== growthZeroMonth && taxZeroMonth !== noGrowthZeroMonth && (
               <ReferenceLine
                 x={taxZeroMonth}
-                stroke="#f59e0b"
+                stroke={CHART_SEMANTIC.taxes}
                 strokeDasharray="3 3"
                 strokeWidth={1}
-                label={{ value: fmtDuration(taxZeroMonth), position: "top", fontSize: 10, fill: "#d97706" }}
+                label={{ value: fmtDuration(taxZeroMonth), position: "top", fontSize: 10, fill: CHART_SEMANTIC.taxes }}
               />
             )}
 
@@ -211,7 +212,7 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
             <Line
               type="monotone"
               dataKey="withGrowth"
-              stroke="#10b981"
+              stroke={CHART_SEMANTIC.surplus}
               strokeWidth={2.5}
               dot={false}
               name="withGrowth"
@@ -219,7 +220,7 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
             <Line
               type="monotone"
               dataKey="withoutGrowth"
-              stroke="#9ca3af"
+              stroke={CHART_SERIES[5]}
               strokeWidth={2}
               strokeDasharray="6 3"
               dot={false}
@@ -229,7 +230,7 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
               <Line
                 type="monotone"
                 dataKey="withTax"
-                stroke="#f59e0b"
+                stroke={CHART_SEMANTIC.taxes}
                 strokeWidth={2}
                 dot={false}
                 name="withTax"
@@ -241,8 +242,8 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
 
       {/* Starting balances */}
       {startingBalances.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs text-stone-500" data-testid="burndown-starting-balances">
-          <span className="font-medium text-stone-600">Starting:</span>
+        <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs text-slate-500" data-testid="burndown-starting-balances">
+          <span className="font-medium text-slate-400">Starting:</span>
           {startingBalances.map((b, i) => (
             <span key={b.category}>
               {b.category} {fmt(b.balance)}{i < startingBalances.length - 1 ? " ·" : ""}
@@ -254,17 +255,17 @@ export default function RunwayBurndownChart({ details }: { details: RunwayExplai
       {/* Withdrawal order */}
       {details.withdrawalOrder.length > 0 && (
         <div className="mt-4" data-testid="burndown-withdrawal-order">
-          <p className="mb-2 text-xs font-medium text-stone-500 uppercase tracking-wide">Suggested Withdrawal Order</p>
+          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">Suggested Withdrawal Order</p>
           <div className="flex flex-wrap gap-2">
             {details.withdrawalOrder.map((entry, i) => {
               const treatmentLabel = entry.taxTreatment === "tax-free" ? "tax-free"
                 : entry.taxTreatment === "tax-deferred" ? "taxed as income"
                 : "capital gains";
               return (
-                <span key={i} className="inline-flex items-center gap-1.5 rounded-lg bg-stone-50 px-2.5 py-1.5 text-xs" data-testid={`burndown-withdrawal-${i}`}>
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-stone-200 text-[10px] font-bold text-stone-600">{i + 1}</span>
-                  <span className="max-w-[150px] truncate text-stone-700 font-medium">{entry.category}</span>
-                  <span className="text-stone-400">({treatmentLabel})</span>
+                <span key={i} className="inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-slate-700/40 px-2.5 py-1.5 text-xs" data-testid={`burndown-withdrawal-${i}`}>
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-600 text-[10px] font-bold text-slate-200">{i + 1}</span>
+                  <span className="max-w-[150px] truncate font-medium text-slate-200">{entry.category}</span>
+                  <span className="text-slate-500">({treatmentLabel})</span>
                 </span>
               );
             })}

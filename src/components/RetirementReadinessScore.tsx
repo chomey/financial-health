@@ -7,15 +7,15 @@ interface Props {
 }
 
 const TIER_COLORS: Record<string, string> = {
-  "Retirement Ready": "text-emerald-300 bg-emerald-500/10 border-emerald-500/20",
-  "Strong": "text-cyan-300 bg-cyan-500/10 border-cyan-500/20",
-  "On Track": "text-violet-300 bg-violet-500/10 border-violet-500/20",
-  "Building": "text-amber-300 bg-amber-500/10 border-amber-500/20",
-  "Getting Started": "text-slate-300 bg-slate-500/10 border-slate-500/20",
+  "Retirement Ready": "border-cyan-400/20 bg-cyan-400/10 text-cyan-300",
+  "Strong": "border-cyan-400/20 bg-cyan-400/10 text-cyan-300",
+  "On Track": "border-violet-400/20 bg-violet-400/10 text-violet-300",
+  "Building": "border-amber-400/20 bg-amber-400/10 text-amber-300",
+  "Getting Started": "border-slate-400/20 bg-slate-400/10 text-slate-300",
 };
 
 const TIER_BAR_COLORS: Record<string, string> = {
-  "Retirement Ready": "bg-emerald-400",
+  "Retirement Ready": "bg-cyan-400",
   "Strong": "bg-cyan-400",
   "On Track": "bg-violet-400",
   "Building": "bg-amber-400",
@@ -70,7 +70,7 @@ export default function RetirementReadinessScore({ result }: Props) {
               <span className="text-xs text-slate-400 w-32 truncate">{label}</span>
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${value >= 75 ? "bg-emerald-400" : value >= 50 ? "bg-cyan-400" : value >= 25 ? "bg-amber-400" : "bg-rose-400"}`}
+                  className={`h-full rounded-full transition-all duration-500 ${value >= 50 ? "bg-cyan-400" : "bg-amber-400"}`}
                   style={{ width: `${value}%` }}
                 />
               </div>

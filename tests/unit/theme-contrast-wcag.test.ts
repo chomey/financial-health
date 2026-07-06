@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
+import { CHART_AXIS_TICK, CHART_SEMANTIC, CHART_SERIES, CHART_TOOLTIP_STYLE } from "@/lib/chart-theme";
 
 /**
  * WCAG AA contrast ratio tests for the cyberpunk theme.
@@ -103,9 +104,9 @@ const colorPairs: {
   { name: "foreground (#e2e8f0) on surface-3", fg: "#e2e8f0", bg: BG_SURFACE_3, minRatio: WCAG_AA_NORMAL },
   { name: "slate-300 (#cbd5e1) on surface-3", fg: "#cbd5e1", bg: BG_SURFACE_3, minRatio: WCAG_AA_NORMAL },
 
-  // Muted/secondary text — large text threshold (labels, section headers)
-  { name: "slate-400 (#94a3b8) on background [large text]", fg: "#94a3b8", bg: BG_DARK, minRatio: WCAG_AA_LARGE },
-  { name: "slate-400 (#94a3b8) on surface-2 [large text]", fg: "#94a3b8", bg: BG_SURFACE_2, minRatio: WCAG_AA_LARGE },
+  // Muted/secondary text, including text-xs chart legends
+  { name: "slate-400 (#94a3b8) on background", fg: "#94a3b8", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
+  { name: "slate-400 (#94a3b8) on surface-2", fg: "#94a3b8", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
 
   // Focus indicators — non-text contrast threshold
   { name: "cyan-400/60 focus ring on slate-900", fg: FOCUS_RING_CYAN, bg: BG_DARK, minRatio: WCAG_AA_LARGE },
@@ -173,5 +174,17 @@ describe("Task 134: Theme CSS variable definitions are present", () => {
 
   it("foreground is light slate-200 (#e2e8f0)", () => {
     expect(globalsCss).toMatch(/--foreground:\s*#e2e8f0/);
+  });
+});
+
+describe("Chart theme tokens", () => {
+  it("uses the approved categorical palette order", () => {
+    expect(CHART_SERIES).toEqual(["#22d3ee", "#a78bfa", "#f472b6", "#fbbf24", "#fb7185", "#94a3b8"]);
+  });
+
+  it("keeps chart text and tooltip colors accessible on dark surfaces", () => {
+    expect(contrastRatio(CHART_AXIS_TICK.fill, BG_SURFACE_2)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL);
+    expect(contrastRatio(CHART_TOOLTIP_STYLE.color, CHART_TOOLTIP_STYLE.backgroundColor)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL);
+    expect(contrastRatio(CHART_SEMANTIC.taxes, BG_SURFACE_2)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL);
   });
 });

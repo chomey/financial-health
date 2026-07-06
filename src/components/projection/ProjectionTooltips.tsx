@@ -1,6 +1,7 @@
 "use client";
 
 import { useCurrency } from "@/lib/CurrencyContext";
+import { CHART_SEMANTIC } from "@/lib/chart-theme";
 import type { CustomTooltipProps } from "./ProjectionUtils";
 
 export function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
@@ -55,7 +56,7 @@ export function BurndownTooltip({ active, payload, label }: CustomTooltipProps) 
 export function MilestoneLabelContent({
   viewBox,
   value,
-  fill = "#10b981",
+  fill = CHART_SEMANTIC.surplus,
   offsetY = 0,
 }: {
   viewBox?: { x: number; y: number; width: number; height: number };

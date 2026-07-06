@@ -45,6 +45,7 @@ import { normalizeToMonthly } from "@/components/IncomeEntry";
 import { normalizeExpenseToMonthly } from "@/components/ExpenseEntry";
 // getFilingStatuses moved to wizard-only
 import { getStepFromURL, updateStepURL, type WizardStep } from "@/lib/url-state";
+import { CHART_SERIES } from "@/lib/chart-theme";
 import {
   PrintSnapshotButton,
   AppHeader,
@@ -641,7 +642,7 @@ export default function Home() {
               const portfolio = getPortfolioSummary(stocks);
               if (portfolio.totalValue === 0) return null;
               const fc = (v: number) => formatCurrencyCompact(Math.abs(v), homeCurrency, homeCurrency);
-              const ALLOC_COLORS = ["#a78bfa", "#22d3ee", "#f472b6", "#34d399", "#fbbf24", "#fb923c", "#60a5fa", "#e879f9"];
+              const ALLOC_COLORS = CHART_SERIES;
               const stockDetails = stocks
                 .filter((s) => getStockValue(s) > 0)
                 .map((s) => {
@@ -666,7 +667,7 @@ export default function Home() {
 
                   {/* Total gain/loss + return */}
                   <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                    <p className={`text-3xl font-semibold tracking-tight tabular-nums ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                    <p className={`text-3xl font-semibold tracking-tight tabular-nums ${portfolio.totalGainLoss >= 0 ? "text-cyan-400" : "text-rose-400"}`}>
                       {portfolio.totalGainLoss >= 0 ? "+" : ""}{fc(portfolio.totalGainLoss)}
                     </p>
                     {portfolio.totalCostBasis > 0 && (
@@ -718,13 +719,13 @@ export default function Home() {
                           <tr key={s.id} className="border-b border-white/5 bg-[var(--surface-1)]">
                             <td className="py-1.5 font-mono font-medium text-slate-300">{s.ticker}</td>
                             <td className="py-1.5 text-right tabular-nums text-slate-300">{fc(s.value)}</td>
-                            <td className={`py-1.5 text-right font-medium tabular-nums ${s.gainLoss ? (s.gainLoss.amount >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
+                            <td className={`py-1.5 text-right font-medium tabular-nums ${s.gainLoss ? (s.gainLoss.amount >= 0 ? "text-cyan-400" : "text-rose-400") : "text-slate-500"}`}>
                               {s.gainLoss ? `${s.gainLoss.amount >= 0 ? "+" : ""}${fc(s.gainLoss.amount)}` : "—"}
                             </td>
-                            <td className={`py-1.5 text-right tabular-nums ${s.gainLoss ? (s.gainLoss.percentage >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
+                            <td className={`py-1.5 text-right tabular-nums ${s.gainLoss ? (s.gainLoss.percentage >= 0 ? "text-cyan-400" : "text-rose-400") : "text-slate-500"}`}>
                               {s.gainLoss ? `${s.gainLoss.percentage >= 0 ? "+" : ""}${s.gainLoss.percentage.toFixed(1)}%` : "—"}
                             </td>
-                            <td className={`py-1.5 hidden text-right tabular-nums sm:table-cell ${s.annualized !== null ? (s.annualized >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
+                            <td className={`py-1.5 hidden text-right tabular-nums sm:table-cell ${s.annualized !== null ? (s.annualized >= 0 ? "text-cyan-400" : "text-rose-400") : "text-slate-500"}`}>
                               {s.annualized !== null ? `${s.annualized >= 0 ? "+" : ""}${s.annualized.toFixed(1)}%/yr` : "—"}
                             </td>
                           </tr>
@@ -736,7 +737,7 @@ export default function Home() {
                   {/* Best / Worst performers */}
                   {stockDetails.length > 1 && bestPerformer?.gainLoss && worstPerformer?.gainLoss && bestPerformer.ticker !== worstPerformer.ticker && (
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-1 text-[11px] font-medium text-emerald-400">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-cyan-400/10 px-2 py-1 text-[11px] font-medium text-cyan-300">
                         Best: {bestPerformer.ticker} +{bestPerformer.gainLoss.percentage.toFixed(1)}%
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-full bg-rose-400/10 px-2 py-1 text-[11px] font-medium text-rose-400">

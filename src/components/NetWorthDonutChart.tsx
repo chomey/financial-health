@@ -15,6 +15,7 @@ import type { StockHolding } from "@/components/StockEntry";
 import { getStockValue } from "@/components/StockEntry";
 import { useCurrency } from "@/lib/CurrencyContext";
 import HelpTip from "@/components/HelpTip";
+import { CHART_SEMANTIC, CHART_SERIES } from "@/lib/chart-theme";
 
 export type DonutView = "breakdown" | "liquidity";
 
@@ -48,21 +49,8 @@ export function computeLiquidityData(
   return { liquid, illiquid };
 }
 
-const COLORS = [
-  "#22d3ee", // cyan-400
-  "#a78bfa", // violet-400
-  "#34d399", // emerald-400
-  "#f59e0b", // amber-400
-  "#60a5fa", // blue-400
-  "#f472b6", // pink-400
-  "#4ade80", // green-400
-  "#fb923c", // orange-400
-  "#e879f9", // fuchsia-400
-  "#facc15", // yellow-400
-];
-
-const DEBT_COLOR = "#f87171"; // red-400
-const PROPERTY_PATTERN_COLOR = "#2dd4bf"; // teal-400 for property equity
+const DEBT_COLOR = CHART_SEMANTIC.debt;
+const PROPERTY_PATTERN_COLOR = CHART_SEMANTIC.assets;
 
 export interface DonutSlice {
   name: string;
@@ -158,7 +146,7 @@ export function computeDonutData(
 function getSliceColor(slice: DonutSlice, index: number, assetIndex: number): string {
   if (slice.type === "debt") return DEBT_COLOR;
   if (slice.isProperty) return PROPERTY_PATTERN_COLOR;
-  return COLORS[assetIndex % COLORS.length];
+  return CHART_SERIES[assetIndex % CHART_SERIES.length];
 }
 
 interface CustomTooltipProps {
@@ -176,7 +164,7 @@ function DonutTooltip({ active, payload }: CustomTooltipProps) {
       <p className="text-sm font-medium text-slate-200">{slice.name}</p>
       <p
         className={`text-sm font-medium tabular-nums ${
-          slice.type === "debt" ? "text-red-400" : "text-emerald-400"
+          slice.type === "debt" ? "text-rose-400" : "text-cyan-400"
         }`}
       >
         {fmt.full(slice.value)}
@@ -250,7 +238,7 @@ export default function NetWorthDonutChart({
   const colorMap = slicesWithPct.map((slice, i) => {
     if (slice.type === "debt") return DEBT_COLOR;
     if (slice.isProperty) return PROPERTY_PATTERN_COLOR;
-    const color = COLORS[assetColorIdx % COLORS.length];
+    const color = CHART_SERIES[assetColorIdx % CHART_SERIES.length];
     assetColorIdx++;
     return color;
   });
@@ -386,7 +374,7 @@ export default function NetWorthDonutChart({
               </span>
               <span
                 className={`text-sm font-bold ${
-                  netWorth >= 0 ? "text-cyan-400" : "text-red-400"
+                  netWorth >= 0 ? "text-cyan-400" : "text-rose-400"
                 }`}
               >
                 {formatFullCurrency(netWorth)}
@@ -414,7 +402,7 @@ export default function NetWorthDonutChart({
                     } else if (slice.isProperty) {
                       color = PROPERTY_PATTERN_COLOR;
                     } else {
-                      color = COLORS[tableAssetIdx % COLORS.length];
+                      color = CHART_SERIES[tableAssetIdx % CHART_SERIES.length];
                       tableAssetIdx++;
                     }
                     const total = slice.type === "asset" ? totalAssets : totalDebts;
@@ -424,7 +412,7 @@ export default function NetWorthDonutChart({
                         <td className="py-1 pr-2">
                           <div className="flex items-center gap-1.5">
                             <span
-                              className="inline-block h-2.5 w-2.5 rounded-sm shrink-0"
+                              className="inline-block h-2 w-2 rounded-full shrink-0"
                               style={{
                                 backgroundColor: color,
                                 ...(slice.isProperty
@@ -438,7 +426,7 @@ export default function NetWorthDonutChart({
                             <span className="text-slate-300">{slice.name}</span>
                           </div>
                         </td>
-                        <td className={`py-1 px-2 text-right font-medium tabular-nums whitespace-nowrap ${slice.type === "debt" ? "text-red-400" : "text-slate-100"}`}>
+                        <td className={`py-1 px-2 text-right font-medium tabular-nums whitespace-nowrap ${slice.type === "debt" ? "text-rose-400" : "text-slate-100"}`}>
                           {slice.type === "debt" ? "-" : ""}{formatFullCurrency(slice.value)}
                         </td>
                         <td className="py-1 pl-2 text-right tabular-nums text-slate-500 whitespace-nowrap">
@@ -464,7 +452,7 @@ export default function NetWorthDonutChart({
               ...(liquid > 0 ? [{ name: "Liquid", value: liquid, pct: liquidPct }] : []),
               ...(illiquid > 0 ? [{ name: "Illiquid", value: illiquid, pct: illiquidPct }] : []),
             ];
-            const liqColors = ["#22d3ee", "#475569"]; // cyan for liquid, slate for illiquid
+            const liqColors = [CHART_SEMANTIC.assets, CHART_SERIES[5]];
             return (
               <>
                 <div className="relative" style={{ height: 240 }}>
@@ -507,7 +495,7 @@ export default function NetWorthDonutChart({
                     <div key={item.name} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5">
                         <span
-                          className="inline-block h-2.5 w-2.5 rounded-full"
+                          className="inline-block h-2 w-2 rounded-full"
                           style={{ backgroundColor: liqColors[i] }}
                         />
                         <span className="text-slate-300">{item.name}</span>

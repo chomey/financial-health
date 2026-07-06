@@ -1,6 +1,7 @@
 "use client";
 
 import type { EarlyWithdrawalPenalty } from "@/lib/withdrawal-tax";
+import { CHART_SEMANTIC } from "@/lib/chart-theme";
 
 interface AccountsByTreatment {
   taxFree: { categories: string[]; total: number };
@@ -42,22 +43,22 @@ export default function WithdrawalTaxSummary({
     {
       label: "Tax-free",
       sublabel: "No tax on withdrawal",
-      color: "bg-emerald-400/10 text-emerald-300 border-emerald-400/20",
-      barColor: "bg-emerald-400",
+      color: "border-cyan-400/20 bg-cyan-400/10 text-cyan-300",
+      barColor: CHART_SEMANTIC.income,
       data: accountsByTreatment.taxFree,
     },
     {
       label: "Taxable",
       sublabel: "Gains taxed at capital gains rate",
       color: "bg-amber-400/10 text-amber-300 border-amber-400/20",
-      barColor: "bg-amber-400",
+      barColor: CHART_SEMANTIC.taxes,
       data: accountsByTreatment.taxable,
     },
     {
       label: "Tax-deferred",
       sublabel: "Full withdrawal taxed as income",
-      color: "bg-rose-400/10 text-rose-300 border-rose-400/20",
-      barColor: "bg-rose-400",
+      color: "border-violet-400/20 bg-violet-400/10 text-violet-300",
+      barColor: CHART_SEMANTIC.investments,
       data: accountsByTreatment.taxDeferred,
     },
   ];
@@ -83,7 +84,7 @@ export default function WithdrawalTaxSummary({
         </p>
       )}
       {taxDragMonths <= 0.5 && (
-        <p className="mt-2 text-sm text-emerald-400" data-testid="tax-drag-summary">
+        <p className="mt-2 text-sm text-cyan-300" data-testid="tax-drag-summary">
           Minimal withdrawal tax impact on your runway
         </p>
       )}
@@ -97,8 +98,8 @@ export default function WithdrawalTaxSummary({
             return (
               <div
                 key={t.label}
-                className={`${t.barColor} transition-all duration-500`}
-                style={{ width: `${pct}%` }}
+                className="transition-all duration-500"
+                style={{ width: `${pct}%`, backgroundColor: t.barColor }}
                 title={`${t.label}: ${formatValue(t.data.total, homeCurrency)} (${Math.round(pct)}%)`}
               />
             );
@@ -142,7 +143,7 @@ export default function WithdrawalTaxSummary({
               {earlyWithdrawalPenalties.map((p) => (
                 <div
                   key={p.category}
-                  className="flex items-start gap-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2"
+                  className="flex items-start gap-2 rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-2"
                   data-testid={`penalty-warning-${p.category.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
                 >
                   <span className="mt-0.5 shrink-0 text-sm" aria-hidden="true">⚠️</span>

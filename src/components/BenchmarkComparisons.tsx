@@ -8,6 +8,7 @@ import {
 } from "@/lib/benchmarks";
 import { useCurrency } from "@/lib/CurrencyContext";
 import HelpTip from "@/components/HelpTip";
+import { CHART_SEMANTIC, CHART_SERIES } from "@/lib/chart-theme";
 
 interface BenchmarkComparisonsProps {
   age?: number;
@@ -45,9 +46,9 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
   const benchmarkWidth = Math.max((Math.abs(benchmarkValue) / maxVal) * 100, 2);
   const nationalWidth = Math.max((Math.abs(nationalAverage) / maxVal) * 100, 2);
 
-  const userColor = aboveBenchmark ? "bg-emerald-400" : "bg-violet-400";
-  const benchmarkColor = "bg-slate-600";
-  const nationalColor = "bg-amber-400";
+  const userColor = aboveBenchmark ? CHART_SEMANTIC.surplus : CHART_SEMANTIC.investments;
+  const benchmarkColor = CHART_SERIES[5];
+  const nationalColor = CHART_SEMANTIC.taxes;
 
   return (
     <div className="space-y-2" data-testid={`benchmark-${metric.toLowerCase().replace(/\s+/g, "-")}`}>
@@ -64,7 +65,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
             </span>
           )}
           {aboveBenchmark && (
-            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-0.5 text-xs font-medium text-emerald-300">
+            <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2 py-0.5 text-xs font-medium text-cyan-300">
               {isDebtMetric ? "Below median" : "Above median"}
             </span>
           )}
@@ -77,8 +78,8 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
           <span className="text-xs text-slate-400 w-14 shrink-0">You</span>
           <div className="h-5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${userColor}`}
-              style={{ width: `${userWidth}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${userWidth}%`, backgroundColor: userColor }}
             />
           </div>
           <span className="text-xs font-medium text-slate-300 w-16 text-right shrink-0">
@@ -91,8 +92,8 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
           <span className="text-xs text-slate-400 w-14 shrink-0">Median</span>
           <div className="h-5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${benchmarkColor}`}
-              style={{ width: `${benchmarkWidth}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${benchmarkWidth}%`, backgroundColor: benchmarkColor }}
             />
           </div>
           <span className="text-xs font-medium text-slate-400 w-16 text-right shrink-0">
@@ -105,8 +106,8 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
           <span className="text-xs text-slate-400 w-14 shrink-0">Nat&apos;l Avg</span>
           <div className="h-5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${nationalColor}`}
-              style={{ width: `${nationalWidth}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${nationalWidth}%`, backgroundColor: nationalColor }}
             />
           </div>
           <span className="text-xs font-medium text-amber-400 w-16 text-right shrink-0">

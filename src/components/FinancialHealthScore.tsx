@@ -66,18 +66,12 @@ function computeSubScores(props: FinancialHealthScoreProps): SubScore[] {
   ];
 }
 
-function getScoreColor(score: number): string {
-  if (score >= 80) return "text-emerald-400";
-  if (score >= 60) return "text-cyan-400";
-  if (score >= 40) return "text-amber-400";
-  return "text-rose-400";
+function getScoreColor(_score: number): string {
+  return "text-cyan-400";
 }
 
-function getScoreStrokeColor(score: number): string {
-  if (score >= 80) return "stroke-emerald-400";
-  if (score >= 60) return "stroke-cyan-400";
-  if (score >= 40) return "stroke-amber-400";
-  return "stroke-rose-400";
+function getScoreStrokeColor(_score: number): string {
+  return "stroke-cyan-400";
 }
 
 function getScoreLabel(score: number): string {
@@ -134,7 +128,7 @@ function SubScoreBar({ sub }: { sub: SubScore }) {
       <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-1)]">
         <div
           className={`h-full rounded-full transition-all duration-500 ${
-            pct >= 80 ? "bg-emerald-400" : pct >= 50 ? "bg-cyan-400" : pct >= 25 ? "bg-amber-400" : "bg-rose-400"
+            pct >= 50 ? "bg-cyan-400" : pct >= 25 ? "bg-amber-400" : "bg-rose-400"
           }`}
           style={{ width: `${pct}%` }}
         />

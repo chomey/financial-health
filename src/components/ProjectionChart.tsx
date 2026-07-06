@@ -24,6 +24,7 @@ import {
 } from "@/lib/projections";
 import type { Scenario, Milestone } from "@/lib/projections";
 import { getInflationFromURL, updateInflationURL, getOutlookYearsFromURL, updateOutlookYearsURL, OUTLOOK_YEAR_OPTIONS, type OutlookYears } from "@/lib/url-state";
+import { CHART_AXIS_TICK, CHART_GRID, CHART_SEMANTIC, CHART_SERIES } from "@/lib/chart-theme";
 import type { RunwayExplainerDetails } from "@/components/DataFlowArrows";
 import { buildSummary } from "@/components/RunwayBurndownChart";
 import {
@@ -302,7 +303,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               onClick={(e) => { e.stopPropagation(); setMode("keep-earning"); }}
               className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                 mode === "keep-earning"
-                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
+                  ? "border border-cyan-400/30 bg-cyan-400/20 text-cyan-300 shadow-sm"
                   : "bg-[var(--surface-1)] text-slate-400 hover:bg-white/10"
               }`}
               data-testid="mode-keep-earning"
@@ -313,7 +314,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               onClick={(e) => { e.stopPropagation(); setMode("income-stops"); }}
               className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                 mode === "income-stops"
-                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
+                  ? "border border-cyan-400/30 bg-cyan-400/20 text-cyan-300 shadow-sm"
                   : "bg-[var(--surface-1)] text-slate-400 hover:bg-white/10"
               }`}
               data-testid="mode-income-stops"
@@ -335,7 +336,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                   i === 0 ? "rounded-l-lg" : i === OUTLOOK_YEAR_OPTIONS.length - 1 ? "rounded-r-lg" : ""
                 } ${
                   outlookYears === opt
-                    ? "bg-emerald-500/20 text-emerald-400 font-medium"
+                    ? "bg-cyan-400/20 text-cyan-300 font-medium"
                     : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
                 }`}
                 data-testid={`outlook-${opt}yr`}
@@ -380,7 +381,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
         {/* Surplus subtitle inline */}
         {mode === "keep-earning" && surplusInfo.income > 0 && (
           <p className="text-xs tabular-nums text-slate-500" data-testid="projection-surplus-subtitle">
-            Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-emerald-400" : "font-medium text-red-400"}>{formatCurrency(surplusInfo.surplus)}</span>/mo
+            Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-cyan-300" : "font-medium text-rose-400"}>{formatCurrency(surplusInfo.surplus)}</span>/mo
           </p>
         )}
       </div>
@@ -406,7 +407,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 <td className="py-1.5 pr-4 font-medium text-slate-300">Net Worth</td>
                 <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.netWorth)}</td>
                 {summaryPoints.milestones.map((p, i) => (
-                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium tabular-nums text-emerald-400`}>
+                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium tabular-nums text-cyan-400`}>
                     {formatTableCurrency(p.netWorth)}
                   </td>
                 ))}
@@ -415,7 +416,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 <td className="py-1.5 pr-4 font-medium text-slate-300">Total Assets</td>
                 <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.totalAssets)}</td>
                 {summaryPoints.milestones.map((p, i) => (
-                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-blue-400`}>
+                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-cyan-400`}>
                     {formatTableCurrency(p.totalAssets)}
                   </td>
                 ))}
@@ -426,7 +427,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     <td className="py-1.5 pr-4 font-medium text-slate-300">Consumer Debt</td>
                     <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.consumerDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-red-400`}>
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-rose-400`}>
                         {formatTableCurrency(p.consumerDebts)}
                       </td>
                     ))}
@@ -435,7 +436,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     <td className="py-1.5 pr-4 font-medium text-slate-300">Mortgage</td>
                     <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.mortgageDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-red-400`}>
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-rose-400`}>
                         {formatTableCurrency(p.mortgageDebts)}
                       </td>
                     ))}
@@ -446,7 +447,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                   <td className="py-1.5 pr-4 font-medium text-slate-300">Total Debts</td>
                   <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.totalDebts)}</td>
                   {summaryPoints.milestones.map((p, i) => (
-                    <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-red-400`}>
+                    <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-rose-400`}>
                       {formatTableCurrency(p.totalDebts)}
                     </td>
                   ))}
@@ -460,17 +461,17 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       <div className="h-64 sm:h-80" data-testid="projection-chart-container">
         <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
           <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
             <XAxis
               dataKey="year"
               type="number"
               domain={[0, years]}
-              tick={{ fontSize: 10, fill: "#94a3b8" }}
+              tick={CHART_AXIS_TICK}
               tickFormatter={(v) => `${v}y`}
               ticks={xTicks}
             />
             <YAxis
-              tick={{ fontSize: 10, fill: "#94a3b8" }}
+              tick={CHART_AXIS_TICK}
               tickFormatter={formatCurrency}
               width={55}
             />
@@ -493,7 +494,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               type="monotone"
               dataKey="assets"
               name="Assets"
-              stroke="#22d3ee"
+              stroke={CHART_SEMANTIC.assets}
               strokeWidth={1.5}
               strokeDasharray="4 4"
               dot={false}
@@ -505,7 +506,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               type="monotone"
               dataKey="debts"
               name="Debts"
-              stroke="#f87171"
+              stroke={CHART_SEMANTIC.debt}
               strokeWidth={1.5}
               strokeDasharray="4 4"
               dot={false}
@@ -518,7 +519,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 type="monotone"
                 dataKey="mortgage"
                 name="Mortgage"
-                stroke="#fb923c"
+                stroke={CHART_SERIES[3]}
                 strokeWidth={1.5}
                 strokeDasharray="6 3"
                 dot={false}
@@ -532,17 +533,17 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 {consumerDebtFreeYear !== null && consumerDebtFreeYear <= years && consumerDebtFreeYear > 0 && (
                   <ReferenceLine
                     x={consumerDebtFreeYear}
-                    stroke="#10b981"
+                    stroke={CHART_SEMANTIC.surplus}
                     strokeDasharray="6 3"
-                    label={<MilestoneLabelContent value="Consumer Debt Free" fill="#10b981" />}
+                    label={<MilestoneLabelContent value="Consumer Debt Free" fill={CHART_SEMANTIC.surplus} />}
                   />
                 )}
                 {mortgageFreeYear !== null && mortgageFreeYear <= years && mortgageFreeYear > 0 && (
                   <ReferenceLine
                     x={mortgageFreeYear}
-                    stroke="#059669"
+                    stroke={CHART_SERIES[0]}
                     strokeDasharray="6 3"
-                    label={<MilestoneLabelContent value="Mortgage Free" fill="#059669" offsetY={
+                    label={<MilestoneLabelContent value="Mortgage Free" fill={CHART_SERIES[0]} offsetY={
                       consumerDebtFreeYear !== null && Math.abs(mortgageFreeYear - consumerDebtFreeYear) < years * 0.15 ? 20 : 0
                     } />}
                   />
@@ -552,9 +553,9 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               debtFreeYear !== null && debtFreeYear <= years && debtFreeYear > 0 && (
                 <ReferenceLine
                   x={debtFreeYear}
-                  stroke="#10b981"
+                  stroke={CHART_SEMANTIC.surplus}
                   strokeDasharray="6 3"
-                  label={<MilestoneLabelContent value="Debt Free" fill="#10b981" />}
+                  label={<MilestoneLabelContent value="Debt Free" fill={CHART_SEMANTIC.surplus} />}
                 />
               )
             )}
@@ -563,13 +564,13 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             {fireNumber > 0 && (
               <ReferenceLine
                 y={fireNumber}
-                stroke="#f59e0b"
+                stroke={CHART_SEMANTIC.taxes}
                 strokeDasharray="4 3"
                 strokeWidth={1.5}
                 label={{
                   value: `🔥 FIRE: ${formatCurrency(fireNumber)}`,
                   position: "right",
-                  fill: "#f59e0b",
+                  fill: CHART_SEMANTIC.taxes,
                   fontSize: 10,
                 }}
               />
@@ -585,7 +586,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 label={{
                   value: m.label,
                   position: "right",
-                  fill: "#64748b",
+                  fill: CHART_AXIS_TICK.fill,
                   fontSize: 10,
                 }}
               />
@@ -598,28 +599,28 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
         <span className="flex items-center gap-1">
           <span
-            className="inline-block h-0.5 w-4 rounded"
+            className="inline-block h-2 w-2 rounded-full"
             style={{ backgroundColor: SCENARIO_COLORS[scenario] }}
           />
           Net Worth
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-indigo-400" />
+          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SEMANTIC.assets }} />
           Assets
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-red-400" />
+          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SEMANTIC.debt }} />
           Debts
         </span>
         {hasMortgage && (
           <span className="flex items-center gap-1" data-testid="mortgage-burndown-legend">
-            <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-orange-400" />
+            <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SERIES[3] }} />
             Mortgage
           </span>
         )}
         {fireNumber > 0 && (
           <span className="flex items-center gap-1" data-testid="fire-legend">
-            <span className="inline-block h-0.5 w-4 rounded border-t-2 border-dashed border-amber-400" />
+            <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SEMANTIC.taxes }} />
             🔥 FIRE
             <HelpTip text={`Portfolio size where ${safeWithdrawalRate}% annual withdrawals cover all expenses. The 4% rule means saving ${Math.round(100 / safeWithdrawalRate)}× your annual expenses.`} />
           </span>
@@ -688,7 +689,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     <td className="py-1.5 pr-4 font-medium text-slate-300 truncate max-w-[120px]">{ap.category}</td>
                     <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(ap.currentValue)}</td>
                     {ap.milestoneValues.map((val, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-emerald-400`}>
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-cyan-400`}>
                         {formatTableCurrency(val)}
                       </td>
                     ))}
@@ -710,16 +711,16 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           {/* Legend */}
           <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" data-testid="burndown-legend">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-4 rounded bg-emerald-400" style={{ height: 2 }} />
+              <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SEMANTIC.surplus }} />
               <span className="text-slate-400">With investment growth</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-4 rounded" style={{ height: 2, borderTop: "2px dashed #64748b", background: "none" }} />
+              <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SERIES[5] }} />
               <span className="text-slate-400">Without growth</span>
             </span>
             {burndownData.hasTaxDrag && (
               <span className="flex items-center gap-1.5">
-                <span className="inline-block w-4 rounded bg-amber-400" style={{ height: 2 }} />
+                <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: CHART_SEMANTIC.taxes }} />
                 <span className="text-slate-400">After withdrawal taxes</span>
               </span>
             )}
@@ -728,17 +729,17 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           <div className="h-72 sm:h-80 w-full" data-testid="burndown-chart-container">
             <ResponsiveContainer width="100%" height="100%" minHeight={1} minWidth={1}>
               <LineChart data={burndownData.data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
                 <XAxis
                   dataKey="year"
                   type="number"
                   domain={[0, years]}
-                  tick={{ fontSize: 10, fill: "#94a3b8" }}
+                  tick={CHART_AXIS_TICK}
                   tickFormatter={(v) => `${v}y`}
                   ticks={xTicks}
                 />
                 <YAxis
-                  tick={{ fontSize: 10, fill: "#94a3b8" }}
+                  tick={CHART_AXIS_TICK}
                   tickFormatter={formatCurrency}
                   width={55}
                 />
@@ -751,29 +752,29 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                     stroke="rgba(255,255,255,0.15)"
                     strokeDasharray="4 4"
                     strokeWidth={1}
-                    label={{ value: "6-mo emergency fund", position: "right", fontSize: 10, fill: "#64748b" }}
+                    label={{ value: "6-mo emergency fund", position: "right", fontSize: 10, fill: CHART_AXIS_TICK.fill }}
                   />
                 )}
 
                 {/* Zero-crossing markers */}
                 {burndownData.noGrowthZero !== null && (
-                  <ReferenceLine x={burndownData.noGrowthZero} stroke="#64748b" strokeDasharray="3 3" strokeWidth={1}
-                    label={{ value: fmtYears(burndownData.noGrowthZero), position: "top", fontSize: 10, fill: "#94a3b8" }} />
+                  <ReferenceLine x={burndownData.noGrowthZero} stroke={CHART_SERIES[5]} strokeDasharray="3 3" strokeWidth={1}
+                    label={{ value: fmtYears(burndownData.noGrowthZero), position: "top", fontSize: 10, fill: CHART_AXIS_TICK.fill }} />
                 )}
                 {burndownData.growthZero !== null && burndownData.growthZero !== burndownData.noGrowthZero && (
-                  <ReferenceLine x={burndownData.growthZero} stroke="#34d399" strokeDasharray="3 3" strokeWidth={1}
-                    label={{ value: fmtYears(burndownData.growthZero), position: "top", fontSize: 10, fill: "#34d399" }} />
+                  <ReferenceLine x={burndownData.growthZero} stroke={CHART_SEMANTIC.surplus} strokeDasharray="3 3" strokeWidth={1}
+                    label={{ value: fmtYears(burndownData.growthZero), position: "top", fontSize: 10, fill: CHART_SEMANTIC.surplus }} />
                 )}
                 {burndownData.taxZero !== null && burndownData.taxZero !== burndownData.growthZero && burndownData.taxZero !== burndownData.noGrowthZero && (
-                  <ReferenceLine x={burndownData.taxZero} stroke="#f59e0b" strokeDasharray="3 3" strokeWidth={1}
-                    label={{ value: fmtYears(burndownData.taxZero), position: "top", fontSize: 10, fill: "#f59e0b" }} />
+                  <ReferenceLine x={burndownData.taxZero} stroke={CHART_SEMANTIC.taxes} strokeDasharray="3 3" strokeWidth={1}
+                    label={{ value: fmtYears(burndownData.taxZero), position: "top", fontSize: 10, fill: CHART_SEMANTIC.taxes }} />
                 )}
 
-                <Line type="monotone" dataKey="withGrowth" stroke="#34d399" strokeWidth={2.5} dot={false} name="withGrowth"
-                  style={{ filter: "drop-shadow(0 0 5px #34d399)" }} />
-                <Line type="monotone" dataKey="withoutGrowth" stroke="#64748b" strokeWidth={2} strokeDasharray="6 3" dot={false} name="withoutGrowth" />
+                <Line type="monotone" dataKey="withGrowth" stroke={CHART_SEMANTIC.surplus} strokeWidth={2.5} dot={false} name="withGrowth"
+                  style={{ filter: `drop-shadow(0 0 5px ${CHART_SEMANTIC.surplus})` }} />
+                <Line type="monotone" dataKey="withoutGrowth" stroke={CHART_SERIES[5]} strokeWidth={2} strokeDasharray="6 3" dot={false} name="withoutGrowth" />
                 {burndownData.hasTaxDrag && (
-                  <Line type="monotone" dataKey="withTax" stroke="#f59e0b" strokeWidth={2} dot={false} name="withTax" />
+                  <Line type="monotone" dataKey="withTax" stroke={CHART_SEMANTIC.taxes} strokeWidth={2} dot={false} name="withTax" />
                 )}
               </LineChart>
             </ResponsiveContainer>
