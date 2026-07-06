@@ -67,7 +67,7 @@ function StepCircle({ step, size = "sm" }: { step: FlowchartStep; size?: "sm" | 
     );
   }
   return (
-    <div className={`flex ${dim} flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5`}>
+    <div className={`flex ${dim} flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-[var(--surface-1)]`}>
       <span className={`${textSize} font-medium text-slate-500`}>{step.stepNumber}</span>
     </div>
   );
@@ -91,7 +91,7 @@ function StepContextSection({ context }: { context: StepContext }) {
 
   if (!hasItems && !hasProgress) {
     return (
-      <div className="mt-3 rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2.5">
+      <div className="mt-3 rounded-lg border border-white/5 bg-[var(--surface-1)] px-3 py-2.5">
         <p className="text-xs font-medium text-slate-500 mb-1">{context.heading}</p>
         <p className="text-xs text-slate-600 italic">None found in your data yet</p>
       </div>
@@ -99,7 +99,7 @@ function StepContextSection({ context }: { context: StepContext }) {
   }
 
   return (
-    <div className="mt-3 rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2.5">
+    <div className="mt-3 rounded-lg border border-white/5 bg-[var(--surface-1)] px-3 py-2.5">
       <p className="text-xs font-medium text-slate-500 mb-1.5">{context.heading}</p>
       {hasItems && (
         <div className="space-y-1">
@@ -124,7 +124,7 @@ function StepContextSection({ context }: { context: StepContext }) {
               {Math.min(100, Math.round((context.progress.current / context.progress.target) * 100))}%
             </span>
           </div>
-          <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+          <div className="h-1.5 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
@@ -216,7 +216,7 @@ function StepDetailModal({
 
         {step.status !== "complete" && step.progress > 0 && step.progress < 100 && (
           <div className="mb-3 flex items-center gap-2">
-            <div className="h-1.5 flex-1 rounded-full bg-white/5 overflow-hidden">
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
               <div className="h-full rounded-full bg-amber-400 transition-all duration-500" style={{ width: `${step.progress}%` }} />
             </div>
             <span className="text-xs font-medium text-amber-400 tabular-nums">{step.progress}%</span>
@@ -396,8 +396,8 @@ function TimelineStep({
           step.status === "in-progress"
             ? "bg-amber-500/8 ring-1 ring-amber-400/25 hover:bg-amber-500/12"
             : step.status === "complete"
-              ? "hover:bg-white/[0.03]"
-              : "hover:bg-white/[0.03]"
+              ? "bg-[var(--surface-1)] hover:bg-white/[0.04]"
+              : "bg-[var(--surface-1)] hover:bg-white/[0.04]"
         }`}
       >
         <div className="flex items-center gap-2">
@@ -514,7 +514,7 @@ export default function FinancialFlowchart({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 shadow-sm transition-all duration-200"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 shadow-sm transition-all duration-200"
       data-testid="financial-flowchart"
     >
       {/* Header */}
@@ -529,7 +529,7 @@ export default function FinancialFlowchart({
         </div>
         <div className="flex-1 min-w-[120px] max-w-xs">
           <div
-            className="h-2 w-full overflow-hidden rounded-full bg-white/5"
+            className="h-2 w-full overflow-hidden rounded-full bg-[var(--surface-1)]"
             role="progressbar"
             aria-valuenow={percentage}
             aria-valuemin={0}

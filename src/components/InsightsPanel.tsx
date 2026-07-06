@@ -105,7 +105,7 @@ function InsightRow({
       ref={rowRef}
       className={`flex items-start gap-2 transition-all duration-300 ${
         visible ? "opacity-100" : "opacity-0"
-      } ${isClickable ? "cursor-pointer hover:bg-white/5 -mx-2 px-2 rounded" : ""}`}
+      } ${isClickable ? "cursor-pointer rounded-lg bg-[var(--surface-1)] px-2 py-1 hover:bg-white/5" : "rounded-lg bg-[var(--surface-1)] px-2 py-1"}`}
       data-testid={`insight-card-${insight.id}`}
       data-insight-type={insight.type}
       onClick={handleClick}
@@ -152,7 +152,7 @@ export default function InsightsPanel({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-4"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 backdrop-blur-sm"
       data-testid="insights-panel"
     >
       {/* Projection milestones */}

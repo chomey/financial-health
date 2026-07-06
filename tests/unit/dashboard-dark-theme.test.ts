@@ -18,16 +18,16 @@ const pageSrc = fs.readFileSync(
 );
 
 describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
-  it("metric cards use glass effect background (bg-white/5)", () => {
-    expect(dashboardSrc).toContain("bg-white/5");
+  it("metric cards use the hero surface token", () => {
+    expect(dashboardSrc).toContain("bg-[var(--surface-3)]");
   });
 
   it("metric cards use backdrop-blur for glass effect", () => {
     expect(dashboardSrc).toContain("backdrop-blur-sm");
   });
 
-  it("metric cards use semi-transparent dark border (border-white/10)", () => {
-    expect(dashboardSrc).toContain("border-white/10");
+  it("metric cards use the strong surface border", () => {
+    expect(dashboardSrc).toContain("border-[var(--surface-border-strong)]");
   });
 
   it("positive metric value uses emerald-400 instead of green-600", () => {
@@ -67,7 +67,7 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
   });
 
   it("metric cards use consistent border without special glow", () => {
-    expect(dashboardSrc).toContain("border-white/10");
+    expect(dashboardSrc).toContain("border-[var(--surface-border-strong)]");
     expect(dashboardSrc).not.toContain("animate-glow-pulse");
     expect(dashboardSrc).not.toContain("animate-warning-pulse");
   });
@@ -126,8 +126,8 @@ describe("Task 128: Dashboard dark theme — DataFlowArrows", () => {
     expect(arrowsSrc).toContain("text-slate-200");
   });
 
-  it("source summary card uses dark glass background (bg-slate-700/50)", () => {
-    expect(arrowsSrc).toContain("bg-slate-700/50");
+  it("source summary card uses the inner surface token", () => {
+    expect(arrowsSrc).toContain("bg-[var(--surface-1)]");
   });
 
   it("source summary positive accent uses cyan-500 instead of green-500", () => {

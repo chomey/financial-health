@@ -35,7 +35,7 @@ export default function RetirementReadinessScore({ result }: Props) {
   const barColor = TIER_BAR_COLORS[result.tier] ?? TIER_BAR_COLORS["Getting Started"];
 
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900/50 p-4 sm:p-5" data-testid="retirement-readiness-score">
+    <div className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5" data-testid="retirement-readiness-score">
       <h3 className="mb-1 text-sm font-semibold text-slate-200">Retirement Readiness</h3>
       <p className="mb-4 text-xs text-slate-500">How prepared you are for retirement</p>
 
@@ -45,7 +45,7 @@ export default function RetirementReadinessScore({ result }: Props) {
           {result.score}
         </div>
         <div>
-          <div className={`inline-block rounded-lg border px-2.5 py-1 text-sm font-semibold ${tierColor}`} data-testid="readiness-tier">
+          <div className={`inline-block rounded-full border px-2.5 py-1 text-sm font-semibold ${tierColor}`} data-testid="readiness-tier">
             {result.tier}
           </div>
           <div className="mt-1 text-xs text-slate-500">out of 100</div>
@@ -53,7 +53,7 @@ export default function RetirementReadinessScore({ result }: Props) {
       </div>
 
       {/* Overall bar */}
-      <div className="h-3 w-full overflow-hidden rounded-full bg-slate-800 mb-4">
+      <div className="mb-4 h-3 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
         <div
           className={`h-full rounded-full ${barColor} transition-all duration-700`}
           style={{ width: `${result.score}%` }}
@@ -68,7 +68,7 @@ export default function RetirementReadinessScore({ result }: Props) {
             <div key={key} className="flex items-center gap-2">
               <span className="text-xs w-4 text-center" aria-hidden="true">{icon}</span>
               <span className="text-xs text-slate-400 w-32 truncate">{label}</span>
-              <div className="flex-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${value >= 75 ? "bg-emerald-400" : value >= 50 ? "bg-cyan-400" : value >= 25 ? "bg-amber-400" : "bg-rose-400"}`}
                   style={{ width: `${value}%` }}

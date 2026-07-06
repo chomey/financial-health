@@ -260,7 +260,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
   return (
     <section
-      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-6"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 backdrop-blur-sm"
       data-testid="projection-chart"
       aria-label="Financial projection"
     >
@@ -281,7 +281,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                   scenario === s
                     ? "text-slate-900 shadow-sm"
-                    : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
+                    : "bg-[var(--surface-1)] text-slate-400 hover:bg-white/10"
                 }`}
                 style={scenario === s ? { backgroundColor: SCENARIO_COLORS[s] } : undefined}
                 data-testid={`scenario-${s}`}
@@ -303,7 +303,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                 mode === "keep-earning"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
-                  : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
+                  : "bg-[var(--surface-1)] text-slate-400 hover:bg-white/10"
               }`}
               data-testid="mode-keep-earning"
             >
@@ -314,7 +314,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               className={`focus-ring rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ${
                 mode === "income-stops"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm"
-                  : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
+                  : "bg-[var(--surface-1)] text-slate-400 hover:bg-white/10"
               }`}
               data-testid="mode-income-stops"
             >

@@ -21,8 +21,8 @@ describe("NetWorthDonutChart dark theme", () => {
       <NetWorthDonutChart assets={[]} debts={[]} properties={[]} stocks={[]} />
     );
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain("border-white/10");
-    expect(card.className).toContain("bg-white/5");
+    expect(card.className).toContain("border-[var(--surface-border)]");
+    expect(card.className).toContain("bg-[var(--surface-2)]");
     expect(card.className).toContain("backdrop-blur-sm");
   });
 
@@ -36,8 +36,8 @@ describe("NetWorthDonutChart dark theme", () => {
       />
     );
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain("border-white/10");
-    expect(card.className).toContain("bg-white/5");
+    expect(card.className).toContain("border-[var(--surface-border)]");
+    expect(card.className).toContain("bg-[var(--surface-2)]");
   });
 
   it("renders composition table with dark row borders", () => {
@@ -75,8 +75,8 @@ describe("ExpenseBreakdownChart dark theme", () => {
       <ExpenseBreakdownChart expenses={[]} />
     );
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain("border-white/10");
-    expect(card.className).toContain("bg-white/5");
+    expect(card.className).toContain("border-[var(--surface-border)]");
+    expect(card.className).toContain("bg-[var(--surface-2)]");
     expect(card.className).toContain("backdrop-blur-sm");
   });
 
@@ -88,8 +88,8 @@ describe("ExpenseBreakdownChart dark theme", () => {
       />
     );
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain("border-white/10");
-    expect(card.className).toContain("bg-white/5");
+    expect(card.className).toContain("border-[var(--surface-border)]");
+    expect(card.className).toContain("bg-[var(--surface-2)]");
   });
 
   it("renders spending power box with dark surface", () => {
@@ -101,7 +101,7 @@ describe("ExpenseBreakdownChart dark theme", () => {
       />
     );
     const spendingPower = getByTestId("spending-power");
-    expect(spendingPower.className).toContain("bg-slate-800/50");
+    expect(spendingPower.className).toContain("bg-[var(--surface-1)]");
   });
 
   it("legend entries use slate-300 text (not stone)", () => {

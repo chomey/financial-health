@@ -64,7 +64,7 @@ export default function WithdrawalTaxSummary({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 p-3 sm:p-5 shadow-sm transition-all duration-200"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 shadow-sm transition-all duration-200"
       data-testid="withdrawal-tax-summary"
     >
       <div className="flex items-center justify-between">
@@ -90,7 +90,7 @@ export default function WithdrawalTaxSummary({
 
       {/* Tax treatment breakdown bar */}
       <div className="mt-3">
-        <div className="flex h-3 w-full overflow-hidden rounded-full bg-white/5">
+        <div className="flex h-3 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
           {treatments.map((t) => {
             const pct = totalLiquid > 0 ? (t.data.total / totalLiquid) * 100 : 0;
             if (pct <= 0) return null;
@@ -177,7 +177,7 @@ export default function WithdrawalTaxSummary({
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                       </svg>
                     )}
-                    <span className="max-w-[150px] truncate rounded bg-white/5 px-1.5 py-0.5 font-medium">
+                    <span className="max-w-[150px] truncate rounded-lg bg-[var(--surface-1)] px-1.5 py-0.5 font-medium">
                       {cat}
                     </span>
                   </span>

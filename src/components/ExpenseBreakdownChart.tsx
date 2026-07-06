@@ -174,7 +174,7 @@ export default function ExpenseBreakdownChart({
   if (data.length === 0) {
     return (
       <div
-        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5 text-center"
+        className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 text-center backdrop-blur-sm"
         data-testid="expense-breakdown-chart"
       >
         <p className="text-sm text-slate-400">
@@ -192,7 +192,7 @@ export default function ExpenseBreakdownChart({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 backdrop-blur-sm"
       data-testid="expense-breakdown-chart"
     >
       <div className="mb-3 flex items-center gap-1.5">
@@ -207,7 +207,7 @@ export default function ExpenseBreakdownChart({
             <span>Expenses: {fmt.compact(totalExpenses)}/mo</span>
             <span>{hasTaxSlice ? "Gross Income" : "Income"}: {fmt.compact(incomeForComparison)}/mo</span>
           </div>
-          <div className="relative h-4 w-full overflow-hidden rounded-full bg-slate-700/50">
+          <div className="relative h-4 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
             {/* Expense fill */}
             <div
               className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
@@ -242,7 +242,7 @@ export default function ExpenseBreakdownChart({
 
       {/* Spending power & inflation */}
       {spendingPower > 0 && (
-        <div className="mb-4 rounded-lg bg-slate-800/50 border border-white/5 px-3 py-2.5 space-y-1.5" data-testid="spending-power">
+        <div className="mb-4 space-y-1.5 rounded-lg border border-white/5 bg-[var(--surface-1)] px-3 py-2.5" data-testid="spending-power">
           <div className="flex items-center justify-between">
             <span className="text-xs text-slate-400">Spending Power</span>
             <span className="text-xs font-medium text-slate-100">{fmt.compact(spendingPower)}/mo</span>

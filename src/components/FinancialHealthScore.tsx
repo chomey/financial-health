@@ -131,7 +131,7 @@ function SubScoreBar({ sub }: { sub: SubScore }) {
         <span className="text-xs font-medium text-slate-300">{sub.label}</span>
         <span className="text-xs text-slate-500">{Math.round(sub.score)}/25</span>
       </div>
-      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+      <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-1)]">
         <div
           className={`h-full rounded-full transition-all duration-500 ${
             pct >= 80 ? "bg-emerald-400" : pct >= 50 ? "bg-cyan-400" : pct >= 25 ? "bg-amber-400" : "bg-rose-400"
@@ -150,7 +150,7 @@ export default function FinancialHealthScore(props: FinancialHealthScoreProps) {
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 p-3 sm:p-5 shadow-sm"
+      className="rounded-2xl border border-[var(--surface-border-strong)] bg-[var(--surface-3)] p-5 shadow-sm"
       data-testid="financial-health-score"
     >
       <div className="flex items-center justify-between mb-3">

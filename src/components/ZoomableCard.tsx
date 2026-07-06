@@ -49,7 +49,7 @@ export default function ZoomableCard({ children }: { children: React.ReactNode }
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}
         aria-label="Click to expand chart"
       >
-        <div className="absolute right-2 top-2 z-10 rounded-md bg-slate-800/80 p-1 text-slate-400 opacity-0 shadow-sm backdrop-blur-sm transition-opacity duration-150 group-hover:opacity-100">
+        <div className="absolute right-2 top-2 z-10 rounded-lg bg-[var(--surface-1)] p-1 text-slate-400 opacity-0 shadow-sm backdrop-blur-sm transition-opacity duration-150 group-hover:opacity-100">
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
           </svg>

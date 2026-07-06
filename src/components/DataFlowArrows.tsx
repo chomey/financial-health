@@ -356,7 +356,7 @@ export function SourceSummaryCard({
 
   return (
     <div
-      className={`relative flex flex-col rounded-lg border-l-[3px] bg-slate-700/50 px-3 py-2 shadow-sm ${
+      className={`relative flex flex-col rounded-lg border-l-[3px] bg-[var(--surface-1)] px-3 py-2 shadow-sm ${
         isPositive ? "border-l-cyan-500" : "border-l-rose-500"
       }`}
       data-testid={`source-summary-${sourceId}`}
@@ -397,7 +397,7 @@ export function SourceSummaryCard({
       )}
 
       {/* Total with hand-drawn oval — sticky at bottom */}
-      <div className="sticky bottom-0 flex items-center justify-between border-t border-slate-600 pt-1.5 bg-slate-700/80" data-testid={`source-summary-total-row-${sourceId}`}>
+      <div className="sticky bottom-0 flex items-center justify-between border-t border-white/10 bg-[var(--surface-1)] pt-1.5" data-testid={`source-summary-total-row-${sourceId}`}>
         <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">Total</span>
         <div className="relative">
           <span

@@ -235,7 +235,7 @@ export default function NetWorthDonutChart({
   if (slices.length === 0) {
     return (
       <div
-        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5 text-center"
+        className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 text-center backdrop-blur-sm"
         data-testid="donut-chart"
       >
         <p className="text-sm text-slate-400">
@@ -257,7 +257,7 @@ export default function NetWorthDonutChart({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-5"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 backdrop-blur-sm"
       data-testid="donut-chart"
     >
       <div className="mb-3 flex items-center justify-between gap-2 flex-wrap">
@@ -294,7 +294,7 @@ export default function NetWorthDonutChart({
                 type="checkbox"
                 checked={showMortgages}
                 onChange={(e) => setShowMortgages(e.target.checked)}
-                className="rounded border-white/20 bg-white/5 text-violet-500 focus:ring-violet-400/30 h-3.5 w-3.5"
+                className="h-3.5 w-3.5 rounded border-white/20 bg-[var(--surface-1)] text-violet-500 focus:ring-violet-400/30"
               />
               Mortgages
             </label>

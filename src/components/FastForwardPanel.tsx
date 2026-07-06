@@ -160,7 +160,7 @@ export default function FastForwardPanel({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="focus-ring flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 shadow-sm text-left transition-colors duration-200 hover:bg-white/10 hover:shadow-md"
+        className="focus-ring flex w-full items-center justify-between rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] px-5 py-3 text-left shadow-sm transition-colors duration-200 hover:bg-white/10 hover:shadow-md"
         data-testid="fast-forward-toggle"
         aria-expanded={false}
       >
@@ -184,7 +184,7 @@ export default function FastForwardPanel({
 
   return (
     <section
-      className="overflow-hidden rounded-xl border border-white/10 bg-white/5 p-3 shadow-sm sm:p-6"
+      className="overflow-hidden rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 shadow-sm"
       data-testid="fast-forward-panel"
       aria-label="Fast Forward scenario modeling"
     >
@@ -207,7 +207,7 @@ export default function FastForwardPanel({
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="focus-ring rounded-md p-1 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300"
+            className="focus-ring rounded-lg p-1 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300"
             aria-label="Collapse Fast Forward"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -232,7 +232,7 @@ export default function FastForwardPanel({
               className={`focus-ring rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors duration-150 ${
                 activePreset === preset.id
                   ? "border-violet-400/50 bg-violet-400/15 text-violet-300"
-                  : "border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:border-white/20"
+                  : "border-white/10 bg-[var(--surface-1)] text-slate-400 hover:bg-white/10 hover:border-white/20"
               }`}
               data-testid={`preset-${preset.id}`}
             >
@@ -254,7 +254,7 @@ export default function FastForwardPanel({
               className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-colors duration-200 ${
                 mod.retireToday
                   ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
-                  : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  : "border-white/10 bg-[var(--surface-1)] text-slate-300 hover:bg-white/10"
               }`}
             >
               <input
@@ -286,7 +286,7 @@ export default function FastForwardPanel({
               className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-colors duration-200 ${
                 mod.maxTaxSheltered
                   ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-300"
-                  : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  : "border-white/10 bg-[var(--surface-1)] text-slate-300 hover:bg-white/10"
               }`}
             >
               <input
@@ -335,7 +335,7 @@ export default function FastForwardPanel({
               What if you downsized housing?
             </h4>
             <div className={`rounded-lg border px-3 py-2 transition-colors duration-200 ${
-              mod.housingDownsizePercent > 0 ? "border-violet-400/40 bg-violet-400/10" : "border-white/10"
+              mod.housingDownsizePercent > 0 ? "border-violet-400/40 bg-violet-400/10" : "border-white/10 bg-[var(--surface-1)]"
             }`}>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span className="text-sm text-slate-300 flex-1 min-w-[140px]">
@@ -374,7 +374,7 @@ export default function FastForwardPanel({
             What if market returns changed?
           </h4>
           <div className={`rounded-lg border px-3 py-2 transition-colors duration-200 ${
-            mod.roiAdjustment !== 0 ? "border-pink-400/40 bg-pink-400/10" : "border-white/10"
+            mod.roiAdjustment !== 0 ? "border-pink-400/40 bg-pink-400/10" : "border-white/10 bg-[var(--surface-1)]"
           }`}>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="text-sm text-slate-300 flex-1 min-w-[140px]">Global ROI adjustment</span>
@@ -397,7 +397,7 @@ export default function FastForwardPanel({
                 {mod.roiAdjustment !== 0 && (
                   <button
                     onClick={() => setRoiAdjustment(0)}
-                    className="focus-ring rounded px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                    className="focus-ring rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
                     title="Reset"
                   >
                     ↩
@@ -414,7 +414,7 @@ export default function FastForwardPanel({
             FIRE withdrawal rate
           </h4>
           <div className={`rounded-lg border px-3 py-2 transition-colors duration-200 ${
-            safeWithdrawalRate !== 4 ? "border-amber-400/40 bg-amber-400/10" : "border-white/10"
+            safeWithdrawalRate !== 4 ? "border-amber-400/40 bg-amber-400/10" : "border-white/10 bg-[var(--surface-1)]"
           }`}>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="text-sm text-slate-300 flex-1 min-w-[140px]">Safe withdrawal rate</span>
@@ -437,7 +437,7 @@ export default function FastForwardPanel({
                 {safeWithdrawalRate !== 4 && (
                   <button
                     onClick={() => onSwrChange?.(4)}
-                    className="focus-ring rounded px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                    className="focus-ring rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
                     title="Reset to 4%"
                   >
                     ↩
@@ -464,7 +464,7 @@ export default function FastForwardPanel({
                   className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-colors duration-200 ${
                     mod.excludedDebtIds.includes(debt.id)
                       ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
-                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                      : "border-white/10 bg-[var(--surface-1)] text-slate-300 hover:bg-white/10"
                   }`}
                   data-testid={`debt-toggle-${debt.id}`}
                 >
@@ -505,7 +505,7 @@ export default function FastForwardPanel({
                     <div
                       key={asset.id}
                       className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-colors duration-200 ${
-                        isModified ? "border-violet-400/40 bg-violet-400/10" : "border-white/10"
+                        isModified ? "border-violet-400/40 bg-violet-400/10" : "border-white/10 bg-[var(--surface-1)]"
                       }`}
                       data-testid={`contribution-${asset.id}`}
                     >
@@ -531,7 +531,7 @@ export default function FastForwardPanel({
                         {isModified && (
                           <button
                             onClick={() => setContributionOverride(asset.id, undefined)}
-                            className="focus-ring ml-1 rounded px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                            className="focus-ring ml-1 rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
                             title="Reset to original"
                           >
                             ↩
@@ -551,13 +551,13 @@ export default function FastForwardPanel({
             What if your income changed?
           </h4>
           <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-3 py-2 transition-colors duration-200 ${
-            mod.incomeAdjustment !== 0 ? "border-cyan-400/40 bg-cyan-400/10" : "border-white/10"
+            mod.incomeAdjustment !== 0 ? "border-cyan-400/40 bg-cyan-400/10" : "border-white/10 bg-[var(--surface-1)]"
           }`}>
             <span className="text-sm text-slate-300 flex-1 min-w-[140px]">Monthly adjustment</span>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setIncomeAdjustment(mod.incomeAdjustment - 500)}
-                className="focus-ring rounded px-1.5 py-0.5 text-xs font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10"
+                className="focus-ring rounded-lg px-1.5 py-0.5 text-xs font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10"
                 data-testid="income-decrease"
               >
                 -$500
@@ -569,7 +569,7 @@ export default function FastForwardPanel({
               </span>
               <button
                 onClick={() => setIncomeAdjustment(mod.incomeAdjustment + 500)}
-                className="focus-ring rounded px-1.5 py-0.5 text-xs font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10"
+                className="focus-ring rounded-lg px-1.5 py-0.5 text-xs font-medium text-slate-400 transition-colors duration-150 hover:bg-white/10"
                 data-testid="income-increase"
               >
                 +$500
@@ -577,7 +577,7 @@ export default function FastForwardPanel({
               {mod.incomeAdjustment !== 0 && (
                 <button
                   onClick={() => setIncomeAdjustment(0)}
-                  className="focus-ring ml-1 rounded px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                  className="focus-ring ml-1 rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
                   title="Reset"
                 >
                   ↩
@@ -593,7 +593,7 @@ export default function FastForwardPanel({
             One-time windfall
           </h4>
           <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-3 py-2 transition-colors duration-200 ${
-            mod.windfall > 0 ? "border-amber-400/40 bg-amber-400/10" : "border-white/10"
+            mod.windfall > 0 ? "border-amber-400/40 bg-amber-400/10" : "border-white/10 bg-[var(--surface-1)]"
           }`}>
             <span className="text-sm text-slate-300 flex-1 min-w-[140px]">
               Bonus, inheritance, or lump sum
@@ -613,7 +613,7 @@ export default function FastForwardPanel({
               {mod.windfall > 0 && (
                 <button
                   onClick={() => setWindfall(0)}
-                  className="focus-ring ml-1 rounded px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
+                  className="focus-ring ml-1 rounded-lg px-1 text-xs text-slate-500 transition-colors duration-150 hover:text-slate-300"
                   title="Reset"
                 >
                   ↩
@@ -649,7 +649,7 @@ export default function FastForwardPanel({
             {comparison.netWorthDeltas.map(({ year, baseline, scenario: scenVal, delta }) => (
               <div
                 key={year}
-                className="rounded-lg border border-white/10 bg-white/5 p-3"
+                className="rounded-lg border border-white/10 bg-[var(--surface-1)] p-3"
                 data-testid={`delta-year-${year}`}
               >
                 <p className="text-xs font-medium text-slate-400 mb-1">Net worth at year {year}</p>

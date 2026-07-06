@@ -113,7 +113,7 @@ function CashFlowTable({
             </div>
             <div className="space-y-0.5">
               {section.rows.map((row) => (
-                <div key={row.label} className="flex items-center justify-between rounded px-2 py-1 bg-white/5">
+                <div key={row.label} className="flex items-center justify-between rounded-lg bg-[var(--surface-1)] px-2 py-1">
                   <span className="text-xs text-slate-300">{row.label}</span>
                   <span className="text-xs font-medium tabular-nums text-slate-300">{fmt.full(row.value)}/mo</span>
                 </div>
@@ -245,13 +245,13 @@ export default function CashFlowSankey({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-sm"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] shadow-sm backdrop-blur-sm"
       data-testid="cash-flow-sankey"
     >
       <button
         type="button"
         onClick={() => setCollapsed(!collapsed)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors duration-150 hover:bg-white/5 rounded-xl"
+        className="flex w-full items-center justify-between rounded-2xl px-5 py-3 text-left transition-colors duration-150 hover:bg-white/5"
         aria-expanded={!collapsed}
         data-testid="cash-flow-toggle"
       >
@@ -393,7 +393,7 @@ export default function CashFlowSankey({
               {/* Tooltip */}
               {tooltip && (
                 <div
-                  className="absolute pointer-events-none z-10 rounded-md bg-slate-900 border border-white/10 px-2 py-1 text-xs text-slate-200 shadow-lg whitespace-nowrap"
+                  className="pointer-events-none absolute z-10 whitespace-nowrap rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-xs text-slate-200 shadow-lg"
                   style={{
                     left: tooltip.x,
                     top: tooltip.y,

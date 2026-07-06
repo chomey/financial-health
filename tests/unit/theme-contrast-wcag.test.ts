@@ -61,8 +61,9 @@ function blendRgba(
 
 // --- Theme color constants ---
 const BG_DARK = "#0f172a"; // slate-900 (--background)
-// Glass card surface: rgba(255,255,255,0.05) on #0f172a
-const BG_GLASS = blendRgba(255, 255, 255, 0.05, BG_DARK);
+const BG_SURFACE_1 = blendRgba(255, 255, 255, 0.03, BG_DARK);
+const BG_SURFACE_2 = blendRgba(255, 255, 255, 0.05, BG_DARK);
+const BG_SURFACE_3 = blendRgba(255, 255, 255, 0.08, BG_DARK);
 const FOCUS_RING_CYAN = blendRgba(34, 211, 238, 0.60, BG_DARK);
 
 const WCAG_AA_NORMAL = 4.5; // Minimum contrast ratio for normal text
@@ -87,16 +88,20 @@ const colorPairs: {
   { name: "pink-400 (#f472b6) on background", fg: "#f472b6", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
   { name: "amber-400 (#fbbf24) on background", fg: "#fbbf24", bg: BG_DARK, minRatio: WCAG_AA_NORMAL },
 
-  // Text on glass card surface (bg-white/5 over slate-900)
-  { name: "foreground (#e2e8f0) on glass card", fg: "#e2e8f0", bg: BG_GLASS, minRatio: WCAG_AA_NORMAL },
-  { name: "slate-300 (#cbd5e1) on glass card", fg: "#cbd5e1", bg: BG_GLASS, minRatio: WCAG_AA_NORMAL },
-  { name: "cyan-400 (#22d3ee) on glass card", fg: "#22d3ee", bg: BG_GLASS, minRatio: WCAG_AA_NORMAL },
-  { name: "rose-400 (#fb7185) on glass card", fg: "#fb7185", bg: BG_GLASS, minRatio: WCAG_AA_NORMAL },
-  { name: "violet-400 (#a78bfa) on glass card", fg: "#a78bfa", bg: BG_GLASS, minRatio: WCAG_AA_NORMAL },
+  // Text on tokenized card surfaces
+  { name: "foreground (#e2e8f0) on surface-1", fg: "#e2e8f0", bg: BG_SURFACE_1, minRatio: WCAG_AA_NORMAL },
+  { name: "slate-300 (#cbd5e1) on surface-1", fg: "#cbd5e1", bg: BG_SURFACE_1, minRatio: WCAG_AA_NORMAL },
+  { name: "foreground (#e2e8f0) on surface-2", fg: "#e2e8f0", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
+  { name: "slate-300 (#cbd5e1) on surface-2", fg: "#cbd5e1", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
+  { name: "cyan-400 (#22d3ee) on surface-2", fg: "#22d3ee", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
+  { name: "rose-400 (#fb7185) on surface-2", fg: "#fb7185", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
+  { name: "violet-400 (#a78bfa) on surface-2", fg: "#a78bfa", bg: BG_SURFACE_2, minRatio: WCAG_AA_NORMAL },
+  { name: "foreground (#e2e8f0) on surface-3", fg: "#e2e8f0", bg: BG_SURFACE_3, minRatio: WCAG_AA_NORMAL },
+  { name: "slate-300 (#cbd5e1) on surface-3", fg: "#cbd5e1", bg: BG_SURFACE_3, minRatio: WCAG_AA_NORMAL },
 
   // Muted/secondary text — large text threshold (labels, section headers)
   { name: "slate-400 (#94a3b8) on background [large text]", fg: "#94a3b8", bg: BG_DARK, minRatio: WCAG_AA_LARGE },
-  { name: "slate-400 (#94a3b8) on glass card [large text]", fg: "#94a3b8", bg: BG_GLASS, minRatio: WCAG_AA_LARGE },
+  { name: "slate-400 (#94a3b8) on surface-2 [large text]", fg: "#94a3b8", bg: BG_SURFACE_2, minRatio: WCAG_AA_LARGE },
 
   // Focus indicators — non-text contrast threshold
   { name: "cyan-400/60 focus ring on slate-900", fg: FOCUS_RING_CYAN, bg: BG_DARK, minRatio: WCAG_AA_LARGE },
@@ -110,10 +115,14 @@ describe("Task 134: WCAG AA contrast ratio verification for cyberpunk theme", ()
     expect(contrastRatio("#808080", "#808080")).toBeCloseTo(1, 1);
   });
 
-  it("glass card blend produces a slightly lighter surface than background", () => {
+  it("surface blends produce progressively lighter surfaces than background", () => {
     const bgLum = relativeLuminance(BG_DARK);
-    const glassLum = relativeLuminance(BG_GLASS);
-    expect(glassLum).toBeGreaterThan(bgLum);
+    const surface1Lum = relativeLuminance(BG_SURFACE_1);
+    const surface2Lum = relativeLuminance(BG_SURFACE_2);
+    const surface3Lum = relativeLuminance(BG_SURFACE_3);
+    expect(surface1Lum).toBeGreaterThan(bgLum);
+    expect(surface2Lum).toBeGreaterThan(surface1Lum);
+    expect(surface3Lum).toBeGreaterThan(surface2Lum);
   });
 
   for (const pair of colorPairs) {
@@ -141,6 +150,11 @@ describe("Task 134: Theme CSS variable definitions are present", () => {
     "--accent-muted",
     "--accent-surface",
     "--accent-border",
+    "--surface-1",
+    "--surface-2",
+    "--surface-3",
+    "--surface-border",
+    "--surface-border-strong",
   ];
 
   for (const v of requiredVars) {

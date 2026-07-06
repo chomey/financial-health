@@ -22,6 +22,11 @@ html {
   --accent-muted: #94a3b8;      /* slate-400 — secondary text, labels, borders */
   --accent-surface: rgba(255, 255, 255, 0.05);  /* glass card surface */
   --accent-border: rgba(255, 255, 255, 0.10);   /* subtle card borders */
+  --surface-1: rgba(255, 255, 255, 0.03);       /* nested/inner items */
+  --surface-2: rgba(255, 255, 255, 0.05);       /* standard module cards */
+  --surface-3: rgba(255, 255, 255, 0.08);       /* hero cards */
+  --surface-border: rgba(255, 255, 255, 0.10);
+  --surface-border-strong: rgba(255, 255, 255, 0.16);
 }
 
 @theme inline {
@@ -201,10 +206,10 @@ body {
 
 /* Global card hover glow — targets all rounded card elements with border */
 /* This covers all dark glass cards site-wide with a single rule */
-html body :is(.rounded-xl, .rounded-lg)[class*="border"][class*="bg-white"] {
+html body :is(.rounded-2xl, .rounded-xl, .rounded-lg)[class*="border"][class*="bg-"] {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-html body :is(.rounded-xl, .rounded-lg)[class*="border"][class*="bg-white"]:hover {
+html body :is(.rounded-2xl, .rounded-xl, .rounded-lg)[class*="border"][class*="bg-"]:hover {
   border-color: rgba(34, 211, 238, 0.35);
   box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.15), 0 10px 24px -8px rgba(34, 211, 238, 0.12);
 }

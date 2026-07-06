@@ -512,7 +512,7 @@ export default function Home() {
 
       {/* ── All sections (scrollable) ── */}
       <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mx-auto max-w-5xl space-y-8">
+        <div className="mx-auto max-w-5xl space-y-6">
 
           {/* Welcome */}
           <p className="text-sm text-slate-500 max-w-3xl">
@@ -657,7 +657,7 @@ export default function Home() {
               const worstPerformer = stockDetails.reduce<typeof stockDetails[0] | null>((worst, s) =>
                 s.gainLoss && (!worst || !worst.gainLoss || s.gainLoss.percentage < worst.gainLoss.percentage) ? s : worst, null);
               return (
-                <ZoomableCard><div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4 shadow-sm transition-all duration-200 sm:p-5" data-testid="portfolio-performance">
+                <ZoomableCard><div className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 shadow-sm transition-all duration-200" data-testid="portfolio-performance">
                   {/* Header */}
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Portfolio Performance</h3>
@@ -715,7 +715,7 @@ export default function Home() {
                       </thead>
                       <tbody>
                         {stockDetails.map((s) => (
-                          <tr key={s.id} className="border-b border-white/5">
+                          <tr key={s.id} className="border-b border-white/5 bg-[var(--surface-1)]">
                             <td className="py-1.5 font-mono font-medium text-slate-300">{s.ticker}</td>
                             <td className="py-1.5 text-right tabular-nums text-slate-300">{fc(s.value)}</td>
                             <td className={`py-1.5 text-right font-medium tabular-nums ${s.gainLoss ? (s.gainLoss.amount >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
@@ -736,10 +736,10 @@ export default function Home() {
                   {/* Best / Worst performers */}
                   {stockDetails.length > 1 && bestPerformer?.gainLoss && worstPerformer?.gainLoss && bestPerformer.ticker !== worstPerformer.ticker && (
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-400/10 px-2 py-1 text-[11px] font-medium text-emerald-400">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-1 text-[11px] font-medium text-emerald-400">
                         Best: {bestPerformer.ticker} +{bestPerformer.gainLoss.percentage.toFixed(1)}%
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-md bg-rose-400/10 px-2 py-1 text-[11px] font-medium text-rose-400">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-rose-400/10 px-2 py-1 text-[11px] font-medium text-rose-400">
                         Worst: {worstPerformer.ticker} {worstPerformer.gainLoss.percentage.toFixed(1)}%
                       </span>
                     </div>
@@ -756,7 +756,7 @@ export default function Home() {
 
           {/* Simple mode: upgrade banner */}
           {mode === "simple" && (
-            <div className="mt-2 rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 text-center" data-testid="simple-mode-upgrade-banner">
+            <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 p-5 text-center" data-testid="simple-mode-upgrade-banner">
               <p className="text-sm text-slate-400">
                 Want more detail?{" "}
                 <button

@@ -64,7 +64,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
             </span>
           )}
           {aboveBenchmark && (
-            <span className="text-xs font-medium text-emerald-300 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">
+            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-0.5 text-xs font-medium text-emerald-300">
               {isDebtMetric ? "Below median" : "Above median"}
             </span>
           )}
@@ -75,7 +75,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-400 w-14 shrink-0">You</span>
-          <div className="flex-1 h-5 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
               className={`h-full rounded-full transition-all duration-500 ${userColor}`}
               style={{ width: `${userWidth}%` }}
@@ -89,7 +89,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
         {/* Benchmark bar */}
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-400 w-14 shrink-0">Median</span>
-          <div className="flex-1 h-5 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
               className={`h-full rounded-full transition-all duration-500 ${benchmarkColor}`}
               style={{ width: `${benchmarkWidth}%` }}
@@ -103,7 +103,7 @@ function ComparisonBar({ comparison }: { comparison: BenchmarkComparison }) {
         {/* National average bar */}
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-400 w-14 shrink-0">Nat&apos;l Avg</span>
-          <div className="flex-1 h-5 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-5 flex-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
               className={`h-full rounded-full transition-all duration-500 ${nationalColor}`}
               style={{ width: `${nationalWidth}%` }}
@@ -137,7 +137,7 @@ export default function BenchmarkComparisons({
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 p-3 sm:p-5 shadow-sm"
+      className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 shadow-sm"
       data-testid="benchmark-comparisons"
     >
       <div className="flex items-center justify-between mb-4">
@@ -149,7 +149,7 @@ export default function BenchmarkComparisons({
         </div>
         <button
           onClick={() => setShowInfo(!showInfo)}
-          className="text-slate-500 hover:text-slate-300 transition-colors duration-150 p-1 rounded-md hover:bg-white/10"
+          className="rounded-lg p-1 text-slate-500 transition-colors duration-150 hover:bg-white/10 hover:text-slate-300"
           aria-label="Data sources information"
           data-testid="benchmark-info-button"
         >

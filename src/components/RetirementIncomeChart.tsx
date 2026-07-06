@@ -56,7 +56,7 @@ export default function RetirementIncomeChart({
   const barMax = Math.max(totalIncome, monthlyExpenses);
 
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900/50 p-4 sm:p-5" data-testid="retirement-income-chart">
+    <div className="rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5" data-testid="retirement-income-chart">
       <h3 className="mb-1 text-sm font-semibold text-slate-200">Retirement Income vs Expenses</h3>
       <p className="mb-4 text-xs text-slate-500">
         How your projected retirement income covers monthly expenses
@@ -68,7 +68,7 @@ export default function RetirementIncomeChart({
           <span>Retirement Income</span>
           <span className="font-medium text-slate-300">{fc(totalIncome)}/mo</span>
         </div>
-        <div className="h-8 w-full overflow-hidden rounded-lg bg-slate-800" data-testid="income-bar">
+        <div className="h-8 w-full overflow-hidden rounded-lg bg-[var(--surface-1)]" data-testid="income-bar">
           <div className="flex h-full">
             {sources.map((source) => {
               const widthPct = (source.monthlyAmount / barMax) * 100;
@@ -92,7 +92,7 @@ export default function RetirementIncomeChart({
           <span>Monthly Expenses</span>
           <span className="font-medium text-slate-300">{fc(monthlyExpenses)}/mo</span>
         </div>
-        <div className="h-8 w-full overflow-hidden rounded-lg bg-slate-800" data-testid="expenses-bar">
+        <div className="h-8 w-full overflow-hidden rounded-lg bg-[var(--surface-1)]" data-testid="expenses-bar">
           <div
             className="h-full rounded-lg bg-rose-500/60 transition-all duration-500"
             style={{ width: `${(monthlyExpenses / barMax) * 100}%` }}

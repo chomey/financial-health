@@ -145,7 +145,7 @@ describe("SourceSummaryCard", () => {
     expect(itemsContainer.className).toContain("max-h-[160px]");
   });
 
-  it("has sticky total row with shadow", () => {
+  it("has sticky total row with inner surface", () => {
     render(
       <SourceSummaryCard
         sourceId="section-assets"
@@ -159,7 +159,7 @@ describe("SourceSummaryCard", () => {
     const totalRow = screen.getByTestId("source-summary-total-row-section-assets");
     expect(totalRow.className).toContain("sticky");
     expect(totalRow.className).toContain("bottom-0");
-    expect(totalRow.className).toContain("bg-slate-700/80");
+    expect(totalRow.className).toContain("bg-[var(--surface-1)]");
   });
 
   it("renders without items when items is undefined", () => {

@@ -20,7 +20,7 @@ describe("Metric cards have consistent styling", () => {
     const runwayCard = screen.getByRole("group", { name: "Financial Runway" });
     expect(runwayCard.className).not.toContain("animate-glow-pulse");
     expect(runwayCard.className).not.toContain("animate-warning-pulse");
-    expect(runwayCard.className).toContain("border-white/10");
+    expect(runwayCard.className).toContain("border-[var(--surface-border-strong)]");
   });
 });
 

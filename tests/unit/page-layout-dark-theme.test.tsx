@@ -32,8 +32,8 @@ describe("InsightsPanel dark theme", () => {
     // The insights panel container should have dark glass bg
     const panel = container.querySelector('[data-testid="insights-panel"]') as HTMLElement;
     expect(panel).toBeTruthy();
-    expect(panel.className).toContain("bg-white/5");
-    expect(panel.className).toContain("border-white/10");
+    expect(panel.className).toContain("bg-[var(--surface-2)]");
+    expect(panel.className).toContain("border-[var(--surface-border)]");
     // Individual insight rows should exist
     const cards = container.querySelectorAll('[data-testid^="insight-card-"]');
     expect(cards.length).toBeGreaterThan(0);
@@ -70,8 +70,8 @@ describe("BenchmarkComparisons dark theme", () => {
       />
     );
     const card = container.querySelector('[data-testid="benchmark-comparisons"]') as HTMLElement;
-    expect(card.className).toContain("bg-white/5");
-    expect(card.className).toContain("border-white/10");
+    expect(card.className).toContain("bg-[var(--surface-2)]");
+    expect(card.className).toContain("border-[var(--surface-border)]");
   });
 
   it("heading uses light text color", () => {
