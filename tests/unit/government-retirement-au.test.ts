@@ -17,11 +17,11 @@ import { encodeState, decodeState } from "@/lib/url-state";
 
 describe("Government retirement income (AU)", () => {
   describe("Age Pension constants", () => {
-    it("single rate is ~$1,116/fortnight", () => {
+    it("single rate is ~$1,201/fortnight", () => {
       expect(AU_PENSION_SINGLE_FORTNIGHTLY).toBeGreaterThan(1000);
       expect(AU_PENSION_SINGLE_FORTNIGHTLY).toBeLessThan(1300);
     });
-    it("couple rate is ~$841/fortnight each", () => {
+    it("couple rate is ~$905/fortnight each", () => {
       expect(AU_PENSION_COUPLE_EACH_FORTNIGHTLY).toBeGreaterThan(700);
       expect(AU_PENSION_COUPLE_EACH_FORTNIGHTLY).toBeLessThan(1000);
     });

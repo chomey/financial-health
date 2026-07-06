@@ -14,9 +14,9 @@ describe("australianGovernmentRetirement", () => {
     it("converts fortnightly Age Pension to monthly (× 26 / 12)", () => {
       expect(
         australianGovernmentRetirement.computeMonthly({
-          agePensionFortnightly: 1116.30,
+          agePensionFortnightly: AU_PENSION_SINGLE_FORTNIGHTLY,
         }),
-      ).toBeCloseTo((1116.30 * 26) / 12, 6);
+      ).toBeCloseTo((AU_PENSION_SINGLE_FORTNIGHTLY * 26) / 12, 6);
     });
 
     it("matches the documented formula exactly", () => {
@@ -84,6 +84,11 @@ describe("australianGovernmentRetirement", () => {
         expect(preset.label.length).toBeGreaterThan(0);
       }
     });
+
+    it("derives benefit amounts in labels from the constants", () => {
+      expect(presets.find((p) => p.value === "full-single")?.label).toBe("Full single ($1,201/fn)");
+      expect(presets.find((p) => p.value === "full-couple")?.label).toBe("Full couple ($905/fn ea)");
+    });
   });
 
   describe("presetsFor(unknown field)", () => {
@@ -96,12 +101,12 @@ describe("australianGovernmentRetirement", () => {
   });
 
   describe("constants", () => {
-    it("AU_PENSION_SINGLE_FORTNIGHTLY is the Sep 2024 published max", () => {
-      expect(AU_PENSION_SINGLE_FORTNIGHTLY).toBeCloseTo(1116.30);
+    it("AU_PENSION_SINGLE_FORTNIGHTLY is the 20 March 2026 published max", () => {
+      expect(AU_PENSION_SINGLE_FORTNIGHTLY).toBeCloseTo(1200.90);
     });
 
-    it("AU_PENSION_COUPLE_EACH_FORTNIGHTLY is the Sep 2024 published max", () => {
-      expect(AU_PENSION_COUPLE_EACH_FORTNIGHTLY).toBeCloseTo(841.40);
+    it("AU_PENSION_COUPLE_EACH_FORTNIGHTLY is the 20 March 2026 published max", () => {
+      expect(AU_PENSION_COUPLE_EACH_FORTNIGHTLY).toBeCloseTo(905.20);
     });
 
     it("single rate is higher than couple-each rate", () => {

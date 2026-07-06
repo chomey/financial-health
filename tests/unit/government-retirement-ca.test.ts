@@ -19,12 +19,12 @@ describe("Government retirement income (CA)", () => {
     it("none returns 0", () => {
       expect(getCppPresetAmount("none")).toBe(0);
     });
-    it("average returns ~$817/mo", () => {
+    it("average returns ~$925/mo", () => {
       expect(getCppPresetAmount("average")).toBe(CPP_AVERAGE_MONTHLY);
       expect(CPP_AVERAGE_MONTHLY).toBeGreaterThan(700);
       expect(CPP_AVERAGE_MONTHLY).toBeLessThan(1000);
     });
-    it("max returns ~$1,365/mo", () => {
+    it("max returns ~$1,508/mo", () => {
       expect(getCppPresetAmount("max")).toBe(CPP_MAX_MONTHLY);
       expect(CPP_MAX_MONTHLY).toBeGreaterThan(1200);
       expect(CPP_MAX_MONTHLY).toBeLessThan(1600);
@@ -41,7 +41,7 @@ describe("Government retirement income (CA)", () => {
     it("none returns 0", () => {
       expect(getOasPresetAmount("none")).toBe(0);
     });
-    it("full returns ~$728/mo", () => {
+    it("full returns ~$742/mo", () => {
       expect(getOasPresetAmount("full")).toBe(OAS_MAX_MONTHLY_65_74);
       expect(OAS_MAX_MONTHLY_65_74).toBeGreaterThan(600);
       expect(OAS_MAX_MONTHLY_65_74).toBeLessThan(900);

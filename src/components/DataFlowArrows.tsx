@@ -22,13 +22,10 @@ const renderUSCapitalGainsExplainer = () => (
 );
 
 const CAPITAL_GAINS_EXPLAINERS: Record<CountryCode, (totalCapitalGains: number) => ReactNode> = {
-  CA: (totalCapitalGains) => (
+  CA: (_totalCapitalGains) => (
     <div className="text-xs text-slate-400 space-y-1">
       <p>Canada taxes capital gains at a reduced inclusion rate:</p>
-      <p className="font-medium text-slate-300">First $250,000: 50% included in income</p>
-      {totalCapitalGains > 250000 && (
-        <p className="font-medium text-slate-300">Above $250,000: 66.67% included</p>
-      )}
+      <p className="font-medium text-slate-300">50% included in income</p>
     </div>
   ),
   US: renderUSCapitalGainsExplainer,

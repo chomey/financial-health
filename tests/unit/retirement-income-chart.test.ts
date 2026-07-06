@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { computeMonthlyGovernmentIncome } from "@/lib/government-retirement";
 import { fortnightlyToMonthly, AU_PENSION_SINGLE_FORTNIGHTLY } from "@/lib/countries/australia/government-retirement";
+import { CPP_AVERAGE_MONTHLY, OAS_MAX_MONTHLY_65_74 } from "@/lib/countries/canada/government-retirement";
+import { SS_AVERAGE_MONTHLY } from "@/lib/countries/usa/government-retirement";
 
 describe("Retirement income chart data", () => {
   describe("coverage calculation", () => {
@@ -52,13 +54,16 @@ describe("Retirement income chart data", () => {
 
   describe("government income by country", () => {
     it("CA: CPP + OAS combined", () => {
-      const income = computeMonthlyGovernmentIncome("CA", { cppMonthly: 817, oasMonthly: 728 });
-      expect(income).toBe(1545);
+      const income = computeMonthlyGovernmentIncome("CA", {
+        cppMonthly: CPP_AVERAGE_MONTHLY,
+        oasMonthly: OAS_MAX_MONTHLY_65_74,
+      });
+      expect(income).toBeCloseTo(CPP_AVERAGE_MONTHLY + OAS_MAX_MONTHLY_65_74);
     });
 
     it("US: Social Security only", () => {
-      const income = computeMonthlyGovernmentIncome("US", { ssMonthly: 1976 });
-      expect(income).toBe(1976);
+      const income = computeMonthlyGovernmentIncome("US", { ssMonthly: SS_AVERAGE_MONTHLY });
+      expect(income).toBe(SS_AVERAGE_MONTHLY);
     });
 
     it("AU: Age Pension fortnightly to monthly", () => {

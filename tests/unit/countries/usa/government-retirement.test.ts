@@ -95,6 +95,13 @@ describe("americanGovernmentRetirement", () => {
         expect(preset.label.length).toBeGreaterThan(0);
       }
     });
+
+    it("derives benefit amounts in labels from the constants", () => {
+      expect(presets.find((p) => p.value === "average")?.label).toBe("Average ($2,071/mo)");
+      expect(presets.find((p) => p.value === "max-62")?.label).toBe("Max @ 62 ($2,969/mo)");
+      expect(presets.find((p) => p.value === "max-67")?.label).toBe("Max @ 67 ($4,207/mo)");
+      expect(presets.find((p) => p.value === "max-70")?.label).toBe("Max @ 70 ($5,181/mo)");
+    });
   });
 
   describe("presetsFor(unknown field)", () => {
@@ -107,20 +114,20 @@ describe("americanGovernmentRetirement", () => {
   });
 
   describe("constants", () => {
-    it("SS_AVERAGE_MONTHLY is the 2025 published average (~$1,976)", () => {
-      expect(SS_AVERAGE_MONTHLY).toBe(1_976);
+    it("SS_AVERAGE_MONTHLY is the 2026 published average (~$2,071)", () => {
+      expect(SS_AVERAGE_MONTHLY).toBe(2_071);
     });
 
-    it("SS_MAX_AT_62 is the 2025 published max at 62 (~$2,710)", () => {
-      expect(SS_MAX_AT_62).toBe(2_710);
+    it("SS_MAX_AT_62 is the 2026 published max at 62 (~$2,969)", () => {
+      expect(SS_MAX_AT_62).toBe(2_969);
     });
 
-    it("SS_MAX_AT_67 is the 2025 published max at FRA 67 (~$3,822)", () => {
-      expect(SS_MAX_AT_67).toBe(3_822);
+    it("SS_MAX_AT_67 is the 2026 published max at FRA 67 (~$4,207)", () => {
+      expect(SS_MAX_AT_67).toBe(4_207);
     });
 
-    it("SS_MAX_AT_70 is the 2025 published max at 70 (~$4,873)", () => {
-      expect(SS_MAX_AT_70).toBe(4_873);
+    it("SS_MAX_AT_70 is the 2026 published max at 70 (~$5,181)", () => {
+      expect(SS_MAX_AT_70).toBe(5_181);
     });
   });
 });

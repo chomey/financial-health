@@ -6,6 +6,7 @@ import {
   CPP_MAX_MONTHLY,
   CPP_AVERAGE_MONTHLY,
   OAS_MAX_MONTHLY_65_74,
+  OAS_CLAWBACK_THRESHOLD,
   type CppPreset,
   type OasPreset,
 } from "@/lib/countries/canada/government-retirement";
@@ -131,7 +132,7 @@ function CppOasInput({ value, onChange }: { value: GovernmentRetirementIncome | 
       <div>
         <div className="mb-2 flex items-center gap-1.5">
           <label className="text-sm font-medium text-slate-300">OAS (Old Age Security)</label>
-          <HelpTip text={`Monthly OAS pension at 65. Full pension: ${formatMo(OAS_MAX_MONTHLY_65_74)} (ages 65-74). Available to most Canadians who have lived in Canada for 10+ years after age 18. Subject to clawback above ~$91K income.`} />
+          <HelpTip text={`Monthly OAS pension at 65. Full pension: ${formatMo(OAS_MAX_MONTHLY_65_74)} (ages 65-74). Available to most Canadians who have lived in Canada for 10+ years after age 18. Subject to clawback above ~$${Math.round(OAS_CLAWBACK_THRESHOLD / 1000)}K income.`} />
         </div>
         <div className="flex gap-1.5 mb-2">
           {(["none", "full", "custom"] as OasPreset[]).map((p) => (

@@ -66,7 +66,6 @@ describe("Government retirement income (US)", () => {
       const fireNoSS = computeFireNumber(5000);
       const fireWithSS = computeFireNumber(5000, SS_AVERAGE_MONTHLY);
       expect(fireWithSS!).toBeLessThan(fireNoSS!);
-      // (5000-1976)*12/0.04 = $907,200 vs 5000*12/0.04 = $1,500,000
       expect(fireWithSS!).toBeCloseTo((5000 - SS_AVERAGE_MONTHLY) * 12 / 0.04, -2);
     });
   });

@@ -75,6 +75,11 @@ describe("canadianGovernmentRetirement", () => {
         expect(preset.label.length).toBeGreaterThan(0);
       }
     });
+
+    it("derives benefit amounts in labels from the constants", () => {
+      expect(presets.find((p) => p.value === "average")?.label).toBe("Average ($925/mo)");
+      expect(presets.find((p) => p.value === "max")?.label).toBe("Max ($1,508/mo)");
+    });
   });
 
   describe("presetsFor('oas')", () => {
@@ -104,6 +109,10 @@ describe("canadianGovernmentRetirement", () => {
         expect(preset.label.length).toBeGreaterThan(0);
       }
     });
+
+    it("derives benefit amounts in labels from the constants", () => {
+      expect(presets.find((p) => p.value === "full")?.label).toBe("Full ($742/mo)");
+    });
   });
 
   describe("presetsFor(unknown field)", () => {
@@ -115,24 +124,24 @@ describe("canadianGovernmentRetirement", () => {
   });
 
   describe("constants", () => {
-    it("CPP_MAX_MONTHLY is the 2025 published max", () => {
-      expect(CPP_MAX_MONTHLY).toBeCloseTo(1364.6);
+    it("CPP_MAX_MONTHLY is the 2026 published max", () => {
+      expect(CPP_MAX_MONTHLY).toBeCloseTo(1507.65);
     });
 
-    it("CPP_AVERAGE_MONTHLY is the 2025 published average", () => {
-      expect(CPP_AVERAGE_MONTHLY).toBeCloseTo(816.52);
+    it("CPP_AVERAGE_MONTHLY is the 2026 published average", () => {
+      expect(CPP_AVERAGE_MONTHLY).toBeCloseTo(925.35);
     });
 
-    it("OAS_MAX_MONTHLY_65_74 is the 2025 published max", () => {
-      expect(OAS_MAX_MONTHLY_65_74).toBeCloseTo(727.67);
+    it("OAS_MAX_MONTHLY_65_74 is the Q1 2026 published max", () => {
+      expect(OAS_MAX_MONTHLY_65_74).toBeCloseTo(742.31);
     });
 
     it("OAS_MAX_MONTHLY_75_PLUS is higher than 65-74 rate", () => {
       expect(OAS_MAX_MONTHLY_75_PLUS).toBeGreaterThan(OAS_MAX_MONTHLY_65_74);
     });
 
-    it("OAS_CLAWBACK_THRESHOLD is around $91K", () => {
-      expect(OAS_CLAWBACK_THRESHOLD).toBeCloseTo(90997);
+    it("OAS_CLAWBACK_THRESHOLD is the 2025 tax year threshold", () => {
+      expect(OAS_CLAWBACK_THRESHOLD).toBeCloseTo(93454);
     });
   });
 });
