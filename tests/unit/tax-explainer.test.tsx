@@ -31,7 +31,7 @@ const sampleDetails: TaxExplainerDetails = {
   totalTax: 8000,
   afterTaxIncome: 46000,
   brackets: [
-    { min: 0, max: 57375, rate: 0.15, amountInBracket: 54000, taxInBracket: 8100 },
+    { min: 0, max: 57375, rate: 0.145, amountInBracket: 54000, taxInBracket: 7830 },
   ],
   hasCapitalGains: false,
 };
@@ -54,7 +54,7 @@ describe("TaxExplainerContent", () => {
       ...sampleDetails,
       grossIncome: 100000,
       brackets: [
-        { min: 0, max: 57375, rate: 0.15, amountInBracket: 57375, taxInBracket: 8606 },
+        { min: 0, max: 57375, rate: 0.145, amountInBracket: 57375, taxInBracket: 8319 },
         { min: 57375, max: 114750, rate: 0.205, amountInBracket: 42625, taxInBracket: 8738 },
       ],
     };
@@ -114,7 +114,7 @@ describe("TaxExplainerContent", () => {
     render(<TaxExplainerContent details={cgDetails} />);
     const section = screen.getByTestId("tax-capital-gains");
     expect(section).toHaveTextContent("50% included");
-    expect(section).toHaveTextContent("$250,000");
+    expect(section).not.toHaveTextContent("$250,000");
   });
 
   it("renders US capital gains section", () => {
@@ -130,14 +130,16 @@ describe("TaxExplainerContent", () => {
     expect(section).toHaveTextContent("20%");
   });
 
-  it("shows CA above $250k inclusion rate when gains exceed threshold", () => {
+  it("shows the flat CA inclusion rate when gains exceed the old threshold", () => {
     const cgDetails: TaxExplainerDetails = {
       ...sampleDetails,
       hasCapitalGains: true,
       capitalGainsInfo: { country: "CA", totalCapitalGains: 300000 },
     };
     render(<TaxExplainerContent details={cgDetails} />);
-    expect(screen.getByTestId("tax-capital-gains")).toHaveTextContent("66.67%");
+    const section = screen.getByTestId("tax-capital-gains");
+    expect(section).toHaveTextContent("50% included");
+    expect(section).not.toHaveTextContent("66.67%");
   });
 });
 
@@ -253,9 +255,9 @@ describe("TaxExplainerContent zero income", () => {
     totalTax: 0,
     afterTaxIncome: 0,
     brackets: [
-      { min: 0, max: 57375, rate: 0.15, amountInBracket: 0, taxInBracket: 0 },
+      { min: 0, max: 57375, rate: 0.145, amountInBracket: 0, taxInBracket: 0 },
       { min: 57375, max: 114750, rate: 0.205, amountInBracket: 0, taxInBracket: 0 },
-      { min: 114750, max: 158468, rate: 0.26, amountInBracket: 0, taxInBracket: 0 },
+      { min: 114750, max: 177882, rate: 0.26, amountInBracket: 0, taxInBracket: 0 },
     ],
     hasCapitalGains: false,
   };
@@ -345,14 +347,14 @@ describe("TaxExplainerContent dual bracket tables", () => {
   it("shows tax amounts in bracket rows when income > 0", () => {
     render(<TaxExplainerContent details={detailsWithProvincial} />);
     const fedRow = screen.getByTestId("tax-federal-brackets-row-0");
-    expect(fedRow).toHaveTextContent("$8,100"); // taxInBracket
+    expect(fedRow).toHaveTextContent("$7,830"); // taxInBracket
     const provRow = screen.getByTestId("tax-provincial-brackets-row-0");
     expect(provRow).toHaveTextContent("$2,598");
   });
 
   it("shows federal subtotal", () => {
     render(<TaxExplainerContent details={detailsWithProvincial} />);
-    expect(screen.getByTestId("tax-federal-brackets-subtotal")).toHaveTextContent("$8,100");
+    expect(screen.getByTestId("tax-federal-brackets-subtotal")).toHaveTextContent("$7,830");
   });
 
   it("shows provincial subtotal", () => {

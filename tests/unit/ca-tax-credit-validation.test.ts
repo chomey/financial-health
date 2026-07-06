@@ -14,11 +14,11 @@ describe("Task 154 — Canadian tax credit/bracket validation (2025/2026)", () =
   describe("CA federal brackets 2025", () => {
     it("has correct 2025 bracket thresholds", () => {
       const b = CA_FEDERAL_2025.brackets;
-      expect(b[0]).toEqual({ min: 0, max: 57_375, rate: 0.15 });
+      expect(b[0]).toEqual({ min: 0, max: 57_375, rate: 0.145 });
       expect(b[1]).toEqual({ min: 57_375, max: 114_750, rate: 0.205 });
-      expect(b[2]).toEqual({ min: 114_750, max: 158_468, rate: 0.26 });
-      expect(b[3]).toEqual({ min: 158_468, max: 220_000, rate: 0.29 });
-      expect(b[4]).toEqual({ min: 220_000, max: Infinity, rate: 0.33 });
+      expect(b[2]).toEqual({ min: 114_750, max: 177_882, rate: 0.26 });
+      expect(b[3]).toEqual({ min: 177_882, max: 253_414, rate: 0.29 });
+      expect(b[4]).toEqual({ min: 253_414, max: Infinity, rate: 0.33 });
     });
 
     it("has correct 2025 BPA ($16,129)", () => {
@@ -27,9 +27,13 @@ describe("Task 154 — Canadian tax credit/bracket validation (2025/2026)", () =
   });
 
   describe("CA federal brackets 2026", () => {
-    it("2026 brackets are inflation-indexed from 2025 (~2.7%)", () => {
-      expect(CA_FEDERAL_2026.brackets[0].max).toBe(58_924);
-      expect(CA_FEDERAL_2026.basicPersonalAmount).toBe(16_564);
+    it("has official 2026 brackets indexed at 2.0%", () => {
+      expect(CA_FEDERAL_2026.brackets[0]).toEqual({ min: 0, max: 58_523, rate: 0.14 });
+      expect(CA_FEDERAL_2026.brackets[1]).toEqual({ min: 58_523, max: 117_045, rate: 0.205 });
+      expect(CA_FEDERAL_2026.brackets[2]).toEqual({ min: 117_045, max: 181_440, rate: 0.26 });
+      expect(CA_FEDERAL_2026.brackets[3]).toEqual({ min: 181_440, max: 258_482, rate: 0.29 });
+      expect(CA_FEDERAL_2026.brackets[4]).toEqual({ min: 258_482, max: Infinity, rate: 0.33 });
+      expect(CA_FEDERAL_2026.basicPersonalAmount).toBe(16_452);
     });
   });
 
@@ -41,7 +45,7 @@ describe("Task 154 — Canadian tax credit/bracket validation (2025/2026)", () =
 
     it("returns 2026 tables when requested", () => {
       const { federal } = getCanadianBrackets("ON", 2026);
-      expect(federal.basicPersonalAmount).toBe(16_564);
+      expect(federal.basicPersonalAmount).toBe(16_452);
     });
   });
 
@@ -71,10 +75,10 @@ describe("Task 154 — Canadian tax credit/bracket validation (2025/2026)", () =
   });
 
   describe("Spousal Amount Credit", () => {
-    it("2025: maxAmount is $2,419 (15% of BPA $16,129)", () => {
+    it("2025: maxAmount is $2,339 (14.5% of BPA $16,129)", () => {
       const credit = findCreditCategory("Spousal Amount Credit", "CA", 2025);
       expect(credit).toBeDefined();
-      expect(credit!.maxAmount).toBe(2_419);
+      expect(credit!.maxAmount).toBe(2_339);
     });
 
     it("2025: description mentions $16,129 threshold", () => {
@@ -82,9 +86,9 @@ describe("Task 154 — Canadian tax credit/bracket validation (2025/2026)", () =
       expect(credit!.description).toContain("$16,129");
     });
 
-    it("2026: maxAmount is $2,485 (indexed)", () => {
+    it("2026: maxAmount is $2,303 (14% of BPA $16,452)", () => {
       const credit = findCreditCategory("Spousal Amount Credit", "CA", 2026);
-      expect(credit!.maxAmount).toBe(2_485);
+      expect(credit!.maxAmount).toBe(2_303);
     });
   });
 
@@ -247,14 +251,18 @@ describe("Task 154 — Canadian tax credit/bracket validation (2025/2026)", () =
       }
     });
 
-    it("2026 maxAmounts are >= 2025 maxAmounts (inflation indexed)", () => {
+    it("2026 maxAmounts are >= 2025 maxAmounts except lowest-rate federal credits", () => {
       const cats2025 = getAllCreditCategories("CA", 2025);
       const cats2026 = getAllCreditCategories("CA", 2026);
       for (const c25 of cats2025) {
         if (c25.maxAmount && c25.maxAmount > 0) {
           const c26 = cats2026.find((c) => c.name === c25.name);
           expect(c26).toBeDefined();
-          // 2026 should be >= 2025 (inflation indexing)
+          if (c25.name === "Spousal Amount Credit") {
+            expect(c26!.maxAmount).toBe(2_303);
+            continue;
+          }
+          // 2026 should be >= 2025 for indexed amounts not reduced by the Bill C-4 rate cut.
           expect(c26!.maxAmount).toBeGreaterThanOrEqual(c25.maxAmount);
         }
       }

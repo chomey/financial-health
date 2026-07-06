@@ -4,21 +4,21 @@
  * Sources:
  * - Federal: https://www.canada.ca/en/revenue-agency/services/tax/individuals/frequently-asked-questions-individuals/canadian-income-tax-rates-individuals-current-previous-years.html
  * - Provincial: Individual provincial tax acts and CRA references
- * - Capital gains inclusion rate: Budget 2024 — 50% on first $250k, 66.67% above (for individuals)
+ * - Capital gains inclusion rate: 50% on all gains; the proposed two-tier increase was cancelled March 21, 2025
  */
 
 import type { BracketTable } from "@/lib/bracket-math";
 export type { BracketTable } from "@/lib/bracket-math";
 
 /**
- * Capital gains inclusion rates for Canadian individuals (2024+).
- * First $250,000 of capital gains: 50% inclusion.
- * Above $250,000: 66.67% inclusion.
+ * Capital gains inclusion rates for Canadian individuals.
+ * 50% inclusion applies to all gains; the proposed two-tier increase was
+ * cancelled March 21, 2025.
  */
 export const CA_CAPITAL_GAINS = {
   firstTierLimit: 250_000,
   firstTierRate: 0.5,
-  secondTierRate: 2 / 3,
+  secondTierRate: 0.5,
 };
 
 // ─── Federal ──────────────────────────────────────────────────────────────────
@@ -26,28 +26,26 @@ export const CA_CAPITAL_GAINS = {
 /** 2025 Canadian Federal Tax Brackets */
 export const CA_FEDERAL_2025: BracketTable = {
   brackets: [
-    { min: 0, max: 57_375, rate: 0.15 },
+    // Lowest rate is 14.5% for 2025 (Bill C-4 cut effective July 1, 2025; full-year blended rate).
+    { min: 0, max: 57_375, rate: 0.145 },
     { min: 57_375, max: 114_750, rate: 0.205 },
-    { min: 114_750, max: 158_468, rate: 0.26 },
-    { min: 158_468, max: 220_000, rate: 0.29 },
-    { min: 220_000, max: Infinity, rate: 0.33 },
+    { min: 114_750, max: 177_882, rate: 0.26 },
+    { min: 177_882, max: 253_414, rate: 0.29 },
+    { min: 253_414, max: Infinity, rate: 0.33 },
   ],
   basicPersonalAmount: 16_129,
 };
 
-/**
- * 2026 Canadian Federal Tax Brackets (estimated via CRA indexation factor ~2.7%).
- * These will be validated/corrected in Task 154 when official CRA values are published.
- */
+/** 2026 Canadian Federal Tax Brackets: official CRA 2026 values (2.0% indexation; lowest rate 14% per Bill C-4). */
 export const CA_FEDERAL_2026: BracketTable = {
   brackets: [
-    { min: 0, max: 58_924, rate: 0.15 },
-    { min: 58_924, max: 117_847, rate: 0.205 },
-    { min: 117_847, max: 162_747, rate: 0.26 },
-    { min: 162_747, max: 225_940, rate: 0.29 },
-    { min: 225_940, max: Infinity, rate: 0.33 },
+    { min: 0, max: 58_523, rate: 0.14 },
+    { min: 58_523, max: 117_045, rate: 0.205 },
+    { min: 117_045, max: 181_440, rate: 0.26 },
+    { min: 181_440, max: 258_482, rate: 0.29 },
+    { min: 258_482, max: Infinity, rate: 0.33 },
   ],
-  basicPersonalAmount: 16_564,
+  basicPersonalAmount: 16_452,
 };
 
 // ─── Provincial / Territorial ─────────────────────────────────────────────────
@@ -241,24 +239,32 @@ const CA_PROVINCIAL_BY_YEAR: Record<number, Record<string, BracketTable>> = {
 export const SUPPORTED_TAX_YEARS = [2025, 2026] as const;
 export type TaxYear = (typeof SUPPORTED_TAX_YEARS)[number];
 
+export function clampTaxYear(year: number): TaxYear {
+  const minYear = SUPPORTED_TAX_YEARS[0];
+  const maxYear = SUPPORTED_TAX_YEARS[SUPPORTED_TAX_YEARS.length - 1];
+
+  if (!Number.isFinite(year)) return maxYear;
+  if (year < minYear) return minYear;
+  if (year > maxYear) return maxYear;
+  return year as TaxYear;
+}
+
 /**
  * Get Canadian federal and provincial/territorial tax brackets.
  * @param province - Two-letter province/territory code (e.g., "ON", "BC", "AB")
  * @param year - Tax year (2025 or 2026; defaults to 2025)
  * @returns Federal and provincial bracket tables
- * @throws If the province code is not recognized or year is unsupported
+ * @throws If the province code is not recognized
  */
 export function getCanadianBrackets(
   province: string,
   year: number = 2025
 ): { federal: BracketTable; provincial: BracketTable } {
-  const federal = CA_FEDERAL_BY_YEAR[year];
-  if (!federal) {
-    throw new Error(`Tax year ${year} is not supported. Supported years: ${SUPPORTED_TAX_YEARS.join(", ")}`);
-  }
+  const taxYear = clampTaxYear(year);
+  const federal = CA_FEDERAL_BY_YEAR[taxYear];
 
   const code = province.toUpperCase();
-  const provincialTables = CA_PROVINCIAL_BY_YEAR[year] ?? CA_PROVINCIAL_2025;
+  const provincialTables = CA_PROVINCIAL_BY_YEAR[taxYear];
   const provincial = provincialTables[code];
   if (!provincial) {
     throw new Error(
@@ -272,15 +278,10 @@ export function getCanadianBrackets(
 
 /**
  * Calculate the taxable portion of capital gains for Canadian individuals.
- * First $250,000: 50% inclusion. Above $250,000: 66.67% inclusion.
+ * 50% inclusion applies to all gains.
  */
 export function calculateCanadianCapitalGainsInclusion(capitalGains: number): number {
   if (capitalGains <= 0) return 0;
 
-  const { firstTierLimit, firstTierRate, secondTierRate } = CA_CAPITAL_GAINS;
-  if (capitalGains <= firstTierLimit) {
-    return capitalGains * firstTierRate;
-  }
-
-  return firstTierLimit * firstTierRate + (capitalGains - firstTierLimit) * secondTierRate;
+  return capitalGains * CA_CAPITAL_GAINS.firstTierRate;
 }

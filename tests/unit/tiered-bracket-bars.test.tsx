@@ -16,13 +16,13 @@ import {
 } from "@/components/DataFlowArrows";
 
 const baseBrackets = [
-  { min: 0, max: 57375, rate: 0.15, amountInBracket: 50000, taxInBracket: 7500 },
+  { min: 0, max: 57375, rate: 0.145, amountInBracket: 50000, taxInBracket: 7250 },
   { min: 57375, max: 114750, rate: 0.205, amountInBracket: 0, taxInBracket: 0 },
-  { min: 114750, max: 158468, rate: 0.26, amountInBracket: 0, taxInBracket: 0 },
+  { min: 114750, max: 177882, rate: 0.26, amountInBracket: 0, taxInBracket: 0 },
 ];
 
 const sampleDetails: TaxExplainerDetails = {
-  federalTax: 7500,
+  federalTax: 7250,
   provincialStateTax: 2500,
   jurisdictionLabel: "Ontario",
   jurisdictionType: "Provincial",
@@ -73,7 +73,7 @@ describe("TieredBracketBars", () => {
   it("shows rate labels on each row", () => {
     render(<TaxExplainerContent details={sampleDetails} />);
     const row0 = screen.getByTestId("tax-federal-brackets-row-0");
-    expect(row0).toHaveTextContent("15.0%");
+    expect(row0).toHaveTextContent("14.5%");
     const row1 = screen.getByTestId("tax-federal-brackets-row-1");
     expect(row1).toHaveTextContent("20.5%");
   });
@@ -81,7 +81,7 @@ describe("TieredBracketBars", () => {
   it("shows tax amount on filled rows and dash on unfilled rows", () => {
     render(<TaxExplainerContent details={sampleDetails} />);
     const row0 = screen.getByTestId("tax-federal-brackets-row-0");
-    expect(row0).toHaveTextContent("$7,500");
+    expect(row0).toHaveTextContent("$7,250");
     const row1 = screen.getByTestId("tax-federal-brackets-row-1");
     expect(row1).toHaveTextContent("—");
   });
@@ -95,7 +95,7 @@ describe("TieredBracketBars", () => {
 
   it("shows subtotals below bracket sections", () => {
     render(<TaxExplainerContent details={sampleDetails} />);
-    expect(screen.getByTestId("tax-federal-brackets-subtotal")).toHaveTextContent("$7,500");
+    expect(screen.getByTestId("tax-federal-brackets-subtotal")).toHaveTextContent("$7,250");
     expect(screen.getByTestId("tax-provincial-brackets-subtotal")).toHaveTextContent("$2,525");
   });
 
@@ -128,9 +128,9 @@ describe("TieredBracketBars", () => {
       ...sampleDetails,
       grossIncome: 80000,
       brackets: [
-        { min: 0, max: 57375, rate: 0.15, amountInBracket: 57375, taxInBracket: 8606 },
+        { min: 0, max: 57375, rate: 0.145, amountInBracket: 57375, taxInBracket: 8319 },
         { min: 57375, max: 114750, rate: 0.205, amountInBracket: 22625, taxInBracket: 4638 },
-        { min: 114750, max: 158468, rate: 0.26, amountInBracket: 0, taxInBracket: 0 },
+        { min: 114750, max: 177882, rate: 0.26, amountInBracket: 0, taxInBracket: 0 },
       ],
     };
     render(<TaxExplainerContent details={multiDetails} />);

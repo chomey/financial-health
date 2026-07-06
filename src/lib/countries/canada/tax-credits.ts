@@ -33,16 +33,16 @@ const CA_CATEGORIES: TaxCreditCategory[] = [
     type: "non-refundable",
     jurisdiction: "CA",
     description:
-      "Claimable when your spouse or common-law partner's net income is below ~$16,129. Worth up to ~$2,419 federally. Only available to married or common-law couples.",
+      "Claimable when your spouse or common-law partner's net income is below ~$16,129. Worth up to ~$2,339 federally. Only available to married or common-law couples.",
     incomeLimits: {},
     requiresSpouse: true,
-    maxAmount: 2_419,
+    maxAmount: 2_339,
     fixedAmount: true,
     yearOverrides: {
       2026: {
-        maxAmount: 2_485,
+        maxAmount: 2_303,
         description:
-          "Claimable when your spouse or common-law partner's net income is below ~$16,564. Worth up to ~$2,485 federally. Only available to married or common-law couples.",
+          "Claimable when your spouse or common-law partner's net income is below ~$16,452. Worth up to ~$2,303 federally. Only available to married or common-law couples.",
       },
     },
   },
@@ -68,12 +68,12 @@ const CA_CATEGORIES: TaxCreditCategory[] = [
     type: "non-refundable",
     jurisdiction: "CA",
     description:
-      "15% federal credit on eligible medical expenses exceeding the lesser of 3% of your net income or $2,833. No income cap, but the effective benefit shrinks as income rises since the 3% floor grows. Includes prescriptions, dental, vision, and many specialist costs.",
+      "14.5% federal credit on eligible medical expenses exceeding the lesser of 3% of your net income or $2,833. No income cap, but the effective benefit shrinks as income rises since the 3% floor grows. Includes prescriptions, dental, vision, and many specialist costs.",
     incomeLimits: {},
     yearOverrides: {
       2026: {
         description:
-          "15% federal credit on eligible medical expenses exceeding the lesser of 3% of your net income or $2,910. No income cap, but the effective benefit shrinks as income rises since the 3% floor grows. Includes prescriptions, dental, vision, and many specialist costs.",
+          "14% federal credit on eligible medical expenses exceeding the lesser of 3% of your net income or $2,910. No income cap, but the effective benefit shrinks as income rises since the 3% floor grows. Includes prescriptions, dental, vision, and many specialist costs.",
       },
     },
   },
@@ -82,9 +82,15 @@ const CA_CATEGORIES: TaxCreditCategory[] = [
     type: "non-refundable",
     jurisdiction: "CA",
     description:
-      "15% credit on up to $20,000 of eligible renovation costs that make your home safer or more accessible. Available to individuals 65+ or those who qualify for the Disability Tax Credit. No income limit.",
+      "14.5% credit on up to $20,000 of eligible renovation costs that make your home safer or more accessible. Available to individuals 65+ or those who qualify for the Disability Tax Credit. No income limit.",
     incomeLimits: {},
     maxAmount: 20000,
+    yearOverrides: {
+      2026: {
+        description:
+          "14% credit on up to $20,000 of eligible renovation costs that make your home safer or more accessible. Available to individuals 65+ or those who qualify for the Disability Tax Credit. No income limit.",
+      },
+    },
   },
   {
     name: "Canada Workers Benefit (CWB)",

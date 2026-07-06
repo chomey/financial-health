@@ -3,6 +3,7 @@ import {
   getCanadianBrackets,
   calculateCanadianCapitalGainsInclusion,
   CA_FEDERAL_2025,
+  CA_FEDERAL_2026,
   CA_ON_2025,
   CA_BC_2025,
   CA_AB_2025,
@@ -12,6 +13,7 @@ import {
 import {
   getUSBrackets,
   US_FEDERAL_2025,
+  US_FEDERAL_2026,
   US_CAPITAL_GAINS_2025,
   US_CA_2025,
   US_NY_2025,
@@ -46,8 +48,9 @@ describe("getCanadianBrackets", () => {
     expect(() => getCanadianBrackets("XX")).toThrow("Unknown Canadian province/territory code");
   });
 
-  it("throws for unsupported tax year", () => {
-    expect(() => getCanadianBrackets("ON", 2024)).toThrow("Tax year 2024 is not supported");
+  it("clamps unsupported tax years to the supported range", () => {
+    expect(getCanadianBrackets("ON", 2024).federal).toBe(CA_FEDERAL_2025);
+    expect(getCanadianBrackets("ON", 2027).federal).toBe(CA_FEDERAL_2026);
   });
 });
 
@@ -61,28 +64,28 @@ describe("calculateProgressiveTax", () => {
   });
 
   it("returns 0 for income below basic personal amount", () => {
-    // Federal BPA is $16,129 at 15% rate → credit = $2,419.35
-    // Tax on $16,129 = $16,129 × 0.15 = $2,419.35 → net tax = 0
+    // Federal BPA is $16,129 at 14.5% rate → credit = $2,338.71
+    // Tax on $16,129 = $16,129 × 0.145 = $2,338.71 → net tax = 0
     expect(calculateProgressiveTax(16_129, CA_FEDERAL_2025)).toBeCloseTo(0, 2);
   });
 
   it("calculates federal tax correctly for $50,000 income", () => {
-    // $50,000 is entirely in the first bracket (0–57,375 at 15%)
-    // Gross tax = $50,000 × 0.15 = $7,500
-    // BPA credit = $16,129 × 0.15 = $2,419.35
-    // Net tax = $7,500 - $2,419.35 = $5,080.65
+    // $50,000 is entirely in the first bracket (0–57,375 at 14.5%)
+    // Gross tax = $50,000 × 0.145 = $7,250
+    // BPA credit = $16,129 × 0.145 = $2,338.71
+    // Net tax = $7,250 - $2,338.71 = $4,911.30
     const tax = calculateProgressiveTax(50_000, CA_FEDERAL_2025);
-    expect(tax).toBeCloseTo(5_080.65, 0);
+    expect(tax).toBeCloseTo(4_911.3, 0);
   });
 
   it("calculates federal tax correctly for $100,000 income", () => {
-    // Bracket 1: $57,375 × 0.15 = $8,606.25
+    // Bracket 1: $57,375 × 0.145 = $8,319.38
     // Bracket 2: ($100,000 - $57,375) × 0.205 = $42,625 × 0.205 = $8,738.13
-    // Gross tax = $17,344.38
-    // BPA credit = $16,129 × 0.15 = $2,419.35
-    // Net tax = $14,925.03
+    // Gross tax = $17,057.50
+    // BPA credit = $16,129 × 0.145 = $2,338.71
+    // Net tax = $14,718.80
     const tax = calculateProgressiveTax(100_000, CA_FEDERAL_2025);
-    expect(tax).toBeCloseTo(14_925, 0);
+    expect(tax).toBeCloseTo(14_719, 0);
   });
 
   it("calculates Ontario provincial tax correctly for $100,000 income", () => {
@@ -100,8 +103,8 @@ describe("calculateProgressiveTax", () => {
     const federal = calculateProgressiveTax(100_000, CA_FEDERAL_2025);
     const provincial = calculateProgressiveTax(100_000, CA_ON_2025);
     const combined = federal + provincial;
-    // Combined should be approximately $21,307
-    expect(combined).toBeCloseTo(21_307, -2); // within $100
+    // Combined should be approximately $21,101
+    expect(combined).toBeCloseTo(21_101, -2); // within $100
   });
 
   it("calculates Alberta tax for $200,000 income", () => {
@@ -143,15 +146,11 @@ describe("calculateCanadianCapitalGainsInclusion", () => {
     expect(calculateCanadianCapitalGainsInclusion(250_000)).toBe(125_000);
   });
 
-  it("applies 66.67% inclusion for gains above $250,000", () => {
-    // First $250k at 50% = $125,000
-    // Next $100k at 66.67% = $66,670 (approximately)
-    const inclusion = calculateCanadianCapitalGainsInclusion(350_000);
-    const expected = 250_000 * 0.5 + 100_000 * (2 / 3);
-    expect(inclusion).toBeCloseTo(expected, 2);
+  it("applies 50% inclusion for gains above $250,000", () => {
+    expect(calculateCanadianCapitalGainsInclusion(350_000)).toBe(175_000);
   });
 
-  it("handles exactly $250,000 at first tier only", () => {
+  it("handles exactly $250,000", () => {
     expect(calculateCanadianCapitalGainsInclusion(250_000)).toBe(125_000);
   });
 });
@@ -192,7 +191,7 @@ describe("bracket table integrity", () => {
   it("capital gains constants are valid", () => {
     expect(CA_CAPITAL_GAINS.firstTierLimit).toBe(250_000);
     expect(CA_CAPITAL_GAINS.firstTierRate).toBe(0.5);
-    expect(CA_CAPITAL_GAINS.secondTierRate).toBeCloseTo(2 / 3, 4);
+    expect(CA_CAPITAL_GAINS.secondTierRate).toBe(0.5);
   });
 });
 
@@ -240,8 +239,9 @@ describe("getUSBrackets", () => {
     expect(() => getUSBrackets("XX")).toThrow("Unknown US state code");
   });
 
-  it("throws for unsupported tax year", () => {
-    expect(() => getUSBrackets("CA", 2024)).toThrow("Tax year 2024 is not supported");
+  it("clamps unsupported tax years to the supported range", () => {
+    expect(getUSBrackets("CA", 2024).federal).toBe(US_FEDERAL_2025);
+    expect(getUSBrackets("CA", 2027).federal).toBe(US_FEDERAL_2026);
   });
 });
 
@@ -253,10 +253,10 @@ describe("US federal tax calculations (single filer)", () => {
     // Bracket 2: ($48,475 - $11,925) × 0.12 = $36,550 × 0.12 = $4,386.00
     // Bracket 3: ($50,000 - $48,475) × 0.22 = $1,525 × 0.22 = $335.50
     // Gross = $5,914.00
-    // BPA (standard deduction) credit = $15,000 × 0.10 = $1,500
-    // Net = $4,414.00
+    // BPA (standard deduction) credit = $15,750 × 0.10 = $1,575
+    // Net = $4,339.00
     const tax = calculateProgressiveTax(50_000, US_FEDERAL_2025);
-    expect(tax).toBeCloseTo(4_414, 0);
+    expect(tax).toBeCloseTo(4_339, 0);
   });
 
   it("calculates federal tax for $100,000 income", () => {
@@ -265,10 +265,10 @@ describe("US federal tax calculations (single filer)", () => {
     // Bracket 3: ($100,000 - $48,475) = $51,525 but cap at $103,350
     //   so $51,525 × 0.22 = $11,335.50
     // Gross = $16,914.00
-    // BPA credit = $15,000 × 0.10 = $1,500
-    // Net = $15,414.00
+    // BPA credit = $15,750 × 0.10 = $1,575
+    // Net = $15,339.00
     const tax = calculateProgressiveTax(100_000, US_FEDERAL_2025);
-    expect(tax).toBeCloseTo(15_414, 0);
+    expect(tax).toBeCloseTo(15_339, 0);
   });
 
   it("calculates federal tax for $200,000 income", () => {
@@ -278,20 +278,20 @@ describe("US federal tax calculations (single filer)", () => {
     // Bracket 4: ($197,300 - $103,350) × 0.24 = $93,950 × 0.24 = $22,548.00
     // Bracket 5: ($200,000 - $197,300) × 0.32 = $2,700 × 0.32 = $864.00
     // Gross = $41,063.00
-    // BPA credit = $15,000 × 0.10 = $1,500
-    // Net = $39,563.00
+    // BPA credit = $15,750 × 0.10 = $1,575
+    // Net = $39,488.00
     const tax = calculateProgressiveTax(200_000, US_FEDERAL_2025);
-    expect(tax).toBeCloseTo(39_563, 0);
+    expect(tax).toBeCloseTo(39_488, 0);
   });
 
-  it("returns 0 for income at or below standard deduction equivalent", () => {
+  it("applies the US standard deduction value as a credit in raw bracket math", () => {
     // calculateProgressiveTax uses BPA as credit at lowest rate
-    // For US_FEDERAL: BPA = $15,000, lowest rate = 10%, credit = $1,500
-    // Tax on $15,000: $11,925 × 0.10 + $3,075 × 0.12 = $1,192.50 + $369 = $1,561.50
-    // Net = $1,561.50 - $1,500 = $61.50 (not zero because US deduction works differently)
+    // For US_FEDERAL: BPA = $15,750, lowest rate = 10%, credit = $1,575
+    // Tax on $15,750: $11,925 × 0.10 + $3,825 × 0.12 = $1,192.50 + $459 = $1,651.50
+    // Net = $1,651.50 - $1,575 = $76.50
     // This is expected — the tax engine will apply deduction before brackets for US
-    const tax = calculateProgressiveTax(15_000, US_FEDERAL_2025);
-    expect(tax).toBeCloseTo(61.5, 0);
+    const tax = calculateProgressiveTax(15_750, US_FEDERAL_2025);
+    expect(tax).toBeCloseTo(76.5, 0);
   });
 
   it("returns 0 for zero income", () => {
@@ -431,7 +431,7 @@ describe("US bracket table integrity", () => {
     }
   });
 
-  it("US federal standard deduction is $15,000", () => {
-    expect(US_FEDERAL_2025.basicPersonalAmount).toBe(15_000);
+  it("US federal standard deduction is $15,750", () => {
+    expect(US_FEDERAL_2025.basicPersonalAmount).toBe(15_750);
   });
 });
