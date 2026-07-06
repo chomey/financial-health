@@ -24,6 +24,15 @@ describe("Early withdrawal penalties", () => {
       expect(penalties[0].rule).toContain("earnings");
     });
 
+    it("457 has no 10% penalty before 59.5", () => {
+      const penalties = getEarlyWithdrawalPenalties(["457(b)"], 40, "US");
+      expect(penalties).toHaveLength(1);
+      expect(penalties[0].penaltyPercent).toBe(0);
+      expect(penalties[0].penaltyFreeAge).toBe(59.5);
+      expect(penalties[0].rule).toContain("No 10% early-withdrawal penalty");
+      expect(penalties[0].rule).toContain("ordinary income");
+    });
+
     it("no penalty at 60 for 401k", () => {
       const penalties = getEarlyWithdrawalPenalties(["401k"], 60, "US");
       expect(penalties).toHaveLength(0);
