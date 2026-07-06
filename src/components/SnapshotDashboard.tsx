@@ -215,7 +215,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <h3 className="text-sm font-medium text-slate-400">{metric.title}</h3>
+          <h3 className="text-xs font-medium uppercase tracking-wider text-slate-400">{metric.title}</h3>
           {metric.helpText && <HelpTip text={metric.helpText} />}
         </div>
         <span className="text-base" aria-hidden="true">
@@ -223,7 +223,7 @@ function MetricCard({ metric, insights, homeCurrency, connections }: { metric: M
         </span>
       </div>
       <p
-        className={`mt-1 text-2xl font-bold ${valueColor}`}
+        className={`mt-1 text-3xl font-semibold tracking-tight tabular-nums md:text-4xl ${valueColor}`}
         aria-label={`${metric.title}: ${formatMetricValue(metric.value, metric.format, homeCurrency)}`}
       >
         {formatMetricValue(animatedValue, metric.format, homeCurrency)}

@@ -149,7 +149,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
     <div className="rounded-lg border border-white/10 bg-slate-900/90 px-3 py-2 shadow-md backdrop-blur-sm">
       <p className="text-sm font-medium text-slate-200">{segment.name}</p>
       <p
-        className={`text-sm font-medium ${
+        className={`text-sm font-medium tabular-nums ${
           segment.type === "debt"
             ? "text-red-400"
             : segment.type === "total"
@@ -163,7 +163,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
         {formatCurrency(Math.abs(segment.value))}
       </p>
       {segment.type !== "total" && (
-        <p className="text-xs text-slate-500">
+        <p className="text-xs tabular-nums text-slate-500">
           Running total: {formatCurrency(segment.cumulative)}
         </p>
       )}

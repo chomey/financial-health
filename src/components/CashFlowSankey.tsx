@@ -109,13 +109,13 @@ function CashFlowTable({
                 <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: section.color }} />
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">{section.title}</span>
               </div>
-              <span className="text-xs font-medium text-slate-400">{fmt.full(sectionTotal)}/mo</span>
+              <span className="text-xs font-medium tabular-nums text-slate-400">{fmt.full(sectionTotal)}/mo</span>
             </div>
             <div className="space-y-0.5">
               {section.rows.map((row) => (
                 <div key={row.label} className="flex items-center justify-between rounded px-2 py-1 bg-white/5">
                   <span className="text-xs text-slate-300">{row.label}</span>
-                  <span className="text-xs font-medium text-slate-300">{fmt.full(row.value)}/mo</span>
+                  <span className="text-xs font-medium tabular-nums text-slate-300">{fmt.full(row.value)}/mo</span>
                 </div>
               ))}
             </div>

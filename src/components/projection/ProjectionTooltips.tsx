@@ -18,12 +18,12 @@ export function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
     <div className="rounded-lg border border-white/10 bg-slate-900/90 p-3 shadow-lg backdrop-blur-sm">
       <p className="mb-1 text-xs font-medium text-slate-400">{yearLabel} from now</p>
       {payload.map((entry, i) => (
-        <p key={i} className="text-sm font-semibold" style={{ color: entry.color }}>
+        <p key={i} className="text-sm font-semibold tabular-nums" style={{ color: entry.color }}>
           {entry.name}: {fmt.full(entry.value)}
         </p>
       ))}
       {withdrawalTaxDrag > 0 && (
-        <p className="mt-1 text-xs text-amber-400" data-testid="tooltip-tax-drag">
+        <p className="mt-1 text-xs tabular-nums text-amber-400" data-testid="tooltip-tax-drag">
           Withdrawal tax paid: {fmt.full(withdrawalTaxDrag)}
         </p>
       )}
@@ -42,7 +42,7 @@ export function BurndownTooltip({ active, payload, label }: CustomTooltipProps) 
         const n = String(entry.name ?? "");
         const displayName = n === "withGrowth" ? "With growth" : n === "withoutGrowth" ? "Without growth" : n === "withTax" ? "After taxes" : n;
         return (
-          <p key={i} className="text-sm font-semibold" style={{ color: entry.color }}>
+          <p key={i} className="text-sm font-semibold tabular-nums" style={{ color: entry.color }}>
             {displayName}: ${Math.abs(entry.value).toLocaleString("en-US", { maximumFractionDigits: 0 })}
           </p>
         );

@@ -117,8 +117,8 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
           </span>
         )}
       </div>
-      <p className="text-sm text-slate-300">{fmt.full(item.value)}/mo</p>
-      <p className="text-xs text-slate-500">{item.percentage.toFixed(1)}% of total</p>
+      <p className="text-sm tabular-nums text-slate-300">{fmt.full(item.value)}/mo</p>
+      <p className="text-xs tabular-nums text-slate-500">{item.percentage.toFixed(1)}% of total</p>
     </div>
   );
 }
@@ -339,10 +339,10 @@ export default function ExpenseBreakdownChart({
               )}
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-100 font-medium">
+              <span className="font-medium tabular-nums text-slate-100">
                 {fmt.compact(slice.value)}
               </span>
-              <span className="text-slate-500 w-10 text-right">
+              <span className="w-10 text-right tabular-nums text-slate-500">
                 {slice.percentage.toFixed(1)}%
               </span>
             </div>

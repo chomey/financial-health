@@ -14,6 +14,20 @@ describe("Soft cyberpunk theme tokens", () => {
     expect(css).toMatch(/--foreground:\s*#e2e8f0/);
   });
 
+  it("uses Geist as the body font with system fallbacks", () => {
+    expect(css).toContain("font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif");
+    expect(css).not.toContain("font-family: Arial, Helvetica, sans-serif");
+  });
+
+  it("sets the root font size to 16px", () => {
+    expect(css).toMatch(/html\s*{[\s\S]*font-size:\s*16px/);
+    expect(css).not.toMatch(/html\s*{[\s\S]*font-size:\s*18px/);
+  });
+
+  it("defines a tabular number utility", () => {
+    expect(css).toMatch(/\.tabular-nums\s*{[\s\S]*font-variant-numeric:\s*tabular-nums/);
+  });
+
   it("defines --accent-positive (cyan)", () => {
     expect(css).toMatch(/--accent-positive:\s*#22d3ee/);
   });

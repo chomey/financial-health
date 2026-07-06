@@ -660,17 +660,17 @@ export default function Home() {
                 <ZoomableCard><div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4 shadow-sm transition-all duration-200 sm:p-5" data-testid="portfolio-performance">
                   {/* Header */}
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-slate-400">Portfolio Performance</h3>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Portfolio Performance</h3>
                     <span className="text-lg" aria-hidden="true">📊</span>
                   </div>
 
                   {/* Total gain/loss + return */}
                   <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                    <p className={`text-2xl font-bold ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                    <p className={`text-3xl font-semibold tracking-tight tabular-nums ${portfolio.totalGainLoss >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                       {portfolio.totalGainLoss >= 0 ? "+" : ""}{fc(portfolio.totalGainLoss)}
                     </p>
                     {portfolio.totalCostBasis > 0 && (
-                      <p className="text-sm text-slate-400" data-testid="portfolio-return-pct">
+                      <p className="text-sm tabular-nums text-slate-400" data-testid="portfolio-return-pct">
                         {portfolio.overallReturnPct >= 0 ? "+" : ""}{portfolio.overallReturnPct.toFixed(1)}% return on {fc(portfolio.totalCostBasis)} invested
                       </p>
                     )}
@@ -692,7 +692,7 @@ export default function Home() {
                       </div>
                       <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
                         {stockDetails.map((s, i) => (
-                          <span key={s.id} className="flex items-center gap-1 text-[10px] text-slate-400">
+                          <span key={s.id} className="flex items-center gap-1 text-xs tabular-nums text-slate-400">
                             <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: ALLOC_COLORS[i % ALLOC_COLORS.length] }} />
                             {s.ticker} {s.weight.toFixed(0)}%
                           </span>
@@ -717,14 +717,14 @@ export default function Home() {
                         {stockDetails.map((s) => (
                           <tr key={s.id} className="border-b border-white/5">
                             <td className="py-1.5 font-mono font-medium text-slate-300">{s.ticker}</td>
-                            <td className="py-1.5 text-right text-slate-300">{fc(s.value)}</td>
-                            <td className={`py-1.5 text-right font-medium ${s.gainLoss ? (s.gainLoss.amount >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
+                            <td className="py-1.5 text-right tabular-nums text-slate-300">{fc(s.value)}</td>
+                            <td className={`py-1.5 text-right font-medium tabular-nums ${s.gainLoss ? (s.gainLoss.amount >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
                               {s.gainLoss ? `${s.gainLoss.amount >= 0 ? "+" : ""}${fc(s.gainLoss.amount)}` : "—"}
                             </td>
-                            <td className={`py-1.5 text-right ${s.gainLoss ? (s.gainLoss.percentage >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
+                            <td className={`py-1.5 text-right tabular-nums ${s.gainLoss ? (s.gainLoss.percentage >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
                               {s.gainLoss ? `${s.gainLoss.percentage >= 0 ? "+" : ""}${s.gainLoss.percentage.toFixed(1)}%` : "—"}
                             </td>
-                            <td className={`py-1.5 text-right hidden sm:table-cell ${s.annualized !== null ? (s.annualized >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
+                            <td className={`py-1.5 hidden text-right tabular-nums sm:table-cell ${s.annualized !== null ? (s.annualized >= 0 ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}>
                               {s.annualized !== null ? `${s.annualized >= 0 ? "+" : ""}${s.annualized.toFixed(1)}%/yr` : "—"}
                             </td>
                           </tr>

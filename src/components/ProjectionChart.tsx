@@ -266,7 +266,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
     >
       <div className="mb-3 sm:mb-4 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
         <div className="flex items-center gap-1.5">
-          <h3 className="text-lg font-semibold text-slate-200">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
             Financial Projection
           </h3>
           <HelpTip text="Moderate scenario uses your entered ROI values as-is. Conservative is 30% lower, Optimistic 30% higher. Toggle inflation adjustment to see real (purchasing-power) values." />
@@ -379,7 +379,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
         {/* Surplus subtitle inline */}
         {mode === "keep-earning" && surplusInfo.income > 0 && (
-          <p className="text-xs text-slate-500" data-testid="projection-surplus-subtitle">
+          <p className="text-xs tabular-nums text-slate-500" data-testid="projection-surplus-subtitle">
             Income {formatCurrency(surplusInfo.income)} − Expenses {formatCurrency(surplusInfo.expenses)} = <span className={surplusInfo.surplus >= 0 ? "font-medium text-emerald-400" : "font-medium text-red-400"}>{formatCurrency(surplusInfo.surplus)}</span>/mo
           </p>
         )}
@@ -404,18 +404,18 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
             <tbody className="divide-y divide-white/5">
               <tr>
                 <td className="py-1.5 pr-4 font-medium text-slate-300">Net Worth</td>
-                <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.netWorth)}</td>
+                <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.netWorth)}</td>
                 {summaryPoints.milestones.map((p, i) => (
-                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-emerald-400 font-medium`}>
+                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right font-medium tabular-nums text-emerald-400`}>
                     {formatTableCurrency(p.netWorth)}
                   </td>
                 ))}
               </tr>
               <tr>
                 <td className="py-1.5 pr-4 font-medium text-slate-300">Total Assets</td>
-                <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.totalAssets)}</td>
+                <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.totalAssets)}</td>
                 {summaryPoints.milestones.map((p, i) => (
-                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-blue-400`}>
+                  <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-blue-400`}>
                     {formatTableCurrency(p.totalAssets)}
                   </td>
                 ))}
@@ -424,18 +424,18 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 <>
                   <tr>
                     <td className="py-1.5 pr-4 font-medium text-slate-300">Consumer Debt</td>
-                    <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.consumerDebts)}</td>
+                    <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.consumerDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-400`}>
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-red-400`}>
                         {formatTableCurrency(p.consumerDebts)}
                       </td>
                     ))}
                   </tr>
                   <tr>
                     <td className="py-1.5 pr-4 font-medium text-slate-300">Mortgage</td>
-                    <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.mortgageDebts)}</td>
+                    <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.mortgageDebts)}</td>
                     {summaryPoints.milestones.map((p, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-400`}>
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-red-400`}>
                         {formatTableCurrency(p.mortgageDebts)}
                       </td>
                     ))}
@@ -444,9 +444,9 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
               ) : (
                 <tr>
                   <td className="py-1.5 pr-4 font-medium text-slate-300">Total Debts</td>
-                  <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(summaryPoints.current.totalDebts)}</td>
+                  <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(summaryPoints.current.totalDebts)}</td>
                   {summaryPoints.milestones.map((p, i) => (
-                    <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-red-400`}>
+                    <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-red-400`}>
                       {formatTableCurrency(p.totalDebts)}
                     </td>
                   ))}
@@ -668,7 +668,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
       {/* Per-asset projections with dynamic milestones */}
       {assetProjections.length > 0 && (
         <div className="mt-4 border-t border-white/10 pt-4" data-testid="asset-projections-table">
-          <h4 className="mb-2 text-sm font-semibold text-slate-300">Asset Growth Projections</h4>
+          <h4 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-300">Asset Growth Projections</h4>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
@@ -686,9 +686,9 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
                 {assetProjections.map((ap) => (
                   <tr key={ap.category}>
                     <td className="py-1.5 pr-4 font-medium text-slate-300 truncate max-w-[120px]">{ap.category}</td>
-                    <td className="py-1.5 px-2 text-right text-slate-400">{formatTableCurrency(ap.currentValue)}</td>
+                    <td className="py-1.5 px-2 text-right tabular-nums text-slate-400">{formatTableCurrency(ap.currentValue)}</td>
                     {ap.milestoneValues.map((val, i) => (
-                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right text-emerald-400`}>
+                      <td key={milestoneYears[i]} className={`py-1.5 ${i === milestoneYears.length - 1 ? "pl-2" : "px-2"} text-right tabular-nums text-emerald-400`}>
                         {formatTableCurrency(val)}
                       </td>
                     ))}
@@ -781,7 +781,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
 
           {/* Starting balances */}
           {runwayDetails.withGrowth[0] && (
-            <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs text-slate-500" data-testid="burndown-starting-balances">
+            <div className="mt-3 flex flex-wrap items-center gap-x-1 text-xs tabular-nums text-slate-500" data-testid="burndown-starting-balances">
               <span className="font-medium text-slate-400">Starting:</span>
               {runwayDetails.categories
                 .map(cat => ({ category: cat, balance: runwayDetails.withGrowth[0]?.balances[cat] ?? 0 }))
@@ -797,7 +797,7 @@ export default function ProjectionChart({ state, runwayDetails, safeWithdrawalRa
           {/* Withdrawal order */}
           {runwayDetails.withdrawalOrder.length > 0 && (
             <div className="mt-4" data-testid="burndown-withdrawal-order">
-              <p className="mb-2 text-xs font-medium text-slate-500 uppercase tracking-wide">Suggested Withdrawal Order</p>
+              <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-300">Suggested Withdrawal Order</p>
               <div className="flex flex-wrap gap-2">
                 {runwayDetails.withdrawalOrder.map((entry, i) => {
                   const treatmentLabel = entry.taxTreatment === "tax-free" ? "tax-free"

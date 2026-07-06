@@ -175,13 +175,13 @@ function DonutTooltip({ active, payload }: CustomTooltipProps) {
     <div className="rounded-lg border border-white/10 bg-slate-900/90 px-3 py-2 shadow-md backdrop-blur-sm">
       <p className="text-sm font-medium text-slate-200">{slice.name}</p>
       <p
-        className={`text-sm font-medium ${
+        className={`text-sm font-medium tabular-nums ${
           slice.type === "debt" ? "text-red-400" : "text-emerald-400"
         }`}
       >
         {fmt.full(slice.value)}
       </p>
-      <p className="text-xs text-slate-500">
+      <p className="text-xs tabular-nums text-slate-500">
         {slice.percentage.toFixed(1)}% of {slice.type === "debt" ? "total debts" : "total assets"}
       </p>
     </div>
@@ -438,10 +438,10 @@ export default function NetWorthDonutChart({
                             <span className="text-slate-300">{slice.name}</span>
                           </div>
                         </td>
-                        <td className={`py-1 px-2 text-right font-medium whitespace-nowrap ${slice.type === "debt" ? "text-red-400" : "text-slate-100"}`}>
+                        <td className={`py-1 px-2 text-right font-medium tabular-nums whitespace-nowrap ${slice.type === "debt" ? "text-red-400" : "text-slate-100"}`}>
                           {slice.type === "debt" ? "-" : ""}{formatFullCurrency(slice.value)}
                         </td>
-                        <td className="py-1 pl-2 text-right text-slate-500 whitespace-nowrap">
+                        <td className="py-1 pl-2 text-right tabular-nums text-slate-500 whitespace-nowrap">
                           {pct.toFixed(1)}%
                         </td>
                       </tr>
@@ -513,8 +513,8 @@ export default function NetWorthDonutChart({
                         <span className="text-slate-300">{item.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-slate-100 font-medium">{formatFullCurrency(item.value)}</span>
-                        <span className="text-slate-500 w-10 text-right">{item.pct.toFixed(1)}%</span>
+                        <span className="font-medium tabular-nums text-slate-100">{formatFullCurrency(item.value)}</span>
+                        <span className="w-10 text-right tabular-nums text-slate-500">{item.pct.toFixed(1)}%</span>
                       </div>
                     </div>
                   ))}

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 html {
-  font-size: 18px;
+  font-size: 16px;
   scroll-snap-type: y proximity;
 }
 
@@ -132,7 +132,11 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Slide-in animation for newly added items */

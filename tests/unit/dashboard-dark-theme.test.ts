@@ -44,6 +44,14 @@ describe("Task 128: Dashboard dark theme — SnapshotDashboard", () => {
     expect(dashboardSrc).not.toContain("text-stone-500");
   });
 
+  it("metric titles use small uppercase labels", () => {
+    expect(dashboardSrc).toContain("text-xs font-medium uppercase tracking-wider text-slate-400");
+  });
+
+  it("metric values are dominant and use tabular numerals", () => {
+    expect(dashboardSrc).toContain("text-3xl font-semibold tracking-tight tabular-nums md:text-4xl");
+  });
+
   it("income replacement progress bar track uses dark slate-700", () => {
     expect(dashboardSrc).toContain("bg-slate-700");
   });

@@ -103,13 +103,13 @@ export default function RetirementIncomeChart({
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mb-3">
         {sources.map((source) => (
-          <div key={source.label} className="flex items-center gap-1.5 text-xs text-slate-400">
+          <div key={source.label} className="flex items-center gap-1.5 text-xs tabular-nums text-slate-400">
             <div className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: source.color }} />
             <span>{source.label}: {fc(source.monthlyAmount)}/mo</span>
           </div>
         ))}
         {gap > 0 && (
-          <div className="flex items-center gap-1.5 text-xs text-amber-400/80">
+          <div className="flex items-center gap-1.5 text-xs tabular-nums text-amber-400/80">
             <div className="h-2.5 w-2.5 rounded-sm bg-amber-400/40" />
             <span>Gap: {fc(gap)}/mo</span>
           </div>
